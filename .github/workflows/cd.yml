@@ -28,8 +28,8 @@ jobs:
     needs: publish_release
     uses: Energinet-DataHub/.github/.github/workflows/dispatch-deployment-request.yml@3.0.2
     with:
-      CALLER_REPOSITORY_NAME: geh-metering-point
-      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-metering-point
+      CALLER_REPOSITORY_NAME: geh-actor-registry
+      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-actor-registry
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       ENVIRONMENT_REPOSITORY_PATH: ${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}

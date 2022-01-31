@@ -33,7 +33,7 @@ module "kvs_sql_ms_actor_register_database_name" {
 
   name          = "mssql-actor-register-database-name"
   value         = module.mssqldb_actor_register.name
-  key_vault_id  = module.kv_shared.id
+  key_vault_id  = data.azurerm_key_vault.kv_shared_resources.id
 
   tags          = azurerm_resource_group.this.tags
 }
