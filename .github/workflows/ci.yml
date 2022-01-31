@@ -23,22 +23,6 @@ on:
 jobs:
   ci_base:
     uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@3.0.2
-  
-  dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@3.0.2
-    with:
-      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.ActorRegistry.sln'
-      DOTNET_VERSION: '5.0'
-      USE_AZURITE: true
-      USE_AZURE_FUNCTIONS_CORE_TOOLS: true
-      USE_SQLLOCALDB_2019: true
-    secrets:
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID }}
-      AZURE_SPN_SECRET: ${{ secrets.AZURE_SPN_SECRET }}
-      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-      AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
 
   terraform_validate:
     uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@3.0.2
@@ -47,8 +31,8 @@ jobs:
       TERRAFORM_VERSION: '1.1.4'
 
   database_migration_ci:
-    needs: [ci_base, terraform_validate, dotnet_solution_ci]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@3.0.2
+    needs: [ci_base, terraform_validate]
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-webapi-artifact.yml@3.0.2
     with:
       CSPROJ_FILE_PATH: 'source/Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp/Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.csproj'
       DOTNET_VERSION: '5.0.404'
@@ -60,6 +44,6 @@ jobs:
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@3.0.2
     with:
-      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-metering-point
+      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-actor-registry
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
