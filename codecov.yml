@@ -1,0 +1,21 @@
+flags:
+  unit:
+    paths:
+  integration:
+    paths:
+      - source/Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp/
+     
+coverage:
+  status:
+    project:
+      default:
+        flags:
+          - unit
+          - integration
+      unit:
+        flags:
+          - unit
+      integration:
+        flags:
+          - integration
+
