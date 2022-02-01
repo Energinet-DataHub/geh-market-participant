@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-output actor_registry_connection_string {
+output ms_actor_registry_connection_string {
   description = "Connection string of the actor registry database created in the shared server"
-  value       = local.ACTOR_REGISTRY_CONNECTION_STRING
+  value       = local.MS_ACTOR_REGISTRY_CONNECTION_STRING
   sensitive   = true
 }
