@@ -16,7 +16,7 @@ data "azurerm_mssql_server" "mssqlsrv" {
   resource_group_name = var.shared_resources_resource_group_name
 }
 
-module "mssqldb_actor_register" {
+module "mssqldb_market_participant" {
   source                = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/mssql-database?ref=5.4.0"
 
   name                  = "registry"
@@ -28,11 +28,11 @@ module "mssqldb_actor_register" {
   tags                  = azurerm_resource_group.this.tags
 }
 
-module "kvs_sql_ms_actor_register_database_name" {
+module "kvs_sql_ms_market_participant_database_name" {
   source        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/key-vault-secret?ref=5.1.0"
 
-  name          = "mssql-actor-register-database-name"
-  value         = module.mssqldb_actor_register.name
+  name          = "mssql-market-participant-database-name"
+  value         = module.mssqldb_market_participant.name
   key_vault_id  = data.azurerm_key_vault.kv_shared_resources.id
 
   tags          = azurerm_resource_group.this.tags

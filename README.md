@@ -1,3 +1,3 @@
-# ActorRegistry
+# MarketParticipant
 
 TBD
