@@ -1,4 +1,4 @@
-ActorRegistry
+MarketParticipant
 ApplyDBMigrationsApp
 dk
 energinet

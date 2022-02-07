@@ -44,6 +44,6 @@ jobs:
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@3.0.2
     with:
-      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-actor-registry
+      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
