@@ -20,7 +20,7 @@ using DbUp.Engine;
 using DbUp.Engine.Transactions;
 using DbUp.ScriptProviders;
 
-namespace Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public class CustomScriptProvider : EmbeddedScriptProvider, IScriptProvider
     {
