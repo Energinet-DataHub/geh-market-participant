@@ -12,10 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record Organization(
-        Uuid Id,
-        GlobalLocationNumber Gln,
-        string Name);
+    public sealed record Uuid
+    {
+        private readonly Guid _id;
+
+        public Uuid(Guid id)
+        {
+            _id = id;
+        }
+
+        public Uuid(string id)
+        {
+            _id = Guid.Parse(id);
+        }
+
+        public Guid AsGuid()
+        {
+            return _id;
+        }
+
+        public override string ToString()
+        {
+            return _id.ToString();
+        }
+    }
 }
