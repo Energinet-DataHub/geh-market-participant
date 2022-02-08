@@ -50,9 +50,17 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
+    <EmbeddedResource Include="Scripts\T-001\Seed\202202081107 ChangeVoltActors.sql" />
+    <EmbeddedResource Include="Scripts\T-001\Seed\202202081140 AddBatmanActors.sql" />
+    <EmbeddedResource Include="Scripts\T-001\Seed\202202081157 AddBatmanGridAreas.sql" />
+    <EmbeddedResource Include="Scripts\T-001\Seed\202202081213 AddBatmanGridAreaLinks.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311104 RemoveAssignGridAreaToEnerginetActor.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Seed\202202081107 ChangeVoltActors.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Seed\202202081140 AddBatmanActors.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Seed\202202081157 AddBatmanGridAreas.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Seed\202202081213 AddBatmanGridAreaLinks.sql" />
     <None Remove="Scripts\B-002\Model\202201311000 Create GridAreaInfo Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202201311000 Create GridAreaInfo Table.sql" />
     <None Remove="Scripts\B-002\Model\202201311001 Create GridArea View.sql" />
