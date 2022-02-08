@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public static class EnvironmentFilter
     {
