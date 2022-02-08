@@ -13,16 +13,23 @@
 // limitations under the License.
 
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
-namespace Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp
 {
-    public static class ConnectionStringFactory
+    public static class Program
     {
-        private const string DefaultConnectionString = "Server=(local); Database=MeteringPointData; Trusted_connection=true";
-
-        public static string GetConnectionString(string[] args)
+        public static int Main(string[] args)
         {
-            return args.FirstOrDefault() ?? DefaultConnectionString;
+            var connectionString = ConnectionStringFactory.GetConnectionString(args);
+            var filter = EnvironmentFilter.GetFilter(args);
+            var isDryRun = args.Contains("dryRun");
+
+            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, filter, isDryRun);
+
+            var result = upgrader.PerformUpgrade();
+
+            return ResultReporter.ReportResult(result);
         }
     }
 }

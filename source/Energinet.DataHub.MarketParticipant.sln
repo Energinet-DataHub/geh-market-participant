@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31829.152
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MeteringPoints.ApplyDBMigrationsApp", "Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp\Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.csproj", "{9028F8A2-D06C-42AC-9085-EC51061D57AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp", "Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj", "{9028F8A2-D06C-42AC-9085-EC51061D57AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

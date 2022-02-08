@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     /// <summary>
     /// Compare sql script file names

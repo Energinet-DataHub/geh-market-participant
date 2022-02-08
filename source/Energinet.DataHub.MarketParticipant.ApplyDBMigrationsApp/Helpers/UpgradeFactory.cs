@@ -17,7 +17,7 @@ using System.Reflection;
 using DbUp;
 using DbUp.Engine;
 
-namespace Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.Helpers
+namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public static class UpgradeFactory
     {
