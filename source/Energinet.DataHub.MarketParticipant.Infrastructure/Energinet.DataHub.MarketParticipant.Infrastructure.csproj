@@ -4,10 +4,17 @@
         <TargetFramework>net5.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>10</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Domain\Energinet.DataHub.MarketParticipant.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Ardalis.GuardClauses" Version="4.0.0" />
+      <PackageReference Include="Dapper" Version="2.0.123" />
+      <PackageReference Include="Dapper.SimpleCRUD" Version="2.3.0" />
     </ItemGroup>
 
 </Project>
