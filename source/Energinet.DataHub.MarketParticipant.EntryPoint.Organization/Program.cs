@@ -1,19 +1,27 @@
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Azure.Functions.Worker.Configuration;
+using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 {
-    public class Program
+    public static class Program
     {
-        public static void Main()
+        public static async Task Main()
         {
-            var host = new HostBuilder()
-                .ConfigureFunctionsWorkerDefaults()
-                .Build();
+            var startup = new Startup();
 
-            host.Run();
+            await using (startup.ConfigureAwait(false))
+            {
+                var host = new HostBuilder()
+                    .ConfigureFunctionsWorkerDefaults(options => options.UseMiddleware<SimpleInjectorScopedRequest>())
+                    .ConfigureServices(startup.ConfigureServices)
+                    .Build()
+                    .UseSimpleInjector(startup.Container);
+
+                await host.RunAsync().ConfigureAwait(false);
+            }
         }
     }
 }
