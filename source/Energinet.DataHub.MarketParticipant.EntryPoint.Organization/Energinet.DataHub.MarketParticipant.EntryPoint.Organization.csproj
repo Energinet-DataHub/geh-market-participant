@@ -22,4 +22,7 @@
             <CopyToPublishDirectory>Never</CopyToPublishDirectory>
         </None>
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Infrastructure\Energinet.DataHub.MarketParticipant.Infrastructure.csproj" />
+    </ItemGroup>
 </Project>
