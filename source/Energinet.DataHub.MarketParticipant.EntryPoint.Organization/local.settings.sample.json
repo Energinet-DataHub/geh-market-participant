@@ -1,0 +1,8 @@
+{
+    "IsEncrypted": false,
+    "Values": {
+        "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+        "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+        "SQL_MP_DB_CONNECTION_STRING": "INSERT CONNECTION STRING HERE"
+    }
+}
