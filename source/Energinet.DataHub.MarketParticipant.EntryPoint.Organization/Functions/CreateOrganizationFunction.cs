@@ -57,9 +57,16 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
                 return response;
             }
-            catch (Exception e)
+            catch (FluentValidation.ValidationException e)
             {
-                _logger.LogError("Error in CreateOrganization: {message}", e.Message);
+                _logger.LogError("ValidationException in CreateOrganization: {message}", e.Message);
+                var response = request.CreateResponse(HttpStatusCode.BadRequest);
+                await response.WriteStringAsync(e.Message);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in CreateOrganization: {message}", ex.Message);
                 return request.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
