@@ -32,3 +32,9 @@ runs:
       with:
         name: databasemigration
         path: ${{ inputs.RELEASE_FOLDER_PATH }}/migration/databasemigration
+        
+    - name: Publish Organization function to release folder
+      uses: actions/download-artifact@v2
+      with:
+        name: organization
+        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/organization
