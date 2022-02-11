@@ -7,8 +7,9 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
+    [Collection("IntegrationTest")]
     [IntegrationTest]
-    public sealed class OrganziationRepositoryTests
+    public sealed class OrganizationRepositoryTests
     {
 
         [Fact]
@@ -26,8 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             await orgRepository.SaveAsync(testOrg);
-
-            Assert.True(true);
+            var (uuid, globalLocationNumber, name) = await orgRepository.GetFromIdAsync(testOrg.Id);
+            Assert.Equal(testOrg.Id.ToString(), uuid.ToString());
+            Assert.Equal(testOrg.Gln.Value, globalLocationNumber.Value);
+            Assert.Equal(testOrg.Name, name);
         }
     }
 

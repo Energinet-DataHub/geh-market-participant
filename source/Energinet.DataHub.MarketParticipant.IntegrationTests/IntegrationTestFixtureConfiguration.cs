@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using Xunit;
+
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 {
-    public sealed record Organization(
-        Uuid Id,
-        GlobalLocationNumber Gln,
-        string Name)
+    [CollectionDefinition("IntegrationTest")]
+    public sealed class IntegrationTestFixtureConfiguration :
+        ICollectionFixture<DatabaseFixture>
     {
-        public Organization() : this(default, default, default) { }
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
     }
 }

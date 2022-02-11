@@ -23,6 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Mappers
         public override void SetValue(IDbDataParameter parameter, Uuid value)
         {
             parameter.Value = value.AsGuid();
+            parameter.DbType = DbType.Guid;
         }
 
         public override Uuid Parse(object value)

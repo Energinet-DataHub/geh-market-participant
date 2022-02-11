@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -28,5 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// </summary>
         /// <param name="organization">The organization to save.</param>
         Task SaveAsync(Organization organization);
+
+        /// <summary>
+        /// Get the organization with the specified Id
+        /// </summary>
+        /// <param name="id">The Id of the organization to get.</param>
+        Task<Organization> GetFromIdAsync(Uuid id);
     }
 }

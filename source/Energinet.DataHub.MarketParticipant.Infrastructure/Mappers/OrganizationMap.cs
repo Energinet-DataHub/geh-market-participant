@@ -18,12 +18,12 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Mappers
 {
-    public class OrganizationMap: ClassMapper<Organization>
+    public sealed class OrganizationMap: ClassMapper<Organization>
     {
         public OrganizationMap()
         {
-           base.Table("OrganizationInfo");
-           base.AutoMap();
+           Table("OrganizationInfo");
+           AutoMap();
         }
     }
 }

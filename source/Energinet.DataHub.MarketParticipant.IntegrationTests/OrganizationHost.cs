@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
         private static IConfigurationRoot BuildConfig()
         {
-            Environment.SetEnvironmentVariable("SQL_MP_DB_CONNECTION_STRING", "UseDevelopmentStorage=true");
+            Environment.SetEnvironmentVariable("SQL_MP_DB_CONNECTION_STRING", "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Database=marketparticipant;Connection Timeout=3");
 
             return new ConfigurationBuilder().AddEnvironmentVariables().Build();
         }

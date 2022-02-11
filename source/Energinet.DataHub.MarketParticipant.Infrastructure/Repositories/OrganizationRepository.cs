@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Dapper;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using DapperExtensions;
@@ -34,6 +36,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
             await using var connection = new SqlConnection(_actorDbConfig.ConnectionString);
             await connection.OpenAsync().ConfigureAwait(false);
             await connection.InsertAsync(organization).ConfigureAwait(false);
+        }
+
+        public async Task<Organization> GetFromIdAsync(Uuid id)
+        {
+            await using var connection = new SqlConnection(_actorDbConfig.ConnectionString);
+            await connection.OpenAsync().ConfigureAwait(false);
+            return await connection.QuerySingleAsync<Organization>("SELECT * FROM OrganizationInfo WHERE Id = @id",
+                new {Id = id } ).ConfigureAwait(false);
         }
     }
 }

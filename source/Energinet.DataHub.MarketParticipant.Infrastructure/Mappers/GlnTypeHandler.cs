@@ -22,7 +22,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Mappers
     {
         public override void SetValue(IDbDataParameter parameter, GlobalLocationNumber value)
         {
-            parameter.Value = value.ToString();
+            parameter.Value = value.Value;
+            parameter.DbType = DbType.String;
         }
 
         public override GlobalLocationNumber Parse(object value)
