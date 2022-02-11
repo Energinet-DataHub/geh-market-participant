@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using Dapper;
+using DapperExtensions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,19 +29,30 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
     {
         protected override void Configure(Container container)
         {
-            RegisterActor(container);
+            RegisterActorConfig(container);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Singleton);
+            SetupDapper();
         }
 
-        private static void RegisterActor(Container container)
+        private static void RegisterActorConfig(Container container)
         {
             container.RegisterSingleton(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
                 var connectionString = configuration.GetValue<string>("SQL_MP_DB_CONNECTION_STRING") ??
                                        throw new InvalidOperationException(
-                                           "Market Participant Connection string not found");
+                                           "Market Participant datababase Connection string not found");
                 return new ActorDbConfig(connectionString);
+            });
+        }
+
+        private static void SetupDapper()
+        {
+            SqlMapper.AddTypeHandler(new GlnTypeHandler());
+            SqlMapper.AddTypeHandler(new UUIDTypeHandler());
+            DapperAsyncExtensions.SetMappingAssemblies(new[]
+            {
+                typeof (OrganizationMap).Assembly
             });
         }
     }

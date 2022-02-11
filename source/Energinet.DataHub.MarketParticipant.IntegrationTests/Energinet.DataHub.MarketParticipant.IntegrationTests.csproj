@@ -19,18 +19,15 @@ limitations under the License.
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <LangVersion>9.0</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Domain\Energinet.DataHub.MarketParticipant.Domain.csproj" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+      <PackageReference Include="xunit.categories" Version="2.0.6" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Ardalis.GuardClauses" Version="4.0.0" />
-      <PackageReference Include="Dapper" Version="2.0.123" />
-      <PackageReference Include="DapperExtensions" Version="1.7.0" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
+      <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj" />
     </ItemGroup>
 
 </Project>

@@ -16,7 +16,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Dapper;
+using DapperExtensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
 {
