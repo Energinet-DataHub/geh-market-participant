@@ -30,7 +30,7 @@ module "func_entrypoint_marketparticipant" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE       = true
     FUNCTIONS_WORKER_RUNTIME                  = "dotnet-isolated"
     # Endregion
-    SQL_MP_DB_CONNECTION_STRING         = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING.value
+    SQL_MP_DB_CONNECTION_STRING        		  = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
   }
   
   tags                                      = azurerm_resource_group.this.tags
