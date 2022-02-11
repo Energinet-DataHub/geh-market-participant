@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Energinet.DataHub.MarketParticipant.Integration.Model", "Energinet.DataHub.MarketParticipant.Integration.Model", "{08B5255F-E2B9-4D6A-8F45-A682D91D846B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source", "source", "{3821FDDA-A95E-4AD8-B6F3-48D316368056}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MessageHub.Integration.Model", "Energinet.DataHub.MarketParticipant.Integration.Model\source\Energinet.DataHub.MarketParticipant.Integration.Model\Energinet.DataHub.MessageHub.Integration.Model.csproj", "{7F32065C-9A5D-476F-81A0-15D76108E391}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Debug|x64.Build.0 = Debug|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Debug|x86.Build.0 = Debug|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Release|x64.ActiveCfg = Release|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Release|x64.Build.0 = Release|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F32065C-9A5D-476F-81A0-15D76108E391}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3821FDDA-A95E-4AD8-B6F3-48D316368056} = {08B5255F-E2B9-4D6A-8F45-A682D91D846B}
+		{7F32065C-9A5D-476F-81A0-15D76108E391} = {3821FDDA-A95E-4AD8-B6F3-48D316368056}
+	EndGlobalSection
+EndGlobal
