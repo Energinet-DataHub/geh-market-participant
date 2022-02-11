@@ -60,7 +60,8 @@ jobs:
 
   create_prerelease:
     needs: [
-      database_migration_ci
+      database_migration_ci,
+      organization_func_ci
     ]
     uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@3.0.2
     with:
