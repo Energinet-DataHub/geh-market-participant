@@ -20,7 +20,7 @@ using Dapper;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
 {
-    public class OrganizationRepository : IOrganizationRepository
+    public sealed class OrganizationRepository : IOrganizationRepository
     {
         private readonly ActorDbConfig _actorDbConfig;
 

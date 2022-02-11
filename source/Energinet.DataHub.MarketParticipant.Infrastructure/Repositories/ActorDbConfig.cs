@@ -16,7 +16,7 @@ using Ardalis.GuardClauses;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
 {
-    public class ActorDbConfig
+    public sealed class ActorDbConfig
     {
         public ActorDbConfig(string connectionString)
         {

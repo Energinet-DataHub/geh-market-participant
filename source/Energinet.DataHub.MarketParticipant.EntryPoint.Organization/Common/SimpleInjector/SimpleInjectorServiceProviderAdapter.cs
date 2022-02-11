@@ -18,7 +18,7 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector
 {
-    public class SimpleInjectorServiceProviderAdapter : IServiceProvider
+    public sealed class SimpleInjectorServiceProviderAdapter : IServiceProvider
     {
         private readonly Container _container;
 

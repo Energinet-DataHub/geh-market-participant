@@ -19,7 +19,7 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector
 {
-    public class SimpleInjectorActivator : IFunctionActivator
+    public sealed class SimpleInjectorActivator : IFunctionActivator
     {
         private readonly Container _container;
 

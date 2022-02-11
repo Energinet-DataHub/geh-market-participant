@@ -38,9 +38,6 @@ namespace Energinet.DataHub.MarketParticipant.Utilities
                 }
 
                 var value = Parse(valueAsString, property.PropertyType);
-
-
-
                 property.SetValue(obj, value, null);
             }
 
