@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +31,16 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
         {
             RegisterActor(container);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Singleton);
+
+            // Services
+            Container.AddApplicationServices();
+
+            // Functions
+            Container.Register<CreateOrganizationFunction>();
+
+            // Add MediatR
+            Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
+
         }
 
         private static void RegisterActor(Container container)
