@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             _startup = new Startup();
         }
 
-        public static async Task<OrganizationHost> InitializeAsync()
+        public static Task<OrganizationHost> InitializeAsync()
         {
             var host = new OrganizationHost();
 
@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             serviceCollection.BuildServiceProvider().UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
             host._startup.Container.Options.AllowOverridingRegistrations = true;
 
-            return host;
+            return Task.FromResult(host);
         }
 
         public Scope BeginScope()

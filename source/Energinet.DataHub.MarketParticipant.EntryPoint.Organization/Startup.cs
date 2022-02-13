@@ -48,8 +48,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
         private static void SetupDapper()
         {
-            SqlMapper.AddTypeHandler(new GlnTypeHandler());
-            SqlMapper.AddTypeHandler(new UUIDTypeHandler());
             DapperAsyncExtensions.SetMappingAssemblies(new[]
             {
                 typeof (OrganizationMap).Assembly

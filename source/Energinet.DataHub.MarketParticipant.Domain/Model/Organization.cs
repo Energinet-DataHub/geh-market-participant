@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record Organization(
@@ -19,6 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         GlobalLocationNumber Gln,
         string Name)
     {
-        public Organization() : this(default, default, default) { }
+        public Organization( GlobalLocationNumber Gln, string Name) : this(new Uuid(Guid.Empty), Gln, Name) { }
     }
 }

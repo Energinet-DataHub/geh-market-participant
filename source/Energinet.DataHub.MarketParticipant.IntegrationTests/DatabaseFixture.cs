@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await ExecuteDbCommandAsync(connection, $"CREATE DATABASE [{MarketParticipantDbName}]");
             await ExecuteDbCommandAsync(connection, $"USE [{MarketParticipantDbName}]");
 
-            InitDbSchema();
+            ApplyInitialMigrations();
         }
 
         public async Task DisposeAsync()
@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await ExecuteDbCommandAsync(connection, $"DROP DATABASE [{MarketParticipantDbName}]");
         }
 
-        private void InitDbSchema()
+        private void ApplyInitialMigrations()
         {
             var upgrader = UpgradeFactory.GetUpgradeEngine(_connectionString, GetFilter(), false);
            upgrader.PerformUpgrade();

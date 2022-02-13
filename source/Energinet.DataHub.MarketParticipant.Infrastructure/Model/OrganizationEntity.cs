@@ -1,4 +1,4 @@
-﻿// // Copyright 2020 Energinet DataHub A/S
+// // Copyright 2020 Energinet DataHub A/S
 // //
 // // Licensed under the Apache License, Version 2.0 (the "License2");
 // // you may not use this file except in compliance with the License.
@@ -12,23 +12,18 @@
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
 
-using System.Data;
-using Dapper;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Mappers
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model
 {
-    public sealed class UUIDTypeHandler : SqlMapper.TypeHandler<Uuid>
+    [Table("OrganizationInfo")]
+    public class OrganizationEntity
     {
-        public override void SetValue(IDbDataParameter parameter, Uuid value)
-        {
-            parameter.Value = value.AsGuid();
-            parameter.DbType = DbType.Guid;
-        }
-
-        public override Uuid Parse(object value)
-        {
-            return new Uuid(value.ToString() ?? string.Empty);
-        }
+        [Key]
+        public Guid Id { get; set; }
+        public string Gln { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -12,3 +12,6 @@ CREATE TABLE [dbo].[OrganizationInfo](
             )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+-- ALTER TABLE [dbo].[OrganizationInfo] ADD  CONSTRAINT [DF_OrganizationInfo_Id]  DEFAULT (newid()) FOR [Id]
+-- GO

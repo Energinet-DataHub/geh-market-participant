@@ -14,11 +14,11 @@
 
 
 using DapperExtensions.Mapper;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Mappers
 {
-    public sealed class OrganizationMap: ClassMapper<Organization>
+    public sealed class OrganizationMap: ClassMapper<OrganizationEntity>
     {
         public OrganizationMap()
         {

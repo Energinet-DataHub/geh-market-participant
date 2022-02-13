@@ -23,17 +23,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     /// </summary>
     public interface IOrganizationRepository
     {
+        /// <summary>
+        /// Adds a new organization.
+        /// </summary>
+        /// <param name="gln">The Gln number for the organization</param>
+        /// <param name="name">The Name for the organization</param>
+        /// <returns>The id of the added organization</returns>
+        Task<Uuid> AddAsync(Organization organization);
 
         /// <summary>
-        /// Saves the organization.
+        /// Updates the organization.
         /// </summary>
         /// <param name="organization">The organization to save.</param>
-        Task SaveAsync(Organization organization);
+        Task UpdateAsync(Organization organization);
 
         /// <summary>
-        /// Get the organization with the specified Id
+        /// Gets an organization with the specified Id
         /// </summary>
         /// <param name="id">The Id of the organization to get.</param>
-        Task<Organization> GetFromIdAsync(Uuid id);
+        Task<Organization> GetAsync(Uuid id);
     }
 }

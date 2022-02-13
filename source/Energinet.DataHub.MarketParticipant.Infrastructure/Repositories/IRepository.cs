@@ -12,23 +12,16 @@
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
 
-using System.Data;
-using Dapper;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Mappers
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
 {
-    public sealed class GlnTypeHandler : SqlMapper.TypeHandler<GlobalLocationNumber>
+    public interface IRepository<T>
     {
-        public override void SetValue(IDbDataParameter parameter, GlobalLocationNumber value)
-        {
-            parameter.Value = value.Value;
-            parameter.DbType = DbType.String;
-        }
-
-        public override GlobalLocationNumber Parse(object value)
-        {
-            return new GlobalLocationNumber(value.ToString() ?? string.Empty);
-        }
+        //Task<List<T>> GetAllAsync();
+        Task<T> GetByIdAsync(int id);
+        Task<int> CreateAsync(T entity);
+        //Task<int> UpdateAsync(T entity);
+        //Task<int> DeleteAsync(T entity);
     }
 }
