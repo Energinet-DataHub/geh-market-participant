@@ -16,16 +16,16 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record Uuid
+    public sealed record OrganizationId : IComparable<OrganizationId>
     {
         private readonly Guid _id;
 
-        public Uuid(Guid id)
+        public OrganizationId(Guid id)
         {
             _id = id;
         }
 
-        public Uuid(string id)
+        public OrganizationId(string id)
         {
             _id = Guid.Parse(id);
         }
@@ -39,5 +39,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         {
             return _id.ToString();
         }
+
+        public int CompareTo(OrganizationId? other)
+        {
+            return other == null
+                ? 1
+                : AsGuid().CompareTo(other.AsGuid());
+        }
+
+        public static implicit operator OrganizationId(Guid g) => new(g);
     }
 }

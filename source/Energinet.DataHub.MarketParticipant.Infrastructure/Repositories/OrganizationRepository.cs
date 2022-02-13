@@ -32,12 +32,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
             _actorDbConfig = actorDbConfig;
         }
 
-        public async Task<Uuid> AddAsync(Organization organization)
+        public async Task<OrganizationId> AddAsync(Organization organization)
         {
             await using var connection = new SqlConnection(_actorDbConfig.ConnectionString);
             await connection.OpenAsync().ConfigureAwait(false);
             var orgToAdd = new OrganizationEntity {Gln = organization.Gln.Value, Id = organization.Id.AsGuid(), Name = organization.Name};
-            return new Uuid(await connection.InsertAsync(orgToAdd).ConfigureAwait(false));
+            return new OrganizationId(await connection.InsertAsync(orgToAdd).ConfigureAwait(false));
         }
 
         public async Task UpdateAsync(Organization organization)
@@ -47,12 +47,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
             await connection.UpdateAsync(organization).ConfigureAwait(false);
         }
 
-        public async Task<Organization> GetAsync(Uuid id)
+        public async Task<Organization> GetAsync(OrganizationId id)
         {
             await using var connection = new SqlConnection(_actorDbConfig.ConnectionString);
             await connection.OpenAsync().ConfigureAwait(false);
             var orgEnt = await connection.GetAsync<OrganizationEntity>(id.AsGuid());
-            return new Organization(new Uuid(orgEnt.Id), new GlobalLocationNumber(orgEnt.Gln), orgEnt.Name);
+            return new Organization(new OrganizationId(orgEnt.Id), new GlobalLocationNumber(orgEnt.Gln), orgEnt.Name);
             // return await connection.QuerySingleAsync<Organization>("SELECT * FROM OrganizationInfo WHERE Id = @id",
             //     new {Id = id } ).ConfigureAwait(false);
         }

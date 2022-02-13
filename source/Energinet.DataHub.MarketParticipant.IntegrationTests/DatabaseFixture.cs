@@ -16,6 +16,8 @@ using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests
@@ -26,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         private const string BaseConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Connection Timeout=3";
 
         private string _connectionString;
+        private MarketParticipantDbContext _context;
 
         public DatabaseFixture()
         {
@@ -35,6 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             };
             _connectionString = builder.ToString();
         }
+
         public async Task InitializeAsync()
         {
             await using var connection = new SqlConnection(BaseConnectionString);
@@ -44,6 +48,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await ExecuteDbCommandAsync(connection, $"USE [{MarketParticipantDbName}]");
 
             ApplyInitialMigrations();
+
+            var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
+                .UseSqlServer(_connectionString);
+
+            _context = new MarketParticipantDbContext(optionsBuilder.Options);
         }
 
         public async Task DisposeAsync()

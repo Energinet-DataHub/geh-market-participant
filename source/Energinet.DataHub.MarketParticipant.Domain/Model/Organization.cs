@@ -17,10 +17,10 @@ using System;
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record Organization(
-        Uuid Id,
+        OrganizationId Id,
         GlobalLocationNumber Gln,
         string Name)
     {
-        public Organization( GlobalLocationNumber Gln, string Name) : this(new Uuid(Guid.Empty), Gln, Name) { }
+        public Organization( GlobalLocationNumber Gln, string Name) : this(new OrganizationId(Guid.Empty), Gln, Name) { }
     }
 }

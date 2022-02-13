@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <param name="gln">The Gln number for the organization</param>
         /// <param name="name">The Name for the organization</param>
         /// <returns>The id of the added organization</returns>
-        Task<Uuid> AddAsync(Organization organization);
+        Task<OrganizationId> AddAsync(Organization organization);
 
         /// <summary>
         /// Updates the organization.
@@ -41,6 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// Gets an organization with the specified Id
         /// </summary>
         /// <param name="id">The Id of the organization to get.</param>
-        Task<Organization> GetAsync(Uuid id);
+        Task<Organization> GetAsync(OrganizationId id);
     }
 }
