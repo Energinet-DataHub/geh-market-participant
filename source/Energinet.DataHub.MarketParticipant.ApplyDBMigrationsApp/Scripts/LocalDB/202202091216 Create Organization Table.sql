@@ -13,5 +13,5 @@ CREATE TABLE [dbo].[OrganizationInfo](
 ) ON [PRIMARY]
 GO
 
--- ALTER TABLE [dbo].[OrganizationInfo] ADD  CONSTRAINT [DF_OrganizationInfo_Id]  DEFAULT (newid()) FOR [Id]
--- GO
+ALTER TABLE [dbo].[OrganizationInfo] ADD  CONSTRAINT [DF_OrganizationInfo_Id]  DEFAULT (newid()) FOR [Id]
+GO
