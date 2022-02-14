@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             await _organizationRepository.SaveAsync(organisationToSave).ConfigureAwait(false);
 
-            return new Unit();
+            return Unit.Value;
         }
     }
 }
