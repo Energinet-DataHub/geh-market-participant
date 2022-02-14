@@ -24,8 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         {
             RuleFor(command => command.Name)
                 .NotEmpty()
-                .Length(1, 50)
-                .SetValidator(new OrganizationNameRule<CreateOrganizationCommand>());
+                .Length(1, 50);
 
             RuleFor(command => command.Gln)
                 .NotEmpty()

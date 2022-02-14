@@ -23,38 +23,26 @@ using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganisationResponse>
+    public class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, Unit>
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly ILogger<CreateOrganizationHandler> _logger;
 
-        public CreateOrganizationHandler(
-            IOrganizationRepository organizationRepository,
-            ILogger<CreateOrganizationHandler> logger)
+        public CreateOrganizationHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
-            _logger = logger;
         }
-        public async Task<CreateOrganisationResponse> Handle(
+        public async Task<Unit> Handle(
             CreateOrganizationCommand request,
             CancellationToken cancellationToken)
         {
-            try
-            {
-                var organisationToSave = new Organization(
-                    new Uuid(Guid.NewGuid()),
-                    new GlobalLocationNumber(request.Gln),
-                    request.Name);
+            var organisationToSave = new Organization(
+                new Uuid(Guid.NewGuid()),
+                new GlobalLocationNumber(request.Gln),
+                request.Name);
 
-                await _organizationRepository.SaveAsync(organisationToSave).ConfigureAwait(false);
+            await _organizationRepository.SaveAsync(organisationToSave).ConfigureAwait(false);
 
-                return new CreateOrganisationResponse(true, string.Empty);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Error in CreateOrganizationHandler: {message}", e.Message);
-                return new CreateOrganisationResponse(false, e.Message);
-            }
+            return new Unit();
         }
     }
 }

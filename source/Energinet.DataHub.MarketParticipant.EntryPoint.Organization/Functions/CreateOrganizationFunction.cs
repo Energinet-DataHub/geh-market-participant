@@ -47,13 +47,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             {
                 var createOrganizationCommand = await CreateOrganizationCommandFromRequest(request);
 
-                var (success, errorMessage) = await _mediator.Send(createOrganizationCommand).ConfigureAwait(false);
+                if (createOrganizationCommand is null)
+                {
+                    throw new FluentValidation.ValidationException("Invalid arguments");
+                }
 
-                var response = success
-                    ? request.CreateResponse(HttpStatusCode.OK)
-                    : request.CreateResponse(HttpStatusCode.BadRequest);
+                await _mediator.Send(createOrganizationCommand).ConfigureAwait(false);
 
-                if (!string.IsNullOrWhiteSpace(errorMessage)) await response.WriteStringAsync(errorMessage);
+                var response = request.CreateResponse(HttpStatusCode.OK);
 
                 return response;
             }
