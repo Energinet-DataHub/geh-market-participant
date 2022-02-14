@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Xunit;
 using Xunit.Categories;
 
@@ -25,6 +26,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     [IntegrationTest]
     public sealed class OrganizationRepositoryTests
     {
+        private readonly DatabaseFixture _fixture;
+
+        public OrganizationRepositoryTests(DatabaseFixture fixture)
+        {
+            _fixture = fixture;
+        }
 
         [Fact]
         public async Task SaveAsync_OneOrganization_CanReadBack()
@@ -32,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
-            var orgRepository = scope.GetInstance<IOrganizationRepository>();
+            var orgRepository = new OrganizationRepository(_fixture.MarketParticipantDbContext); //scope.GetInstance<IOrganizationRepository>();
             var testOrg = new Organization(
                 new GlobalLocationNumber("123"),
                 "Test"

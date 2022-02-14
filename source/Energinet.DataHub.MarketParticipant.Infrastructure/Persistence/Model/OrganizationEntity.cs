@@ -13,15 +13,11 @@
 // // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    [Table("OrganizationInfo")]
     public class OrganizationEntity
     {
-        [Key]
         public Guid Id { get; set; }
         public string Gln { get; set; }
         public string Name { get; set; }

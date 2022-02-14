@@ -15,8 +15,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         {
         }
 
-        public DbSet<Organization> Organizations { get; private set; }
+        public DbSet<OrganizationEntity> Organizations { get; private set; }
 
         public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
 

@@ -13,26 +13,22 @@
 // // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public class OrganizationEntityConfiguration : IEntityTypeConfiguration<Organization>
+    public class OrganizationEntityConfiguration : IEntityTypeConfiguration<OrganizationEntity>
     {
-        public void Configure(EntityTypeBuilder<Organization> builder)
+        public void Configure(EntityTypeBuilder<OrganizationEntity> builder)
         {
             builder.ToTable("OrganizationInfo");
             builder.HasKey(organization => organization.Id);
             builder.Property(p => p.Id)
-                .HasConversion
-                (uuid => uuid.AsGuid(),
-                    guid => new OrganizationId(guid));
+                .ValueGeneratedOnAdd();
 
-            builder.Property(p => p.Gln)
-                .HasConversion(
-                    number => number.Value,
-                    s => new GlobalLocationNumber(s));
         }
     }
 }

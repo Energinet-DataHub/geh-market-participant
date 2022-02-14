@@ -14,8 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -49,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
                 x.AddLogging();
             });
             var config = services.BuildServiceProvider().GetService<IConfiguration>()!;
+            AddMarketParticipantContext(services, config);
             Container.RegisterSingleton(() => config);
 
             Configure(Container);
@@ -71,6 +75,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
                 ServiceLifetime.Singleton);
 
             services.Replace(descriptor);
+        }
+
+        private static void AddMarketParticipantContext(IServiceCollection services, IConfiguration config)
+        {
+            services.AddDbContext<MarketParticipantDbContext>(
+                options => options.UseSqlServer(config.GetValue<string>("SQL_MP_DB_CONNECTION_STRING"))
+            );
         }
     }
 }

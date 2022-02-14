@@ -1,4 +1,4 @@
-// // Copyright 2020 Energinet DataHub A/S
+﻿// // Copyright 2020 Energinet DataHub A/S
 // //
 // // Licensed under the Apache License, Version 2.0 (the "License2");
 // // you may not use this file except in compliance with the License.
@@ -12,20 +12,29 @@
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
 
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
-    public interface IMarketParticipantDbContext
+    internal sealed class OrganizationMapper
     {
-        DbSet<OrganizationEntity> Organizations { get; }
+        public static OrganizationEntity MapToEntity(Organization from)
+        {
+            return new OrganizationEntity()
+            {
+                Gln = from.Gln.Value,
+                Id = from.Id.Value,
+                Name = from.Name
+            };
+        }
 
-        /// <summary>
-        /// Saves changes to the database.
-        /// </summary>
-        Task<int> SaveChangesAsync();
+        public static Organization MapFromEntity(OrganizationEntity from)
+        {
+            return new Organization(
+                new OrganizationId(from.Id),
+                new GlobalLocationNumber(from.Gln),
+                from.Name);
+        }
     }
 }

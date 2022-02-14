@@ -28,7 +28,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         private const string BaseConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Connection Timeout=3";
 
         private string _connectionString;
-        private MarketParticipantDbContext _context;
+
+        public MarketParticipantDbContext MarketParticipantDbContext { get; private set; }
 
         public DatabaseFixture()
         {
@@ -52,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
                 .UseSqlServer(_connectionString);
 
-            _context = new MarketParticipantDbContext(optionsBuilder.Options);
+            MarketParticipantDbContext = new MarketParticipantDbContext(optionsBuilder.Options);
         }
 
         public async Task DisposeAsync()
