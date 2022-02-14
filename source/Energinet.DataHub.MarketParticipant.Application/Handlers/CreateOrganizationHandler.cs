@@ -19,7 +19,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
@@ -36,11 +35,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             CancellationToken cancellationToken)
         {
             var organisationToSave = new Organization(
-                new Uuid(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 new GlobalLocationNumber(request.Gln),
                 request.Name);
 
-            await _organizationRepository.SaveAsync(organisationToSave).ConfigureAwait(false);
+            await _organizationRepository.AddAsync(organisationToSave).ConfigureAwait(false);
 
             return Unit.Value;
         }
