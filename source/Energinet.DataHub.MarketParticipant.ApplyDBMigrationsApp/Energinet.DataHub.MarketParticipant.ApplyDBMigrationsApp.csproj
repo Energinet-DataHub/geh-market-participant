@@ -19,6 +19,9 @@ limitations under the License.
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -127,6 +130,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311102 Seed GridAreaInfo Table.sql" />
     <None Remove="Scripts\U-001\Seed\202201311103 Seed GridAreaLinkInfo Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311103 Seed GridAreaLinkInfo Table.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

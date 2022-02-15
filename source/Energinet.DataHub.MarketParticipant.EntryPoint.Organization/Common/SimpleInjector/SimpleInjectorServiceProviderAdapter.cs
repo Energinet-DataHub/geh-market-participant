@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Utilities;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector
@@ -30,7 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.Sim
         public object GetService(Type serviceType)
         {
             Guard.ThrowIfNull(serviceType, nameof(serviceType));
-
             return _container.GetInstance(serviceType);
         }
     }

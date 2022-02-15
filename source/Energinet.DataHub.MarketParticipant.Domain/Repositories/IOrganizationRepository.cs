@@ -22,7 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     /// </summary>
     public interface IOrganizationRepository
     {
-
         /// <summary>
         /// Saves the organization.
         /// </summary>
