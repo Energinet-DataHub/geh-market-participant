@@ -36,8 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.HasDefaultSchema(DatabaseSchemaNames.CommandModel);
-
             if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
 
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());

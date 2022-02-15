@@ -12,11 +12,9 @@
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {

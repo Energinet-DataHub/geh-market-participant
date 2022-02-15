@@ -32,9 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         public async Task<OrganizationId> AddAsync(Organization organization)
         {
             Guard.Against.Null(organization, nameof(organization));
-            await _marketParticipantDbContext.Organizations.AddAsync(OrganizationMapper.MapToEntity(organization)).ConfigureAwait(false);
+            var orgEntity = OrganizationMapper.MapToEntity(organization);
+            await _marketParticipantDbContext.Organizations.AddAsync(orgEntity).ConfigureAwait(false);
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return organization.Id;
+            return new OrganizationId(orgEntity.Id);
         }
 
         public async Task UpdateAsync(Organization organization)

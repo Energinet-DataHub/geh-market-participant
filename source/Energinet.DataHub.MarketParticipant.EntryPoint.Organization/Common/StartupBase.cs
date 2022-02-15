@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Azure.Functions.Worker;
@@ -52,8 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
                 x.AddLogging();
             });
             var config = services.BuildServiceProvider().GetService<IConfiguration>()!;
-            AddMarketParticipantContext(services, config);
             Container.RegisterSingleton(() => config);
+            AddMarketParticipantContext(services, config);
 
             Configure(Container);
         }

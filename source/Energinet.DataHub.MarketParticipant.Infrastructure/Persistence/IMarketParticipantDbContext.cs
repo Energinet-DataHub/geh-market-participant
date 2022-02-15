@@ -13,7 +13,6 @@
 // // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
