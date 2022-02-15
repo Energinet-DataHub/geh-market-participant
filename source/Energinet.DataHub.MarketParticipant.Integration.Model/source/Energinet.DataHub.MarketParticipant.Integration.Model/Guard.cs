@@ -12,6 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.Integration.Model.Tests")]
+namespace Energinet.DataHub.MarketParticipant.Integration.Model
+{
+    internal static class Guard
+    {
+        public static void ThrowIfNull(object element, string name)
+        {
+            if (element is null)
+            {
+                throw new System.ArgumentNullException(name);
+            }
+        }
+    }
+}

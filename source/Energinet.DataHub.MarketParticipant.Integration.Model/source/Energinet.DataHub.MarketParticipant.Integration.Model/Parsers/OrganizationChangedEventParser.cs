@@ -39,5 +39,25 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationChangedEvent)}", ex);
             }
         }
+
+        public byte[] Parse(OrganizationChangedEvent changedEvent)
+        {
+            try
+            {
+                Guard.ThrowIfNull(changedEvent, nameof(changedEvent));
+
+                return new OrganizationChangedEventContract
+                {
+                    Id = changedEvent.Id.ToString(),
+                    ActorId = changedEvent.ActorId.ToString(),
+                    Gln = changedEvent.Gln,
+                    Name = changedEvent.Name,
+                }.ToByteArray();
+            }
+            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationChangedEvent)}", ex);
+            }
+        }
     }
 }

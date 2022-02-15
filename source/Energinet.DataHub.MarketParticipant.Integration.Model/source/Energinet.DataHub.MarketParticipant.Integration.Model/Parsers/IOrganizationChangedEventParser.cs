@@ -27,5 +27,12 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
         /// <param name="protoContract">A byte array containing the OrganizationChangedEvent protobuf contract.</param>
         /// <returns>The parsed OrganizationChangedEvent.</returns>
         OrganizationChangedEvent Parse(byte[] protoContract);
+
+        /// <summary>
+        /// Parses the event.
+        /// </summary>
+        /// <param name="changedEvent">The event</param>
+        /// <returns>The protobuf contract.</returns>
+        byte[] Parse(OrganizationChangedEvent changedEvent);
     }
 }

@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
+using System;
 
-[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.Integration.Model.Tests")]
+[assembly:CLSCompliant(false)]
