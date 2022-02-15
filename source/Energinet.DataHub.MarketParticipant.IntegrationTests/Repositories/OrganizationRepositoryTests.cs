@@ -37,20 +37,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
-            var orgRepository = new OrganizationRepository(_fixture.MarketParticipantDbContext); //scope.GetInstance<IOrganizationRepository>();
+            var orgRepository = new OrganizationRepository(_fixture.MarketParticipantDbContext);
             var testOrg = new Organization(
                 new GlobalLocationNumber("123"),
-                "Test"
-            );
+                "Test");
 
             // Act
-            var orgId = await orgRepository.AddAsync(testOrg);
-            var newOrg = await orgRepository.GetAsync(orgId);
+            var orgId = await orgRepository.AddAsync(testOrg).ConfigureAwait(false);
+            var newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.Equal(testOrg.Gln.Value, newOrg.Gln.Value);
             Assert.Equal(testOrg.Name, newOrg.Name);
         }
     }
-
 }

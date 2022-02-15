@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
@@ -31,6 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
         public static Organization MapFromEntity(OrganizationEntity from)
         {
+            Guard.ThrowIfNull(from, nameof(from));
             return new Organization(
                 new OrganizationId(from.Id),
                 new GlobalLocationNumber(from.Gln),

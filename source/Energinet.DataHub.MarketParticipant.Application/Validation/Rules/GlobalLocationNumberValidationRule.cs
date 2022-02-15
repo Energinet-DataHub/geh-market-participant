@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
     public class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, string>
     {
+        public override string Name => "GlobalLocationNumberValidation";
+
         public override bool IsValid(ValidationContext<T> context, string value)
         {
             return IsValidGlnNumber(value);
         }
-
-        public override string Name => "GlobalLocationNumberValidation";
 
         protected override string GetDefaultMessageTemplate(string errorCode)
         {

@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
@@ -30,17 +31,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             _organizationRepository = organizationRepository;
         }
-        public async Task<Unit> Handle(
-            CreateOrganizationCommand request,
-            CancellationToken cancellationToken)
+
+        public async Task<Unit> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
+            Guard.ThrowIfNull(request, nameof(request));
+
             var organisationToSave = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 new GlobalLocationNumber(request.Gln),
                 request.Name);
 
             await _organizationRepository.AddAsync(organisationToSave).ConfigureAwait(false);
-
             return Unit.Value;
         }
     }

@@ -18,8 +18,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
+    /// <summary>
+    /// The interface used for the DB context for the MarketParticipant database
+    /// </summary>
     public interface IMarketParticipantDbContext
     {
+        /// <summary>
+        /// Represent access to the organization database table
+        /// </summary>
         DbSet<OrganizationEntity> Organizations { get; }
 
         /// <summary>

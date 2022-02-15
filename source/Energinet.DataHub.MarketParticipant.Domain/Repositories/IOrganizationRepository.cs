@@ -25,8 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Adds a new organization.
         /// </summary>
-        /// <param name="gln">The Gln number for the organization</param>
-        /// <param name="name">The Name for the organization</param>
+        /// <param name="organization">The organization to add</param>
         /// <returns>The id of the added organization</returns>
         Task<OrganizationId> AddAsync(Organization organization);
 

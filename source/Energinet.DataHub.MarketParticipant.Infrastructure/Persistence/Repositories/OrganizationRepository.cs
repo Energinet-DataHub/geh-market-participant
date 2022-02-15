@@ -12,15 +12,15 @@
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
 using System.Threading.Tasks;
-using Ardalis.GuardClauses;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
-    public class OrganizationRepository: IOrganizationRepository
+    public class OrganizationRepository : IOrganizationRepository
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<OrganizationId> AddAsync(Organization organization)
         {
-            Guard.Against.Null(organization, nameof(organization));
+            Guard.ThrowIfNull(organization, nameof(organization));
             var orgEntity = OrganizationMapper.MapToEntity(organization);
             await _marketParticipantDbContext.Organizations.AddAsync(orgEntity).ConfigureAwait(false);
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -40,14 +40,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task UpdateAsync(Organization organization)
         {
-            Guard.Against.Null(organization, nameof(organization));
+            Guard.ThrowIfNull(organization, nameof(organization));
             _marketParticipantDbContext.Organizations.Update(OrganizationMapper.MapToEntity(organization));
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task<Organization> GetAsync(OrganizationId id)
         {
-            return  OrganizationMapper.MapFromEntity(await _marketParticipantDbContext.Organizations.SingleOrDefaultAsync(s => s.Id == id.Value));
+            return OrganizationMapper.MapFromEntity(
+                await _marketParticipantDbContext.Organizations
+                    .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false));
         }
     }
 }

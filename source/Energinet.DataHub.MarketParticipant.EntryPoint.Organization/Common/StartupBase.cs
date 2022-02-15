@@ -79,8 +79,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
         private static void AddMarketParticipantContext(IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<MarketParticipantDbContext>(
-                options => options.UseSqlServer(config.GetValue<string>("SQL_MP_DB_CONNECTION_STRING"))
-            );
+                options =>
+                    options.UseSqlServer(config.GetValue<string>("SQL_MP_DB_CONNECTION_STRING")));
         }
     }
 }

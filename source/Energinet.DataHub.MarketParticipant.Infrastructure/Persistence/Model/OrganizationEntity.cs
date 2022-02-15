@@ -18,6 +18,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
     public class OrganizationEntity
     {
+        public OrganizationEntity()
+        {
+            Gln = string.Empty;
+            Name = string.Empty;
+        }
+
         public Guid Id { get; set; }
         public string Gln { get; set; }
         public string Name { get; set; }

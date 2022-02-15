@@ -15,9 +15,9 @@
 using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
@@ -36,9 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
-
         }
-
-
     }
 }

@@ -26,10 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
     {
         private const string MarketParticipantDbName = "marketparticipant";
         private const string BaseConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Connection Timeout=3";
-
-        private string _connectionString;
-
-        public MarketParticipantDbContext MarketParticipantDbContext { get; private set; }
+        private readonly string _connectionString;
 
         public DatabaseFixture()
         {
@@ -40,13 +37,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             _connectionString = builder.ToString();
         }
 
+        public MarketParticipantDbContext? MarketParticipantDbContext { get; private set; }
+
         public async Task InitializeAsync()
         {
             await using var connection = new SqlConnection(BaseConnectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync().ConfigureAwait(false);
 
-            await ExecuteDbCommandAsync(connection, $"CREATE DATABASE [{MarketParticipantDbName}]");
-            await ExecuteDbCommandAsync(connection, $"USE [{MarketParticipantDbName}]");
+            await ExecuteDbCommandAsync(connection, $"CREATE DATABASE [{MarketParticipantDbName}]").ConfigureAwait(false);
+            await ExecuteDbCommandAsync(connection, $"USE [{MarketParticipantDbName}]").ConfigureAwait(false);
 
             ApplyInitialMigrations();
 
@@ -59,26 +58,45 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         public async Task DisposeAsync()
         {
             await using var connection = new SqlConnection(BaseConnectionString);
-            await connection.OpenAsync();
+            await connection.OpenAsync().ConfigureAwait(false);
 
-            await ExecuteDbCommandAsync(connection, $"EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'{MarketParticipantDbName}'");
-            await ExecuteDbCommandAsync(connection, "USE [master]");
-            await ExecuteDbCommandAsync(connection, $"ALTER DATABASE [{MarketParticipantDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE");
-            await ExecuteDbCommandAsync(connection, "USE [master]");
-            await ExecuteDbCommandAsync(connection, $"DROP DATABASE [{MarketParticipantDbName}]");
-        }
+            await ExecuteDbCommandAsync(
+                    connection,
+                    $"EXEC msdb.dbo.sp_delete_database_backuphistory @database_name = N'{MarketParticipantDbName}'")
+                .ConfigureAwait(false);
 
-        private void ApplyInitialMigrations()
-        {
-            var upgrader = UpgradeFactory.GetUpgradeEngine(_connectionString, GetFilter(), false);
-           upgrader.PerformUpgrade();
+            await ExecuteDbCommandAsync(
+                    connection,
+                    "USE [master]")
+                .ConfigureAwait(false);
+
+            await ExecuteDbCommandAsync(
+                    connection,
+                    $"ALTER DATABASE [{MarketParticipantDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE")
+                .ConfigureAwait(false);
+
+            await ExecuteDbCommandAsync(
+                    connection,
+                    "USE [master]")
+                .ConfigureAwait(false);
+
+            await ExecuteDbCommandAsync(
+                    connection,
+                    $"DROP DATABASE [{MarketParticipantDbName}]")
+                .ConfigureAwait(false);
         }
 
         private static async Task ExecuteDbCommandAsync(SqlConnection connection, string commandText)
         {
             await using var cmd = connection.CreateCommand();
             cmd.CommandText = commandText;
-            await cmd.ExecuteNonQueryAsync();
+            await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
+        }
+
+        private void ApplyInitialMigrations()
+        {
+            var upgradeEngine = UpgradeFactory.GetUpgradeEngine(_connectionString, GetFilter());
+            upgradeEngine.PerformUpgrade();
         }
 
         private Func<string, bool> GetFilter()

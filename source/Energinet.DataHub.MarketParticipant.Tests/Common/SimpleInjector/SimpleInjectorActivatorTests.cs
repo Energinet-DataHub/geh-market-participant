@@ -24,6 +24,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common.SimpleInjector
     [UnitTest]
     public sealed class SimpleInjectorActivatorTests
     {
+        /// <summary>
+        /// For testing only.
+        /// </summary>
+        private interface IFoo
+        {
+        }
+
         [Fact]
         public async Task CreateInstance_AllArgumentsCorrectlyProvided_InstanceIsCreated()
         {
@@ -52,10 +59,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common.SimpleInjector
 
             // Act + Assert
             Assert.Throws<ArgumentNullException>(() => target.CreateInstance(null!, new MockedFunctionContext()));
-        }
-
-        private interface IFoo
-        {
         }
 
         private sealed class Foo : IFoo

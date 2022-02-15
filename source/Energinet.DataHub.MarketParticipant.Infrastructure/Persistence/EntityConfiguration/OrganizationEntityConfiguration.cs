@@ -13,6 +13,7 @@
 // // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -22,11 +23,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
     {
         public void Configure(EntityTypeBuilder<OrganizationEntity> builder)
         {
+            Guard.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("OrganizationInfo");
             builder.HasKey(organization => organization.Id);
             builder.Property(p => p.Id)
                 .ValueGeneratedOnAdd();
-
         }
     }
 }

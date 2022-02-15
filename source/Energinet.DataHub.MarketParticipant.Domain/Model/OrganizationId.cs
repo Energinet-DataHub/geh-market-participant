@@ -17,36 +17,4 @@ using System;
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record OrganizationId(Guid Value);
-    // public sealed record OrganizationId : IComparable<OrganizationId>
-    // {
-    //     private readonly Guid _id;
-    //
-    //     public OrganizationId(Guid id)
-    //     {
-    //         _id = id;
-    //     }
-    //
-    //     public OrganizationId(string id)
-    //     {
-    //         _id = Guid.Parse(id);
-    //     }
-    //
-    //     public Guid AsGuid()
-    //     {
-    //         return _id;
-    //     }
-    //
-    //     public override string ToString()
-    //     {
-    //         return _id.ToString();
-    //     }
-    //
-    //     public int CompareTo(OrganizationId? other)
-    //     {
-    //         return other == null
-    //             ? 1
-    //             : AsGuid().CompareTo(other.AsGuid());
-    //     }
-
-    // }
 }
