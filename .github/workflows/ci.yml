@@ -28,7 +28,7 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@5.0.0
     with:
       TERRAFORM_WORKING_DIR_PATH: './build/infrastructure/main'
-      TERRAFORM_VERSION: '1.1.4'
+      TERRAFORM_VERSION: '1.1.5'
 
   database_migration_ci:
     needs: [ci_base, terraform_validate]
