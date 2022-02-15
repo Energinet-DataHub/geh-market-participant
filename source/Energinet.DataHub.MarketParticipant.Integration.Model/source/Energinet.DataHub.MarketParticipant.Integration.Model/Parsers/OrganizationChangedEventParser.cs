@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
 
