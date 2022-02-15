@@ -17,15 +17,15 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
     /// <summary>
-    /// Parses the ActorCreated protobuf contract.
+    /// Parses the protobuf contract.
     /// </summary>
-    public interface IActorCreatedParser
+    public interface IOrganizationChangedEventParser
     {
         /// <summary>
-        /// Parses the ActorCreated protobuf contract.
+        /// Parses the protobuf contract.
         /// </summary>
-        /// <param name="actorCreatedContract">A byte array containing the ActorCreated protobuf contract.</param>
+        /// <param name="protoContract">A byte array containing the ActorCreated protobuf contract.</param>
         /// <returns>The parsed ActorCreated.</returns>
-        ActorCreated Parse(byte[] actorCreatedContract);
+        OrganizationChangedEvent Parse(byte[] protoContract);
     }
 }

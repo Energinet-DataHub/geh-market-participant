@@ -17,6 +17,9 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 
-message ActorCreatedContract {
-  string ActorId = 1; // Unique dataset identification
+message OrganizationChangedEventContract {
+  string Id = 1;
+  string ActorId = 2;
+  string Gln = 3;
+  string Name = 4;
 }

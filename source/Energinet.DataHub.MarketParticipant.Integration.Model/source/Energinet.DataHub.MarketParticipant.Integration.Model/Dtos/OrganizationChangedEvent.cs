@@ -16,21 +16,26 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record ActorCreated
+    public sealed record OrganizationChangedEvent
     {
         /// <summary>
-        /// Specifies which data is available for consumption by a market operator.
-        /// When a notification is received, the data is immediately made available for peeking.
+        /// An event representing af change to a given Organization.
         /// </summary>
-        /// <param name="actorId">
-        /// A guid uniquely identifying the data. This guid will be passed back
-        /// to the sub-domain with the request for data to be generated.
-        /// </param>
-        public ActorCreated(Guid actorId)
+        /// <param name="id">Organization ID</param>
+        /// <param name="actorId">Actor ID</param>
+        /// <param name="gln">GLN number</param>
+        /// <param name="name">Name</param>
+        public OrganizationChangedEvent(Guid id, Guid actorId, string gln, string name)
         {
+            Id = id;
             ActorId = actorId;
+            Gln = gln;
+            Name = name;
         }
 
+        public Guid Id { get; }
         public Guid ActorId { get; }
+        public string Gln { get; }
+        public string Name { get; }
     }
 }

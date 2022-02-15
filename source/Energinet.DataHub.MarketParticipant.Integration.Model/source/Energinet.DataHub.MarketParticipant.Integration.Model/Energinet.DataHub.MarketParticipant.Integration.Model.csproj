@@ -73,7 +73,7 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protobuf\ActorCreatedContract.proto">
+    <Protobuf Include="Protobuf\OrganizationChangedEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Public</Access>
       <ProtoCompile>True</ProtoCompile>

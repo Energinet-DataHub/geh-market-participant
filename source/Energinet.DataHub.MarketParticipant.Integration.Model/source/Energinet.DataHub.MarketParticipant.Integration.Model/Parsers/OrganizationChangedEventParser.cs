@@ -20,19 +20,23 @@ using Google.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
-    public sealed class ActorCreatedParser : IActorCreatedParser
+    public sealed class OrganizationChangedEventParser : IOrganizationChangedEventParser
     {
-        public ActorCreated Parse(byte[] actorCreatedContract)
+        public OrganizationChangedEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = ActorCreatedContract.Parser.ParseFrom(actorCreatedContract);
+                var contract = OrganizationChangedEventContract.Parser.ParseFrom(protoContract);
 
-                return new ActorCreated(actorId: Guid.Parse(contract.ActorId));
+                return new OrganizationChangedEvent(
+                    id: Guid.Parse(contract.Id),
+                    actorId: Guid.Parse(contract.ActorId),
+                    gln: contract.Gln,
+                    name: contract.Name);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorCreated)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationChangedEvent)}", ex);
             }
         }
     }
