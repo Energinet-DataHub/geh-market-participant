@@ -23,17 +23,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     public interface IOrganizationRepository
     {
         /// <summary>
-        /// Adds a new organization.
+        /// Updates and organization, or adds it if not already present.
         /// </summary>
-        /// <param name="organization">The organization to add</param>
+        /// <param name="organization">The organization to add or update</param>
         /// <returns>The id of the added organization</returns>
-        Task<OrganizationId> AddAsync(Organization organization);
-
-        /// <summary>
-        /// Updates the organization.
-        /// </summary>
-        /// <param name="organization">The organization to save.</param>
-        Task UpdateAsync(Organization organization);
+        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
 
         /// <summary>
         /// Gets an organization with the specified Id

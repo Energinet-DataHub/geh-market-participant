@@ -14,6 +14,7 @@
 
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
@@ -37,7 +38,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             _connectionString = builder.ToString();
         }
 
-        public MarketParticipantDbContext? MarketParticipantDbContext { get; private set; }
+        public MarketParticipantDbContext CreateDbContext()
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
+                .UseSqlServer(_connectionString);
+
+            return new MarketParticipantDbContext(optionsBuilder.Options);
+        }
 
         public async Task InitializeAsync()
         {
@@ -48,11 +55,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await ExecuteDbCommandAsync(connection, $"USE [{MarketParticipantDbName}]").ConfigureAwait(false);
 
             ApplyInitialMigrations();
-
-            var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
-                .UseSqlServer(_connectionString);
-
-            MarketParticipantDbContext = new MarketParticipantDbContext(optionsBuilder.Options);
         }
 
         public async Task DisposeAsync()
@@ -86,6 +88,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .ConfigureAwait(false);
         }
 
+        private static Func<string, bool> GetFilter()
+        {
+            return file =>
+                file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                file.Contains(".Scripts.LocalDB.", StringComparison.OrdinalIgnoreCase);
+        }
+
         private static async Task ExecuteDbCommandAsync(SqlConnection connection, string commandText)
         {
             await using var cmd = connection.CreateCommand();
@@ -97,13 +106,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         {
             var upgradeEngine = UpgradeFactory.GetUpgradeEngine(_connectionString, GetFilter());
             upgradeEngine.PerformUpgrade();
-        }
-
-        private Func<string, bool> GetFilter()
-        {
-           return file =>
-               file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-               file.Contains(".Scripts.LocalDB.", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

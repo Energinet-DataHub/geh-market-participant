@@ -22,6 +22,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         string Name)
     {
         public Organization(GlobalLocationNumber gln, string name)
-            : this(new OrganizationId(Guid.Empty), gln, name) { }
+            : this(new OrganizationId(Guid.Empty), gln, name)
+        {
+        }
     }
 }

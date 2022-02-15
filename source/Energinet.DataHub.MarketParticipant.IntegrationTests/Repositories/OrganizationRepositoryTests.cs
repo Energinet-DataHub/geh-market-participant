@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using Xunit;
 using Xunit.Categories;
 
@@ -37,13 +38,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
-            var orgRepository = new OrganizationRepository(_fixture.MarketParticipantDbContext);
+            await using var context = _fixture.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
             var testOrg = new Organization(
                 new GlobalLocationNumber("123"),
                 "Test");
 
             // Act
-            var orgId = await orgRepository.AddAsync(testOrg).ConfigureAwait(false);
+            var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
             var newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert

@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 new GlobalLocationNumber(request.Gln),
                 request.Name);
 
-            await _organizationRepository.AddAsync(organisationToSave).ConfigureAwait(false);
+            await _organizationRepository.AddOrUpdateAsync(organisationToSave).ConfigureAwait(false);
             return Unit.Value;
         }
     }

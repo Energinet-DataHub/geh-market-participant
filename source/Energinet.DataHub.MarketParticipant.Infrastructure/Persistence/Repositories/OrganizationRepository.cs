@@ -29,20 +29,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _marketParticipantDbContext = marketParticipantDbContext;
         }
 
-        public async Task<OrganizationId> AddAsync(Organization organization)
+        public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
         {
             Guard.ThrowIfNull(organization, nameof(organization));
             var orgEntity = OrganizationMapper.MapToEntity(organization);
-            await _marketParticipantDbContext.Organizations.AddAsync(orgEntity).ConfigureAwait(false);
+            _marketParticipantDbContext.Organizations.Update(orgEntity);
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
             return new OrganizationId(orgEntity.Id);
-        }
-
-        public async Task UpdateAsync(Organization organization)
-        {
-            Guard.ThrowIfNull(organization, nameof(organization));
-            _marketParticipantDbContext.Organizations.Update(OrganizationMapper.MapToEntity(organization));
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async Task<Organization> GetAsync(OrganizationId id)

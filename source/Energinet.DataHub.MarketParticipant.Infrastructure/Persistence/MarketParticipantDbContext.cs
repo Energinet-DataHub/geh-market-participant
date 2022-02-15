@@ -12,11 +12,11 @@
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
@@ -36,10 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            if (modelBuilder == null) throw new ArgumentNullException(nameof(modelBuilder));
-
+            Guard.ThrowIfNull(modelBuilder, nameof(modelBuilder));
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
-
             base.OnModelCreating(modelBuilder);
         }
     }
