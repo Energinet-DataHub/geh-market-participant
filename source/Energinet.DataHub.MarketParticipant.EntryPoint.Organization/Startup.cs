@@ -40,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
-
         }
 
         private static void RegisterActor(Container container)

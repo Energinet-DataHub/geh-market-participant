@@ -46,8 +46,8 @@ namespace Energinet.DataHub.MarketParticipant.Utilities
 
         private static object? Parse(string valueToConvert, Type dataType)
         {
-            TypeConverter obj = TypeDescriptor.GetConverter(dataType);
-            var value = obj.ConvertFromString(null, CultureInfo.InvariantCulture,  valueToConvert);
+            var obj = TypeDescriptor.GetConverter(dataType);
+            var value = obj.ConvertFromString(null, CultureInfo.InvariantCulture, valueToConvert);
             return value;
         }
     }

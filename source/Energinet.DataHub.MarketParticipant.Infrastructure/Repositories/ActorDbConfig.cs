@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Ardalis.GuardClauses;
+using System;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
 {
@@ -20,7 +20,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
     {
         public ActorDbConfig(string connectionString)
         {
-            ConnectionString = Guard.Against.NullOrWhiteSpace(connectionString, nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(connectionString))
+                throw new ArgumentNullException(nameof(connectionString));
+
+            ConnectionString = connectionString;
         }
 
         public string ConnectionString { get; }

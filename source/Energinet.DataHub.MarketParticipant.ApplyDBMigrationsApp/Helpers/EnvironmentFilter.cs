@@ -15,16 +15,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public static class EnvironmentFilter
     {
-        private static readonly string[] _validEnvironments = { "u-001", "u-002", "t-001", "b-001", "b-002", "p-001"};
+        private static readonly string[] _validEnvironments = { "U-001", "U-002", "T-001", "B-001", "B-002", "P-001" };
 
         public static Func<string, bool> GetFilter(string[] args)
         {
-            var environment = GetEnvironmentArgument(args).Replace("-", "_").ToUpper();
+            Guard.ThrowIfNull(args, nameof(args));
+
+            var environment = GetEnvironmentArgument(args)
+                .Replace("-", "_", StringComparison.InvariantCulture)
+                .ToUpperInvariant();
+
             if (string.IsNullOrEmpty(environment))
             {
                 return file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
@@ -41,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 
         private static string GetEnvironmentArgument(IReadOnlyList<string> args)
         {
-            return args.Count > 1 && _validEnvironments.Contains(args[1].ToLower())
+            return args.Count > 1 && _validEnvironments.Contains(args[1].ToUpperInvariant())
                 ? args[1]
                 : string.Empty;
         }
