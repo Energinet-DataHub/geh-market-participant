@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
     {
         public static async Task Main()
         {
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var startup = new Startup();
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
             await using (startup.ConfigureAwait(false))
             {

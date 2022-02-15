@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -43,10 +43,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequestData request)
         {
+            Guard.ThrowIfNull(request, nameof(request));
+
             try
             {
-                var createOrganizationCommand = await CreateOrganizationCommandFromRequest(request);
-
+                var createOrganizationCommand = await CreateOrganizationCommandAsync(request).ConfigureAwait(false);
                 if (createOrganizationCommand is null)
                 {
                     throw new FluentValidation.ValidationException("Invalid arguments");
@@ -55,38 +56,34 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
                 await _mediator.Send(createOrganizationCommand).ConfigureAwait(false);
 
                 var response = request.CreateResponse(HttpStatusCode.OK);
-
                 return response;
             }
             catch (FluentValidation.ValidationException e)
             {
                 _logger.LogError("ValidationException in CreateOrganization: {message}", e.Message);
                 var response = request.CreateResponse(HttpStatusCode.BadRequest);
-                await response.WriteStringAsync(e.Message);
+                await response.WriteStringAsync(e.Message).ConfigureAwait(false);
                 return response;
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 _logger.LogError("Error in CreateOrganization: {message}", ex.Message);
                 return request.CreateResponse(HttpStatusCode.InternalServerError);
             }
         }
 
-        private static async Task<CreateOrganizationCommand?> CreateOrganizationCommandFromRequest(HttpRequestData request)
+        private static async Task<CreateOrganizationCommand?> CreateOrganizationCommandAsync(HttpRequestData request)
         {
-            string requestBody;
-            using (var streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
 
-            var createOrganizationCommand = JsonSerializer.Deserialize<CreateOrganizationCommand>(requestBody, options);
-            return createOrganizationCommand;
+            return await JsonSerializer
+                .DeserializeAsync<CreateOrganizationCommand>(request.Body, options)
+                .ConfigureAwait(false);
         }
     }
 }
