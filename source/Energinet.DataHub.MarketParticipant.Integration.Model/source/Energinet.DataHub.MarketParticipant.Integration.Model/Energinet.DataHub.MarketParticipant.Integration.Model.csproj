@@ -46,7 +46,7 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
 Documentation
 https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Integration.Model/documents/documentation.md
     </PackageDescription>
-    <Description>Library containing models for Energinet.DataHub.MessageHub</Description>
+    <Description>Library containing models for Energinet.DataHub.MarketParticipant</Description>
     <PackageTags>geh;library</PackageTags>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
