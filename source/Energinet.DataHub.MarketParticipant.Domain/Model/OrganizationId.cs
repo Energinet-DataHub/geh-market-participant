@@ -16,28 +16,5 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record Uuid
-    {
-        private readonly Guid _id;
-
-        public Uuid(Guid id)
-        {
-            _id = id;
-        }
-
-        public Uuid(string id)
-        {
-            _id = Guid.Parse(id);
-        }
-
-        public Guid AsGuid()
-        {
-            return _id;
-        }
-
-        public override string ToString()
-        {
-            return _id.ToString();
-        }
-    }
+    public sealed record OrganizationId(Guid Value);
 }

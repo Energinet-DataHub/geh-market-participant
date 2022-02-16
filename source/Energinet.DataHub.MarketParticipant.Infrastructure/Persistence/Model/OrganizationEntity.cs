@@ -14,18 +14,18 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class ActorDbConfig
+    public class OrganizationEntity
     {
-        public ActorDbConfig(string connectionString)
+        public OrganizationEntity()
         {
-            if (string.IsNullOrWhiteSpace(connectionString))
-                throw new ArgumentNullException(nameof(connectionString));
-
-            ConnectionString = connectionString;
+            Gln = string.Empty;
+            Name = string.Empty;
         }
 
-        public string ConnectionString { get; }
+        public Guid Id { get; set; }
+        public string Gln { get; set; }
+        public string Name { get; set; }
     }
 }
