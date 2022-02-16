@@ -46,17 +46,17 @@ variable shared_resources_resource_group_name {
   description   = "Name of the Resource Group, that contains the shared resources."
 }
 
-variable "subnet_internal_private_endpoints_address_space" {
+variable subnet_internal_private_endpoints_address_space {
   type          = string
   description   = "Address space of the subnet for internal Private endpoints"
 }
 
-variable "subnet_external_private_endpoints_address_space" {
+variable subnet_external_private_endpoints_address_space {
   type          = string
   description   = "Address space of the subnet for external Private endpoints"
 }
 
-variable "subnet_vnet_integrations_functions_address_space" {
+variable subnet_vnet_integrations_functions_address_space {
   type          = string
   description   = "Address space of the subnet for Virtual Network integrations of Azure Functions"
 }
