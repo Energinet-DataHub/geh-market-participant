@@ -18,7 +18,9 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
+using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Repositories;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
@@ -34,9 +36,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
             // Services
             Container.AddApplicationServices();
+            Container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Transient);
 
             // Functions
             Container.Register<CreateOrganizationFunction>();
+
+            // ServiceBus config
+            AddServiceBusConfig(container);
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
@@ -51,6 +57,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
                                        throw new InvalidOperationException(
                                            "Market Participant Connection string not found");
                 return new ActorDbConfig(connectionString);
+            });
+        }
+
+        private static void AddServiceBusConfig(Container container)
+        {
+            container.RegisterSingleton(() =>
+            {
+                var configuration = container.GetService<IConfiguration>();
+
+                return new ServiceBusConfig(
+                    configuration.GetValue<string>("SERVICE_BUS_CONNECTION_STRING"),
+                    configuration.GetValue<string>("SBT_MARKET_PARTICIPANT_CHANGED_NAME"));
             });
         }
     }
