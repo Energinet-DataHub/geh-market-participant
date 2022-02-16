@@ -32,10 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Tests.Parsers
 
             // act
             var actualBytes = target.Parse(@event);
-            var actaulEvent = target.Parse(actualBytes);
+            var actualEvent = target.Parse(actualBytes);
 
             // assert
-            Assert.Equal(@event, actaulEvent);
+            Assert.Equal(@event, actualEvent);
         }
     }
 }
