@@ -53,6 +53,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-002\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />

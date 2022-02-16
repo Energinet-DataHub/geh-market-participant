@@ -11,19 +11,5 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-using System;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record Organization(
-        OrganizationId Id,
-        GlobalLocationNumber Gln,
-        string Name)
-    {
-        public Organization(GlobalLocationNumber gln, string name)
-            : this(new OrganizationId(Guid.Empty), gln, name)
-        {
-        }
-    }
-}
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.IntegrationTests")]

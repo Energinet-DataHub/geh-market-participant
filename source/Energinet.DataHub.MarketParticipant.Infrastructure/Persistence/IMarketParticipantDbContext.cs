@@ -13,26 +13,24 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
     /// <summary>
-    /// Provides access to the Organizations.
+    /// The interface used for the DB context for the MarketParticipant database
     /// </summary>
-    public interface IOrganizationRepository
+    public interface IMarketParticipantDbContext
     {
         /// <summary>
-        /// Updates and organization, or adds it if not already present.
+        /// Represent access to the organization database table
         /// </summary>
-        /// <param name="organization">The organization to add or update</param>
-        /// <returns>The id of the added organization</returns>
-        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
+        DbSet<OrganizationEntity> Organizations { get; }
 
         /// <summary>
-        /// Gets an organization with the specified Id
+        /// Saves changes to the database.
         /// </summary>
-        /// <param name="id">The Id of the organization to get.</param>
-        Task<Organization> GetAsync(OrganizationId id);
+        Task<int> SaveChangesAsync();
     }
 }

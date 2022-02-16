@@ -37,11 +37,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             Guard.ThrowIfNull(request, nameof(request));
 
             var organisationToSave = new Organization(
-                new Uuid(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 new GlobalLocationNumber(request.Gln),
                 request.Name);
 
-            await _organizationRepository.SaveAsync(organisationToSave).ConfigureAwait(false);
+            await _organizationRepository.AddOrUpdateAsync(organisationToSave).ConfigureAwait(false);
             return Unit.Value;
         }
     }
