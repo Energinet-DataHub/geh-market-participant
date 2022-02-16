@@ -13,29 +13,26 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Microsoft.EntityFrameworkCore;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    ///     The interface used for the DB context for the MarketParticipant database
+    ///     Provides access to the Grid Areas.
     /// </summary>
-    public interface IMarketParticipantDbContext
+    public interface IGridAreaRepository
     {
         /// <summary>
-        ///     Represent access to the organization database table
+        ///     Updates a GridArea, or adds it if it's not already present.
         /// </summary>
-        DbSet<OrganizationEntity> Organizations { get; }
+        /// <param name="gridArea">The GridArea to add or update</param>
+        /// <returns>The id of the added GridArea</returns>
+        Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea);
 
         /// <summary>
-        ///     Represent access to the GridAreas database table
+        ///     Gets an GridArea with the specified Id
         /// </summary>
-        DbSet<GridAreaEntity> GridAreas { get; }
-
-        /// <summary>
-        ///     Saves changes to the database.
-        /// </summary>
-        Task<int> SaveChangesAsync();
+        /// <param name="id">The Id of the GridArea to get.</param>
+        Task<GridArea> GetAsync(GridAreaId id);
     }
 }
