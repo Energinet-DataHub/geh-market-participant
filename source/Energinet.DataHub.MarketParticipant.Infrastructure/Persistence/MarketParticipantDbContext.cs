@@ -21,23 +21,31 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local", Justification = "Private setters are needed by EF Core")]
+    [SuppressMessage(
+        "ReSharper",
+        "UnusedAutoPropertyAccessor.Local",
+        Justification = "Private setters are needed by EF Core")]
     public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     {
-        #nullable disable
+#nullable disable
         public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
             : base(options)
         {
         }
 
         public DbSet<OrganizationEntity> Organizations { get; private set; }
+        public DbSet<GridAreaEntity> GridAreas { get; private set; }
 
-        public Task<int> SaveChangesAsync() => base.SaveChangesAsync();
+        public Task<int> SaveChangesAsync()
+        {
+            return base.SaveChangesAsync();
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             Guard.ThrowIfNull(modelBuilder, nameof(modelBuilder));
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreEntityConfiguration());
             base.OnModelCreating(modelBuilder);
         }
     }

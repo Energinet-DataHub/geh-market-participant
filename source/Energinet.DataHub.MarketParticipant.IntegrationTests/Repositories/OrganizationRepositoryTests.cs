@@ -51,5 +51,26 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(testOrg.Gln.Value, newOrg.Gln.Value);
             Assert.Equal(testOrg.Name, newOrg.Name);
         }
+
+        [Fact]
+        public async Task SaveAsync_OneGridArea_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.CreateDbContext();
+            var gridRepository = new GridAreaRepository(context);
+            var testGrid = new GridArea(
+                new GridAreaName("Test Grid Area"),
+                new GridAreaCode("801"));
+
+            // Act
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var newOrg = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(testGrid.Name.Value, newOrg.Name.Value);
+            Assert.Equal(testGrid.Code, newOrg.Code);
+        }
     }
 }
