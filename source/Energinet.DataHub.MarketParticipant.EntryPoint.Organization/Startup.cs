@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
@@ -20,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,19 +35,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
             // Services
             Container.AddApplicationServices();
-            Container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Transient);
+            Container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
 
             // Functions
             Container.Register<CreateOrganizationFunction>();
 
-            // ServiceBus config
-            AddServiceBusConfig(container);
+            // ServiceBusClient
+            RegisterServiceBusClient(container);
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
         }
 
-        private static void AddServiceBusConfig(Container container)
+        private static void RegisterServiceBusClient(Container container)
         {
             container.RegisterSingleton(() =>
             {
@@ -57,6 +57,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
                     configuration.GetValue<string>("SERVICE_BUS_CONNECTION_STRING"),
                     configuration.GetValue<string>("SBT_MARKET_PARTICIPANT_CHANGED_NAME"));
             });
+
+            container.RegisterSingleton(
+                () => new MarketParticipantServiceBusClient(container.GetService<ServiceBusConfig>()!.ConnectionString));
         }
     }
 }

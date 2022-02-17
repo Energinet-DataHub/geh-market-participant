@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 request.Name);
 
             await _organizationRepository.AddOrUpdateAsync(organisationToSave).ConfigureAwait(false);
-            await _organizationEventDispatcher.DispatchAsync(organisationToSave).ConfigureAwait(false);
+            await _organizationEventDispatcher.DispatchChangedEventAsync(organisationToSave).ConfigureAwait(false);
 
             return Unit.Value;
         }

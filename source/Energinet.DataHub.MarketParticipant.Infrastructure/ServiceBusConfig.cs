@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure
 {
-    public class ServiceBusConfig
+    public sealed class ServiceBusConfig
     {
         public ServiceBusConfig(string connectionString, string topicMarketParticipantChanged)
         {

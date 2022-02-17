@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     /// <summary>
-    /// IOrganizationEventDispatcher
+    /// IMarketParticipantServiceBusClient
     /// </summary>
-    public interface IOrganizationEventDispatcher
+    public interface IMarketParticipantServiceBusClient
     {
         /// <summary>
-        /// Dispatches a changed event for a given organization
+        /// Creates a ServiceBusSender
         /// </summary>
-        /// <param name="organization">The organization to dispatch event for.</param>
-        Task DispatchChangedEventAsync(Organization organization);
+        /// <param name="queueOrTopicName">The queue or topic name.</param>
+        ServiceBusSender CreateSender(string queueOrTopicName);
     }
 }
