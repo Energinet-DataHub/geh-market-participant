@@ -19,7 +19,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
     {
         protected override void Configure(Container container)
         {
-            RegisterActor(container);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Singleton);
 
             // Services
@@ -46,18 +45,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
-        }
-
-        private static void RegisterActor(Container container)
-        {
-            container.RegisterSingleton(() =>
-            {
-                var configuration = container.GetService<IConfiguration>();
-                var connectionString = configuration.GetValue<string>("SQL_MP_DB_CONNECTION_STRING") ??
-                                       throw new InvalidOperationException(
-                                           "Market Participant Connection string not found");
-                return new ActorDbConfig(connectionString);
-            });
         }
 
         private static void AddServiceBusConfig(Container container)

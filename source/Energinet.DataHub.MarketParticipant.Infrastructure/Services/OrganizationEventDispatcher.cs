@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             Guard.ThrowIfNull(organization, nameof(organization));
 
             var changedEvent = new OrganizationChangedEvent(
-                organization.Id.AsGuid(),
+                organization.Id.Value,
                 System.Guid.NewGuid(),
                 organization.Gln.Value,
                 organization.Name);

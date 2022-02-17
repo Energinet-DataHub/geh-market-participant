@@ -16,14 +16,17 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record Organization(
-        OrganizationId Id,
-        GlobalLocationNumber Gln,
-        string Name)
+    public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code)
     {
-        public Organization(GlobalLocationNumber gln, string name)
-            : this(new OrganizationId(Guid.Empty), gln, name)
+        public GridArea(GridAreaName name, GridAreaCode code)
+            : this(new GridAreaId(Guid.Empty), name, code)
         {
         }
     }
+
+    public sealed record GridAreaId(Guid Value);
+
+    public sealed record GridAreaCode(string Value);
+
+    public sealed record GridAreaName(string Value);
 }

@@ -18,21 +18,21 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    /// Provides access to the Organizations.
+    ///     Provides access to the Grid Areas.
     /// </summary>
-    public interface IOrganizationRepository
+    public interface IGridAreaRepository
     {
         /// <summary>
-        /// Updates and organization, or adds it if not already present.
+        ///     Updates a GridArea, or adds it if it's not already present.
         /// </summary>
-        /// <param name="organization">The organization to add or update</param>
-        /// <returns>The id of the added organization</returns>
-        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
+        /// <param name="gridArea">The GridArea to add or update</param>
+        /// <returns>The id of the added GridArea</returns>
+        Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea);
 
         /// <summary>
-        /// Gets an organization with the specified Id
+        ///     Gets an GridArea with the specified Id
         /// </summary>
-        /// <param name="id">The Id of the organization to get.</param>
-        Task<Organization> GetAsync(OrganizationId id);
+        /// <param name="id">The Id of the GridArea to get.</param>
+        Task<GridArea> GetAsync(GridAreaId id);
     }
 }

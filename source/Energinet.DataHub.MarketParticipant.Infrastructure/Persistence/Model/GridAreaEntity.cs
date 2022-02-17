@@ -14,16 +14,18 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record Organization(
-        OrganizationId Id,
-        GlobalLocationNumber Gln,
-        string Name)
+    public class GridAreaEntity
     {
-        public Organization(GlobalLocationNumber gln, string name)
-            : this(new OrganizationId(Guid.Empty), gln, name)
+        public GridAreaEntity()
         {
+            Code = string.Empty;
+            Name = string.Empty;
         }
+
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Code { get; set; }
     }
 }
