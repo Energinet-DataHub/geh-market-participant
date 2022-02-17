@@ -33,6 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         ///     Gets an GridArea with the specified Id
         /// </summary>
         /// <param name="id">The Id of the GridArea to get.</param>
-        Task<GridArea> GetAsync(GridAreaId id);
+        /// <returns>The specified grid area or null if not found</returns>
+        Task<GridArea?> GetAsync(GridAreaId id);
     }
 }

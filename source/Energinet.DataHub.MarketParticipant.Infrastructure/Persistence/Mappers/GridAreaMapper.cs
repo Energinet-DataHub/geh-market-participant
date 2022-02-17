@@ -20,12 +20,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
     internal sealed class GridAreaMapper
     {
-        public static GridAreaEntity MapToEntity(GridArea from)
+        public static GridAreaEntity MapToEntity(GridArea from, GridAreaEntity to)
         {
-            return new GridAreaEntity { Id = from.Id.Value, Code = from.Code.Value, Name = from.Name.Value };
+            to.Code = from.Code.Value;
+            to.Id = from.Id.Value;
+            to.Name = from.Name.Value;
+            return to;
         }
 
-        public static GridArea MapFromEntity(GridAreaEntity from)
+        public static GridArea? MapFromEntity(GridAreaEntity from)
         {
             Guard.ThrowIfNull(from, nameof(from));
             return new GridArea(
