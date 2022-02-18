@@ -22,6 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
     {
         public static void AddRepositories(this Container container)
         {
+            container.Register<IGridAreaRepository, GridAreaRepository>(Lifestyle.Scoped);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
         }
     }
