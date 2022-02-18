@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System;
+using FluentValidation;
+using FluentValidation.Validators;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    public sealed class GuidValidationRule<T> : PropertyValidator<T, string>
+    {
+        public override string Name => "GuidValidation";
+
+        public override bool IsValid(ValidationContext<T> context, string value)
+        {
+            return Guid.TryParse(value, out _);
+        }
+
+        protected override string GetDefaultMessageTemplate(string errorCode)
+        {
+            return "'{PropertyName}' must have a valid guid.";
+        }
+    }
 }

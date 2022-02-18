@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Model
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    public sealed record ErrorResponse
+    {
+        public ErrorResponse(ErrorDescriptor error)
+        {
+            Error = error;
+        }
+
+        public ErrorDescriptor Error { get; }
+    }
 }

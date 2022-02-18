@@ -13,19 +13,24 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public class OrganizationEntity
+    public sealed class OrganizationEntity
     {
         public OrganizationEntity()
         {
             Gln = string.Empty;
             Name = string.Empty;
+            Roles = new Collection<OrganizationRoleEntity>();
         }
 
         public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
         public string Gln { get; set; }
         public string Name { get; set; }
+
+        public Collection<OrganizationRoleEntity> Roles { get; }
     }
 }

@@ -24,40 +24,34 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public sealed class CreateOrganizationFunction
+    public sealed class AddOrganizationRoleFunction
     {
         private readonly IMediator _mediator;
 
-        public CreateOrganizationFunction(IMediator mediator)
+        public AddOrganizationRoleFunction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         // TODO: Should this be REST?
-        [Function("CreateOrganization")]
+        [Function("AddOrganizationRole")]
         public Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequestData request)
         {
             return request.ProcessAsync(async () =>
             {
-                var createOrganizationCommand = await CreateOrganizationCommandAsync(request).ConfigureAwait(false);
+                var addOrganizationRoleCommand = await AddOrganizationCommandAsync(request).ConfigureAwait(false);
 
-                var response = await _mediator
-                    .Send(createOrganizationCommand)
+                await _mediator
+                    .Send(addOrganizationRoleCommand)
                     .ConfigureAwait(false);
 
-                var responseData = request.CreateResponse(HttpStatusCode.OK);
-
-                await responseData
-                    .WriteAsJsonAsync(response)
-                    .ConfigureAwait(false);
-
-                return responseData;
+                return request.CreateResponse(HttpStatusCode.OK);
             });
         }
 
-        private static async Task<CreateOrganizationCommand> CreateOrganizationCommandAsync(HttpRequestData request)
+        private static async Task<AddOrganizationRoleCommand> AddOrganizationCommandAsync(HttpRequestData request)
         {
             var options = new JsonSerializerOptions
             {
@@ -66,11 +60,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
             try
             {
-                var organizationDto = await JsonSerializer
-                    .DeserializeAsync<OrganizationDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty, string.Empty, string.Empty);
+                var organizationRoleDto = await JsonSerializer
+                    .DeserializeAsync<OrganizationRoleDto>(request.Body, options)
+                    .ConfigureAwait(false) ?? new OrganizationRoleDto(string.Empty);
 
-                return new CreateOrganizationCommand(organizationDto);
+                var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
+                var organizationId = query.Get("organizationId") ?? string.Empty;
+
+                return new AddOrganizationRoleCommand(organizationId, organizationRoleDto);
             }
             catch (JsonException)
             {

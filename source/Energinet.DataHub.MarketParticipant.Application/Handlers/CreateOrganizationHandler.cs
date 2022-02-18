@@ -23,7 +23,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, Unit>
+    public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
 
@@ -32,17 +32,22 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             _organizationRepository = organizationRepository;
         }
 
-        public async Task<Unit> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
+        public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organisationToSave = new Organization(
-                new OrganizationId(Guid.NewGuid()),
-                new GlobalLocationNumber(request.Gln),
-                request.Name);
+            var organizationDto = request.Organization;
 
-            await _organizationRepository.AddOrUpdateAsync(organisationToSave).ConfigureAwait(false);
-            return Unit.Value;
+            var organisationToSave = new Organization(
+                Guid.Parse(organizationDto.ActorId), // TODO: Where do we get ActorId from?
+                new GlobalLocationNumber(organizationDto.Gln),
+                organizationDto.Name);
+
+            var createdId = await _organizationRepository
+                .AddOrUpdateAsync(organisationToSave)
+                .ConfigureAwait(false);
+
+            return new CreateOrganizationResponse(createdId.Value.ToString());
         }
     }
 }

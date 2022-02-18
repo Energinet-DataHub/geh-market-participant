@@ -5,6 +5,7 @@ GO
 CREATE TABLE [dbo].[OrganizationInfo]
 (
     [Id]   [uniqueidentifier] NOT NULL,
+    [ActorId]   [uniqueidentifier] NOT NULL,
     [Name] [nvarchar](max)    NOT NULL,
     [Gln]  [nvarchar](50)     NOT NULL
         CONSTRAINT [PK_OrganizationInfo] PRIMARY KEY CLUSTERED

@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    internal static class RepositoryRegistration
+    {
+        public static void AddRepositories(this Container container)
+        {
+            container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
+        }
+    }
 }

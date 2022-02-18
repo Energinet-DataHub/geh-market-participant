@@ -13,17 +13,54 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record Organization(
-        OrganizationId Id,
-        GlobalLocationNumber Gln,
-        string Name)
+    public sealed class Organization
     {
-        public Organization(GlobalLocationNumber gln, string name)
-            : this(new OrganizationId(Guid.Empty), gln, name)
+        private readonly ICollection<IOrganizationRole> _roles;
+
+        public Organization(
+            Guid actorId,
+            GlobalLocationNumber gln,
+            string name)
         {
+            Id = new OrganizationId(Guid.Empty);
+            ActorId = actorId;
+            Gln = gln;
+            Name = name;
+            _roles = new Collection<IOrganizationRole>();
+        }
+
+        public Organization(
+            OrganizationId id,
+            Guid actorId,
+            GlobalLocationNumber gln,
+            string name,
+            IEnumerable<IOrganizationRole> roles)
+        {
+            Id = id;
+            ActorId = actorId;
+            Gln = gln;
+            Name = name;
+            _roles = roles.ToList();
+        }
+
+        public OrganizationId Id { get; }
+        public Guid ActorId { get; }
+
+        public GlobalLocationNumber Gln { get; }
+        public string Name { get; }
+
+        public IEnumerable<IOrganizationRole> Roles => _roles;
+
+        public void AddRole(IOrganizationRole organizationRole)
+        {
+            // TODO: Validation rules. Check for conflicting roles.
+            _roles.Add(organizationRole);
         }
     }
 }
