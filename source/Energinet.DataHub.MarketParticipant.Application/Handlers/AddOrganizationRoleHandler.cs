@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -42,6 +43,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             var organization = await _organizationRepository
                 .GetAsync(organizationId)
                 .ConfigureAwait(false);
+
+            if (organization == null)
+            {
+                throw new NotFoundValidationException(organizationId.Value);
+            }
 
             organization.AddRole(CreateRole(request.Role));
 

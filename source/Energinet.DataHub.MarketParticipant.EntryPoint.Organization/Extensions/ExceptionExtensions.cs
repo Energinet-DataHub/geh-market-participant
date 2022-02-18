@@ -18,6 +18,7 @@ using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -69,6 +70,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions
 
             return source switch
             {
+                NotFoundValidationException _ =>
+                    request.CreateResponse(HttpStatusCode.NotFound),
+
                 FluentValidationException ve =>
                     CreateHttpResponseData(
                         request,
