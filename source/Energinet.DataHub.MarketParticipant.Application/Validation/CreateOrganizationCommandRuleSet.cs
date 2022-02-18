@@ -22,10 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public CreateOrganizationCommandRuleSet()
         {
-            RuleFor(command => command.Organization.ActorId)
-                .NotEmpty()
-                .SetValidator(new GuidValidationRule<CreateOrganizationCommand>());
-
             RuleFor(command => command.Organization.Name)
                 .NotEmpty()
                 .Length(1, 50);

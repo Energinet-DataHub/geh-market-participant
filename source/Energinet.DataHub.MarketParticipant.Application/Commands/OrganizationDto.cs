@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record OrganizationDto(string ActorId, string Name, string Gln);
+    public sealed record OrganizationDto(string? ActorId, string Name, string Gln);
 }

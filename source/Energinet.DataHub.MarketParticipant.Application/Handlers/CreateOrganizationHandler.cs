@@ -36,12 +36,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organizationDto = request.Organization;
+            var (actor, name, gln) = request.Organization;
+
+            Guid? actorId = null;
+
+            if (Guid.TryParse(actor, out var parsedActorId))
+            {
+                actorId = parsedActorId;
+            }
 
             var organisationToSave = new Organization(
-                Guid.Parse(organizationDto.ActorId), // TODO: Where do we get ActorId from?
-                new GlobalLocationNumber(organizationDto.Gln),
-                organizationDto.Name);
+                actorId, // TODO: Where do we get ActorId from?
+                new GlobalLocationNumber(gln),
+                name);
 
             var createdId = await _organizationRepository
                 .AddOrUpdateAsync(organisationToSave)
