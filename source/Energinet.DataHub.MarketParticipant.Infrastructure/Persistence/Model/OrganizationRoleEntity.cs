@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    public sealed class OrganizationRoleEntity
+    {
+        public Guid Id { get; set; }
+        public Guid OrganizationId { get; set; }
+        public int BusinessRole { get; set; }
+        public int Status { get; set; }
+    }
 }

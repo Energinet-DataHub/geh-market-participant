@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
-using SimpleInjector;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Model
 {
-    internal sealed class Startup : StartupBase
+    public sealed record ErrorDescriptor
     {
-        protected override void Configure(Container container)
+        public ErrorDescriptor(
+            string code,
+            string message,
+            string? target = null,
+            IEnumerable<ErrorDescriptor>? details = null)
         {
-            Container.Register<CreateOrganizationFunction>();
-            Container.Register<AddOrganizationRoleFunction>();
+            Code = code;
+            Message = message;
+            Target = target;
+            Details = details;
         }
+
+        public string Code { get; }
+        public string Message { get; }
+        public string? Target { get; }
+        public IEnumerable<ErrorDescriptor>? Details { get; }
     }
 }

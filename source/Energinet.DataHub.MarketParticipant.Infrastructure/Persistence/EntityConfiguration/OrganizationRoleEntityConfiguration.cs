@@ -19,18 +19,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class OrganizationEntityConfiguration : IEntityTypeConfiguration<OrganizationEntity>
+    public sealed class OrganizationRoleEntityConfiguration : IEntityTypeConfiguration<OrganizationRoleEntity>
     {
-        public void Configure(EntityTypeBuilder<OrganizationEntity> builder)
+        public void Configure(EntityTypeBuilder<OrganizationRoleEntity> builder)
         {
             Guard.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("OrganizationInfo");
-            builder.HasKey(organization => organization.Id);
-            builder.Property(organization => organization.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(organization => organization.Roles)
-                .WithOne()
-                .HasForeignKey(role => role.OrganizationId);
+            builder.ToTable("OrganizationRole");
+            builder.HasKey(role => role.Id);
+            builder.Property(role => role.Id).ValueGeneratedOnAdd();
         }
     }
 }

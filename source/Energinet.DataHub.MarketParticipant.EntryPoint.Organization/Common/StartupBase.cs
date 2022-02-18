@@ -14,11 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
@@ -42,6 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContexts(Container);
+
             SwitchToSimpleInjector(services);
 
             services.AddLogging();
@@ -50,9 +51,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
                 x.DisposeContainerWithServiceProvider = false;
                 x.AddLogging();
             });
-            var config = services.BuildServiceProvider().GetService<IConfiguration>()!;
-            Container.RegisterSingleton(() => config);
-            AddMarketParticipantContext(services, config);
+
+            Container.AddApplicationServices();
+            Container.AddDbContextInterfaces();
+            Container.AddRepositories();
+
+            // Add MediatR
+            Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
 
             Configure(Container);
         }
@@ -74,13 +79,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
                 ServiceLifetime.Singleton);
 
             services.Replace(descriptor);
-        }
-
-        private static void AddMarketParticipantContext(IServiceCollection services, IConfiguration config)
-        {
-            services.AddDbContext<MarketParticipantDbContext>(
-                options =>
-                    options.UseSqlServer(config.GetValue<string>("SQL_MP_DB_CONNECTION_STRING")));
         }
     }
 }
