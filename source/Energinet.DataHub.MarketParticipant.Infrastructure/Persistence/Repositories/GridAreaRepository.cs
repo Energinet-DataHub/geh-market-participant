@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,17 +34,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
         {
             Guard.ThrowIfNull(gridArea, nameof(gridArea));
-            var gridAreaEntity = GridAreaMapper.MapToEntity(gridArea);
-            _marketParticipantDbContext.GridAreas.Update(gridAreaEntity);
+            var gridEntity =
+                await _marketParticipantDbContext.GridAreas.FirstOrDefaultAsync(entity =>
+                    entity.Id == gridArea.Id.Value).ConfigureAwait(false) ?? new GridAreaEntity();
+
+            _marketParticipantDbContext.GridAreas.Update(GridAreaMapper.MapToEntity(gridArea, gridEntity));
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new GridAreaId(gridAreaEntity.Id);
+            return new GridAreaId(gridEntity.Id);
         }
 
-        public async Task<GridArea> GetAsync(GridAreaId id)
+        public async Task<GridArea?> GetAsync(GridAreaId id)
         {
-            return GridAreaMapper.MapFromEntity(
-                await _marketParticipantDbContext.GridAreas
-                    .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false));
+            var gridArea = await _marketParticipantDbContext.GridAreas
+                .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false);
+            return gridArea is null ? null : GridAreaMapper.MapFromEntity(gridArea);
         }
     }
 }
