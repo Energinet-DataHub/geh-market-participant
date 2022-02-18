@@ -42,6 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
             var testOrg = new Organization(
+                Guid.NewGuid(),
                 new GlobalLocationNumber("123"),
                 "Test");
 
@@ -83,13 +84,21 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
             var testOrg = new Organization(
+                Guid.NewGuid(),
                 new GlobalLocationNumber("123"),
                 "Test");
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
             var newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
-            newOrg = newOrg with { Gln = new GlobalLocationNumber("234"), Name = "NewName" };
+
+            newOrg = new Organization(
+                newOrg!.Id,
+                newOrg.ActorId,
+                new GlobalLocationNumber("234"),
+                "NewName",
+                newOrg.Roles);
+
             await orgRepository.AddOrUpdateAsync(newOrg).ConfigureAwait(false);
             newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
