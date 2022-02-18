@@ -1,3 +1,3 @@
 ALTER TABLE [dbo].[OrganizationInfo]
-    ADD [ActorId] [uniqueidentifier] DEFAULT (newid())
+    ADD [ActorId] [uniqueidentifier] NOT NULL DEFAULT (newid())
 GO
