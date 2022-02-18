@@ -24,40 +24,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection("IntegrationTest")]
     [IntegrationTest]
-    public sealed class OrganizationRepositoryTests
+    public sealed class GridAreaRepositoryTests
     {
         private readonly MarketParticipantDatabaseFixture _fixture;
 
-        public OrganizationRepositoryTests(MarketParticipantDatabaseFixture fixture)
+        public GridAreaRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
             _fixture = fixture;
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_OneOrganization_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization(
-                new GlobalLocationNumber("123"),
-                "Test");
-
-            // Act
-            var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
-            var newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
-
-            // Assert
-            Assert.NotNull(newOrg);
-            Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
-            Assert.Equal(testOrg.Gln.Value, newOrg?.Gln.Value);
-            Assert.Equal(testOrg.Name, newOrg?.Name);
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_OrganizationNotExists_ReturnsNull()
+        public async Task AddOrUpdateAsync_GridNotExists_ReturnsNull()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
@@ -75,29 +52,52 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_OneOrganizationChanged_CanReadBack()
+        public async Task AddOrUpdateAsync_OneGridArea_CanReadBack()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization(
-                new GlobalLocationNumber("123"),
-                "Test");
+            var gridRepository = new GridAreaRepository(context);
+            var testGrid = new GridArea(
+                new GridAreaName("Test Grid Area"),
+                new GridAreaCode("801"));
 
             // Act
-            var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
-            var newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
-            newOrg = newOrg with { Gln = new GlobalLocationNumber("234"), Name = "NewName" };
-            await orgRepository.AddOrUpdateAsync(newOrg).ConfigureAwait(false);
-            newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(newOrg);
-            Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
-            Assert.Equal("234", newOrg?.Gln.Value);
-            Assert.Equal("NewName", newOrg?.Name);
+            Assert.NotNull(newGrid);
+            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
+            Assert.Equal(testGrid.Name.Value, newGrid?.Name.Value);
+            Assert.Equal(testGrid.Code, newGrid?.Code);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_GridAreaChanged_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var gridRepository = new GridAreaRepository(context);
+            var testGrid = new GridArea(
+                new GridAreaName("Test Grid Area"),
+                new GridAreaCode("801"));
+
+            // Act
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+            newGrid = newGrid with { Code = new GridAreaCode("234"), Name = new GridAreaName("NewName") };
+            await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
+            newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(newGrid);
+            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
+            Assert.Equal("234", newGrid?.Code.Value);
+            Assert.Equal("NewName", newGrid?.Name.Value);
         }
     }
 }

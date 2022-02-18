@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,17 +34,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
         {
             Guard.ThrowIfNull(organization, nameof(organization));
-            var orgEntity = OrganizationMapper.MapToEntity(organization);
-            _marketParticipantDbContext.Organizations.Update(orgEntity);
+            var orgEntity =
+                await _marketParticipantDbContext.Organizations.FirstOrDefaultAsync(entity =>
+                    entity.Id == organization.Id.Value).ConfigureAwait(false) ?? new OrganizationEntity();
+
+            _marketParticipantDbContext.Organizations.Update(OrganizationMapper.MapToEntity(organization, orgEntity));
+
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
             return new OrganizationId(orgEntity.Id);
         }
 
-        public async Task<Organization> GetAsync(OrganizationId id)
+        public async Task<Organization?> GetAsync(OrganizationId id)
         {
-            return OrganizationMapper.MapFromEntity(
-                await _marketParticipantDbContext.Organizations
-                    .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false));
+            var org = await _marketParticipantDbContext.Organizations
+                .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false);
+            return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
         }
     }
 }

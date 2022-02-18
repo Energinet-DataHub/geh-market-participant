@@ -20,17 +20,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
     internal sealed class OrganizationMapper
     {
-        public static OrganizationEntity MapToEntity(Organization from)
+        public static OrganizationEntity MapToEntity(Organization from, OrganizationEntity to)
         {
-            return new OrganizationEntity()
-            {
-                Gln = from.Gln.Value,
-                Id = from.Id.Value,
-                Name = from.Name
-            };
+            to.Gln = from.Gln.Value;
+            to.Name = from.Name;
+            to.Id = from.Id.Value;
+            return to;
         }
 
-        public static Organization MapFromEntity(OrganizationEntity from)
+        public static Organization? MapFromEntity(OrganizationEntity from)
         {
             Guard.ThrowIfNull(from, nameof(from));
             return new Organization(
