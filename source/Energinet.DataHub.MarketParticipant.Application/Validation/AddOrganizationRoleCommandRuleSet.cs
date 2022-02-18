@@ -14,21 +14,22 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public class CreateOrganizationCommandRuleSet : AbstractValidator<CreateOrganizationCommand>
+    public sealed class AddOrganizationRoleCommandRuleSet : AbstractValidator<AddOrganizationRoleCommand>
     {
-        public CreateOrganizationCommandRuleSet()
+        public AddOrganizationRoleCommandRuleSet()
         {
-            RuleFor(command => command.Organization.Name)
+            RuleFor(command => command.OrganizationId)
                 .NotEmpty()
-                .Length(1, 50);
+                .SetValidator(new GuidValidationRule<AddOrganizationRoleCommand>());
 
-            RuleFor(command => command.Organization.Gln)
+            RuleFor(command => command.Role.BusinessRole)
                 .NotEmpty()
-                .SetValidator(new GlobalLocationNumberValidationRule<CreateOrganizationCommand>());
+                .IsEnumName(typeof(BusinessRoleCode), false);
         }
     }
 }

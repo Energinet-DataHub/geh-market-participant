@@ -24,7 +24,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, Unit>
+    public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
@@ -35,19 +35,31 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             _organizationEventDispatcher = organizationEventDispatcher;
         }
 
-        public async Task<Unit> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
+        public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organisationToSave = new Organization(
-                new OrganizationId(Guid.NewGuid()),
-                new GlobalLocationNumber(request.Gln),
-                request.Name);
+            var (actor, name, gln) = request.Organization;
 
-            await _organizationRepository.AddOrUpdateAsync(organisationToSave).ConfigureAwait(false);
+            Guid? actorId = null;
+
+            if (Guid.TryParse(actor, out var parsedActorId))
+            {
+                actorId = parsedActorId;
+            }
+
+            var organisationToSave = new Organization(
+                actorId, // TODO: Where do we get ActorId from?
+                new GlobalLocationNumber(gln),
+                name);
+
+            var createdId = await _organizationRepository
+                .AddOrUpdateAsync(organisationToSave)
+                .ConfigureAwait(false);
+
             await _organizationEventDispatcher.DispatchChangedEventAsync(organisationToSave).ConfigureAwait(false);
 
-            return Unit.Value;
+            return new CreateOrganizationResponse(createdId.Value.ToString());
         }
     }
 }

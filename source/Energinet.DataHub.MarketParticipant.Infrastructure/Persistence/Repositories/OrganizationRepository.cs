@@ -34,20 +34,35 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
         {
             Guard.ThrowIfNull(organization, nameof(organization));
-            var orgEntity =
-                await _marketParticipantDbContext.Organizations.FirstOrDefaultAsync(entity =>
-                    entity.Id == organization.Id.Value).ConfigureAwait(false) ?? new OrganizationEntity();
 
-            _marketParticipantDbContext.Organizations.Update(OrganizationMapper.MapToEntity(organization, orgEntity));
+            OrganizationEntity source;
+
+            if (organization.Id.Value == default)
+            {
+                source = new OrganizationEntity();
+            }
+            else
+            {
+                source = await _marketParticipantDbContext
+                    .Organizations
+                    .FirstAsync(entity => entity.Id == organization.Id.Value)
+                    .ConfigureAwait(false);
+            }
+
+            OrganizationMapper.MapToEntity(organization, source);
+            _marketParticipantDbContext.Organizations.Update(source);
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new OrganizationId(orgEntity.Id);
+            return new OrganizationId(source.Id);
         }
 
         public async Task<Organization?> GetAsync(OrganizationId id)
         {
-            var org = await _marketParticipantDbContext.Organizations
-                .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false);
+            var org = await _marketParticipantDbContext
+                .Organizations
+                .FirstOrDefaultAsync(s => s.Id == id.Value)
+                .ConfigureAwait(false);
+
             return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
         }
     }

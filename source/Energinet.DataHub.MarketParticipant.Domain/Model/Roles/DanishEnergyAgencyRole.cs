@@ -12,18 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Validation;
-using FluentValidation;
-using SimpleInjector;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 {
-    internal static class ApplicationServiceRegistration
+    public sealed class DanishEnergyAgencyRole : OrganizationRoleBase, IOrganizationRole
     {
-        public static void AddApplicationServices(this Container container)
+        public DanishEnergyAgencyRole()
         {
-            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
         }
+
+        public DanishEnergyAgencyRole(Guid id, RoleStatus status)
+        : base(id, status)
+        {
+        }
+
+        public BusinessRoleCode Code => BusinessRoleCode.Sts;
     }
 }
