@@ -55,6 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
             Container.AddApplicationServices();
             Container.AddDbContextInterfaces();
             Container.AddRepositories();
+            Container.AddServiceBus();
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
