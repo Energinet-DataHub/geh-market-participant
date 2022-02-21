@@ -24,13 +24,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class OrganizationEventDispatcher : IOrganizationEventDispatcher
     {
-        private readonly ServiceBusConfig _serviceBusConfig;
         private readonly IOrganizationChangedEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public OrganizationEventDispatcher(ServiceBusConfig serviceBusConfig, IOrganizationChangedEventParser eventParser, IMarketParticipantServiceBusClient serviceBusClient)
+        public OrganizationEventDispatcher(IOrganizationChangedEventParser eventParser, IMarketParticipantServiceBusClient serviceBusClient)
         {
-            _serviceBusConfig = serviceBusConfig;
             _eventParser = eventParser;
             _serviceBusClient = serviceBusClient;
         }
@@ -48,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             var bytes = _eventParser.Parse(changedEvent);
             var message = new ServiceBusMessage(bytes);
 
-            await using var sender = _serviceBusClient.CreateSender(_serviceBusConfig.TopicMarketParticipantChanged);
+            await using var sender = _serviceBusClient.CreateSender();
 
             await sender.SendMessageAsync(message).ConfigureAwait(false);
         }

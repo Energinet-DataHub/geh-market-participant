@@ -21,10 +21,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     public sealed class MarketParticipantServiceBusClient : IAsyncDisposable, IMarketParticipantServiceBusClient
     {
         private readonly ServiceBusClient _client;
+        private readonly string _queueOrTopicName;
 
-        public MarketParticipantServiceBusClient(string connectionString)
+        public MarketParticipantServiceBusClient(string connectionString, string queueOrTopicName)
         {
             _client = new ServiceBusClient(connectionString);
+            _queueOrTopicName = queueOrTopicName;
         }
 
         public ValueTask DisposeAsync()
@@ -32,9 +34,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return _client.DisposeAsync();
         }
 
-        public ServiceBusSender CreateSender(string queueOrTopicName)
+        public ServiceBusSender CreateSender()
         {
-            return _client.CreateSender(queueOrTopicName);
+            return _client.CreateSender(_queueOrTopicName);
         }
     }
 }

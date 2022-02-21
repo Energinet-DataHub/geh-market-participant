@@ -24,7 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         /// <summary>
         /// Creates a ServiceBusSender
         /// </summary>
-        /// <param name="queueOrTopicName">The queue or topic name.</param>
-        ServiceBusSender CreateSender(string queueOrTopicName);
+        ServiceBusSender CreateSender();
     }
 }

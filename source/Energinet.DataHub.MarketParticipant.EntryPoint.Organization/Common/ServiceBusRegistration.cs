@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,13 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
             {
                 var configuration = container.GetService<IConfiguration>();
 
-                return new ServiceBusConfig(
+                return new MarketParticipantServiceBusClient(
                     configuration.GetValue<string>("SERVICE_BUS_CONNECTION_STRING"),
                     configuration.GetValue<string>("SBT_MARKET_PARTICIPANT_CHANGED_NAME"));
             });
-
-            container.RegisterSingleton(
-                () => new MarketParticipantServiceBusClient(container.GetService<ServiceBusConfig>()!.ConnectionString));
         }
     }
 }
