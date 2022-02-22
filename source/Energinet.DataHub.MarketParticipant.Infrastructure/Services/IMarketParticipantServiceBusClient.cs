@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Azure.Messaging.ServiceBus;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    /// <summary>
+    /// IMarketParticipantServiceBusClient
+    /// </summary>
+    public interface IMarketParticipantServiceBusClient
+    {
+        /// <summary>
+        /// Creates a ServiceBusSender
+        /// </summary>
+        ServiceBusSender CreateSender();
+    }
 }

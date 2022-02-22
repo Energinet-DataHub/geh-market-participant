@@ -18,22 +18,22 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    ///     Provides access to the Organizations.
+    /// Provides access to organizations.
     /// </summary>
     public interface IOrganizationRepository
     {
         /// <summary>
-        ///     Starts tracking an entity, it updates it if already present or adds it if not already present.
+        /// Adds the given organization to the repository, or updates it, if it already exists.
         /// </summary>
-        /// <param name="organization">The organization to add or update</param>
-        /// <returns>The id of the added organization</returns>
+        /// <param name="organization">The organization to add or update.</param>
+        /// <returns>The id of the added organization.</returns>
         Task<OrganizationId> AddOrUpdateAsync(Organization organization);
 
         /// <summary>
-        ///     Gets an organization with the specified Id
+        /// Gets an organization with the specified id.
         /// </summary>
-        /// <param name="id">The Id of the organization to get.</param>
-        /// <returns>The specified grid area or null if not found</returns>
+        /// <param name="id">The id of the organization to get.</param>
+        /// <returns>The organization with the specified id; or null if the organization does not exist.</returns>
         Task<Organization?> GetAsync(OrganizationId id);
     }
 }

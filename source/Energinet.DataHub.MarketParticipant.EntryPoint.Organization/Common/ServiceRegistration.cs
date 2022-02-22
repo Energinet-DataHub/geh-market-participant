@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    internal static class ServiceRegistration
+    {
+        public static void AddServices(this Container container)
+        {
+            container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
+        }
+    }
 }

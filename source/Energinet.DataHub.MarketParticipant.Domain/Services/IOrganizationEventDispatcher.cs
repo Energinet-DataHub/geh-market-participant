@@ -12,9 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    /// <summary>
+    /// IOrganizationEventDispatcher
+    /// </summary>
+    public interface IOrganizationEventDispatcher
+    {
+        /// <summary>
+        /// Dispatches a changed event for a given organization
+        /// </summary>
+        /// <param name="organization">The organization to dispatch event for.</param>
+        Task DispatchChangedEventAsync(Organization organization);
+    }
 }

@@ -12,18 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Validation;
+using FluentValidation;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 {
-    internal sealed class Startup : StartupBase
+    internal static class ApplicationServiceRegistration
     {
-        protected override void Configure(Container container)
+        public static void AddApplicationServices(this Container container)
         {
-            Container.Register<CreateOrganizationFunction>();
-            Container.Register<AddOrganizationRoleFunction>();
+            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<AddOrganizationRoleCommand>, AddOrganizationRoleCommandRuleSet>(Lifestyle.Scoped);
         }
     }
 }
