@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -32,7 +33,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateOrganizationHandler(new Mock<IOrganizationRepository>().Object);
+            var target = new CreateOrganizationHandler(
+                new Mock<IOrganizationRepository>().Object,
+                new Mock<IOrganizationEventDispatcher>().Object);
 
             // Act + Assert
             await Assert
@@ -45,7 +48,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateOrganizationHandler(organizationRepository.Object);
+            var target = new CreateOrganizationHandler(
+                organizationRepository.Object,
+                new Mock<IOrganizationEventDispatcher>().Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -69,7 +74,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateOrganizationHandler(organizationRepository.Object);
+            var target = new CreateOrganizationHandler(
+                organizationRepository.Object,
+                new Mock<IOrganizationEventDispatcher>().Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -91,6 +98,41 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.Equal(expectedId.ToString(), response.OrganizationId);
+        }
+
+        [Fact]
+        public async Task Handle_NewOrganization_DispatchesEvent()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationEventDispatcher = new Mock<IOrganizationEventDispatcher>();
+            var target = new CreateOrganizationHandler(
+                organizationRepository.Object,
+                organizationEventDispatcher.Object);
+
+            var expectedId = Guid.NewGuid();
+
+            const string actorId = "0a7e6621-4a3a-49c4-8b5e-9c7d4d93baae";
+            const string orgName = "SomeName";
+            const string orgGln = "SomeGln";
+
+            organizationRepository
+                .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(
+                    o => o.ActorId.ToString() == actorId && o.Name == orgName && o.Gln.Value == orgGln)))
+                .ReturnsAsync(new OrganizationId(expectedId));
+
+            var command = new CreateOrganizationCommand(new OrganizationDto(actorId, orgName, orgGln));
+
+            // Act
+            await target
+                .Handle(command, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            organizationEventDispatcher.Verify(
+                x => x.DispatchChangedEventAsync(It.Is<Organization>(
+                    o => o.Id.Value == expectedId)),
+                Times.Once);
         }
     }
 }

@@ -48,16 +48,25 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 actorId = parsedActorId;
             }
 
-            var organisationToSave = new Organization(
+            var organizationToSave = new Organization(
                 actorId, // TODO: Where do we get ActorId from?
                 new GlobalLocationNumber(gln),
                 name);
 
             var createdId = await _organizationRepository
-                .AddOrUpdateAsync(organisationToSave)
+                .AddOrUpdateAsync(organizationToSave)
                 .ConfigureAwait(false);
 
-            await _organizationEventDispatcher.DispatchChangedEventAsync(organisationToSave).ConfigureAwait(false);
+            var organizationWithId = new Organization(
+                createdId,
+                organizationToSave.ActorId,
+                organizationToSave.Gln,
+                organizationToSave.Name,
+                organizationToSave.Roles);
+
+            await _organizationEventDispatcher
+                .DispatchChangedEventAsync(organizationWithId)
+                .ConfigureAwait(false);
 
             return new CreateOrganizationResponse(createdId.Value.ToString());
         }
