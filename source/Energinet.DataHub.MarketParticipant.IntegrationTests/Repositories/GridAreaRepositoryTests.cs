@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
             var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
-            newGrid = newGrid with { Code = new GridAreaCode("234"), Name = new GridAreaName("NewName") };
+            newGrid = newGrid! with { Code = new GridAreaCode("234"), Name = new GridAreaName("NewName") };
             await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
             newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
 

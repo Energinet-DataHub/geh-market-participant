@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -78,6 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             private static void AddMockConfiguration(Container container)
             {
                 container.Options.AllowOverridingRegistrations = true;
+                container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
             }
         }
     }

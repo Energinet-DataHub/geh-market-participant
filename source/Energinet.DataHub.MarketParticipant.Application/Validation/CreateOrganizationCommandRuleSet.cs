@@ -22,13 +22,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public CreateOrganizationCommandRuleSet()
         {
-            RuleFor(command => command.Organization.Name)
-                .NotEmpty()
-                .Length(1, 50);
+            RuleFor(command => command.Organization)
+                .NotNull()
+                .ChildRules(validator =>
+                {
+                    validator
+                        .RuleFor(organization => organization.Name)
+                        .NotEmpty()
+                        .Length(1, 50);
 
-            RuleFor(command => command.Organization.Gln)
-                .NotEmpty()
-                .SetValidator(new GlobalLocationNumberValidationRule<CreateOrganizationCommand>());
+                    validator
+                        .RuleFor(organization => organization.Gln)
+                        .NotEmpty()
+                        .SetValidator(new GlobalLocationNumberValidationRule<OrganizationDto>());
+                });
         }
     }
 }
