@@ -142,5 +142,32 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
             Assert.Contains(organization.Roles, x => x is DanishEnergyAgencyRole);
         }
+
+        [Fact]
+        public async Task GetAsync_DifferentContexts_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepository2 = new OrganizationRepository(context2);
+
+            var organization = new Organization(
+                null,
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            // Act
+            organization.AddRole(new BalancePowerSupplierRole());
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository2.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Single(organization!.Roles);
+            Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
+        }
     }
 }

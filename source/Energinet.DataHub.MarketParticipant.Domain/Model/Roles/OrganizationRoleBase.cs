@@ -37,19 +37,25 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 
         public void Activate()
         {
-            EnsureCorrectState(RoleStatus.Active, RoleStatus.New, RoleStatus.Inactive);
+            EnsureCorrectState(RoleStatus.Active, RoleStatus.New, RoleStatus.Inactive, RoleStatus.Passive);
             Status = RoleStatus.Active;
         }
 
         public void Deactivate()
         {
-            EnsureCorrectState(RoleStatus.Inactive, RoleStatus.Active);
+            EnsureCorrectState(RoleStatus.Inactive, RoleStatus.Active, RoleStatus.Passive);
             Status = RoleStatus.Inactive;
+        }
+
+        public void SetAsPassive()
+        {
+            EnsureCorrectState(RoleStatus.Passive, RoleStatus.Active, RoleStatus.Inactive);
+            Status = RoleStatus.Passive;
         }
 
         public void Delete()
         {
-            EnsureCorrectState(RoleStatus.Deleted, RoleStatus.New, RoleStatus.Active, RoleStatus.Inactive);
+            EnsureCorrectState(RoleStatus.Deleted, RoleStatus.New, RoleStatus.Active, RoleStatus.Inactive, RoleStatus.Passive);
             Status = RoleStatus.Deleted;
         }
 

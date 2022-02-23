@@ -14,12 +14,12 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public enum RoleStatus
+    /// <summary>
+    /// Describes a marked role and its permissions.
+    /// </summary>
+#pragma warning disable CA1040 // Avoid empty interfaces, TODO: Permissions are added later.
+    public interface IMarketRole
+#pragma warning restore CA1040 // Avoid empty interfaces
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
     }
 }

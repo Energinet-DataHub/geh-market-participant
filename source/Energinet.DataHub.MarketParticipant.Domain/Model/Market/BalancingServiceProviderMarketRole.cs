@@ -6,20 +6,13 @@
 //
 //     http://www.apache.org/licenses/LICENSE-2.0
 //
-// Unless required by applicable law or agreed to in writing, software
+// Unless required by applicable law or agreed to in writing,software
 // distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Market
 {
-    public enum RoleStatus
-    {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
-    }
+    public sealed class BalancingServiceProviderMarketRole : IMarketRole { }
 }

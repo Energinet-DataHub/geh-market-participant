@@ -17,7 +17,7 @@ using System;
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     /// <summary>
-    /// Represents one of the role of an organization.
+    /// Represents one of the roles of an organization.
     /// </summary>
     public interface IOrganizationRole
     {
@@ -38,15 +38,21 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         /// <summary>
         /// Activates the current role, the status changes to Active.
-        /// Only New and Inactive roles can be activated.
+        /// Only New, Inactive and Passive roles can be activated.
         /// </summary>
         void Activate();
 
         /// <summary>
         /// Deactives the current role, the status changes to Inactive.
-        /// Only Active roles can be deactivated.
+        /// Only Active and Passive roles can be deactivated.
         /// </summary>
         void Deactivate();
+
+        /// <summary>
+        /// Passive roles have certain domain-specific actions that can be performed.
+        /// Only Active and Inactive roles can be set to passive.
+        /// </summary>
+        void SetAsPassive();
 
         /// <summary>
         /// Soft-deletes the current role, the status changes to Deleted.
