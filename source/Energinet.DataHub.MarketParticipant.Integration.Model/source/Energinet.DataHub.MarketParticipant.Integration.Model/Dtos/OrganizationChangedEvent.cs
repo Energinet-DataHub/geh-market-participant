@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="actorId">Actor ID</param>
         /// <param name="gln">GLN number</param>
         /// <param name="name">Name</param>
-        public OrganizationChangedEvent(Guid id, Guid actorId, string gln, string name)
+        public OrganizationChangedEvent(Guid id, Guid? actorId, string gln, string name)
         {
             Id = id;
             ActorId = actorId;
@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         }
 
         public Guid Id { get; }
-        public Guid ActorId { get; }
+        public Guid? ActorId { get; }
         public string Gln { get; }
         public string Name { get; }
     }
