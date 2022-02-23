@@ -20,13 +20,13 @@ using FluentValidation.Validators;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
-    public class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, string>
+    public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, string>
     {
         public override string Name => "GlobalLocationNumberValidation";
 
         public override bool IsValid(ValidationContext<T> context, string value)
         {
-            return IsValidGlnNumber(value);
+            return !string.IsNullOrEmpty(value) && IsValidGlnNumber(value);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)

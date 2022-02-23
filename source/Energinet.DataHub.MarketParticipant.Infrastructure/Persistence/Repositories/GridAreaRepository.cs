@@ -18,7 +18,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -34,19 +33,36 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
         {
             Guard.ThrowIfNull(gridArea, nameof(gridArea));
-            var gridEntity =
-                await _marketParticipantDbContext.GridAreas.FirstOrDefaultAsync(entity =>
-                    entity.Id == gridArea.Id.Value).ConfigureAwait(false) ?? new GridAreaEntity();
 
-            _marketParticipantDbContext.GridAreas.Update(GridAreaMapper.MapToEntity(gridArea, gridEntity));
+            GridAreaEntity destination;
+
+            if (gridArea.Id.Value == default)
+            {
+                destination = new GridAreaEntity();
+            }
+            else
+            {
+                destination = await _marketParticipantDbContext
+                    .GridAreas
+                    .FindAsync(gridArea.Id.Value)
+                    .ConfigureAwait(false);
+            }
+
+            GridAreaMapper.MapToEntity(gridArea, destination);
+            _marketParticipantDbContext.GridAreas.Update(destination);
+
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new GridAreaId(gridEntity.Id);
+            return new GridAreaId(destination.Id);
         }
 
         public async Task<GridArea?> GetAsync(GridAreaId id)
         {
+            Guard.ThrowIfNull(id, nameof(id));
+
             var gridArea = await _marketParticipantDbContext.GridAreas
-                .SingleOrDefaultAsync(s => s.Id == id.Value).ConfigureAwait(false);
+                .FindAsync(id.Value)
+                .ConfigureAwait(false);
+
             return gridArea is null ? null : GridAreaMapper.MapFromEntity(gridArea);
         }
     }

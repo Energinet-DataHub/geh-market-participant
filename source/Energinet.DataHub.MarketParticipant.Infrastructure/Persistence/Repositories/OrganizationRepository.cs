@@ -18,11 +18,10 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
-    public class OrganizationRepository : IOrganizationRepository
+    public sealed class OrganizationRepository : IOrganizationRepository
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
@@ -35,32 +34,34 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             Guard.ThrowIfNull(organization, nameof(organization));
 
-            OrganizationEntity source;
+            OrganizationEntity destination;
 
             if (organization.Id.Value == default)
             {
-                source = new OrganizationEntity();
+                destination = new OrganizationEntity();
             }
             else
             {
-                source = await _marketParticipantDbContext
+                destination = await _marketParticipantDbContext
                     .Organizations
-                    .FirstAsync(entity => entity.Id == organization.Id.Value)
+                    .FindAsync(organization.Id.Value)
                     .ConfigureAwait(false);
             }
 
-            OrganizationMapper.MapToEntity(organization, source);
-            _marketParticipantDbContext.Organizations.Update(source);
+            OrganizationMapper.MapToEntity(organization, destination);
+            _marketParticipantDbContext.Organizations.Update(destination);
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new OrganizationId(source.Id);
+            return new OrganizationId(destination.Id);
         }
 
         public async Task<Organization?> GetAsync(OrganizationId id)
         {
+            Guard.ThrowIfNull(id, nameof(id));
+
             var org = await _marketParticipantDbContext
                 .Organizations
-                .FirstOrDefaultAsync(s => s.Id == id.Value)
+                .FindAsync(id.Value)
                 .ConfigureAwait(false);
 
             return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
