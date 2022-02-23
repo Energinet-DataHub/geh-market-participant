@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Tests
 {
-    public sealed class TestB
+    public sealed class CreateOrganizationHandlerTests
     {
-        public TestB()
-        {
-            new OrganizationRepository(null!).Equals(null!);
-        }
     }
 }
