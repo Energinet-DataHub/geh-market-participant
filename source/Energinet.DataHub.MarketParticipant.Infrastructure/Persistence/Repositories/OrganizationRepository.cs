@@ -18,7 +18,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -45,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             {
                 destination = await _marketParticipantDbContext
                     .Organizations
-                    .FirstAsync(entity => entity.Id == organization.Id.Value)
+                    .FindAsync(organization.Id.Value)
                     .ConfigureAwait(false);
             }
 
@@ -62,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var org = await _marketParticipantDbContext
                 .Organizations
-                .FirstOrDefaultAsync(s => s.Id == id.Value)
+                .FindAsync(id.Value)
                 .ConfigureAwait(false);
 
             return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
