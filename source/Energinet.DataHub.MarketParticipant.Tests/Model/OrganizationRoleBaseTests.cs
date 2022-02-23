@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Xunit;
@@ -103,7 +104,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
 
             public OrganizationRoleBaseTest(RoleStatus initialStatus)
-                : base(Guid.Empty, initialStatus)
+                : base(Guid.Empty, initialStatus, new Collection<MeteringPointType>())
             {
             }
         }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
@@ -23,17 +24,20 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
             Id = Guid.Empty;
             Status = RoleStatus.New;
+            MeteringPointTypes = new Collection<MeteringPointType>();
         }
 
-        protected OrganizationRoleBase(Guid id, RoleStatus status)
+        protected OrganizationRoleBase(Guid id, RoleStatus status, Collection<MeteringPointType> meteringPointTypes)
         {
             Id = id;
             Status = status;
+            MeteringPointTypes = meteringPointTypes;
         }
 
         public Guid Id { get; }
 
         public RoleStatus Status { get; private set; }
+        public Collection<MeteringPointType> MeteringPointTypes { get; init; }
 
         public void Activate()
         {
@@ -56,9 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         private void EnsureCorrectState(RoleStatus targetState, params RoleStatus[] allowedStates)
         {
             if (!allowedStates.Contains(Status) && targetState != Status)
-            {
                 throw new InvalidOperationException($"Cannot change state from {Status} to {targetState}.");
-            }
         }
     }
 }

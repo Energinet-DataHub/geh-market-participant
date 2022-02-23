@@ -13,14 +13,23 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
+using System.Data.Common;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
     public sealed class OrganizationRoleEntity
     {
+        public OrganizationRoleEntity()
+        {
+            MeteringPointTypes = new Collection<MeteringPointType>();
+        }
+
         public Guid Id { get; set; }
         public Guid OrganizationId { get; set; }
         public int BusinessRole { get; set; }
         public int Status { get; set; }
+        public Collection<MeteringPointType> MeteringPointTypes { get; }
     }
 }

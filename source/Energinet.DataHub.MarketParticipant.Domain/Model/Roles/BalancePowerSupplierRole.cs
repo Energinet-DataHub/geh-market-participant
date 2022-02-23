@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 {
@@ -22,8 +23,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
         }
 
-        public BalancePowerSupplierRole(Guid id, RoleStatus status)
-        : base(id, status)
+        public BalancePowerSupplierRole(Guid id, RoleStatus status, Collection<MeteringPointType> meteringPointTypes)
+            : base(id, status, meteringPointTypes)
         {
         }
 

@@ -142,5 +142,38 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
             Assert.Contains(organization.Roles, x => x is DanishEnergyAgencyRole);
         }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_OrganizationRoleWithMeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization(
+                null,
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            var roleWithMeteringTypes = new MeteringPointAdministratorRole();
+            roleWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D02Analysis);
+            organization.AddRole(roleWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Single(organization!.Roles);
+            Assert.Contains(organization.Roles, x => x is MeteringPointAdministratorRole);
+            Assert.Contains(
+                organization.Roles.First().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D02Analysis));
+        }
     }
 }
