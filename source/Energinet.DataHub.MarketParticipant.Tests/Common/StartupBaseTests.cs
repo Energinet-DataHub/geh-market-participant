@@ -15,6 +15,8 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -32,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         {
             // Arrange
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton((IConfiguration)new ConfigurationBuilder().Build());
+            serviceCollection.AddSingleton(BuildConfig());
             await using var target = new TestOfStartupBase();
 
             // Act
@@ -49,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         {
             // Arrange
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<IConfiguration>(BuildConfig());
+            serviceCollection.AddSingleton(BuildConfig());
             var configureContainerMock = new Mock<Action>();
             await using var target = new TestOfStartupBase { ConfigureContainer = configureContainerMock.Object };
 
@@ -60,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             configureContainerMock.Verify(x => x(), Times.Once);
         }
 
-        private static IConfigurationRoot BuildConfig()
+        private static IConfiguration BuildConfig()
         {
             return new ConfigurationBuilder().AddEnvironmentVariables().Build();
         }
@@ -78,6 +80,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             private static void AddMockConfiguration(Container container)
             {
                 container.Options.AllowOverridingRegistrations = true;
+                container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
+                container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
             }
         }
     }

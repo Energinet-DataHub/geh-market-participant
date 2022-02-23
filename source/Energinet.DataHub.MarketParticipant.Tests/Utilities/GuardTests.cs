@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
-using SimpleInjector;
+using System;
+using Energinet.DataHub.MarketParticipant.Utilities;
+using Xunit;
+using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
+namespace Energinet.DataHub.MarketParticipant.Tests.Utilities
 {
-    internal static class ServiceRegistration
+    [UnitTest]
+    public class GuardTests
     {
-        public static void AddServices(this Container container)
+        [Fact]
+        public void ThrowIfNull_UsesCorrectParameterName()
         {
-            container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
-            container.Register<IOrganizationEventDispatcher, OrganizationEventDispatcher>(Lifestyle.Scoped);
+            // Arrange + Act
+            var exception = Assert.Throws<ArgumentNullException>(() => TestMethod(null!));
+
+            // Assert
+            Assert.Equal("str", exception.ParamName);
+        }
+
+        private static void TestMethod(string str)
+        {
+            Guard.ThrowIfNull(str, nameof(str));
         }
     }
 }
