@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -59,6 +60,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public void AddRole(IOrganizationRole organizationRole)
         {
+            Guard.ThrowIfNull(organizationRole, nameof(organizationRole));
+
             // TODO: Validation rules. Check for conflicting roles.
             _roles.Add(organizationRole);
         }

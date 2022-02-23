@@ -27,9 +27,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 .NotEmpty()
                 .SetValidator(new GuidValidationRule<AddOrganizationRoleCommand>());
 
-            RuleFor(command => command.Role.BusinessRole)
-                .NotEmpty()
-                .IsEnumName(typeof(BusinessRoleCode), false);
+            RuleFor(command => command.Role)
+                .NotNull()
+                .ChildRules(validator =>
+                {
+                    validator
+                        .RuleFor(role => role.BusinessRole)
+                        .NotEmpty()
+                        .IsEnumName(typeof(BusinessRoleCode), false);
+                });
         }
     }
 }

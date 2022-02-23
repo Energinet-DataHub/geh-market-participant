@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -21,20 +20,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
-    [SuppressMessage(
-        "ReSharper",
-        "UnusedAutoPropertyAccessor.Local",
-        Justification = "Private setters are needed by EF Core")]
     public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     {
-#nullable disable
         public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<OrganizationEntity> Organizations { get; private set; }
-        public DbSet<GridAreaEntity> GridAreas { get; private set; }
+        // Used for mocking.
+        protected MarketParticipantDbContext()
+        {
+        }
+
+        public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
+        public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
 
         public Task<int> SaveChangesAsync()
         {

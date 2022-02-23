@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -107,6 +109,38 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
             Assert.Equal("234", newOrg?.Gln.Value);
             Assert.Equal("NewName", newOrg?.Name);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_OrganizationRoleAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+
+            var organization = new Organization(
+                null,
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            organization.AddRole(new BalancePowerSupplierRole());
+
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Act
+            organization!.AddRole(new DanishEnergyAgencyRole());
+
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Equal(2, organization!.Roles.Count());
+            Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
+            Assert.Contains(organization.Roles, x => x is DanishEnergyAgencyRole);
         }
     }
 }

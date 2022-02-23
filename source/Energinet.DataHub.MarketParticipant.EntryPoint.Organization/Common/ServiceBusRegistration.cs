@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
     {
         public static void AddServiceBus(this Container container)
         {
-            container.RegisterSingleton(() =>
+            container.RegisterSingleton<IMarketParticipantServiceBusClient>(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
 
