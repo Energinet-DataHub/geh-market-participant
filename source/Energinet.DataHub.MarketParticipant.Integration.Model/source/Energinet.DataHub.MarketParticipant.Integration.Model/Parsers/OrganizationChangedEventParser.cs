@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 
                 return new OrganizationChangedEvent(
                     id: Guid.Parse(contract.Id),
-                    actorId: Guid.Parse(contract.ActorId),
+                    actorId: !string.IsNullOrWhiteSpace(contract.ActorId) ? Guid.Parse(contract.ActorId) : null,
                     gln: contract.Gln,
                     name: contract.Name);
             }
@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return new OrganizationChangedEventContract
                 {
                     Id = changedEvent.Id.ToString(),
-                    ActorId = changedEvent.ActorId.ToString(),
+                    ActorId = changedEvent.ActorId?.ToString(),
                     Gln = changedEvent.Gln,
                     Name = changedEvent.Name,
                 }.ToByteArray();
