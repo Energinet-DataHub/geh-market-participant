@@ -121,7 +121,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
 
             var organization = new Organization(
-                null,
+                Guid.NewGuid(),
                 new GlobalLocationNumber("123"),
                 "Test");
 
@@ -153,7 +153,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
 
             var organization = new Organization(
-                null,
+                Guid.NewGuid(),
                 new GlobalLocationNumber("123"),
                 "Test");
 
@@ -192,7 +192,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository2 = new OrganizationRepository(context2);
 
             var organization = new Organization(
-                null,
+                Guid.NewGuid(),
                 new GlobalLocationNumber("123"),
                 "Test");
 

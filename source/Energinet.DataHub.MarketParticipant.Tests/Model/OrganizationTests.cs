@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void AddRoles_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new Organization(null, new GlobalLocationNumber("1234"), "fake_value");
+            var target = new Organization(Guid.NewGuid(), new GlobalLocationNumber("1234"), "fake_value");
 
             // Act + Assert
             Assert.Throws<ArgumentNullException>(() => target.AddRole(null!));
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void AddRoles_ValidRole_IsInCollection()
         {
             // Arrange
-            var target = new Organization(null, new GlobalLocationNumber("1234"), "fake_value");
+            var target = new Organization(Guid.NewGuid(), new GlobalLocationNumber("1234"), "fake_value");
 
             // Act
             target.AddRole(new SystemOperatorRole());

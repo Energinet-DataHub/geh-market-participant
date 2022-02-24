@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             {
                 var organizationDto = await JsonSerializer
                     .DeserializeAsync<OrganizationDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty, string.Empty, string.Empty);
+                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty, string.Empty);
 
                 return new CreateOrganizationCommand(organizationDto);
             }
