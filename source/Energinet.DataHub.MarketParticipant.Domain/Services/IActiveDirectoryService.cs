@@ -12,7 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+using System;
+using System.Threading.Tasks;
+
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed record OrganizationDto(string Name, string Gln);
+    /// <summary>
+    /// Service for accessing Azure AD
+    /// </summary>
+    public interface IActiveDirectoryService
+    {
+        /// <summary>
+        /// Ensures an App registration ID for the given GLN number
+        /// </summary>
+        Task<Guid> EnsureAppRegistrationIdAsync(string gln);
+    }
 }

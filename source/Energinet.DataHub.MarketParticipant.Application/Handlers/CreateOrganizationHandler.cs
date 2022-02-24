@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -28,28 +28,25 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
+        private readonly IActiveDirectoryService _activeDirectoryService;
 
-        public CreateOrganizationHandler(IOrganizationRepository organizationRepository, IOrganizationEventDispatcher organizationEventDispatcher)
+        public CreateOrganizationHandler(IOrganizationRepository organizationRepository, IOrganizationEventDispatcher organizationEventDispatcher, IActiveDirectoryService activeDirectoryService)
         {
             _organizationRepository = organizationRepository;
             _organizationEventDispatcher = organizationEventDispatcher;
+            _activeDirectoryService = activeDirectoryService;
         }
 
         public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var (actor, name, gln) = request.Organization;
+            var (name, gln) = request.Organization;
 
-            Guid? actorId = null;
-
-            if (Guid.TryParse(actor, out var parsedActorId))
-            {
-                actorId = parsedActorId;
-            }
+            var appRegistrationId = await _activeDirectoryService.EnsureAppRegistrationIdAsync(gln).ConfigureAwait(false);
 
             var organizationToSave = new Organization(
-                actorId, // TODO: Where do we get ActorId from?
+                appRegistrationId,
                 new GlobalLocationNumber(gln),
                 name);
 
