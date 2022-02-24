@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
@@ -23,17 +24,21 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
             Id = Guid.Empty;
             Status = RoleStatus.New;
+            MarketRoles = new List<MarketRole>();
         }
 
-        protected OrganizationRoleBase(Guid id, RoleStatus status)
+        protected OrganizationRoleBase(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
         {
             Id = id;
             Status = status;
+            MarketRoles = new List<MarketRole>(marketRoles);
         }
 
         public Guid Id { get; }
 
         public RoleStatus Status { get; private set; }
+
+        public ICollection<MarketRole> MarketRoles { get; }
 
         public void Activate()
         {

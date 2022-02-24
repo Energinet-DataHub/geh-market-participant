@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
 
             public OrganizationRoleBaseTest(RoleStatus initialStatus)
-                : base(Guid.Empty, initialStatus)
+                : base(Guid.Empty, initialStatus, Array.Empty<MarketRole>())
             {
             }
         }

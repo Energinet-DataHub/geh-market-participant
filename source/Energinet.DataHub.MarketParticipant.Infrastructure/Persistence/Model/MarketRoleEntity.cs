@@ -12,7 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Market
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class LfcOperatorMarketRole : IMarketRole { }
+    public sealed class MarketRoleEntity
+    {
+        public Guid Id { get; set; }
+        public Guid OrganizationRoleId { get; set; }
+        public int Function { get; set; }
+    }
 }

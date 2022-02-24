@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -35,6 +36,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// The status of the current role.
         /// </summary>
         RoleStatus Status { get; }
+
+        /// <summary>
+        /// The list of market roles (functions and permissions) supported by the current organization role.
+        /// </summary>
+        public ICollection<MarketRole> MarketRoles { get; }
 
         /// <summary>
         /// Activates the current role, the status changes to Active.

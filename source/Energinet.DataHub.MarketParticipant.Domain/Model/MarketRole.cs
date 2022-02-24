@@ -12,7 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Market
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed class MeritOrderListResponsibleMarketRole : IMarketRole { }
+    /// <summary>
+    /// Describes a marked role, defined by its function and permissions.
+    /// </summary>
+    public sealed class MarketRole
+    {
+        public MarketRole(EicFunction function)
+        {
+            Function = function;
+        }
+
+        /// <summary>
+        /// Specifies the EIC function of the current role.
+        /// </summary>
+        public EicFunction Function { get; }
+    }
 }

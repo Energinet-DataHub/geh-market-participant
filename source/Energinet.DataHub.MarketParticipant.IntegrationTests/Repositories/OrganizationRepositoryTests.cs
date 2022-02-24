@@ -144,6 +144,42 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
+        public async Task AddOrUpdateAsync_MarketRoleAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+
+            var organization = new Organization(
+                null,
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            organization.AddRole(new BalancePowerSupplierRole { MarketRoles = { new MarketRole(EicFunction.BalancingServiceProvider) } });
+
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Act
+            organization!.AddRole(new DanishEnergyAgencyRole { MarketRoles = { new MarketRole(EicFunction.SystemOperator) } });
+
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Equal(2, organization!.Roles.Count());
+            Assert.Contains(
+                organization.Roles,
+                x => x is BalancePowerSupplierRole role && role.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
+            Assert.Contains(
+                organization.Roles,
+                x => x is DanishEnergyAgencyRole role && role.MarketRoles.All(y => y.Function == EicFunction.SystemOperator));
+        }
+
+        [Fact]
         public async Task GetAsync_DifferentContexts_CanReadBack()
         {
             // Arrange
@@ -151,6 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 

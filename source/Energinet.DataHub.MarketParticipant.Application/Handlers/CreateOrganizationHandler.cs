@@ -29,7 +29,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
 
-        public CreateOrganizationHandler(IOrganizationRepository organizationRepository, IOrganizationEventDispatcher organizationEventDispatcher)
+        public CreateOrganizationHandler(
+            IOrganizationRepository organizationRepository,
+            IOrganizationEventDispatcher organizationEventDispatcher)
         {
             _organizationRepository = organizationRepository;
             _organizationEventDispatcher = organizationEventDispatcher;

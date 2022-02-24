@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Market
+namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed class SchedulingAreaResponsibleMarketRole : IMarketRole { }
+    public sealed record MarketRoleDto(string Function);
 }
