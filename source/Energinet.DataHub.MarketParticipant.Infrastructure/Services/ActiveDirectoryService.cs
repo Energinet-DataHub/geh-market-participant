@@ -31,6 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task<Guid> EnsureAppRegistrationIdAsync(string gln)
         {
+            // This is a temporary implementation using the actor DB.
+            // Will be replaced by Azure AD integration at a later time.
             const string param = "GLN";
             const string query = @"SELECT TOP 1 [Id]
                         FROM  [dbo].[ActorInfo]
@@ -53,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 return Guid.Parse(record.GetString(0));
             }
 
-            throw new InvalidOperationException("Actor not found");
+            return Guid.NewGuid();
         }
     }
 }
