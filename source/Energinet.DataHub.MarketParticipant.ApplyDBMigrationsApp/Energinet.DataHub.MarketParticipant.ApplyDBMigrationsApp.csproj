@@ -45,6 +45,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-001\Model\202201311006 Set Keys and Default.sql" />
     <EmbeddedResource Include="Scripts\B-001\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Model\202202161302 Create GridAreaNew Table.sql" />
+    <EmbeddedResource Include="Scripts\B-001\Model\202202231708 Add MeteringTypeToRole Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311101 Seed ActorInfo Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311102 Seed GridAreaInfo Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311103 Seed GridAreaLinkInfo Table.sql" />
@@ -53,6 +54,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202202161302 Create GridAreaNew Table.sql" />
+    <EmbeddedResource Include="Scripts\B-002\Model\202202231708 Add MeteringTypeToRole Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
     <EmbeddedResource Include="Scripts\LocalDB\202202181115 Add ActorId to Organization Table.sql" />
@@ -62,6 +64,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\LocalDB\202202231708 Add MeteringTypeToRole Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Model\202202161302 Create GridAreaNew Table.sql" />
+    <EmbeddedResource Include="Scripts\T-001\Model\202202231708 Add MeteringTypeToRole Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202202081107 ChangeVoltActors.sql" />
@@ -70,6 +73,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\T-001\Seed\202202081213 AddBatmanGridAreaLinks.sql" />
     <EmbeddedResource Include="Scripts\U-001\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Model\202202161302 Create GridAreaNew Table.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Model\202202231708 Add MeteringTypeToRole Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311104 RemoveAssignGridAreaToEnerginetActor.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
