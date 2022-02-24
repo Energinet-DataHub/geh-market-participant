@@ -29,8 +29,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public GridAreaEntity? GridArea { get; set; }
         public int BusinessRole { get; set; }
         public int Status { get; set; }
-        private Guid GridAreaId { get; set; }
-
         public Collection<MarketRoleEntity> MarketRoles { get; }
+
+        private Guid GridAreaId { get; set; }
     }
 }

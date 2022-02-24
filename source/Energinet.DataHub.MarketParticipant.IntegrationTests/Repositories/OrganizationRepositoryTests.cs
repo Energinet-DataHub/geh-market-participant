@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -132,7 +133,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new GridArea(
                     new GridAreaId(Guid.Empty),
                     new GridAreaName("fake_value"),
-                    new GridAreaCode("1234"))));
+                    new GridAreaCode("1234")),
+                new List<MarketRole>()));
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -160,7 +162,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
 
             var organization = new Organization(
-                null,
+                Guid.Empty,
                 new GlobalLocationNumber("123"),
                 "Test");
 
@@ -170,7 +172,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new GridArea(
                     new GridAreaId(Guid.Empty),
                     new GridAreaName("fake_value"),
-                    new GridAreaCode("1234"))));
+                    new GridAreaCode("1234")),
+                new List<MarketRole>()));
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
