@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
@@ -24,16 +25,19 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
             Id = Guid.Empty;
             Status = RoleStatus.New;
             Area = new GridArea(new GridAreaId(Guid.Empty), new GridAreaName(string.Empty), new GridAreaCode(string.Empty));
+            MarketRoles = new List<MarketRole>();
         }
 
         protected OrganizationRoleBase(
             Guid id,
             RoleStatus status,
-            GridArea? area)
+            GridArea? area,
+            IEnumerable<MarketRole> marketRoles)
         {
             Id = id;
             Status = status;
             Area = area;
+            MarketRoles = new List<MarketRole>(marketRoles);
         }
 
         public Guid Id { get; }
@@ -42,21 +46,29 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 
         public GridArea? Area { get; }
 
+        public ICollection<MarketRole> MarketRoles { get; }
+
         public void Activate()
         {
-            EnsureCorrectState(RoleStatus.Active, RoleStatus.New, RoleStatus.Inactive);
+            EnsureCorrectState(RoleStatus.Active, RoleStatus.New, RoleStatus.Inactive, RoleStatus.Passive);
             Status = RoleStatus.Active;
         }
 
         public void Deactivate()
         {
-            EnsureCorrectState(RoleStatus.Inactive, RoleStatus.Active);
+            EnsureCorrectState(RoleStatus.Inactive, RoleStatus.Active, RoleStatus.Passive);
             Status = RoleStatus.Inactive;
+        }
+
+        public void SetAsPassive()
+        {
+            EnsureCorrectState(RoleStatus.Passive, RoleStatus.Active, RoleStatus.Inactive);
+            Status = RoleStatus.Passive;
         }
 
         public void Delete()
         {
-            EnsureCorrectState(RoleStatus.Deleted, RoleStatus.New, RoleStatus.Active, RoleStatus.Inactive);
+            EnsureCorrectState(RoleStatus.Deleted, RoleStatus.New, RoleStatus.Active, RoleStatus.Inactive, RoleStatus.Passive);
             Status = RoleStatus.Deleted;
         }
 

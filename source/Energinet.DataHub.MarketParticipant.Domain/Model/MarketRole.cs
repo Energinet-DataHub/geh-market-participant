@@ -12,14 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public enum RoleStatus
+    /// <summary>
+    /// Describes a marked role, defined by its function and permissions.
+    /// </summary>
+    public sealed class MarketRole
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        public MarketRole(EicFunction function)
+        {
+            Function = function;
+        }
+
+        /// <summary>
+        /// Specifies the EIC function of the current role.
+        /// </summary>
+        public EicFunction Function { get; }
     }
 }

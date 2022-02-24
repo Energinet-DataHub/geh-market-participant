@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System;
+using System.Threading.Tasks;
+
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public enum RoleStatus
+    /// <summary>
+    /// Service for accessing Azure AD
+    /// </summary>
+    public interface IActiveDirectoryService
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        /// <summary>
+        /// Ensures an App registration ID for the given GLN number
+        /// </summary>
+        Task<Guid> EnsureAppRegistrationIdAsync(string gln);
     }
 }

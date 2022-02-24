@@ -25,6 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
         {
             container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationEventDispatcher, OrganizationEventDispatcher>(Lifestyle.Scoped);
+            container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
         }
     }
 }

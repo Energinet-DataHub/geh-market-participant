@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record OrganizationRoleDto(string BusinessRole);
+    public sealed record OrganizationRoleDto(string BusinessRole, IEnumerable<MarketRoleDto> MarketRoles);
 }

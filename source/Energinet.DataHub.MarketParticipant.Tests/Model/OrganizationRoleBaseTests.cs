@@ -34,6 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData(RoleStatus.New, true)]
         [InlineData(RoleStatus.Active, true)]
         [InlineData(RoleStatus.Inactive, true)]
+        [InlineData(RoleStatus.Passive, true)]
         [InlineData(RoleStatus.Deleted, false)]
         public void Activate_ChangesState_IfAllowed(RoleStatus initialStatus, bool isAllowed)
         {
@@ -56,6 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData(RoleStatus.New, false)]
         [InlineData(RoleStatus.Active, true)]
         [InlineData(RoleStatus.Inactive, true)]
+        [InlineData(RoleStatus.Passive, true)]
         [InlineData(RoleStatus.Deleted, false)]
         public void Deactivate_ChangesState_IfAllowed(RoleStatus initialStatus, bool isAllowed)
         {
@@ -78,6 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData(RoleStatus.New, true)]
         [InlineData(RoleStatus.Active, true)]
         [InlineData(RoleStatus.Inactive, true)]
+        [InlineData(RoleStatus.Passive, true)]
         [InlineData(RoleStatus.Deleted, true)]
         public void Delete_ChangesState_IfAllowed(RoleStatus initialStatus, bool isAllowed)
         {
@@ -109,7 +112,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                     new GridArea(
                         new GridAreaId(Guid.NewGuid()),
                         new GridAreaName("fake_value"),
-                        new GridAreaCode("fake_value")))
+                        new GridAreaCode("fake_value")),
+                    Array.Empty<MarketRole>())
             {
             }
         }

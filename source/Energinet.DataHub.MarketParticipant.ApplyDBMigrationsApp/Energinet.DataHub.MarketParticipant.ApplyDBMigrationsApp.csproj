@@ -57,6 +57,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-002\Model\202202230930 Add GridAreaId to OrganizationRole Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202240930 Create MarketRole Table.sql" />
     <EmbeddedResource Include="Scripts\LocalDB\202202181115 Add ActorId to Organization Table.sql" />
     <EmbeddedResource Include="Scripts\LocalDB\202202171430 Create OrganizationRole Table.sql" />
     <EmbeddedResource Include="Scripts\LocalDB\202202091216 Create Organization Table.sql" />
@@ -74,6 +75,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\U-001\Model\202202091216 Create Organization Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Model\202202161302 Create GridAreaNew Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Model\202202230930 Add GridAreaId to OrganizationRole Table.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Model\202202240930 Create MarketRole Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311104 RemoveAssignGridAreaToEnerginetActor.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
@@ -84,6 +86,8 @@ limitations under the License.
     <None Remove="Scripts\B-002\Model\202201311000 Create GridAreaInfo Table.sql" />
     <None Remove="Scripts\LocalDB\202202171430 Create OrganizationRole Table.sql" />
     <None Remove="Scripts\LocalDB\202202181115 Add ActorId to Organization Table.sql" />
+    <None Remove="Scripts\LocalDB\202202240930 Create MarketRole Table.sql" />
+    <None Remove="Scripts\U-001\Model\202202240930 Create MarketRole Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202201311000 Create GridAreaInfo Table.sql" />
     <None Remove="Scripts\B-002\Model\202201311001 Create GridArea View.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202201311001 Create GridArea View.sql" />

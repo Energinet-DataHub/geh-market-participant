@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var changedEvent = new OrganizationChangedEvent(
                 organization.Id.Value,
-                System.Guid.NewGuid(),
+                organization.ActorId,
                 organization.Gln.Value,
                 organization.Name);
 

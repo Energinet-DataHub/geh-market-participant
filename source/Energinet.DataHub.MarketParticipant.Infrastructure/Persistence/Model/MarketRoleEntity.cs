@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public enum RoleStatus
+    public sealed class MarketRoleEntity
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        public Guid Id { get; set; }
+        public Guid OrganizationRoleId { get; set; }
+        public int Function { get; set; }
     }
 }

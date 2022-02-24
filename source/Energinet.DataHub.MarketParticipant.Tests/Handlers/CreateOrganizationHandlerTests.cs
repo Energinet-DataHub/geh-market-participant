@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -35,7 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var target = new CreateOrganizationHandler(
                 new Mock<IOrganizationRepository>().Object,
-                new Mock<IOrganizationEventDispatcher>().Object);
+                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IActiveDirectoryService>().Object);
 
             // Act + Assert
             await Assert
@@ -50,7 +52,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new CreateOrganizationHandler(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object);
+                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IActiveDirectoryService>().Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -58,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(expectedId));
 
-            var command = new CreateOrganizationCommand(new OrganizationDto(null, "fake_value", "fake_value"));
+            var command = new CreateOrganizationCommand(new OrganizationDto("fake_value", "fake_value"));
 
             // Act
             var response = await target
@@ -76,20 +79,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new CreateOrganizationHandler(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object);
+                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IActiveDirectoryService>().Object);
 
             var expectedId = Guid.NewGuid();
 
-            const string actorId = "0a7e6621-4a3a-49c4-8b5e-9c7d4d93baae";
             const string orgName = "SomeName";
             const string orgGln = "SomeGln";
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(
-                    o => o.ActorId.ToString() == actorId && o.Name == orgName && o.Gln.Value == orgGln)))
+                    o => o.Name == orgName && o.Gln.Value == orgGln)))
                 .ReturnsAsync(new OrganizationId(expectedId));
 
-            var command = new CreateOrganizationCommand(new OrganizationDto(actorId, orgName, orgGln));
+            var command = new CreateOrganizationCommand(new OrganizationDto(orgName, orgGln));
 
             // Act
             var response = await target
@@ -108,20 +111,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationEventDispatcher = new Mock<IOrganizationEventDispatcher>();
             var target = new CreateOrganizationHandler(
                 organizationRepository.Object,
-                organizationEventDispatcher.Object);
+                organizationEventDispatcher.Object,
+                new Mock<IActiveDirectoryService>().Object);
 
             var expectedId = Guid.NewGuid();
 
-            const string actorId = "0a7e6621-4a3a-49c4-8b5e-9c7d4d93baae";
             const string orgName = "SomeName";
             const string orgGln = "SomeGln";
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(
-                    o => o.ActorId.ToString() == actorId && o.Name == orgName && o.Gln.Value == orgGln)))
+                    o => o.Name == orgName && o.Gln.Value == orgGln)))
                 .ReturnsAsync(new OrganizationId(expectedId));
 
-            var command = new CreateOrganizationCommand(new OrganizationDto(actorId, orgName, orgGln));
+            var command = new CreateOrganizationCommand(new OrganizationDto(orgName, orgGln));
 
             // Act
             await target

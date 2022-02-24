@@ -122,7 +122,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
 
             var organization = new Organization(
-                null,
+                Guid.NewGuid(),
                 new GlobalLocationNumber("123"),
                 "Test");
 
@@ -180,6 +180,70 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal("fake_value", organization?.Roles.First().Area?.Name.Value);
             Assert.NotEqual(Guid.Empty, organization?.Roles.First().Area?.Id.Value);
             Assert.Equal("1234", organization?.Roles.First().Area?.Code.Value);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_MarketRoleAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+
+            var organization = new Organization(
+                Guid.NewGuid(),
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            organization.AddRole(new BalancePowerSupplierRole { MarketRoles = { new MarketRole(EicFunction.BalancingServiceProvider) } });
+
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Act
+            organization!.AddRole(new DanishEnergyAgencyRole { MarketRoles = { new MarketRole(EicFunction.SystemOperator) } });
+
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Equal(2, organization!.Roles.Count());
+            Assert.Contains(
+                organization.Roles,
+                x => x is BalancePowerSupplierRole role && role.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
+            Assert.Contains(
+                organization.Roles,
+                x => x is DanishEnergyAgencyRole role && role.MarketRoles.All(y => y.Function == EicFunction.SystemOperator));
+        }
+
+        [Fact]
+        public async Task GetAsync_DifferentContexts_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepository2 = new OrganizationRepository(context2);
+
+            var organization = new Organization(
+                Guid.NewGuid(),
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            // Act
+            organization.AddRole(new BalancePowerSupplierRole());
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository2.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Single(organization!.Roles);
+            Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
         }
     }
 }
