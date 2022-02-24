@@ -31,7 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
         public override MarketParticipantDbContext CreateDbContext()
         {
             var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
-                .UseSqlServer(ConnectionString);
+                .UseSqlServer(ConnectionString)
+                .EnableSensitiveDataLogging();
 
             return new MarketParticipantDbContext(optionsBuilder.Options);
         }

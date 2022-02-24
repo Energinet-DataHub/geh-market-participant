@@ -22,8 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
         }
 
-        public SystemOperatorRole(Guid id, RoleStatus status)
-        : base(id, status)
+        public SystemOperatorRole(
+            Guid id,
+            RoleStatus status,
+            GridArea? area)
+            : base(id, status, area)
         {
         }
 

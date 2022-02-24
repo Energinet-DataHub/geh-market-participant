@@ -103,7 +103,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
 
             public OrganizationRoleBaseTest(RoleStatus initialStatus)
-                : base(Guid.Empty, initialStatus)
+                : base(
+                    Guid.Empty,
+                    initialStatus,
+                    new GridArea(
+                        new GridAreaId(Guid.NewGuid()),
+                        new GridAreaName("fake_value"),
+                        new GridAreaCode("fake_value")))
             {
             }
         }

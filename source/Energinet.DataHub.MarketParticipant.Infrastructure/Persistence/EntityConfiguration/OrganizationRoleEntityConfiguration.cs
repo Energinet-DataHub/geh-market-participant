@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("OrganizationRole");
             builder.HasKey(role => role.Id);
             builder.Property(role => role.Id).ValueGeneratedOnAdd();
+            builder.HasOne<GridAreaEntity>(role => role.GridArea!).WithMany().HasForeignKey("GridAreaId");
         }
     }
 }

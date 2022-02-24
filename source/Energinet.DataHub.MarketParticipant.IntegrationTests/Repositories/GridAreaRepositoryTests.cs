@@ -60,6 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
             var testGrid = new GridArea(
+                new GridAreaId(Guid.Empty),
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"));
 
@@ -83,6 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
             var testGrid = new GridArea(
+                new GridAreaId(Guid.NewGuid()),
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"));
 

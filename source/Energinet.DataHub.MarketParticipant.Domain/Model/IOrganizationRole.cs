@@ -37,6 +37,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         RoleStatus Status { get; }
 
         /// <summary>
+        /// The grid area that the role has at its disposal
+        /// </summary>
+        GridArea? Area { get; }
+
+        /// <summary>
         /// Activates the current role, the status changes to Active.
         /// Only New and Inactive roles can be activated.
         /// </summary>

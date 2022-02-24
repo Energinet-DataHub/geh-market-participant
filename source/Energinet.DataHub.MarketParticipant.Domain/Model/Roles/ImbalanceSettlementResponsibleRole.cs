@@ -22,8 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
         }
 
-        public ImbalanceSettlementResponsibleRole(Guid id, RoleStatus status)
-        : base(id, status)
+        public ImbalanceSettlementResponsibleRole(
+            Guid id,
+            RoleStatus status,
+            GridArea? area)
+            : base(id, status, area)
         {
         }
 

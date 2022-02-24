@@ -22,8 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
         }
 
-        public DanishEnergyAgencyRole(Guid id, RoleStatus status)
-        : base(id, status)
+        public DanishEnergyAgencyRole(
+            Guid id,
+            RoleStatus status,
+            GridArea? area)
+            : base(id, status, area)
         {
         }
 
