@@ -19,12 +19,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     /// <summary>
     /// Service for accessing Azure AD
-    /// </summary>V
+    /// </summary>
     public interface IActiveDirectoryService
     {
         /// <summary>
         /// Ensures an App registration ID for the given GLN number
-        /// </summary>V
+        /// </summary>
         Task<Guid> EnsureAppRegistrationIdAsync(string gln);
     }
 }
