@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 {
@@ -22,8 +23,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
         }
 
-        public ImbalanceSettlementResponsibleRole(Guid id, RoleStatus status)
-        : base(id, status)
+        public ImbalanceSettlementResponsibleRole(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
+            : base(id, status, marketRoles)
         {
         }
 
