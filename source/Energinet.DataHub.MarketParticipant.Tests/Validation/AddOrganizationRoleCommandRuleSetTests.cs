@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
@@ -55,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(AddOrganizationRoleCommand.OrganizationId);
 
-            var organizationRoleDto = new OrganizationRoleDto(ValidRole);
+            var organizationRoleDto = new OrganizationRoleDto(ValidRole, Array.Empty<MarketRoleDto>());
 
             var target = new AddOrganizationRoleCommandRuleSet();
             var command = new AddOrganizationRoleCommand(value, organizationRoleDto);
@@ -98,7 +99,80 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(AddOrganizationRoleCommand.Role)}.{nameof(OrganizationRoleDto.BusinessRole)}";
 
-            var organizationRoleDto = new OrganizationRoleDto(value);
+            var organizationRoleDto = new OrganizationRoleDto(value, Array.Empty<MarketRoleDto>());
+
+            var target = new AddOrganizationRoleCommandRuleSet();
+            var command = new AddOrganizationRoleCommand(ValidId, organizationRoleDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Fact]
+        public async Task Validate_MarketRole_ValidatesProperty()
+        {
+            // Arrange
+            var propertyName = $"{nameof(AddOrganizationRoleCommand.Role)}.{nameof(OrganizationRoleDto.MarketRoles)}";
+
+            var organizationRoleDto = new OrganizationRoleDto(ValidRole, null!);
+
+            var target = new AddOrganizationRoleCommandRuleSet();
+            var command = new AddOrganizationRoleCommand(ValidId, organizationRoleDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+
+        [Fact]
+        public async Task Validate_NullMarketRole_ValidatesProperty()
+        {
+            // Arrange
+            var propertyName = $"{nameof(AddOrganizationRoleCommand.Role)}.{nameof(OrganizationRoleDto.MarketRoles)}[0]";
+
+            var organizationRoleDto = new OrganizationRoleDto(ValidRole, new MarketRoleDto[] { null! });
+
+            var target = new AddOrganizationRoleCommandRuleSet();
+            var command = new AddOrganizationRoleCommand(ValidId, organizationRoleDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+
+        [Theory]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        [InlineData("  ", false)]
+        [InlineData("GridAccessProvider", true)]
+        [InlineData("ProductionResponsibleParty", true)]
+        [InlineData("Consumer", true)]
+        [InlineData("CONSUMER", true)]
+        [InlineData("ConsumerXyz", false)]
+        public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(AddOrganizationRoleCommand.Role)}.{nameof(OrganizationRoleDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
+
+            var organizationRoleDto = new OrganizationRoleDto(ValidRole, new[] { new MarketRoleDto(value) });
 
             var target = new AddOrganizationRoleCommandRuleSet();
             var command = new AddOrganizationRoleCommand(ValidId, organizationRoleDto);

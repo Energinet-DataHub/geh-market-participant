@@ -19,6 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         New = 1,
         Active = 2,
         Inactive = 3,
-        Deleted = 4
+        Passive = 4,
+        Deleted = 5
     }
 }

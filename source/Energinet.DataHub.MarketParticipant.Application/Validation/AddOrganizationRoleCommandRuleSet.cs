@@ -35,6 +35,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(role => role.BusinessRole)
                         .NotEmpty()
                         .IsEnumName(typeof(BusinessRoleCode), false);
+
+                    validator
+                        .RuleFor(x => x.MarketRoles)
+                        .NotNull()
+                        .ChildRules(rolesValidator =>
+                        {
+                            rolesValidator
+                                .RuleForEach(x => x)
+                                .NotNull()
+                                .ChildRules(roleValidator =>
+                                {
+                                    roleValidator
+                                        .RuleFor(x => x.Function)
+                                        .NotEmpty()
+                                        .IsEnumName(typeof(EicFunction), false);
+                                });
+                        });
                 });
         }
     }
