@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         }
 
         public Guid Id { get; set; }
-        public Guid? ActorId { get; set; }
+        public Guid ActorId { get; set; }
         public string Gln { get; set; }
         public string Name { get; set; }
 
