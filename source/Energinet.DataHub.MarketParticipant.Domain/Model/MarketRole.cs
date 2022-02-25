@@ -13,21 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed class MeteredDataAggregatorRole : OrganizationRoleBase, IOrganizationRole
+    /// <summary>
+    /// Describes a marked role, defined by its function and permissions.
+    /// </summary>
+    public sealed class MarketRole
     {
-        public MeteredDataAggregatorRole()
+        public MarketRole(EicFunction function)
         {
+            Function = function;
         }
 
-        public MeteredDataAggregatorRole(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
-            : base(id, status, marketRoles)
-        {
-        }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Dea;
+        /// <summary>
+        /// Specifies the EIC function of the current role.
+        /// </summary>
+        public EicFunction Function { get; }
     }
 }

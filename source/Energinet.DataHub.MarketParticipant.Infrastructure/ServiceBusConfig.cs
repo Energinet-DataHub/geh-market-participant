@@ -12,22 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.Infrastructure
 {
-    public sealed class MeteredDataAggregatorRole : OrganizationRoleBase, IOrganizationRole
+    public sealed class ServiceBusConfig
     {
-        public MeteredDataAggregatorRole()
+        public ServiceBusConfig(string connectionString, string integrationEventsTopicName)
         {
+            ConnectionString = connectionString;
+            IntegrationEventsTopicName = integrationEventsTopicName;
         }
 
-        public MeteredDataAggregatorRole(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
-            : base(id, status, marketRoles)
-        {
-        }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Dea;
+        public string ConnectionString { get; }
+        public string IntegrationEventsTopicName { get; }
     }
 }

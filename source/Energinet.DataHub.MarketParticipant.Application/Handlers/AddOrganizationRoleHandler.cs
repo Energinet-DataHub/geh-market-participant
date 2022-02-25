@@ -58,10 +58,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return Unit.Value;
         }
 
-        private static IOrganizationRole CreateRole(OrganizationRoleDto role)
+        private static IOrganizationRole CreateRole(OrganizationRoleDto organizationRoleDto)
         {
-            var businessRole = Enum.Parse<BusinessRoleCode>(role.BusinessRole, true);
-            return businessRole switch
+            var businessRole = Enum.Parse<BusinessRoleCode>(organizationRoleDto.BusinessRole, true);
+
+            IOrganizationRole organizationRole = businessRole switch
             {
                 BusinessRoleCode.Ddk => new BalanceResponsiblePartyRole(),
                 BusinessRoleCode.Ddm => new GridAccessProviderRole(),
@@ -72,8 +73,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 BusinessRoleCode.Ez => new SystemOperatorRole(),
                 BusinessRoleCode.Mdr => new MeteredDataResponsibleRole(),
                 BusinessRoleCode.Sts => new DanishEnergyAgencyRole(),
-                _ => throw new ArgumentOutOfRangeException(nameof(role))
+                _ => throw new ArgumentOutOfRangeException(nameof(organizationRoleDto))
             };
+
+            foreach (var marketRoleDto in organizationRoleDto.MarketRoles)
+            {
+                var function = Enum.Parse<EicFunction>(marketRoleDto.Function, true);
+                organizationRole.MarketRoles.Add(new MarketRole(function));
+            }
+
+            return organizationRole;
         }
     }
 }

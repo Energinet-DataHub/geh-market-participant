@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
-    public sealed class MeteredDataAggregatorRole : OrganizationRoleBase, IOrganizationRole
+    public interface IFluentHealth
     {
-        public MeteredDataAggregatorRole()
-        {
-        }
-
-        public MeteredDataAggregatorRole(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
-            : base(id, status, marketRoles)
-        {
-        }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Dea;
+        Task<IReadOnlyCollection<(string Key, bool Result)>> RunAsync();
+        Task<IReadOnlyCollection<(string Key, bool Result)>> RunInParallelAsync();
+        IFluentHealth AddSqlDatabase(string verficationKey, string connectionString);
+        IFluentHealth AddMessageBus(string verficationKey, string connectionString, string queueName);
     }
 }

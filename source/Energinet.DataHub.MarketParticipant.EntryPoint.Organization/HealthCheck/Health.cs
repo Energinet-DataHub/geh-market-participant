@@ -12,22 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
-    public sealed class MeteredDataAggregatorRole : OrganizationRoleBase, IOrganizationRole
+    public sealed class Health : IHealth
     {
-        public MeteredDataAggregatorRole()
+        private readonly ISqlDatabaseVerifier _sqlDatabaseVerifier;
+        private readonly IServiceBusQueueVerifier _serviceBusVerifier;
+
+        public Health(
+            ISqlDatabaseVerifier sqlDatabaseVerifier,
+            IServiceBusQueueVerifier serviceBusVerifier)
         {
+            _sqlDatabaseVerifier = sqlDatabaseVerifier;
+            _serviceBusVerifier = serviceBusVerifier;
         }
 
-        public MeteredDataAggregatorRole(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
-            : base(id, status, marketRoles)
+        public IFluentHealth CreateFluentValidator()
         {
+            return new FluentHealth(_sqlDatabaseVerifier, _serviceBusVerifier);
         }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Dea;
     }
 }
