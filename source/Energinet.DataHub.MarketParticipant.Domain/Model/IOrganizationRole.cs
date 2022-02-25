@@ -38,6 +38,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         RoleStatus Status { get; }
 
         /// <summary>
+        /// The grid area that the role has at its disposal
+        /// </summary>
+        GridArea? Area { get; }
+
+        /// <summary>
         /// The list of market roles (functions and permissions) supported by the current organization role.
         /// </summary>
         public ICollection<MarketRole> MarketRoles { get; }
