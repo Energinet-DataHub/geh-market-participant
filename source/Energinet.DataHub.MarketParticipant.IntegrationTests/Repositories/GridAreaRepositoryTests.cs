@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
             var testGrid = new GridArea(
-                new GridAreaId(Guid.NewGuid()),
+                new GridAreaId(Guid.Empty),
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"));
 
@@ -100,6 +100,30 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
             Assert.Equal("234", newGrid?.Code.Value);
             Assert.Equal("NewName", newGrid?.Name.Value);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_AddGridAreaToOrganizationRole_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var gridRepository = new GridAreaRepository(context);
+            var testGrid = new GridArea(
+                new GridAreaId(Guid.Empty),
+                new GridAreaName("Test Grid Area"),
+                new GridAreaCode("801"));
+
+            // Act
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(newGrid);
+            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
+            Assert.Equal("801", newGrid?.Code.Value);
+            Assert.Equal("Test Grid Area", newGrid?.Name.Value);
         }
     }
 }
