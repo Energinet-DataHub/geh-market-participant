@@ -18,15 +18,22 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    /// Provides access to the Organizations.
+    /// Provides access to organizations.
     /// </summary>
     public interface IOrganizationRepository
     {
+        /// <summary>
+        /// Adds the given organization to the repository, or updates it, if it already exists.
+        /// </summary>
+        /// <param name="organization">The organization to add or update.</param>
+        /// <returns>The id of the added organization.</returns>
+        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
 
         /// <summary>
-        /// Saves the organization.
+        /// Gets an organization with the specified id.
         /// </summary>
-        /// <param name="organization">The organization to save.</param>
-        Task SaveAsync(Organization organization);
+        /// <param name="id">The id of the organization to get.</param>
+        /// <returns>The organization with the specified id; or null if the organization does not exist.</returns>
+        Task<Organization?> GetAsync(OrganizationId id);
     }
 }

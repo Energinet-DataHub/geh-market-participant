@@ -14,9 +14,10 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
@@ -40,6 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContexts(Container);
+
             SwitchToSimpleInjector(services);
 
             services.AddLogging();
@@ -48,8 +51,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
                 x.DisposeContainerWithServiceProvider = false;
                 x.AddLogging();
             });
-            var config = services.BuildServiceProvider().GetService<IConfiguration>()!;
-            Container.RegisterSingleton(() => config);
+
+            Container.AddApplicationServices();
+            Container.AddDbContextInterfaces();
+            Container.AddRepositories();
+            Container.AddServiceBus();
+            Container.AddServices();
+
+            // Add MediatR
+            Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
 
             Configure(Container);
         }

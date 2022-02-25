@@ -24,6 +24,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common.SimpleInjector
     [UnitTest]
     public sealed class SimpleInjectorServiceProviderAdapterTests
     {
+        /// <summary>
+        /// For testing only.
+        /// </summary>
+        private interface IFoo
+        {
+        }
+
         [Fact]
         public async Task GetService_AllIsGood_ReturnsInstance()
         {
@@ -66,10 +73,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common.SimpleInjector
 
             // Act + Assert
             Assert.Throws<ArgumentNullException>(() => target.GetService(null!));
-        }
-
-        private interface IFoo
-        {
         }
 
         private sealed class Foo : IFoo

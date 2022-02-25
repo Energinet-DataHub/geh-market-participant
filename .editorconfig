@@ -161,6 +161,15 @@ dotnet_naming_style.instance_field_style.capitalization = camel_case
 dotnet_naming_style.instance_field_style.required_prefix = _
 
 ##############################################################
+# C# Test Conventions                                        #
+##############################################################
+
+[*{.test,Tests}.cs]
+
+dotnet_diagnostic.VSTHRD200.severity = none
+dotnet_diagnostic.CA1707.severity = none
+
+##############################################################
 # C# Conventions                                             #
 ##############################################################
 
@@ -193,7 +202,6 @@ csharp_style_conditional_delegate_call = true:suggestion
 
 # Code block preferences
 csharp_prefer_braces = when_multiline:error
-csharp_braces_for_ifelse = required_for_multiline_statement
 
 # Unused value preferences
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
@@ -269,6 +277,7 @@ csharp_preserve_single_line_blocks = true
 dotnet_diagnostic.CA1303.severity = suggestion
 dotnet_diagnostic.CA1715.severity = error
 dotnet_diagnostic.CA1001.severity = warning
+dotnet_diagnostic.CA1008.severity = none
 dotnet_diagnostic.CA1009.severity = warning
 dotnet_diagnostic.CA1014.severity = none
 dotnet_diagnostic.CA1016.severity = warning
@@ -438,7 +447,7 @@ dotnet_diagnostic.SA1408.severity = error
 dotnet_diagnostic.SA1410.severity = error
 dotnet_diagnostic.SA1411.severity = error
 dotnet_diagnostic.SA1412.severity = error
-dotnet_diagnostic.SA1413.severity = error
+dotnet_diagnostic.SA1413.severity = none
 dotnet_diagnostic.SA1500.severity = error
 dotnet_diagnostic.SA1501.severity = none
 dotnet_diagnostic.SA1502.severity = none
@@ -455,7 +464,7 @@ dotnet_diagnostic.SA1512.severity = error
 dotnet_diagnostic.SA1513.severity = error
 dotnet_diagnostic.SA1514.severity = error
 dotnet_diagnostic.SA1515.severity = suggestion
-dotnet_diagnostic.SA1516.severity = error
+dotnet_diagnostic.SA1516.severity = none
 dotnet_diagnostic.SA1517.severity = error
 dotnet_diagnostic.SA1518.severity = error
 dotnet_diagnostic.SA1519.severity = error
@@ -504,11 +513,4 @@ dotnet_diagnostic.SA1652.severity = none
 dotnet_diagnostic.SX1101.severity = error
 dotnet_diagnostic.SX1309.severity = error
 
-##############################################################
-# C# Test Conventions                                        #
-##############################################################
-
-[*{.test,Tests}.cs]
-
-dotnet_diagnostic.VSTHRD200.severity = none
-dotnet_diagnostic.CA1707.severity = none
+dotnet_code_quality.CA1062.null_check_validation_methods = ThrowIfNull|ThrowIfNullOrWhiteSpace

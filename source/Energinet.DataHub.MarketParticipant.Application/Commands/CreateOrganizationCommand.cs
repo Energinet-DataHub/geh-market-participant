@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -16,5 +16,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public record CreateOrganizationCommand(string Name, string Gln) : IRequest<Unit>;
+    public sealed record CreateOrganizationCommand(OrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
 }

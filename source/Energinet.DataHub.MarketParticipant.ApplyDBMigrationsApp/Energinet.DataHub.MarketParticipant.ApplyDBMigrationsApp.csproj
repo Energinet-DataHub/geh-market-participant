@@ -19,6 +19,9 @@ limitations under the License.
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,6 +44,7 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-001\Model\202201311005 Create Actor View.sql" />
     <EmbeddedResource Include="Scripts\B-001\Model\202201311006 Set Keys and Default.sql" />
     <EmbeddedResource Include="Scripts\B-001\Model\202202091216 Create Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\B-001\Model\202202161302 Create GridAreaNew Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311101 Seed ActorInfo Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311102 Seed GridAreaInfo Table.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311103 Seed GridAreaLinkInfo Table.sql" />
@@ -48,9 +52,16 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\B-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202202091216 Create Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\B-002\Model\202202161302 Create GridAreaNew Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\B-002\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202240930 Create MarketRole Table.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202181115 Add ActorId to Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202171430 Create OrganizationRole Table.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202091216 Create Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\LocalDB\202202161302 Create GridAreaNew Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Model\202202091216 Create Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\T-001\Model\202202161302 Create GridAreaNew Table.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202202081107 ChangeVoltActors.sql" />
@@ -58,6 +69,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\T-001\Seed\202202081157 AddBatmanGridAreas.sql" />
     <EmbeddedResource Include="Scripts\T-001\Seed\202202081213 AddBatmanGridAreaLinks.sql" />
     <EmbeddedResource Include="Scripts\U-001\Model\202202091216 Create Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Model\202202161302 Create GridAreaNew Table.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Model\202202171430 Create OrganizationRole Table.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Model\202202181115 Add ActorId to Organization Table.sql" />
+    <EmbeddedResource Include="Scripts\U-001\Model\202202240930 Create MarketRole Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311105 RemoveAssignedActorToGridArea.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311104 RemoveAssignGridAreaToEnerginetActor.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311106 RemoveGridAreaWithNoActor.sql" />
@@ -66,6 +81,12 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\U-001\Seed\202202081157 AddBatmanGridAreas.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202202081213 AddBatmanGridAreaLinks.sql" />
     <None Remove="Scripts\B-002\Model\202201311000 Create GridAreaInfo Table.sql" />
+    <None Remove="Scripts\LocalDB\202202171430 Create OrganizationRole Table.sql" />
+    <None Remove="Scripts\LocalDB\202202181115 Add ActorId to Organization Table.sql" />
+    <None Remove="Scripts\LocalDB\202202240930 Create MarketRole Table.sql" />
+    <None Remove="Scripts\U-001\Model\202202171430 Create OrganizationRole Table.sql" />
+    <None Remove="Scripts\U-001\Model\202202181115 Add ActorId to Organization Table.sql" />
+    <None Remove="Scripts\U-001\Model\202202240930 Create MarketRole Table.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202201311000 Create GridAreaInfo Table.sql" />
     <None Remove="Scripts\B-002\Model\202201311001 Create GridArea View.sql" />
     <EmbeddedResource Include="Scripts\B-002\Model\202201311001 Create GridArea View.sql" />
@@ -127,6 +148,10 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311102 Seed GridAreaInfo Table.sql" />
     <None Remove="Scripts\U-001\Seed\202201311103 Seed GridAreaLinkInfo Table.sql" />
     <EmbeddedResource Include="Scripts\U-001\Seed\202201311103 Seed GridAreaLinkInfo Table.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

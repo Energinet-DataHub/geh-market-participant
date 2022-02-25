@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -12,37 +12,63 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, Unit>
+    public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
+        private readonly IActiveDirectoryService _activeDirectoryService;
 
-        public CreateOrganizationHandler(IOrganizationRepository organizationRepository)
+        public CreateOrganizationHandler(
+            IOrganizationRepository organizationRepository,
+            IOrganizationEventDispatcher organizationEventDispatcher,
+            IActiveDirectoryService activeDirectoryService)
         {
             _organizationRepository = organizationRepository;
+            _organizationEventDispatcher = organizationEventDispatcher;
+            _activeDirectoryService = activeDirectoryService;
         }
-        public async Task<Unit> Handle(
-            CreateOrganizationCommand request,
-            CancellationToken cancellationToken)
+
+        public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
-            var organisationToSave = new Organization(
-                new Uuid(Guid.NewGuid()),
-                new GlobalLocationNumber(request.Gln),
-                request.Name);
+            Guard.ThrowIfNull(request, nameof(request));
 
-            await _organizationRepository.SaveAsync(organisationToSave).ConfigureAwait(false);
+            var (name, gln) = request.Organization;
 
-            return Unit.Value;
+            var appRegistrationId = await _activeDirectoryService.EnsureAppRegistrationIdAsync(gln).ConfigureAwait(false);
+
+            var organizationToSave = new Organization(
+                appRegistrationId,
+                new GlobalLocationNumber(gln),
+                name);
+
+            var createdId = await _organizationRepository
+                .AddOrUpdateAsync(organizationToSave)
+                .ConfigureAwait(false);
+
+            var organizationWithId = new Organization(
+                createdId,
+                organizationToSave.ActorId,
+                organizationToSave.Gln,
+                organizationToSave.Name,
+                organizationToSave.Roles);
+
+            await _organizationEventDispatcher
+                .DispatchChangedEventAsync(organizationWithId)
+                .ConfigureAwait(false);
+
+            return new CreateOrganizationResponse(createdId.Value.ToString());
         }
     }
 }

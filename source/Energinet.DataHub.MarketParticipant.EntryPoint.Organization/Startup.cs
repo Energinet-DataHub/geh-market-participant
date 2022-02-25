@@ -12,15 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Application;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Repositories;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
@@ -29,30 +23,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
     {
         protected override void Configure(Container container)
         {
-            RegisterActor(container);
-            container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Singleton);
-
-            // Services
-            Container.AddApplicationServices();
-
-            // Functions
             Container.Register<CreateOrganizationFunction>();
+            Container.Register<AddOrganizationRoleFunction>();
+            Container.Register<HealthFunction>();
 
-            // Add MediatR
-            Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
-
-        }
-
-        private static void RegisterActor(Container container)
-        {
-            container.RegisterSingleton(() =>
-            {
-                var configuration = container.GetService<IConfiguration>();
-                var connectionString = configuration.GetValue<string>("SQL_MP_DB_CONNECTION_STRING") ??
-                                       throw new InvalidOperationException(
-                                           "Market Participant Connection string not found");
-                return new ActorDbConfig(connectionString);
-            });
+            // health check
+            container.Register<ISqlDatabaseVerifier, SqlDatabaseVerifier>(Lifestyle.Scoped);
+            container.Register<IServiceBusQueueVerifier, ServiceBusQueueVerifier>(Lifestyle.Scoped);
+            container.Register<IHealth, Health>(Lifestyle.Scoped);
         }
     }
 }

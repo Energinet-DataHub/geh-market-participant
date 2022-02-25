@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -12,81 +12,70 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.IO;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public class CreateOrganizationFunction
+    public sealed class CreateOrganizationFunction
     {
         private readonly IMediator _mediator;
-        private readonly ILogger<CreateOrganizationFunction> _logger;
 
-        public CreateOrganizationFunction(
-            IMediator mediator,
-            ILogger<CreateOrganizationFunction> logger)
+        public CreateOrganizationFunction(IMediator mediator)
         {
             _mediator = mediator;
-            _logger = logger;
         }
 
+        // TODO: Should this be REST?
         [Function("CreateOrganization")]
-        public async Task<HttpResponseData> RunAsync(
+        public Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequestData request)
         {
-            try
+            return request.ProcessAsync(async () =>
             {
-                var createOrganizationCommand = await CreateOrganizationCommandFromRequest(request);
+                var createOrganizationCommand = await CreateOrganizationCommandAsync(request).ConfigureAwait(false);
 
-                if (createOrganizationCommand is null)
-                {
-                    throw new FluentValidation.ValidationException("Invalid arguments");
-                }
+                var response = await _mediator
+                    .Send(createOrganizationCommand)
+                    .ConfigureAwait(false);
 
-                await _mediator.Send(createOrganizationCommand).ConfigureAwait(false);
+                var responseData = request.CreateResponse(HttpStatusCode.OK);
 
-                var response = request.CreateResponse(HttpStatusCode.OK);
+                await responseData
+                    .WriteAsJsonAsync(response)
+                    .ConfigureAwait(false);
 
-                return response;
-            }
-            catch (FluentValidation.ValidationException e)
-            {
-                _logger.LogError("ValidationException in CreateOrganization: {message}", e.Message);
-                var response = request.CreateResponse(HttpStatusCode.BadRequest);
-                await response.WriteStringAsync(e.Message);
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error in CreateOrganization: {message}", ex.Message);
-                return request.CreateResponse(HttpStatusCode.InternalServerError);
-            }
+                return responseData;
+            });
         }
 
-        private static async Task<CreateOrganizationCommand?> CreateOrganizationCommandFromRequest(HttpRequestData request)
+        private static async Task<CreateOrganizationCommand> CreateOrganizationCommandAsync(HttpRequestData request)
         {
-            string requestBody;
-            using (var streamReader = new StreamReader(request.Body))
-            {
-                requestBody = await streamReader.ReadToEndAsync();
-            }
-
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             };
 
-            var createOrganizationCommand = JsonSerializer.Deserialize<CreateOrganizationCommand>(requestBody, options);
-            return createOrganizationCommand;
+            try
+            {
+                var organizationDto = await JsonSerializer
+                    .DeserializeAsync<OrganizationDto>(request.Body, options)
+                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty, string.Empty);
+
+                return new CreateOrganizationCommand(organizationDto);
+            }
+            catch (JsonException)
+            {
+                throw new ValidationException("The body of the request could not be read.");
+            }
         }
     }
 }

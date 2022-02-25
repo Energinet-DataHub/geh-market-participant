@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -22,13 +22,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public CreateOrganizationCommandRuleSet()
         {
-            RuleFor(command => command.Name)
-                .NotEmpty()
-                .Length(1, 50);
+            RuleFor(command => command.Organization)
+                .NotNull()
+                .ChildRules(validator =>
+                {
+                    validator
+                        .RuleFor(organization => organization.Name)
+                        .NotEmpty()
+                        .Length(1, 50);
 
-            RuleFor(command => command.Gln)
-                .NotEmpty()
-                .SetValidator(new GlobalLocationNumberValidationRule<CreateOrganizationCommand>());
+                    validator
+                        .RuleFor(organization => organization.Gln)
+                        .NotEmpty()
+                        .SetValidator(new GlobalLocationNumberValidationRule<OrganizationDto>());
+                });
         }
     }
 }
