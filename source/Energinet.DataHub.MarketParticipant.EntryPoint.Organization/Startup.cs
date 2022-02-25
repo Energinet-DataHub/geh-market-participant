@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
@@ -24,6 +25,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
         {
             Container.Register<CreateOrganizationFunction>();
             Container.Register<AddOrganizationRoleFunction>();
+            Container.Register<HealthFunction>();
+
+            // health check
+            container.Register<ISqlDatabaseVerifier, SqlDatabaseVerifier>(Lifestyle.Scoped);
+            container.Register<IServiceBusQueueVerifier, ServiceBusQueueVerifier>(Lifestyle.Scoped);
+            container.Register<IHealth, Health>(Lifestyle.Scoped);
         }
     }
 }

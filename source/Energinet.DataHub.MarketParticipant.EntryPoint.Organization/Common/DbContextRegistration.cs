@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,18 +25,23 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
     {
         public static void AddDbContexts(this IServiceCollection services, Container container)
         {
-            services.AddDbContext<MarketParticipantDbContext>(options => BuildDbContext(options, container));
+            services.AddDbContext<MarketParticipantDbContext>(options =>
+            {
+                var config = container.GetService<DatabaseConfig>();
+                options.UseSqlServer(config?.ConnectionString!);
+            });
         }
 
         public static void AddDbContextInterfaces(this Container container)
         {
-            container.Register<IMarketParticipantDbContext, MarketParticipantDbContext>(Lifestyle.Scoped);
-        }
+            container.RegisterSingleton(() =>
+            {
+                var config = container.GetService<IConfiguration>();
+                var connectionString = config.GetValue<string>("SQL_MP_DB_CONNECTION_STRING");
+                return new DatabaseConfig(connectionString);
+            });
 
-        private static void BuildDbContext(DbContextOptionsBuilder options, Container container)
-        {
-            var config = container.GetService<IConfiguration>();
-            options.UseSqlServer(config.GetValue<string>("SQL_MP_DB_CONNECTION_STRING"));
+            container.Register<IMarketParticipantDbContext, MarketParticipantDbContext>(Lifestyle.Scoped);
         }
     }
 }
