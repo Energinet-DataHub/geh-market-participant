@@ -37,3 +37,23 @@ module "func_entrypoint_marketparticipant" {
   
   tags                                      = azurerm_resource_group.this.tags
 }
+
+resource "azurerm_application_insights_web_test" "markpart_availability" {
+  name                    = "markpart-availability"
+  location                = azurerm_resource_group.this.location
+  resource_group_name     = azurerm_resource_group.this.name
+  application_insights_id = data.azurerm_key_vault_secret.appi-shared-id.value
+  kind                    = "ping"
+  frequency               = 300
+  timeout                 = 60
+  enabled                 = true
+  geo_locations           = ["emea-nl-ams-azr"]
+  configuration           = <<XML
+<WebTest Name="markpart-availability" Id="ef2e3b37-738f-4e24-8062-4ff020c6a803" Enabled="True" Timeout="120" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010" PreAuthenticate="True" Proxy="default" StopOnError="False">
+	<Items>
+		<Request Method="GET" Guid="a1469715-d63e-0a42-5ee6-fe852bf585ae" Version="1.1" Url="https://func-organization-markpart-${var.environment_short}-${var.environment_instance}.azurewebsites.net/api/HealthFunction?" ThinkTime="0" Timeout="120" ParseDependentRequests="False" FollowRedirects="True" RecordResult="True" Cache="False" ResponseTimeGoal="0" Encoding="utf-8" ExpectedHttpStatusCode="200" ExpectedResponseUrl="" ReportingName="" IgnoreHttpStatusCode="False" />
+	</Items>
+</WebTest>
+XML
+
+}
