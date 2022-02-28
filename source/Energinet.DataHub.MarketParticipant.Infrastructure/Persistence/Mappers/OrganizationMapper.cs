@@ -61,6 +61,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Id = from.Id;
             to.Status = (int)from.Status;
             to.BusinessRole = (int)from.Code;
+            if (from.Area != null)
+            {
+                var gridArea = to.GridArea ?? new GridAreaEntity();
+                GridAreaMapper.MapToEntity(@from.Area, gridArea);
+                to.GridArea = gridArea;
+            }
 
             // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
             to.MeteringPointTypes.Clear();
@@ -89,52 +95,62 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 var businessRole = (BusinessRoleCode)role.BusinessRole;
                 var roleStatus = (RoleStatus)role.Status;
+                var gridArea = role.GridArea != null ? GridAreaMapper.MapFromEntity(role.GridArea) : null;
 
                 return (IOrganizationRole)(businessRole switch
                 {
                     BusinessRoleCode.Ddk => new BalanceResponsiblePartyRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddm => new GridAccessProviderRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddq => new BalancePowerSupplierRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddx => new ImbalanceSettlementResponsibleRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddz => new MeteringPointAdministratorRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Dea => new MeteredDataAggregatorRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ez => new SystemOperatorRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Mdr => new MeteredDataResponsibleRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Sts => new DanishEnergyAgencyRole(
                         role.Id,
                         roleStatus,
+                        gridArea,
                         marketRoles,
                         role.MeteringPointTypes),
                     _ => throw new ArgumentOutOfRangeException(nameof(role))

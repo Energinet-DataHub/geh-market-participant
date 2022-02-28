@@ -24,6 +24,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
             Id = Guid.Empty;
             Status = RoleStatus.New;
+            Area = new GridArea(
+                new GridAreaId(Guid.Empty),
+                new GridAreaName(string.Empty),
+                new GridAreaCode(string.Empty));
+
             MarketRoles = new List<MarketRole>();
             MeteringPointTypes = new List<MeteringPointType>();
         }
@@ -31,11 +36,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         protected OrganizationRoleBase(
             Guid id,
             RoleStatus status,
+            GridArea? area,
             IEnumerable<MarketRole> marketRoles,
             IEnumerable<MeteringPointType> meteringPointTypes)
         {
             Id = id;
             Status = status;
+            Area = area;
             MarketRoles = new List<MarketRole>(marketRoles);
             MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
         }
@@ -44,6 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 
         public RoleStatus Status { get; private set; }
         public ICollection<MeteringPointType> MeteringPointTypes { get; }
+
+        public GridArea? Area { get; }
 
         public ICollection<MarketRole> MarketRoles { get; }
 

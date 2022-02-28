@@ -28,10 +28,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 
         public Guid Id { get; set; }
         public Guid OrganizationId { get; set; }
+        public GridAreaEntity? GridArea { get; set; }
         public int BusinessRole { get; set; }
         public int Status { get; set; }
         public Collection<MeteringPointType> MeteringPointTypes { get; }
-
         public Collection<MarketRoleEntity> MarketRoles { get; }
+
+        private Guid GridAreaId { get; set; }
     }
 }

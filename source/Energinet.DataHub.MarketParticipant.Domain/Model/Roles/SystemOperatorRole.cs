@@ -27,9 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         public SystemOperatorRole(
             Guid id,
             RoleStatus status,
+            GridArea? area,
             IEnumerable<MarketRole> marketRoles,
             IEnumerable<MeteringPointType> meteringPointTypes)
-            : base(id, status, marketRoles, meteringPointTypes)
+            : base(id, status, area, marketRoles, meteringPointTypes)
         {
         }
 
