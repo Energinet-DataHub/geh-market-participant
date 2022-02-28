@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System.Threading.Tasks;
+
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
-    public enum RoleStatus
+    public interface IServiceBusQueueVerifier
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        Task<bool> VerifyAsync(string connectionString, string name);
     }
 }

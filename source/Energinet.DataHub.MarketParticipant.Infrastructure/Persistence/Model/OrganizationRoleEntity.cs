@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Data.Common;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
@@ -23,6 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public OrganizationRoleEntity()
         {
+            MarketRoles = new Collection<MarketRoleEntity>();
             MeteringPointTypes = new Collection<MeteringPointType>();
         }
 
@@ -31,5 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public int BusinessRole { get; set; }
         public int Status { get; set; }
         public Collection<MeteringPointType> MeteringPointTypes { get; }
+
+        public Collection<MarketRoleEntity> MarketRoles { get; }
     }
 }

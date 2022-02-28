@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure
 {
-    public enum RoleStatus
+    public sealed class DatabaseConfig
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        public DatabaseConfig(string connectionString)
+        {
+            ConnectionString = connectionString;
+        }
+
+        public string ConnectionString { get; }
     }
 }

@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         private readonly ICollection<IOrganizationRole> _roles;
 
         public Organization(
-            Guid? actorId,
+            Guid actorId,
             GlobalLocationNumber gln,
             string name)
         {
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public Organization(
             OrganizationId id,
-            Guid? actorId,
+            Guid actorId,
             GlobalLocationNumber gln,
             string name,
             IEnumerable<IOrganizationRole> roles)
@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         }
 
         public OrganizationId Id { get; }
-        public Guid? ActorId { get; }
+        public Guid ActorId { get; }
 
         public GlobalLocationNumber Gln { get; }
         public string Name { get; }

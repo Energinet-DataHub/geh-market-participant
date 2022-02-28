@@ -13,25 +13,27 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
-    public sealed class BalancePowerSupplierRole : OrganizationRoleBase, IOrganizationRole
+    public sealed class SqlDatabaseVerifier : ISqlDatabaseVerifier
     {
-        public BalancePowerSupplierRole()
+        public async Task<bool> VerifyAsync(string connectionString)
         {
+            try
+            {
+                await using var connection = new SqlConnection(connectionString);
+                await connection.OpenAsync().ConfigureAwait(false);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                return false;
+            }
         }
-
-        public BalancePowerSupplierRole(
-            Guid id,
-            RoleStatus status,
-            IEnumerable<MarketRole> marketRoles,
-            IEnumerable<MeteringPointType> meteringPointTypes)
-            : base(id, status, marketRoles, meteringPointTypes)
-        {
-        }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Ddq;
     }
 }

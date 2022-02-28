@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
@@ -62,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             {
                 var organizationRoleDto = await JsonSerializer
                     .DeserializeAsync<OrganizationRoleDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new OrganizationRoleDto(string.Empty);
+                    .ConfigureAwait(false) ?? new OrganizationRoleDto(string.Empty, Array.Empty<MarketRoleDto>());
 
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
@@ -23,8 +24,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
         }
 
-        public SystemOperatorRole(Guid id, RoleStatus status, Collection<MeteringPointType> meteringPointTypes)
-            : base(id, status, meteringPointTypes)
+        public SystemOperatorRole(
+            Guid id,
+            RoleStatus status,
+            IEnumerable<MarketRole> marketRoles,
+            IEnumerable<MeteringPointType> meteringPointTypes)
+            : base(id, status, marketRoles, meteringPointTypes)
         {
         }
 

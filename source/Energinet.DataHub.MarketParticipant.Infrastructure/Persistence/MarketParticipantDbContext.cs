@@ -46,6 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             Guard.ThrowIfNull(modelBuilder, nameof(modelBuilder));
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OrganizationRoleEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreEntityConfiguration());
             modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);

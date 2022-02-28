@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
-    public enum RoleStatus
+    public interface IHealth
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        IFluentHealth CreateFluentValidator();
     }
 }

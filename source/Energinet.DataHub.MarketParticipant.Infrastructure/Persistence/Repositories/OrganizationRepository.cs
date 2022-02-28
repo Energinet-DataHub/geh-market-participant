@@ -47,6 +47,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     .Organizations
                     .Include(x => x.Roles)
                     .ThenInclude(x => x.MeteringPointTypes)
+                    .Include(x => x.Roles)
+                    .ThenInclude(x => x.MarketRoles)
+                    .AsSingleQuery()
                     .FirstAsync(x => x.Id == organization.Id.Value)
                     .ConfigureAwait(false);
             }
@@ -66,6 +69,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Organizations
                 .Include(x => x.Roles)
                 .ThenInclude(x => x.MeteringPointTypes)
+                .Include(x => x.Roles)
+                .ThenInclude(x => x.MarketRoles)
+                .AsSingleQuery()
                 .FirstOrDefaultAsync(x => x.Id == id.Value)
                 .ConfigureAwait(false);
 

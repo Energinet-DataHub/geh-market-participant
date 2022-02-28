@@ -31,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Name = from.Name;
 
             var roleEntities = to.Roles.ToDictionary(x => x.Id);
-
             foreach (var role in from.Roles)
             {
                 if (roleEntities.TryGetValue(role.Id, out var existing))
@@ -63,13 +62,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Status = (int)from.Status;
             to.BusinessRole = (int)from.Code;
 
-            var meteringPointTypeEntities = to.MeteringPointTypes.ToDictionary(x => x.Value);
+            // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
+            to.MeteringPointTypes.Clear();
             foreach (var meteringPointType in from.MeteringPointTypes)
             {
-                if (!meteringPointTypeEntities.TryGetValue(meteringPointType.Value, out var existing))
-                {
-                    to.MeteringPointTypes.Add(meteringPointType);
-                }
+                to.MeteringPointTypes.Add(meteringPointType);
+            }
+
+            // Market roles are currently treated as value types, so they are deleted and recreated with each update.
+            to.MarketRoles.Clear();
+            foreach (var marketRole in from.MarketRoles)
+            {
+                to.MarketRoles.Add(new MarketRoleEntity { Function = (int)marketRole.Function });
             }
         }
 
@@ -77,6 +81,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         {
             return roles.Select(role =>
             {
+                var marketRoles = role.MarketRoles.Select(marketRole =>
+                {
+                    var function = (EicFunction)marketRole.Function;
+                    return new MarketRole(function);
+                });
+
                 var businessRole = (BusinessRoleCode)role.BusinessRole;
                 var roleStatus = (RoleStatus)role.Status;
 
@@ -85,38 +95,47 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     BusinessRoleCode.Ddk => new BalanceResponsiblePartyRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddm => new GridAccessProviderRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddq => new BalancePowerSupplierRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddx => new ImbalanceSettlementResponsibleRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ddz => new MeteringPointAdministratorRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Dea => new MeteredDataAggregatorRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Ez => new SystemOperatorRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Mdr => new MeteredDataResponsibleRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     BusinessRoleCode.Sts => new DanishEnergyAgencyRole(
                         role.Id,
                         roleStatus,
+                        marketRoles,
                         role.MeteringPointTypes),
                     _ => throw new ArgumentOutOfRangeException(nameof(role))
                 });

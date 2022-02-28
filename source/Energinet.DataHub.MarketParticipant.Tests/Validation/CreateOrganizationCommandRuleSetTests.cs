@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(OrganizationDto.Name)}";
 
-            var organizationDto = new OrganizationDto(null, value, ValidGln);
+            var organizationDto = new OrganizationDto(value, ValidGln);
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(OrganizationDto.Gln)}";
 
-            var organizationDto = new OrganizationDto(null, ValidName, value);
+            var organizationDto = new OrganizationDto(ValidName, value);
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);

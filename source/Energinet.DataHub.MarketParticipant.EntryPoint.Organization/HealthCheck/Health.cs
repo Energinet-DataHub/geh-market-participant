@@ -12,26 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
-    public sealed class BalancePowerSupplierRole : OrganizationRoleBase, IOrganizationRole
+    public sealed class Health : IHealth
     {
-        public BalancePowerSupplierRole()
+        private readonly ISqlDatabaseVerifier _sqlDatabaseVerifier;
+        private readonly IServiceBusQueueVerifier _serviceBusVerifier;
+
+        public Health(
+            ISqlDatabaseVerifier sqlDatabaseVerifier,
+            IServiceBusQueueVerifier serviceBusVerifier)
         {
+            _sqlDatabaseVerifier = sqlDatabaseVerifier;
+            _serviceBusVerifier = serviceBusVerifier;
         }
 
-        public BalancePowerSupplierRole(
-            Guid id,
-            RoleStatus status,
-            IEnumerable<MarketRole> marketRoles,
-            IEnumerable<MeteringPointType> meteringPointTypes)
-            : base(id, status, marketRoles, meteringPointTypes)
+        public IFluentHealth CreateFluentValidator()
         {
+            return new FluentHealth(_sqlDatabaseVerifier, _serviceBusVerifier);
         }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Ddq;
     }
 }

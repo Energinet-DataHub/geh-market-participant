@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure
 {
-    public enum RoleStatus
+    public sealed class ServiceBusConfig
     {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
+        public ServiceBusConfig(string connectionString, string integrationEventsTopicName)
+        {
+            ConnectionString = connectionString;
+            IntegrationEventsTopicName = integrationEventsTopicName;
+        }
+
+        public string ConnectionString { get; }
+        public string IntegrationEventsTopicName { get; }
     }
 }
