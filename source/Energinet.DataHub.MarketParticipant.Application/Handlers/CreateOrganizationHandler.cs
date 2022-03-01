@@ -16,9 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -26,49 +24,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
-        private readonly IActiveDirectoryService _activeDirectoryService;
+        private readonly IOrganizationFactoryService _organizationFactoryService;
 
-        public CreateOrganizationHandler(
-            IOrganizationRepository organizationRepository,
-            IOrganizationEventDispatcher organizationEventDispatcher,
-            IActiveDirectoryService activeDirectoryService)
+        public CreateOrganizationHandler(IOrganizationFactoryService organizationFactoryService)
         {
-            _organizationRepository = organizationRepository;
-            _organizationEventDispatcher = organizationEventDispatcher;
-            _activeDirectoryService = activeDirectoryService;
+            _organizationFactoryService = organizationFactoryService;
         }
 
         public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var (name, gln) = request.Organization;
+            var gln = new GlobalLocationNumber(request.Organization.Gln);
 
-            var appRegistrationId = await _activeDirectoryService.EnsureAppRegistrationIdAsync(gln).ConfigureAwait(false);
-
-            var organizationToSave = new Organization(
-                appRegistrationId,
-                new GlobalLocationNumber(gln),
-                name);
-
-            var createdId = await _organizationRepository
-                .AddOrUpdateAsync(organizationToSave)
+            var organization = await _organizationFactoryService
+                .CreateAsync(gln, request.Organization.Name)
                 .ConfigureAwait(false);
 
-            var organizationWithId = new Organization(
-                createdId,
-                organizationToSave.ActorId,
-                organizationToSave.Gln,
-                organizationToSave.Name,
-                organizationToSave.Roles);
-
-            await _organizationEventDispatcher
-                .DispatchChangedEventAsync(organizationWithId)
-                .ConfigureAwait(false);
-
-            return new CreateOrganizationResponse(createdId.Value.ToString());
+            return new CreateOrganizationResponse(organization.Id.Value.ToString());
         }
     }
 }

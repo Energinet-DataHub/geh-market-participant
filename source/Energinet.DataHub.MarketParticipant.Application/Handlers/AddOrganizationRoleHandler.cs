@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             foreach (var marketRoleDto in organizationRoleDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRoleDto.Function, true);
-                organizationRole.MarketRoles.Add(new MarketRole(function));
+                organizationRole.AddMarketRole(new MarketRole(function));
             }
 
             return organizationRole;

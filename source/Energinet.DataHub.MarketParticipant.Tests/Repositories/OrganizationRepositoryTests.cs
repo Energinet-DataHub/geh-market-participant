@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Moq;
@@ -26,14 +27,26 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Repositories
     public sealed class OrganizationRepositoryTests
     {
         [Fact]
-        public async Task GetAsync_ArgumentNull_ThrowsException()
+        public async Task GetAsync_OrganizationIdNull_ThrowsException()
         {
             // Arrange
             var target = new OrganizationRepository(new Mock<MarketParticipantDbContext>().Object);
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync(null!))
+                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync((OrganizationId)null!))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task GetAsync_GlnNull_ThrowsException()
+        {
+            // Arrange
+            var target = new OrganizationRepository(new Mock<MarketParticipantDbContext>().Object);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync((GlobalLocationNumber)null!))
                 .ConfigureAwait(false);
         }
 

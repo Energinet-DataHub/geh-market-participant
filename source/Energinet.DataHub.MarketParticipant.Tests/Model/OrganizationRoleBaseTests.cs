@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Xunit;
@@ -97,6 +99,55 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             {
                 Assert.Throws<InvalidOperationException>(() => target.Delete());
             }
+        }
+
+        [Fact]
+        public void AddMarketRole_ValidRole_AddedToCollection()
+        {
+            // Arrange
+            var target = new OrganizationRoleBaseTest();
+
+            // Act
+            target.AddMarketRole(new MarketRole(EicFunction.Agent));
+            target.AddMarketRole(new MarketRole(EicFunction.SystemOperator));
+            target.AddMarketRole(new MarketRole(EicFunction.BalanceResponsibleParty));
+
+            // Assert
+            Assert.Equal(3, target.MarketRoles.Count());
+            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.Agent);
+            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.SystemOperator);
+            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.BalanceResponsibleParty);
+        }
+
+        [Fact]
+        public void AddMarketRole_AddExistingRole_ThrowsException()
+        {
+            // Arrange
+            var target = new OrganizationRoleBaseTest();
+            target.AddMarketRole(new MarketRole(EicFunction.Agent));
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.AddMarketRole(new MarketRole(EicFunction.Agent)));
+        }
+
+        [Fact]
+        public void RemoveMarketRole_ValidRole_RemovedFromCollection()
+        {
+            // Arrange
+            var target = new OrganizationRoleBaseTest();
+            var marketRole = new MarketRole(EicFunction.SystemOperator);
+
+            target.AddMarketRole(new MarketRole(EicFunction.Agent));
+            target.AddMarketRole(marketRole);
+            target.AddMarketRole(new MarketRole(EicFunction.BalanceResponsibleParty));
+
+            // Act
+            target.RemoveMarketRole(marketRole);
+
+            // Assert
+            Assert.Equal(2, target.MarketRoles.Count());
+            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.Agent);
+            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.BalanceResponsibleParty);
         }
 
         private sealed class OrganizationRoleBaseTest : OrganizationRoleBase

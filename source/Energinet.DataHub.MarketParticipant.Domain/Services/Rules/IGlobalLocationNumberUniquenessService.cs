@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     /// <summary>
-    /// Service for accessing Azure AD
+    /// Ensures that GLN is unique across organizations according to domain rules.
     /// </summary>
-    public interface IActiveDirectoryService
+    public interface IGlobalLocationNumberUniquenessService
     {
         /// <summary>
-        /// Ensures an App registration ID for the given GLN number
+        /// Checks whether GLN is available and throws an exception, if it is not.
         /// </summary>
-        Task<Guid> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
+        /// <param name="globalLocationNumber">The GLN to check for availability.</param>
+        Task EnsureGlobalLocationNumberAvailableAsync(GlobalLocationNumber globalLocationNumber);
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
@@ -50,6 +51,18 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Single(target.Roles, r => r is SystemOperatorRole);
             Assert.Single(target.Roles, r => r is BalancePowerSupplierRole);
             Assert.Single(target.Roles, r => r is DanishEnergyAgencyRole);
+        }
+
+        [Fact]
+        public void AddRoles_RoleAlreadyExists_ThrowsException()
+        {
+            // Arrange
+            var target = new Organization(Guid.NewGuid(), new GlobalLocationNumber("1234"), "fake_value");
+            target.AddRole(new SystemOperatorRole());
+            target.AddRole(new DanishEnergyAgencyRole());
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.AddRole(new DanishEnergyAgencyRole()));
         }
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using SimpleInjector;
@@ -23,6 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
     {
         public static void AddServices(this Container container)
         {
+            container.Register<IGlobalLocationNumberUniquenessService, GlobalLocationNumberUniquenessService>(Lifestyle.Scoped);
+            container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationEventDispatcher, OrganizationEventDispatcher>(Lifestyle.Scoped);
             container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
