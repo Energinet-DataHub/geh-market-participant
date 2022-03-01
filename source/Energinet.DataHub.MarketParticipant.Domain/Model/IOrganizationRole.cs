@@ -18,22 +18,22 @@ using System.Collections.Generic;
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     /// <summary>
-    ///     Represents one of the role of an organization.
+    /// Represents one of the role of an organization.
     /// </summary>
     public interface IOrganizationRole
     {
         /// <summary>
-        ///     The id of the organization role.
+        /// The id of the organization role.
         /// </summary>
         public Guid Id { get; }
 
         /// <summary>
-        ///     The ebIX business role code for the current role.
+        /// The ebIX business role code for the current role.
         /// </summary>
         BusinessRoleCode Code { get; }
 
         /// <summary>
-        ///     The status of the current role.
+        /// The status of the current role.
         /// </summary>
         RoleStatus Status { get; }
 
@@ -53,20 +53,20 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public ICollection<MeteringPointType> MeteringPointTypes { get; }
 
         /// <summary>
-        ///     Activates the current role, the status changes to Active.
-        ///     Only New and Inactive roles can be activated.
+        /// Activates the current role, the status changes to Active.
+        /// Only New and Inactive roles can be activated.
         /// </summary>
         void Activate();
 
         /// <summary>
-        ///     Deactives the current role, the status changes to Inactive.
-        ///     Only Active roles can be deactivated.
+        /// Deactives the current role, the status changes to Inactive.
+        /// Only Active roles can be deactivated.
         /// </summary>
         void Deactivate();
 
         /// <summary>
-        ///     Soft-deletes the current role, the status changes to Deleted.
-        ///     The role becomes read-only after deletion.
+        /// Soft-deletes the current role, the status changes to Deleted.
+        /// The role becomes read-only after deletion.
         /// </summary>
         void Delete();
     }
