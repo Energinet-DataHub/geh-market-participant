@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -21,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
+using Xunit.Sdk;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
@@ -45,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var testOrg = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
             // Act
@@ -84,10 +86,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var gln = new GlobalLocationNumber(Guid.NewGuid().ToString());
             var orgRepository = new OrganizationRepository(context);
             var testOrg = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                gln,
                 "Test");
 
             // Act
@@ -97,7 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             newOrg = new Organization(
                 newOrg!.Id,
                 newOrg.ActorId,
-                new GlobalLocationNumber("234"),
+                gln,
                 "NewName",
                 newOrg.Roles);
 
@@ -107,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
-            Assert.Equal("234", newOrg?.Gln.Value);
+            Assert.Equal(gln.Value, newOrg?.Gln.Value);
             Assert.Equal("NewName", newOrg?.Name);
         }
 
@@ -122,10 +125,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
-            organization.AddRole(new BalancePowerSupplierRole());
+            organization.AddRole(new BalancePowerSupplierRole(
+                Guid.Empty,
+                RoleStatus.New,
+                new GridArea(
+                    new GridAreaId(Guid.Empty),
+                    new GridAreaName("fake_value"),
+                    new GridAreaCode("1234")),
+                new List<MarketRole>()));
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -144,6 +154,39 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
+        public async Task AddOrUpdateAsync_AddGridAreaToOrganizationRole_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+
+            var organization = new Organization(
+                Guid.Empty,
+                new GlobalLocationNumber("123"),
+                "Test");
+
+            organization.AddRole(new BalancePowerSupplierRole(
+                Guid.Empty,
+                RoleStatus.New,
+                new GridArea(
+                    new GridAreaId(Guid.Empty),
+                    new GridAreaName("fake_value"),
+                    new GridAreaCode("1234")),
+                new List<MarketRole>()));
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal("fake_value", organization?.Roles.First().Area?.Name.Value);
+            Assert.NotEqual(Guid.Empty, organization?.Roles.First().Area?.Id.Value);
+            Assert.Equal("1234", organization?.Roles.First().Area?.Code.Value);
+        }
+
+        [Fact]
         public async Task AddOrUpdateAsync_MarketRoleAdded_CanReadBack()
         {
             // Arrange
@@ -154,7 +197,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
             organization.AddRole(new BalancePowerSupplierRole { MarketRoles = { new MarketRole(EicFunction.BalancingServiceProvider) } });
@@ -193,7 +236,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
             // Act

@@ -24,19 +24,27 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
             Id = Guid.Empty;
             Status = RoleStatus.New;
+            Area = new GridArea(new GridAreaId(Guid.Empty), new GridAreaName(string.Empty), new GridAreaCode(string.Empty));
             MarketRoles = new List<MarketRole>();
         }
 
-        protected OrganizationRoleBase(Guid id, RoleStatus status, IEnumerable<MarketRole> marketRoles)
+        protected OrganizationRoleBase(
+            Guid id,
+            RoleStatus status,
+            GridArea? area,
+            IEnumerable<MarketRole> marketRoles)
         {
             Id = id;
             Status = status;
+            Area = area;
             MarketRoles = new List<MarketRole>(marketRoles);
         }
 
         public Guid Id { get; }
 
         public RoleStatus Status { get; private set; }
+
+        public GridArea? Area { get; }
 
         public ICollection<MarketRole> MarketRoles { get; }
 

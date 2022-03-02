@@ -18,10 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code)
     {
-        public GridArea(GridAreaName name, GridAreaCode code)
-            : this(new GridAreaId(Guid.Empty), name, code)
-        {
-        }
     }
 
     public sealed record GridAreaId(Guid Value);
