@@ -65,6 +65,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         void Deactivate();
 
         /// <summary>
+        /// Passive roles have certain domain-specific actions that can be performed.
+        /// Only Active and Inactive roles can be set to passive.
+        /// </summary>
+        void SetAsPassive();
+
+        /// <summary>
         /// Soft-deletes the current role, the status changes to Deleted.
         /// The role becomes read-only after deletion.
         /// </summary>

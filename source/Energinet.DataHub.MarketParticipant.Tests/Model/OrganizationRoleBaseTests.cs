@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Xunit;

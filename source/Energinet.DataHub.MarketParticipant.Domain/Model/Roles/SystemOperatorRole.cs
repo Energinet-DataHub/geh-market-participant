@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 {
