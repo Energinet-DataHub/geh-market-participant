@@ -18,7 +18,7 @@ using System.Collections.Generic;
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     /// <summary>
-    /// Represents one of the role of an organization.
+    /// Represents one of the roles of an organization.
     /// </summary>
     public interface IOrganizationRole
     {
