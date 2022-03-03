@@ -272,7 +272,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
             var roleWithMeteringTypes = new MeteringPointAdministratorRole();
@@ -305,7 +305,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization(
                 Guid.NewGuid(),
-                new GlobalLocationNumber("123"),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
             var roleWithMeteringTypes = new MeteringPointAdministratorRole();
