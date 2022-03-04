@@ -12,20 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Service for accessing Azure AD
+    /// A factory service ensuring correct construction of an Organization.
     /// </summary>
-    public interface IActiveDirectoryService
+    public interface IOrganizationFactoryService
     {
         /// <summary>
-        /// Ensures an App registration ID for the given GLN number
+        /// Creates an organization.
         /// </summary>
-        Task<Guid> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
+        /// <param name="gln">The global location number of the new organization.</param>
+        /// <param name="name">The name of the new organization.</param>
+        /// <returns>The created organization.</returns>
+        Task<Organization> CreateAsync(GlobalLocationNumber gln, string name);
     }
 }

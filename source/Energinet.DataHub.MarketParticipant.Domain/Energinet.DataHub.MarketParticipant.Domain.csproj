@@ -25,10 +25,6 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
   </ItemGroup>
 
