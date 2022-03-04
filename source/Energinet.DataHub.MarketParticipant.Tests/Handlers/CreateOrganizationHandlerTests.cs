@@ -18,9 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -34,10 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateOrganizationHandler(
-                new Mock<IOrganizationRepository>().Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+            var target = new CreateOrganizationHandler(new Mock<IOrganizationFactoryService>().Object);
 
             // Act + Assert
             await Assert
@@ -49,19 +44,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewOrganization_ReturnsOrganizationId()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateOrganizationHandler(
-                organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+            var gln = new GlobalLocationNumber("fake_gln");
+            var name = "fake_name";
+
+            var organizationFactoryService = new Mock<IOrganizationFactoryService>();
+            var target = new CreateOrganizationHandler(organizationFactoryService.Object);
 
             var expectedId = Guid.NewGuid();
+            var expectedOrganization = new Organization(
+                new OrganizationId(expectedId),
+                Guid.NewGuid(),
+                gln,
+                name,
+                Array.Empty<IOrganizationRole>());
 
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(new OrganizationId(expectedId));
+            organizationFactoryService
+                .Setup(x => x.CreateAsync(It.Is<GlobalLocationNumber>(g => g == gln), name))
+                .ReturnsAsync(expectedOrganization);
 
-            var command = new CreateOrganizationCommand(new OrganizationDto("fake_value", "fake_value"));
+            var command = new CreateOrganizationCommand(new OrganizationDto(name, gln.Value));
 
             // Act
             var response = await target
@@ -70,72 +71,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.Equal(expectedId.ToString(), response.OrganizationId);
-        }
-
-        [Fact]
-        public async Task Handle_NewOrganization_ValuesAreMapped()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateOrganizationHandler(
-                organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IActiveDirectoryService>().Object);
-
-            var expectedId = Guid.NewGuid();
-
-            const string orgName = "SomeName";
-            const string orgGln = "SomeGln";
-
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(
-                    o => o.Name == orgName && o.Gln.Value == orgGln)))
-                .ReturnsAsync(new OrganizationId(expectedId));
-
-            var command = new CreateOrganizationCommand(new OrganizationDto(orgName, orgGln));
-
-            // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
-
-            // Assert
-            Assert.Equal(expectedId.ToString(), response.OrganizationId);
-        }
-
-        [Fact]
-        public async Task Handle_NewOrganization_DispatchesEvent()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var organizationEventDispatcher = new Mock<IOrganizationEventDispatcher>();
-            var target = new CreateOrganizationHandler(
-                organizationRepository.Object,
-                organizationEventDispatcher.Object,
-                new Mock<IActiveDirectoryService>().Object);
-
-            var expectedId = Guid.NewGuid();
-
-            const string orgName = "SomeName";
-            const string orgGln = "SomeGln";
-
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(
-                    o => o.Name == orgName && o.Gln.Value == orgGln)))
-                .ReturnsAsync(new OrganizationId(expectedId));
-
-            var command = new CreateOrganizationCommand(new OrganizationDto(orgName, orgGln));
-
-            // Act
-            await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
-
-            // Assert
-            organizationEventDispatcher.Verify(
-                x => x.DispatchChangedEventAsync(It.Is<Organization>(
-                    o => o.Id.Value == expectedId)),
-                Times.Once);
         }
     }
 }

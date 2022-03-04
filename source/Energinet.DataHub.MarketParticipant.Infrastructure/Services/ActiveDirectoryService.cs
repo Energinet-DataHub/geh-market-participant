@@ -16,6 +16,9 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
@@ -29,8 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _configuration = configuration;
         }
 
-        public async Task<Guid> EnsureAppRegistrationIdAsync(string gln)
+        public async Task<Guid> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln)
         {
+            Guard.ThrowIfNull(gln, nameof(gln));
+
             // This is a temporary implementation using the actor DB.
             // Will be replaced by Azure AD integration at a later time.
             const string param = "GLN";
@@ -43,15 +48,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             await using var command = new SqlCommand(query, connection)
             {
-                Parameters = { new SqlParameter(param, gln) }
+                Parameters = { new SqlParameter(param, gln.Value) }
             };
 
             await using var reader = await command.ExecuteReaderAsync().ConfigureAwait(false);
 
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
-                var record = ((IDataRecord)reader)!;
-
+                var record = (IDataRecord)reader;
                 return Guid.Parse(record.GetString(0));
             }
 

@@ -14,18 +14,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 {
     public abstract class OrganizationRoleBase
     {
+        private readonly List<MarketRole> _marketRoles;
+
         protected OrganizationRoleBase()
         {
             Id = Guid.Empty;
             Status = RoleStatus.New;
-            Area = new GridArea(new GridAreaId(Guid.Empty), new GridAreaName(string.Empty), new GridAreaCode(string.Empty));
-            MarketRoles = new List<MarketRole>();
+            Area = null;
+            _marketRoles = new List<MarketRole>();
         }
 
         protected OrganizationRoleBase(
@@ -37,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
             Id = id;
             Status = status;
             Area = area;
-            MarketRoles = new List<MarketRole>(marketRoles);
+            _marketRoles = new List<MarketRole>(marketRoles);
         }
 
         public Guid Id { get; }
@@ -46,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 
         public GridArea? Area { get; }
 
-        public ICollection<MarketRole> MarketRoles { get; }
+        public IEnumerable<MarketRole> MarketRoles => _marketRoles;
 
         public void Activate()
         {
@@ -70,6 +74,23 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
             EnsureCorrectState(RoleStatus.Deleted, RoleStatus.New, RoleStatus.Active, RoleStatus.Inactive, RoleStatus.Passive);
             Status = RoleStatus.Deleted;
+        }
+
+        public void AddMarketRole(MarketRole marketRole)
+        {
+            Guard.ThrowIfNull(marketRole, nameof(marketRole));
+
+            if (_marketRoles.Any(r => r.Function == marketRole.Function))
+            {
+                throw new ValidationException($"Cannot add market role {marketRole.Function} as it already exists.");
+            }
+
+            _marketRoles.Add(marketRole);
+        }
+
+        public void RemoveMarketRole(MarketRole marketRole)
+        {
+            _marketRoles.Remove(marketRole);
         }
 
         private void EnsureCorrectState(RoleStatus targetState, params RoleStatus[] allowedStates)
