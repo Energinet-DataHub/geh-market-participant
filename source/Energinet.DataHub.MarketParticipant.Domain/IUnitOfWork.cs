@@ -15,16 +15,16 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain
 {
     /// <summary>
-    /// Service for accessing Azure AD
+    /// TODO
     /// </summary>
-    public interface IActiveDirectoryService
+    public interface IUnitOfWork : IAsyncDisposable
     {
         /// <summary>
-        /// Ensures an App registration ID for the given GLN number
+        /// TODO
         /// </summary>
-        Task<Guid> EnsureAppRegistrationIdAsync(string gln);
+        Task CommitAsync();
     }
 }

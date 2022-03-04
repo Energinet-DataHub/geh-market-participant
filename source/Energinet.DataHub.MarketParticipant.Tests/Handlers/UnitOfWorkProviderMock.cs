@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
+using Moq;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
-    /// <summary>
-    /// Service for accessing Azure AD
-    /// </summary>
-    public interface IActiveDirectoryService
+    internal static class UnitOfWorkProviderMock
     {
-        /// <summary>
-        /// Ensures an App registration ID for the given GLN number
-        /// </summary>
-        Task<Guid> EnsureAppRegistrationIdAsync(string gln);
+        public static IUnitOfWorkProvider Create()
+        {
+            var uowp = new Mock<IUnitOfWorkProvider>();
+            uowp.Setup(x => x.NewUnitOfWork()).Returns(new Mock<IUnitOfWork>().Object);
+            return uowp.Object;
+        }
     }
 }

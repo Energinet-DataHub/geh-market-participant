@@ -15,10 +15,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -29,20 +29,25 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
         private readonly IActiveDirectoryService _activeDirectoryService;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         public CreateOrganizationHandler(
             IOrganizationRepository organizationRepository,
             IOrganizationEventDispatcher organizationEventDispatcher,
-            IActiveDirectoryService activeDirectoryService)
+            IActiveDirectoryService activeDirectoryService,
+            IUnitOfWorkProvider unitOfWorkProvider)
         {
             _organizationRepository = organizationRepository;
             _organizationEventDispatcher = organizationEventDispatcher;
             _activeDirectoryService = activeDirectoryService;
+            _unitOfWorkProvider = unitOfWorkProvider;
         }
 
         public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
+
+            await using var uow = _unitOfWorkProvider.NewUnitOfWork();
 
             var (name, gln) = request.Organization;
 
@@ -67,6 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             await _organizationEventDispatcher
                 .DispatchChangedEventAsync(organizationWithId)
                 .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
 
             return new CreateOrganizationResponse(createdId.Value.ToString());
         }

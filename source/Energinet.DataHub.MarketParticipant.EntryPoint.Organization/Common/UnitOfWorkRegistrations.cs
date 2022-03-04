@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Infrastructure;
+using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 {
-    /// <summary>
-    /// Service for accessing Azure AD
-    /// </summary>
-    public interface IActiveDirectoryService
+    internal static class UnitOfWorkRegistrations
     {
-        /// <summary>
-        /// Ensures an App registration ID for the given GLN number
-        /// </summary>
-        Task<Guid> EnsureAppRegistrationIdAsync(string gln);
+        public static void AddUnitOfWorkProvider(this Container container)
+        {
+            container.Register<IUnitOfWorkProvider, UnitOfWorkProvider>();
+        }
     }
 }

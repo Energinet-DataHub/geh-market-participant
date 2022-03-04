@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
-using Xunit.Sdk;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {

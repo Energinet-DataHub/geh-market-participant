@@ -20,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -37,7 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateOrganizationHandler(
                 new Mock<IOrganizationRepository>().Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             // Act + Assert
             await Assert
@@ -53,7 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateOrganizationHandler(
                 organizationRepository.Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             var expectedId = Guid.NewGuid();
 
@@ -80,7 +81,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateOrganizationHandler(
                 organizationRepository.Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             var expectedId = Guid.NewGuid();
 
@@ -112,7 +114,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateOrganizationHandler(
                 organizationRepository.Object,
                 organizationEventDispatcher.Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             var expectedId = Guid.NewGuid();
 

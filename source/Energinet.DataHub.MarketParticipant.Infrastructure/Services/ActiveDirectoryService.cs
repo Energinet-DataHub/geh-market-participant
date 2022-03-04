@@ -16,6 +16,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
