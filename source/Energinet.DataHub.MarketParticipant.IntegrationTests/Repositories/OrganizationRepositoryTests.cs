@@ -199,13 +199,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new GlobalLocationNumber(Guid.NewGuid().ToString()),
                 "Test");
 
-            organization.AddRole(new BalancePowerSupplierRole { MarketRoles = { new MarketRole(EicFunction.BalancingServiceProvider) } });
+            var balancePowerSupplierRole = new BalancePowerSupplierRole();
+            balancePowerSupplierRole.AddMarketRole(new MarketRole(EicFunction.BalancingServiceProvider));
+            organization.AddRole(balancePowerSupplierRole);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            organization!.AddRole(new DanishEnergyAgencyRole { MarketRoles = { new MarketRole(EicFunction.SystemOperator) } });
+            var danishEnergyAgencyRole = new DanishEnergyAgencyRole();
+            danishEnergyAgencyRole.AddMarketRole(new MarketRole(EicFunction.SystemOperator));
+            organization!.AddRole(danishEnergyAgencyRole);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -247,6 +251,38 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(organization);
             Assert.Single(organization!.Roles);
             Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
+        }
+
+        [Fact]
+        public async Task GetAsync_GlobalLocationNumber_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepository2 = new OrganizationRepository(context2);
+
+            var globalLocationNumber = new GlobalLocationNumber("00000000");
+            var organization = new Organization(
+                Guid.NewGuid(),
+                globalLocationNumber,
+                "Test");
+
+            organization.AddRole(new BalancePowerSupplierRole());
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+
+            // Act
+            var organizations = await orgRepository2
+                .GetAsync(globalLocationNumber)
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organizations);
+            var expected = organizations.Single();
+            Assert.Equal(globalLocationNumber, expected.Gln);
         }
     }
 }
