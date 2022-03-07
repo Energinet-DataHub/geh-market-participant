@@ -27,8 +27,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
             Guid id,
             RoleStatus status,
             GridArea? area,
-            IEnumerable<MarketRole> marketRoles)
-            : base(id, status, area, marketRoles)
+            IEnumerable<MarketRole> marketRoles,
+            IEnumerable<MeteringPointType> meteringPointTypes)
+            : base(id, status, area, marketRoles, meteringPointTypes)
         {
         }
 

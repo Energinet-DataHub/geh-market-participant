@@ -28,4 +28,8 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Ardalis.SmartEnum" Version="2.0.1" />
+  </ItemGroup>
+
 </Project>
