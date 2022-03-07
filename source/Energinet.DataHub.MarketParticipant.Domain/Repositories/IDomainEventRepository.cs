@@ -13,16 +13,18 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
-    public sealed class DomainEventEntity
+    /// <summary>
+    /// TODO
+    /// </summary>
+    public interface IDomainEventRepository
     {
-        public int Id { get; set; }
-        public Guid EntityId { get; set; }
-        public string EntityType { get; set; } = null!;
-        public bool IsSent { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
-        public string Event { get; set; } = null!;
+        /// <summary>
+        /// TODO
+        /// </summary>
+        Task InsertAsync(Guid domainObjectId, string domainObjectType, object domainEvent);
     }
 }
