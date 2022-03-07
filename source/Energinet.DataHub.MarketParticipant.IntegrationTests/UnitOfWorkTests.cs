@@ -65,6 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         private static async Task ExecuteInUnitOfWork(DbContext context, bool commit, Func<Task> work)
         {
             await using var uow = new UnitOfWork(context);
+            await uow.InitializeAsync().ConfigureAwait(false);
             await work().ConfigureAwait(false);
             if (commit)
             {
