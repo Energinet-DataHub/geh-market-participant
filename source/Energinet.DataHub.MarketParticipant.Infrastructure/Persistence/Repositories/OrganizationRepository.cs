@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -76,6 +78,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ConfigureAwait(false);
 
             return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
+        }
+
+        public async Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber)
+        {
+            Guard.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
+
+            var organizations = await _marketParticipantDbContext
+                .Organizations
+                .Include(x => x.Roles)
+                .ThenInclude(x => x.MarketRoles)
+                .AsSingleQuery()
+                .Where(x => x.Gln == globalLocationNumber.Value)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return organizations.Select(OrganizationMapper.MapFromEntity);
         }
     }
 }

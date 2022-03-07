@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Utilities;
 
@@ -62,7 +63,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         {
             Guard.ThrowIfNull(organizationRole, nameof(organizationRole));
 
-            // TODO: Validation rules. Check for conflicting roles.
+            if (_roles.Any(r => r.Code == organizationRole.Code))
+            {
+                throw new ValidationException($"Cannot add role {organizationRole.Code} as it already exists.");
+            }
+
             _roles.Add(organizationRole);
         }
     }

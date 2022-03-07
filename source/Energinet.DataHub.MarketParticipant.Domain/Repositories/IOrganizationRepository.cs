@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -35,5 +36,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <param name="id">The id of the organization to get.</param>
         /// <returns>The organization with the specified id; or null if the organization does not exist.</returns>
         Task<Organization?> GetAsync(OrganizationId id);
+
+        /// <summary>
+        /// Gets all organizations with the specified GLN.
+        /// </summary>
+        /// <param name="globalLocationNumber">The GLN to find organizations for.</param>
+        /// <returns>The list of orginizations with the specified GLN.</returns>
+        Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber);
     }
 }

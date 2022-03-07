@@ -43,9 +43,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         GridArea? Area { get; }
 
         /// <summary>
-        /// The list of market roles (functions and permissions) supported by the current organization role.
+        /// The roles (functions and permissions) supported by the current organization role.
         /// </summary>
-        public ICollection<MarketRole> MarketRoles { get; }
+        public IEnumerable<MarketRole> MarketRoles { get; }
 
         /// <summary>
         ///     The status of the current role.
@@ -75,5 +75,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// The role becomes read-only after deletion.
         /// </summary>
         void Delete();
+
+        /// <summary>
+        /// Adds the specified market role.
+        /// </summary>
+        /// <param name="marketRole">The market role to add.</param>
+        void AddMarketRole(MarketRole marketRole);
+
+        /// <summary>
+        /// Removes the specified market role.
+        /// </summary>
+        /// <param name="marketRole">The market role to remove.</param>
+        void RemoveMarketRole(MarketRole marketRole);
     }
 }
