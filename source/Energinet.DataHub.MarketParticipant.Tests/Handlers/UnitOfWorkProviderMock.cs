@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public static IUnitOfWorkProvider Create()
         {
             var uowp = new Mock<IUnitOfWorkProvider>();
-            uowp.Setup(x => x.NewUnitOfWork()).Returns(new Mock<IUnitOfWork>().Object);
+            uowp.Setup(x => x.NewUnitOfWorkAsync()).ReturnsAsync(new Mock<IUnitOfWork>().Object);
             return uowp.Object;
         }
     }

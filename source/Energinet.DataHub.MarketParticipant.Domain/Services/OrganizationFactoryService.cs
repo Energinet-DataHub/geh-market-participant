@@ -26,21 +26,26 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
         private readonly IGlobalLocationNumberUniquenessService _globalLocationNumberUniquenessService;
         private readonly IActiveDirectoryService _activeDirectoryService;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         public OrganizationFactoryService(
             IOrganizationRepository organizationRepository,
             IOrganizationEventDispatcher organizationEventDispatcher,
             IGlobalLocationNumberUniquenessService globalLocationNumberUniquenessService,
-            IActiveDirectoryService activeDirectoryService)
+            IActiveDirectoryService activeDirectoryService,
+            IUnitOfWorkProvider unitOfWorkProvider)
         {
             _organizationRepository = organizationRepository;
             _organizationEventDispatcher = organizationEventDispatcher;
             _globalLocationNumberUniquenessService = globalLocationNumberUniquenessService;
             _activeDirectoryService = activeDirectoryService;
+            _unitOfWorkProvider = unitOfWorkProvider;
         }
 
         public async Task<Organization> CreateAsync(GlobalLocationNumber gln, string name)
         {
+            await using var uow = await _unitOfWorkProvider.NewUnitOfWorkAsync().ConfigureAwait(false);
+
             await _globalLocationNumberUniquenessService
                 .EnsureGlobalLocationNumberAvailableAsync(gln)
                 .ConfigureAwait(false);
@@ -68,6 +73,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             await _organizationEventDispatcher
                 .DispatchChangedEventAsync(organizationWithId)
                 .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
 
             return organizationWithId;
         }

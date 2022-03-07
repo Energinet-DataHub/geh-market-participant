@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -22,23 +23,35 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure
 {
     public sealed class UnitOfWork : IUnitOfWork
     {
-        private readonly IDbContextTransaction _transaction;
+        private readonly DbContext _context;
+        private IDbContextTransaction? _transaction;
 
         public UnitOfWork(DbContext context)
         {
             Guard.ThrowIfNull(context, nameof(context));
 
-            _transaction = context.Database.BeginTransaction();
+            _context = context;
         }
 
-        public async Task CommitAsync()
+        public async Task InitializeAsync()
         {
-            await _transaction.CommitAsync().ConfigureAwait(false);
+            _transaction = await _context.Database.BeginTransactionAsync().ConfigureAwait(false);
         }
 
-        public async ValueTask DisposeAsync()
+        public Task CommitAsync()
         {
-            await _transaction.DisposeAsync().ConfigureAwait(false);
+            if (_transaction == null)
+                throw new InvalidOperationException($"{nameof(UnitOfWork)} has not been initialized");
+
+            return _transaction.CommitAsync();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            if (_transaction == null)
+                return ValueTask.CompletedTask;
+
+            return _transaction.DisposeAsync();
         }
     }
 }

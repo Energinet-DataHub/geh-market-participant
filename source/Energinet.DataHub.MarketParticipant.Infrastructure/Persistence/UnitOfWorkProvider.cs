@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -34,9 +35,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure
             _context = context;
         }
 
-        public IUnitOfWork NewUnitOfWork()
+        public async Task<IUnitOfWork> NewUnitOfWorkAsync()
         {
-            return new UnitOfWork(_context);
+            var unitOfWork = new UnitOfWork(_context);
+            await unitOfWork.InitializeAsync().ConfigureAwait(false);
+            return unitOfWork;
         }
     }
 }

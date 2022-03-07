@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Handlers;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -36,7 +37,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
                 new Mock<IGlobalLocationNumberUniquenessService>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             var expectedId = Guid.NewGuid();
 
@@ -62,7 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
                 new Mock<IGlobalLocationNumberUniquenessService>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             var expectedId = Guid.NewGuid();
 
@@ -93,7 +96,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 organizationEventDispatcher.Object,
                 new Mock<IGlobalLocationNumberUniquenessService>().Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             var expectedId = Guid.NewGuid();
 
@@ -126,7 +130,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IOrganizationRepository>().Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
                 globalLocationNumberUniquenessService.Object,
-                new Mock<IActiveDirectoryService>().Object);
+                new Mock<IActiveDirectoryService>().Object,
+                UnitOfWorkProviderMock.Create());
 
             const string orgName = "SomeName";
             const string orgGln = "SomeGln";
