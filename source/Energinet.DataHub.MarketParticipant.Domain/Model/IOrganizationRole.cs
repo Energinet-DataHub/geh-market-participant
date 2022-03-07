@@ -54,13 +54,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         /// <summary>
         /// Activates the current role, the status changes to Active.
-        /// Only New and Inactive roles can be activated.
+        /// Only New, Inactive and Passive roles can be activated.
         /// </summary>
         void Activate();
 
         /// <summary>
         /// Deactives the current role, the status changes to Inactive.
-        /// Only Active roles can be deactivated.
+        /// Only Active and Passive roles can be deactivated.
         /// </summary>
         void Deactivate();
 
