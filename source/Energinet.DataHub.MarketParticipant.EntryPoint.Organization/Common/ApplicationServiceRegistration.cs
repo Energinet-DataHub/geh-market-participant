@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
         public static void AddApplicationServices(this Container container)
         {
             container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<AddOrganizationRoleCommand>, AddOrganizationRoleCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>(Lifestyle.Scoped);
         }
     }
 }

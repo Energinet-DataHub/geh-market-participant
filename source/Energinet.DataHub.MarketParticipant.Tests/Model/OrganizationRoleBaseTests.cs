@@ -16,7 +16,6 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Xunit;
 using Xunit.Categories;
 
@@ -29,16 +28,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Ctor_NewRole_HasStatusNew()
         {
             // Arrange + Act + Assert
-            Assert.Equal(RoleStatus.New, new OrganizationRoleBaseTest().Status);
+            Assert.Equal(ActorStatus.New, new OrganizationRoleBaseTest().Status);
         }
 
         [Theory]
-        [InlineData(RoleStatus.New, true)]
-        [InlineData(RoleStatus.Active, true)]
-        [InlineData(RoleStatus.Inactive, true)]
-        [InlineData(RoleStatus.Passive, true)]
-        [InlineData(RoleStatus.Deleted, false)]
-        public void Activate_ChangesState_IfAllowed(RoleStatus initialStatus, bool isAllowed)
+        [InlineData(ActorStatus.New, true)]
+        [InlineData(ActorStatus.Active, true)]
+        [InlineData(ActorStatus.Inactive, true)]
+        [InlineData(ActorStatus.Passive, true)]
+        [InlineData(ActorStatus.Deleted, false)]
+        public void Activate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
             var target = new OrganizationRoleBaseTest(initialStatus);
@@ -47,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             if (isAllowed)
             {
                 target.Activate();
-                Assert.Equal(RoleStatus.Active, target.Status);
+                Assert.Equal(ActorStatus.Active, target.Status);
             }
             else
             {
@@ -56,12 +55,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         }
 
         [Theory]
-        [InlineData(RoleStatus.New, false)]
-        [InlineData(RoleStatus.Active, true)]
-        [InlineData(RoleStatus.Inactive, true)]
-        [InlineData(RoleStatus.Passive, true)]
-        [InlineData(RoleStatus.Deleted, false)]
-        public void Deactivate_ChangesState_IfAllowed(RoleStatus initialStatus, bool isAllowed)
+        [InlineData(ActorStatus.New, false)]
+        [InlineData(ActorStatus.Active, true)]
+        [InlineData(ActorStatus.Inactive, true)]
+        [InlineData(ActorStatus.Passive, true)]
+        [InlineData(ActorStatus.Deleted, false)]
+        public void Deactivate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
             var target = new OrganizationRoleBaseTest(initialStatus);
@@ -70,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             if (isAllowed)
             {
                 target.Deactivate();
-                Assert.Equal(RoleStatus.Inactive, target.Status);
+                Assert.Equal(ActorStatus.Inactive, target.Status);
             }
             else
             {
@@ -79,12 +78,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         }
 
         [Theory]
-        [InlineData(RoleStatus.New, true)]
-        [InlineData(RoleStatus.Active, true)]
-        [InlineData(RoleStatus.Inactive, true)]
-        [InlineData(RoleStatus.Passive, true)]
-        [InlineData(RoleStatus.Deleted, true)]
-        public void Delete_ChangesState_IfAllowed(RoleStatus initialStatus, bool isAllowed)
+        [InlineData(ActorStatus.New, true)]
+        [InlineData(ActorStatus.Active, true)]
+        [InlineData(ActorStatus.Inactive, true)]
+        [InlineData(ActorStatus.Passive, true)]
+        [InlineData(ActorStatus.Deleted, true)]
+        public void Delete_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
             var target = new OrganizationRoleBaseTest(initialStatus);
@@ -93,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             if (isAllowed)
             {
                 target.Delete();
-                Assert.Equal(RoleStatus.Deleted, target.Status);
+                Assert.Equal(ActorStatus.Deleted, target.Status);
             }
             else
             {
@@ -156,7 +155,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             {
             }
 
-            public OrganizationRoleBaseTest(RoleStatus initialStatus)
+            public OrganizationRoleBaseTest(ActorStatus initialStatus)
                 : base(
                     Guid.Empty,
                     initialStatus,

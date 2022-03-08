@@ -19,22 +19,22 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class AddOrganizationRoleCommandRuleSet : AbstractValidator<AddOrganizationRoleCommand>
+    public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCommand>
     {
-        public AddOrganizationRoleCommandRuleSet()
+        public CreateActorCommandRuleSet()
         {
             RuleFor(command => command.OrganizationId)
                 .NotEmpty()
-                .SetValidator(new GuidValidationRule<AddOrganizationRoleCommand>());
+                .SetValidator(new GuidValidationRule<CreateActorCommand>());
 
-            RuleFor(command => command.Role)
+            RuleFor(command => command.Actor)
                 .NotNull()
                 .ChildRules(validator =>
                 {
                     validator
-                        .RuleFor(role => role.BusinessRole)
+                        .RuleFor(role => role.Gln)
                         .NotEmpty()
-                        .IsEnumName(typeof(BusinessRoleCode), false);
+                        .SetValidator(new GlobalLocationNumberValidationRule<ActorDto>());
 
                     validator
                         .RuleFor(x => x.MarketRoles)

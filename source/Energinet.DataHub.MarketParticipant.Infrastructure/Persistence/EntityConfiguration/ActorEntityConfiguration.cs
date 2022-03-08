@@ -19,22 +19,22 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class OrganizationRoleEntityConfiguration : IEntityTypeConfiguration<OrganizationRoleEntity>
+    public sealed class ActorEntityConfiguration : IEntityTypeConfiguration<ActorEntity>
     {
-        public void Configure(EntityTypeBuilder<OrganizationRoleEntity> builder)
+        public void Configure(EntityTypeBuilder<ActorEntity> builder)
         {
             Guard.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("OrganizationRole");
-            builder.HasKey(role => role.Id);
-            builder.Property(role => role.Id).ValueGeneratedOnAdd();
+            builder.ToTable("ActorInfoNew");
+            builder.HasKey(actor => actor.Id);
+            builder.Property(actor => actor.Id).ValueGeneratedNever();
             builder
-                .HasOne<GridAreaEntity>(role => role.GridArea!)
+                .HasOne(actor => actor.SingleGridArea!)
                 .WithMany()
                 .HasForeignKey("GridAreaId");
             builder
-                .HasMany(organization => organization.MarketRoles)
+                .HasMany(actor => actor.MarketRoles)
                 .WithOne()
-                .HasForeignKey(role => role.OrganizationRoleId);
+                .HasForeignKey(marketRole => marketRole.ActorInfoId);
         }
     }
 }

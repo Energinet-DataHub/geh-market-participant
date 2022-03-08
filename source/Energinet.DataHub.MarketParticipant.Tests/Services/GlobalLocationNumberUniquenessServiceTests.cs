@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GlobalLocationNumberUniquenessService(organizationRepository.Object);
+            var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
 
@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await target
-                .EnsureGlobalLocationNumberAvailableAsync(gln)
+                .ValidateGlobalLocationNumberAvailableAsync(gln)
                 .ConfigureAwait(false);
         }
 
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GlobalLocationNumberUniquenessService(organizationRepository.Object);
+            var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
 
@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ValidationException>(() => target.EnsureGlobalLocationNumberAvailableAsync(gln))
+                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(gln))
                 .ConfigureAwait(false);
         }
     }

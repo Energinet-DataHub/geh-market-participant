@@ -14,7 +14,16 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 {
-    public sealed record OrganizationRoleDto(string BusinessRole, IEnumerable<MarketRoleDto> MarketRoles);
+    public sealed class BalanceResponsiblePartyRole : IBusinessRole
+    {
+        public BusinessRoleCode Code => BusinessRoleCode.Ddk;
+
+        public IEnumerable<EicFunction> Functions { get; } = new[]
+        {
+            // TODO: add
+            EicFunction.Agent
+        };
+    }
 }

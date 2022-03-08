@@ -32,10 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new OrganizationFactoryService(
+            var target = new ActorFactoryService(
                 organizationRepository.Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IGlobalLocationNumberUniquenessService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
 
             var expectedId = Guid.NewGuid();
@@ -58,10 +58,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new OrganizationFactoryService(
+            var target = new ActorFactoryService(
                 organizationRepository.Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
-                new Mock<IGlobalLocationNumberUniquenessService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
 
             var expectedId = Guid.NewGuid();
@@ -89,10 +89,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var organizationEventDispatcher = new Mock<IOrganizationEventDispatcher>();
-            var target = new OrganizationFactoryService(
+            var target = new ActorFactoryService(
                 organizationRepository.Object,
                 organizationEventDispatcher.Object,
-                new Mock<IGlobalLocationNumberUniquenessService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
 
             var expectedId = Guid.NewGuid();
@@ -121,8 +121,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public async Task CreateAsync_NewOrganization_EnsuresGlnUniqueness()
         {
             // Arrange
-            var globalLocationNumberUniquenessService = new Mock<IGlobalLocationNumberUniquenessService>();
-            var target = new OrganizationFactoryService(
+            var globalLocationNumberUniquenessService = new Mock<IUniqueGlobalLocationNumberRuleService>();
+            var target = new ActorFactoryService(
                 new Mock<IOrganizationRepository>().Object,
                 new Mock<IOrganizationEventDispatcher>().Object,
                 globalLocationNumberUniquenessService.Object,
@@ -139,7 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             globalLocationNumberUniquenessService.Verify(
-                x => x.EnsureGlobalLocationNumberAvailableAsync(globalLocationNumber),
+                x => x.ValidateGlobalLocationNumberAvailableAsync(globalLocationNumber),
                 Times.Once);
         }
     }

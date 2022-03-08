@@ -16,7 +16,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Xunit;
 using Xunit.Categories;
 

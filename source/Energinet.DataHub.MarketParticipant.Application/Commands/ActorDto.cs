@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public enum RoleStatus
-    {
-        New = 1,
-        Active = 2,
-        Inactive = 3,
-        Passive = 4,
-        Deleted = 5
-    }
+    public sealed record ActorDto(string Gln, IEnumerable<MarketRoleDto> MarketRoles);
 }

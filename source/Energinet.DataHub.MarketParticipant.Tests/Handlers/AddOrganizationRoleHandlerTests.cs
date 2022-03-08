@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new AddOrganizationRoleHandler(new Mock<IOrganizationRepository>().Object);
+            var target = new CreateActorHandler(new Mock<IOrganizationRepository>().Object);
 
             // Act + Assert
             await Assert
@@ -47,15 +47,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new AddOrganizationRoleHandler(organizationRepository.Object);
+            var target = new CreateActorHandler(organizationRepository.Object);
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
                 .ReturnsAsync((Organization?)null);
 
-            var command = new AddOrganizationRoleCommand(
+            var command = new CreateActorCommand(
                 "62A79F4A-CB51-4D1E-8B4B-9A9BF3FB2BD4",
-                new OrganizationRoleDto("ddq", Array.Empty<MarketRoleDto>()));
+                new ActorDto("ddq", Array.Empty<MarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new AddOrganizationRoleHandler(organizationRepository.Object);
+            var target = new CreateActorHandler(organizationRepository.Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -87,9 +87,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     o => o.ActorId.ToString() == actorId && o.Name == orgName && o.Gln.Value == orgGln)))
                 .ReturnsAsync(new OrganizationId(expectedId));
 
-            var command = new AddOrganizationRoleCommand(
+            var command = new CreateActorCommand(
                 orgId,
-                new OrganizationRoleDto(role, Array.Empty<MarketRoleDto>()));
+                new ActorDto(role, Array.Empty<MarketRoleDto>()));
 
             // Act
             await target

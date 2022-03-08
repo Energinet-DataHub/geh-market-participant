@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 {
-    public sealed class MarketRoleEntity
+    public sealed class GridAccessProviderRole : IBusinessRole
     {
-        public Guid Id { get; set; }
-        public Guid ActorInfoId { get; set; }
-        public int Function { get; set; }
+        public BusinessRoleCode Code => BusinessRoleCode.Ddm;
+
+        public IEnumerable<EicFunction> Functions { get; } = new[]
+        {
+            // TODO: add
+            EicFunction.Agent
+        };
     }
 }

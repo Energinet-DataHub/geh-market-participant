@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -39,8 +40,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var changedEvent = new OrganizationChangedEvent(
                 organization.Id.Value,
-                organization.ActorId,
-                organization.Gln.Value,
+            // TODO: Another PR.
+                organization.Actors.Select(x => x.ActorId.Value).Single(),
+                organization.Actors.Select(x => x.Gln.Value).Single(),
                 organization.Name);
 
             var bytes = _eventParser.Parse(changedEvent);

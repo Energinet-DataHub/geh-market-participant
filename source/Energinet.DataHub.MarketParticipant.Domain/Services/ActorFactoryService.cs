@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -20,56 +21,64 @@ using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed class OrganizationFactoryService : IOrganizationFactoryService
+    public sealed class ActorFactoryService : IActorFactoryService
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
-        private readonly IGlobalLocationNumberUniquenessService _globalLocationNumberUniquenessService;
+        private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+        private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
         private readonly IActiveDirectoryService _activeDirectoryService;
 
-        public OrganizationFactoryService(
+        public ActorFactoryService(
             IOrganizationRepository organizationRepository,
             IOrganizationEventDispatcher organizationEventDispatcher,
-            IGlobalLocationNumberUniquenessService globalLocationNumberUniquenessService,
+            IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
+            IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
             IActiveDirectoryService activeDirectoryService)
         {
             _organizationRepository = organizationRepository;
             _organizationEventDispatcher = organizationEventDispatcher;
-            _globalLocationNumberUniquenessService = globalLocationNumberUniquenessService;
+            _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+            _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
             _activeDirectoryService = activeDirectoryService;
         }
 
-        public async Task<Organization> CreateAsync(GlobalLocationNumber gln, string name)
+        public async Task<Actor> CreateAsync(
+            Organization organization,
+            GlobalLocationNumber gln,
+            IReadOnlyCollection<MarketRole> marketRoles)
         {
-            await _globalLocationNumberUniquenessService
-                .EnsureGlobalLocationNumberAvailableAsync(gln)
+            Guard.ThrowIfNull(organization, nameof(organization));
+            Guard.ThrowIfNull(marketRoles, nameof(marketRoles));
+
+            await _uniqueGlobalLocationNumberRuleService
+                .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
                 .ConfigureAwait(false);
+
+            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(
+                organization.Actors,
+                marketRoles);
 
             var appRegistrationId = await _activeDirectoryService
                 .EnsureAppRegistrationIdAsync(gln)
                 .ConfigureAwait(false);
 
-            var organizationToSave = new Organization(
-                appRegistrationId,
-                gln,
-                name);
+            var newActor = new Actor(appRegistrationId, gln);
 
-            var createdId = await _organizationRepository
-                .AddOrUpdateAsync(organizationToSave)
+            foreach (var marketRole in marketRoles)
+                newActor.MarketRoles.Add(marketRole);
+
+            organization.Actors.Add(newActor);
+
+            await _organizationRepository
+                .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
-
-            var organizationWithId = new Organization(
-                createdId,
-                organizationToSave.ActorId,
-                organizationToSave.Gln,
-                organizationToSave.Name,
-                organizationToSave.Roles);
 
             await _organizationEventDispatcher
-                .DispatchChangedEventAsync(organizationWithId)
+                .DispatchChangedEventAsync(organization)
                 .ConfigureAwait(false);
 
-            return organizationWithId;
+            return newActor;
         }
     }
 }

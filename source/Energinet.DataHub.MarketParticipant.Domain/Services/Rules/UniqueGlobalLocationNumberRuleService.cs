@@ -20,22 +20,22 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
-    public sealed class GlobalLocationNumberUniquenessService : IGlobalLocationNumberUniquenessService
+    public sealed class UniqueGlobalLocationNumberRuleService : IUniqueGlobalLocationNumberRuleService
     {
         private readonly IOrganizationRepository _organizationRepository;
 
-        public GlobalLocationNumberUniquenessService(IOrganizationRepository organizationRepository)
+        public UniqueGlobalLocationNumberRuleService(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
 
-        public async Task EnsureGlobalLocationNumberAvailableAsync(GlobalLocationNumber globalLocationNumber)
+        public async Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, GlobalLocationNumber globalLocationNumber)
         {
             var organizations = await _organizationRepository
                 .GetAsync(globalLocationNumber)
                 .ConfigureAwait(false);
 
-            if (organizations.Any())
+            if (organizations.Any(o => o.Id != organization.Id))
             {
                 throw new ValidationException("The specified GLN is already in use.");
             }

@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record AddOrganizationRoleCommand(string OrganizationId, OrganizationRoleDto Role) : IRequest<Unit>;
+    public enum ActorStatus
+    {
+        New = 1,
+        Active = 2,
+        Inactive = 3,
+        Passive = 4,
+        Deleted = 5
+    }
 }

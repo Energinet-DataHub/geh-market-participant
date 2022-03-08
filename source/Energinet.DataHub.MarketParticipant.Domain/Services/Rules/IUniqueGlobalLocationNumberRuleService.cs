@@ -15,19 +15,18 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     /// <summary>
-    /// A factory service ensuring correct construction of an Organization.
+    /// Ensures that GLN is unique across actors according to domain rules.
     /// </summary>
-    public interface IOrganizationFactoryService
+    public interface IUniqueGlobalLocationNumberRuleService
     {
         /// <summary>
-        /// Creates an organization.
+        /// Checks whether GLN is available and throws an exception, if it is not.
         /// </summary>
-        /// <param name="gln">The global location number of the new organization.</param>
-        /// <param name="name">The name of the new organization.</param>
-        /// <returns>The created organization.</returns>
-        Task<Organization> CreateAsync(GlobalLocationNumber gln, string name);
+        /// <param name="organization">The organization that will contain the actor with the specified GLN.</param>
+        /// <param name="globalLocationNumber">The GLN to check for availability.</param>
+        Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, GlobalLocationNumber globalLocationNumber);
     }
 }

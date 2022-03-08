@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateOrganizationHandler(new Mock<IOrganizationFactoryService>().Object);
+            var target = new CreateOrganizationHandler(new Mock<IActorFactoryService>().Object);
 
             // Act + Assert
             await Assert
@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var gln = new GlobalLocationNumber("fake_gln");
             var name = "fake_name";
 
-            var organizationFactoryService = new Mock<IOrganizationFactoryService>();
+            var organizationFactoryService = new Mock<IActorFactoryService>();
             var target = new CreateOrganizationHandler(organizationFactoryService.Object);
 
             var expectedId = Guid.NewGuid();
@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Guid.NewGuid(),
                 gln,
                 name,
-                Array.Empty<IOrganizationRole>());
+                Array.Empty<IBusinessRole>());
 
             organizationFactoryService
                 .Setup(x => x.CreateAsync(It.Is<GlobalLocationNumber>(g => g == gln), name))

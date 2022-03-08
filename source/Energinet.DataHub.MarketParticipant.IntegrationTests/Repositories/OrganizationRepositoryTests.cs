@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -129,7 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             organization.AddRole(new BalancePowerSupplierRole(
                 Guid.Empty,
-                RoleStatus.New,
+                ActorStatus.New,
                 new GridArea(
                     new GridAreaId(Guid.Empty),
                     new GridAreaName("fake_value"),
@@ -168,7 +168,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             organization.AddRole(new BalancePowerSupplierRole(
                 Guid.Empty,
-                RoleStatus.New,
+                ActorStatus.New,
                 new GridArea(
                     new GridAreaId(Guid.Empty),
                     new GridAreaName("fake_value"),

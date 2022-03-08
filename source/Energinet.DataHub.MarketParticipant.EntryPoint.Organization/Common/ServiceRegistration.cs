@@ -24,8 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
     {
         public static void AddServices(this Container container)
         {
-            container.Register<IGlobalLocationNumberUniquenessService, GlobalLocationNumberUniquenessService>(Lifestyle.Scoped);
-            container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
+            container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
+            container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationEventDispatcher, OrganizationEventDispatcher>(Lifestyle.Scoped);
             container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);

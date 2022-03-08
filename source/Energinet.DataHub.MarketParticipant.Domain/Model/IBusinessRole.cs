@@ -12,26 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed class GridAccessProviderRole : OrganizationRoleBase, IOrganizationRole
+    /// <summary>
+    /// Represents a business role and the associated functions.
+    /// </summary>
+    public interface IBusinessRole
     {
-        public GridAccessProviderRole()
-        {
-        }
+        /// <summary>
+        /// The business role code.
+        /// </summary>
+        BusinessRoleCode Code { get; }
 
-        public GridAccessProviderRole(
-            Guid id,
-            RoleStatus status,
-            GridArea? area,
-            IEnumerable<MarketRole> marketRoles)
-            : base(id, status, area, marketRoles)
-        {
-        }
-
-        public BusinessRoleCode Code => BusinessRoleCode.Ddm;
+        /// <summary>
+        /// The functions associated ti the current role.
+        /// </summary>
+        IEnumerable<EicFunction> Functions { get; }
     }
 }

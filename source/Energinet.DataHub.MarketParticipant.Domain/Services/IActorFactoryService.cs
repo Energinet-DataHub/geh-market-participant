@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Service for accessing Azure AD
+    /// A factory service ensuring correct construction of an actor.
     /// </summary>
-    public interface IActiveDirectoryService
+    public interface IActorFactoryService
     {
         /// <summary>
-        /// Ensures an App registration ID for the given GLN number
+        /// Creates an actor.
         /// </summary>
-        Task<ActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
+        /// <param name="organization">The organization that will contain the new actor.</param>
+        /// <param name="gln">The global location number of the new actor.</param>
+        /// <param name="marketRoles">The market roles assigned to the new actor.</param>
+        /// <returns>The created actor.</returns>
+        Task<Actor> CreateAsync(Organization organization, GlobalLocationNumber gln, IReadOnlyCollection<MarketRole> marketRoles);
     }
 }

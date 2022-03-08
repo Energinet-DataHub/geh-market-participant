@@ -33,6 +33,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _marketParticipantDbContext = marketParticipantDbContext;
         }
 
+        public async Task<Organization?> GetAsync(OrganizationId id)
+        {
+            Guard.ThrowIfNull(id, nameof(id));
+
+            var org = await _marketParticipantDbContext
+                .Organizations
+                .Include(x => x.Actors)
+                .ThenInclude(x => x.MarketRoles)
+                .AsSingleQuery()
+                .FirstOrDefaultAsync(x => x.Id == id.Value)
+                .ConfigureAwait(false);
+
+            return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
+        }
+
         public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
         {
             Guard.ThrowIfNull(organization, nameof(organization));
@@ -47,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             {
                 destination = await _marketParticipantDbContext
                     .Organizations
-                    .Include(x => x.Roles)
+                    .Include(x => x.Actors)
                     .ThenInclude(x => x.MarketRoles)
                     .AsSingleQuery()
                     .FirstAsync(x => x.Id == organization.Id.Value)
@@ -61,31 +76,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return new OrganizationId(destination.Id);
         }
 
-        public async Task<Organization?> GetAsync(OrganizationId id)
-        {
-            Guard.ThrowIfNull(id, nameof(id));
-
-            var org = await _marketParticipantDbContext
-                .Organizations
-                .Include(x => x.Roles)
-                .ThenInclude(x => x.MarketRoles)
-                .AsSingleQuery()
-                .FirstOrDefaultAsync(x => x.Id == id.Value)
-                .ConfigureAwait(false);
-
-            return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
-        }
-
         public async Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber)
         {
             Guard.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
 
             var organizations = await _marketParticipantDbContext
                 .Organizations
-                .Include(x => x.Roles)
+                .Include(x => x.Actors)
                 .ThenInclude(x => x.MarketRoles)
                 .AsSingleQuery()
-                .Where(x => x.Gln == globalLocationNumber.Value)
+                .Where(x => x.Actors.Any(y => y.Gln == globalLocationNumber.Value))
                 .ToListAsync()
                 .ConfigureAwait(false);
 

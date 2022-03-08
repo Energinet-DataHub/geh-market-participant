@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Ensures that GLN is unique across organizations according to domain rules.
+    /// Provides services for mapping between market roles and business role codes.
     /// </summary>
-    public interface IGlobalLocationNumberUniquenessService
+    public interface IBusinessRoleCodeDomainService
     {
         /// <summary>
-        /// Checks whether GLN is available and throws an exception, if it is not.
+        /// Gets the business role codes derived from the market roles.
         /// </summary>
-        /// <param name="globalLocationNumber">The GLN to check for availability.</param>
-        Task EnsureGlobalLocationNumberAvailableAsync(GlobalLocationNumber globalLocationNumber);
+        /// <param name="marketRoles">The market roles to get business role codes for.</param>
+        /// <returns>A list of business role codes derived from the market roles.</returns>
+        IEnumerable<BusinessRoleCode> GetBusinessRoleCodes(IEnumerable<MarketRole> marketRoles);
     }
 }

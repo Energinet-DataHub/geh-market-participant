@@ -24,13 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     public interface IOrganizationRepository
     {
         /// <summary>
-        /// Adds the given organization to the repository, or updates it, if it already exists.
-        /// </summary>
-        /// <param name="organization">The organization to add or update.</param>
-        /// <returns>The id of the added organization.</returns>
-        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
-
-        /// <summary>
         /// Gets an organization with the specified id.
         /// </summary>
         /// <param name="id">The id of the organization to get.</param>
@@ -38,10 +31,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         Task<Organization?> GetAsync(OrganizationId id);
 
         /// <summary>
-        /// Gets all organizations with the specified GLN.
+        /// Adds the given organization to the repository, or updates it, if it already exists.
+        /// </summary>
+        /// <param name="organization">The organization to add or update.</param>
+        /// <returns>The id of the added organization.</returns>
+        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
+
+        /// <summary>
+        /// Gets all organizations with an actor that has the specified GLN.
         /// </summary>
         /// <param name="globalLocationNumber">The GLN to find organizations for.</param>
-        /// <returns>The list of orginizations with the specified GLN.</returns>
+        /// <returns>The list of orginizations with an actor that has the specified GLN.</returns>
         Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber);
     }
 }

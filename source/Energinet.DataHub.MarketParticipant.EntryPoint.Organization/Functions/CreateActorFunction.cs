@@ -25,17 +25,16 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public sealed class AddOrganizationRoleFunction
+    public sealed class CreateActorFunction
     {
         private readonly IMediator _mediator;
 
-        public AddOrganizationRoleFunction(IMediator mediator)
+        public CreateActorFunction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        // TODO: Should this be REST?
-        [Function("AddOrganizationRole")]
+        [Function("CreateActor")]
         public Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
             HttpRequestData request)
@@ -52,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             });
         }
 
-        private static async Task<AddOrganizationRoleCommand> AddOrganizationCommandAsync(HttpRequestData request)
+        private static async Task<CreateActorCommand> AddOrganizationCommandAsync(HttpRequestData request)
         {
             var options = new JsonSerializerOptions
             {
@@ -62,13 +61,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             try
             {
                 var organizationRoleDto = await JsonSerializer
-                    .DeserializeAsync<OrganizationRoleDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new OrganizationRoleDto(string.Empty, Array.Empty<MarketRoleDto>());
+                    .DeserializeAsync<ActorDto>(request.Body, options)
+                    .ConfigureAwait(false) ?? new ActorDto(string.Empty, Array.Empty<MarketRoleDto>());
 
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
 
-                return new AddOrganizationRoleCommand(organizationId, organizationRoleDto);
+                return new CreateActorCommand(organizationId, organizationRoleDto);
             }
             catch (JsonException)
             {
