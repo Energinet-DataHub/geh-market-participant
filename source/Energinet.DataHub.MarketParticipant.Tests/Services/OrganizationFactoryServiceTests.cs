@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -35,10 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
                 new Mock<IGlobalLocationNumberUniquenessService>().Object,
                 new Mock<IActiveDirectoryService>().Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IDomainEventRepository>().Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -62,10 +63,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
                 new Mock<IGlobalLocationNumberUniquenessService>().Object,
                 new Mock<IActiveDirectoryService>().Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IDomainEventRepository>().Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -87,17 +88,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAsync_NewOrganization_DispatchesEvent()
+        public async Task CreateAsync_NewOrganization_InsertsDomainEvent()
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var organizationEventDispatcher = new Mock<IOrganizationEventDispatcher>();
+            var eventRepository = new Mock<IDomainEventRepository>();
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
-                organizationEventDispatcher.Object,
                 new Mock<IGlobalLocationNumberUniquenessService>().Object,
                 new Mock<IActiveDirectoryService>().Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                eventRepository.Object);
 
             var expectedId = Guid.NewGuid();
 
@@ -115,9 +116,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ConfigureAwait(false);
 
             // Assert
-            organizationEventDispatcher.Verify(
-                x => x.DispatchChangedEventAsync(It.Is<Organization>(
-                    o => o.Id.Value == expectedId)),
+            eventRepository.Verify(
+                x => x.InsertAsync(expectedId, nameof(Organization), It.Is<OrganizationChangedDomainEvent>(
+                    o => o.Id == expectedId)),
                 Times.Once);
         }
 
@@ -128,10 +129,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var globalLocationNumberUniquenessService = new Mock<IGlobalLocationNumberUniquenessService>();
             var target = new OrganizationFactoryService(
                 new Mock<IOrganizationRepository>().Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IActiveDirectoryService>().Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IDomainEventRepository>().Object);
 
             const string orgName = "SomeName";
             const string orgGln = "SomeGln";

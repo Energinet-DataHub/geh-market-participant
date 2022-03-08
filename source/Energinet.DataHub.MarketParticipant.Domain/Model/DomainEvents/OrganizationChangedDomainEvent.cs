@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents
 {
-    /// <summary>
-    /// Domain event dispatcher for organization events
-    /// </summary>
-    public interface IOrganizationEventDispatcher
+    public sealed record OrganizationChangedDomainEvent
     {
-        /// <summary>
-        /// Dispatches an <see cref="OrganizationChangedDomainEvent"/>
-        /// </summary>
-        /// <param name="domainEvent">The <see cref="OrganizationChangedDomainEvent" /> to dispatch.</param>
-        Task DispatchChangedEventAsync(OrganizationChangedDomainEvent domainEvent);
+        public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
+        public string Gln { get; set; } = null!;
+        public string Name { get; set; } = null!;
     }
 }
