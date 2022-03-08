@@ -28,25 +28,33 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         {
             Id = Guid.Empty;
             Status = RoleStatus.New;
-            Area = null;
+            Area = new GridArea(
+                new GridAreaId(Guid.Empty),
+                new GridAreaName(string.Empty),
+                new GridAreaCode(string.Empty));
+
             _marketRoles = new List<MarketRole>();
+            MeteringPointTypes = new List<MeteringPointType>();
         }
 
         protected OrganizationRoleBase(
             Guid id,
             RoleStatus status,
             GridArea? area,
-            IEnumerable<MarketRole> marketRoles)
+            IEnumerable<MarketRole> marketRoles,
+            IEnumerable<MeteringPointType> meteringPointTypes)
         {
             Id = id;
             Status = status;
             Area = area;
             _marketRoles = new List<MarketRole>(marketRoles);
+            MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
         }
 
         public Guid Id { get; }
 
         public RoleStatus Status { get; private set; }
+        public ICollection<MeteringPointType> MeteringPointTypes { get; }
 
         public GridArea? Area { get; }
 
@@ -54,25 +62,40 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
 
         public void Activate()
         {
-            EnsureCorrectState(RoleStatus.Active, RoleStatus.New, RoleStatus.Inactive, RoleStatus.Passive);
+            EnsureCorrectState(
+                RoleStatus.Active,
+                RoleStatus.New,
+                RoleStatus.Inactive,
+                RoleStatus.Passive);
             Status = RoleStatus.Active;
         }
 
         public void Deactivate()
         {
-            EnsureCorrectState(RoleStatus.Inactive, RoleStatus.Active, RoleStatus.Passive);
+            EnsureCorrectState(
+                RoleStatus.Inactive,
+                RoleStatus.Active,
+                RoleStatus.Passive);
             Status = RoleStatus.Inactive;
         }
 
         public void SetAsPassive()
         {
-            EnsureCorrectState(RoleStatus.Passive, RoleStatus.Active, RoleStatus.Inactive);
+            EnsureCorrectState(
+                RoleStatus.Passive,
+                RoleStatus.Active,
+                RoleStatus.Inactive);
             Status = RoleStatus.Passive;
         }
 
         public void Delete()
         {
-            EnsureCorrectState(RoleStatus.Deleted, RoleStatus.New, RoleStatus.Active, RoleStatus.Inactive, RoleStatus.Passive);
+            EnsureCorrectState(
+                RoleStatus.Deleted,
+                RoleStatus.New,
+                RoleStatus.Active,
+                RoleStatus.Inactive,
+                RoleStatus.Passive);
             Status = RoleStatus.Deleted;
         }
 
@@ -96,9 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Roles
         private void EnsureCorrectState(RoleStatus targetState, params RoleStatus[] allowedStates)
         {
             if (!allowedStates.Contains(Status) && targetState != Status)
-            {
                 throw new InvalidOperationException($"Cannot change state from {Status} to {targetState}.");
-            }
         }
     }
 }

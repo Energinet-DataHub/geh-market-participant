@@ -48,6 +48,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public IEnumerable<MarketRole> MarketRoles { get; }
 
         /// <summary>
+        ///     The status of the current role.
+        /// </summary>
+        public ICollection<MeteringPointType> MeteringPointTypes { get; }
+
+        /// <summary>
         /// Activates the current role, the status changes to Active.
         /// Only New, Inactive and Passive roles can be activated.
         /// </summary>

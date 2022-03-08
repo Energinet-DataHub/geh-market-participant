@@ -164,7 +164,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                         new GridAreaId(Guid.NewGuid()),
                         new GridAreaName("fake_value"),
                         new GridAreaCode("fake_value")),
-                    Array.Empty<MarketRole>())
+                    Array.Empty<MarketRole>(),
+                    Array.Empty<MeteringPointType>())
             {
             }
         }
