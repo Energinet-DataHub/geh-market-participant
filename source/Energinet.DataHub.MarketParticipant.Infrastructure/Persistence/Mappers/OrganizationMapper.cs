@@ -31,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Name = from.Name;
 
             var roleEntities = to.Roles.ToDictionary(x => x.Id);
-
             foreach (var role in from.Roles)
             {
                 if (roleEntities.TryGetValue(role.Id, out var existing))
@@ -62,16 +61,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Id = from.Id;
             to.Status = (int)from.Status;
             to.BusinessRole = (int)from.Code;
-            if (@from.Area != null)
+            if (from.Area != null)
             {
                 var gridArea = to.GridArea ?? new GridAreaEntity();
                 GridAreaMapper.MapToEntity(@from.Area, gridArea);
                 to.GridArea = gridArea;
             }
 
+            // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
+            to.MeteringPointTypes.Clear();
+            foreach (var meteringPointType in from.MeteringPointTypes)
+            {
+                to.MeteringPointTypes.Add(meteringPointType);
+            }
+
             // Market roles are currently treated as value types, so they are deleted and recreated with each update.
             to.MarketRoles.Clear();
-
             foreach (var marketRole in from.MarketRoles)
             {
                 to.MarketRoles.Add(new MarketRoleEntity { Function = (int)marketRole.Function });
@@ -94,15 +99,60 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 return (IOrganizationRole)(businessRole switch
                 {
-                    BusinessRoleCode.Ddk => new BalanceResponsiblePartyRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Ddm => new GridAccessProviderRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Ddq => new BalancePowerSupplierRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Ddx => new ImbalanceSettlementResponsibleRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Ddz => new MeteringPointAdministratorRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Dea => new MeteredDataAggregatorRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Ez => new SystemOperatorRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Mdr => new MeteredDataResponsibleRole(role.Id, roleStatus, gridArea, marketRoles),
-                    BusinessRoleCode.Sts => new DanishEnergyAgencyRole(role.Id, roleStatus, gridArea, marketRoles),
+                    BusinessRoleCode.Ddk => new BalanceResponsiblePartyRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Ddm => new GridAccessProviderRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Ddq => new BalancePowerSupplierRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Ddx => new ImbalanceSettlementResponsibleRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Ddz => new MeteringPointAdministratorRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Dea => new MeteredDataAggregatorRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Ez => new SystemOperatorRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Mdr => new MeteredDataResponsibleRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
+                    BusinessRoleCode.Sts => new DanishEnergyAgencyRole(
+                        role.Id,
+                        roleStatus,
+                        gridArea,
+                        marketRoles,
+                        role.MeteringPointTypes),
                     _ => throw new ArgumentOutOfRangeException(nameof(role))
                 });
             }).ToList();

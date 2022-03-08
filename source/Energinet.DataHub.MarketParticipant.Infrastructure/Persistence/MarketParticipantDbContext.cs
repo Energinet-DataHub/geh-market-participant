@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfi
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
+using SmartEnum.EFCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
@@ -47,6 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new OrganizationRoleEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreEntityConfiguration());
+            modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -134,7 +134,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                     new GridAreaId(Guid.Empty),
                     new GridAreaName("fake_value"),
                     new GridAreaCode("1234")),
-                new List<MarketRole>()));
+                new List<MarketRole>(),
+                new List<MeteringPointType>()));
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -173,7 +174,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                     new GridAreaId(Guid.Empty),
                     new GridAreaName("fake_value"),
                     new GridAreaCode("1234")),
-                new List<MarketRole>()));
+                new List<MarketRole>(),
+                new List<MeteringPointType>()));
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -219,10 +221,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(2, organization!.Roles.Count());
             Assert.Contains(
                 organization.Roles,
-                x => x is BalancePowerSupplierRole role && role.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
+                x => x is BalancePowerSupplierRole role &&
+                     role.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
             Assert.Contains(
                 organization.Roles,
-                x => x is DanishEnergyAgencyRole role && role.MarketRoles.All(y => y.Function == EicFunction.SystemOperator));
+                x => x is DanishEnergyAgencyRole role &&
+                     role.MarketRoles.All(y => y.Function == EicFunction.SystemOperator));
         }
 
         [Fact]
@@ -251,6 +255,77 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(organization);
             Assert.Single(organization!.Roles);
             Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_OrganizationRoleWith1MeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization(
+                Guid.NewGuid(),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
+                "Test");
+
+            var roleWithMeteringTypes = new MeteringPointAdministratorRole();
+            roleWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            organization.AddRole(roleWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Single(organization!.Roles);
+            Assert.Contains(organization.Roles, x => x is MeteringPointAdministratorRole);
+            Assert.Contains(
+                organization.Roles.First().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D03NotUsed));
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_OrganizationRoleWith2MeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization(
+                Guid.NewGuid(),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
+                "Test");
+
+            var roleWithMeteringTypes = new MeteringPointAdministratorRole();
+            roleWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            roleWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D12TotalConsumption);
+            organization.AddRole(roleWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Single(organization!.Roles);
+            Assert.Equal(2, organization!.Roles.First().MeteringPointTypes.Count);
+            Assert.Contains(organization.Roles, x => x is MeteringPointAdministratorRole);
+            Assert.Contains(
+                organization.Roles.First().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D03NotUsed));
+            Assert.Contains(
+                organization.Roles.First().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D12TotalConsumption));
         }
 
         [Fact]
