@@ -10,7 +10,7 @@ CREATE TABLE [dbo].[DomainEvent]
     [IsSent]        [bit]                NOT NULL,
     [Timestamp]     [datetime2]          NOT NULL,
     [Event]         [nvarchar](max)      NOT NULL,
-    [EventTypeName] [nvarchar](32)       NOT NULL
+    [EventTypeName] [nvarchar](128)       NOT NULL
         CONSTRAINT [PK_DomainEvent_Id] PRIMARY KEY CLUSTERED
             (
              [Id] ASC
