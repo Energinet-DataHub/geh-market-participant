@@ -18,10 +18,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
     public sealed class DomainEventRepository : IDomainEventRepository
     {

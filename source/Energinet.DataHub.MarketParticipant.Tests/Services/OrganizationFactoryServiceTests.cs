@@ -127,8 +127,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var globalLocationNumberUniquenessService = new Mock<IGlobalLocationNumberUniquenessService>();
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            organizationRepository
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(new OrganizationId(Guid.NewGuid()));
+
             var target = new OrganizationFactoryService(
-                new Mock<IOrganizationRepository>().Object,
+                organizationRepository.Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IActiveDirectoryService>().Object,
                 UnitOfWorkProviderMock.Create(),
