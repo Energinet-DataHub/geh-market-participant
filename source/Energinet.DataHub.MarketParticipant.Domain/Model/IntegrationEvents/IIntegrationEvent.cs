@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
     /// <summary>
-    /// Repository giving access to domain events
+    /// Common interface for integration events
     /// </summary>
-    public interface IDomainEventRepository
+    public interface IIntegrationEvent
     {
         /// <summary>
-        /// Inserts a new domain event for the given domain object id and type
+        /// ID of the domain object that spawned this event
         /// </summary>
-        Task InsertAsync(DomainEvent domainEvent);
-
-        /// <summary>
-        /// Retrieves a specified number of of unsent domain events ordered by oldest first
-        /// </summary>
-        IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents);
+        Guid Id { get; set; }
     }
 }

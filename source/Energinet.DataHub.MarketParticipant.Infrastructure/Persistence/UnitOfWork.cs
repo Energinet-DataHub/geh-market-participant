@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -28,8 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure
 
         public UnitOfWork(DbContext context)
         {
-            Guard.ThrowIfNull(context, nameof(context));
-
             _context = context;
         }
 

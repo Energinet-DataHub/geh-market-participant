@@ -13,7 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -43,10 +47,32 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             await repository
-                .InsertAsync(Guid.NewGuid(), "domainType", new { Number = 1, Name = "name" })
+                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
                 .ConfigureAwait(false);
 
             // assert
+        }
+
+        [Fact]
+        public async Task GetAsync_UnsentExists_ReturnsUnsent()
+        {
+            // arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var repository = new DomainEventRepository(context);
+            var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
+            await repository.InsertAsync(domainEvent).ConfigureAwait(false);
+
+            // act
+            var actual = new List<DomainEvent>();
+            await foreach (var x in repository.GetOldestUnsentDomainEventsAsync(1))
+            {
+                actual.Add(x);
+            }
+
+            // assert
+            Assert.NotNull(actual.FirstOrDefault(x => x.DomainObjectId == domainEvent.DomainObjectId));
         }
     }
 }

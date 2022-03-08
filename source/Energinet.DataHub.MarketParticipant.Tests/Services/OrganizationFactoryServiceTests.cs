@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -117,8 +117,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             eventRepository.Verify(
-                x => x.InsertAsync(expectedId, nameof(Organization), It.Is<OrganizationChangedDomainEvent>(
-                    o => o.Id == expectedId)),
+                x => x.InsertAsync(It.Is<DomainEvent>(x => x.DomainObjectId == expectedId && x.DomainObjectType == nameof(Organization) && x.IntegrationEvent.Id == expectedId)),
                 Times.Once);
         }
 

@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organizationToSave.Name,
                 organizationToSave.Roles);
 
-            var domainEvent = new OrganizationChangedDomainEvent
+            var domainEvent = new OrganizationChangedIntegrationEvent
             {
                 Id = organizationWithId.Id.Value,
                 ActorId = organizationWithId.ActorId,
@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 Name = organizationWithId.Name
             };
 
-            await _domainEventRepository.InsertAsync(organizationWithId.Id.Value, nameof(Organization), domainEvent).ConfigureAwait(false);
+            await _domainEventRepository.InsertAsync(new DomainEvent(organizationWithId.Id.Value, nameof(Organization), domainEvent)).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
 

@@ -14,9 +14,9 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public sealed record OrganizationChangedDomainEvent
+    public sealed record OrganizationChangedIntegrationEvent : IIntegrationEvent
     {
         public Guid Id { get; set; }
         public Guid ActorId { get; set; }

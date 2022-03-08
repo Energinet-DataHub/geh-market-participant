@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -23,9 +23,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public interface IOrganizationEventDispatcher
     {
         /// <summary>
-        /// Dispatches an <see cref="OrganizationChangedDomainEvent"/>
+        /// Dispatches an <see cref="OrganizationChangedIntegrationEvent"/>
         /// </summary>
-        /// <param name="domainEvent">The <see cref="OrganizationChangedDomainEvent" /> to dispatch.</param>
-        Task DispatchChangedEventAsync(OrganizationChangedDomainEvent domainEvent);
+        /// <param name="domainEvent">The <see cref="OrganizationChangedIntegrationEvent" /> to dispatch.</param>
+        Task DispatchChangedEventAsync(OrganizationChangedIntegrationEvent domainEvent);
     }
 }

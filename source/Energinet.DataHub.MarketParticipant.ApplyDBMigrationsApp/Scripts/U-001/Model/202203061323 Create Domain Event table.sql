@@ -8,8 +8,9 @@ CREATE TABLE [dbo].[DomainEvent]
     [EntityId]      [uniqueidentifier]   NOT NULL,
     [EntityType]    [nvarchar](32)       NOT NULL,
     [IsSent]        [bit]                NOT NULL,
-    [Timestamp]     [datetime2]           NOT NULL,
-    [Event]         [nvarchar](max)      NOT NULL
+    [Timestamp]     [datetime2]          NOT NULL,
+    [Event]         [nvarchar](max)      NOT NULL,
+    [EventTypeName] [nvarchar](32)       NOT NULL
         CONSTRAINT [PK_DomainEvent_Id] PRIMARY KEY CLUSTERED
             (
              [Id] ASC

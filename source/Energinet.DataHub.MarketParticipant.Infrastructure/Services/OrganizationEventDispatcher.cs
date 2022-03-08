@@ -14,7 +14,7 @@
 
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketParticipant.Domain.Model.DomainEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _serviceBusClient = serviceBusClient;
         }
 
-        public async Task DispatchChangedEventAsync(OrganizationChangedDomainEvent domainEvent)
+        public async Task DispatchChangedEventAsync(OrganizationChangedIntegrationEvent domainEvent)
         {
             Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
 

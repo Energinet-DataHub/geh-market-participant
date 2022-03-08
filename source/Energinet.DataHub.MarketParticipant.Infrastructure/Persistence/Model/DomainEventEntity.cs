@@ -24,5 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public bool IsSent { get; set; }
         public DateTimeOffset Timestamp { get; set; }
         public string Event { get; set; } = null!;
+        public string EventTypeName { get; set; } = null!;
     }
 }
