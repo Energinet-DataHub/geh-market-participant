@@ -64,8 +64,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .ConfigureAwait(false);
             DomainEvent domainEvent = null!;
             await foreach (var e in repository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+            {
                 if (e.Id == id)
                     domainEvent = e;
+            }
 
             // act
             domainEvent.MarkAsSent();
@@ -73,8 +75,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var newRepository = await CreateRepositoryAsync().ConfigureAwait(false);
             DomainEvent actual = null!;
             await foreach (var e in newRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+            {
                 if (e.Id == id)
                     actual = e;
+            }
 
             // assert
             Assert.True(domainEvent.IsSent);
