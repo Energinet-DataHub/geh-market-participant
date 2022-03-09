@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +37,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()
                 .HasForeignKey(marketRole => marketRole.ActorInfoId);
+            builder.OwnsMany(role => role.MeteringPointTypes, ConfigureMeteringTypes);
+        }
+
+        private static void ConfigureMeteringTypes(
+            OwnedNavigationBuilder<ActorEntity, MeteringPointType> meteringPointTypeBuilder)
+        {
+            meteringPointTypeBuilder.WithOwner().HasForeignKey("ActorInfoId");
+            meteringPointTypeBuilder.ToTable("ActorInfoMeteringType");
+            meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
+            meteringPointTypeBuilder.Property(p => p.Value).HasColumnName("MeteringTypeId");
         }
     }
 }

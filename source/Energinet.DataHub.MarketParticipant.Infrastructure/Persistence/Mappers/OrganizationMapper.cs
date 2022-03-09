@@ -66,9 +66,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 to.SingleGridArea = gridArea;
             }
 
+            // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
+            to.MeteringPointTypes.Clear();
+            foreach (var meteringPointType in from.MeteringPointTypes)
+            {
+                to.MeteringPointTypes.Add(meteringPointType);
+            }
+
             // Market roles are currently treated as value types, so they are deleted and recreated with each update.
             to.MarketRoles.Clear();
-
             foreach (var marketRole in from.MarketRoles)
             {
                 to.MarketRoles.Add(new MarketRoleEntity { Function = (int)marketRole.Function });
@@ -97,7 +103,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     actorGln,
                     actorStatus,
                     gridArea,
-                    marketRoles);
+                    marketRoles,
+                    actor.MeteringPointTypes);
             }).ToList();
         }
     }

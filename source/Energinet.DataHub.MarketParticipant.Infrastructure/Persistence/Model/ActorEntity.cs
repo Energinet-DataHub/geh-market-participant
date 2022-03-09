@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
@@ -23,6 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         {
             Gln = string.Empty;
             MarketRoles = new Collection<MarketRoleEntity>();
+            MeteringPointTypes = new Collection<MeteringPointType>();
         }
 
         public Guid Id { get; set; }
@@ -32,6 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 
         public GridAreaEntity? SingleGridArea { get; set; }
 
+        public Collection<MeteringPointType> MeteringPointTypes { get; }
         public Collection<MarketRoleEntity> MarketRoles { get; }
 
         public Guid OrganizationId { get; set; }

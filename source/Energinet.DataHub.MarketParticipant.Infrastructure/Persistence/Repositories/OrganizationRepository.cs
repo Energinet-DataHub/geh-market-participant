@@ -48,6 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 destination = await _marketParticipantDbContext
                     .Organizations
                     .Include(x => x.Actors)
+                    .ThenInclude(x => x.MeteringPointTypes)
+                    .Include(x => x.Actors)
                     .ThenInclude(x => x.MarketRoles)
                     .AsSingleQuery()
                     .FirstAsync(x => x.Id == organization.Id.Value)
@@ -68,6 +70,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             var org = await _marketParticipantDbContext
                 .Organizations
                 .Include(x => x.Actors)
+                .ThenInclude(x => x.MeteringPointTypes)
+                .Include(x => x.Actors)
                 .ThenInclude(x => x.MarketRoles)
                 .AsSingleQuery()
                 .FirstOrDefaultAsync(x => x.Id == id.Value)
@@ -82,6 +86,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var organizations = await _marketParticipantDbContext
                 .Organizations
+                .Include(x => x.Actors)
+                .ThenInclude(x => x.MeteringPointTypes)
                 .Include(x => x.Actors)
                 .ThenInclude(x => x.MarketRoles)
                 .AsSingleQuery()

@@ -110,7 +110,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 new GlobalLocationNumber("fake_value"),
                 status,
                 Enumerable.Empty<GridArea>(),
-                Enumerable.Empty<MarketRole>());
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>());
         }
     }
 }

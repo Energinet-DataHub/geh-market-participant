@@ -85,7 +85,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     gln,
                     ActorStatus.Active,
                     Enumerable.Empty<GridArea>(),
-                    Enumerable.Empty<MarketRole>())
+                    Enumerable.Empty<MarketRole>(),
+                    Enumerable.Empty<MeteringPointType>())
             });
 
             organizationRepository

@@ -32,6 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             _actorStatusTransitioner = new ActorStatusTransitioner();
             Areas = new Collection<GridArea>();
             MarketRoles = new Collection<MarketRole>();
+            MeteringPointTypes = new Collection<MeteringPointType>();
         }
 
         public Actor(
@@ -40,7 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             GlobalLocationNumber gln,
             ActorStatus actorStatus,
             IEnumerable<GridArea> gridAreas,
-            IEnumerable<MarketRole> marketRoles)
+            IEnumerable<MarketRole> marketRoles,
+            IEnumerable<MeteringPointType> meteringPointTypes)
         {
             Id = id;
             ActorId = actorId;
@@ -48,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
             Areas = new List<GridArea>(gridAreas);
             MarketRoles = new List<MarketRole>(marketRoles);
+            MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
         }
 
         /// <summary>
@@ -79,6 +82,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// The roles (functions and permissions) assigned to the current actor.
         /// </summary>
         public ICollection<MarketRole> MarketRoles { get; }
+
+        public ICollection<MeteringPointType> MeteringPointTypes { get; }
 
         /// <summary>
         /// Activates the current actor, the status changes to Active.

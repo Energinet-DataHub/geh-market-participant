@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -122,7 +121,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                         new GridAreaName("fake_value"),
                         new GridAreaCode("1234"))
                 },
-                new List<MarketRole>());
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>());
 
             var organization = new Organization("Test");
             organization.Actors.Add(initialActor);
@@ -166,7 +166,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new GlobalLocationNumber("123"),
                 ActorStatus.New,
                 new[] { expected },
-                new List<MarketRole>()));
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>()));
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -244,6 +245,66 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(organization);
             Assert.Single(organization!.Actors);
             Assert.Contains(organization.Actors, x => x.ActorId.Value == actorId);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_ActorWith1MeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization("Test");
+
+            var actorWithMeteringTypes = new Actor(new ActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            organization.Actors.Add(actorWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Contains(
+                organization!.Actors.Single().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D03NotUsed));
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_OrganizationRoleWith2MeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization("Test");
+
+            var actorWithMeteringTypes = new Actor(new ActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D12TotalConsumption);
+            organization.Actors.Add(actorWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Contains(
+                organization!.Actors.Single().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D03NotUsed));
+            Assert.Contains(
+                organization.Actors.Single().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D12TotalConsumption));
         }
 
         [Fact]
