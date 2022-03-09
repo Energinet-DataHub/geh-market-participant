@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -49,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             IReadOnlyCollection<MarketRole> marketRoles)
         {
             Guard.ThrowIfNull(organization, nameof(organization));
+            Guard.ThrowIfNull(gln, nameof(gln));
             Guard.ThrowIfNull(marketRoles, nameof(marketRoles));
 
             await _uniqueGlobalLocationNumberRuleService
@@ -78,7 +80,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .DispatchChangedEventAsync(organization)
                 .ConfigureAwait(false);
 
-            return newActor;
+            var updatedOrganization = await _organizationRepository
+                .GetAsync(organization.Id)
+                .ConfigureAwait(false);
+
+            return updatedOrganization!.Actors.Single(a => a.ActorId == appRegistrationId);
         }
     }
 }

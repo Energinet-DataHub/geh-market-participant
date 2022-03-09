@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -28,13 +30,15 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
     [UnitTest]
-    public sealed class AddOrganizationRoleHandlerTests
+    public sealed class CreateActorHandlerTests
     {
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateActorHandler(new Mock<IOrganizationRepository>().Object);
+            var target = new CreateActorHandler(
+                new Mock<IOrganizationRepository>().Object,
+                new Mock<IActorFactoryService>().Object);
 
             // Act + Assert
             await Assert
@@ -47,7 +51,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateActorHandler(organizationRepository.Object);
+            var target = new CreateActorHandler(
+                organizationRepository.Object,
+                new Mock<IActorFactoryService>().Object);
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
@@ -55,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 "62A79F4A-CB51-4D1E-8B4B-9A9BF3FB2BD4",
-                new ActorDto("ddq", Array.Empty<MarketRoleDto>()));
+                new ActorDto("fake_value", Array.Empty<MarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -64,43 +70,43 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NewOrganization_ValuesAreMapped()
+        public async Task Handle_NewActor_ActorIdReturned()
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateActorHandler(organizationRepository.Object);
+            var actorFactory = new Mock<IActorFactoryService>();
+            var target = new CreateActorHandler(organizationRepository.Object, actorFactory.Object);
 
-            var expectedId = Guid.NewGuid();
-
-            const string actorId = "0A7E6621-4A3A-49C4-8B5E-9C7D4D93BAAE";
-            const string role = "ddm";
-            const string orgId = "E5E61770-7526-444C-948A-23FFA5B6517D";
+            var orgId = Guid.NewGuid();
             const string orgName = "SomeName";
-            const string orgGln = "SomeGln";
+            var actorId = Guid.NewGuid();
+            const string actorGln = "SomeGln";
+
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
+            var actor = new Actor(new ActorId(actorId), new GlobalLocationNumber(actorGln));
 
             organizationRepository
-                .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == new Guid(orgId))))
-                .ReturnsAsync(new Organization(new Guid(actorId), new GlobalLocationNumber(orgGln), orgName));
+                .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == orgId)))
+                .ReturnsAsync(organization);
 
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(
-                    o => o.ActorId.ToString() == actorId && o.Name == orgName && o.Gln.Value == orgGln)))
-                .ReturnsAsync(new OrganizationId(expectedId));
+            actorFactory
+                .Setup(x => x.CreateAsync(
+                    organization,
+                    It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<MarketRole>>()))
+                .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
-                orgId,
-                new ActorDto(role, Array.Empty<MarketRoleDto>()));
+                orgId.ToString(),
+                new ActorDto(actorGln, Array.Empty<MarketRoleDto>()));
 
             // Act
-            await target
+            var response = await target
                 .Handle(command, CancellationToken.None)
                 .ConfigureAwait(false);
 
             // Assert
-            organizationRepository.Verify(
-                x => x.AddOrUpdateAsync(It.Is<Organization>(
-                    y => y.Roles.Count(z => z.Code == BusinessRoleCode.Ddm) == 1)),
-                Times.Once);
+            Assert.Equal(actor.Id.ToString(), response.ActorId);
         }
     }
 }

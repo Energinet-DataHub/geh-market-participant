@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             Guard.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("ActorInfoNew");
             builder.HasKey(actor => actor.Id);
-            builder.Property(actor => actor.Id).ValueGeneratedNever();
+            builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
             builder
                 .HasOne(actor => actor.SingleGridArea!)
                 .WithMany()

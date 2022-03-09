@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
@@ -22,13 +21,16 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Model
 {
     [UnitTest]
-    public sealed class OrganizationRoleBaseTests
+    public sealed class ActorTests
     {
         [Fact]
         public void Ctor_NewRole_HasStatusNew()
         {
-            // Arrange + Act + Assert
-            Assert.Equal(ActorStatus.New, new OrganizationRoleBaseTest().Status);
+            // Arrange + Act
+            var actor = new Actor(new ActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+
+            // Assert
+            Assert.Equal(ActorStatus.New, actor.Status);
         }
 
         [Theory]
@@ -40,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Activate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = new OrganizationRoleBaseTest(initialStatus);
+            var target = CreateTestActor(initialStatus);
 
             // Act + Assert
             if (isAllowed)
@@ -63,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Deactivate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = new OrganizationRoleBaseTest(initialStatus);
+            var target = CreateTestActor(initialStatus);
 
             // Act + Assert
             if (isAllowed)
@@ -86,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Delete_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = new OrganizationRoleBaseTest(initialStatus);
+            var target = CreateTestActor(initialStatus);
 
             // Act + Assert
             if (isAllowed)
@@ -100,72 +102,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
         }
 
-        [Fact]
-        public void AddMarketRole_ValidRole_AddedToCollection()
+        private static Actor CreateTestActor(ActorStatus status)
         {
-            // Arrange
-            var target = new OrganizationRoleBaseTest();
-
-            // Act
-            target.AddMarketRole(new MarketRole(EicFunction.Agent));
-            target.AddMarketRole(new MarketRole(EicFunction.SystemOperator));
-            target.AddMarketRole(new MarketRole(EicFunction.BalanceResponsibleParty));
-
-            // Assert
-            Assert.Equal(3, target.MarketRoles.Count());
-            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.Agent);
-            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.SystemOperator);
-            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.BalanceResponsibleParty);
-        }
-
-        [Fact]
-        public void AddMarketRole_AddExistingRole_ThrowsException()
-        {
-            // Arrange
-            var target = new OrganizationRoleBaseTest();
-            target.AddMarketRole(new MarketRole(EicFunction.Agent));
-
-            // Act + Assert
-            Assert.Throws<ValidationException>(() => target.AddMarketRole(new MarketRole(EicFunction.Agent)));
-        }
-
-        [Fact]
-        public void RemoveMarketRole_ValidRole_RemovedFromCollection()
-        {
-            // Arrange
-            var target = new OrganizationRoleBaseTest();
-            var marketRole = new MarketRole(EicFunction.SystemOperator);
-
-            target.AddMarketRole(new MarketRole(EicFunction.Agent));
-            target.AddMarketRole(marketRole);
-            target.AddMarketRole(new MarketRole(EicFunction.BalanceResponsibleParty));
-
-            // Act
-            target.RemoveMarketRole(marketRole);
-
-            // Assert
-            Assert.Equal(2, target.MarketRoles.Count());
-            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.Agent);
-            Assert.Single(target.MarketRoles, r => r.Function == EicFunction.BalanceResponsibleParty);
-        }
-
-        private sealed class OrganizationRoleBaseTest : OrganizationRoleBase
-        {
-            public OrganizationRoleBaseTest()
-            {
-            }
-
-            public OrganizationRoleBaseTest(ActorStatus initialStatus)
-                : base(
-                    Guid.Empty,
-                    initialStatus,
-                    new GridArea(
-                        new GridAreaId(Guid.NewGuid()),
-                        new GridAreaName("fake_value"),
-                        new GridAreaCode("fake_value")),
-                    Array.Empty<MarketRole>())
-            {
-            }
+            return new Actor(
+                Guid.Empty,
+                new ActorId(Guid.Empty),
+                new GlobalLocationNumber("fake_value"),
+                status,
+                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<MarketRole>());
         }
     }
 }

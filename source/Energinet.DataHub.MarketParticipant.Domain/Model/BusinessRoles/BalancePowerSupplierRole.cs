@@ -22,8 +22,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 
         public IEnumerable<EicFunction> Functions { get; } = new[]
         {
-            // TODO: add
-            EicFunction.BalanceResponsibleParty
+            EicFunction.EnergySupplier,
+            EicFunction.EnergyTrader
         };
     }
 }

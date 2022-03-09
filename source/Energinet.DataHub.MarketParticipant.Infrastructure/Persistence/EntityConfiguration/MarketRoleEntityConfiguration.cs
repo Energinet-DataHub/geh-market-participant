@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             Guard.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("MarketRole");
             builder.HasKey(role => role.Id);
-            builder.Property(role => role.Id).ValueGeneratedNever();
+            builder.Property(role => role.Id).ValueGeneratedOnAdd();
         }
     }
 }

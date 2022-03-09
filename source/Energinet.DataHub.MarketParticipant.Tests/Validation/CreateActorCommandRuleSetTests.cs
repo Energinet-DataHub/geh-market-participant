@@ -23,16 +23,16 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {
     [UnitTest]
-    public sealed class AddOrganizationRoleCommandRuleSetTests
+    public sealed class CreateActorCommandRuleSetTests
     {
         private const string ValidId = "6AF7D019-06A7-465B-AF9E-983BF0C7A907";
-        private const string ValidRole = "DDQ";
+        private const string ValidGln = "5790000555550";
 
         [Fact]
-        public async Task Validate_OrganizationRoleDto_ValidatesProperty()
+        public async Task Validate_ActorDto_ValidatesProperty()
         {
             // Arrange
-            const string propertyName = nameof(CreateActorCommand.Role);
+            const string propertyName = nameof(CreateActorCommand.Actor);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, null!);
@@ -56,10 +56,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(CreateActorCommand.OrganizationId);
 
-            var organizationRoleDto = new ActorDto(ValidRole, Array.Empty<MarketRoleDto>());
+            var actorDto = new ActorDto(ValidGln, Array.Empty<MarketRoleDto>());
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(value, organizationRoleDto);
+            var command = new CreateActorCommand(value, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -81,28 +81,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("", false)]
         [InlineData(null, false)]
         [InlineData("  ", false)]
-        [InlineData("DDM", true)]
-        [InlineData("Ddm", true)]
-        [InlineData("ddm", true)]
-        [InlineData("DDK", true)]
-        [InlineData("DDQ", true)]
-        [InlineData("DDX", true)]
-        [InlineData("DDZ", true)]
-        [InlineData("DEA", true)]
-        [InlineData("MDR", true)]
-        [InlineData("STS", true)]
-        [InlineData("EZ", true)]
-        [InlineData("ddd", false)]
-        [InlineData("DDXyz", false)]
-        public async Task Validate_BusinessRole_ValidatesProperty(string value, bool isValid)
+        [InlineData("5790000555550", true)]
+        public async Task Validate_ActorGln_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Role)}.{nameof(ActorDto.BusinessRole)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ActorDto.Gln)}";
 
-            var organizationRoleDto = new ActorDto(value, Array.Empty<MarketRoleDto>());
+            var actorDto = new ActorDto(value, Array.Empty<MarketRoleDto>());
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(ValidId, organizationRoleDto);
+            var command = new CreateActorCommand(ValidId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -124,9 +112,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRole_ValidatesProperty()
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Role)}.{nameof(ActorDto.MarketRoles)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ActorDto.MarketRoles)}";
 
-            var organizationRoleDto = new ActorDto(ValidRole, null!);
+            var organizationRoleDto = new ActorDto(ValidGln, null!);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, organizationRoleDto);
@@ -143,9 +131,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_NullMarketRole_ValidatesProperty()
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Role)}.{nameof(ActorDto.MarketRoles)}[0]";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ActorDto.MarketRoles)}[0]";
 
-            var organizationRoleDto = new ActorDto(ValidRole, new MarketRoleDto[] { null! });
+            var organizationRoleDto = new ActorDto(ValidGln, new MarketRoleDto[] { null! });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, organizationRoleDto);
@@ -170,9 +158,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Role)}.{nameof(ActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
 
-            var organizationRoleDto = new ActorDto(ValidRole, new[] { new MarketRoleDto(value) });
+            var organizationRoleDto = new ActorDto(ValidGln, new[] { new MarketRoleDto(value) });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, organizationRoleDto);

@@ -22,8 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 
         public IEnumerable<EicFunction> Functions { get; } = new[]
         {
-            // TODO: add
-            EicFunction.Agent
+            EicFunction.GridAccessProvider,
+            EicFunction.MeterAdministrator,
+            EicFunction.MeterOperator,
+            EicFunction.MeteredDataCollector,
+            EicFunction.PartyConnectedToTheGrid
         };
     }
 }

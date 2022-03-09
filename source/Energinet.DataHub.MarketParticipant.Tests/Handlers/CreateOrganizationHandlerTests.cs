@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateOrganizationHandler(new Mock<IActorFactoryService>().Object);
+            var target = new CreateOrganizationHandler(new Mock<IOrganizationRepository>().Object);
 
             // Act + Assert
             await Assert
@@ -44,25 +44,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewOrganization_ReturnsOrganizationId()
         {
             // Arrange
-            var gln = new GlobalLocationNumber("fake_gln");
             var name = "fake_name";
 
-            var organizationFactoryService = new Mock<IActorFactoryService>();
-            var target = new CreateOrganizationHandler(organizationFactoryService.Object);
+            var organizationRepositoryService = new Mock<IOrganizationRepository>();
+            var target = new CreateOrganizationHandler(organizationRepositoryService.Object);
 
-            var expectedId = Guid.NewGuid();
-            var expectedOrganization = new Organization(
-                new OrganizationId(expectedId),
-                Guid.NewGuid(),
-                gln,
-                name,
-                Array.Empty<IBusinessRole>());
-
-            organizationFactoryService
-                .Setup(x => x.CreateAsync(It.Is<GlobalLocationNumber>(g => g == gln), name))
-                .ReturnsAsync(expectedOrganization);
-
-            var command = new CreateOrganizationCommand(new OrganizationDto(name, gln.Value));
+            var command = new CreateOrganizationCommand(new OrganizationDto(name));
 
             // Act
             var response = await target
@@ -70,7 +57,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(expectedId.ToString(), response.OrganizationId);
+            Assert.NotNull(response.OrganizationId);
+
+            organizationRepositoryService.Verify(
+                x => x.AddOrUpdateAsync(It.Is<Organization>(g => g.Name == name)),
+                Times.Once);
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         NominatedElectricityMarketOperator = 30,
         NominationValidator = 31,
         PartyAdministrator = 32,
-        PartyConnectedtotheGrid = 33,
+        PartyConnectedToTheGrid = 33,
         Producer = 34,
         ProductionResponsibleParty = 35,
         ReconciliationAccountable = 36,

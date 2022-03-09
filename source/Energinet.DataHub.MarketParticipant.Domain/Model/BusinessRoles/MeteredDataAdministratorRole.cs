@@ -16,13 +16,13 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 {
-    public sealed class MeteringPointAdministratorRole : IBusinessRole
+    public sealed class MeteredDataAdministratorRole : IBusinessRole
     {
-        public BusinessRoleCode Code => BusinessRoleCode.Ddz;
+        public BusinessRoleCode Code => BusinessRoleCode.Dlg;
 
         public IEnumerable<EicFunction> Functions { get; } = new[]
         {
-            EicFunction.MeteringPointAdministrator
+            EicFunction.MeteredDataAdministrator
         };
     }
 }

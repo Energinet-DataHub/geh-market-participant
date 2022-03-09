@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     {
         public Organization(string name)
         {
-            Id = new OrganizationId(Guid.NewGuid());
+            Id = new OrganizationId(Guid.Empty);
             Name = name;
             Actors = new Collection<Actor>();
         }

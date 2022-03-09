@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ActorId actorId,
             GlobalLocationNumber gln)
         {
-            Id = Guid.NewGuid();
+            Id = Guid.Empty;
             ActorId = actorId;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner();

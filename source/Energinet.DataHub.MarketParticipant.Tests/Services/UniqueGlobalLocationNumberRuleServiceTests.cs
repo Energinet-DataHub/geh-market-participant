@@ -26,16 +26,17 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
     [UnitTest]
-    public sealed class GlobalLocationNumberUniquenessServiceTests
+    public sealed class UniqueGlobalLocationNumberRuleServiceTests
     {
         [Fact]
-        public async Task EnsureGlobalLocationNumberAvailableAsync_GlnAvailable_DoesNothing()
+        public async Task ValidateGlobalLocationNumberAvailableAsync_GlnAvailable_DoesNothing()
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
+            var organization = new Organization("fake_value");
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -43,26 +44,57 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await target
-                .ValidateGlobalLocationNumberAvailableAsync(gln)
+                .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
                 .ConfigureAwait(false);
         }
 
         [Fact]
-        public async Task EnsureGlobalLocationNumberAvailableAsync_GlnNotAvailable_ThrowsException()
+        public async Task ValidateGlobalLocationNumberAvailableAsync_GlnInOrganization_DoesNothing()
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
+            var organization = new Organization("fake_value");
+            organization.Actors.Add(new Actor(new ActorId(Guid.NewGuid()), gln));
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
-                .ReturnsAsync(new[] { new Organization(Guid.NewGuid(), gln, "fake_value") });
+                .ReturnsAsync(new[] { organization });
+
+            // Act + Assert
+            await target
+                .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task ValidateGlobalLocationNumberAvailableAsync_GlnNotAvailable_ThrowsException()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
+
+            var gln = new GlobalLocationNumber("fake_value");
+            var organization = new Organization(new OrganizationId(Guid.NewGuid()), "fake_value", new[]
+            {
+                new Actor(
+                    Guid.NewGuid(),
+                    new ActorId(Guid.NewGuid()),
+                    gln,
+                    ActorStatus.Active,
+                    Enumerable.Empty<GridArea>(),
+                    Enumerable.Empty<MarketRole>())
+            });
+
+            organizationRepository
+                .Setup(x => x.GetAsync(gln))
+                .ReturnsAsync(new[] { organization });
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(gln))
+                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value"), gln))
                 .ConfigureAwait(false);
         }
     }
