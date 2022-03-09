@@ -6,7 +6,7 @@ ALTER TABLE [dbo].[OrganizationInfo]
     DROP COLUMN [Gln], [ActorId]
 GO
 
-DROP TABLE [dbo].[ActorInfoMeteringType]
+DROP TABLE [dbo].[OrganizationRoleMeteringType]
 GO
 
 DROP TABLE [dbo].[MarketRole]
