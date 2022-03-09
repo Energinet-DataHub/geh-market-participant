@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record DomainEvent
+    public sealed class DomainEvent
     {
         public DomainEvent(Guid domainObjectId, string domainObjectType, IIntegrationEvent integrationEvent)
         {
@@ -26,27 +26,27 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             IntegrationEvent = integrationEvent;
         }
 
-        private DomainEvent(int id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
+        private DomainEvent(DomainEventId id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
             : this(domainObjectId, domainObjectType, integrationEvent)
         {
             Id = id;
             IsSent = isSent;
         }
 
-        public int Id { get; }
+        public DomainEventId Id { get; } = new DomainEventId(0);
         public Guid DomainObjectId { get; }
         public string DomainObjectType { get; }
         public bool IsSent { get; private set; }
         public IIntegrationEvent IntegrationEvent { get; }
 
+        public static DomainEvent Restore(DomainEventId id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
+        {
+            return new DomainEvent(id, domainObjectId, domainObjectType, isSent, integrationEvent);
+        }
+
         public void MarkAsSent()
         {
             IsSent = true;
-        }
-
-        public static DomainEvent Restore(int id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
-        {
-            return new DomainEvent(id, domainObjectId, domainObjectType, isSent, integrationEvent);
         }
     }
 }

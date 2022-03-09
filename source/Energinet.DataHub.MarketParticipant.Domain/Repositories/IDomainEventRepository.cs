@@ -24,9 +24,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     public interface IDomainEventRepository
     {
         /// <summary>
-        /// Inserts a new domain event for the given domain object id and type
+        /// Inserts a <see cref="DomainEvent"/>
         /// </summary>
-        Task InsertAsync(DomainEvent domainEvent);
+        Task<DomainEventId> InsertAsync(DomainEvent domainEvent);
+
+        /// <summary>
+        /// Saves changes to the given <see cref="DomainEvent"/>
+        /// </summary>
+        Task UpdateAsync(DomainEvent domainEvent);
 
         /// <summary>
         /// Retrieves a specified number of of unsent domain events ordered by oldest first

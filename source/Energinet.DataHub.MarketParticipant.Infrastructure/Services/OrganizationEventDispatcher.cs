@@ -22,7 +22,7 @@ using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationEventDispatcher : IOrganizationEventDispatcher
+    public sealed class OrganizationEventDispatcher : IIntegrationEventDispatcher
     {
         private readonly IOrganizationChangedEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
@@ -33,15 +33,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _serviceBusClient = serviceBusClient;
         }
 
-        public async Task DispatchChangedEventAsync(OrganizationChangedIntegrationEvent domainEvent)
+        public async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
-            Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
+            Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+
+            if (integrationEvent is not OrganizationChangedIntegrationEvent organizationChangedIntegrationEvent)
+                return false;
 
             var changedEvent = new OrganizationChangedEvent(
-                domainEvent.Id,
-                domainEvent.ActorId,
-                domainEvent.Gln,
-                domainEvent.Name);
+                organizationChangedIntegrationEvent.Id,
+                organizationChangedIntegrationEvent.ActorId,
+                organizationChangedIntegrationEvent.Gln,
+                organizationChangedIntegrationEvent.Name);
 
             var bytes = _eventParser.Parse(changedEvent);
             var message = new ServiceBusMessage(bytes);
@@ -49,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             await using var sender = _serviceBusClient.CreateSender();
 
             await sender.SendMessageAsync(message).ConfigureAwait(false);
+            return true;
         }
     }
 }

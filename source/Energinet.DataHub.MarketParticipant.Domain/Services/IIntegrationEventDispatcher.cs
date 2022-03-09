@@ -20,12 +20,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     /// <summary>
     /// Domain event dispatcher for organization events
     /// </summary>
-    public interface IOrganizationEventDispatcher
+    public interface IIntegrationEventDispatcher
     {
         /// <summary>
-        /// Dispatches an <see cref="OrganizationChangedIntegrationEvent"/>
+        /// Dispatches an <see cref="IIntegrationEvent"/>
         /// </summary>
-        /// <param name="domainEvent">The <see cref="OrganizationChangedIntegrationEvent" /> to dispatch.</param>
-        Task DispatchChangedEventAsync(OrganizationChangedIntegrationEvent domainEvent);
+        /// <param name="integrationEvent">The <see cref="IIntegrationEvent" /> to try to dispatch.</param>
+        Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent);
     }
 }

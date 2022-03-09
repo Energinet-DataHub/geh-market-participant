@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -40,10 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task InsertAsync_RequiredDataSpecified_InsertsEvent()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var repository = new DomainEventRepository(context);
+            var repository = await CreateRepositoryAsync().ConfigureAwait(false);
 
             // act
             await repository
@@ -54,13 +52,39 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
+        public async Task UpdateAsync_Updates()
+        {
+            // arrange
+            var repository = await CreateRepositoryAsync().ConfigureAwait(false);
+            var id = await repository
+                .InsertAsync(new DomainEvent(
+                    Guid.NewGuid(),
+                    nameof(Organization),
+                    new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
+                .ConfigureAwait(false);
+            DomainEvent domainEvent = null!;
+            await foreach (var e in repository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+                if (e.Id == id)
+                    domainEvent = e;
+
+            // act
+            domainEvent.MarkAsSent();
+            await repository.UpdateAsync(domainEvent).ConfigureAwait(false);
+            var newRepository = await CreateRepositoryAsync().ConfigureAwait(false);
+            DomainEvent actual = null!;
+            await foreach (var e in newRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+                if (e.Id == id)
+                    actual = e;
+
+            // assert
+            Assert.True(domainEvent.IsSent);
+        }
+
+        [Fact]
         public async Task GetAsync_UnsentExists_ReturnsUnsent()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var repository = new DomainEventRepository(context);
+            var repository = await CreateRepositoryAsync().ConfigureAwait(false);
             var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
             await repository.InsertAsync(domainEvent).ConfigureAwait(false);
 
@@ -73,6 +97,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // assert
             Assert.NotNull(actual.FirstOrDefault(x => x.DomainObjectId == domainEvent.DomainObjectId));
+        }
+
+        private async Task<IDomainEventRepository> CreateRepositoryAsync()
+        {
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            return new DomainEventRepository(context);
         }
     }
 }

@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -40,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _domainEventTypesByName = typeof(IIntegrationEvent).Assembly.GetTypes().Where(x => x.IsAssignableTo(typeof(IIntegrationEvent))).ToDictionary(x => x.Name);
         }
 
-        public async Task InsertAsync(DomainEvent domainEvent)
+        public async Task<DomainEventId> InsertAsync(DomainEvent domainEvent)
         {
             Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
 
@@ -59,6 +60,28 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             await _context.DomainEvents.AddAsync(entity).ConfigureAwait(false);
             await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return new DomainEventId(entity.Id);
+        }
+
+        public async Task UpdateAsync(DomainEvent domainEvent)
+        {
+            Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
+
+            var q = from x in _context.DomainEvents.AsQueryable()
+                    where x.Id == domainEvent.Id.Value
+                    select x;
+
+            var entity = await q.FirstOrDefaultAsync().ConfigureAwait(false);
+
+            if (entity == null)
+            {
+                throw new NotFoundValidationException($"{nameof(DomainEvent)} with ID {domainEvent.Id} was not found");
+            }
+
+            entity.IsSent = domainEvent.IsSent;
+
+            await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
         public async IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents)
@@ -68,23 +91,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     orderby x.Id ascending
                     select x;
 
-            await foreach (var x in q.Take(numberOfEvents).AsAsyncEnumerable())
+            await foreach (var entity in q.Take(numberOfEvents).AsAsyncEnumerable())
             {
-                if (!_domainEventTypesByName.TryGetValue(x.EventTypeName, out var type))
+                if (!_domainEventTypesByName.TryGetValue(entity.EventTypeName, out var type))
                 {
-                    throw new InvalidOperationException($"EventType {x.EventTypeName} not found in assembly");
+                    throw new InvalidOperationException($"Unknown EventType {entity.EventTypeName}");
                 }
 
-                using var ms = new MemoryStream(Encoding.UTF8.GetBytes(x.Event));
+                using var ms = new MemoryStream(Encoding.UTF8.GetBytes(entity.Event));
 
                 var domainEvent = await JsonSerializer.DeserializeAsync(ms, type, _jsonSerializerOptions).ConfigureAwait(false);
 
                 if (domainEvent == null)
                 {
-                    throw new InvalidOperationException($"DomainEvent with ID: {x.Id} could not be deserialized");
+                    throw new InvalidOperationException($"{nameof(DomainEvent)} with ID: {entity.Id} could not be deserialized");
                 }
 
-                yield return DomainEvent.Restore(x.Id, x.EntityId, x.EntityType, x.IsSent, (IIntegrationEvent)domainEvent);
+                yield return DomainEvent.Restore(new DomainEventId(entity.Id), entity.EntityId, entity.EntityType, entity.IsSent, (IIntegrationEvent)domainEvent);
             }
         }
     }
