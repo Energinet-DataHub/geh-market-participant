@@ -25,6 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
             Email = string.Empty;
             Phone = string.Empty;
             Category = ContactCategory.Default;
+            Id = Guid.Empty;
         }
 
         public Guid Id { get; set; }

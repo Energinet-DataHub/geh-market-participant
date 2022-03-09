@@ -79,54 +79,66 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_GridAreaChanged_CanReadBack()
+        public async Task AddOrUpdateAsync_ContactChanged_CanReadBack()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var gridRepository = new GridAreaRepository(context);
-            var testGrid = new GridArea(
-                new GridAreaId(Guid.Empty),
-                new GridAreaName("Test Grid Area"),
-                new GridAreaCode("801"));
+            var contactRepository = new ContactRepository(context);
+            var testContact = new Contact(
+                ContactCategory.Charges,
+                new ContactName("fake_value"),
+                new ContactEmail("fake@fake.dk"),
+                new ContactPhone("1234567"));
 
             // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
-            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
-            newGrid = newGrid! with { Code = new GridAreaCode("234"), Name = new GridAreaName("NewName") };
-            await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
-            newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+            var contactId = await contactRepository.AddOrUpdateAsync(testContact).ConfigureAwait(false);
+            var newContact = await contactRepository.GetAsync(contactId).ConfigureAwait(false);
+            newContact = new Contact(
+                newContact!.Id,
+                ContactCategory.Reminder,
+                newContact.Name,
+                new ContactEmail("fake2@fake.dk"),
+                newContact.Phone);
+
+            await contactRepository.AddOrUpdateAsync(newContact).ConfigureAwait(false);
+            newContact = await contactRepository.GetAsync(contactId).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(newGrid);
-            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
-            Assert.Equal("234", newGrid?.Code.Value);
-            Assert.Equal("NewName", newGrid?.Name.Value);
+            Assert.NotNull(newContact);
+            Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
+            Assert.Equal("fake2@fake.dk", newContact?.Email.Value);
+            Assert.Equal(ContactCategory.Reminder, newContact?.Category);
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_AddGridAreaToOrganizationRole_CanReadBack()
+        public async Task GetAsync_DifferentContexts_CanReadBack()
         {
-            // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var gridRepository = new GridAreaRepository(context);
-            var testGrid = new GridArea(
-                new GridAreaId(Guid.Empty),
-                new GridAreaName("Test Grid Area"),
-                new GridAreaCode("801"));
+            await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
+            var contactRepository = new ContactRepository(context);
+            var contactRepositoryReadback = new ContactRepository(contextReadback);
+
+            var testContact = new Contact(
+                ContactCategory.Charges,
+                new ContactName("fake_value"),
+                new ContactEmail("fake@fake.dk"),
+                new ContactPhone("1234567"));
 
             // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
-            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+            var contactId = await contactRepository.AddOrUpdateAsync(testContact).ConfigureAwait(false);
+            var newContact = await contactRepositoryReadback.GetAsync(contactId).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(newGrid);
-            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
-            Assert.Equal("801", newGrid?.Code.Value);
-            Assert.Equal("Test Grid Area", newGrid?.Name.Value);
+            Assert.NotNull(newContact);
+            Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
+            Assert.Equal(testContact.Category, newContact?.Category);
+            Assert.Equal(testContact.Email.Value, newContact?.Email.Value);
+            Assert.Equal(testContact.Name.Value, newContact?.Name.Value);
+            Assert.Equal(testContact.Phone.Value, newContact?.Phone.Value);
         }
     }
 }

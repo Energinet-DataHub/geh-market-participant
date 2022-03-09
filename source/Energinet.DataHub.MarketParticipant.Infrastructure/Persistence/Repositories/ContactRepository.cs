@@ -36,10 +36,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             ContactEntity destination;
 
-            destination = await _marketParticipantDbContext
-                .Contacts
-                .FindAsync(contact.Id.Value)
-                .ConfigureAwait(false) ?? new ContactEntity();
+            if (contact.Id.Value == default)
+            {
+                destination = new ContactEntity();
+            }
+            else
+            {
+                destination = await _marketParticipantDbContext
+                    .Contacts
+                    .FindAsync(contact.Id.Value)
+                    .ConfigureAwait(false);
+            }
 
             ContactMapper.MapToEntity(contact, destination);
             _marketParticipantDbContext.Contacts.Update(destination);

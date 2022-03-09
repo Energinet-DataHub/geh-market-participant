@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     {
         public Contact(ContactCategory category, ContactName name, ContactEmail email, ContactPhone phone)
         {
-            Id = new ContactId(Guid.NewGuid());
+            Id = new ContactId(Guid.Empty);
             Category = category;
             Name = name;
             Email = email;

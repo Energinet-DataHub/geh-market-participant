@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -25,8 +26,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         {
             Guard.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("Contact");
-            builder.HasKey(role => role.Id);
-            builder.Property(role => role.Id).ValueGeneratedNever();
+            builder.HasKey(contact => contact.Id);
+            builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
+            builder.Property(contact => contact.Category)
+                .HasConversion(
+                    to => to.Value,
+                    from => ContactCategory.FromValue(from))
+                .HasColumnName("Category");
         }
     }
 }
