@@ -13,14 +13,24 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code);
+    public class ContactEntity
+    {
+        public ContactEntity()
+        {
+            Name = string.Empty;
+            Email = string.Empty;
+            Phone = string.Empty;
+            Category = ContactCategory.Default;
+        }
 
-    public sealed record GridAreaId(Guid Value);
-
-    public sealed record GridAreaCode(string Value);
-
-    public sealed record GridAreaName(string Value);
+        public Guid Id { get; set; }
+        public ContactCategory Category { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+    }
 }

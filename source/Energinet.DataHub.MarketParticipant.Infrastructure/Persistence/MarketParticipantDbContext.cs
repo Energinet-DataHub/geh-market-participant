@@ -35,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
         public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
+        public DbSet<ContactEntity> Contacts { get; private set; } = null!;
 
         public Task<int> SaveChangesAsync()
         {
@@ -47,7 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new OrganizationRoleEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ContactEntityConfiguration());
             modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
         }

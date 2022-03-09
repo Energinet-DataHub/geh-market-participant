@@ -19,15 +19,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public class GridAreaEntityConfiguration : IEntityTypeConfiguration<GridAreaEntity>
+    public sealed class ContactEntityConfiguration : IEntityTypeConfiguration<ContactEntity>
     {
-        public void Configure(EntityTypeBuilder<GridAreaEntity> builder)
+        public void Configure(EntityTypeBuilder<ContactEntity> builder)
         {
             Guard.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("GridAreaNew");
-            builder.HasKey(gridArea => gridArea.Id);
-            builder.Property(p => p.Id)
-                .ValueGeneratedOnAdd();
+            builder.ToTable("Contact");
+            builder.HasKey(role => role.Id);
+            builder.Property(role => role.Id).ValueGeneratedNever();
         }
     }
 }
