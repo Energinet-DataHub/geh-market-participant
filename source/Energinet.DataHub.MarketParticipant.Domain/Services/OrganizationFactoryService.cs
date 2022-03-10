@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var domainEvent = new OrganizationChangedIntegrationEvent
             {
-                Id = organizationWithId.Id.Value,
+                OrganizationId = organizationWithId.Id.Value,
                 ActorId = organizationWithId.ActorId,
                 Gln = organizationWithId.Gln.Value,
                 Name = organizationWithId.Name

@@ -16,14 +16,13 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    /// <summary>
-    /// Common interface for integration events
-    /// </summary>
-    public interface IIntegrationEvent
+    public abstract class IntegrationEventBase : IIntegrationEvent
     {
-        /// <summary>
-        /// ID of the integration event
-        /// </summary>
-        Guid Id { get; }
+        protected IntegrationEventBase()
+        {
+            Id = Guid.NewGuid();
+        }
+
+        public Guid Id { get; protected set; }
     }
 }

@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 namespace Energinet.DataHub.MarketParticipant.Domain
 {
     /// <summary>
-    /// TODO
+    /// <see cref="IUnitOfWork"/>
     /// </summary>
     public interface IUnitOfWork : IAsyncDisposable
     {
         /// <summary>
-        /// TODO
+        /// Commits changes
         /// </summary>
         Task CommitAsync();
     }

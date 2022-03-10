@@ -40,6 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             if (integrationEvent is not OrganizationChangedIntegrationEvent organizationChangedIntegrationEvent)
                 return false;
 
+            // todo: update integration package model to include OrganizationId
             var changedEvent = new OrganizationChangedEvent(
                 organizationChangedIntegrationEvent.Id,
                 organizationChangedIntegrationEvent.ActorId,

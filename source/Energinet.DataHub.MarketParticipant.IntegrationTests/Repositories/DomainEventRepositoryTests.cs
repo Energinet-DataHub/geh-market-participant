@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             await repository
-                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
+                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
                 .ConfigureAwait(false);
 
             // assert
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .InsertAsync(new DomainEvent(
                     Guid.NewGuid(),
                     nameof(Organization),
-                    new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
+                    new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
                 .ConfigureAwait(false);
             DomainEvent domainEvent = null!;
             await foreach (var e in repository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var repository = new DomainEventRepository(context);
-            var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { Id = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
+            var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
             await repository.InsertAsync(domainEvent).ConfigureAwait(false);
 
             // act

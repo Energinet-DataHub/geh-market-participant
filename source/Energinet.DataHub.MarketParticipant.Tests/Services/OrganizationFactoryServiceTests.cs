@@ -117,7 +117,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             eventRepository.Verify(
-                x => x.InsertAsync(It.Is<DomainEvent>(x => x.DomainObjectId == expectedId && x.DomainObjectType == nameof(Organization) && x.IntegrationEvent.Id == expectedId)),
+                x => x.InsertAsync(It.Is<DomainEvent>(x => x.DomainObjectId == expectedId && x.DomainObjectType == nameof(Organization))),
                 Times.Once);
         }
 
