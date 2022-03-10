@@ -36,6 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Retrieves a specified number of of unsent domain events ordered by oldest first
         /// </summary>
-        IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents);
+        Task<IEnumerable<DomainEvent>> GetOldestUnsentDomainEventsAsync(int numberOfEvents);
     }
 }
