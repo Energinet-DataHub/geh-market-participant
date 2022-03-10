@@ -37,11 +37,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             var organization = new Organization(request.Organization.Name);
 
-            await _organizationRepository
+            var organizationId = await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            return new CreateOrganizationResponse(organization.Id.Value.ToString());
+            return new CreateOrganizationResponse(organizationId.Value.ToString());
         }
     }
 }

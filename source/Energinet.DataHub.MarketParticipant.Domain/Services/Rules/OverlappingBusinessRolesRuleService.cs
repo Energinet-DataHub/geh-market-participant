@@ -39,19 +39,28 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             Guard.ThrowIfNull(actors, nameof(actors));
             Guard.ThrowIfNull(newActorRoles, nameof(newActorRoles));
 
-            var newBusinessRoles = CreateSet(newActorRoles);
+            var setOfSets = actors
+                .Select(x => AreRolesUnique(x.MarketRoles))
+                .Append(AreRolesUnique(newActorRoles))
+                .ToList();
 
-            var allBusinessRoles = actors
-                .SelectMany(actor => CreateSet(actor.MarketRoles))
-                .Concat(newBusinessRoles);
+            var usedBusinessRoles = new HashSet<BusinessRoleCode>();
 
-            var usedRoles = new HashSet<BusinessRoleCode>();
-
-            foreach (var businessRole in allBusinessRoles)
+            foreach (var businessRole in setOfSets.SelectMany(CreateSet))
             {
-                if (!usedRoles.Add(businessRole))
+                if (!usedBusinessRoles.Add(businessRole))
                 {
                     throw new ValidationException($"Cannot add '{businessRole}' as this role is already assigned to another actor within the organization.");
+                }
+            }
+
+            var usedMarketRoles = new HashSet<EicFunction>();
+
+            foreach (var marketRole in setOfSets.SelectMany(x => x))
+            {
+                if (!usedMarketRoles.Add(marketRole.Function))
+                {
+                    throw new ValidationException($"Cannot add '{marketRole.Function}' as this role is already assigned to another actor within the organization.");
                 }
             }
         }
@@ -62,12 +71,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
             foreach (var marketRole in marketRoles)
             {
-                if (usedFunctions.Add(marketRole.Function))
+                if (!usedFunctions.Add(marketRole.Function))
                 {
-                    yield return marketRole;
+                    throw new ValidationException("The market roles cannot contain duplicates.");
                 }
 
-                throw new ValidationException("The market roles cannot contain duplicates.");
+                yield return marketRole;
             }
         }
 

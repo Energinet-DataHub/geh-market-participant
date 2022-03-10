@@ -45,7 +45,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             foreach (var marketRole in marketRoles)
             {
-                distinctRoles.Add(lookup[marketRole.Function]);
+                if (lookup.TryGetValue(marketRole.Function, out var businessRole))
+                {
+                    distinctRoles.Add(businessRole);
+                }
             }
 
             return distinctRoles;
