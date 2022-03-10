@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -26,6 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Ensures an App registration ID for the given GLN number
         /// </summary>
-        Task<Guid> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
+        Task<ActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
     }
 }

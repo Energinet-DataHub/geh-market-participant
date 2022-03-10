@@ -16,5 +16,18 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record OrganizationId(Guid Value);
+    public sealed record OrganizationId
+    {
+        public OrganizationId(string value)
+        {
+            Value = Guid.Parse(value);
+        }
+
+        public OrganizationId(Guid value)
+        {
+            Value = value;
+        }
+
+        public Guid Value { get; }
+    }
 }

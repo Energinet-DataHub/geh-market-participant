@@ -38,10 +38,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         Task<Organization?> GetAsync(OrganizationId id);
 
         /// <summary>
-        /// Gets all organizations with the specified GLN.
+        /// Gets all organizations that contain an actor with the specified GLN.
         /// </summary>
         /// <param name="globalLocationNumber">The GLN to find organizations for.</param>
-        /// <returns>The list of orginizations with the specified GLN.</returns>
+        /// <returns>The list of organizations with an actor that has the specified GLN.</returns>
         Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber);
     }
 }

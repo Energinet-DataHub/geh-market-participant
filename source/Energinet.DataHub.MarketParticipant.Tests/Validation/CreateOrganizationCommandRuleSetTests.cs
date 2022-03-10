@@ -24,9 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     [UnitTest]
     public sealed class CreateOrganizationCommandRuleSetTests
     {
-        private const string ValidName = "Organization Name";
-        private const string ValidGln = "5790000555550";
-
         [Fact]
         public async Task Validate_OrganizationDto_ValidatesProperty()
         {
@@ -56,38 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(OrganizationDto.Name)}";
 
-            var organizationDto = new OrganizationDto(value, ValidGln);
-
-            var target = new CreateOrganizationCommandRuleSet();
-            var command = new CreateOrganizationCommand(organizationDto);
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            if (isValid)
-            {
-                Assert.True(result.IsValid);
-                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
-            }
-            else
-            {
-                Assert.False(result.IsValid);
-                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-            }
-        }
-
-        [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
-        [InlineData("5790000555550", true)]
-        public async Task Validate_OrganizationGln_ValidatesProperty(string value, bool isValid)
-        {
-            // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(OrganizationDto.Gln)}";
-
-            var organizationDto = new OrganizationDto(ValidName, value);
+            var organizationDto = new OrganizationDto(value);
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
