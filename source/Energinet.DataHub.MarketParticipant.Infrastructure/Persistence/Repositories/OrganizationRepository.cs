@@ -45,13 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
             else
             {
-                destination = await _marketParticipantDbContext
-                    .Organizations
-                    .Include(x => x.Actors)
-                    .ThenInclude(x => x.MeteringPointTypes)
-                    .Include(x => x.Actors)
-                    .ThenInclude(x => x.MarketRoles)
-                    .AsSingleQuery()
+                destination = await GetOrganizationQuery()
                     .FirstAsync(x => x.Id == organization.Id.Value)
                     .ConfigureAwait(false);
             }
@@ -67,13 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             Guard.ThrowIfNull(id, nameof(id));
 
-            var org = await _marketParticipantDbContext
-                .Organizations
-                .Include(x => x.Actors)
-                .ThenInclude(x => x.MeteringPointTypes)
-                .Include(x => x.Actors)
-                .ThenInclude(x => x.MarketRoles)
-                .AsSingleQuery()
+            var org = await GetOrganizationQuery()
                 .FirstOrDefaultAsync(x => x.Id == id.Value)
                 .ConfigureAwait(false);
 
@@ -84,18 +72,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             Guard.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
 
-            var organizations = await _marketParticipantDbContext
-                .Organizations
-                .Include(x => x.Actors)
-                .ThenInclude(x => x.MeteringPointTypes)
-                .Include(x => x.Actors)
-                .ThenInclude(x => x.MarketRoles)
-                .AsSingleQuery()
+            var organizations = await GetOrganizationQuery()
                 .Where(x => x.Actors.Any(y => y.Gln == globalLocationNumber.Value))
                 .ToListAsync()
                 .ConfigureAwait(false);
 
             return organizations.Select(OrganizationMapper.MapFromEntity);
+        }
+
+        private IQueryable<OrganizationEntity> GetOrganizationQuery()
+        {
+            return _marketParticipantDbContext
+                .Organizations
+                .Include(x => x.Actors)
+                .ThenInclude(x => x.MeteringPointTypes)
+                .Include(x => x.Actors)
+                .ThenInclude(x => x.MarketRoles)
+                .AsSingleQuery();
         }
     }
 }

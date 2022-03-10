@@ -32,12 +32,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 .ChildRules(validator =>
                 {
                     validator
-                        .RuleFor(role => role.Gln)
+                        .RuleFor(actor => actor.Gln)
                         .NotEmpty()
                         .SetValidator(new GlobalLocationNumberValidationRule<ActorDto>());
 
                     validator
-                        .RuleFor(x => x.MarketRoles)
+                        .RuleFor(actor => actor.MarketRoles)
                         .NotNull()
                         .ChildRules(rolesValidator =>
                         {

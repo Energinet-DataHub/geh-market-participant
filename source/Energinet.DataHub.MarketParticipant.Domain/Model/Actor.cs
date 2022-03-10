@@ -92,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public void Activate() => _actorStatusTransitioner.Activate();
 
         /// <summary>
-        /// Deactives the current actor, the status changes to Inactive.
+        /// Deactivates the current actor, the status changes to Inactive.
         /// Only Active and Passive actors can be deactivated.
         /// </summary>
         public void Deactivate() => _actorStatusTransitioner.Deactivate();
