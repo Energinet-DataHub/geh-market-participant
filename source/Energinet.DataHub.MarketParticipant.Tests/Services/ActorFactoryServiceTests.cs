@@ -107,7 +107,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ActorId(Guid.NewGuid()));
+                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -146,7 +146,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ActorId(Guid.NewGuid()));
+                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -184,7 +184,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ActorId(Guid.NewGuid()));
+                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -222,7 +222,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ActorId(Guid.NewGuid()));
+                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))

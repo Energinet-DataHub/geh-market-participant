@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string actorGln = "SomeGln";
 
             var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
-            var actor = new Actor(new ActorId(actorId), new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == orgId)))
