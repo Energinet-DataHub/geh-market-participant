@@ -37,7 +37,7 @@ CREATE TABLE [dbo].[MarketRole]
     [Function]    [int]              NOT NULL,
 
     CONSTRAINT PK_MarketRole PRIMARY KEY ([Id]),
-    CONSTRAINT FK_ActorInfoId_ActorInfo FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
+    CONSTRAINT FK_ActorInfoId_ActorInfo_MarketRole FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
 )
 GO
 
@@ -48,6 +48,6 @@ CREATE TABLE [dbo].[ActorInfoMeteringType]
     [ActorInfoId]    [uniqueidentifier] NOT NULL,
 
     CONSTRAINT PK_ActorInfoMeteringType PRIMARY KEY ([Id]),
-    CONSTRAINT FK_ActorInfoId_ActorInfo FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
+    CONSTRAINT FK_ActorInfoId_ActorInfo_MeteringType FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
 )
 GO
