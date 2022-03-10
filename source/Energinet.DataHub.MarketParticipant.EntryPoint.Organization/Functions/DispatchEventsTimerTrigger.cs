@@ -12,20 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Validation;
-using FluentValidation;
-using SimpleInjector;
+using MediatR;
+using Microsoft.Azure.Functions.Worker;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    internal static class ApplicationServiceRegistration
+    public sealed class DispatchEventsTimerTrigger
     {
-        public static void AddApplicationServices(this Container container)
+        private readonly IMediator _mediator;
+
+        public DispatchEventsTimerTrigger(IMediator mediator)
         {
-            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<AddOrganizationRoleCommand>, AddOrganizationRoleCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<DispatchEventsCommand>, DispatchEventsCommandRuleSet>(Lifestyle.Scoped);
+            _mediator = mediator;
+        }
+
+        [Function(nameof(DispatchEventsTimerTrigger))]
+#pragma warning disable CA1801
+        public Task RunAsync([TimerTrigger("*/5 * * * * *")] FunctionContext context)
+#pragma warning restore CA1801
+        {
+            return _mediator.Send(new DispatchEventsCommand());
         }
     }
 }

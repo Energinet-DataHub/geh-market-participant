@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Infrastructure;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 {
-    internal static class RepositoryRegistration
+    internal static class UnitOfWorkRegistrations
     {
-        public static void AddRepositories(this Container container)
+        public static void AddUnitOfWorkProvider(this Container container)
         {
-            container.Register<IGridAreaRepository, GridAreaRepository>(Lifestyle.Scoped);
-            container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
-            container.Register<IDomainEventRepository, DomainEventRepository>(Lifestyle.Scoped);
+            container.Register<IUnitOfWorkProvider, UnitOfWorkProvider>();
         }
     }
 }

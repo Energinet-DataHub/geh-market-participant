@@ -13,19 +13,14 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Validation;
 using FluentValidation;
-using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    internal static class ApplicationServiceRegistration
+    public sealed class DispatchEventsCommandRuleSet : AbstractValidator<DispatchEventsCommand>
     {
-        public static void AddApplicationServices(this Container container)
+        public DispatchEventsCommandRuleSet()
         {
-            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<AddOrganizationRoleCommand>, AddOrganizationRoleCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<DispatchEventsCommand>, DispatchEventsCommandRuleSet>(Lifestyle.Scoped);
         }
     }
 }

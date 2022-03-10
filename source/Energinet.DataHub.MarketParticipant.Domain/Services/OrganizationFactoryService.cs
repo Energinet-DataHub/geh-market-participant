@@ -14,33 +14,38 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     public sealed class OrganizationFactoryService : IOrganizationFactoryService
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
         private readonly IGlobalLocationNumberUniquenessService _globalLocationNumberUniquenessService;
         private readonly IActiveDirectoryService _activeDirectoryService;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IDomainEventRepository _domainEventRepository;
 
         public OrganizationFactoryService(
             IOrganizationRepository organizationRepository,
-            IOrganizationEventDispatcher organizationEventDispatcher,
             IGlobalLocationNumberUniquenessService globalLocationNumberUniquenessService,
-            IActiveDirectoryService activeDirectoryService)
+            IActiveDirectoryService activeDirectoryService,
+            IUnitOfWorkProvider unitOfWorkProvider,
+            IDomainEventRepository domainEventRepository)
         {
             _organizationRepository = organizationRepository;
-            _organizationEventDispatcher = organizationEventDispatcher;
             _globalLocationNumberUniquenessService = globalLocationNumberUniquenessService;
             _activeDirectoryService = activeDirectoryService;
+            _unitOfWorkProvider = unitOfWorkProvider;
+            _domainEventRepository = domainEventRepository;
         }
 
         public async Task<Organization> CreateAsync(GlobalLocationNumber gln, string name)
         {
+            await using var uow = await _unitOfWorkProvider.NewUnitOfWorkAsync().ConfigureAwait(false);
+
             await _globalLocationNumberUniquenessService
                 .EnsureGlobalLocationNumberAvailableAsync(gln)
                 .ConfigureAwait(false);
@@ -65,9 +70,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organizationToSave.Name,
                 organizationToSave.Roles);
 
-            await _organizationEventDispatcher
-                .DispatchChangedEventAsync(organizationWithId)
-                .ConfigureAwait(false);
+            var domainEvent = new OrganizationChangedIntegrationEvent
+            {
+                OrganizationId = organizationWithId.Id.Value,
+                ActorId = organizationWithId.ActorId,
+                Gln = organizationWithId.Gln.Value,
+                Name = organizationWithId.Name
+            };
+
+            await _domainEventRepository.InsertAsync(new DomainEvent(organizationWithId.Id.Value, nameof(Organization), domainEvent)).ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
 
             return organizationWithId;
         }
