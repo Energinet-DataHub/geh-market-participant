@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task UpdateAsync_Updates()
+        public async Task UpdateAsync_EventMarkedAsSent_IsNoLongerReturned()
         {
             // arrange
             var target = new DomainEventRepositoryDecorator(_fixture);
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var actual = await FindAsync(target, id).ConfigureAwait(false);
 
             // assert
-            Assert.True(actual!.IsSent);
+            Assert.Null(actual);
         }
 
         [Fact]
