@@ -68,10 +68,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
 
-            var q = from x in _context.DomainEvents.AsQueryable()
-                    where x.Id == domainEvent.Id.Value
-                    select x;
-
             var entity = await _context.DomainEvents.FindAsync(domainEvent.Id.Value).ConfigureAwait(false);
 
             if (entity == null)
