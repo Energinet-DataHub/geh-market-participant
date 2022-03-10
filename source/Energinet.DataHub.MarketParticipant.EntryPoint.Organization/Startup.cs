@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
             Container.Register<CreateOrganizationFunction>();
             Container.Register<CreateActorFunction>();
             Container.Register<HealthFunction>();
+            Container.Register<DispatchEventsTimerTrigger>();
 
             // health check
             container.Register<ISqlDatabaseVerifier, SqlDatabaseVerifier>(Lifestyle.Scoped);

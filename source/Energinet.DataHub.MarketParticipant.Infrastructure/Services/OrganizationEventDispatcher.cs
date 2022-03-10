@@ -15,7 +15,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
@@ -23,7 +23,7 @@ using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationEventDispatcher : IOrganizationEventDispatcher
+    public sealed class OrganizationEventDispatcher : IIntegrationEventDispatcher
     {
         private readonly IOrganizationChangedEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
@@ -34,16 +34,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _serviceBusClient = serviceBusClient;
         }
 
-        public async Task DispatchChangedEventAsync(Organization organization)
+        public async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
-            Guard.ThrowIfNull(organization, nameof(organization));
+            Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
+            if (integrationEvent is not OrganizationChangedIntegrationEvent organizationChangedIntegrationEvent)
+                return false;
+
+            // todo: update integration package model to include OrganizationId
             var changedEvent = new OrganizationChangedEvent(
-                organization.Id.Value,
-            // TODO: Another PR.
-                organization.Actors.Select(x => x.ActorId.Value).First(),
-                organization.Actors.Select(x => x.Gln.Value).First(),
-                organization.Name);
+                organizationChangedIntegrationEvent.Id,
+                organizationChangedIntegrationEvent.ActorId,
+                organizationChangedIntegrationEvent.Gln,
+                organizationChangedIntegrationEvent.Name);
 
             var bytes = _eventParser.Parse(changedEvent);
             var message = new ServiceBusMessage(bytes);
@@ -51,6 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             await using var sender = _serviceBusClient.CreateSender();
 
             await sender.SendMessageAsync(message).ConfigureAwait(false);
+            return true;
         }
     }
 }

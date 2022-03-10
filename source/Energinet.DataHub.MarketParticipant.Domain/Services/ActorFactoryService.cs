@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -25,20 +26,23 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public sealed class ActorFactoryService : IActorFactoryService
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IOrganizationEventDispatcher _organizationEventDispatcher;
+        private readonly IDomainEventRepository _domainEventRepository;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
         private readonly IActiveDirectoryService _activeDirectoryService;
 
         public ActorFactoryService(
             IOrganizationRepository organizationRepository,
-            IOrganizationEventDispatcher organizationEventDispatcher,
+            IDomainEventRepository domainEventRepository,
+            IUnitOfWorkProvider unitOfWorkProvider,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
             IActiveDirectoryService activeDirectoryService)
         {
             _organizationRepository = organizationRepository;
-            _organizationEventDispatcher = organizationEventDispatcher;
+            _domainEventRepository = domainEventRepository;
+            _unitOfWorkProvider = unitOfWorkProvider;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
             _activeDirectoryService = activeDirectoryService;
@@ -72,13 +76,29 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             organization.Actors.Add(newActor);
 
+            var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
+
             await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            await _organizationEventDispatcher
-                .DispatchChangedEventAsync(organization)
-                .ConfigureAwait(false);
+            var organizationChangedEvent = new OrganizationChangedIntegrationEvent
+            {
+                OrganizationId = organization.Id.Value,
+                ActorId = newActor.ActorId.Value,
+                Gln = newActor.Gln.Value,
+                Name = organization.Name
+            };
+
+            var domainEvent = new DomainEvent(
+                organization.Id.Value,
+                nameof(Organization),
+                organizationChangedEvent);
+
+            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+            await uow.CommitAsync().ConfigureAwait(false);
 
             var updatedOrganization = await _organizationRepository
                 .GetAsync(organization.Id)

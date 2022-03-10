@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -35,7 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
@@ -54,7 +56,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
@@ -73,7 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
@@ -92,7 +96,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
@@ -118,10 +123,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var organizationEventDispatcher = new Mock<IOrganizationEventDispatcher>();
+            var organizationEventDispatcher = new Mock<IDomainEventRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
                 organizationEventDispatcher.Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
@@ -143,8 +149,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             organizationEventDispatcher.Verify(
-                x => x.DispatchChangedEventAsync(It.Is<Organization>(
-                    o => o.Id.Value == expectedId)),
+                x => x.InsertAsync(It.Is<DomainEvent>(
+                    o => o.DomainObjectId == expectedId)),
                 Times.Once);
         }
 
@@ -156,7 +162,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var globalLocationNumberUniquenessService = new Mock<IUniqueGlobalLocationNumberRuleService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IActiveDirectoryService>().Object);
@@ -187,7 +194,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var overlappingBusinessRolesService = new Mock<IOverlappingBusinessRolesRuleService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IOrganizationEventDispatcher>().Object,
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IUnitOfWorkProvider>().Object,
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IActiveDirectoryService>().Object);

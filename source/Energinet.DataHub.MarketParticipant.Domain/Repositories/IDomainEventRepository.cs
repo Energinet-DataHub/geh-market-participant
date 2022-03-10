@@ -12,35 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Microsoft.EntityFrameworkCore;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    ///     The interface used for the DB context for the MarketParticipant database
+    /// Repository giving access to domain events
     /// </summary>
-    public interface IMarketParticipantDbContext
+    public interface IDomainEventRepository
     {
         /// <summary>
-        ///     Represent access to the organization database table
+        /// Inserts a <see cref="DomainEvent"/>
         /// </summary>
-        DbSet<OrganizationEntity> Organizations { get; }
+        Task<DomainEventId> InsertAsync(DomainEvent domainEvent);
 
         /// <summary>
-        ///     Represent access to the GridAreas database table
+        /// Saves changes to the given <see cref="DomainEvent"/>
         /// </summary>
-        DbSet<GridAreaEntity> GridAreas { get; }
+        Task UpdateAsync(DomainEvent domainEvent);
 
         /// <summary>
-        ///     Represent access to the DomainEvents database table
+        /// Retrieves a specified number of of unsent domain events ordered by oldest first
         /// </summary>
-        DbSet<DomainEventEntity> DomainEvents { get; }
-
-        /// <summary>
-        ///     Saves changes to the database.
-        /// </summary>
-        Task<int> SaveChangesAsync();
+        IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents);
     }
 }
