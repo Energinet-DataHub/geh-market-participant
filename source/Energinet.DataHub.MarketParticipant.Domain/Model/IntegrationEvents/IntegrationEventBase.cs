@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
@@ -23,6 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
             Id = Guid.NewGuid();
         }
 
+        [JsonInclude]
         public Guid Id { get; protected set; }
     }
 }
