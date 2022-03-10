@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     where x.Id == domainEvent.Id.Value
                     select x;
 
-            var entity = await q.FirstOrDefaultAsync().ConfigureAwait(false);
+            var entity = await _context.DomainEvents.FindAsync(domainEvent.Id.Value).ConfigureAwait(false);
 
             if (entity == null)
             {
@@ -107,7 +107,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     throw new InvalidOperationException($"{nameof(DomainEvent)} with ID: {entity.Id} could not be deserialized");
                 }
 
-                yield return DomainEvent.Restore(new DomainEventId(entity.Id), entity.EntityId, entity.EntityType, entity.IsSent, (IIntegrationEvent)domainEvent);
+                yield return new DomainEvent(new DomainEventId(entity.Id), entity.EntityId, entity.EntityType, entity.IsSent, (IIntegrationEvent)domainEvent);
             }
         }
     }

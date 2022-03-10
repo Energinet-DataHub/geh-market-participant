@@ -16,5 +16,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record DispatchEventsCommand : IRequest<DispatchEventsResponse>;
+    public sealed record DispatchEventsCommand : IRequest<Unit>;
 }

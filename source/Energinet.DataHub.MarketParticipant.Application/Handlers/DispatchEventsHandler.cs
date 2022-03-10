@@ -24,7 +24,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class DispatchEventsHandler : IRequestHandler<DispatchEventsCommand, DispatchEventsResponse>
+    public sealed class DispatchEventsHandler : IRequestHandler<DispatchEventsCommand>
     {
         private readonly IDomainEventRepository _domainEventRepository;
         private readonly IEnumerable<IIntegrationEventDispatcher> _integrationEventDispatchers;
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             _integrationEventDispatchers = integrationEventDispatchers;
         }
 
-        public async Task<DispatchEventsResponse> Handle(DispatchEventsCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(DispatchEventsCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 }
             }
 
-            return new DispatchEventsResponse();
+            return Unit.Value;
         }
     }
 }

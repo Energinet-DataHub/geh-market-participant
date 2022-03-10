@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain
     public interface IUnitOfWorkProvider
     {
         /// <summary>
-        /// Creates an initialized a new <see cref="IUnitOfWork"/>
+        /// Creates and initializes a new <see cref="IUnitOfWork"/>
         /// </summary>
         Task<IUnitOfWork> NewUnitOfWorkAsync();
     }

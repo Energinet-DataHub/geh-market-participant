@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             IntegrationEvent = integrationEvent;
         }
 
-        private DomainEvent(DomainEventId id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
+        public DomainEvent(DomainEventId id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
             : this(domainObjectId, domainObjectType, integrationEvent)
         {
             Id = id;
@@ -38,11 +38,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public string DomainObjectType { get; }
         public bool IsSent { get; private set; }
         public IIntegrationEvent IntegrationEvent { get; }
-
-        public static DomainEvent Restore(DomainEventId id, Guid domainObjectId, string domainObjectType, bool isSent, IIntegrationEvent integrationEvent)
-        {
-            return new DomainEvent(id, domainObjectId, domainObjectType, isSent, integrationEvent);
-        }
 
         public void MarkAsSent()
         {

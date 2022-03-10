@@ -51,7 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .ConfigureAwait(false);
 
             // assert
-            Assert.True(id.Value != default);
+            var actual = await Find(id).ConfigureAwait(false);
+            Assert.NotNull(actual);
         }
 
         [Fact]
@@ -77,19 +78,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             domainEvent.MarkAsSent();
-            await using var newHost = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
-            await using var newScope = newHost.BeginScope();
-            await using var newContext = _fixture.DatabaseManager.CreateDbContext();
-            var newRepository = new DomainEventRepository(newContext);
-            DomainEvent actual = null!;
-            await foreach (var e in newRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
-            {
-                if (e.Id == id)
-                    actual = e;
-            }
+            await repository.UpdateAsync(domainEvent).ConfigureAwait(false);
+            var actual = await Find(id).ConfigureAwait(false);
 
             // assert
-            Assert.True(domainEvent.IsSent);
+            Assert.True(actual!.IsSent);
         }
 
         [Fact]
@@ -112,6 +105,25 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // assert
             Assert.NotNull(actual.FirstOrDefault(x => x.DomainObjectId == domainEvent.DomainObjectId));
+        }
+
+        public async Task<DomainEvent?> Find(DomainEventId id)
+        {
+            await using var newHost = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var newScope = newHost.BeginScope();
+            await using var newContext = _fixture.DatabaseManager.CreateDbContext();
+
+            var newRepository = new DomainEventRepository(newContext);
+
+            DomainEvent? actual = null;
+
+            await foreach (var e in newRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+            {
+                if (e.Id == id)
+                    actual = e;
+            }
+
+            return actual;
         }
     }
 }
