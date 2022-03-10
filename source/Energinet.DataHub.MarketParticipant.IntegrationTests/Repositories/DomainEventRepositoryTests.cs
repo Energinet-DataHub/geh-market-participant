@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -45,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var id = await target
-                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
+                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), CreateIntegrationEvent()))
                 .ConfigureAwait(false);
 
             // assert
@@ -58,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         {
             // arrange
             var target = new DomainEventRepositoryDecorator(_fixture);
-            var newDomainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
+            var newDomainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), CreateIntegrationEvent());
             var id = await target.InsertAsync(newDomainEvent).ConfigureAwait(false);
 
             // act
@@ -76,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         {
             // arrange
             var target = new DomainEventRepositoryDecorator(_fixture);
-            var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
+            var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), CreateIntegrationEvent());
             var id = await target.InsertAsync(domainEvent).ConfigureAwait(false);
 
             // act
@@ -90,13 +89,23 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         {
             DomainEvent? actual = null;
 
-            await foreach (var e in reopository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+            foreach (var e in await reopository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
             {
                 if (e.Id == id)
                     actual = e;
             }
 
             return actual;
+        }
+
+        private static ActorUpdatedIntegrationEvent CreateIntegrationEvent()
+        {
+            return new ActorUpdatedIntegrationEvent
+            {
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                ActorId = Guid.NewGuid(),
+                Gln = new GlobalLocationNumber("fake_value")
+            };
         }
 
         private sealed class DomainEventRepositoryDecorator : IDomainEventRepository
@@ -108,7 +117,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 _fixture = fixture;
             }
 
-            public async IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents)
+            public async Task<IEnumerable<DomainEvent>> GetOldestUnsentDomainEventsAsync(int numberOfEvents)
             {
                 await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
                 await using var scope = host.BeginScope();
@@ -116,10 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
                 var repository = new DomainEventRepository(context);
 
-                await foreach (var domainEvent in repository.GetOldestUnsentDomainEventsAsync(numberOfEvents))
-                {
-                    yield return domainEvent;
-                }
+                return await repository.GetOldestUnsentDomainEventsAsync(numberOfEvents).ConfigureAwait(false);
             }
 
             public async Task<DomainEventId> InsertAsync(DomainEvent domainEvent)

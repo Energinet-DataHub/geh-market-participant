@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -54,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var repositoryMock = new Mock<IDomainEventRepository>();
-            repositoryMock.Setup(x => x.GetOldestUnsentDomainEventsAsync(It.IsAny<int>())).Returns(ToAsyncEnumerable(events));
+            repositoryMock.Setup(x => x.GetOldestUnsentDomainEventsAsync(It.IsAny<int>())).ReturnsAsync(events);
 
             var target = new DispatchEventsHandler(repositoryMock.Object, new IIntegrationEventDispatcher[] { new MockedEventDispatcher(handlesEvent: false) });
 
@@ -76,21 +75,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var repositoryMock = new Mock<IDomainEventRepository>();
-            repositoryMock.Setup(x => x.GetOldestUnsentDomainEventsAsync(It.IsAny<int>())).Returns(ToAsyncEnumerable(events));
+            repositoryMock.Setup(x => x.GetOldestUnsentDomainEventsAsync(It.IsAny<int>())).ReturnsAsync(events);
 
             var target = new DispatchEventsHandler(repositoryMock.Object, new IIntegrationEventDispatcher[] { new MockedEventDispatcher(handlesEvent: true) });
 
             // act + assert
             await target.Handle(new DispatchEventsCommand(), CancellationToken.None).ConfigureAwait(false);
-        }
-
-        private static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(IEnumerable<T> source)
-        {
-            foreach (var x in source)
-            {
-                await Task.CompletedTask.ConfigureAwait(false);
-                yield return x;
-            }
         }
 
         private sealed class MockedEventDispatcher : IIntegrationEventDispatcher
