@@ -41,8 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             var changedEvent = new OrganizationChangedEvent(
                 organization.Id.Value,
             // TODO: Another PR.
-                organization.Actors.Select(x => x.ActorId.Value).Single(),
-                organization.Actors.Select(x => x.Gln.Value).Single(),
+                organization.Actors.Select(x => x.ActorId.Value).First(),
+                organization.Actors.Select(x => x.Gln.Value).First(),
                 organization.Name);
 
             var bytes = _eventParser.Parse(changedEvent);

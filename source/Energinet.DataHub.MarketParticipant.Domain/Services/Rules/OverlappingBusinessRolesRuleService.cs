@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             {
                 if (!usedBusinessRoles.Add(businessRole))
                 {
-                    throw new ValidationException($"Cannot add '{businessRole}' as this role is already assigned to another actor within the organization.");
+                    throw new ValidationException($"Cannot add '{businessRole}' as this business role is already assigned to another actor within the organization.");
                 }
             }
 
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             {
                 if (!usedMarketRoles.Add(marketRole.Function))
                 {
-                    throw new ValidationException($"Cannot add '{marketRole.Function}' as this role is already assigned to another actor within the organization.");
+                    throw new ValidationException($"Cannot add '{marketRole.Function}' as this market role is already assigned to another actor within the organization.");
                 }
             }
         }
