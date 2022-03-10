@@ -49,6 +49,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationRepositoryService = new Mock<IOrganizationRepository>();
             var target = new CreateOrganizationHandler(organizationRepositoryService.Object);
 
+            organizationRepositoryService
+                .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(g => g.Name == name)))
+                .ReturnsAsync(new OrganizationId(Guid.NewGuid()));
+
             var command = new CreateOrganizationCommand(new OrganizationDto(name));
 
             // Act
@@ -58,10 +62,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(response.OrganizationId);
-
-            organizationRepositoryService.Verify(
-                x => x.AddOrUpdateAsync(It.Is<Organization>(g => g.Name == name)),
-                Times.Once);
         }
     }
 }

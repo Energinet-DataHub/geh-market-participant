@@ -43,11 +43,17 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             {
                 var addOrganizationRoleCommand = await AddOrganizationCommandAsync(request).ConfigureAwait(false);
 
-                await _mediator
+                var response = await _mediator
                     .Send(addOrganizationRoleCommand)
                     .ConfigureAwait(false);
 
-                return request.CreateResponse(HttpStatusCode.OK);
+                var responseData = request.CreateResponse(HttpStatusCode.OK);
+
+                await responseData
+                    .WriteAsJsonAsync(response)
+                    .ConfigureAwait(false);
+
+                return responseData;
             });
         }
 
