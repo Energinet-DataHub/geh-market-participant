@@ -1,0 +1,147 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Xunit;
+using Xunit.Categories;
+
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
+{
+    [Collection("IntegrationTest")]
+    [IntegrationTest]
+    public sealed class DomainEventRepositoryTests
+    {
+        private readonly MarketParticipantDatabaseFixture _fixture;
+
+        public DomainEventRepositoryTests(MarketParticipantDatabaseFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
+        [Fact]
+        public async Task InsertAsync_RequiredDataSpecified_InsertsEvent()
+        {
+            // arrange
+            var target = new DomainEventRepositoryDecorator(_fixture);
+
+            // act
+            var id = await target
+                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
+                .ConfigureAwait(false);
+
+            // assert
+            var actual = await FindAsync(target, id).ConfigureAwait(false);
+            Assert.NotNull(actual);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_EventMarkedAsSent_IsNoLongerReturned()
+        {
+            // arrange
+            var target = new DomainEventRepositoryDecorator(_fixture);
+            var newDomainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
+            var id = await target.InsertAsync(newDomainEvent).ConfigureAwait(false);
+
+            // act
+            var domainEvent = await FindAsync(target, id).ConfigureAwait(false);
+            domainEvent!.MarkAsSent();
+            await target.UpdateAsync(domainEvent).ConfigureAwait(false);
+            var actual = await FindAsync(target, id).ConfigureAwait(false);
+
+            // assert
+            Assert.Null(actual);
+        }
+
+        [Fact]
+        public async Task GetAsync_UnsentExists_ReturnsUnsent()
+        {
+            // arrange
+            var target = new DomainEventRepositoryDecorator(_fixture);
+            var domainEvent = new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" });
+            var id = await target.InsertAsync(domainEvent).ConfigureAwait(false);
+
+            // act
+            var actual = await FindAsync(target, id).ConfigureAwait(false);
+
+            // assert
+            Assert.NotNull(actual);
+        }
+
+        private static async Task<DomainEvent?> FindAsync(DomainEventRepositoryDecorator reopository, DomainEventId id)
+        {
+            DomainEvent? actual = null;
+
+            await foreach (var e in reopository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+            {
+                if (e.Id == id)
+                    actual = e;
+            }
+
+            return actual;
+        }
+
+        private sealed class DomainEventRepositoryDecorator : IDomainEventRepository
+        {
+            private readonly MarketParticipantDatabaseFixture _fixture;
+
+            public DomainEventRepositoryDecorator(MarketParticipantDatabaseFixture fixture)
+            {
+                _fixture = fixture;
+            }
+
+            public async IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents)
+            {
+                await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+                await using var scope = host.BeginScope();
+                await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+                var repository = new DomainEventRepository(context);
+
+                await foreach (var domainEvent in repository.GetOldestUnsentDomainEventsAsync(numberOfEvents))
+                {
+                    yield return domainEvent;
+                }
+            }
+
+            public async Task<DomainEventId> InsertAsync(DomainEvent domainEvent)
+            {
+                await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+                await using var scope = host.BeginScope();
+                await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+                var repository = new DomainEventRepository(context);
+
+                return await repository.InsertAsync(domainEvent).ConfigureAwait(false);
+            }
+
+            public async Task UpdateAsync(DomainEvent domainEvent)
+            {
+                await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+                await using var scope = host.BeginScope();
+                await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+                var repository = new DomainEventRepository(context);
+                await repository.UpdateAsync(domainEvent).ConfigureAwait(false);
+            }
+        }
+    }
+}

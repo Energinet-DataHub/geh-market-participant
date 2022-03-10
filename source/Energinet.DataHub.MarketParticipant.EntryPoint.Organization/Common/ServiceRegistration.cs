@@ -27,8 +27,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
             container.Register<IGlobalLocationNumberUniquenessService, GlobalLocationNumberUniquenessService>(Lifestyle.Scoped);
             container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
-            container.Register<IOrganizationEventDispatcher, OrganizationEventDispatcher>(Lifestyle.Scoped);
             container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
+            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(OrganizationEventDispatcher).Assembly);
         }
     }
 }
