@@ -14,14 +14,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public sealed class OrganizationChangedIntegrationEvent : IntegrationEventBase
+    public sealed class ActorUpdatedIntegrationEvent : IntegrationEventBase
     {
-        public Guid OrganizationId { get; set; }
         public Guid ActorId { get; set; }
-        public string Gln { get; set; } = null!;
-        public string Name { get; set; } = null!;
+        public OrganizationId OrganizationId { get; set; } = null!;
+        public ExternalActorId ExternalActorId { get; set; } = null!;
+        public GlobalLocationNumber Gln { get; set; } = null!;
+        public ActorStatus Status { get; set; }
+
+        [JsonInclude]
+        public ICollection<BusinessRoleCode> BusinessRoles { get; private set; } = new List<BusinessRoleCode>();
+
+        [JsonInclude]
+        public ICollection<EicFunction> MarketRoles { get; private set; } = new List<EicFunction>();
     }
 }

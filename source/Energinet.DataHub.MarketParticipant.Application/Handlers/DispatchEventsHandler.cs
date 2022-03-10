@@ -29,7 +29,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         private readonly IDomainEventRepository _domainEventRepository;
         private readonly IEnumerable<IIntegrationEventDispatcher> _integrationEventDispatchers;
 
-        public DispatchEventsHandler(IDomainEventRepository domainEventRepository, IEnumerable<IIntegrationEventDispatcher> integrationEventDispatchers)
+        public DispatchEventsHandler(
+            IDomainEventRepository domainEventRepository,
+            IEnumerable<IIntegrationEventDispatcher> integrationEventDispatchers)
         {
             _domainEventRepository = domainEventRepository;
             _integrationEventDispatchers = integrationEventDispatchers;
@@ -39,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            await foreach (var domainEvent in _domainEventRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
+            foreach (var domainEvent in await _domainEventRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
             {
                 foreach (var dispatcher in _integrationEventDispatchers)
                 {

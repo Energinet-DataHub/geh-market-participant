@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
             container.Register<IValidator<DispatchEventsCommand>, DispatchEventsCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
-            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(OrganizationEventDispatcher).Assembly);
+            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
         }
     }
 }

@@ -45,9 +45,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
 
-            using var ms = new MemoryStream();
+            var integrationEvent = domainEvent.IntegrationEvent;
 
-            await JsonSerializer.SerializeAsync(ms, domainEvent.IntegrationEvent, _jsonSerializerOptions).ConfigureAwait(false);
+            await using var ms = new MemoryStream();
+            await JsonSerializer
+                .SerializeAsync(ms, integrationEvent, integrationEvent.GetType(), _jsonSerializerOptions)
+                .ConfigureAwait(false);
 
             var entity = new DomainEventEntity
             {
@@ -55,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 EntityType = domainEvent.DomainObjectType,
                 Timestamp = DateTimeOffset.UtcNow,
                 Event = Encoding.UTF8.GetString(ms.ToArray()),
-                EventTypeName = domainEvent.IntegrationEvent.GetType().Name
+                EventTypeName = integrationEvent.GetType().Name
             };
 
             await _context.DomainEvents.AddAsync(entity).ConfigureAwait(false);
@@ -69,7 +72,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
 
             var entity = await _context.DomainEvents.FindAsync(domainEvent.Id.Value).ConfigureAwait(false);
-
             if (entity == null)
             {
                 throw new NotFoundValidationException($"{nameof(DomainEvent)} with ID {domainEvent.Id} was not found");
@@ -80,12 +82,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             await _context.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        public async IAsyncEnumerable<DomainEvent> GetOldestUnsentDomainEventsAsync(int numberOfEvents)
+        public async Task<IEnumerable<DomainEvent>> GetOldestUnsentDomainEventsAsync(int numberOfEvents)
         {
             var q = from x in _context.DomainEvents.AsQueryable()
                     where x.IsSent == false
-                    orderby x.Id ascending
+                    orderby x.Id
                     select x;
+
+            var domainEvents = new List<DomainEvent>();
 
             await foreach (var entity in q.Take(numberOfEvents).AsAsyncEnumerable())
             {
@@ -94,17 +98,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     throw new InvalidOperationException($"Unknown EventType {entity.EventTypeName}");
                 }
 
-                using var ms = new MemoryStream(Encoding.UTF8.GetBytes(entity.Event));
+                await using var ms = new MemoryStream(Encoding.UTF8.GetBytes(entity.Event));
 
                 var domainEvent = await JsonSerializer.DeserializeAsync(ms, type, _jsonSerializerOptions).ConfigureAwait(false);
-
                 if (domainEvent == null)
                 {
                     throw new InvalidOperationException($"{nameof(DomainEvent)} with ID: {entity.Id} could not be deserialized");
                 }
 
-                yield return new DomainEvent(new DomainEventId(entity.Id), entity.EntityId, entity.EntityType, entity.IsSent, (IIntegrationEvent)domainEvent);
+                domainEvents.Add(new DomainEvent(
+                    new DomainEventId(entity.Id),
+                    entity.EntityId,
+                    entity.EntityType,
+                    entity.IsSent,
+                    (IIntegrationEvent)domainEvent));
             }
+
+            return domainEvents;
         }
     }
 }
