@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
@@ -24,11 +24,21 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
     {
         public static void AddServices(this Container container)
         {
-            container.Register<IGlobalLocationNumberUniquenessService, GlobalLocationNumberUniquenessService>(Lifestyle.Scoped);
-            container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
-            container.Register<IOrganizationChangedEventParser, OrganizationChangedEventParser>(Lifestyle.Scoped);
-            container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
-            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(OrganizationEventDispatcher).Assembly);
+            container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
+            container.Register<IOverlappingBusinessRolesRuleService, OverlappingBusinessRolesRuleService>(Lifestyle.Scoped);
+            container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
+            container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
+            container.Collection.Register<IBusinessRole>(
+                new BalancePowerSupplierRole(),
+                new BalanceResponsiblePartyRole(),
+                new DanishEnergyAgencyRole(),
+                new GridAccessProviderRole(),
+                new ImbalanceSettlementResponsibleRole(),
+                new MeteredDataAdministratorRole(),
+                new MeteredDataAggregatorRole(),
+                new MeteredDataResponsibleRole(),
+                new MeteringPointAdministratorRole(),
+                new SystemOperatorRole());
         }
     }
 }

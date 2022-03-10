@@ -28,9 +28,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.HasKey(organization => organization.Id);
             builder.Property(organization => organization.Id).ValueGeneratedOnAdd();
             builder
-                .HasMany(organization => organization.Roles)
+                .HasMany(organization => organization.Actors)
                 .WithOne()
-                .HasForeignKey(role => role.OrganizationId);
+                .HasForeignKey(actor => actor.OrganizationId);
         }
     }
 }

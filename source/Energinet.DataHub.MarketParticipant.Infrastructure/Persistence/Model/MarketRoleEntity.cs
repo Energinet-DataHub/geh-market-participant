@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     public sealed class MarketRoleEntity
     {
         public Guid Id { get; set; }
-        public Guid OrganizationRoleId { get; set; }
+        public Guid ActorInfoId { get; set; }
         public int Function { get; set; }
     }
 }

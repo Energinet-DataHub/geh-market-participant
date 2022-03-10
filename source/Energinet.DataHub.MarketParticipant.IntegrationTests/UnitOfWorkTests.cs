@@ -80,10 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
         private static Organization CreateEntity()
         {
-            return new Organization(
-                Guid.NewGuid(),
-                new GlobalLocationNumber(Guid.NewGuid().ToString()),
-                "Test");
+            return new Organization("Test");
         }
     }
 }
