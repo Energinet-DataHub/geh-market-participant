@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         private static void MapActorEntity(Actor from, ActorEntity to)
         {
             to.Id = from.Id;
-            to.ActorId = from.ActorId.Value;
+            to.ActorId = from.ExternalActorId.Value;
             to.Gln = from.Gln.Value;
             to.Status = (int)from.Status;
 
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 return new Actor(
                     actor.Id,
-                    new ActorId(actor.ActorId),
+                    new ExternalActorId(actor.ActorId),
                     actorGln,
                     actorStatus,
                     gridArea,

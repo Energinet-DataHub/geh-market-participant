@@ -25,6 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Ensures an App registration ID for the given GLN number
         /// </summary>
-        Task<ActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
+        Task<ExternalActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
     }
 }

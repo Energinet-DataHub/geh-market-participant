@@ -24,7 +24,7 @@ CREATE TABLE [dbo].[ActorInfoNew]
     [Status]         [int]              NOT NULL,
     [GridAreaId]     [uniqueidentifier] NULL,
 
-    CONSTRAINT PK_ActorInfo PRIMARY KEY ([Id]),
+    CONSTRAINT PK_ActorInfoNew PRIMARY KEY ([Id]),
     CONSTRAINT FK_OrganizationId_OrganizationInfo FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[OrganizationInfo]([Id]),
     CONSTRAINT UQ_ActorId UNIQUE ([ActorId])
 )
