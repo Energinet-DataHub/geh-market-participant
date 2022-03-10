@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         BusinessRoleCode Code { get; }
 
         /// <summary>
-        /// The functions associated ti the current role.
+        /// The functions associated to the current role.
         /// </summary>
         IEnumerable<EicFunction> Functions { get; }
     }
