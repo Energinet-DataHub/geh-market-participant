@@ -46,11 +46,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var repository = new DomainEventRepository(context);
 
             // act
-            await repository
+            var id = await repository
                 .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), new OrganizationChangedIntegrationEvent { OrganizationId = Guid.NewGuid(), ActorId = Guid.NewGuid(), Gln = "gln", Name = "name" }))
                 .ConfigureAwait(false);
 
             // assert
+            Assert.True(id.Value != default);
         }
 
         [Fact]
