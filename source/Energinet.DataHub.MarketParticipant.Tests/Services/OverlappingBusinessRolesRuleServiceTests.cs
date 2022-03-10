@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.BalanceResponsibleParty)))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
-            var actor = new Actor(new ActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
             actor.MarketRoles.Add(new MarketRole(EicFunction.BalanceResponsibleParty));
 
             // Act + Assert
@@ -107,7 +107,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.BalanceResponsibleParty)))
                 .Returns(Enumerable.Empty<BusinessRoleCode>());
 
-            var actor = new Actor(new ActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
             actor.MarketRoles.Add(new MarketRole(EicFunction.BalanceResponsibleParty));
 
             // Act + Assert
@@ -139,7 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.EnergySupplier)))
                 .Returns(new[] { BusinessRoleCode.Ddq });
 
-            var actor = new Actor(new ActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
             actor.MarketRoles.Add(new MarketRole(EicFunction.BalanceResponsibleParty));
 
             // Act + Assert

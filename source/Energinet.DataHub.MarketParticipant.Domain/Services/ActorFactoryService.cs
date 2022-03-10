@@ -87,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             var organizationChangedEvent = new OrganizationChangedIntegrationEvent
             {
                 OrganizationId = organization.Id.Value,
-                ActorId = newActor.ActorId.Value,
+                ActorId = newActor.ExternalActorId.Value,
                 Gln = newActor.Gln.Value,
                 Name = organization.Name
             };
@@ -104,7 +104,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .GetAsync(organization.Id)
                 .ConfigureAwait(false);
 
-            return updatedOrganization!.Actors.Single(a => a.ActorId == appRegistrationId);
+            return updatedOrganization!.Actors.Single(a => a.ExternalActorId == appRegistrationId);
         }
     }
 }

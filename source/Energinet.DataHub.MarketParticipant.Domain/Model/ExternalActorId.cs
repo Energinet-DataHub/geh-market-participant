@@ -16,14 +16,14 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record ActorId
+    public sealed record ExternalActorId
     {
-        public ActorId(string value)
+        public ExternalActorId(string value)
         {
             Value = Guid.Parse(value);
         }
 
-        public ActorId(Guid value)
+        public ExternalActorId(Guid value)
         {
             Value = value;
         }

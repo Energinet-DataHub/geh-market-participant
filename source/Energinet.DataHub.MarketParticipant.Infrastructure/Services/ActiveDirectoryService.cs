@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _configuration = configuration;
         }
 
-        public async Task<ActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln)
+        public async Task<ExternalActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln)
         {
             Guard.ThrowIfNull(gln, nameof(gln));
 
@@ -56,10 +56,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 var record = (IDataRecord)reader;
-                return new ActorId(record.GetString(0));
+                return new ExternalActorId(record.GetString(0));
             }
 
-            return new ActorId(Guid.NewGuid());
+            return new ExternalActorId(Guid.NewGuid());
         }
     }
 }
