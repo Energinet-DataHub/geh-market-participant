@@ -36,11 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IDomainEventRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
 
             // Act + Assert
@@ -57,11 +56,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IDomainEventRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
 
             // Act + Assert
@@ -78,11 +76,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IDomainEventRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 new Mock<IActiveDirectoryService>().Object);
 
             // Act + Assert
@@ -100,11 +97,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var activeDirectory = new Mock<IActiveDirectoryService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IDomainEventRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 activeDirectory.Object);
 
             var organization = new Organization("fake_value");
@@ -132,15 +128,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var domainEventRepository = new Mock<IDomainEventRepository>();
+            var actorIntegrationEventsQueueService = new Mock<IActorIntegrationEventsQueueService>();
             var activeDirectory = new Mock<IActiveDirectoryService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                domainEventRepository.Object,
                 UnitOfWorkProviderMock.Create(),
+                actorIntegrationEventsQueueService.Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 activeDirectory.Object);
 
             var expectedId = Guid.NewGuid();
@@ -179,9 +174,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ConfigureAwait(false);
 
             // Assert
-            domainEventRepository.Verify(
-                x => x.InsertAsync(It.Is<DomainEvent>(
-                    o => o.DomainObjectId == expectedId)),
+            actorIntegrationEventsQueueService.Verify(
+                x => x.EnqueueActorUpdatedEventAsync(
+                    It.Is<OrganizationId>(y => y == organizationAfterUpdate.Id),
+                    It.IsAny<Actor>()),
                 Times.Once);
         }
 
@@ -194,11 +190,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var activeDirectory = new Mock<IActiveDirectoryService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IDomainEventRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 activeDirectory.Object);
 
             var organization = new Organization("fake_value");
@@ -232,11 +227,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var activeDirectory = new Mock<IActiveDirectoryService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
-                new Mock<IDomainEventRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object,
                 activeDirectory.Object);
 
             var organization = new Organization("fake_value");

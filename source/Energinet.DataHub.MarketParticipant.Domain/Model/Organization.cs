@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public OrganizationId Id { get; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
         public ICollection<Actor> Actors { get; }
     }

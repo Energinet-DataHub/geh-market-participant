@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -26,28 +25,25 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public sealed class ActorFactoryService : IActorFactoryService
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IDomainEventRepository _domainEventRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
         private readonly IActiveDirectoryService _activeDirectoryService;
 
         public ActorFactoryService(
             IOrganizationRepository organizationRepository,
-            IDomainEventRepository domainEventRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
+            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-            IBusinessRoleCodeDomainService businessRoleCodeDomainService,
             IActiveDirectoryService activeDirectoryService)
         {
             _organizationRepository = organizationRepository;
-            _domainEventRepository = domainEventRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
+            _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
             _activeDirectoryService = activeDirectoryService;
         }
 
@@ -83,6 +79,19 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
+            var savedActor = await SaveActorAsync(organization, appRegistrationId).ConfigureAwait(false);
+
+            await _actorIntegrationEventsQueueService
+                .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)
+                .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+
+            return savedActor;
+        }
+
+        private async Task<Actor> SaveActorAsync(Organization organization, ExternalActorId appRegistrationId)
+        {
             await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
@@ -91,36 +100,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .GetAsync(organization.Id)
                 .ConfigureAwait(false);
 
-            var savedActor = savedOrganization!.Actors.Single(a => a.ExternalActorId == appRegistrationId);
-
-            var actorUpdatedEvent = new ActorUpdatedIntegrationEvent
-            {
-                OrganizationId = organization.Id,
-                ActorId = savedActor.Id,
-                ExternalActorId = savedActor.ExternalActorId,
-                Gln = savedActor.Gln,
-                Status = savedActor.Status
-            };
-
-            foreach (var marketRole in newActor.MarketRoles)
-            {
-                actorUpdatedEvent.MarketRoles.Add(marketRole.Function);
-            }
-
-            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(newActor.MarketRoles))
-            {
-                actorUpdatedEvent.BusinessRoles.Add(businessRole);
-            }
-
-            var domainEvent = new DomainEvent(
-                savedActor.Id,
-                nameof(Actor),
-                actorUpdatedEvent);
-
-            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
-            await uow.CommitAsync().ConfigureAwait(false);
-
-            return savedActor;
+            return savedOrganization!
+                .Actors
+                .Single(a => a.ExternalActorId == appRegistrationId);
         }
     }
 }
