@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="externalActorId">The external actor ID for integrating Azure AD and domains.</param>
         /// <param name="gln">GLN.</param>
         /// <param name="status">The status of the current actor.</param>
-        /// <param name="businessRoles">The ebIX roles assigne to the actor.</param>
+        /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
         /// <param name="marketRoles">The roles (functions) assigned to the current actor.</param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
