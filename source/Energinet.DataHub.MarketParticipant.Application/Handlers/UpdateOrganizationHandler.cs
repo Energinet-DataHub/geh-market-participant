@@ -12,35 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class CreateActorHandler : IRequestHandler<CreateActorCommand, CreateActorResponse>
+    public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IActorFactoryService _actorFactoryService;
 
-        public CreateActorHandler(
-            IOrganizationRepository organizationRepository,
-            IActorFactoryService actorFactoryService)
+        public UpdateOrganizationHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
-            _actorFactoryService = actorFactoryService;
         }
 
-        public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
@@ -54,23 +46,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(organizationId.Value);
             }
 
-            var actorGln = new GlobalLocationNumber(request.Actor.Gln);
-            var actorRoles = CreateMarketRoles(request.Actor).ToList();
+            organization.Name = request.Organization.Name;
 
-            var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles)
+            await _organizationRepository
+                .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            return new CreateActorResponse(actor.Id.ToString());
-        }
-
-        private static IEnumerable<MarketRole> CreateMarketRoles(ActorDto actorDto)
-        {
-            foreach (var marketRole in actorDto.MarketRoles)
-            {
-                var function = Enum.Parse<EicFunction>(marketRole.Function, true);
-                yield return new MarketRole(function);
-            }
+            return Unit.Value;
         }
     }
 }

@@ -80,6 +80,29 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         }
 
         [Theory]
+        [InlineData(ActorStatus.New, false)]
+        [InlineData(ActorStatus.Active, true)]
+        [InlineData(ActorStatus.Inactive, true)]
+        [InlineData(ActorStatus.Passive, true)]
+        [InlineData(ActorStatus.Deleted, false)]
+        public void SetAsPassive_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
+        {
+            // Arrange
+            var target = CreateTestActor(initialStatus);
+
+            // Act + Assert
+            if (isAllowed)
+            {
+                target.SetAsPassive();
+                Assert.Equal(ActorStatus.Passive, target.Status);
+            }
+            else
+            {
+                Assert.Throws<InvalidOperationException>(() => target.SetAsPassive());
+            }
+        }
+
+        [Theory]
         [InlineData(ActorStatus.New, true)]
         [InlineData(ActorStatus.Active, true)]
         [InlineData(ActorStatus.Inactive, true)]

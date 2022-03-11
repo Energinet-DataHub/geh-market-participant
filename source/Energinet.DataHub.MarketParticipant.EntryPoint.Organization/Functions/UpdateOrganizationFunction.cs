@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
@@ -25,39 +24,33 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public sealed class CreateActorFunction
+    public sealed class UpdateOrganizationFunction
     {
         private readonly IMediator _mediator;
 
-        public CreateActorFunction(IMediator mediator)
+        public UpdateOrganizationFunction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [Function("CreateActor")]
+        [Function("UpdateOrganization")]
         public Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put")]
             HttpRequestData request)
         {
             return request.ProcessAsync(async () =>
             {
-                var addOrganizationRoleCommand = await CreateActorCommandAsync(request).ConfigureAwait(false);
+                var updateOrganizationCommand = await UpdateOrganizationCommandAsync(request).ConfigureAwait(false);
 
-                var response = await _mediator
-                    .Send(addOrganizationRoleCommand)
+                await _mediator
+                    .Send(updateOrganizationCommand)
                     .ConfigureAwait(false);
 
-                var responseData = request.CreateResponse(HttpStatusCode.OK);
-
-                await responseData
-                    .WriteAsJsonAsync(response)
-                    .ConfigureAwait(false);
-
-                return responseData;
+                return request.CreateResponse(HttpStatusCode.OK);
             });
         }
 
-        private static async Task<CreateActorCommand> CreateActorCommandAsync(HttpRequestData request)
+        private static async Task<UpdateOrganizationCommand> UpdateOrganizationCommandAsync(HttpRequestData request)
         {
             var options = new JsonSerializerOptions
             {
@@ -66,14 +59,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
             try
             {
-                var actorDto = await JsonSerializer
-                    .DeserializeAsync<ActorDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new ActorDto(string.Empty, Array.Empty<MarketRoleDto>());
+                var organizationDto = await JsonSerializer
+                    .DeserializeAsync<OrganizationDto>(request.Body, options)
+                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty);
 
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
 
-                return new CreateActorCommand(organizationId, actorDto);
+                return new UpdateOrganizationCommand(organizationId, organizationDto);
             }
             catch (JsonException)
             {
