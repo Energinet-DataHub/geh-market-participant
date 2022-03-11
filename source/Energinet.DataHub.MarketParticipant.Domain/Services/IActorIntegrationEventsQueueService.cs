@@ -12,25 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// A factory service ensuring correct construction of an actor.
+    /// Creates and enqueues integration events.
     /// </summary>
-    public interface IActorFactoryService
+    public interface IActorIntegrationEventsQueueService
     {
         /// <summary>
-        /// Creates an actor.
+        /// Creates and enqueues an ActorUpdated integration event for the specified actor.
         /// </summary>
-        /// <param name="organization">The organization that will contain the new actor.</param>
-        /// <param name="gln">The global location number of the new actor.</param>
-        /// <param name="marketRoles">The market roles assigned to the new actor.</param>
-        /// <returns>The created actor.</returns>
-        Task<Actor> CreateAsync(Organization organization, GlobalLocationNumber gln, IReadOnlyCollection<MarketRole> marketRoles);
+        /// <param name="organizationId">The organization id the actor belongs to.</param>
+        /// <param name="actor">The actor to publish an integration event for.</param>
+        Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Actor actor);
     }
 }

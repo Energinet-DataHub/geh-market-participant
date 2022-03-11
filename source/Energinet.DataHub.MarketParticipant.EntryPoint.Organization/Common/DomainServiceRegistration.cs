@@ -20,10 +20,11 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
 {
-    internal static class ServiceRegistration
+    internal static class DomainServiceRegistration
     {
         public static void AddServices(this Container container)
         {
+            container.Register<IActorIntegrationEventsQueueService, ActorIntegrationEventsQueueService>(Lifestyle.Scoped);
             container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
             container.Register<IOverlappingBusinessRolesRuleService, OverlappingBusinessRolesRuleService>(Lifestyle.Scoped);
             container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);

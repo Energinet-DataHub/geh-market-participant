@@ -25,39 +25,33 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public sealed class CreateActorFunction
+    public sealed class UpdateActorFunction
     {
         private readonly IMediator _mediator;
 
-        public CreateActorFunction(IMediator mediator)
+        public UpdateActorFunction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [Function("CreateActor")]
+        [Function("UpdateActor")]
         public Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put")]
             HttpRequestData request)
         {
             return request.ProcessAsync(async () =>
             {
-                var addOrganizationRoleCommand = await CreateActorCommandAsync(request).ConfigureAwait(false);
+                var updateActorCommand = await UpdateActorCommandAsync(request).ConfigureAwait(false);
 
-                var response = await _mediator
-                    .Send(addOrganizationRoleCommand)
+                await _mediator
+                    .Send(updateActorCommand)
                     .ConfigureAwait(false);
 
-                var responseData = request.CreateResponse(HttpStatusCode.OK);
-
-                await responseData
-                    .WriteAsJsonAsync(response)
-                    .ConfigureAwait(false);
-
-                return responseData;
+                return request.CreateResponse(HttpStatusCode.OK);
             });
         }
 
-        private static async Task<CreateActorCommand> CreateActorCommandAsync(HttpRequestData request)
+        private static async Task<UpdateActorCommand> UpdateActorCommandAsync(HttpRequestData request)
         {
             var options = new JsonSerializerOptions
             {
@@ -66,14 +60,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
             try
             {
-                var actorDto = await JsonSerializer
-                    .DeserializeAsync<ActorDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new ActorDto(string.Empty, Array.Empty<MarketRoleDto>());
+                var marketRoles = await JsonSerializer
+                    .DeserializeAsync<MarketRoleDto[]>(request.Body, options)
+                    .ConfigureAwait(false) ?? Array.Empty<MarketRoleDto>();
 
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
+                var actorId = query.Get("actorId") ?? string.Empty;
 
-                return new CreateActorCommand(organizationId, actorDto);
+                return new UpdateActorCommand(organizationId, actorId, marketRoles);
             }
             catch (JsonException)
             {

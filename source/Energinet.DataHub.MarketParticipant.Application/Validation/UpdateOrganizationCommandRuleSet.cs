@@ -17,9 +17,9 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class CreateOrganizationCommandRuleSet : AbstractValidator<CreateOrganizationCommand>
+    public sealed class UpdateOrganizationCommandRuleSet : AbstractValidator<UpdateOrganizationCommand>
     {
-        public CreateOrganizationCommandRuleSet()
+        public UpdateOrganizationCommandRuleSet()
         {
             RuleFor(command => command.Organization)
                 .NotNull()
