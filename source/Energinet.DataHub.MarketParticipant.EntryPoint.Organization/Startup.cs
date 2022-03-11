@@ -25,6 +25,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
         {
             Container.Register<CreateOrganizationFunction>();
             Container.Register<CreateActorFunction>();
+            Container.Register<UpdateOrganizationFunction>();
+            Container.Register<UpdateActorFunction>();
             Container.Register<HealthFunction>();
             Container.Register<DispatchEventsTimerTrigger>();
 
