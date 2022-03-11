@@ -17,9 +17,15 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 
-message OrganizationChangedEventContract {
+message ActorUpdatedIntegrationEventContract {
   string Id = 1;
   string ActorId = 2;
-  string Gln = 3;
-  string Name = 4;
+  string ExternalActorId = 3;
+
+  string OrganizationId = 4;
+  string Gln = 5;
+  int32 Status = 6;
+
+  repeated int32 BusinessRoles = 7;
+  repeated int32 MarketRoles = 8;
 }
