@@ -51,12 +51,12 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         }
 
         public Guid Id { get; }
-        public Guid ActorId { get; set; }
-        public Guid OrganizationId { get; set; }
+        public Guid ActorId { get; }
+        public Guid OrganizationId { get; }
 
-        public Guid ExternalActorId { get; set; }
-        public string Gln { get; set; } = null!;
-        public ActorStatus Status { get; set; }
+        public Guid ExternalActorId { get; }
+        public string Gln { get; }
+        public ActorStatus Status { get; }
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
         public IEnumerable<EicFunction> MarketRoles { get; }

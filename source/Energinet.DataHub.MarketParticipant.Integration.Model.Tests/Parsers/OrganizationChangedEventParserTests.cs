@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Xunit;
@@ -36,8 +35,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Tests.Parsers
                 Guid.NewGuid(),
                 "0123456789012",
                 ActorStatus.Active,
-                Enumerable.Empty<BusinessRoleCode>(),
-                Enumerable.Empty<EicFunction>());
+                new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
+                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty });
 
             // act
             var actualBytes = target.Parse(@event);
