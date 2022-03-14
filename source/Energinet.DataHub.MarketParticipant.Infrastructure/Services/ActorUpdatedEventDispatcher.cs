@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -27,11 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class ActorUpdatedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IOrganizationChangedEventParser _eventParser;
+        private readonly IActorUpdatedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public ActorUpdatedEventDispatcher(
-            IOrganizationChangedEventParser eventParser,
+            IActorUpdatedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -42,22 +42,25 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
-            // todo: update integration package model to include OrganizationId
-            //var changedEvent = new OrganizationChangedEvent(
-            //    organizationChangedIntegrationEvent.Id,
-            //    organizationChangedIntegrationEvent.ActorId,
-            //    organizationChangedIntegrationEvent.Gln,
-            //    organizationChangedIntegrationEvent.Name);
+            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
+                actorUpdatedIntegrationEvent.Id,
+                actorUpdatedIntegrationEvent.ActorId,
+                actorUpdatedIntegrationEvent.OrganizationId.Value,
+                actorUpdatedIntegrationEvent.ExternalActorId.Value,
+                actorUpdatedIntegrationEvent.Gln.Value,
+                (ActorStatus)actorUpdatedIntegrationEvent.Status,
+                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
+                actorUpdatedIntegrationEvent.MarketRoles.Select(x => (EicFunction)x));
 
-            //var bytes = _eventParser.Parse(changedEvent);
-            //var message = new ServiceBusMessage(bytes);
+            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            var message = new ServiceBusMessage(bytes);
 
-            //await using var sender = _serviceBusClient.CreateSender();
+            await using var sender = _serviceBusClient.CreateSender();
 
-            //await sender.SendMessageAsync(message).ConfigureAwait(false);
+            await sender.SendMessageAsync(message).ConfigureAwait(false);
             return true;
         }
     }
