@@ -39,6 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         DbSet<ContactEntity> Contacts { get; }
 
         /// <summary>
+        ///     Represent access to the DomainEvents database table
+        /// </summary>
+        DbSet<DomainEventEntity> DomainEvents { get; }
+
+        /// <summary>
         ///     Saves changes to the database.
         /// </summary>
         Task<int> SaveChangesAsync();

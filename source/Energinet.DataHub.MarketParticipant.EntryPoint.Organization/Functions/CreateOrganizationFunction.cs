@@ -33,7 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             _mediator = mediator;
         }
 
-        // TODO: Should this be REST?
         [Function("CreateOrganization")]
         public Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
@@ -66,9 +65,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
             try
             {
+                // TODO: Use the new lib?
                 var organizationDto = await JsonSerializer
                     .DeserializeAsync<OrganizationDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty, string.Empty);
+                    .ConfigureAwait(false) ?? new OrganizationDto(string.Empty);
 
                 return new CreateOrganizationCommand(organizationDto);
             }

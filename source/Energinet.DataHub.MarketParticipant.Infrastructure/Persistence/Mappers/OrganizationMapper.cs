@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
@@ -26,22 +25,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         public static void MapToEntity(Organization from, OrganizationEntity to)
         {
             to.Id = from.Id.Value;
-            to.ActorId = from.ActorId;
-            to.Gln = from.Gln.Value;
             to.Name = from.Name;
 
-            var roleEntities = to.Roles.ToDictionary(x => x.Id);
-            foreach (var role in from.Roles)
+            var actorEntities = to.Actors.ToDictionary(x => x.Id);
+
+            foreach (var actor in from.Actors)
             {
-                if (roleEntities.TryGetValue(role.Id, out var existing))
+                if (actorEntities.TryGetValue(actor.Id, out var existing))
                 {
-                    MapRoleEntity(role, existing);
+                    MapActorEntity(actor, existing);
                 }
                 else
                 {
-                    var newRole = new OrganizationRoleEntity();
-                    MapRoleEntity(role, newRole);
-                    to.Roles.Add(newRole);
+                    var newActor = new ActorEntity();
+                    MapActorEntity(actor, newActor);
+                    to.Actors.Add(newActor);
                 }
             }
         }
@@ -50,22 +48,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         {
             return new Organization(
                 new OrganizationId(from.Id),
-                from.ActorId,
-                new GlobalLocationNumber(from.Gln),
                 from.Name,
-                MapEntitiesToRoles(from.Roles));
+                MapEntitiesToActors(from.Actors));
         }
 
-        private static void MapRoleEntity(IOrganizationRole from, OrganizationRoleEntity to)
+        private static void MapActorEntity(Actor from, ActorEntity to)
         {
             to.Id = from.Id;
+            to.ActorId = from.ExternalActorId.Value;
+            to.Gln = from.Gln.Value;
             to.Status = (int)from.Status;
-            to.BusinessRole = (int)from.Code;
-            if (from.Area != null)
+
+            if (from.Areas.Any())
             {
-                var gridArea = to.GridArea ?? new GridAreaEntity();
-                GridAreaMapper.MapToEntity(@from.Area, gridArea);
-                to.GridArea = gridArea;
+                var gridArea = to.SingleGridArea ?? new GridAreaEntity();
+                GridAreaMapper.MapToEntity(from.Areas.Single(), gridArea);
+                to.SingleGridArea = gridArea;
             }
 
             // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
@@ -83,78 +81,30 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             }
         }
 
-        private static IEnumerable<IOrganizationRole> MapEntitiesToRoles(IEnumerable<OrganizationRoleEntity> roles)
+        private static IEnumerable<Actor> MapEntitiesToActors(IEnumerable<ActorEntity> actors)
         {
-            return roles.Select(role =>
+            return actors.Select(actor =>
             {
-                var marketRoles = role.MarketRoles.Select(marketRole =>
+                var marketRoles = actor.MarketRoles.Select(marketRole =>
                 {
                     var function = (EicFunction)marketRole.Function;
                     return new MarketRole(function);
                 });
 
-                var businessRole = (BusinessRoleCode)role.BusinessRole;
-                var roleStatus = (RoleStatus)role.Status;
-                var gridArea = role.GridArea != null ? GridAreaMapper.MapFromEntity(role.GridArea) : null;
+                var actorGln = new GlobalLocationNumber(actor.Gln);
+                var actorStatus = (ActorStatus)actor.Status;
+                var gridArea = actor.SingleGridArea != null
+                    ? new[] { GridAreaMapper.MapFromEntity(actor.SingleGridArea) }
+                    : Array.Empty<GridArea>();
 
-                return (IOrganizationRole)(businessRole switch
-                {
-                    BusinessRoleCode.Ddk => new BalanceResponsiblePartyRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Ddm => new GridAccessProviderRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Ddq => new BalancePowerSupplierRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Ddx => new ImbalanceSettlementResponsibleRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Ddz => new MeteringPointAdministratorRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Dea => new MeteredDataAggregatorRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Ez => new SystemOperatorRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Mdr => new MeteredDataResponsibleRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    BusinessRoleCode.Sts => new DanishEnergyAgencyRole(
-                        role.Id,
-                        roleStatus,
-                        gridArea,
-                        marketRoles,
-                        role.MeteringPointTypes),
-                    _ => throw new ArgumentOutOfRangeException(nameof(role))
-                });
+                return new Actor(
+                    actor.Id,
+                    new ExternalActorId(actor.ActorId),
+                    actorGln,
+                    actorStatus,
+                    gridArea,
+                    marketRoles,
+                    actor.MeteringPointTypes);
             }).ToList();
         }
     }

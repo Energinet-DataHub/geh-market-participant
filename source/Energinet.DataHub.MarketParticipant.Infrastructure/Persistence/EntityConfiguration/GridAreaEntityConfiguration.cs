@@ -26,8 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             Guard.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("GridAreaNew");
             builder.HasKey(gridArea => gridArea.Id);
-            builder.Property(p => p.Id)
-                .ValueGeneratedOnAdd();
+            builder.Property(p => p.Id).ValueGeneratedOnAdd();
         }
     }
 }

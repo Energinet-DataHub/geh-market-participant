@@ -16,7 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -24,24 +24,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
-        private readonly IOrganizationFactoryService _organizationFactoryService;
+        private readonly IOrganizationRepository _organizationRepository;
 
-        public CreateOrganizationHandler(IOrganizationFactoryService organizationFactoryService)
+        public CreateOrganizationHandler(IOrganizationRepository organizationRepository)
         {
-            _organizationFactoryService = organizationFactoryService;
+            _organizationRepository = organizationRepository;
         }
 
         public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var gln = new GlobalLocationNumber(request.Organization.Gln);
+            var organization = new Organization(request.Organization.Name);
 
-            var organization = await _organizationFactoryService
-                .CreateAsync(gln, request.Organization.Name)
+            var organizationId = await _organizationRepository
+                .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            return new CreateOrganizationResponse(organization.Id.Value.ToString());
+            return new CreateOrganizationResponse(organizationId.Value.ToString());
         }
     }
 }

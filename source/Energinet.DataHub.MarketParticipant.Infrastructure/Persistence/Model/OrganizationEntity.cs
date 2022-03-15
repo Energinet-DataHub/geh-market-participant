@@ -21,16 +21,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public OrganizationEntity()
         {
-            Gln = string.Empty;
             Name = string.Empty;
-            Roles = new Collection<OrganizationRoleEntity>();
+            Actors = new Collection<ActorEntity>();
         }
 
         public Guid Id { get; set; }
-        public Guid ActorId { get; set; }
-        public string Gln { get; set; }
         public string Name { get; set; }
 
-        public Collection<OrganizationRoleEntity> Roles { get; }
+        public Collection<ActorEntity> Actors { get; }
     }
 }
