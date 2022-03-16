@@ -13,11 +13,6 @@ VALUES (N'c2059ddf-ad04-4a99-bc98-2c6fde857025', N'8100000000204', 1, N'DDM,MDR'
 INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name])
 VALUES (N'ef69b130-1ead-4e58-a926-a2b1154d7e2a', N'8100000000207', 1, N'DDM,MDR', 1, N'Volt T-001')
 
-INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name])
-VALUES (N'31e83b3a-22d3-49ce-bdf1-2d456205f0d1', N'8100000000209', 1, N'DDM,MDR', 1, N'endk-DDM6')
-
-INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name])
-VALUES (N'd2eabcd3-3ed1-4dea-a5be-f043b703dac0', N'8100000000213', 1, N'DDM,MDR', 1, N'endk-DDM4')
 GO
 
 --Add the new grid Areas
@@ -40,14 +35,6 @@ VALUES (N'e2b2ea7b-4300-4cb0-93cc-ee33ab8f3b30', 37, N'120', N'KMDTest5', N'DK1'
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
 VALUES (N'd45f9498-1954-4c7d-8e9c-0d4a2aba058b', 38, N'123', N'KMDTest5', N'DK1', 1,
         N'ef69b130-1ead-4e58-a926-a2b1154d7e2a')
-
-INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
-VALUES (n'15bc0fbe-1ee2-476b-87df-b6d737bc527a', 39, N'125', N'KMDTest4', N'DK1', 1,
-        N'31e83b3a-22d3-49ce-bdf1-2d456205f0d1')
-
-INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
-VALUES (N'f1294a65-18d9-40d2-9996-19fd4c9636e9', 40, N'128', N'KMDTest6', N'DK1', 1,
-        N'd2eabcd3-3ed1-4dea-a5be-f043b703dac0')
 GO
 
 --Add Grid Area Links
@@ -67,12 +54,6 @@ VALUES (N'c86fd83f-c8ec-45a0-8915-54aba3b99e4e', N'e2b2ea7b-4300-4cb0-93cc-ee33a
 
 INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId])
 VALUES (N'39a4c1da-3d20-43be-a84b-92361e5dde6a', N'd45f9498-1954-4c7d-8e9c-0d4a2aba058b', 38)
-
-INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId])
-VALUES (N'fe70d76f-a29e-4d2b-a14d-49d3ce042bca', N'15bc0fbe-1ee2-476b-87df-b6d737bc527a', 39)
-
-INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId])
-VALUES (N'70b700f3-2263-49cc-affd-c91182acdb7c', N'f1294a65-18d9-40d2-9996-19fd4c9636e9', 40)
 
 SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] OFF
 GO
