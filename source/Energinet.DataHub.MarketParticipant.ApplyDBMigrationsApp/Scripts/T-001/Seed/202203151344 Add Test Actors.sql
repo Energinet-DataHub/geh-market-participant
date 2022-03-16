@@ -12,12 +12,11 @@ VALUES (N'c2059ddf-ad04-4a99-bc98-2c6fde857025', N'8100000000204', 1, N'DDM,MDR'
 
 INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name])
 VALUES (N'ef69b130-1ead-4e58-a926-a2b1154d7e2a', N'8100000000207', 1, N'DDM,MDR', 1, N'Volt T-001')
-
 GO
 
 --Add the new grid Areas
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
-VALUES (n'2285dcb4-0bdd-4ec9-90cc-d757a062fb86', 34, N'116', N'KMDTest4', N'DK1', 1,
+VALUES (N'2285dcb4-0bdd-4ec9-90cc-d757a062fb86', 34, N'116', N'KMDTest4', N'DK1', 1,
         N'bb71f037-692d-4bcd-9c79-741ad90e33ca')
 
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
@@ -25,7 +24,7 @@ VALUES (N'62b86e5f-0216-4315-a3d5-a5523652c183', 35, N'117', N'KMDTest5', N'DK1'
         N'e52427c2-204b-4cf2-beec-35b95f935619')
 
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
-VALUES (n'f1b0d811-c334-44de-b5ba-79f17b807fbc', 36, N'119', N'KMDTest4', N'DK1', 1,
+VALUES (N'f1b0d811-c334-44de-b5ba-79f17b807fbc', 36, N'119', N'KMDTest4', N'DK1', 1,
         N'5ed12387-2926-4a93-a76c-e779d2b54f4a')
 
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId])
