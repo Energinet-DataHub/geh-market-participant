@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Microsoft.Extensions.Hosting;
 using SimpleInjector;
 

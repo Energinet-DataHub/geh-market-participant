@@ -14,25 +14,17 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation;
 using MediatR;
+using MediatR.Pipeline;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR
+namespace Energinet.DataHub.MarketParticipant.Common.MediatR
 {
-    internal sealed class ValidationPipelineBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class EmptyRequestPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
-        private readonly IValidator<TRequest> _requestValidator;
-
-        public ValidationPipelineBehaviour(IValidator<TRequest> requestValidator)
+        public Task Process(TRequest request, TResponse response, CancellationToken cancellationToken)
         {
-            _requestValidator = requestValidator;
-        }
-
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
-        {
-            await _requestValidator.ValidateAndThrowAsync(request, cancellationToken).ConfigureAwait(false);
-            return await next().ConfigureAwait(false);
+            return Task.CompletedTask;
         }
     }
 }

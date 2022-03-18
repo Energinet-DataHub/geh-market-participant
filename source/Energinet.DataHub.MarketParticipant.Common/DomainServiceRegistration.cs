@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
+namespace Energinet.DataHub.MarketParticipant.Common
 {
     internal static class DomainServiceRegistration
     {

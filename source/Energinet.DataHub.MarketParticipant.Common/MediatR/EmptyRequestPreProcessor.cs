@@ -14,15 +14,14 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using MediatR;
 using MediatR.Pipeline;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR
+namespace Energinet.DataHub.MarketParticipant.Common.MediatR
 {
-    public class EmptyRequestPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    public class EmptyRequestPreProcessor<TRequest> : IRequestPreProcessor<TRequest>
+        where TRequest : notnull
     {
-        public Task Process(TRequest request, TResponse response, CancellationToken cancellationToken)
+        public Task Process(TRequest request, CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }

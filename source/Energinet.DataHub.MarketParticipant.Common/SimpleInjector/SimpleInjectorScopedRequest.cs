@@ -19,7 +19,7 @@ using Microsoft.Azure.Functions.Worker.Middleware;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector
+namespace Energinet.DataHub.MarketParticipant.Common.SimpleInjector
 {
     public sealed class SimpleInjectorScopedRequest : IFunctionsWorkerMiddleware
     {
