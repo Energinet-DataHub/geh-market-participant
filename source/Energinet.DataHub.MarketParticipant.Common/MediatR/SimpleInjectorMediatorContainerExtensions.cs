@@ -19,7 +19,7 @@ using MediatR;
 using MediatR.Pipeline;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR
+namespace Energinet.DataHub.MarketParticipant.Common.MediatR
 {
     internal static class SimpleInjectorMediatorContainerExtensions
     {

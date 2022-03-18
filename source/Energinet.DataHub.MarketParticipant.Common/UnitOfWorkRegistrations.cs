@@ -12,27 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Utilities;
-using Microsoft.Azure.Functions.Worker;
+using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Infrastructure;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector
+namespace Energinet.DataHub.MarketParticipant.Common
 {
-    public sealed class SimpleInjectorActivator : IFunctionActivator
+    internal static class UnitOfWorkRegistrations
     {
-        private readonly Container _container;
-
-        public SimpleInjectorActivator(Container container)
+        public static void AddUnitOfWorkProvider(this Container container)
         {
-            _container = container;
-        }
-
-        public object CreateInstance(Type instanceType, FunctionContext context)
-        {
-            Guard.ThrowIfNull(instanceType, nameof(instanceType));
-
-            return _container.GetInstance(instanceType);
+            container.Register<IUnitOfWorkProvider, UnitOfWorkProvider>();
         }
     }
 }

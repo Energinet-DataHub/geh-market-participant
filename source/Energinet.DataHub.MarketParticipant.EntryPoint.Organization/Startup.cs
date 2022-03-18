@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
 using SimpleInjector;

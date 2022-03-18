@@ -14,8 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Domain;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;

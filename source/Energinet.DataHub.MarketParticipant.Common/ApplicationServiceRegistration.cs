@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using FluentValidation;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common
+namespace Energinet.DataHub.MarketParticipant.Common
 {
     internal static class ApplicationServiceRegistration
     {
