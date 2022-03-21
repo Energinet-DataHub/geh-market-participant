@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -308,6 +309,33 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
+        public async Task GetAsync_All_ReturnsAllOrganizations()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepository2 = new OrganizationRepository(context2);
+
+            var globalLocationNumber = new MockedGln();
+            var organization = new Organization("Test");
+
+            organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+
+            // Act
+            var organizations = await orgRepository2
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.NotEmpty(organizations);
+        }
+
+        [Fact]
         public async Task GetAsync_GlobalLocationNumber_CanReadBack()
         {
             // Arrange
@@ -319,7 +347,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var globalLocationNumber = new GlobalLocationNumber("00000000");
+            var globalLocationNumber = new MockedGln();
             var organization = new Organization("Test");
 
             organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));

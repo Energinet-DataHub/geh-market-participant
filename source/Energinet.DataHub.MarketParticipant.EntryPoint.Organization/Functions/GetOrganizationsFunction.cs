@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
@@ -25,26 +22,26 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public sealed class CreateActorFunction
+    public sealed class GetOrganizationsFunction
     {
         private readonly IMediator _mediator;
 
-        public CreateActorFunction(IMediator mediator)
+        public GetOrganizationsFunction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [Function("CreateActor")]
+        [Function("GetOrganizations")]
         public Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
             HttpRequestData request)
         {
             return request.ProcessAsync(async () =>
             {
-                var addOrganizationRoleCommand = await CreateActorCommandAsync(request).ConfigureAwait(false);
+                var getOrganizationsCommand = new GetOrganizationsCommand();
 
                 var response = await _mediator
-                    .Send(addOrganizationRoleCommand)
+                    .Send(getOrganizationsCommand)
                     .ConfigureAwait(false);
 
                 var responseData = request.CreateResponse(HttpStatusCode.OK);
@@ -55,30 +52,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
                 return responseData;
             });
-        }
-
-        private static async Task<CreateActorCommand> CreateActorCommandAsync(HttpRequestData request)
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            try
-            {
-                var actorDto = await JsonSerializer
-                    .DeserializeAsync<ChangeActorDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new ChangeActorDto(new GlobalLocationNumberDto(string.Empty), Array.Empty<MarketRoleDto>());
-
-                var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
-                var organizationId = query.Get("organizationId") ?? string.Empty;
-
-                return new CreateActorCommand(organizationId, actorDto);
-            }
-            catch (JsonException)
-            {
-                throw new ValidationException("The body of the request could not be read.");
-            }
         }
     }
 }

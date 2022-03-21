@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record CreateOrganizationCommand(ChangeOrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    public sealed record GetOrganizationsResponse(IEnumerable<OrganizationDto> Organizations);
 }

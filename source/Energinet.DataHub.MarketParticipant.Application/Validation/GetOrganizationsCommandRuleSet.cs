@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed record CreateOrganizationCommand(ChangeOrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    public sealed class GetOrganizationsCommandRuleSet : AbstractValidator<GetOrganizationsCommand>
+    {
+    }
 }
