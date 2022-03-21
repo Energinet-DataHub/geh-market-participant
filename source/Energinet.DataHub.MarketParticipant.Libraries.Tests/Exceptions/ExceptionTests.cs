@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Tests.Exceptions
+namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Exceptions
 {
     [UnitTest]
     public class ExceptionTests

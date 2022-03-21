@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new ActorDto(
                 actor.Id.ToString(),
                 actor.ExternalActorId.ToString(),
-                new GlobalLocationNumberDto(actor.Gln.ToString()),
+                new GlobalLocationNumberDto(actor.Gln.Value),
                 actor.Status.ToString(),
                 actor.MarketRoles.Select(Map).ToList());
         }

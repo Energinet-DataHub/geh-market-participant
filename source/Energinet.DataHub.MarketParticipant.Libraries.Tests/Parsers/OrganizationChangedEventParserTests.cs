@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Tests.Parsers
+namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 {
     [UnitTest]
     public class OrganizationChangedEventParserTests
