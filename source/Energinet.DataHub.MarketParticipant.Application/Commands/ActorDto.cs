@@ -16,5 +16,10 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record ActorDto(string Gln, IEnumerable<MarketRoleDto> MarketRoles);
+    public sealed record ActorDto(
+        string ActorId,
+        string ExternalActorId,
+        GlobalLocationNumberDto Gln,
+        string Status,
+        IEnumerable<MarketRoleDto> MarketRoles);
 }

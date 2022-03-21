@@ -47,6 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
         protected override void Configure(Container container)
         {
+            Container.Register<GetOrganizationsFunction>();
             Container.Register<CreateOrganizationFunction>();
             Container.Register<CreateActorFunction>();
             Container.Register<UpdateOrganizationFunction>();
