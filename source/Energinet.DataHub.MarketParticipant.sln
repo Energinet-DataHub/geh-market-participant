@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8D1A117E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Energinet.DataHub.MarketParticipant.Common", "Energinet.DataHub.MarketParticipant.Common\Energinet.DataHub.MarketParticipant.Common.csproj", "{EDD2F341-6D5D-40CB-992A-EBB5D3B99687}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi", "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.csproj", "{3DC88C36-187A-45C3-BC66-5F95A8512BBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{EDD2F341-6D5D-40CB-992A-EBB5D3B99687}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDD2F341-6D5D-40CB-992A-EBB5D3B99687}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDD2F341-6D5D-40CB-992A-EBB5D3B99687}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DC88C36-187A-45C3-BC66-5F95A8512BBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DC88C36-187A-45C3-BC66-5F95A8512BBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DC88C36-187A-45C3-BC66-5F95A8512BBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DC88C36-187A-45C3-BC66-5F95A8512BBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
