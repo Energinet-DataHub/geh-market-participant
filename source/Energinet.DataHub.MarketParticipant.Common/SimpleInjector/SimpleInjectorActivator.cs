@@ -12,18 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR.Pipeline;
+using System;
+using Energinet.DataHub.MarketParticipant.Utilities;
+using Microsoft.Azure.Functions.Worker;
+using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.MediatR
+namespace Energinet.DataHub.MarketParticipant.Common.SimpleInjector
 {
-    public class EmptyRequestPreProcessor<TRequest> : IRequestPreProcessor<TRequest>
-        where TRequest : notnull
+    public sealed class SimpleInjectorActivator : IFunctionActivator
     {
-        public Task Process(TRequest request, CancellationToken cancellationToken)
+        private readonly Container _container;
+
+        public SimpleInjectorActivator(Container container)
         {
-            return Task.CompletedTask;
+            _container = container;
+        }
+
+        public object CreateInstance(Type instanceType, FunctionContext context)
+        {
+            Guard.ThrowIfNull(instanceType, nameof(instanceType));
+
+            return _container.GetInstance(instanceType);
         }
     }
 }

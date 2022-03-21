@@ -16,7 +16,7 @@ using System;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector
+namespace Energinet.DataHub.MarketParticipant.Common.SimpleInjector
 {
     public sealed class SimpleInjectorServiceProviderAdapter : IServiceProvider
     {
