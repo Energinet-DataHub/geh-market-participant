@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organization = new Organization(request.CreateOrganization.Name);
+            var organization = new Organization(request.Organization.Name);
 
             var organizationId = await _organizationRepository
                 .AddOrUpdateAsync(organization)

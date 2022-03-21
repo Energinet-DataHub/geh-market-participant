@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_ActorDto_ValidatesProperty()
         {
             // Arrange
-            const string propertyName = nameof(CreateActorCommand.CreateActor);
+            const string propertyName = nameof(CreateActorCommand.Actor);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, null!);
@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(CreateActorCommand.OrganizationId);
 
-            var actorDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), Array.Empty<MarketRoleDto>());
+            var actorDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), Array.Empty<MarketRoleDto>());
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(value, actorDto);
@@ -85,9 +85,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_ActorGln_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.CreateActor)}.{nameof(CreateActorDto.Gln)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ChangeActorDto.Gln)}";
 
-            var actorDto = new CreateActorDto(new GlobalLocationNumberDto(value), Array.Empty<MarketRoleDto>());
+            var actorDto = new ChangeActorDto(new GlobalLocationNumberDto(value), Array.Empty<MarketRoleDto>());
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, actorDto);
@@ -112,9 +112,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRole_ValidatesProperty()
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.CreateActor)}.{nameof(CreateActorDto.MarketRoles)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ChangeActorDto.MarketRoles)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), null!);
+            var organizationRoleDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), null!);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, organizationRoleDto);
@@ -131,9 +131,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_NullMarketRole_ValidatesProperty()
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.CreateActor)}.{nameof(CreateActorDto.MarketRoles)}[0]";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ChangeActorDto.MarketRoles)}[0]";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), new MarketRoleDto[] { null! });
+            var organizationRoleDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), new MarketRoleDto[] { null! });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, organizationRoleDto);
@@ -158,9 +158,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.CreateActor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ChangeActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), new[] { new MarketRoleDto(value) });
+            var organizationRoleDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), new[] { new MarketRoleDto(value) });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(ValidId, organizationRoleDto);

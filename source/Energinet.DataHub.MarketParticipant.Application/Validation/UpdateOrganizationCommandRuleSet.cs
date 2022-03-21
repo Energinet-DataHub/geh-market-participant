@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public UpdateOrganizationCommandRuleSet()
         {
-            RuleFor(command => command.CreateOrganization)
+            RuleFor(command => command.Organization)
                 .NotNull()
                 .ChildRules(validator =>
                 {

@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationDto_ValidatesProperty()
         {
             // Arrange
-            const string propertyName = nameof(CreateOrganizationCommand.CreateOrganization);
+            const string propertyName = nameof(CreateOrganizationCommand.Organization);
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(null!);
@@ -51,9 +51,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationName_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.CreateOrganization)}.{nameof(CreateOrganizationDto.Name)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
 
-            var organizationDto = new CreateOrganizationDto(value);
+            var organizationDto = new ChangeOrganizationDto(value);
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
