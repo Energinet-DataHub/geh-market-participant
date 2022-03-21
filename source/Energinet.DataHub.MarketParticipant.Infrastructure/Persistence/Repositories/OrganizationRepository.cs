@@ -68,6 +68,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return org is not null ? OrganizationMapper.MapFromEntity(org) : null;
         }
 
+        public async Task<IEnumerable<Organization>> GetAsync()
+        {
+            var entities = await GetOrganizationQuery()
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return entities.Select(OrganizationMapper.MapFromEntity);
+        }
+
         public async Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber)
         {
             Guard.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
