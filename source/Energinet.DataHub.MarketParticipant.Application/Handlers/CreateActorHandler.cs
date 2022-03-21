@@ -64,9 +64,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new CreateActorResponse(actor.Id.ToString());
         }
 
-        private static IEnumerable<MarketRole> CreateMarketRoles(ChangeActorDto changeActorDto)
+        private static IEnumerable<MarketRole> CreateMarketRoles(ChangeActorDto actorDto)
         {
-            foreach (var marketRole in changeActorDto.MarketRoles)
+            foreach (var marketRole in actorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.Function, true);
                 yield return new MarketRole(function);

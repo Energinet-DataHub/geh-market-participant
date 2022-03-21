@@ -33,7 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 {
                     validator
                         .RuleFor(actor => actor.Gln)
-                        .NotNull()
                         .SetValidator(new GlobalLocationNumberValidationRule<ChangeActorDto>());
 
                     validator
