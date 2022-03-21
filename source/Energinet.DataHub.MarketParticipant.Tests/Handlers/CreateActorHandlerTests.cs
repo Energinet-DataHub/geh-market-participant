@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 "62A79F4A-CB51-4D1E-8B4B-9A9BF3FB2BD4",
-                new ActorDto("fake_value", Array.Empty<MarketRoleDto>()));
+                new CreateActorDto(new GlobalLocationNumberDto("fake_value"), Array.Empty<MarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -98,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId.ToString(),
-                new ActorDto(actorGln, Array.Empty<MarketRoleDto>()));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>()));
 
             // Act
             var response = await target

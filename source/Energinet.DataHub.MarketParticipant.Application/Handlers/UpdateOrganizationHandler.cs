@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(organizationId.Value);
             }
 
-            organization.Name = request.Organization.Name;
+            organization.Name = request.CreateOrganization.Name;
 
             await _organizationRepository
                 .AddOrUpdateAsync(organization)

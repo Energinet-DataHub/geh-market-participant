@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(g => g.Name == name)))
                 .ReturnsAsync(new OrganizationId(Guid.NewGuid()));
 
-            var command = new CreateOrganizationCommand(new OrganizationDto(name));
+            var command = new CreateOrganizationCommand(new CreateOrganizationDto(name));
 
             // Act
             var response = await target

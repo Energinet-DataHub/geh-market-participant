@@ -27,14 +27,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 .NotEmpty()
                 .SetValidator(new GuidValidationRule<CreateActorCommand>());
 
-            RuleFor(command => command.Actor)
+            RuleFor(command => command.CreateActor)
                 .NotNull()
                 .ChildRules(validator =>
                 {
                     validator
                         .RuleFor(actor => actor.Gln)
-                        .NotEmpty()
-                        .SetValidator(new GlobalLocationNumberValidationRule<ActorDto>());
+                        .NotNull()
+                        .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>());
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)

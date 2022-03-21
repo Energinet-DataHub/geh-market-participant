@@ -54,8 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(organizationId.Value);
             }
 
-            var actorGln = new GlobalLocationNumber(request.Actor.Gln);
-            var actorRoles = CreateMarketRoles(request.Actor).ToList();
+            var actorGln = new GlobalLocationNumber(request.CreateActor.Gln.Value);
+            var actorRoles = CreateMarketRoles(request.CreateActor).ToList();
 
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorGln, actorRoles)
@@ -64,9 +64,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new CreateActorResponse(actor.Id.ToString());
         }
 
-        private static IEnumerable<MarketRole> CreateMarketRoles(ActorDto actorDto)
+        private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto createActorDto)
         {
-            foreach (var marketRole in actorDto.MarketRoles)
+            foreach (var marketRole in createActorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.Function, true);
                 yield return new MarketRole(function);

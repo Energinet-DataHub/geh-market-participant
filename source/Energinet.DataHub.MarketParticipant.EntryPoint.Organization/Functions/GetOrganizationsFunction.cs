@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.ComponentModel.DataAnnotations;
 using System.Net;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
@@ -24,26 +22,26 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 {
-    public sealed class CreateOrganizationFunction
+    public sealed class GetOrganizationsFunction
     {
         private readonly IMediator _mediator;
 
-        public CreateOrganizationFunction(IMediator mediator)
+        public GetOrganizationsFunction(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [Function("CreateOrganization")]
+        [Function("GetOrganizations")]
         public Task<HttpResponseData> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get")]
             HttpRequestData request)
         {
             return request.ProcessAsync(async () =>
             {
-                var createOrganizationCommand = await CreateOrganizationCommandAsync(request).ConfigureAwait(false);
+                var getOrganizationsCommand = new GetOrganizationsCommand();
 
                 var response = await _mediator
-                    .Send(createOrganizationCommand)
+                    .Send(getOrganizationsCommand)
                     .ConfigureAwait(false);
 
                 var responseData = request.CreateResponse(HttpStatusCode.OK);
@@ -54,28 +52,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
 
                 return responseData;
             });
-        }
-
-        private static async Task<CreateOrganizationCommand> CreateOrganizationCommandAsync(HttpRequestData request)
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-
-            try
-            {
-                // TODO: Use the new lib?
-                var organizationDto = await JsonSerializer
-                    .DeserializeAsync<CreateOrganizationDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new CreateOrganizationDto(string.Empty);
-
-                return new CreateOrganizationCommand(organizationDto);
-            }
-            catch (JsonException)
-            {
-                throw new ValidationException("The body of the request could not be read.");
-            }
         }
     }
 }
