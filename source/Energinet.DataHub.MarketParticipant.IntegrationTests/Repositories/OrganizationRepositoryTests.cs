@@ -334,7 +334,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(organizations);
             var expected = organizations.First();
-            Assert.Equal(globalLocationNumber, expected.Actors.Single().Gln);
+            Assert.Equal(globalLocationNumber, expected.Actors.First().Gln);
         }
 
         [Fact]
