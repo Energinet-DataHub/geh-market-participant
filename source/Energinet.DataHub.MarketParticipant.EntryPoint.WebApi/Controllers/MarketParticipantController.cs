@@ -66,5 +66,17 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 ? Ok(response)
                 : NotFound();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOrganizationAsync(ChangeOrganizationDto organization)
+        {
+            var getSingleOrganizationCommand = new CreateOrganizationCommand(organization);
+
+            var response = await _mediator
+                .Send(getSingleOrganizationCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
     }
 }
