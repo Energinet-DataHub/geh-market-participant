@@ -18,7 +18,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Client.Extensions
 {
     public static class ContainerExtensions
     {
