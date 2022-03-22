@@ -14,11 +14,15 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.Common;
+using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using SimpleInjector;
 using Xunit;
@@ -71,6 +75,26 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         {
             public Action? ConfigureContainer { get; init; }
 
+            protected override void Configure(IServiceCollection services)
+            {
+            }
+
+            protected override void ConfigureSimpleInjector(IServiceCollection services)
+            {
+                var descriptor = new ServiceDescriptor(
+                    typeof(IFunctionActivator),
+                    typeof(SimpleInjectorActivator),
+                    ServiceLifetime.Singleton);
+
+                services.Replace(descriptor);
+
+                services.AddSimpleInjector(Container, x =>
+                {
+                    x.DisposeContainerWithServiceProvider = false;
+                    x.AddLogging();
+                });
+            }
+
             protected override void Configure(Container container)
             {
                 AddMockConfiguration(container);
@@ -81,6 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             {
                 container.Options.AllowOverridingRegistrations = true;
                 container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
+                container.Register(() => new Mock<IUnitOfWorkProvider>().Object);
                 container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
             }
         }

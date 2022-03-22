@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using SimpleInjector;
 using Xunit;
 using Xunit.Categories;

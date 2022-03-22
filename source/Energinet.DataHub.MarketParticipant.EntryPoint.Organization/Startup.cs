@@ -12,20 +12,48 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Common;
+using Energinet.DataHub.MarketParticipant.Common;
+using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 {
     internal sealed class Startup : StartupBase
     {
+        protected override void Configure(IServiceCollection services)
+        {
+        }
+
+        protected override void ConfigureSimpleInjector(IServiceCollection services)
+        {
+            var descriptor = new ServiceDescriptor(
+                typeof(IFunctionActivator),
+                typeof(SimpleInjectorActivator),
+                ServiceLifetime.Singleton);
+
+            services.Replace(descriptor);
+
+            services.AddSimpleInjector(Container, x =>
+            {
+                x.DisposeContainerWithServiceProvider = false;
+                x.AddLogging();
+            });
+        }
+
         protected override void Configure(Container container)
         {
+            Container.Register<GetOrganizationsFunction>();
             Container.Register<CreateOrganizationFunction>();
-            Container.Register<AddOrganizationRoleFunction>();
+            Container.Register<CreateActorFunction>();
+            Container.Register<UpdateOrganizationFunction>();
+            Container.Register<UpdateActorFunction>();
             Container.Register<HealthFunction>();
+            Container.Register<DispatchEventsTimerTrigger>();
 
             // health check
             container.Register<ISqlDatabaseVerifier, SqlDatabaseVerifier>(Lifestyle.Scoped);

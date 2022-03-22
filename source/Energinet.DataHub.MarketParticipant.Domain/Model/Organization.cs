@@ -16,54 +16,29 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class Organization
     {
-        private readonly ICollection<IOrganizationRole> _roles;
-
-        public Organization(
-            Guid actorId,
-            GlobalLocationNumber gln,
-            string name)
+        public Organization(string name)
         {
             Id = new OrganizationId(Guid.Empty);
-            ActorId = actorId;
-            Gln = gln;
             Name = name;
-            _roles = new Collection<IOrganizationRole>();
+            Actors = new Collection<Actor>();
         }
 
-        public Organization(
-            OrganizationId id,
-            Guid actorId,
-            GlobalLocationNumber gln,
-            string name,
-            IEnumerable<IOrganizationRole> roles)
+        public Organization(OrganizationId id, string name, IEnumerable<Actor> actors)
         {
             Id = id;
-            ActorId = actorId;
-            Gln = gln;
             Name = name;
-            _roles = roles.ToList();
+            Actors = actors.ToList();
         }
 
         public OrganizationId Id { get; }
-        public Guid ActorId { get; }
 
-        public GlobalLocationNumber Gln { get; }
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public IEnumerable<IOrganizationRole> Roles => _roles;
-
-        public void AddRole(IOrganizationRole organizationRole)
-        {
-            Guard.ThrowIfNull(organizationRole, nameof(organizationRole));
-
-            // TODO: Validation rules. Check for conflicting roles.
-            _roles.Add(organizationRole);
-        }
+        public ICollection<Actor> Actors { get; }
     }
 }

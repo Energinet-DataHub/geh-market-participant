@@ -25,11 +25,11 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
+    <PackageReference Include="Ardalis.SmartEnum" Version="2.0.1" />
   </ItemGroup>
 
 </Project>

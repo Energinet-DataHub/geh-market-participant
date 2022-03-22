@@ -22,8 +22,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         Ddx = 4,
         Ddz = 5,
         Dea = 6,
-        Ez = 7,
+        Dlg = 7,
         Mdr = 8,
-        Sts = 9
+        Sts = 9,
+        Ez = 10
     }
 }

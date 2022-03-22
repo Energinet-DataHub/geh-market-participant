@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public class CreateOrganizationCommandRuleSet : AbstractValidator<CreateOrganizationCommand>
+    public sealed class CreateOrganizationCommandRuleSet : AbstractValidator<CreateOrganizationCommand>
     {
         public CreateOrganizationCommandRuleSet()
         {
@@ -30,11 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(organization => organization.Name)
                         .NotEmpty()
                         .Length(1, 50);
-
-                    validator
-                        .RuleFor(organization => organization.Gln)
-                        .NotEmpty()
-                        .SetValidator(new GlobalLocationNumberValidationRule<OrganizationDto>());
                 });
         }
     }

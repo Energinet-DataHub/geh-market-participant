@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfi
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
+using SmartEnum.EFCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
@@ -34,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
         public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
+        public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
 
         public Task<int> SaveChangesAsync()
         {
@@ -44,9 +46,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         {
             Guard.ThrowIfNull(modelBuilder, nameof(modelBuilder));
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new OrganizationRoleEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
+            modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -15,18 +15,19 @@
 using System;
 using System.Globalization;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using FluentValidation;
 using FluentValidation.Validators;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
-    public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, string>
+    public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, GlobalLocationNumberDto?>
     {
         public override string Name => "GlobalLocationNumberValidation";
 
-        public override bool IsValid(ValidationContext<T> context, string value)
+        public override bool IsValid(ValidationContext<T> context, GlobalLocationNumberDto? value)
         {
-            return !string.IsNullOrEmpty(value) && IsValidGlnNumber(value);
+            return !string.IsNullOrEmpty(value?.Value) && IsValidGlnNumber(value.Value);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)

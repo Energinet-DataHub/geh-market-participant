@@ -13,16 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Roles;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
-using Xunit.Sdk;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
@@ -45,10 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization(
-                Guid.NewGuid(),
-                new GlobalLocationNumber(Guid.NewGuid().ToString()),
-                "Test");
+            var testOrg = new Organization("Test");
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
@@ -57,7 +52,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
-            Assert.Equal(testOrg.Gln.Value, newOrg?.Gln.Value);
             Assert.Equal(testOrg.Name, newOrg?.Name);
         }
 
@@ -86,12 +80,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var gln = new GlobalLocationNumber(Guid.NewGuid().ToString());
             var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization(
-                Guid.NewGuid(),
-                gln,
-                "Test");
+            var testOrg = new Organization("Test");
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
@@ -99,10 +89,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             newOrg = new Organization(
                 newOrg!.Id,
-                newOrg.ActorId,
-                gln,
                 "NewName",
-                newOrg.Roles);
+                newOrg.Actors);
 
             await orgRepository.AddOrUpdateAsync(newOrg).ConfigureAwait(false);
             newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -110,12 +98,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
-            Assert.Equal(gln.Value, newOrg?.Gln.Value);
             Assert.Equal("NewName", newOrg?.Name);
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_OrganizationRoleAdded_CanReadBack()
+        public async Task AddOrUpdateAsync_ActorAdded_CanReadBack()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
@@ -123,38 +110,43 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var organization = new Organization(
-                Guid.NewGuid(),
-                new GlobalLocationNumber(Guid.NewGuid().ToString()),
-                "Test");
-
-            organization.AddRole(new BalancePowerSupplierRole(
+            var initialActor = new Actor(
                 Guid.Empty,
-                RoleStatus.New,
-                new GridArea(
-                    new GridAreaId(Guid.Empty),
-                    new GridAreaName("fake_value"),
-                    new GridAreaCode("1234")),
-                new List<MarketRole>()));
+                new ExternalActorId(Guid.NewGuid()),
+                new GlobalLocationNumber(Guid.NewGuid().ToString()),
+                ActorStatus.New,
+                new[]
+                {
+                    new GridArea(
+                        new GridAreaId(Guid.Empty),
+                        new GridAreaName("fake_value"),
+                        new GridAreaCode("1234"))
+                },
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>());
+
+            var organization = new Organization("Test");
+            organization.Actors.Add(initialActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            organization!.AddRole(new DanishEnergyAgencyRole());
+            var newActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            organization!.Actors.Add(newActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(organization);
-            Assert.Equal(2, organization!.Roles.Count());
-            Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
-            Assert.Contains(organization.Roles, x => x is DanishEnergyAgencyRole);
+            Assert.Equal(2, organization!.Actors.Count);
+            Assert.Contains(organization.Actors, x => x.ExternalActorId == initialActor.ExternalActorId);
+            Assert.Contains(organization.Actors, x => x.ExternalActorId == newActor.ExternalActorId);
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_AddGridAreaToOrganizationRole_CanReadBack()
+        public async Task AddOrUpdateAsync_AddGridAreaToActor_CanReadBack()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
@@ -162,28 +154,35 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var organization = new Organization(
-                Guid.Empty,
-                new GlobalLocationNumber("123"),
-                "Test");
+            var organization = new Organization("Test");
 
-            organization.AddRole(new BalancePowerSupplierRole(
+            var expected = new GridArea(
+                new GridAreaId(Guid.Empty),
+                new GridAreaName("fake_value"),
+                new GridAreaCode("1234"));
+
+            organization.Actors.Add(new Actor(
                 Guid.Empty,
-                RoleStatus.New,
-                new GridArea(
-                    new GridAreaId(Guid.Empty),
-                    new GridAreaName("fake_value"),
-                    new GridAreaCode("1234")),
-                new List<MarketRole>()));
+                new ExternalActorId(Guid.NewGuid()),
+                new GlobalLocationNumber("123"),
+                ActorStatus.New,
+                new[] { expected },
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>()));
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+            var actual = organization!
+                .Actors
+                .Single()
+                .Areas
+                .Single();
 
             // Assert
-            Assert.Equal("fake_value", organization?.Roles.First().Area?.Name.Value);
-            Assert.NotEqual(Guid.Empty, organization?.Roles.First().Area?.Id.Value);
-            Assert.Equal("1234", organization?.Roles.First().Area?.Code.Value);
+            Assert.NotEqual(Guid.Empty, actual.Id.Value);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Code, actual.Code);
         }
 
         [Fact]
@@ -195,31 +194,32 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var organization = new Organization(
-                Guid.NewGuid(),
-                new GlobalLocationNumber(Guid.NewGuid().ToString()),
-                "Test");
+            var organization = new Organization("Test");
 
-            organization.AddRole(new BalancePowerSupplierRole { MarketRoles = { new MarketRole(EicFunction.BalancingServiceProvider) } });
+            var balancePowerSupplierActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            balancePowerSupplierActor.MarketRoles.Add(new MarketRole(EicFunction.BalancingServiceProvider));
+            organization.Actors.Add(balancePowerSupplierActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            organization!.AddRole(new DanishEnergyAgencyRole { MarketRoles = { new MarketRole(EicFunction.SystemOperator) } });
+            var meteringPointAdministratorActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            meteringPointAdministratorActor.MarketRoles.Add(new MarketRole(EicFunction.MeteringPointAdministrator));
+            organization!.Actors.Add(meteringPointAdministratorActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(organization);
-            Assert.Equal(2, organization!.Roles.Count());
+            Assert.Equal(2, organization!.Actors.Count);
             Assert.Contains(
-                organization.Roles,
-                x => x is BalancePowerSupplierRole role && role.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
+                organization.Actors,
+                x => x.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
             Assert.Contains(
-                organization.Roles,
-                x => x is DanishEnergyAgencyRole role && role.MarketRoles.All(y => y.Function == EicFunction.SystemOperator));
+                organization.Actors,
+                x => x.MarketRoles.All(y => y.Function == EicFunction.MeteringPointAdministrator));
         }
 
         [Fact]
@@ -234,20 +234,134 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var organization = new Organization(
-                Guid.NewGuid(),
-                new GlobalLocationNumber(Guid.NewGuid().ToString()),
-                "Test");
+            var organization = new Organization("Test");
+            var actorId = Guid.NewGuid();
 
             // Act
-            organization.AddRole(new BalancePowerSupplierRole());
+            organization.Actors.Add(new Actor(new ExternalActorId(actorId), new GlobalLocationNumber("fake_value")));
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository2.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(organization);
-            Assert.Single(organization!.Roles);
-            Assert.Contains(organization.Roles, x => x is BalancePowerSupplierRole);
+            Assert.Single(organization!.Actors);
+            Assert.Contains(organization.Actors, x => x.ExternalActorId.Value == actorId);
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_ActorWith1MeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization("Test");
+
+            var actorWithMeteringTypes = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            organization.Actors.Add(actorWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Contains(
+                organization!.Actors.Single().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D03NotUsed));
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_OrganizationRoleWith2MeteringTypesAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepositoryRead = new OrganizationRepository(contextRead);
+
+            var organization = new Organization("Test");
+
+            var actorWithMeteringTypes = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D12TotalConsumption);
+            organization.Actors.Add(actorWithMeteringTypes);
+
+            // Act
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Contains(
+                organization!.Actors.Single().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D03NotUsed));
+            Assert.Contains(
+                organization.Actors.Single().MeteringPointTypes,
+                x => x.Equals(MeteringPointType.D12TotalConsumption));
+        }
+
+        [Fact]
+        public async Task GetAsync_All_ReturnsAllOrganizations()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepository2 = new OrganizationRepository(context2);
+
+            var globalLocationNumber = new MockedGln();
+            var organization = new Organization("Test");
+
+            organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+
+            // Act
+            var organizations = await orgRepository2
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.NotEmpty(organizations);
+        }
+
+        [Fact]
+        public async Task GetAsync_GlobalLocationNumber_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
+            var orgRepository = new OrganizationRepository(context);
+            var orgRepository2 = new OrganizationRepository(context2);
+
+            var globalLocationNumber = new MockedGln();
+            var organization = new Organization("Test");
+
+            organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+
+            // Act
+            var organizations = await orgRepository2
+                .GetAsync(globalLocationNumber)
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organizations);
+            var expected = organizations.Single();
+            Assert.Equal(globalLocationNumber, expected.Actors.Single().Gln);
         }
     }
 }
