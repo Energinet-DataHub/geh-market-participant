@@ -1,21 +1,18 @@
-flags:
-  unit:
-    paths:
-  integration:
-    paths:
-      - source/Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp/
-     
 coverage:
   status:
     project:
       default:
+        target: auto
         flags:
           - unit
           - integration
       unit:
-        flags:
-          - unit
+        paths:
+          - source/Energinet.DataHub.MarketParticipant.Application/
+          - source/Energinet.DataHub.MarketParticipant.Domain/
+          - source/Energinet.DataHub.MarketParticipant.Common/
       integration:
-        flags:
-          - integration
-
+        paths:
+          - source/Energinet.DataHub.MarketParticipant.Infrastructure/
+          - source/Energinet.DataHub.MarketParticipant.EntryPoint.WebApi/
+          - source/Energinet.DataHub.MarketParticipant.EntryPoint.Organization/
