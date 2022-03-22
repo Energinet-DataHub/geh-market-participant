@@ -1,0 +1,25 @@
+flags:
+  businesslogic:
+    paths:
+      - source/Energinet.DataHub.MarketParticipant.Application/
+      - source/Energinet.DataHub.MarketParticipant.Domain/
+      - source/Energinet.DataHub.MarketParticipant.Common/
+  infrastructure:
+    paths:
+      - source/Energinet.DataHub.MarketParticipant.Infrastructure/
+      - source/Energinet.DataHub.MarketParticipant.EntryPoint.WebApi/
+      - source/Energinet.DataHub.MarketParticipant.EntryPoint.Organization/
+
+coverage:
+  status:
+    project:
+      default:
+        flags:
+          - businesslogic
+          - infrastructure
+      businesslogic:
+        flags:
+          - businesslogic
+      infrastructure:
+        flags:
+          - infrastructure
