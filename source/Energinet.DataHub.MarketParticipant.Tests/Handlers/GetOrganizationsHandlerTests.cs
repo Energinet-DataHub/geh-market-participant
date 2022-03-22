@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actualActor = actualOrganization.Actors.Single();
             Assert.Equal(actor.Id.ToString(), actualActor.ActorId);
             Assert.Equal(actor.ExternalActorId.ToString(), actualActor.ExternalActorId);
-            Assert.Equal(actor.Gln.ToString(), actualActor.Gln.Value);
+            Assert.Equal(actor.Gln.Value, actualActor.Gln.Value);
             Assert.Equal(actor.Status.ToString(), actualActor.Status);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
