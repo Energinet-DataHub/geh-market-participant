@@ -59,7 +59,6 @@ jobs:
       DOTNET_VERSION: '5.0'
       ARTIFACT_NAME: organization
       
-
   create_prerelease:
     needs: [
       database_migration_ci,
