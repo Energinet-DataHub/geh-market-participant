@@ -72,5 +72,20 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
             return Ok(response);
         }
+
+        [HttpPut("{organizationId:guid}")]
+        public async Task<IActionResult> UpdateOrganizationAsync(
+            Guid organizationId,
+            ChangeOrganizationDto organization)
+        {
+            var getSingleOrganizationCommand =
+                new UpdateOrganizationCommand(new OrganizationId(organizationId), organization);
+
+            var response = await _mediator
+                .Send(getSingleOrganizationCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
     }
 }
