@@ -58,6 +58,7 @@ jobs:
       CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.EntryPoint.Organization/Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj'
       DOTNET_VERSION: '5.0'
       ARTIFACT_NAME: organization
+      
 
   create_prerelease:
     needs: [
