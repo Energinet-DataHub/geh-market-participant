@@ -35,12 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("ping")]
-        public Task<string> PingAsync()
-        {
-            return Task.FromResult("pong");
-        }
-
         [HttpGet]
         public async Task<IActionResult> ListAllAsync()
         {
