@@ -39,7 +39,7 @@ jobs:
       ARTIFACT_NAME: databasemigration
       
   dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@6.0.0
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
       DOTNET_VERSION: '5.0'
@@ -57,7 +57,7 @@ jobs:
     with:
       CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.EntryPoint.Organization/Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj'
       DOTNET_VERSION: '5.0'
-      ARTIFACT_NAME: organization    
+      ARTIFACT_NAME: organization
 
   create_prerelease:
     needs: [
