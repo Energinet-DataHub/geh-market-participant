@@ -27,14 +27,21 @@ namespace Energinet.DataHub.MarketParticipant.Common
         public static void AddApplicationServices(this Container container)
         {
             container.Register<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(
+                Lifestyle.Scoped);
             container.Register<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>(
+                Lifestyle.Scoped);
             container.Register<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<DispatchEventsCommand>, DispatchEventsCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>(
+                Lifestyle.Scoped);
             container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
-            container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
-            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
+            container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(
+                Lifestyle.Scoped);
+            container.Collection.Register(
+                typeof(IIntegrationEventDispatcher),
+                typeof(ActorUpdatedEventDispatcher).Assembly);
         }
     }
 }
