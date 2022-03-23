@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -27,12 +28,12 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class CreateActorHandler : IRequestHandler<CreateActorCommand, CreateActorResponse>
+    public sealed class GetActorHandler : IRequestHandler<GetSingleActorCommand, GetSingleActorResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IActorFactoryService _actorFactoryService;
 
-        public CreateActorHandler(
+        public GetActorHandler(
             IOrganizationRepository organizationRepository,
             IActorFactoryService actorFactoryService)
         {
@@ -40,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             _actorFactoryService = actorFactoryService;
         }
 
-        public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
+        public async Task<GetSingleActorResponse> Handle(GetSingleActorCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
@@ -53,23 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(request.OrganizationId.Value);
             }
 
-            var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
-            var actorRoles = CreateMarketRoles(request.Actor).ToList();
+            var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
 
-            var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles)
-                .ConfigureAwait(false);
-
-            return new CreateActorResponse(actor.Id.ToString());
-        }
-
-        private static IEnumerable<MarketRole> CreateMarketRoles(ChangeActorDto actorDto)
-        {
-            foreach (var marketRole in actorDto.MarketRoles)
-            {
-                var function = Enum.Parse<EicFunction>(marketRole.Function, true);
-                yield return new MarketRole(function);
-            }
+            return actor is null
+                ? new GetSingleActorResponse(false, null)
+                : new GetSingleActorResponse(true, OrganizationMapper.Map(actor));
         }
     }
 }
