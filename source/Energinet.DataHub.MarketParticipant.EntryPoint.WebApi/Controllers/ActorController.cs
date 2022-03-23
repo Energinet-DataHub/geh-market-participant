@@ -36,9 +36,23 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
-        public async Task<IActionResult> GetActorAsync(Guid organizationId, Guid actorId)
+        public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
-            var getOrganizationsCommand = new GetOrganizationsCommand();
+            var getOrganizationsCommand = new GetSingleActorCommand(actorId, new OrganizationId(organizationId));
+
+            var response = await _mediator
+                .Send(getOrganizationsCommand)
+                .ConfigureAwait(false);
+
+            return response.ActorFound
+                ? Ok(response)
+                : NotFound();
+        }
+
+        [HttpPost("{organizationId:guid}/actor")]
+        public async Task<IActionResult> CreateActorAsync(Guid organizationId, ChangeActorDto actorDto)
+        {
+            var getOrganizationsCommand = new CreateActorCommand(new OrganizationId(organizationId), actorDto);
 
             var response = await _mediator
                 .Send(getOrganizationsCommand)

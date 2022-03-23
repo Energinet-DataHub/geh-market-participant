@@ -30,8 +30,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Actors.Select(Map).ToList());
         }
 
-        private static ActorDto Map(Actor actor)
+        public static ActorDto Map(Actor actor)
         {
+            Guard.ThrowIfNull(actor, nameof(actor));
             return new ActorDto(
                 actor.Id.ToString(),
                 actor.ExternalActorId.ToString(),

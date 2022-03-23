@@ -12,10 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using MediatR;
+using FluentValidation;
+using FluentValidation.Validators;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
-    public sealed record CreateActorCommand(OrganizationId OrganizationId, ChangeActorDto Actor) : IRequest<CreateActorResponse>;
+    public sealed class OrganizationIdValidationRule<T> : PropertyValidator<T, OrganizationId?>
+    {
+        public override string Name => "OrganizationIdValidation";
+
+        public override bool IsValid(ValidationContext<T> context, OrganizationId? value)
+        {
+            return Guid.Empty != value?.Value;
+        }
+
+        protected override string GetDefaultMessageTemplate(string errorCode)
+        {
+            return "'{PropertyName}' must have a valid and non empty Guid.";
+        }
+    }
 }
