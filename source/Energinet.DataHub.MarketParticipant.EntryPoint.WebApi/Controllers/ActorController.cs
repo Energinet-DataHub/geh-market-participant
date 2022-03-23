@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -50,15 +51,20 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
-            var getOrganizationsCommand = new GetSingleActorCommand(actorId, organizationId);
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var getOrganizationsCommand = new GetSingleActorCommand(actorId, organizationId);
 
-            var response = await _mediator
-                .Send(getOrganizationsCommand)
-                .ConfigureAwait(false);
+                    var response = await _mediator
+                        .Send(getOrganizationsCommand)
+                        .ConfigureAwait(false);
 
-            return response.ActorFound
-                ? Ok(response)
-                : NotFound();
+                    return response.ActorFound
+                        ? Ok(response)
+                        : NotFound();
+                },
+                _logger).ConfigureAwait(false);
         }
 
         [HttpPost("{organizationId:guid}/actor")]

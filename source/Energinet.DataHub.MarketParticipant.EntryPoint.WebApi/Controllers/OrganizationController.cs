@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -38,13 +38,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> ListAllAsync()
         {
-            var getOrganizationsCommand = new GetOrganizationsCommand();
+            return await this.ProcessAsync(
+                async () =>
+                    {
+                        var getOrganizationsCommand = new GetOrganizationsCommand();
 
-            var response = await _mediator
-                .Send(getOrganizationsCommand)
-                .ConfigureAwait(false);
+                        var response = await _mediator
+                            .Send(getOrganizationsCommand)
+                            .ConfigureAwait(false);
 
-            return Ok(response);
+                        return Ok(response);
+                    },
+                _logger).ConfigureAwait(false);
         }
 
         [HttpGet("{organizationId:guid}")]
@@ -78,14 +83,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             Guid organizationId,
             ChangeOrganizationDto organization)
         {
-            var getSingleOrganizationCommand =
-                new UpdateOrganizationCommand(organizationId, organization);
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var getSingleOrganizationCommand =
+                        new UpdateOrganizationCommand(organizationId, organization);
 
-            var response = await _mediator
-                .Send(getSingleOrganizationCommand)
-                .ConfigureAwait(false);
+                    var response = await _mediator
+                        .Send(getSingleOrganizationCommand)
+                        .ConfigureAwait(false);
 
-            return Ok(response);
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
         }
     }
 }
