@@ -15,36 +15,39 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class GetOrganizationsHandler : IRequestHandler<GetOrganizationsCommand, GetOrganizationsResponse>
+    public sealed class
+        GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
 
-        public GetOrganizationsHandler(IOrganizationRepository organizationRepository)
+        public GetSingleOrganizationHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
 
-        public async Task<GetOrganizationsResponse> Handle(
-            GetOrganizationsCommand request,
+        public async Task<GetSingleOrganizationResponse> Handle(
+            GetSingleOrganizationCommand request,
             CancellationToken cancellationToken)
         {
-            var organizations = await _organizationRepository
-                .GetAsync()
+            Guard.ThrowIfNull(request, nameof(request));
+
+            var organization = await _organizationRepository
+                .GetAsync(new OrganizationId(request.OrganizationId))
                 .ConfigureAwait(false);
 
-            var mapped = organizations
-                .Select(OrganizationMapper.Map)
-                .ToList();
-
-            return new GetOrganizationsResponse(mapped);
+            return organization is not null
+                ? new GetSingleOrganizationResponse(true, OrganizationMapper.Map(organization))
+                : new GetSingleOrganizationResponse(false, null);
         }
     }
 }
