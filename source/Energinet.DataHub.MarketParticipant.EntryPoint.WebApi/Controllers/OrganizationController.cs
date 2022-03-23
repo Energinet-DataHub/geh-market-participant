@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             ChangeOrganizationDto organization)
         {
             var getSingleOrganizationCommand =
-                new UpdateOrganizationCommand(new OrganizationId(organizationId), organization);
+                new UpdateOrganizationCommand(organizationId, organization);
 
             var response = await _mediator
                 .Send(getSingleOrganizationCommand)
