@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             Guard.ThrowIfNull(request, nameof(request));
 
             var organization = await _organizationRepository
-                .GetAsync(request.OrganizationId)
+                .GetAsync(new OrganizationId(request.OrganizationId))
                 .ConfigureAwait(false);
 
             return organization is not null

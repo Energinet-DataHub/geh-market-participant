@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(CreateActorCommand.Actor);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(new OrganizationId(ValidId), null!);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), null!);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), Array.Empty<MarketRoleDto>());
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(new OrganizationId(value), actorDto);
+            var command = new CreateActorCommand(Guid.Parse(value), actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(new GlobalLocationNumberDto(value), Array.Empty<MarketRoleDto>());
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(new OrganizationId(ValidId), actorDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var organizationRoleDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), null!);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(new OrganizationId(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -137,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var organizationRoleDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), new MarketRoleDto[] { null! });
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(new OrganizationId(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -164,7 +164,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var organizationRoleDto = new ChangeActorDto(new GlobalLocationNumberDto(ValidGln), new[] { new MarketRoleDto(value) });
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(new OrganizationId(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

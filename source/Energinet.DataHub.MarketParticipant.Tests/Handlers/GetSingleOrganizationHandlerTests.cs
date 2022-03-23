@@ -35,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new GetSingleOrganizationHandler(organizationRepository.Object);
+            const string orgId = "1572cb86-3c1d-4899-8d7a-983d8de0796b";
 
             var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
 
@@ -48,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<MeteringPointType>());
 
             var organization = new Organization(
-                new OrganizationId(Guid.NewGuid()),
+                new OrganizationId(orgId),
                 "fake_value",
                 new[] { actor });
 
@@ -56,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleOrganizationCommand(organization.Id);
+            var command = new GetSingleOrganizationCommand(Guid.Parse(orgId));
 
             // Act
             var response = await target

@@ -46,12 +46,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             Guard.ThrowIfNull(request, nameof(request));
 
             var organization = await _organizationRepository
-                .GetAsync(request.OrganizationId)
+                .GetAsync(new OrganizationId(request.OrganizationId))
                 .ConfigureAwait(false);
 
             if (organization == null)
             {
-                throw new NotFoundValidationException(request.OrganizationId.Value);
+                throw new NotFoundValidationException(request.OrganizationId);
             }
 
             var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);

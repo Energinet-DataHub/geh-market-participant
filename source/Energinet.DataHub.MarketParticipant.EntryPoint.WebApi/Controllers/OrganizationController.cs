@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}")]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
-            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(new OrganizationId(organizationId));
+            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
             var response = await _mediator
                 .Send(getSingleOrganizationCommand)

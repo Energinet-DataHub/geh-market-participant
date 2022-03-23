@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,7 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("organization")]
     public class ActorController : ControllerBase
     {
         private readonly ILogger<ActorController> _logger;
@@ -38,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
-            var getOrganizationsCommand = new GetSingleActorCommand(actorId, new OrganizationId(organizationId));
+            var getOrganizationsCommand = new GetSingleActorCommand(actorId, organizationId);
 
             var response = await _mediator
                 .Send(getOrganizationsCommand)
@@ -52,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpPost("{organizationId:guid}/actor")]
         public async Task<IActionResult> CreateActorAsync(Guid organizationId, ChangeActorDto actorDto)
         {
-            var getOrganizationsCommand = new CreateActorCommand(new OrganizationId(organizationId), actorDto);
+            var getOrganizationsCommand = new CreateActorCommand(organizationId, actorDto);
 
             var response = await _mediator
                 .Send(getOrganizationsCommand)
