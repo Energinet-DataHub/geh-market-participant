@@ -12,27 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Organization")]
     public class MarketParticipantController : ControllerBase
     {
         private readonly ILogger<MarketParticipantController> _logger;
+        private readonly IMediator _mediator;
 
-        public MarketParticipantController(ILogger<MarketParticipantController> logger)
+        public MarketParticipantController(ILogger<MarketParticipantController> logger, IMediator mediator)
         {
             _logger = logger;
+            _mediator = mediator;
         }
 
-        [HttpGet("ping")]
-        public Task<string> PingAsync()
+        [HttpGet]
+        public async Task<IActionResult> ListAllAsync()
         {
-            return Task.FromResult("ping");
+            var getOrganizationsCommand = new GetOrganizationsCommand();
+
+            var response = await _mediator
+                .Send(getOrganizationsCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
+
+        [HttpGet("{organizationId:guid}")]
+        public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
+        {
+            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(new OrganizationId(organizationId));
+
+            var response = await _mediator
+                .Send(getSingleOrganizationCommand)
+                .ConfigureAwait(false);
+
+            return response.OrganizationFound
+                ? Ok(response)
+                : NotFound();
         }
     }
 }
