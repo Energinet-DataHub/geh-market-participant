@@ -116,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
                 "Frontend service app id not found.");
 
-            //Container.AddJwtTokenSecurity(openIdUrl, audience);
+            Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }
 }
