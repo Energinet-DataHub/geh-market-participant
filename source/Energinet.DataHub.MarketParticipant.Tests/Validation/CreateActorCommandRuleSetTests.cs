@@ -47,11 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
         [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF128", true)]
-        [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF1XX", false)]
         public async Task Validate_OrganizationId_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
