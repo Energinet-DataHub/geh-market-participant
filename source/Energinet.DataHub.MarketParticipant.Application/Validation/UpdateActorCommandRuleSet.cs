@@ -31,9 +31,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
             RuleFor(actor => actor.ChangeActor)
                 .NotNull()
-                .ChildRules(rolesValidator =>
+                .ChildRules(changeActorValidator =>
                 {
-                    rolesValidator
+                    changeActorValidator
+                        .RuleFor(x => x.Status)
+                        .NotEmpty()
+                        .IsEnumName(typeof(ActorStatus));
+
+                    changeActorValidator
                         .RuleFor(x => x.MarketRoles)
                         .ChildRules(rolesValidator =>
                             rolesValidator

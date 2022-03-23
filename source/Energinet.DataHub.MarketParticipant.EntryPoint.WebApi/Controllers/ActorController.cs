@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost("{organizationId:guid}/actor")]
-        public async Task<IActionResult> CreateActorAsync(Guid organizationId, ChangeActorDto actorDto)
+        public async Task<IActionResult> CreateActorAsync(Guid organizationId, CreateActorDto actorDto)
         {
             var getOrganizationsCommand = new CreateActorCommand(organizationId, actorDto);
 
