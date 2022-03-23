@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -66,7 +68,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
 
-                return new UpdateOrganizationCommand(organizationId, organizationDto);
+                if (Guid.TryParse(organizationId, out var orgGuid))
+                {
+                    return new UpdateOrganizationCommand(orgGuid, organizationDto);
+                }
+                else
+                {
+                    throw new ValidationException("Invalid organizationId, must be a valid GUID");
+                }
             }
             catch (JsonException)
             {

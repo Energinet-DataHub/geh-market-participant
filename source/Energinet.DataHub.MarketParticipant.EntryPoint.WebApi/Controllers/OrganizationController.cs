@@ -23,13 +23,13 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
-    [Route("Organization")]
-    public class MarketParticipantController : ControllerBase
+    [Route("[controller]")]
+    public class OrganizationController : ControllerBase
     {
-        private readonly ILogger<MarketParticipantController> _logger;
+        private readonly ILogger<OrganizationController> _logger;
         private readonly IMediator _mediator;
 
-        public MarketParticipantController(ILogger<MarketParticipantController> logger, IMediator mediator)
+        public OrganizationController(ILogger<OrganizationController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}")]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
-            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(new OrganizationId(organizationId));
+            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
             var response = await _mediator
                 .Send(getSingleOrganizationCommand)
@@ -59,6 +59,33 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return response.OrganizationFound
                 ? Ok(response)
                 : NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateOrganizationAsync(ChangeOrganizationDto organization)
+        {
+            var getSingleOrganizationCommand = new CreateOrganizationCommand(organization);
+
+            var response = await _mediator
+                .Send(getSingleOrganizationCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
+
+        [HttpPut("{organizationId:guid}")]
+        public async Task<IActionResult> UpdateOrganizationAsync(
+            Guid organizationId,
+            ChangeOrganizationDto organization)
+        {
+            var getSingleOrganizationCommand =
+                new UpdateOrganizationCommand(organizationId, organization);
+
+            var response = await _mediator
+                .Send(getSingleOrganizationCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
         }
     }
 }

@@ -17,5 +17,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record UpdateOrganizationCommand(Guid OrganizationId, ChangeOrganizationDto Organization) : IRequest;
+    public sealed record GetSingleActorCommand(Guid ActorId, Guid OrganizationId) : IRequest<GetSingleActorResponse>;
 }
