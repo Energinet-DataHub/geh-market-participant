@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(organizationId.Value);
             }
 
-            var actorId = Guid.Parse(request.ActorId);
+            var actorId = request.ActorId;
             var actor = organization
                 .Actors
                 .SingleOrDefault(actor => actor.Id == actorId);
@@ -94,7 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             actor.MarketRoles.Clear();
 
-            foreach (var marketRoleDto in request.MarketRoles)
+            foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRoleDto.Function, true);
                 actor.MarketRoles.Add(new MarketRole(function));

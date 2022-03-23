@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using MediatR;
@@ -34,6 +35,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("{organizationId:guid}/actor")]
+        public async Task<IActionResult> GetSingleActorAsync(Guid organizationId)
+        {
+            var getOrganizationsCommand = new GetActorsCommand(organizationId);
+
+            var response = await _mediator
+                .Send(getOrganizationsCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
+
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
@@ -52,6 +65,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         public async Task<IActionResult> CreateActorAsync(Guid organizationId, ChangeActorDto actorDto)
         {
             var getOrganizationsCommand = new CreateActorCommand(organizationId, actorDto);
+
+            var response = await _mediator
+                .Send(getOrganizationsCommand)
+                .ConfigureAwait(false);
+
+            return Ok(response);
+        }
+
+        [HttpPut("{organizationId:guid}/actor/{actorId:guid}")]
+        public async Task<IActionResult> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActor)
+        {
+            var getOrganizationsCommand = new UpdateActorCommand(organizationId, actorId, changeActor);
 
             var response = await _mediator
                 .Send(getOrganizationsCommand)

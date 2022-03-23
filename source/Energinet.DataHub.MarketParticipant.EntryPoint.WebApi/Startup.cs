@@ -53,9 +53,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseRouting();
 
-            app.UseMiddleware<JwtTokenMiddleware>();
-            app.UseMiddleware<UserMiddleware>();
-            app.UseAuthorization();
+            // app.UseMiddleware<JwtTokenMiddleware>();
+            // app.UseMiddleware<UserMiddleware>();
+            // app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -123,7 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
                 "Frontend service app id not found.");
 
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
+            //Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }
 }

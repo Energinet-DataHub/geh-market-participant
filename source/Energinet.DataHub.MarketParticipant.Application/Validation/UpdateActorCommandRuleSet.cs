@@ -24,27 +24,28 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         public UpdateActorCommandRuleSet()
         {
             RuleFor(command => command.OrganizationId)
-                .NotEmpty()
-                .SetValidator(new GuidValidationRule<UpdateActorCommand>());
+                .NotEmpty();
 
             RuleFor(command => command.ActorId)
-                .NotEmpty()
-                .SetValidator(new GuidValidationRule<UpdateActorCommand>());
+                .NotEmpty();
 
-            RuleFor(actor => actor.MarketRoles)
+            RuleFor(actor => actor.ChangeActor)
                 .NotNull()
                 .ChildRules(rolesValidator =>
                 {
                     rolesValidator
-                        .RuleForEach(x => x)
-                        .NotNull()
-                        .ChildRules(roleValidator =>
-                        {
-                            roleValidator
-                                .RuleFor(x => x.Function)
-                                .NotEmpty()
-                                .IsEnumName(typeof(EicFunction), false);
-                        });
+                        .RuleFor(x => x.MarketRoles)
+                        .ChildRules(rolesValidator =>
+                            rolesValidator
+                                .RuleForEach(x => x)
+                                .NotNull()
+                                .ChildRules(roleValidator =>
+                                {
+                                    roleValidator
+                                        .RuleFor(x => x.Function)
+                                        .NotEmpty()
+                                        .IsEnumName(typeof(EicFunction), false);
+                                }));
                 });
         }
     }

@@ -67,8 +67,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
                 var actorId = query.Get("actorId") ?? string.Empty;
+                var gln = query.Get("gln") ?? string.Empty;
 
-                return new UpdateActorCommand(organizationId, actorId, marketRoles);
+                if (!Guid.TryParse(organizationId, out var orgGuid))
+                    throw new ValidationException("Invalid organizationId, must be a valid GUID");
+                if (!Guid.TryParse(actorId, out var actorGuid))
+                    throw new ValidationException("Invalid actorId, must be a valid GUID");
+
+                return new UpdateActorCommand(orgGuid, actorGuid, new ChangeActorDto(new GlobalLocationNumberDto(gln), marketRoles));
             }
             catch (JsonException)
             {

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -23,18 +25,17 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class
-        GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
+    public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
 
-        public GetSingleOrganizationHandler(IOrganizationRepository organizationRepository)
+        public GetActorsHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
 
-        public async Task<GetSingleOrganizationResponse> Handle(
-            GetSingleOrganizationCommand request,
+        public async Task<GetActorsResponse> Handle(
+            GetActorsCommand request,
             CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
@@ -43,9 +44,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .GetAsync(new OrganizationId(request.OrganizationId))
                 .ConfigureAwait(false);
 
-            return organization is not null
-                ? new GetSingleOrganizationResponse(true, OrganizationMapper.Map(organization))
-                : new GetSingleOrganizationResponse(false, null);
+            if (organization == null)
+            {
+                throw new NotFoundValidationException(request.OrganizationId);
+            }
+
+            var actors = organization.Actors.Select(OrganizationMapper.Map);
+
+            return new GetActorsResponse(actors);
         }
     }
 }

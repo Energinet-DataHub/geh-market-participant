@@ -68,14 +68,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
 
-                if (Guid.TryParse(organizationId, out var orgGuid))
-                {
-                    return new UpdateOrganizationCommand(orgGuid, organizationDto);
-                }
-                else
-                {
+                if (!Guid.TryParse(organizationId, out var orgGuid))
                     throw new ValidationException("Invalid organizationId, must be a valid GUID");
-                }
+
+                return new UpdateOrganizationCommand(orgGuid, organizationDto);
             }
             catch (JsonException)
             {
