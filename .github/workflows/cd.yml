@@ -33,3 +33,10 @@ jobs:
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       ENVIRONMENT_REPOSITORY_PATH: ${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}
+
+  upload_main_coverage_result_to_codecov:
+    uses: Energinet-DataHub/.github/.github/workflows/upload-coverage-to-codecov.yml@add-artifact-for-coverage-reports
+    with:
+      CALLER_REPOSITORY_NAME: geh-market-participant
+      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
+      DESTINATION_FOLDER_PATH: 
