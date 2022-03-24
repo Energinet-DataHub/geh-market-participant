@@ -39,4 +39,3 @@ jobs:
     with:
       CALLER_REPOSITORY_NAME: geh-market-participant
       CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
-      DESTINATION_FOLDER_PATH: 
