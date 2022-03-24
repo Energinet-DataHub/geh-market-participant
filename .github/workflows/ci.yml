@@ -64,7 +64,7 @@ jobs:
       database_migration_ci,
       organization_func_ci
     ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@5.1.0
+    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@5.0.1
     with:
       CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
     secrets:
