@@ -55,27 +55,35 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}")]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
-            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
-            var response = await _mediator
-                .Send(getSingleOrganizationCommand)
-                .ConfigureAwait(false);
+                    var response = await _mediator
+                        .Send(getSingleOrganizationCommand)
+                        .ConfigureAwait(false);
 
-            return response.OrganizationFound
-                ? Ok(response)
-                : NotFound();
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateOrganizationAsync(ChangeOrganizationDto organization)
         {
-            var getSingleOrganizationCommand = new CreateOrganizationCommand(organization);
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var createOrganizationCommand = new CreateOrganizationCommand(organization);
 
-            var response = await _mediator
-                .Send(getSingleOrganizationCommand)
-                .ConfigureAwait(false);
+                    var response = await _mediator
+                        .Send(createOrganizationCommand)
+                        .ConfigureAwait(false);
 
-            return Ok(response);
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
         }
 
         [HttpPut("{organizationId:guid}")]
@@ -86,11 +94,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    var getSingleOrganizationCommand =
+                    var updateOrganizationCommand =
                         new UpdateOrganizationCommand(organizationId, organization);
 
                     var response = await _mediator
-                        .Send(getSingleOrganizationCommand)
+                        .Send(updateOrganizationCommand)
                         .ConfigureAwait(false);
 
                     return Ok(response);

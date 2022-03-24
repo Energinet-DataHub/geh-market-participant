@@ -16,6 +16,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Utilities;
@@ -43,9 +44,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .GetAsync(new OrganizationId(request.OrganizationId))
                 .ConfigureAwait(false);
 
-            return organization is not null
-                ? new GetSingleOrganizationResponse(true, OrganizationMapper.Map(organization))
-                : new GetSingleOrganizationResponse(false, null);
+            if (organization == null)
+            {
+                throw new NotFoundValidationException(request.OrganizationId);
+            }
+
+            return new GetSingleOrganizationResponse(OrganizationMapper.Map(organization));
         }
     }
 }
