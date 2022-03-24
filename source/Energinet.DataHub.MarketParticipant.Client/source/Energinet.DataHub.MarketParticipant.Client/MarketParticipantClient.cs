@@ -20,38 +20,54 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
+using Energinet.DataHub.MarketParticipant.Client.Results;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantClient : IMarketParticipantClient
     {
-        private const string GetOrganizationsBase = "GetOrganizations";
+        private const string OrganizationsBaseUrl = "Organization";
 
-        private static readonly JsonSerializerOptions _defaultOptions = new()
+        // private static readonly JsonSerializerOptions _defaultOptions = new()
+        // {
+        //     Converters = { new JsonStringEnumConverter() },
+        //     PropertyNameCaseInsensitive = true
+        // };
+        private readonly IFlurlClient _httpClient;
+
+        public MarketParticipantClient(IFlurlClient client)
         {
-            Converters = { new JsonStringEnumConverter() }
-        };
-
-        private readonly HttpClient _httpClient;
-
-        public MarketParticipantClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
+            _httpClient = client;
         }
 
         public async Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
         {
             var response = await _httpClient
-                .GetAsync(new Uri(GetOrganizationsBase, UriKind.Relative))
+                .Request(OrganizationsBaseUrl)
+                .GetAsync()
                 .ConfigureAwait(false);
 
-            var organizations = await response
-                .EnsureSuccessStatusCode()
-                .Content
-                .ReadFromJsonAsync<GetCommand>(_defaultOptions)
+            var listAllOrganizationsResult = await response.GetJsonAsync<ListAllOrganizationsResult>()
                 .ConfigureAwait(false);
 
-            return organizations?.Organizations ?? Array.Empty<OrganizationDto>();
+            return listAllOrganizationsResult?.Organizations ?? Array.Empty<OrganizationDto>();
         }
+
+        // public async Task<OrganizationDto> GetOrganizationAsync(Guid organizationId)
+        // {
+        //     var response = await _httpClient
+        //         .GetAsync(new Uri(OrganizationsBaseUrl, UriKind.Relative))
+        //         .ConfigureAwait(false);
+        //
+        //     var listAllOrganizationsResult = await response
+        //         .EnsureSuccessStatusCode()
+        //         .Content
+        //         .ReadFromJsonAsync<ListAllOrganizationsResult>(_defaultOptions)
+        //         .ConfigureAwait(false);
+        //
+        //     return listAllOrganizationsResult?.Organizations ?? Array.Empty<OrganizationDto>();
+        // }
     }
 }

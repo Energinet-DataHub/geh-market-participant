@@ -15,32 +15,34 @@
 using System;
 using System.Linq;
 using System.Net.Http;
+using Flurl;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantClientFactory
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IFlurlClientFactory _flurlClientFactory;
 
-        public MarketParticipantClientFactory(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
+        public MarketParticipantClientFactory(IHttpContextAccessor httpContextAccessor, IFlurlClientFactory flurlClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
+            _flurlClientFactory = flurlClientFactory;
             _httpContextAccessor = httpContextAccessor;
         }
 
         public IMarketParticipantClient CreateClient()
         {
-            var httpClient = _httpClientFactory.CreateClient();
+            var httpClient = _flurlClientFactory.Get(new Url());
             SetAuthorizationHeader(httpClient);
             return new MarketParticipantClient(httpClient);
         }
 
         public IMarketParticipantClient CreateClient(Uri baseUrl)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = baseUrl;
+            var httpClient = _flurlClientFactory.Get(baseUrl);
             SetAuthorizationHeader(httpClient);
             return new MarketParticipantClient(httpClient);
         }
@@ -53,10 +55,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .Single();
         }
 
-        private void SetAuthorizationHeader(HttpClient httpClient)
+        private void SetAuthorizationHeader(IFlurlClient httpClient)
         {
             var authHeaderValue = GetAuthorizationHeaderValue();
-            httpClient.DefaultRequestHeaders.Add("Authorization", authHeaderValue);
+            httpClient.WithHeader("Authorization", authHeaderValue);
         }
     }
 }

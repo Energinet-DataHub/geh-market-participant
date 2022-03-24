@@ -15,12 +15,11 @@
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Client.Results
 {
-    // TODO: Remove this class when going REST.
-    public class GetCommand
+    public class ListAllOrganizationsResult
     {
-        public GetCommand(IEnumerable<OrganizationDto> organizations)
+        public ListAllOrganizationsResult(IEnumerable<OrganizationDto> organizations)
         {
             Organizations = organizations;
         }
