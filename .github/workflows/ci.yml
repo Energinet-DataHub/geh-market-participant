@@ -22,24 +22,24 @@ on:
 
 jobs:
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@5.1.0
 
   terraform_validate:
-    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@5.1.0
     with:
       TERRAFORM_WORKING_DIR_PATH: './build/infrastructure/main'
       TERRAFORM_VERSION: '1.1.4'
 
   database_migration_ci:
     needs: [ci_base, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-webapi-artifact.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-webapi-artifact.yml@5.1.0
     with:
       CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp/Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj'
       DOTNET_VERSION: '5.0.404'
       ARTIFACT_NAME: databasemigration
       
   dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@5.1.0
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
       DOTNET_VERSION: '5.0'
@@ -53,18 +53,18 @@ jobs:
       
   organization_func_ci:
     needs: [ci_base, dotnet_solution_ci, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@5.1.0
     with:
       CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.EntryPoint.Organization/Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj'
       DOTNET_VERSION: '5.0'
-      ARTIFACT_NAME: organization    
+      ARTIFACT_NAME: organization
 
   create_prerelease:
     needs: [
       database_migration_ci,
       organization_func_ci
     ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@5.0.1
+    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@5.1.0
     with:
       CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
     secrets:
