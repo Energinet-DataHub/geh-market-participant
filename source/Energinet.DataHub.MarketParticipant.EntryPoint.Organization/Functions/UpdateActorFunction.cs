@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
                 if (!Guid.TryParse(actorId, out var actorGuid))
                     throw new ValidationException("Invalid actorId, must be a valid GUID");
 
-                return new UpdateActorCommand(orgGuid, actorGuid, new ChangeActorDto(new GlobalLocationNumberDto(gln), status,  marketRoles));
+                return new UpdateActorCommand(orgGuid, actorGuid, new ChangeActorDto(new GlobalLocationNumberDto(gln), status, marketRoles));
             }
             catch (JsonException)
             {
