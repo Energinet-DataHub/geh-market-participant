@@ -18,7 +18,6 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
