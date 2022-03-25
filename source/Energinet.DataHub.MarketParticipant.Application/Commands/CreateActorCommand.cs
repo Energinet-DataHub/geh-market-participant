@@ -17,5 +17,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record CreateActorCommand(Guid OrganizationId, ChangeActorDto Actor) : IRequest<CreateActorResponse>;
+    public sealed record CreateActorCommand(Guid OrganizationId, CreateActorDto Actor) : IRequest<CreateActorResponse>;
 }
