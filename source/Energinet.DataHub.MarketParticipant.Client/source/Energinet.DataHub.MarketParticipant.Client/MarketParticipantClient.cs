@@ -174,5 +174,22 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 return null;
             }
         }
+
+        public async Task<bool?> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto createActorDto)
+        {
+            try
+            {
+                await _httpClient
+                    .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
+                    .PutJsonAsync(createActorDto)
+                    .ConfigureAwait(false);
+
+                return true;
+            }
+            catch (FlurlHttpException)
+            {
+                return false;
+            }
+        }
     }
 }

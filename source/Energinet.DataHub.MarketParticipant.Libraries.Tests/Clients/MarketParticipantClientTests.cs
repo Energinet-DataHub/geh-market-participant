@@ -280,7 +280,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
         }
 
         [Fact]
-        public async Task UpdateOrganizationAsync_ReturnsOrganizationId_CanReadBack()
+        public async Task UpdateOrganizationAsync_CanReadBack()
         {
             // Arrange
             const string incomingOrgJson = @"
@@ -445,7 +445,11 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""value"": ""123456""
                     },
                     ""status"": ""New"",
-                    ""marketRoles"": []
+                    ""marketRoles"": [
+                        {
+                            ""function"": ""EnergySupplier""
+                        }
+                    ]
                 }";
 
             using var httpTest = new HttpTest();
@@ -469,7 +473,60 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"), actual.ExternalActorId);
             Assert.Equal("123456", actual.Gln.Value);
             Assert.Equal(ActorStatus.New, actual.Status);
-            Assert.True(actual.MarketRoles.Count == 0);
+            Assert.True(actual.MarketRoles.Count == 1);
+
+            var marketRole = actual.MarketRoles.First();
+            Assert.Equal(EicFunction.EnergySupplier, marketRole.Function);
+        }
+
+        [Fact]
+        public async Task UpdateActorAsync_CanReadBackActor()
+        {
+            // Arrange
+            const string createdActorJson = @"
+                {
+                    ""actorId"": ""361fb10a-4204-46b6-bf9e-171ab2e61a59"",
+                    ""externalActorId"": ""c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"",
+                    ""gln"": {
+                        ""value"": ""1234567""
+                    },
+                    ""status"": ""Active"",
+                    ""marketRoles"": [
+                        {
+                            ""function"": ""BillingAgent""
+                        }
+                    ]
+                }";
+
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
+            var actorId = Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59");
+            httpTest.RespondWith(createdActorJson);
+
+            // Act
+            await target.UpdateActorAsync(
+                    orgId,
+                    actorId,
+                    new ChangeActorDto(
+                        new GlobalLocationNumberDto("1234567"),
+                        ActorStatus.Active.ToString(),
+                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) }))
+                .ConfigureAwait(false);
+
+            var actual = await target.GetActorAsync(orgId, actorId);
+
+            // Assert
+            Assert.NotNull(actual);
+            Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), actual.ActorId);
+            Assert.Equal(Guid.Parse("c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"), actual.ExternalActorId);
+            Assert.Equal("1234567", actual.Gln.Value);
+            Assert.Equal(ActorStatus.Active, actual.Status);
+            Assert.True(actual.MarketRoles.Count == 1);
+
+            var marketRole = actual.MarketRoles.First();
+            Assert.Equal(EicFunction.BillingAgent, marketRole.Function);
         }
     }
 }
