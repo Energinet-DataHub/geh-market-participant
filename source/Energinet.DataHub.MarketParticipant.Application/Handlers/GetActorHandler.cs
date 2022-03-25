@@ -54,12 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
 
-            if (actor == null)
+            return actor switch
             {
-                throw new NotFoundValidationException(request.ActorId);
-            }
-
-            return new GetSingleActorResponse(OrganizationMapper.Map(actor));
+                null => throw new NotFoundValidationException(request.ActorId),
+                _ => new GetSingleActorResponse(OrganizationMapper.Map(actor))
+            };
         }
     }
 }
