@@ -12,9 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Client.Results
 {
-    public sealed record GetActorsResponse(IEnumerable<ActorDto> Actors);
+    public class SingleOrganizationsResult
+    {
+        public SingleOrganizationsResult(OrganizationDto organization)
+        {
+            Organization = organization;
+        }
+
+        public OrganizationDto Organization { get; set; }
+    }
 }

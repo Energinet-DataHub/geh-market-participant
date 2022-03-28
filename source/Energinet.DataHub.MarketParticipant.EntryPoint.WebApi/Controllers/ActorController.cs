@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor")]
-        public async Task<IActionResult> GetSingleActorAsync(Guid organizationId)
+        public async Task<IActionResult> GetActorsAsync(Guid organizationId)
         {
             return await this.ProcessAsync(
                 async () =>
@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(getActorsCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok(response.Actors);
                 },
                 _logger).ConfigureAwait(false);
         }
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(getSingleActorCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok(response.Actor);
                 },
                 _logger).ConfigureAwait(false);
         }
@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(createActorCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok(response.ActorId);
                 },
                 _logger).ConfigureAwait(false);
         }
