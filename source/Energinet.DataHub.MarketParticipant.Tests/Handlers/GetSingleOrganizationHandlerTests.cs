@@ -65,7 +65,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.True(response.OrganizationFound);
             Assert.NotNull(response.Organization);
 
             var actualOrganization = response.Organization!;
