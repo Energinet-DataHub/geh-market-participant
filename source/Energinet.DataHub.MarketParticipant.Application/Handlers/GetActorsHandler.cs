@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
@@ -24,18 +25,17 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class
-        GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
+    public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
 
-        public GetSingleOrganizationHandler(IOrganizationRepository organizationRepository)
+        public GetActorsHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
 
-        public async Task<GetSingleOrganizationResponse> Handle(
-            GetSingleOrganizationCommand request,
+        public async Task<GetActorsResponse> Handle(
+            GetActorsCommand request,
             CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
@@ -49,7 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(request.OrganizationId);
             }
 
-            return new GetSingleOrganizationResponse(OrganizationMapper.Map(organization));
+            var actors = organization.Actors.Select(OrganizationMapper.Map);
+
+            return new GetActorsResponse(actors);
         }
     }
 }

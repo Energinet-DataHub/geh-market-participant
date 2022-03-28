@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new CreateActorResponse(actor.Id.ToString());
         }
 
-        private static IEnumerable<MarketRole> CreateMarketRoles(ChangeActorDto actorDto)
+        private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto actorDto)
         {
             foreach (var marketRole in actorDto.MarketRoles)
             {
