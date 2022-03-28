@@ -26,11 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private const string OrganizationsBaseUrl = "Organization";
         private const string ActorBaseUrl = "Actor";
 
-        // private static readonly JsonSerializerOptions _defaultOptions = new()
-        // {
-        //     Converters = { new JsonStringEnumConverter() },
-        //     PropertyNameCaseInsensitive = true
-        // };
         private readonly IFlurlClient _httpClient;
 
         public MarketParticipantClient(IFlurlClient client)
