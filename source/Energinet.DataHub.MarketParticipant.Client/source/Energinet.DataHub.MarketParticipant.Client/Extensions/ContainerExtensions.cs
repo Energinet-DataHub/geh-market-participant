@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Extensions
 {
     public static class ContainerExtensions
     {
-        public static IServiceCollection AddMarketParticipantClient(this IServiceCollection source)
+        public static IServiceCollection AddMarketParticipantClient(this IServiceCollection source, Uri baseUrl)
         {
             source.AddHttpContextAccessor();
             source.AddScoped(x =>
