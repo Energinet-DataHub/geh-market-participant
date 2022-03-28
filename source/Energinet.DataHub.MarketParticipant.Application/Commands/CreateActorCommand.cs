@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record CreateActorCommand(string OrganizationId, ActorDto Actor) : IRequest<CreateActorResponse>;
+    public sealed record CreateActorCommand(Guid OrganizationId, ChangeActorDto Actor) : IRequest<CreateActorResponse>;
 }

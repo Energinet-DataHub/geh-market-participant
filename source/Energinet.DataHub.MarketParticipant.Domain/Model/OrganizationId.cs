@@ -31,5 +31,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         }
 
         public Guid Value { get; }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

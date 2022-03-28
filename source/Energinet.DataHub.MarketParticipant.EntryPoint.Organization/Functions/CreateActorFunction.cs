@@ -18,6 +18,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;
@@ -67,13 +68,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
             try
             {
                 var actorDto = await JsonSerializer
-                    .DeserializeAsync<ActorDto>(request.Body, options)
-                    .ConfigureAwait(false) ?? new ActorDto(string.Empty, Array.Empty<MarketRoleDto>());
+                    .DeserializeAsync<ChangeActorDto>(request.Body, options)
+                    .ConfigureAwait(false) ?? new ChangeActorDto(new GlobalLocationNumberDto(string.Empty), Array.Empty<MarketRoleDto>());
 
                 var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
                 var organizationId = query.Get("organizationId") ?? string.Empty;
-
-                return new CreateActorCommand(organizationId, actorDto);
+                if (Guid.TryParse(organizationId, out var orgGuid))
+                {
+                    return new CreateActorCommand(orgGuid, actorDto);
+                }
+                else
+                {
+                    throw new ValidationException("Invalid organizationId, must be a valid GUID");
+                }
             }
             catch (JsonException)
             {

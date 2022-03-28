@@ -24,8 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         public CreateActorCommandRuleSet()
         {
             RuleFor(command => command.OrganizationId)
-                .NotEmpty()
-                .SetValidator(new GuidValidationRule<CreateActorCommand>());
+                .NotEmpty();
 
             RuleFor(command => command.Actor)
                 .NotNull()
@@ -33,8 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 {
                     validator
                         .RuleFor(actor => actor.Gln)
-                        .NotEmpty()
-                        .SetValidator(new GlobalLocationNumberValidationRule<ActorDto>());
+                        .SetValidator(new GlobalLocationNumberValidationRule<ChangeActorDto>());
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)

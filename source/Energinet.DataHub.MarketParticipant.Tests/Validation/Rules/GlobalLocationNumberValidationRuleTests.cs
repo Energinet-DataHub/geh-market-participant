@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using FluentValidation;
 using Xunit;
@@ -102,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
 
             public bool Validate(string value)
             {
-                return _rule.IsValid(new ValidationContext<object>(null!), value);
+                return _rule.IsValid(new ValidationContext<object>(null!), new GlobalLocationNumberDto(value));
             }
         }
     }
