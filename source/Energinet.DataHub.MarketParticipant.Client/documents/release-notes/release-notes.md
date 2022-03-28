@@ -5,7 +5,9 @@
 - Preparing package for release.
 
 ## Version 0.3.1
-###Added methods for the following endpoints
+
+### Added methods for the following endpoints
+
 - For actors
     - GetActorsAsync
     - GetActorAsync
