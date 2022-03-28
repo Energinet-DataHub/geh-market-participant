@@ -33,13 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public IMarketParticipantClient CreateClient()
-        {
-            var httpClient = _flurlClientFactory.Get(new Url());
-            SetAuthorizationHeader(httpClient);
-            return new MarketParticipantClient(httpClient);
-        }
-
         public IMarketParticipantClient CreateClient(Uri baseUrl)
         {
             var httpClient = _flurlClientFactory.Get(baseUrl);
