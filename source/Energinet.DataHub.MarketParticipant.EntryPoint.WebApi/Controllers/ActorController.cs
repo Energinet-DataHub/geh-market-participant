@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -34,30 +35,72 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("{organizationId:guid}/actor")]
+        public async Task<IActionResult> GetSingleActorAsync(Guid organizationId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var getActorsCommand = new GetActorsCommand(organizationId);
+
+                    var response = await _mediator
+                        .Send(getActorsCommand)
+                        .ConfigureAwait(false);
+
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
-            var getOrganizationsCommand = new GetSingleActorCommand(actorId, organizationId);
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var getSingleActorCommand = new GetSingleActorCommand(actorId, organizationId);
 
-            var response = await _mediator
-                .Send(getOrganizationsCommand)
-                .ConfigureAwait(false);
+                    var response = await _mediator
+                        .Send(getSingleActorCommand)
+                        .ConfigureAwait(false);
 
-            return response.ActorFound
-                ? Ok(response)
-                : NotFound();
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
         }
 
         [HttpPost("{organizationId:guid}/actor")]
-        public async Task<IActionResult> CreateActorAsync(Guid organizationId, ChangeActorDto actorDto)
+        public async Task<IActionResult> CreateActorAsync(Guid organizationId, CreateActorDto actorDto)
         {
-            var getOrganizationsCommand = new CreateActorCommand(organizationId, actorDto);
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var createActorCommand = new CreateActorCommand(organizationId, actorDto);
 
-            var response = await _mediator
-                .Send(getOrganizationsCommand)
-                .ConfigureAwait(false);
+                    var response = await _mediator
+                        .Send(createActorCommand)
+                        .ConfigureAwait(false);
 
-            return Ok(response);
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
+        [HttpPut("{organizationId:guid}/actor/{actorId:guid}")]
+        public async Task<IActionResult> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActor)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var updateActorCommand = new UpdateActorCommand(organizationId, actorId, changeActor);
+
+                    var response = await _mediator
+                        .Send(updateActorCommand)
+                        .ConfigureAwait(false);
+
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
         }
     }
 }

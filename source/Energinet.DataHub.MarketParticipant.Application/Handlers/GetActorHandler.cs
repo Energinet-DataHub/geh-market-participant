@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,9 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
 
-            return actor is null
-                ? new GetSingleActorResponse(false, null)
-                : new GetSingleActorResponse(true, OrganizationMapper.Map(actor));
+            return actor switch
+            {
+                null => throw new NotFoundValidationException(request.ActorId),
+                _ => new GetSingleActorResponse(OrganizationMapper.Map(actor))
+            };
         }
     }
 }

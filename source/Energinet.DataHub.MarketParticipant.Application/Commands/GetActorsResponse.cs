@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands
 {
-    public sealed record UpdateActorCommand(Guid OrganizationId, Guid ActorId, ChangeActorDto ChangeActor) : IRequest;
+    public sealed record GetActorsResponse(IEnumerable<ActorDto> Actor);
 }

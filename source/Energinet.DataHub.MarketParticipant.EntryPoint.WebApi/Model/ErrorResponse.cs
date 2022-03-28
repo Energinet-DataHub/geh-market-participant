@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Model
 {
-    public sealed record UpdateActorCommand(Guid OrganizationId, Guid ActorId, ChangeActorDto ChangeActor) : IRequest;
+    public sealed record ErrorResponse
+    {
+        public ErrorResponse(ErrorDescriptor error)
+        {
+            Error = error;
+        }
+
+        public ErrorDescriptor Error { get; }
+    }
 }
