@@ -21,6 +21,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public DeleteContactCommandRuleSet()
         {
+            RuleFor(command => command.OrganizationId)
+                .NotEmpty();
+
             RuleFor(command => command.ContactId)
                 .NotEmpty();
         }

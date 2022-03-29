@@ -16,8 +16,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record ChangeActorDto(
-        GlobalLocationNumberDto Gln,
-        string Status,
-        IEnumerable<MarketRoleDto> MarketRoles);
+    public sealed record ChangeActorDto(string Status, IEnumerable<MarketRoleDto> MarketRoles);
 }

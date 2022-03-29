@@ -15,8 +15,8 @@
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
     public sealed record CreateContactDto(
-        string Category,
         string Name,
+        string Category,
         string Email,
         string? Phone);
 }

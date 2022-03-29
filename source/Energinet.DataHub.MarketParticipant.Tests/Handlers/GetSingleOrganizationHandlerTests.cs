@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -29,6 +30,37 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class GetSingleOrganizationHandlerTests
     {
+        [Fact]
+        public async Task Handle_NullArgument_ThrowsException()
+        {
+            // Arrange
+            var target = new GetSingleOrganizationHandler(new Mock<IOrganizationRepository>().Object);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Handle_NoOrganization_ThrowsNotFoundException()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var target = new GetSingleOrganizationHandler(organizationRepository.Object);
+
+            organizationRepository
+                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+                .ReturnsAsync((Organization?)null);
+
+            var command = new GetSingleOrganizationCommand(Guid.NewGuid());
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
+                .ConfigureAwait(false);
+        }
+
         [Fact]
         public async Task Handle_HasOrganization_ReturnsOrganization()
         {

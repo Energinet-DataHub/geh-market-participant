@@ -60,24 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return entities.Select(ContactMapper.MapFromEntity);
         }
 
-        public async Task<ContactId> AddOrUpdateAsync(Contact contact)
+        public async Task<ContactId> AddAsync(Contact contact)
         {
             Guard.ThrowIfNull(contact, nameof(contact));
 
-            ContactEntity destination;
-
-            if (contact.Id.Value == default)
-            {
-                destination = new ContactEntity();
-            }
-            else
-            {
-                destination = await _marketParticipantDbContext
-                    .Contacts
-                    .FindAsync(contact.Id.Value)
-                    .ConfigureAwait(false);
-            }
-
+            var destination = new ContactEntity();
             ContactMapper.MapToEntity(contact, destination);
             _marketParticipantDbContext.Contacts.Update(destination);
 
@@ -85,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return new ContactId(destination.Id);
         }
 
-        public async Task DeleteAsync(Contact contact)
+        public async Task RemoveAsync(Contact contact)
         {
             Guard.ThrowIfNull(contact, nameof(contact));
 

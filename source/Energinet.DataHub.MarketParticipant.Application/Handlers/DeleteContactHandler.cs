@@ -48,11 +48,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             if (contact == null)
             {
-                throw new NotFoundValidationException(request.ContactId);
+                return Unit.Value;
             }
 
             await _contactRepository
-                .DeleteAsync(contact)
+                .RemoveAsync(contact)
                 .ConfigureAwait(false);
 
             return Unit.Value;

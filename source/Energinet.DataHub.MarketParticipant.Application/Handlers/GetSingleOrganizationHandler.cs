@@ -24,8 +24,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class
-        GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
+    public sealed class GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
 

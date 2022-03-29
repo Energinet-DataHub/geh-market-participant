@@ -16,9 +16,9 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -31,6 +31,37 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class UpdateOrganizationHandlerTests
     {
+        [Fact]
+        public async Task Handle_NullArgument_ThrowsException()
+        {
+            // Arrange
+            var target = new UpdateOrganizationHandler(new Mock<IOrganizationRepository>().Object);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Handle_NoOrganization_ThrowsNotFoundException()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var target = new UpdateOrganizationHandler(organizationRepository.Object);
+
+            organizationRepository
+                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+                .ReturnsAsync((Organization?)null);
+
+            var command = new UpdateOrganizationCommand(Guid.NewGuid(), new ChangeOrganizationDto("fake_value"));
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
+                .ConfigureAwait(false);
+        }
+
         [Fact]
         public async Task Handle_UpdateOrganization_ReturnsOk()
         {

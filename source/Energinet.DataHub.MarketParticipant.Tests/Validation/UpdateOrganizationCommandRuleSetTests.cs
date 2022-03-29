@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
@@ -22,16 +23,39 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {
     [UnitTest]
-    public sealed class CreateOrganizationCommandRuleSetTests
+    public sealed class UpdateOrganizationCommandRuleSetTests
     {
+        private const string ValidName = "Company Name";
+
+        private static readonly Guid _validOrganizationId = Guid.NewGuid();
+
+        [Fact]
+        public async Task Validate_OrganizationId_ValidatesProperty()
+        {
+            // Arrange
+            const string propertyName = nameof(UpdateOrganizationCommand.OrganizationId);
+
+            var organizationDto = new ChangeOrganizationDto(ValidName);
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(Guid.Empty, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+
         [Fact]
         public async Task Validate_OrganizationDto_ValidatesProperty()
         {
             // Arrange
-            const string propertyName = nameof(CreateOrganizationCommand.Organization);
+            const string propertyName = nameof(UpdateOrganizationCommand.Organization);
 
-            var target = new CreateOrganizationCommandRuleSet();
-            var command = new CreateOrganizationCommand(null!);
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, null!);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -51,12 +75,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationName_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
 
             var organizationDto = new ChangeOrganizationDto(value);
 
-            var target = new CreateOrganizationCommandRuleSet();
-            var command = new CreateOrganizationCommand(organizationDto);
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

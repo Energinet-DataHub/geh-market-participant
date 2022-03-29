@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -33,20 +34,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .NotEmpty()
                         .Length(1, 250);
 
-                    // TODO: How?
                     validator
                         .RuleFor(contact => contact.Category)
-                        .NotEmpty();
+                        .Must(category => ContactCategory.TryFromName(category, out _));
 
                     validator
                         .RuleFor(contact => contact.Email)
                         .NotEmpty()
                         .Length(1, 254);
 
-                    // TODO: Works for null?
                     validator
                         .RuleFor(contact => contact.Phone)
-                        .Length(1, 250);
+                        .Length(1, 15)
+                        .When(contact => contact.Phone != null);
                 });
         }
     }

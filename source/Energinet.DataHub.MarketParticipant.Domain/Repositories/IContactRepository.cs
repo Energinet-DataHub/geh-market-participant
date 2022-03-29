@@ -42,12 +42,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// </summary>
         /// <param name="contact">The Contact to add or update</param>
         /// <returns>The id of the added Contact</returns>
-        Task<ContactId> AddOrUpdateAsync(Contact contact);
+        Task<ContactId> AddAsync(Contact contact);
 
         /// <summary>
         /// Deletes the specified contact.
         /// </summary>
         /// <param name="contact">The contact to delete.</param>
-        Task DeleteAsync(Contact contact);
+        Task RemoveAsync(Contact contact);
     }
 }

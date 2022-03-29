@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .ValidateCategoriesAcrossContacts(existingContacts.Append(contact));
 
             var contactId = await _contactRepository
-                .AddOrUpdateAsync(contact)
+                .AddAsync(contact)
                 .ConfigureAwait(false);
 
             return new CreateContactResponse(contactId.Value);

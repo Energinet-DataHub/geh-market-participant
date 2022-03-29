@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -30,15 +28,13 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
     [UnitTest]
-    public sealed class CreateActorHandlerTests
+    public sealed class GetActorHandlerTests
     {
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                new Mock<IActorFactoryService>().Object);
+            var target = new GetActorHandler(new Mock<IOrganizationRepository>().Object);
 
             // Act + Assert
             await Assert
@@ -51,17 +47,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateActorHandler(
-                organizationRepository.Object,
-                new Mock<IActorFactoryService>().Object);
+            var target = new GetActorHandler(organizationRepository.Object);
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
                 .ReturnsAsync((Organization?)null);
 
-            var command = new CreateActorCommand(
-                Guid.Parse("62A79F4A-CB51-4D1E-8B4B-9A9BF3FB2BD4"),
-                new CreateActorDto(new GlobalLocationNumberDto("fake_value"), Array.Empty<MarketRoleDto>()));
+            var command = new GetSingleActorCommand(Guid.NewGuid(), Guid.NewGuid());
 
             // Act + Assert
             await Assert
@@ -70,43 +62,55 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NewActor_ActorIdReturned()
+        public async Task Handle_NoActor_ThrowsNotFoundException()
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(organizationRepository.Object, actorFactory.Object);
+            var target = new GetActorHandler(organizationRepository.Object);
+
+            var orgId = Guid.NewGuid();
+            const string orgName = "SomeName";
+
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
+
+            organizationRepository
+                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+                .ReturnsAsync(organization);
+
+            var command = new GetSingleActorCommand(Guid.NewGuid(), orgId);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Handle_HasActor_ReturnsActor()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var target = new GetActorHandler(organizationRepository.Object);
 
             var orgId = Guid.NewGuid();
             const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
             const string actorGln = "SomeGln";
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var organization = new Organization(new OrganizationId(orgId), orgName, new[] { actor });
 
             organizationRepository
-                .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == orgId)))
+                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
                 .ReturnsAsync(organization);
 
-            actorFactory
-                .Setup(x => x.CreateAsync(
-                    organization,
-                    It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>()))
-                .ReturnsAsync(actor);
-
-            var command = new CreateActorCommand(
-                orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>()));
+            var command = new GetSingleActorCommand(Guid.NewGuid(), Guid.NewGuid());
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(actor.Id.ToString(), response.ActorId);
+            Assert.NotNull(response.Actor);
         }
     }
 }
