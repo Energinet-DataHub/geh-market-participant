@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -19,14 +20,19 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public class GridAreaEntityConfiguration : IEntityTypeConfiguration<GridAreaEntity>
+    public sealed class ContactEntityConfiguration : IEntityTypeConfiguration<ContactEntity>
     {
-        public void Configure(EntityTypeBuilder<GridAreaEntity> builder)
+        public void Configure(EntityTypeBuilder<ContactEntity> builder)
         {
             Guard.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("GridAreaNew");
-            builder.HasKey(gridArea => gridArea.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.ToTable("Contact");
+            builder.HasKey(contact => contact.Id);
+            builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
+            builder.Property(contact => contact.Category)
+                .HasConversion(
+                    to => to.Value,
+                    from => ContactCategory.FromValue(from))
+                .HasColumnName("Category");
         }
     }
 }
