@@ -97,14 +97,22 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actorId = Guid.NewGuid();
             const string actorGln = "SomeGln";
 
-            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var actor = new Actor(
+                actorId,
+                new ExternalActorId(actorId),
+                new GlobalLocationNumber(actorGln),
+                ActorStatus.Active,
+                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>());
+
             var organization = new Organization(new OrganizationId(orgId), orgName, new[] { actor });
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleActorCommand(Guid.NewGuid(), Guid.NewGuid());
+            var command = new GetSingleActorCommand(actorId, Guid.NewGuid());
 
             // Act
             var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

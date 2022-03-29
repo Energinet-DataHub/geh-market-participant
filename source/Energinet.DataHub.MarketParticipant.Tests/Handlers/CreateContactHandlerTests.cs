@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateContactCommand(
                 Guid.Parse("62A79F4A-CB51-4D1E-8B4B-9A9BF3FB2BD4"),
-                new CreateContactDto("fake_value", "fake_value", "fake_value", "fake_value"));
+                new CreateContactDto("fake_value", "Default", "fake@value", null));
 
             // Act + Assert
             await Assert
@@ -103,9 +103,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(orgId))
                 .ReturnsAsync(new[] { contact, contact, contact });
 
+            contactRepository
+                .Setup(x => x.AddAsync(It.Is<Contact>(y => y.OrganizationId == orgId)))
+                .ReturnsAsync(contact.Id);
+
             var command = new CreateContactCommand(
                 orgId.Value,
-                new CreateContactDto("fake_value", "fake_value", "fake_value", "fake_value"));
+                new CreateContactDto("fake_value", "Default", "fake@value", null));
 
             // Act
             await target
@@ -149,7 +153,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateContactCommand(
                 orgId.Value,
-                new CreateContactDto("fake_value", "fake_value", "fake_value", "fake_value"));
+                new CreateContactDto("fake_value", "Default", "fake@value", null));
 
             // Act
             var response = await target

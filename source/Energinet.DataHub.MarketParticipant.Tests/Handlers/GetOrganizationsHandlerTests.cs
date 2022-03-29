@@ -30,18 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetOrganizationsHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new GetOrganizationsHandler(new Mock<IOrganizationRepository>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_HasOrganization_ReturnsOrganization()
         {
             // Arrange

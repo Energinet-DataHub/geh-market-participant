@@ -125,7 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 Guid.NewGuid(),
-                Guid.NewGuid(),
+                Guid.Empty,
                 new ChangeActorDto("Active", Array.Empty<MarketRoleDto>()));
 
             // Act
@@ -161,7 +161,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 Guid.NewGuid(),
-                Guid.NewGuid(),
+                Guid.Empty,
                 new ChangeActorDto("Active", Array.Empty<MarketRoleDto>()));
 
             // Act

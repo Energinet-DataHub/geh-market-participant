@@ -61,12 +61,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = scope.GetInstance<IOrganizationRepository>();
+            var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(new Organization("Test Organization"))
                 .ConfigureAwait(false);
 
             var contactRepository = new ContactRepository(context);
+            var categories = new[]
+            {
+                ContactCategory.EndOfSupply,
+                ContactCategory.ChargeLinks,
+                ContactCategory.Notification,
+                ContactCategory.MeasurementData,
+                ContactCategory.Recon
+            };
 
             for (var i = 0; i < 5; i++)
             {
@@ -74,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                     .AddAsync(new Contact(
                         organizationId,
                         "fake_value",
-                        ContactCategory.Charges,
+                        categories[i],
                         new EmailAddress("fake@fake.dk"),
                         new PhoneNumber("1234567")))
                     .ConfigureAwait(false);
@@ -97,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = scope.GetInstance<IOrganizationRepository>();
+            var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(new Organization("Test Organization"))
                 .ConfigureAwait(false);
@@ -133,7 +141,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = scope.GetInstance<IOrganizationRepository>();
+            var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(new Organization("Test Organization"))
                 .ConfigureAwait(false);
@@ -163,13 +171,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         {
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = scope.GetInstance<IOrganizationRepository>();
+            var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(new Organization("Test Organization"))
                 .ConfigureAwait(false);
 
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
 
             var contactRepository = new ContactRepository(context);
