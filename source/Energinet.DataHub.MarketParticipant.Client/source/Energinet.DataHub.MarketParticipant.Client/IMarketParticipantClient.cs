@@ -68,6 +68,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
         Task<IEnumerable<ActorDto>?> GetActorsAsync(Guid organizationId);
 
         /// <summary>
+        /// Creates an actor in a specific organization
+        /// </summary>
+        /// <param name="organizationId">The id of the organization to create the actor in</param>
+        /// <param name="createActorDto">The details of the actor to be created</param>
+        /// <returns>The id of the created actor</returns>
+        Task<Guid?> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto);
+
+        /// <summary>
         /// Updates an actor
         /// </summary>
         /// <param name="organizationId">The organization the actor belongs to</param>
