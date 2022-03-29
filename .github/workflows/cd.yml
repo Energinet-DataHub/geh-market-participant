@@ -33,8 +33,16 @@ jobs:
     secrets:
       PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       ENVIRONMENT_REPOSITORY_PATH: ${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}
-
-  upload_main_coverage_result_to_codecov:
-    uses: Energinet-DataHub/.github/.github/workflows/upload-coverage-to-codecov.yml@6.0.0
+      
+  update_coverage_report:
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@6.0.0
     with:
-      RELEASE_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
+      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
+      DOTNET_VERSION: '5.0'
+      USE_SQLLOCALDB_2019: true
+    secrets:
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID }}
+      AZURE_SPN_SECRET: ${{ secrets.AZURE_SPN_SECRET }}
+      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
