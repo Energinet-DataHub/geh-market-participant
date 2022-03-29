@@ -13,18 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Client.Models;
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    // TODO: Remove this class when going REST.
-    public class GetCommand
-    {
-        public GetCommand(IEnumerable<OrganizationDto> organizations)
-        {
-            Organizations = organizations;
-        }
-
-        public IEnumerable<OrganizationDto> Organizations { get; set; }
-    }
+    public sealed record CreateActorDto(GlobalLocationNumberDto Gln, IEnumerable<MarketRoleDto> MarketRoles);
 }
