@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                             .Send(getOrganizationsCommand)
                             .ConfigureAwait(false);
 
-                        return Ok(response);
+                        return Ok(response.Organizations);
                     },
                 _logger).ConfigureAwait(false);
         }
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(getSingleOrganizationCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok(response.Organization);
                 },
                 _logger).ConfigureAwait(false);
         }
@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(createOrganizationCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok(response.OrganizationId);
                 },
                 _logger).ConfigureAwait(false);
         }

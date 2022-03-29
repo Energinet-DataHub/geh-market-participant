@@ -14,44 +14,121 @@
 
 using System;
 using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
+using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantClient : IMarketParticipantClient
     {
-        private const string GetOrganizationsBase = "GetOrganizations";
+        private const string OrganizationsBaseUrl = "Organization";
+        private const string ActorBaseUrl = "Actor";
 
-        private static readonly JsonSerializerOptions _defaultOptions = new()
+        private readonly IFlurlClient _httpClient;
+
+        public MarketParticipantClient(IFlurlClient client)
         {
-            Converters = { new JsonStringEnumConverter() }
-        };
-
-        private readonly HttpClient _httpClient;
-
-        public MarketParticipantClient(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
+            _httpClient = client;
         }
 
         public async Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
         {
             var response = await _httpClient
-                .GetAsync(new Uri(GetOrganizationsBase, UriKind.Relative))
+                .Request(OrganizationsBaseUrl)
+                .GetAsync()
                 .ConfigureAwait(false);
 
-            var organizations = await response
-                .EnsureSuccessStatusCode()
-                .Content
-                .ReadFromJsonAsync<GetCommand>(_defaultOptions)
+            var listAllOrganizationsResult = await response.GetJsonAsync<IEnumerable<OrganizationDto>>()
                 .ConfigureAwait(false);
 
-            return organizations?.Organizations ?? Array.Empty<OrganizationDto>();
+            return listAllOrganizationsResult ?? Array.Empty<OrganizationDto>();
+        }
+
+        public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            var singleOrganizationsResult = await response.GetJsonAsync<OrganizationDto>()
+                .ConfigureAwait(false);
+
+            return singleOrganizationsResult;
+        }
+
+        public async Task<Guid?> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl)
+                .PostJsonAsync(organizationDto)
+                .ConfigureAwait(false);
+
+            var orgId = await response.GetStringAsync()
+                .ConfigureAwait(false);
+
+            return Guid.Parse(orgId);
+        }
+
+        public async Task<bool> UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
+        {
+            await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId)
+                .PutJsonAsync(organizationDto)
+                .ConfigureAwait(false);
+
+            return true;
+        }
+
+        public async Task<IEnumerable<ActorDto>?> GetActorsAsync(Guid organizationId)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            var actors = await response.GetJsonAsync<IEnumerable<ActorDto>>()
+                .ConfigureAwait(false);
+
+            return actors;
+        }
+
+        public async Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            var actor = await response.GetJsonAsync<ActorDto>()
+                .ConfigureAwait(false);
+
+            return actor;
+        }
+
+        public async Task<Guid?> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
+                .PostJsonAsync(createActorDto)
+                .ConfigureAwait(false);
+
+            var actor = await response.GetStringAsync()
+                .ConfigureAwait(false);
+
+            return Guid.Parse(actor);
+        }
+
+        public async Task<bool?> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto createActorDto)
+        {
+            await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
+                .PutJsonAsync(createActorDto)
+                .ConfigureAwait(false);
+
+            return true;
         }
     }
 }
