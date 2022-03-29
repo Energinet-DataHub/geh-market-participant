@@ -25,16 +25,18 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class GetActorHandler : IRequestHandler<GetSingleActorCommand, GetSingleActorResponse>
+    public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
 
-        public GetActorHandler(IOrganizationRepository organizationRepository)
+        public GetActorsHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
         }
 
-        public async Task<GetSingleActorResponse> Handle(GetSingleActorCommand request, CancellationToken cancellationToken)
+        public async Task<GetActorsResponse> Handle(
+            GetActorsCommand request,
+            CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
@@ -47,13 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 throw new NotFoundValidationException(request.OrganizationId);
             }
 
-            var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
+            var actors = organization.Actors.Select(OrganizationMapper.Map);
 
-            return actor switch
-            {
-                null => throw new NotFoundValidationException(request.ActorId),
-                _ => new GetSingleActorResponse(OrganizationMapper.Map(actor))
-            };
+            return new GetActorsResponse(actors);
         }
     }
 }
