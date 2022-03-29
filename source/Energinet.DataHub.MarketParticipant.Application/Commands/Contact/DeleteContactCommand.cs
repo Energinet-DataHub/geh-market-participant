@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
-    public sealed record GetOrganizationsResponse(IEnumerable<OrganizationDto> Organizations);
+    public sealed record DeleteContactCommand(Guid OrganizationId, Guid ContactId) : IRequest;
 }

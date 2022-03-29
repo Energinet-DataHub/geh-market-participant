@@ -14,7 +14,7 @@
 
 using System.Net;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions;
 using MediatR;
 using Microsoft.Azure.Functions.Worker;

@@ -14,10 +14,10 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record OrganizationDto(
-        string OrganizationId,
-        string Name,
-        IEnumerable<ActorDto> Actors);
+    public sealed record ChangeActorDto(
+        GlobalLocationNumberDto Gln,
+        string Status,
+        IEnumerable<MarketRoleDto> MarketRoles);
 }

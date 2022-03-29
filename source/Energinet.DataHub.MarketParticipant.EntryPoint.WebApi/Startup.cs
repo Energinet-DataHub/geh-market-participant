@@ -53,8 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseRouting();
 
-            app.UseMiddleware<JwtTokenMiddleware>();
-            app.UseMiddleware<UserMiddleware>();
+            //app.UseMiddleware<JwtTokenMiddleware>();
+            //app.UseMiddleware<UserMiddleware>();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
@@ -117,13 +117,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         protected override void Configure(Container container)
         {
-            var openIdUrl = Configuration["FRONTEND_OPEN_ID_URL"] ?? throw new InvalidOperationException(
-                "Frontend OpenID URL not found.");
-
-            var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
-                "Frontend service app id not found.");
-
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
+            //var openIdUrl = Configuration["FRONTEND_OPEN_ID_URL"] ?? throw new InvalidOperationException(
+            //    "Frontend OpenID URL not found.");
+            //var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
+            //    "Frontend service app id not found.");
+            //Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }
 }

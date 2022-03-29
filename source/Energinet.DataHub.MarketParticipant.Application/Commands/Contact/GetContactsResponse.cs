@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
-    public sealed record CreateOrganizationResponse(string OrganizationId);
+    public sealed record GetContactsResponse(IEnumerable<ContactDto> Contacts);
 }

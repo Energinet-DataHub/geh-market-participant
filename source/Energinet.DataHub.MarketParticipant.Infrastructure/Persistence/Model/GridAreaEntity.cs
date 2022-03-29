@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public class GridAreaEntity
+    public sealed class GridAreaEntity
     {
         public GridAreaEntity()
         {

@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 

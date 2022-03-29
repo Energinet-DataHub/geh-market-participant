@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
-    public sealed record UpdateActorCommand(Guid OrganizationId, Guid ActorId, ChangeActorDto ChangeActor) : IRequest;
+    public sealed record CreateContactDto(
+        string Category,
+        string Name,
+        string Email,
+        string? Phone);
 }

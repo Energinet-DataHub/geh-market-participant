@@ -12,22 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
-    public class ContactRepository : IContactRepository
+    public sealed class ContactRepository : IContactRepository
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
         public ContactRepository(IMarketParticipantDbContext marketParticipantDbContext)
         {
             _marketParticipantDbContext = marketParticipantDbContext;
+        }
+
+        public async Task<Contact?> GetAsync(ContactId contactId)
+        {
+            Guard.ThrowIfNull(contactId, nameof(contactId));
+
+            var contact = await _marketParticipantDbContext.Contacts
+                .FindAsync(contactId.Value)
+                .ConfigureAwait(false);
+
+            return contact is null ? null : ContactMapper.MapFromEntity(contact);
+        }
+
+        public async Task<IEnumerable<Contact>> GetAsync(OrganizationId organizationId)
+        {
+            Guard.ThrowIfNull(organizationId, nameof(organizationId));
+
+            var query =
+                from contact in _marketParticipantDbContext.Contacts
+                where contact.OrganizationId == organizationId.Value
+                select contact;
+
+            var entities = await query
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return entities.Select(ContactMapper.MapFromEntity);
         }
 
         public async Task<ContactId> AddOrUpdateAsync(Contact contact)
@@ -55,15 +85,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return new ContactId(destination.Id);
         }
 
-        public async Task<Contact?> GetAsync(ContactId id)
+        public async Task DeleteAsync(Contact contact)
         {
-            Guard.ThrowIfNull(id, nameof(id));
+            Guard.ThrowIfNull(contact, nameof(contact));
 
-            var contact = await _marketParticipantDbContext.Contacts
-                .FindAsync(id.Value)
+            var entity = await _marketParticipantDbContext
+                 .Contacts
+                 .FindAsync(contact.Id.Value)
+                 .ConfigureAwait(false);
+
+            _marketParticipantDbContext.Contacts.Remove(entity);
+
+            await _marketParticipantDbContext
+                .SaveChangesAsync()
                 .ConfigureAwait(false);
-
-            return contact is null ? null : ContactMapper.MapFromEntity(contact);
         }
     }
 }

@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+using System;
+using MediatR;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
 {
-    public sealed record GlobalLocationNumberDto(string Value);
+    public sealed record GetSingleOrganizationCommand
+        (Guid OrganizationId) : IRequest<GetSingleOrganizationResponse>;
 }

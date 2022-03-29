@@ -15,7 +15,7 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -25,33 +25,44 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
+    public sealed class GetContactsHandler : IRequestHandler<GetContactsCommand, GetContactsResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IContactRepository _contactRepository;
 
-        public GetActorsHandler(IOrganizationRepository organizationRepository)
+        public GetContactsHandler(
+            IOrganizationRepository organizationRepository,
+            IContactRepository contactRepository)
         {
             _organizationRepository = organizationRepository;
+            _contactRepository = contactRepository;
         }
 
-        public async Task<GetActorsResponse> Handle(
-            GetActorsCommand request,
-            CancellationToken cancellationToken)
+        public async Task<GetContactsResponse> Handle(GetContactsCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
+            var organizationId = new OrganizationId(request.OrganizationId);
+
+            await EnsureOrganizationExistsAsync(organizationId).ConfigureAwait(false);
+
+            var contacts = await _contactRepository
+                .GetAsync(organizationId)
+                .ConfigureAwait(false);
+
+            return new GetContactsResponse(contacts.Select(ContactMapper.Map));
+        }
+
+        private async Task EnsureOrganizationExistsAsync(OrganizationId organizationId)
+        {
             var organization = await _organizationRepository
-                .GetAsync(new OrganizationId(request.OrganizationId))
+                .GetAsync(organizationId)
                 .ConfigureAwait(false);
 
             if (organization == null)
             {
-                throw new NotFoundValidationException(request.OrganizationId);
+                throw new NotFoundValidationException(organizationId.Value);
             }
-
-            var actors = organization.Actors.Select(OrganizationMapper.Map);
-
-            return new GetActorsResponse(actors);
         }
     }
 }

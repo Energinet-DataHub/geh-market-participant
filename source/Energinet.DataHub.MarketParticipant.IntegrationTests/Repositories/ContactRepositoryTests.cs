@@ -62,8 +62,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testContact = new Contact(
                 ContactCategory.Charges,
                 new ContactName("fake_value"),
-                new ContactEmail("fake@fake.dk"),
-                new ContactPhone("1234567"));
+                new EmailAddress("fake@fake.dk"),
+                new PhoneNumber("1234567"));
 
             // Act
             var contactId = await contactRepository.AddOrUpdateAsync(testContact).ConfigureAwait(false);
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newContact);
             Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
             Assert.Equal(testContact.Category, newContact?.Category);
-            Assert.Equal(testContact.Email.Value, newContact?.Email.Value);
+            Assert.Equal(testContact.EmailAddress.Value, newContact?.EmailAddress.Value);
             Assert.Equal(testContact.Name.Value, newContact?.Name.Value);
             Assert.Equal(testContact.Phone.Value, newContact?.Phone.Value);
         }
@@ -89,8 +89,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testContact = new Contact(
                 ContactCategory.Charges,
                 new ContactName("fake_value"),
-                new ContactEmail("fake@fake.dk"),
-                new ContactPhone("1234567"));
+                new EmailAddress("fake@fake.dk"),
+                new PhoneNumber("1234567"));
 
             // Act
             var contactId = await contactRepository.AddOrUpdateAsync(testContact).ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 newContact!.Id,
                 ContactCategory.Reminder,
                 newContact.Name,
-                new ContactEmail("fake2@fake.dk"),
+                new EmailAddress("fake2@fake.dk"),
                 newContact.Phone);
 
             await contactRepository.AddOrUpdateAsync(newContact).ConfigureAwait(false);
@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(newContact);
             Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
-            Assert.Equal("fake2@fake.dk", newContact?.Email.Value);
+            Assert.Equal("fake2@fake.dk", newContact?.EmailAddress.Value);
             Assert.Equal(ContactCategory.Reminder, newContact?.Category);
         }
 
@@ -125,8 +125,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testContact = new Contact(
                 ContactCategory.Charges,
                 new ContactName("fake_value"),
-                new ContactEmail("fake@fake.dk"),
-                new ContactPhone("1234567"));
+                new EmailAddress("fake@fake.dk"),
+                new PhoneNumber("1234567"));
 
             // Act
             var contactId = await contactRepository.AddOrUpdateAsync(testContact).ConfigureAwait(false);
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newContact);
             Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
             Assert.Equal(testContact.Category, newContact?.Category);
-            Assert.Equal(testContact.Email.Value, newContact?.Email.Value);
+            Assert.Equal(testContact.EmailAddress.Value, newContact?.EmailAddress.Value);
             Assert.Equal(testContact.Name.Value, newContact?.Name.Value);
             Assert.Equal(testContact.Phone.Value, newContact?.Phone.Value);
         }

@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
     public sealed record GetActorsResponse(IEnumerable<ActorDto> Actor);
 }

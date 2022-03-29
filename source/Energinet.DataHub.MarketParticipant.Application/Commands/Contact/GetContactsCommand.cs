@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
-    public sealed record ActorDto(
-        string ActorId,
-        string ExternalActorId,
-        GlobalLocationNumberDto Gln,
-        string Status,
-        IEnumerable<MarketRoleDto> MarketRoles);
+    public sealed record GetContactsCommand(Guid OrganizationId) : IRequest<GetContactsResponse>;
 }

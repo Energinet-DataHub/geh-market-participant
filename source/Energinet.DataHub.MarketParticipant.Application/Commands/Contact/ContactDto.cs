@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
-    public sealed record UpdateOrganizationCommand(Guid OrganizationId, ChangeOrganizationDto Organization) : IRequest;
+    public sealed record ContactDto(
+        Guid ContactId,
+        string Category,
+        string Name,
+        string Email,
+        string? Phone);
 }
