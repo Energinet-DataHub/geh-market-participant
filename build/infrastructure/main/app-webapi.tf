@@ -29,7 +29,7 @@ resource "azurerm_app_service" "webapi" {
     "APPINSIGHTS_INSTRUMENTATIONKEY" = "${data.azurerm_key_vault_secret.appi_instrumentation_key.value}"
     "FRONTEND_OPEN_ID_URL" = "${data.azurerm_key_vault_secret.frontend_open_id_url.value}"
     "FRONTEND_SERVICE_APP_ID" = "${data.azurerm_key_vault_secret.frontend_service_app_id.value}"
-	"SQL_MP_DB_CONNECTION_STRING" = "local.MS_MARKET_PARTICIPANT_CONNECTION_STRING"
+	"SQL_MP_DB_CONNECTION_STRING" = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
   }
 
   tags              = azurerm_resource_group.this.tags
