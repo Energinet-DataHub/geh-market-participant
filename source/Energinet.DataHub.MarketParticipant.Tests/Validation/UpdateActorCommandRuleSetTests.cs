@@ -142,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_NullMarketRole_ValidatesProperty()
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ChangeActorDto.MarketRoles)}[0]";
+            var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0]";
 
             var actorDto = new ChangeActorDto(ValidStatus, new MarketRoleDto[] { null! });
 

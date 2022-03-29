@@ -143,7 +143,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData(null, false)]
         [InlineData("  ", false)]
         [InlineData("john@doe.com", true)]
-        [InlineData("not_at_sign", false)]
         [InlineData("{max_value}", true)]
         [InlineData("{too_long_value}", false)]
         public async Task Validate_Email_ValidatesProperty(string value, bool isValid)
@@ -185,12 +184,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [Theory]
         [InlineData("", false)]
         [InlineData(null, true)]
-        [InlineData("  ", false)]
         [InlineData("01020304", true)]
         [InlineData("+45 01020304", true)]
-        [InlineData("01letters02", false)]
-        [InlineData("101010101010101", true)]
-        [InlineData("1010101010101010", false)]
         public async Task Validate_Phone_ValidatesProperty(string value, bool isValid)
         {
             // Arrange

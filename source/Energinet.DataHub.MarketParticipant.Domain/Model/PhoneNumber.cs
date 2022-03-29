@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         private static string ValidateNumber(string number)
         {
-            return _validator.IsValid(number)
+            return !string.IsNullOrWhiteSpace(number) && _validator.IsValid(number)
                 ? number
                 : throw new ValidationException($"The provided phone number {number} is not valid.");
         }

@@ -31,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData("123.456.7890", true)]
         [InlineData("123-456-7890", true)]
         [InlineData("+44 7222 555 555", true)]
-        [InlineData("+33(0) – 123456789", true)]
         [InlineData("+49 (173) 1799 806-44", true)]
         [InlineData("010101 letters 02", false)]
         public void Ctor_Email_ValidatesAddress(string value, bool isValid)

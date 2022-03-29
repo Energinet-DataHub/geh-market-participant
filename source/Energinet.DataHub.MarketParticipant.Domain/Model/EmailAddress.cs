@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         private static MailAddress ValidateAddress(string address)
         {
-            return MailAddress.TryCreate(address, out var parsedAddress)
+            return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out var parsedAddress)
                 ? parsedAddress
                 : throw new ValidationException($"The provided e-mail {address} address is not valid.");
         }

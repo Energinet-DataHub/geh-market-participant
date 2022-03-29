@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         public UpdateOrganizationCommandRuleSet()
         {
             RuleFor(command => command.OrganizationId)
-                .NotNull();
+                .NotEmpty();
 
             RuleFor(command => command.Organization)
                 .NotNull()
