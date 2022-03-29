@@ -11,3 +11,11 @@ yyyyMMddHHmm
 DataHub
 nuget
 NuGet
+UpdateOrganizationAsync
+CreateOrganizationAsync
+GetOrganizationAsync
+GetOrganizationsAsync
+UpdateActorAsync
+CreateActorAsync
+GetActorAsync
+GetActorsAsync
