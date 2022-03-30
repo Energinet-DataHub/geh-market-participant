@@ -18,9 +18,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new GetActorHandler(new Mock<IOrganizationRepository>().Object);
+            var target = new GetActorHandler(new Mock<IOrganizationExistsHelperService>().Object);
 
             // Act + Assert
             await Assert
@@ -43,41 +43,22 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NoOrganization_ThrowsNotFoundException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GetActorHandler(organizationRepository.Object);
-
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
-                .ReturnsAsync((Organization?)null);
-
-            var command = new GetSingleActorCommand(Guid.NewGuid(), Guid.NewGuid());
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NoActor_ThrowsNotFoundException()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GetActorHandler(organizationRepository.Object);
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var target = new GetActorHandler(organizationExistsHelperService.Object);
 
-            var orgId = Guid.NewGuid();
+            var organizationId = Guid.NewGuid();
             const string orgName = "SomeName";
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
+            var organization = new Organization(new OrganizationId(organizationId), orgName, Enumerable.Empty<Actor>());
 
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleActorCommand(Guid.NewGuid(), orgId);
+            var command = new GetSingleActorCommand(Guid.NewGuid(), organizationId);
 
             // Act + Assert
             await Assert
@@ -89,8 +70,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_HasActor_ReturnsActor()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GetActorHandler(organizationRepository.Object);
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var target = new GetActorHandler(organizationExistsHelperService.Object);
 
             var orgId = Guid.NewGuid();
             const string orgName = "SomeName";
@@ -108,17 +89,18 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organization = new Organization(new OrganizationId(orgId), orgName, new[] { actor });
 
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleActorCommand(actorId, Guid.NewGuid());
+            var command = new GetSingleActorCommand(actorId, orgId);
 
             // Act
             var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(response.Actor);
+            Assert.Equal(actorId.ToString(), response.Actor?.ActorId);
         }
     }
 }

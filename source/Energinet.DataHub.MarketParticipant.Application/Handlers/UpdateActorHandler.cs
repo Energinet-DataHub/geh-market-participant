@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -31,17 +32,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
     public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
+            IOrganizationExistsHelperService organizationExistsHelperService,
             IUnitOfWorkProvider unitOfWorkProvider,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService)
         {
             _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
@@ -51,15 +55,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organizationId = new OrganizationId(request.OrganizationId);
-            var organization = await _organizationRepository
-                .GetAsync(organizationId)
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
-
-            if (organization == null)
-            {
-                throw new NotFoundValidationException(organizationId.Value);
-            }
 
             var actorId = request.ActorId;
             var actor = organization
@@ -82,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
-                .EnqueueActorUpdatedEventAsync(organizationId, actor)
+                .EnqueueActorUpdatedEventAsync(organization.Id, actor)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);

@@ -16,7 +16,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -27,16 +27,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class CreateContactHandler : IRequestHandler<CreateContactCommand, CreateContactResponse>
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IContactRepository _contactRepository;
         private readonly IOverlappingContactCategoriesRuleService _overlappingContactCategoriesRuleService;
 
         public CreateContactHandler(
-            IOrganizationRepository organizationRepository,
+            IOrganizationExistsHelperService organizationExistsHelperService,
             IContactRepository contactRepository,
             IOverlappingContactCategoriesRuleService overlappingContactCategoriesRuleService)
         {
-            _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
             _contactRepository = contactRepository;
             _overlappingContactCategoriesRuleService = overlappingContactCategoriesRuleService;
         }
@@ -45,15 +45,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organizationId = new OrganizationId(request.OrganizationId);
-
-            await EnsureOrganizationExistsAsync(organizationId).ConfigureAwait(false);
-
-            var existingContacts = await _contactRepository
-                .GetAsync(organizationId)
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            var contact = CreateContact(organizationId, request.Contact);
+            var existingContacts = await _contactRepository
+                .GetAsync(organization.Id)
+                .ConfigureAwait(false);
+
+            var contact = CreateContact(organization.Id, request.Contact);
 
             _overlappingContactCategoriesRuleService
                 .ValidateCategoriesAcrossContacts(existingContacts.Append(contact));
@@ -74,21 +74,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new Contact(
                 organizationId,
                 contactDto.Name,
-                ContactCategory.FromName(contactDto.Category),
+                ContactCategory.FromName(contactDto.Category, true),
                 new EmailAddress(contactDto.Email),
                 optionalPhoneNumber);
-        }
-
-        private async Task EnsureOrganizationExistsAsync(OrganizationId organizationId)
-        {
-            var organization = await _organizationRepository
-                .GetAsync(organizationId)
-                .ConfigureAwait(false);
-
-            if (organization == null)
-            {
-                throw new NotFoundValidationException(organizationId.Value);
-            }
         }
     }
 }

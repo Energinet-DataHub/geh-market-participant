@@ -19,7 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var target = new CreateContactHandler(
-                new Mock<IOrganizationRepository>().Object,
+                new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IContactRepository>().Object,
                 new Mock<IOverlappingContactCategoriesRuleService>().Object);
 
@@ -48,38 +48,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NoOrganization_ThrowsNotFoundException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new CreateContactHandler(
-                organizationRepository.Object,
-                new Mock<IContactRepository>().Object,
-                new Mock<IOverlappingContactCategoriesRuleService>().Object);
-
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
-                .ReturnsAsync((Organization?)null);
-
-            var command = new CreateContactCommand(
-                Guid.Parse("62A79F4A-CB51-4D1E-8B4B-9A9BF3FB2BD4"),
-                new CreateContactDto("fake_value", "Default", "fake@value", null));
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NoOverlappingCategories_MustValidate()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IContactRepository>();
             var overlappingContactCategoriesRuleService = new Mock<IOverlappingContactCategoriesRuleService>();
             var target = new CreateContactHandler(
-                organizationRepository.Object,
+                organizationExistsHelperService.Object,
                 contactRepository.Object,
                 overlappingContactCategoriesRuleService.Object);
 
@@ -95,8 +71,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new EmailAddress("john@doe"),
                 null);
 
-            organizationRepository
-                .Setup(x => x.GetAsync(orgId))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId.Value))
                 .ReturnsAsync(organization);
 
             contactRepository
@@ -124,10 +100,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewContact_ContactIdReturned()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IContactRepository>();
             var target = new CreateContactHandler(
-                organizationRepository.Object,
+                organizationExistsHelperService.Object,
                 contactRepository.Object,
                 new Mock<IOverlappingContactCategoriesRuleService>().Object);
 
@@ -143,8 +119,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new EmailAddress("john@doe"),
                 null);
 
-            organizationRepository
-                .Setup(x => x.GetAsync(orgId))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId.Value))
                 .ReturnsAsync(organization);
 
             contactRepository

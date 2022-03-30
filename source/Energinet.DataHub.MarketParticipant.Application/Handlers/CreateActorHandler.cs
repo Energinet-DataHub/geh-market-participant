@@ -18,9 +18,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
@@ -29,14 +28,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class CreateActorHandler : IRequestHandler<CreateActorCommand, CreateActorResponse>
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
 
         public CreateActorHandler(
-            IOrganizationRepository organizationRepository,
+            IOrganizationExistsHelperService organizationExistsHelperService,
             IActorFactoryService actorFactoryService)
         {
-            _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
         }
 
@@ -44,14 +43,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationRepository
-                .GetAsync(new OrganizationId(request.OrganizationId))
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
-
-            if (organization == null)
-            {
-                throw new NotFoundValidationException(request.OrganizationId);
-            }
 
             var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
             var actorRoles = CreateMarketRoles(request.Actor).ToList();

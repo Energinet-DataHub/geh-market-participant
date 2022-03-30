@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -35,7 +35,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new UpdateOrganizationHandler(new Mock<IOrganizationRepository>().Object);
+            var target = new UpdateOrganizationHandler(
+                new Mock<IOrganizationRepository>().Object,
+                new Mock<IOrganizationExistsHelperService>().Object);
 
             // Act + Assert
             await Assert
@@ -44,31 +46,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NoOrganization_ThrowsNotFoundException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new UpdateOrganizationHandler(organizationRepository.Object);
-
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
-                .ReturnsAsync((Organization?)null);
-
-            var command = new UpdateOrganizationCommand(Guid.NewGuid(), new ChangeOrganizationDto("fake_value"));
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_UpdateOrganization_ReturnsOk()
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new UpdateOrganizationHandler(organizationRepository.Object);
-            const string orgId = "1572cb86-3c1d-4899-8d7a-983d8de0796b";
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var target = new UpdateOrganizationHandler(
+                organizationRepository.Object,
+                organizationExistsHelperService.Object);
+
+            var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
             var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
 
@@ -86,16 +73,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 new[] { actor });
 
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
                 .ReturnsAsync(organization);
+
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
             var changeDto = new ChangeOrganizationDto("New name");
 
-            var command = new UpdateOrganizationCommand(Guid.Parse(orgId), changeDto);
+            var command = new UpdateOrganizationCommand(orgId, changeDto);
 
             // Act
             var response = await target

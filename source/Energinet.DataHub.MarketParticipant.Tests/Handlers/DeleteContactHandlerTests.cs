@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var target = new DeleteContactHandler(
-                new Mock<IOrganizationRepository>().Object,
+                new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IContactRepository>().Object);
 
             // Act + Assert
@@ -44,45 +44,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NoOrganization_ThrowsNotFoundException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var contactRepository = new Mock<IContactRepository>();
-            var target = new DeleteContactHandler(
-                organizationRepository.Object,
-                contactRepository.Object);
-
-            var organizationId = new OrganizationId(Guid.NewGuid());
-            var contactId = new ContactId(Guid.NewGuid());
-
-            organizationRepository
-                .Setup(x => x.GetAsync(organizationId))
-                .ReturnsAsync((Organization?)null);
-
-            var command = new DeleteContactCommand(organizationId.Value, contactId.Value);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NoContact_DoesNothing()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IContactRepository>();
             var target = new DeleteContactHandler(
-                organizationRepository.Object,
+                organizationExistsHelperService.Object,
                 contactRepository.Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
 
-            organizationRepository
-                .Setup(x => x.GetAsync(organizationId))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
                 .ReturnsAsync(new Organization("fake_value"));
 
             contactRepository
@@ -99,17 +74,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_OneContact_IsDeleted()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IContactRepository>();
             var target = new DeleteContactHandler(
-                organizationRepository.Object,
+                organizationExistsHelperService.Object,
                 contactRepository.Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
 
-            organizationRepository
-                .Setup(x => x.GetAsync(organizationId))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
                 .ReturnsAsync(new Organization("fake_value"));
 
             var contactToDelete = new Contact(

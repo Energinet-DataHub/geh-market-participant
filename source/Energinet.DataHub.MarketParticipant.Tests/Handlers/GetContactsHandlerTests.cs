@@ -18,7 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var target = new GetContactsHandler(
-                new Mock<IOrganizationRepository>().Object,
+                new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IContactRepository>().Object);
 
             // Act + Assert
@@ -45,31 +45,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NoOrganization_ThrowsNotFoundException()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GetContactsHandler(
-                organizationRepository.Object,
-                new Mock<IContactRepository>().Object);
-
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
-                .ReturnsAsync((Organization?)null);
-
-            var command = new GetContactsCommand(Guid.NewGuid());
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_HasContacts_ReturnsContacts()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationRepository = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IContactRepository>();
             var target = new GetContactsHandler(
                 organizationRepository.Object,
@@ -83,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>());
 
             organizationRepository
-                .Setup(x => x.GetAsync(organizationId))
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
                 .ReturnsAsync(organization);
 
             var expected = new Contact(

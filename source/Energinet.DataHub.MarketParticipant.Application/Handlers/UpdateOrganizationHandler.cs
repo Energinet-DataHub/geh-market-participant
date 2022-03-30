@@ -15,8 +15,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
@@ -26,25 +25,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
     public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
     {
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
 
-        public UpdateOrganizationHandler(IOrganizationRepository organizationRepository)
+        public UpdateOrganizationHandler(
+            IOrganizationRepository organizationRepository,
+            IOrganizationExistsHelperService organizationExistsHelperService)
         {
             _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
         }
 
         public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organizationId = request.OrganizationId;
-            var organization = await _organizationRepository
-                .GetAsync(new OrganizationId(organizationId))
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
-
-            if (organization == null)
-            {
-                throw new NotFoundValidationException(organizationId);
-            }
 
             organization.Name = request.Organization.Name;
 

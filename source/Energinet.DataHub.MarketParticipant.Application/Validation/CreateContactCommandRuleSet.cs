@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(contact => contact.Category)
-                        .Must(category => ContactCategory.TryFromName(category, out _));
+                        .Must(category => ContactCategory.TryFromName(category, true, out _));
 
                     validator
                         .RuleFor(contact => contact.Email)
