@@ -21,4 +21,4 @@
 
 ## Version 0.4.0
 
-- GLN cannot be changed on an actor.
+- Global location number cannot be changed on an actor.
