@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
@@ -39,6 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
+                        .NotNull()
                         .ChildRules(rolesValidator =>
                             rolesValidator
                                 .RuleForEach(x => x)

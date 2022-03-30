@@ -15,11 +15,9 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -27,11 +25,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
 
-        public GetActorsHandler(IOrganizationRepository organizationRepository)
+        public GetActorsHandler(IOrganizationExistsHelperService organizationExistsHelperService)
         {
-            _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
         }
 
         public async Task<GetActorsResponse> Handle(
@@ -40,17 +38,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationRepository
-                .GetAsync(new OrganizationId(request.OrganizationId))
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            if (organization == null)
-            {
-                throw new NotFoundValidationException(request.OrganizationId);
-            }
-
             var actors = organization.Actors.Select(OrganizationMapper.Map);
-
             return new GetActorsResponse(actors);
         }
     }

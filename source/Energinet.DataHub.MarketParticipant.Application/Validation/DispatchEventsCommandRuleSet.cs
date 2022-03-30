@@ -19,8 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
     public sealed class DispatchEventsCommandRuleSet : AbstractValidator<DispatchEventsCommand>
     {
-        public DispatchEventsCommandRuleSet()
-        {
-        }
     }
 }

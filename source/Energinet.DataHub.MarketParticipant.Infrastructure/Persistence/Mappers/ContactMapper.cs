@@ -21,21 +21,27 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
     {
         public static void MapToEntity(Contact from, ContactEntity to)
         {
-            to.Category = from.Category;
-            to.Email = from.Email.Value;
             to.Id = from.Id.Value;
-            to.Name = from.Name.Value;
-            to.Phone = from.Phone.Value;
+            to.OrganizationId = from.OrganizationId.Value;
+            to.Name = from.Name;
+            to.Category = from.Category;
+            to.Email = from.Email.Address;
+            to.Phone = from.Phone?.Number;
         }
 
         public static Contact MapFromEntity(ContactEntity from)
         {
+            var pn = from.Phone == null
+                ? null
+                : new PhoneNumber(from.Phone);
+
             return new Contact(
                 new ContactId(from.Id),
+                new OrganizationId(from.OrganizationId),
+                from.Name,
                 from.Category,
-                new ContactName(from.Name),
-                new ContactEmail(from.Email),
-                new ContactPhone(from.Phone));
+                new EmailAddress(from.Email),
+                pn);
         }
     }
 }

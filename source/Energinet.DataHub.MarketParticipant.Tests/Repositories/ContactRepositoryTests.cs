@@ -34,7 +34,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Repositories
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync(null!))
+                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync((ContactId)null!))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task GetAsync_OrganizationIdNull_ThrowsException()
+        {
+            // Arrange
+            var target = new ContactRepository(new Mock<MarketParticipantDbContext>().Object);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync((OrganizationId)null!))
                 .ConfigureAwait(false);
         }
 
@@ -46,7 +58,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Repositories
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.AddOrUpdateAsync(null!))
+                .ThrowsAsync<ArgumentNullException>(() => target.AddAsync(null!))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_ArgumentNull_ThrowsException()
+        {
+            // Arrange
+            var target = new ContactRepository(new Mock<MarketParticipantDbContext>().Object);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.RemoveAsync(null!))
                 .ConfigureAwait(false);
         }
     }
