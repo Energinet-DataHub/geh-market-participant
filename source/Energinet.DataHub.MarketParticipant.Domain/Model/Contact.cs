@@ -22,14 +22,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             OrganizationId organizationId,
             string name,
             ContactCategory category,
-            EmailAddress emailAddress,
+            EmailAddress email,
             PhoneNumber? phone)
         {
             Id = new ContactId(Guid.Empty);
             OrganizationId = organizationId;
             Name = name;
             Category = category;
-            EmailAddress = emailAddress;
+            Email = email;
             Phone = phone;
         }
 
@@ -38,14 +38,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             OrganizationId organizationId,
             string name,
             ContactCategory category,
-            EmailAddress emailAddress,
+            EmailAddress email,
             PhoneNumber? phone)
         {
             Id = id;
             OrganizationId = organizationId;
             Name = name;
             Category = category;
-            EmailAddress = emailAddress;
+            Email = email;
             Phone = phone;
         }
 
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public string Name { get; }
         public ContactCategory Category { get; }
-        public EmailAddress EmailAddress { get; }
+        public EmailAddress Email { get; }
         public PhoneNumber? Phone { get; }
     }
 }

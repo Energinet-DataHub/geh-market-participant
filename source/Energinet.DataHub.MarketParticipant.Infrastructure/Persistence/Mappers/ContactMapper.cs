@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.OrganizationId = from.OrganizationId.Value;
             to.Name = from.Name;
             to.Category = from.Category;
-            to.Email = from.EmailAddress.Address;
+            to.Email = from.Email.Address;
             to.Phone = from.Phone?.Number;
         }
 

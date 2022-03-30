@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 contact.Id.Value,
                 contact.Category.Name,
                 contact.Name,
-                contact.EmailAddress.Address,
+                contact.Email.Address,
                 contact.Phone?.Number);
         }
     }

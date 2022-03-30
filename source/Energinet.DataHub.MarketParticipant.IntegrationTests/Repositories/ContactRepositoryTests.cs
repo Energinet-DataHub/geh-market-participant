@@ -128,7 +128,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
             Assert.NotEqual(Guid.Empty, newContact?.OrganizationId.Value);
             Assert.Equal(testContact.Category, newContact?.Category);
-            Assert.Equal(testContact.EmailAddress.Address, newContact?.EmailAddress.Address);
+            Assert.Equal(testContact.Email.Address, newContact?.Email.Address);
             Assert.Equal(testContact.Name, newContact?.Name);
             Assert.Equal(testContact.Phone?.Number, newContact?.Phone?.Number);
         }
@@ -198,7 +198,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newContact);
             Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
             Assert.Equal(testContact.Category, newContact?.Category);
-            Assert.Equal(testContact.EmailAddress.Address, newContact?.EmailAddress.Address);
+            Assert.Equal(testContact.Email.Address, newContact?.Email.Address);
             Assert.Equal(testContact.Name, newContact?.Name);
             Assert.Equal(testContact.Phone?.Number, newContact?.Phone?.Number);
         }
