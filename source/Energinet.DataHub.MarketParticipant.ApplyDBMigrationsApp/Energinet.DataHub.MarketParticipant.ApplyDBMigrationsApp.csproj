@@ -33,14 +33,6 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\B-001\Model\202203291000 Contacts Phone Optional.sql" />
-    <None Remove="Scripts\B-002\Model\202203291000 Contacts Phone Optional.sql" />
-    <None Remove="Scripts\LocalDB\202203291000 Contacts Phone Optional.sql" />
-    <None Remove="Scripts\T-001\Model\202203291000 Contacts Phone Optional.sql" />
-    <None Remove="Scripts\U-001\Model\202203291000 Contacts Phone Optional.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
   </ItemGroup>
 
