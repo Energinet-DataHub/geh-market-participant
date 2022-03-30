@@ -14,24 +14,21 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
-    public sealed class
-        GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
+    public sealed class GetSingleOrganizationHandler : IRequestHandler<GetSingleOrganizationCommand, GetSingleOrganizationResponse>
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
 
-        public GetSingleOrganizationHandler(IOrganizationRepository organizationRepository)
+        public GetSingleOrganizationHandler(IOrganizationExistsHelperService organizationExistsHelperService)
         {
-            _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
         }
 
         public async Task<GetSingleOrganizationResponse> Handle(
@@ -40,14 +37,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationRepository
-                .GetAsync(new OrganizationId(request.OrganizationId))
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
-
-            if (organization == null)
-            {
-                throw new NotFoundValidationException(request.OrganizationId);
-            }
 
             return new GetSingleOrganizationResponse(OrganizationMapper.Map(organization));
         }

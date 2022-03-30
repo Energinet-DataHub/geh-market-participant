@@ -16,10 +16,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -30,12 +30,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetSingleOrganizationHandlerTests
     {
         [Fact]
+        public async Task Handle_NullArgument_ThrowsException()
+        {
+            // Arrange
+            var target = new GetSingleOrganizationHandler(new Mock<IOrganizationExistsHelperService>().Object);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
         public async Task Handle_HasOrganization_ReturnsOrganization()
         {
             // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var target = new GetSingleOrganizationHandler(organizationRepository.Object);
-            const string orgId = "1572cb86-3c1d-4899-8d7a-983d8de0796b";
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var target = new GetSingleOrganizationHandler(organizationExistsHelperService.Object);
+
+            var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
             var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
 
@@ -53,11 +66,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 new[] { actor });
 
-            organizationRepository
-                .Setup(x => x.GetAsync(It.IsAny<OrganizationId>()))
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleOrganizationCommand(Guid.Parse(orgId));
+            var command = new GetSingleOrganizationCommand(orgId);
 
             // Act
             var response = await target

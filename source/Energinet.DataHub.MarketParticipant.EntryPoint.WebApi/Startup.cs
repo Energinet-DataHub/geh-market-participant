@@ -55,6 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseMiddleware<JwtTokenMiddleware>();
             app.UseMiddleware<UserMiddleware>();
+
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
@@ -77,7 +78,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     "v1",
                     new OpenApiInfo
                     {
-                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi", Version = "v1"
+                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi",
+                        Version = "v1"
                     });
 
                 var securitySchema = new OpenApiSecurityScheme
@@ -119,10 +121,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         {
             var openIdUrl = Configuration["FRONTEND_OPEN_ID_URL"] ?? throw new InvalidOperationException(
                 "Frontend OpenID URL not found.");
-
             var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
                 "Frontend service app id not found.");
-
             Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }

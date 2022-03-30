@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -23,17 +24,30 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     public interface IContactRepository
     {
         /// <summary>
+        /// Gets an Contact with the specified Id
+        /// </summary>
+        /// <param name="contactId">The Id of the Contact to get.</param>
+        /// <returns>The specified Contact or null if not found</returns>
+        Task<Contact?> GetAsync(ContactId contactId);
+
+        /// <summary>
+        /// Gets all contacts tied to a specific organization.
+        /// </summary>
+        /// <param name="organizationId">The id of the organization to get the contacts for.</param>
+        /// <returns>A collection of contacts tied to the specified organization id.</returns>
+        Task<IEnumerable<Contact>> GetAsync(OrganizationId organizationId);
+
+        /// <summary>
         /// Updates a Contact, or adds it if it's not already present.
         /// </summary>
         /// <param name="contact">The Contact to add or update</param>
         /// <returns>The id of the added Contact</returns>
-        Task<ContactId> AddOrUpdateAsync(Contact contact);
+        Task<ContactId> AddAsync(Contact contact);
 
         /// <summary>
-        /// Gets an Contact with the specified Id
+        /// Deletes the specified contact.
         /// </summary>
-        /// <param name="id">The Id of the Contact to get.</param>
-        /// <returns>The specified Contact or null if not found</returns>
-        Task<Contact?> GetAsync(ContactId id);
+        /// <param name="contact">The contact to delete.</param>
+        Task RemoveAsync(Contact contact);
     }
 }

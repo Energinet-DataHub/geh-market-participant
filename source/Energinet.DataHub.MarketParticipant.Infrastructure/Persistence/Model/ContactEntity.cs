@@ -17,21 +17,20 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public class ContactEntity
+    public sealed class ContactEntity
     {
         public ContactEntity()
         {
+            Category = ContactCategory.Default;
             Name = string.Empty;
             Email = string.Empty;
-            Phone = string.Empty;
-            Category = ContactCategory.Default;
-            Id = Guid.Empty;
         }
 
         public Guid Id { get; set; }
+        public Guid OrganizationId { get; set; }
         public ContactCategory Category { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
-        public string Phone { get; set; }
+        public string? Phone { get; set; }
     }
 }

@@ -4,7 +4,6 @@ dk
 energinet
 Energinet
 greenenergyhub
-ie
 sql
 TBD
 yyyyMMddHHmm
@@ -19,3 +18,4 @@ UpdateActorAsync
 CreateActorAsync
 GetActorAsync
 GetActorsAsync
+codecov

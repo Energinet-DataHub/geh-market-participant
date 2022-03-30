@@ -16,36 +16,45 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public class Contact
+    public sealed class Contact
     {
-        public Contact(ContactCategory category, ContactName name, ContactEmail email, ContactPhone phone)
+        public Contact(
+            OrganizationId organizationId,
+            string name,
+            ContactCategory category,
+            EmailAddress email,
+            PhoneNumber? phone)
         {
             Id = new ContactId(Guid.Empty);
-            Category = category;
+            OrganizationId = organizationId;
             Name = name;
+            Category = category;
             Email = email;
             Phone = phone;
         }
 
-        public Contact(ContactId id, ContactCategory category, ContactName name, ContactEmail email, ContactPhone phone)
+        public Contact(
+            ContactId id,
+            OrganizationId organizationId,
+            string name,
+            ContactCategory category,
+            EmailAddress email,
+            PhoneNumber? phone)
         {
             Id = id;
-            Category = category;
+            OrganizationId = organizationId;
             Name = name;
+            Category = category;
             Email = email;
             Phone = phone;
         }
 
-        public ContactId Id { get; set; }
-        public ContactCategory Category { get; set; }
-        public ContactName Name { get; set; }
-        public ContactEmail Email { get; set; }
-        public ContactPhone Phone { get; set; }
+        public ContactId Id { get; }
+        public OrganizationId OrganizationId { get; }
+
+        public string Name { get; }
+        public ContactCategory Category { get; }
+        public EmailAddress Email { get; }
+        public PhoneNumber? Phone { get; }
     }
-
-    public sealed record ContactName(string Value);
-
-    public sealed record ContactEmail(string Value);
-
-    public sealed record ContactPhone(string Value);
 }

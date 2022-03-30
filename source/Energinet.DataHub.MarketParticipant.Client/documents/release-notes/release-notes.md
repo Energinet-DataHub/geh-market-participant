@@ -18,3 +18,7 @@
     - GetOrganizationAsync
     - CreateOrganizationAsync
     - UpdateOrganizationAsync
+
+## Version 0.4.0
+
+- Global location number cannot be changed on an actor.

@@ -15,7 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;
@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_ActorGln_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(ChangeActorDto.Gln)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.Gln)}";
 
             var actorDto = new CreateActorDto(new GlobalLocationNumberDto(value), Array.Empty<MarketRoleDto>());
 
