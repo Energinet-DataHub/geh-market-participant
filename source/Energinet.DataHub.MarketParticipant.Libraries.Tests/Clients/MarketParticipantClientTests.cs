@@ -259,8 +259,13 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             httpTest.RespondWith(incomingOrgJson);
 
             // Act
-            var orgId = await target.CreateOrganizationAsync(new ChangeOrganizationDto("Created"));
-            var createdOrg = await target.GetOrganizationAsync(orgId.GetValueOrDefault()).ConfigureAwait(false);
+            var orgId = await target
+                .CreateOrganizationAsync(new ChangeOrganizationDto("Created"))
+                .ConfigureAwait(false);
+
+            var createdOrg = await target
+                .GetOrganizationAsync(orgId.GetValueOrDefault())
+                .ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(orgId);
@@ -311,8 +316,13 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             httpTest.RespondWith(incomingOrgJson);
 
             // Act
-            await target.UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2"));
-            var changedOrg = await target.GetOrganizationAsync(orgId).ConfigureAwait(false);
+            await target
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2"))
+                .ConfigureAwait(false);
+
+            var changedOrg = await target
+                .GetOrganizationAsync(orgId)
+                .ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(changedOrg);
@@ -419,7 +429,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.New, firstActor.Status);
             Assert.True(firstActor.MarketRoles.Count == 1);
 
-            var firstMarketRole = firstActor.MarketRoles.First();
+            var firstMarketRole = firstActor.MarketRoles[0];
             Assert.Equal(EicFunction.MarketOperator, firstMarketRole.Function);
 
             var secondActor = actual.Skip(1).First();
@@ -429,7 +439,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.Active, secondActor.Status);
             Assert.True(secondActor.MarketRoles.Count == 1);
 
-            var secondMarketRole = secondActor.MarketRoles.First();
+            var secondMarketRole = secondActor.MarketRoles[0];
             Assert.Equal(EicFunction.EnergySupplier, secondMarketRole.Function);
         }
 
@@ -465,7 +475,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     new CreateActorDto(new GlobalLocationNumberDto("123456"), Array.Empty<MarketRoleDto>()))
                 .ConfigureAwait(false);
 
-            var actual = await target.GetActorAsync(orgId, createdActorId.GetValueOrDefault());
+            var actual = await target
+                .GetActorAsync(orgId, createdActorId.GetValueOrDefault())
+                .ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(actual);
@@ -475,7 +487,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.New, actual.Status);
             Assert.True(actual.MarketRoles.Count == 1);
 
-            var marketRole = actual.MarketRoles.First();
+            var marketRole = actual.MarketRoles[0];
             Assert.Equal(EicFunction.EnergySupplier, marketRole.Function);
         }
 
@@ -510,12 +522,13 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     orgId,
                     actorId,
                     new ChangeActorDto(
-                        new GlobalLocationNumberDto("1234567"),
                         ActorStatus.Active.ToString(),
                         new[] { new MarketRoleDto(EicFunction.EnergySupplier) }))
                 .ConfigureAwait(false);
 
-            var actual = await target.GetActorAsync(orgId, actorId);
+            var actual = await target
+                .GetActorAsync(orgId, actorId)
+                .ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(actual);
@@ -525,7 +538,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.Active, actual.Status);
             Assert.True(actual.MarketRoles.Count == 1);
 
-            var marketRole = actual.MarketRoles.First();
+            var marketRole = actual.MarketRoles[0];
             Assert.Equal(EicFunction.BillingAgent, marketRole.Function);
         }
     }

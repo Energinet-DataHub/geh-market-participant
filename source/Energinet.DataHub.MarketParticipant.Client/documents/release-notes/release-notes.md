@@ -18,3 +18,7 @@
     - GetOrganizationAsync
     - CreateOrganizationAsync
     - UpdateOrganizationAsync
+
+## Version 0.4.0
+
+- GLN cannot be changed on an actor.
