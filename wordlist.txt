@@ -1,6 +1,9 @@
+MarketParticipant
 ApplyDBMigrationsApp
 dk
+energinet
 Energinet
+greenenergyhub
 sql
 TBD
 yyyyMMddHHmm
