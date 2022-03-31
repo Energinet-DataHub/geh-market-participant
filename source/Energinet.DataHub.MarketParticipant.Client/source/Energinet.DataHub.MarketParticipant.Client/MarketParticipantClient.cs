@@ -133,6 +133,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             {
                 throw new ArgumentException($"Flurl Body: {e.Call.RequestBody}");
             }
+
             return true;
         }
     }
