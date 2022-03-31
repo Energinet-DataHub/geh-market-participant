@@ -24,4 +24,5 @@
 - Global location number cannot be changed on an actor.
 
 ## Version 0.4.1
+
 - Added CVR and Address to organization
