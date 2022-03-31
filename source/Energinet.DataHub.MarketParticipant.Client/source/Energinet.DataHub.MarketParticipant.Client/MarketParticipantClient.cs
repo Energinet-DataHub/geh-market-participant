@@ -122,17 +122,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<bool?> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto createActorDto)
         {
-            try
-            {
-                await _httpClient
-                    .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
-                    .PutJsonAsync(createActorDto)
-                    .ConfigureAwait(false);
-            }
-            catch (FlurlHttpException e)
-            {
-                throw new ArgumentException($"Flurl Body: {e.Call.RequestBody}");
-            }
+            await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
+                .PutJsonAsync(createActorDto)
+                .ConfigureAwait(false);
 
             return true;
         }
