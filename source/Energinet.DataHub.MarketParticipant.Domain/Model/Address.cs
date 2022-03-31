@@ -15,9 +15,9 @@
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public record Address(
-        string StreetName,
-        string Number,
-        string ZipCode,
-        string City,
-        string Country);
+        string? StreetName,
+        string? Number,
+        string? ZipCode,
+        string? City,
+        string? Country);
 }

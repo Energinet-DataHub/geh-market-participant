@@ -29,14 +29,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class DeleteContactHandlerTests
     {
-        private readonly Address _validAddress = new Address(
+        private readonly Address _validAddress = new(
             "test Street",
             "1",
             "1111",
             "Test City",
             "Test Country");
 
-        private readonly CVRNumber _validCvr = new CVRNumber("12345678");
+        private readonly CVRNumber _validCvr = new("12345678");
 
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()

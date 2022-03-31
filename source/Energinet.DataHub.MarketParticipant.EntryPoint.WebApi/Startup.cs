@@ -14,7 +14,6 @@
 
 using System;
 using System.Text.Json.Serialization;
-using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

@@ -15,40 +15,49 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
 {
-    public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
+    public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
     {
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
 
-        public CreateOrganizationHandler(IOrganizationRepository organizationRepository)
+        public UpdateOrganizationHandler(
+            IOrganizationRepository organizationRepository,
+            IOrganizationExistsHelperService organizationExistsHelperService)
         {
             _organizationRepository = organizationRepository;
+            _organizationExistsHelperService = organizationExistsHelperService;
         }
 
-        public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var address = new Address(
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
+                .ConfigureAwait(false);
+
+            organization.Name = request.Organization.Name;
+            organization.CVR = new CVRNumber(request.Organization.CvrNumber);
+            organization.Address = new Address(
                 request.Organization.Address.StreetName,
                 request.Organization.Address.Number,
                 request.Organization.Address.ZipCode,
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
-            var cvr = new CVRNumber(request.Organization.CvrNumber);
-            var organization = new Organization(request.Organization.Name, cvr, address);
 
-            var organizationId = await _organizationRepository
+            await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            return new CreateOrganizationResponse(organizationId.Value.ToString());
+            return Unit.Value;
         }
     }
 }

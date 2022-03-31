@@ -20,5 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
     public sealed record OrganizationDto(
         string OrganizationId,
         string Name,
-        IEnumerable<ActorDto> Actors);
+        IEnumerable<ActorDto> Actors,
+        string Cvr,
+        AddressDto Address);
 }

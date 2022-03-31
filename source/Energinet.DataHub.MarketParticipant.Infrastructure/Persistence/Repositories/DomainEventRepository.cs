@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
     {
         private readonly IMarketParticipantDbContext _context;
         private readonly IDictionary<string, Type> _domainEventTypesByName;
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
 
         public DomainEventRepository(IMarketParticipantDbContext context)
         {

@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
-using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;

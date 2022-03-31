@@ -15,9 +15,9 @@
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
 {
     public record AddressDto(
-        string StreetName,
-        string Number,
-        string ZipCode,
-        string City,
-        string Country);
+        string? StreetName,
+        string? Number,
+        string? ZipCode,
+        string? City,
+        string? Country);
 }

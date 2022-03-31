@@ -29,14 +29,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     public sealed class OrganizationRepositoryTests
     {
         private readonly MarketParticipantDatabaseFixture _fixture;
-        private readonly Address _validAddress = new Address(
+        private readonly Address _validAddress = new(
             "test Street",
             "1",
             "1111",
             "Test City",
             "Test Country");
 
-        private readonly CVRNumber _validCvr = new CVRNumber("12345678");
+        private readonly CVRNumber _validCvr = new("12345678");
 
         public OrganizationRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {

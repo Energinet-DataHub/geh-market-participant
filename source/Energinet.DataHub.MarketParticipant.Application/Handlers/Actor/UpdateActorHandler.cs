@@ -27,7 +27,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
@@ -88,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return Unit.Value;
         }
 
-        private void UpdateActorMarketRoles(Organization organization, Actor actor, UpdateActorCommand request)
+        private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MarketRoles.Clear();
 
