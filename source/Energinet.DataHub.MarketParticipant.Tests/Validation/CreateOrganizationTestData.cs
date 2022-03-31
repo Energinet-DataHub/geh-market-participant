@@ -12,26 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
+using System.Collections;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {
-    public sealed class OrganizationEntity
+    public class CreateOrganizationTestData
+        : IEnumerable<object[]>
     {
-        public OrganizationEntity()
+        public IEnumerator<object[]> GetEnumerator()
         {
-            Name = string.Empty;
-            Actors = new Collection<ActorEntity>();
-            CVR = string.Empty;
-            Address = new AddressEntity();
+            yield return new object[]
+            {
+                string.Empty, string.Empty, new AddressDto(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty), false
+            };
         }
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string CVR { get; set; }
-        public AddressEntity Address { get; set; }
-
-        public Collection<ActorEntity> Actors { get; }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

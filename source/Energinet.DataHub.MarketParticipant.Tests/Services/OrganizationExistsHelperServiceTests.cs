@@ -33,9 +33,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new OrganizationExistsHelperService(organizationRepository.Object);
+            var validAddress = new Address(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
 
+            var validCvr = new CVRNumber("12345678");
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", validCvr, validAddress);
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))

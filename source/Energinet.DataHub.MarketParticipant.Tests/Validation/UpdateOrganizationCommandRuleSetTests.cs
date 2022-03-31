@@ -35,7 +35,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(UpdateOrganizationCommand.OrganizationId);
 
-            var organizationDto = new ChangeOrganizationDto(ValidName);
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                string.Empty,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty));
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(Guid.Empty, organizationDto);
@@ -77,7 +85,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
 
-            var organizationDto = new ChangeOrganizationDto(value);
+            var organizationDto = new ChangeOrganizationDto(
+                value,
+                string.Empty,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty));
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);

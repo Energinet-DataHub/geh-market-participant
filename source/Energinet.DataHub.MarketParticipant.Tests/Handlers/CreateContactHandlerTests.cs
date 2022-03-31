@@ -60,9 +60,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 overlappingContactCategoriesRuleService.Object);
 
             var orgId = new OrganizationId(Guid.NewGuid());
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
             const string orgName = "SomeName";
 
-            var organization = new Organization(orgId, orgName, Enumerable.Empty<Actor>());
+            var organization = new Organization(orgId, orgName, Enumerable.Empty<Actor>(), validCvr, validAddress);
             var contact = new Contact(
                 new ContactId(Guid.NewGuid()),
                 orgId,
@@ -107,10 +114,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 contactRepository.Object,
                 new Mock<IOverlappingContactCategoriesRuleService>().Object);
 
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
             var orgId = new OrganizationId(Guid.NewGuid());
             const string orgName = "SomeName";
 
-            var organization = new Organization(orgId, orgName, Enumerable.Empty<Actor>());
+            var organization = new Organization(orgId, orgName, Enumerable.Empty<Actor>(), validCvr, validAddress);
             var contact = new Contact(
                 new ContactId(Guid.NewGuid()),
                 orgId,

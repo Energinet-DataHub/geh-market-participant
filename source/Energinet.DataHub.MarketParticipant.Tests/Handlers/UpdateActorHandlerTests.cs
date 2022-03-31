@@ -32,6 +32,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class UpdateActorHandlerTests
     {
+        private readonly Address _validAddress = new(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
+
+        private readonly CVRNumber _validCvr = new("12345678");
+
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
@@ -62,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvr, _validAddress);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -94,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 overlappingBusinessRolesRuleService.Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvr, _validAddress);
 
             organization.Actors.Add(new Actor(
                 new ExternalActorId(organizationId),
@@ -133,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvr, _validAddress);
 
             organization.Actors.Add(new Actor(
                 new ExternalActorId(organizationId),

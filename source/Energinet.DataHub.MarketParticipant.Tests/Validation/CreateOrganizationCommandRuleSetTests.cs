@@ -52,8 +52,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
+            const string validCvr = "123";
+            var validAddress = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
 
-            var organizationDto = new ChangeOrganizationDto(value);
+            var organizationDto = new ChangeOrganizationDto(value, validCvr, validAddress);
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);

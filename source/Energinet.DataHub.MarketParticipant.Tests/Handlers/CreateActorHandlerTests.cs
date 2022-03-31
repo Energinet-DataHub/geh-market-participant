@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -49,16 +50,22 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewActor_ActorIdReturned()
         {
             // Arrange
+            const string orgName = "SomeName";
+            const string actorGln = "SomeGln";
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
             var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
-
             var orgId = Guid.NewGuid();
-            const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
-            const string actorGln = "SomeGln";
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validCvr, validAddress);
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
 
             organizationExistsHelperService

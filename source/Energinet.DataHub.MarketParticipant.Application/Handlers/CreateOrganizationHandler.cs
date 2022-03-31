@@ -35,7 +35,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organization = new Organization(request.Organization.Name);
+            var address = new Address(
+                request.Organization.Address.StreetName,
+                request.Organization.Address.Number,
+                request.Organization.Address.ZipCode,
+                request.Organization.Address.City,
+                request.Organization.Address.Country);
+            var cvr = new CVRNumber(request.Organization.CvrNumber);
+            var organization = new Organization(request.Organization.Name, cvr, address);
 
             var organizationId = await _organizationRepository
                 .AddOrUpdateAsync(organization)

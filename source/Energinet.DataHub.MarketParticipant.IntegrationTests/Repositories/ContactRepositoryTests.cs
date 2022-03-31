@@ -29,6 +29,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     public sealed class ContactRepositoryTests
     {
         private readonly MarketParticipantDatabaseFixture _fixture;
+        private readonly Address _validAddress = new Address(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
+
+        private readonly CVRNumber _validCvr = new CVRNumber("12345678");
 
         public ContactRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
@@ -63,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(new Organization("Test Organization"))
+                .AddOrUpdateAsync(new Organization("Test Organization", _validCvr, _validAddress))
                 .ConfigureAwait(false);
 
             var contactRepository = new ContactRepository(context);
@@ -107,7 +115,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(new Organization("Test Organization"))
+                .AddOrUpdateAsync(new Organization("Test Organization", _validCvr, _validAddress))
                 .ConfigureAwait(false);
 
             var contactRepository = new ContactRepository(context);
@@ -143,7 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(new Organization("Test Organization"))
+                .AddOrUpdateAsync(new Organization("Test Organization", _validCvr, _validAddress))
                 .ConfigureAwait(false);
 
             var contactRepository = new ContactRepository(context);
@@ -175,7 +183,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationRepository = new OrganizationRepository(context);
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(new Organization("Test Organization"))
+                .AddOrUpdateAsync(new Organization("Test Organization", _validCvr, _validAddress))
                 .ConfigureAwait(false);
 
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();

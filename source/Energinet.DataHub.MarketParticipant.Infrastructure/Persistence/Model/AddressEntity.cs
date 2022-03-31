@@ -12,7 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record ChangeOrganizationDto(string Name, string Cvr, AddressDto Address);
+    public class AddressEntity
+    {
+        public AddressEntity()
+        {
+            StreetName = string.Empty;
+            ZipCode = string.Empty;
+            City = string.Empty;
+            Country = string.Empty;
+            Number = string.Empty;
+        }
+
+        public string StreetName { get; set; }
+        public string ZipCode { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+        public string Number { get; set; }
+    }
 }

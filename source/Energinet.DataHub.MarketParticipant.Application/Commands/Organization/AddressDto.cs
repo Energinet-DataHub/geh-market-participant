@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
 {
-    public sealed record ChangeOrganizationDto(string Name, string Cvr, AddressDto Address);
+    public record AddressDto(
+        string StreetName,
+        string Number,
+        string ZipCode,
+        string City,
+        string Country);
 }

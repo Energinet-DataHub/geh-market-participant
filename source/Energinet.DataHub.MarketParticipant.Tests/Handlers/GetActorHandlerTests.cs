@@ -51,8 +51,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             const string orgName = "SomeName";
-
-            var organization = new Organization(new OrganizationId(organizationId), orgName, Enumerable.Empty<Actor>());
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+            var organization = new Organization(
+                new OrganizationId(organizationId),
+                orgName,
+                Enumerable.Empty<Actor>(),
+                validCvr,
+                validAddress);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -77,6 +88,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
             const string actorGln = "SomeGln";
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
 
             var actor = new Actor(
                 actorId,
@@ -87,7 +105,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, new[] { actor });
+            var organization = new Organization(
+                new OrganizationId(orgId),
+                orgName,
+                new[] { actor },
+                validCvr,
+                validAddress);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))

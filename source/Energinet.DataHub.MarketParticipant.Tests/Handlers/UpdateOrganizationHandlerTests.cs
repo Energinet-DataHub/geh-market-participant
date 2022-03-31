@@ -59,6 +59,21 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
 
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var validAddressDto = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
             var actor = new Actor(
                 Guid.NewGuid(),
                 new ExternalActorId(Guid.NewGuid()),
@@ -71,7 +86,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organization = new Organization(
                 new OrganizationId(orgId),
                 "fake_value",
-                new[] { actor });
+                new[] { actor },
+                validCvr,
+                validAddress);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -81,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
-            var changeDto = new ChangeOrganizationDto("New name");
+            var changeDto = new ChangeOrganizationDto("New name", validCvr.Number, validAddressDto);
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 

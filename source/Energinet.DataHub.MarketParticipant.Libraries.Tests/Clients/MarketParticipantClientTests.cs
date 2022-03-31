@@ -258,9 +258,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             httpTest.RespondWith("fb6665a1-b7be-4744-a8ce-08da0272c916");
             httpTest.RespondWith(incomingOrgJson);
 
+            var validAddress = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            const string validCvr = "12345678";
+
             // Act
             var orgId = await target
-                .CreateOrganizationAsync(new ChangeOrganizationDto("Created"))
+                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", validCvr, validAddress))
                 .ConfigureAwait(false);
 
             var createdOrg = await target
@@ -315,9 +324,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             httpTest.RespondWith(string.Empty);
             httpTest.RespondWith(incomingOrgJson);
 
+            var validAddress = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            const string validCvr = "12345678";
+
             // Act
             await target
-                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2"))
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", validCvr, validAddress))
                 .ConfigureAwait(false);
 
             var changedOrg = await target
