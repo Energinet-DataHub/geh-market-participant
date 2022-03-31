@@ -194,5 +194,165 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
             }
         }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData(null, true)]
+        [InlineData("  ", false)]
+        [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2", true)]
+        [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2A", false)]
+        public async Task Validate_OrganizationAddressCity_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.City)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                ValidCvr,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    value,
+                    string.Empty));
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData(null, true)]
+        [InlineData("  ", false)]
+        [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2", true)]
+        [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2A", false)]
+        public async Task Validate_OrganizationAddressCountry_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Country)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                ValidCvr,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    value));
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData(null, true)]
+        [InlineData("  ", false)]
+        [InlineData("K57S9FHJZjmhB6U", true)]
+        [InlineData("K57S9FHJZjmhB6UA", false)]
+        public async Task Validate_OrganizationAddressNumber_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Number)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                ValidCvr,
+                new AddressDto(
+                    string.Empty,
+                    value,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty));
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData(null, true)]
+        [InlineData("  ", false)]
+        [InlineData("K57S9FHJZjmhB6U", true)]
+        [InlineData("K57S9FHJZjmhB6UA", false)]
+        public async Task Validate_OrganizationAddressZipCode_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.ZipCode)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                ValidCvr,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    value,
+                    string.Empty,
+                    string.Empty));
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
     }
 }

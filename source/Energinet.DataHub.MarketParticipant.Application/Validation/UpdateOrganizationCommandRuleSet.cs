@@ -50,13 +50,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                             addressValidator
                                 .RuleFor(address => address.Country)
+                                .NotEmpty()
                                 .Length(1, 50)
-                                .When(address => !string.IsNullOrWhiteSpace(address.Country));
+                                .When(address => !string.IsNullOrEmpty(address.Country));
 
                             addressValidator
                                 .RuleFor(address => address.Number)
+                                .NotEmpty()
                                 .Length(1, 15)
-                                .When(address => !string.IsNullOrWhiteSpace(address.Number));
+                                .When(address => !string.IsNullOrEmpty(address.Number));
 
                             addressValidator
                                 .RuleFor(address => address.StreetName)
@@ -66,8 +68,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                             addressValidator
                                 .RuleFor(address => address.ZipCode)
+                                .NotEmpty()
                                 .Length(1, 15)
-                                .When(address => !string.IsNullOrWhiteSpace(address.ZipCode));
+                                .When(address => !string.IsNullOrEmpty(address.ZipCode));
                         });
                 });
         }

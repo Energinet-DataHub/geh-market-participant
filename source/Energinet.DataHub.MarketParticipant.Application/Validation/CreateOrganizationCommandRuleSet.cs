@@ -39,32 +39,37 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(organization => organization.Address)
                         .ChildRules(addressValidator =>
-                            {
-                                addressValidator
-                                    .RuleFor(address => address.City)
-                                    .Length(1, 50)
-                                    .When(address => !string.IsNullOrWhiteSpace(address.City));
+                        {
+                            addressValidator
+                                .RuleFor(address => address.City)
+                                .NotEmpty()
+                                .Length(1, 50)
+                                .When(address => !string.IsNullOrEmpty(address.City));
 
-                                addressValidator
-                                    .RuleFor(address => address.Country)
-                                    .Length(1, 50)
-                                    .When(address => !string.IsNullOrWhiteSpace(address.Country));
+                            addressValidator
+                                .RuleFor(address => address.Country)
+                                .NotEmpty()
+                                .Length(1, 50)
+                                .When(address => !string.IsNullOrEmpty(address.Country));
 
-                                addressValidator
-                                    .RuleFor(address => address.Number)
-                                    .Length(1, 15)
-                                    .When(address => !string.IsNullOrWhiteSpace(address.Number));
+                            addressValidator
+                                .RuleFor(address => address.Number)
+                                .NotEmpty()
+                                .Length(1, 15)
+                                .When(address => !string.IsNullOrEmpty(address.Number));
 
-                                addressValidator
-                                    .RuleFor(address => address.StreetName)
-                                    .Length(1, 250)
-                                    .When(address => !string.IsNullOrWhiteSpace(address.StreetName));
+                            addressValidator
+                                .RuleFor(address => address.StreetName)
+                                .NotEmpty()
+                                .Length(1, 250)
+                                .When(address => !string.IsNullOrEmpty(address.StreetName));
 
-                                addressValidator
-                                    .RuleFor(address => address.ZipCode)
-                                    .Length(1, 15)
-                                    .When(address => !string.IsNullOrWhiteSpace(address.ZipCode));
-                            });
+                            addressValidator
+                                .RuleFor(address => address.ZipCode)
+                                .NotEmpty()
+                                .Length(1, 15)
+                                .When(address => !string.IsNullOrEmpty(address.ZipCode));
+                        });
                 });
         }
     }
