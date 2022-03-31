@@ -14,10 +14,11 @@
 
 using System;
 using System.Linq;
-using System.Net.Http;
-using Flurl;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Flurl.Http;
 using Flurl.Http.Configuration;
+using Flurl.Serialization.TextJson;
 using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
@@ -36,8 +37,16 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public IMarketParticipantClient CreateClient(Uri baseUrl)
         {
             var httpClient = _flurlClientFactory.Get(baseUrl);
-            SetAuthorizationHeader(httpClient);
+            ConfigureClient(httpClient);
             return new MarketParticipantClient(httpClient);
+        }
+
+        private void ConfigureClient(IFlurlClient client)
+        {
+            var jsonSettings = new JsonSerializerOptions();
+            jsonSettings.Converters.Add(new JsonStringEnumConverter());
+            client.Configure(settings => settings.WithTextJsonSerializer(jsonSettings));
+            SetAuthorizationHeader(client);
         }
 
         private string GetAuthorizationHeaderValue()
