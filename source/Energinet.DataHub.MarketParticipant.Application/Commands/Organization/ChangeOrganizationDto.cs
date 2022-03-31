@@ -16,6 +16,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
 {
     public sealed record ChangeOrganizationDto(
         string Name,
-        string CvrNumber,
+        string Cvr,
         AddressDto Address);
 }
