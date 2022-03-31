@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -29,6 +30,41 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(organization => organization.Name)
                         .NotEmpty()
                         .Length(1, 50);
+
+                    validator
+                        .RuleFor(organization => organization.Cvr)
+                        .Length(1, 8)
+                        .When(prop => !string.IsNullOrWhiteSpace(prop.Cvr));
+
+                    validator
+                        .RuleFor(organization => organization.Address)
+                        .ChildRules(addressValidator =>
+                            {
+                                addressValidator
+                                    .RuleFor(address => address.City)
+                                    .Length(1, 50)
+                                    .When(address => !string.IsNullOrWhiteSpace(address.City));
+
+                                addressValidator
+                                    .RuleFor(address => address.Country)
+                                    .Length(1, 50)
+                                    .When(address => !string.IsNullOrWhiteSpace(address.Country));
+
+                                addressValidator
+                                    .RuleFor(address => address.Number)
+                                    .Length(1, 15)
+                                    .When(address => !string.IsNullOrWhiteSpace(address.Number));
+
+                                addressValidator
+                                    .RuleFor(address => address.StreetName)
+                                    .Length(1, 250)
+                                    .When(address => !string.IsNullOrWhiteSpace(address.StreetName));
+
+                                addressValidator
+                                    .RuleFor(address => address.ZipCode)
+                                    .Length(1, 15)
+                                    .When(address => !string.IsNullOrWhiteSpace(address.ZipCode));
+                            });
                 });
         }
     }

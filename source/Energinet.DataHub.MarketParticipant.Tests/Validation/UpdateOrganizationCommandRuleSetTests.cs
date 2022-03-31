@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     public sealed class UpdateOrganizationCommandRuleSetTests
     {
         private const string ValidName = "Company Name";
+        private const string ValidCvr = "12345678";
 
         private static readonly Guid _validOrganizationId = Guid.NewGuid();
 
@@ -87,9 +88,89 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var organizationDto = new ChangeOrganizationDto(
                 value,
-                string.Empty,
+                ValidCvr,
                 new AddressDto(
                     string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty));
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        [InlineData("  ", false)]
+        [InlineData("12345678", true)]
+        [InlineData("123456789", false)]
+        public async Task Validate_OrganizationCvr_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Cvr)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                value,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty));
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData(null, true)]
+        [InlineData("  ", false)]
+        [InlineData("Np81mDz09UmzLJphrnvA2Suzm5GItyOjb0sWJgXhAasF9vFceybMCicq3kT1O4JWD0PKXzPjtK8QUQwVUUHo4HV3zePz5eXZXYfGz2Zvr9tpMLsxKv6TiDPhX27g1IUzAUyoRJbKW65uZVlS2N2JbthH3uKEYnmhe3O14z2VDDKLnXbMU7uqfQ8XyAIXOPEz2jEnft8sGXSqDB7hw2njPTILlboBqohahxXdS0YfB4FFoR55wp9xdG0ULO", true)]
+        [InlineData("Np81mDz09UmzLJphrnvA2Suzm5GItyOjb0sWJgXhAasF9vFceybMCicq3kT1O4JWD0PKXzPjtK8QUQwVUUHo4HV3zePz5eXZXYfGz2Zvr9tpMLsxKv6TiDPhX27g1IUzAUyoRJbKW65uZVlS2N2JbthH3uKEYnmhe3O14z2VDDKLnXbMU7uqfQ8XyAIXOPEz2jEnft8sGXSqDB7hw2njPTILlboBqohahxXdS0YfB4FFoR55wp9xdG0ULOa", false)]
+        public async Task Validate_OrganizationAddressStreetname_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.StreetName)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                ValidCvr,
+                new AddressDto(
+                    value,
                     string.Empty,
                     string.Empty,
                     string.Empty,

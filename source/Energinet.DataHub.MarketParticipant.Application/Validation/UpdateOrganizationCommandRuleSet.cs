@@ -32,6 +32,43 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(organization => organization.Name)
                         .NotEmpty()
                         .Length(1, 50);
+
+                    validator
+                        .RuleFor(organization => organization.Cvr)
+                        .NotEmpty()
+                        .Length(1, 8);
+
+                    validator
+                        .RuleFor(organization => organization.Address)
+                        .ChildRules(addressValidator =>
+                        {
+                            addressValidator
+                                .RuleFor(address => address.City)
+                                .NotEmpty()
+                                .Length(1, 50)
+                                .When(address => !string.IsNullOrEmpty(address.City));
+
+                            addressValidator
+                                .RuleFor(address => address.Country)
+                                .Length(1, 50)
+                                .When(address => !string.IsNullOrWhiteSpace(address.Country));
+
+                            addressValidator
+                                .RuleFor(address => address.Number)
+                                .Length(1, 15)
+                                .When(address => !string.IsNullOrWhiteSpace(address.Number));
+
+                            addressValidator
+                                .RuleFor(address => address.StreetName)
+                                .NotEmpty()
+                                .Length(1, 250)
+                                .When(address => !string.IsNullOrEmpty(address.StreetName));
+
+                            addressValidator
+                                .RuleFor(address => address.ZipCode)
+                                .Length(1, 15)
+                                .When(address => !string.IsNullOrWhiteSpace(address.ZipCode));
+                        });
                 });
         }
     }
