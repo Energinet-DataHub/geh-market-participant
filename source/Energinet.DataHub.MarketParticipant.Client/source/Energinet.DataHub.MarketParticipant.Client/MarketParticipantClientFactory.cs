@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         private void ConfigureClient(IFlurlClient client)
         {
-            var jsonSettings = new JsonSerializerOptions();
+            var jsonSettings = new JsonSerializerOptions(JsonSerializerDefaults.Web);
             jsonSettings.Converters.Add(new JsonStringEnumConverter());
             client.Configure(settings => settings.WithTextJsonSerializer(jsonSettings));
             SetAuthorizationHeader(client);
