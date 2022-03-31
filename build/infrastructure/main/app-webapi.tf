@@ -64,10 +64,10 @@ module "plan_webapi" {
   tags                = azurerm_resource_group.this.tags
 }
 
-module "kvs_app_market_participant_webapi_base_url" {
+module "kvs_app_markpart_webapi_base_url" {
   source        = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/key-vault-secret?ref=5.1.0"
 
-  name          = "app-market-participant-webapi-base-url"
+  name          = "app-markpart-webapi-base-url"
   value         = "https://${azurerm_app_service.webapi.default_site_hostname}"
   key_vault_id  = data.azurerm_key_vault.kv_shared_resources.id
 

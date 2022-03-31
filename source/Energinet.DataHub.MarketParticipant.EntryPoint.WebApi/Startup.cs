@@ -50,13 +50,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi v1"));
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseMiddleware<JwtTokenMiddleware>();
-            app.UseMiddleware<UserMiddleware>();
-
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
