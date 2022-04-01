@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
             var orgId = Guid.NewGuid();
             var actorId = Guid.NewGuid();
-            var validCvr = new CVRNumber("123");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
                 "1",
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validCvr, validAddress);
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
 
             organizationExistsHelperService
@@ -103,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
             var orgId = Guid.NewGuid();
             var actorId = Guid.NewGuid();
-            var validCvr = new CVRNumber("123");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
                 "1",
@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validCvr, validAddress);
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
             var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
 

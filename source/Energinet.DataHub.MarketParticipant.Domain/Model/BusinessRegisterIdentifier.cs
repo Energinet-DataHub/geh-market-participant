@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record CVRNumber(string Number);
+    public sealed record BusinessRegisterIdentifier(string Identifier);
 }

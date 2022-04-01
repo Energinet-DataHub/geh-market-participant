@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.ZipCode,
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
-            var cvr = new CVRNumber(request.Organization.Cvr);
+            var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
             var organization = new Domain.Model.Organization(request.Organization.Name, cvr, address);
 
             var organizationId = await _organizationRepository

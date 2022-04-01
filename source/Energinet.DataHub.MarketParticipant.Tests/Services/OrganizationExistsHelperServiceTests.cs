@@ -40,9 +40,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "Test City",
             "Test Country");
 
-            var validCvr = new CVRNumber("12345678");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", validCvr, validAddress);
+            var organization = new Organization("fake_value", validBusinessRegisterIdentifier, validAddress);
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))

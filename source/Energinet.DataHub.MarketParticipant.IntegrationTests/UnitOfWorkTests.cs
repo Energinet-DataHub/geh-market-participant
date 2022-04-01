@@ -87,8 +87,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 "Test City",
                 "Test Country");
 
-            var validCvr = new CVRNumber("12345678");
-            return new Organization("Test", validCvr, validAddress);
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
+            return new Organization("Test", validBusinessRegisterIdentifier, validAddress);
         }
     }
 }

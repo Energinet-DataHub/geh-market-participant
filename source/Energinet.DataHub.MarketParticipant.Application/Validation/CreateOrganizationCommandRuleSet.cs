@@ -32,9 +32,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .Length(1, 50);
 
                     validator
-                        .RuleFor(organization => organization.Cvr)
-                        .Length(1, 8)
-                        .When(prop => !string.IsNullOrWhiteSpace(prop.Cvr));
+                        .RuleFor(organization => organization.BusinessRegisterIdentifier)
+                        .NotEmpty()
+                        .Length(1, 8);
 
                     validator
                         .RuleFor(organization => organization.Address)
@@ -55,8 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                             addressValidator
                                 .RuleFor(address => address.Number)
                                 .NotEmpty()
-                                .Length(1, 15)
-                                .When(address => !string.IsNullOrEmpty(address.Number));
+                                .Length(1, 15);
 
                             addressValidator
                                 .RuleFor(address => address.StreetName)

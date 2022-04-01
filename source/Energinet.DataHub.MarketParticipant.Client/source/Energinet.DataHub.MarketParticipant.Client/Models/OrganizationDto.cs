@@ -21,6 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Guid OrganizationId,
         string Name,
         IReadOnlyList<ActorDto> Actors,
-        string Cvr,
+        string BusinessRegisterIdentifier,
         AddressDto Address);
 }

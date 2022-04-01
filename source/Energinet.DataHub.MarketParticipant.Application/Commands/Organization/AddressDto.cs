@@ -19,5 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
         string? Number,
         string? ZipCode,
         string? City,
-        string? Country);
+        string Country);
 }

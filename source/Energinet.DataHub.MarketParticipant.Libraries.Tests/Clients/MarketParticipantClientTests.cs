@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             "Testby",
             "Testland");
 
-        private readonly string _validCvr = "87654321";
+        private readonly string _validBusinessRegisterIdentifier = "87654321";
         [Fact]
         public async Task GetOrganizationsAsync_Unauthorized_ThrowsException()
         {
@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ]
                 }
             ],
-            ""cvr"": ""87654321"",
+            ""BusinessRegisterIdentifier"": ""87654321"",
             ""address"": {
                 ""streetName"": ""Testvej"",
                 ""number"": ""2"",
@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("75ea715f-381e-46fd-831b-5b61b9db7862"), actualActor.ExternalActorId);
             Assert.Equal("9656626091925", actualActor.Gln.Value);
             Assert.Equal(ActorStatus.Active, actualActor.Status);
-            Assert.Equal(_validCvr, actualOrganization.Cvr);
+            Assert.Equal(_validBusinessRegisterIdentifier, actualOrganization.BusinessRegisterIdentifier);
             Assert.Equal(_validAddress.City, actualOrganization.Address.City);
             Assert.Equal(_validAddress.Country, actualOrganization.Address.Country);
             Assert.Equal(_validAddress.Number, actualOrganization.Address.Number);
@@ -140,7 +140,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ]
                             }
                         ],
-                        ""cvr"": ""87654321"",
+                        ""BusinessRegisterIdentifier"": ""87654321"",
                         ""address"": {
                             ""streetName"": ""Testvej"",
                             ""number"": ""2"",
@@ -167,7 +167,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ]
                             }
                         ],
-                        ""cvr"": ""87654321"",
+                        ""BusinessRegisterIdentifier"": ""87654321"",
                         ""address"": {
                             ""streetName"": ""Testvej"",
                             ""number"": ""2"",
@@ -193,7 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             var firstOrganization = actual.First();
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), firstOrganization.OrganizationId);
             Assert.Equal("unit test", firstOrganization.Name);
-            Assert.Equal(_validCvr, firstOrganization.Cvr);
+            Assert.Equal(_validBusinessRegisterIdentifier, firstOrganization.BusinessRegisterIdentifier);
             Assert.Equal(_validAddress.City, firstOrganization.Address.City);
             Assert.Equal(_validAddress.Country, firstOrganization.Address.Country);
             Assert.Equal(_validAddress.Number, firstOrganization.Address.Number);
@@ -212,7 +212,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             var secondOrganization = actual.Skip(1).First();
             Assert.Equal(Guid.Parse("c4d950f7-0acf-439b-9bb6-610255218c6e"), secondOrganization.OrganizationId);
             Assert.Equal("unit test 2", secondOrganization.Name);
-            Assert.Equal(_validCvr, secondOrganization.Cvr);
+            Assert.Equal(_validBusinessRegisterIdentifier, secondOrganization.BusinessRegisterIdentifier);
             Assert.Equal(_validAddress.City, secondOrganization.Address.City);
             Assert.Equal(_validAddress.Country, secondOrganization.Address.Country);
             Assert.Equal(_validAddress.Number, secondOrganization.Address.Number);
@@ -252,7 +252,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ]
 		                }
                     ],
-                    ""cvr"": ""87654321"",
+                    ""BusinessRegisterIdentifier"": ""87654321"",
                     ""address"": {
                         ""streetName"": ""Testvej"",
                         ""number"": ""2"",
@@ -274,7 +274,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.NotNull(actual);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), actual.OrganizationId);
             Assert.Equal("unit test", actual.Name);
-            Assert.Equal(_validCvr, actual.Cvr);
+            Assert.Equal(_validBusinessRegisterIdentifier, actual.BusinessRegisterIdentifier);
             Assert.Equal(_validAddress.City, actual.Address.City);
             Assert.Equal(_validAddress.Country, actual.Address.Country);
             Assert.Equal(_validAddress.Number, actual.Address.Number);
@@ -314,7 +314,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ]
 		                }
                     ],
-                    ""cvr"": ""87654321"",
+                    ""BusinessRegisterIdentifier"": ""87654321"",
                     ""address"": {
                         ""streetName"": ""Testvej"",
                         ""number"": ""2"",
@@ -332,7 +332,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             var orgId = await target
-                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validCvr, _validAddress))
+                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress))
                 .ConfigureAwait(false);
 
             var createdOrg = await target
@@ -345,7 +345,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.NotNull(createdOrg);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), createdOrg.OrganizationId);
             Assert.Equal("unit test", createdOrg.Name);
-            Assert.Equal(_validCvr, createdOrg.Cvr);
+            Assert.Equal(_validBusinessRegisterIdentifier, createdOrg.BusinessRegisterIdentifier);
             Assert.Equal(_validAddress.City, createdOrg.Address.City);
             Assert.Equal(_validAddress.Country, createdOrg.Address.Country);
             Assert.Equal(_validAddress.Number, createdOrg.Address.Number);
@@ -385,7 +385,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ]
 		                }
                     ],
-                    ""cvr"": ""87654321"",
+                    ""BusinessRegisterIdentifier"": ""87654321"",
                     ""address"": {
                         ""streetName"": ""Testvej"",
                         ""number"": ""2"",
@@ -405,7 +405,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             await target
-                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validCvr, changedAddress))
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress))
                 .ConfigureAwait(false);
 
             var changedOrg = await target
@@ -416,7 +416,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.NotNull(changedOrg);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), changedOrg.OrganizationId);
             Assert.Equal("unit test 2", changedOrg.Name);
-            Assert.Equal(_validCvr, changedOrg.Cvr);
+            Assert.Equal(_validBusinessRegisterIdentifier, changedOrg.BusinessRegisterIdentifier);
             Assert.Equal(_validAddress.City, changedOrg.Address.City);
             Assert.Equal(_validAddress.Country, changedOrg.Address.Country);
             Assert.Equal(_validAddress.Number, changedOrg.Address.Number);

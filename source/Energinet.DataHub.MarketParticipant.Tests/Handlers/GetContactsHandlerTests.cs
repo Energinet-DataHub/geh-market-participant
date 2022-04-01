@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 contactRepository.Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
-            var validCvr = new CVRNumber("123");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
                 "1",
@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 organizationId,
                 "fake_value",
                 Enumerable.Empty<Actor>(),
-                validCvr,
+                validBusinessRegisterIdentifier,
                 validAddress);
 
             organizationRepository

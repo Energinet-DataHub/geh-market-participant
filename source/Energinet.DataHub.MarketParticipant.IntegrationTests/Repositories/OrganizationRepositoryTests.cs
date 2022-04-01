@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             "Test City",
             "Test Country");
 
-        private readonly CVRNumber _validCvr = new("12345678");
+        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
 
         public OrganizationRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization("Test", _validCvr, _validAddress);
+            var testOrg = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var testOrg = new Organization("Test", _validCvr, _validAddress);
+            var testOrg = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_OneOrganizationWithCvr_CanReadBack()
+        public async Task AddOrUpdateAsync_OneOrganizationWithBusinessRegisterIdentifier_CanReadBack()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
-            var testOrg = new Organization("Test", _validCvr, _validAddress);
+            var testOrg = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
             Assert.Equal(testOrg.Name, newOrg?.Name);
-            Assert.Equal(testOrg.CVR.Number, newOrg?.CVR.Number);
+            Assert.Equal(testOrg.BusinessRegisterIdentifier.Identifier, newOrg?.BusinessRegisterIdentifier.Identifier);
         }
 
         [Fact]
@@ -138,7 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization("Test", _validCvr, _validAddress);
+            var testOrg = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
@@ -148,7 +148,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 newOrg!.Id,
                 "NewName",
                 newOrg.Actors,
-                newOrg.CVR,
+                newOrg.BusinessRegisterIdentifier,
                 newOrg.Address);
 
             await orgRepository.AddOrUpdateAsync(newOrg).ConfigureAwait(false);
@@ -184,7 +184,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
 
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
             organization.Actors.Add(initialActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -213,7 +213,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var expected = new GridArea(
                 new GridAreaId(Guid.Empty),
@@ -253,7 +253,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var balancePowerSupplierActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
             balancePowerSupplierActor.MarketRoles.Add(new MarketRole(EicFunction.BalancingServiceProvider));
@@ -293,7 +293,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
             var actorId = Guid.NewGuid();
 
             // Act
@@ -318,7 +318,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepositoryRead = new OrganizationRepository(contextRead);
 
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var actorWithMeteringTypes = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
             actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
@@ -346,7 +346,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepositoryRead = new OrganizationRepository(contextRead);
 
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var actorWithMeteringTypes = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
             actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
@@ -380,7 +380,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository2 = new OrganizationRepository(context2);
 
             var globalLocationNumber = new MockedGln();
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -407,7 +407,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository2 = new OrganizationRepository(context2);
 
             var globalLocationNumber = new MockedGln();
-            var organization = new Organization("Test", _validCvr, _validAddress);
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);

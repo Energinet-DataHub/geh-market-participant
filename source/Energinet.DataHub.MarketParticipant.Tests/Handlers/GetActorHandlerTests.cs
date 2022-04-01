@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             const string orgName = "SomeName";
-            var validCvr = new CVRNumber("123");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
                 "1",
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new OrganizationId(organizationId),
                 orgName,
                 Enumerable.Empty<Actor>(),
-                validCvr,
+                validBusinessRegisterIdentifier,
                 validAddress);
 
             organizationExistsHelperService
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
             const string actorGln = "SomeGln";
-            var validCvr = new CVRNumber("123");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
                 "1",
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new OrganizationId(orgId),
                 orgName,
                 new[] { actor },
-                validCvr,
+                validBusinessRegisterIdentifier,
                 validAddress);
 
             organizationExistsHelperService

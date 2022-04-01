@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .ConfigureAwait(false);
 
             organization.Name = request.Organization.Name;
-            organization.CVR = new CVRNumber(request.Organization.Cvr);
+            organization.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
             organization.Address = new Address(
                 request.Organization.Address.StreetName,
                 request.Organization.Address.Number,

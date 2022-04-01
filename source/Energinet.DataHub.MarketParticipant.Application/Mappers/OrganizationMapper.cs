@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Id.ToString(),
                 organization.Name,
                 organization.Actors.Select(Map).ToList(),
-                organization.CVR.Number,
+                organization.BusinessRegisterIdentifier.Identifier,
                 Map(organization.Address));
         }
 
@@ -47,11 +47,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         private static AddressDto Map(Address address)
         {
             return new AddressDto(
-                address?.StreetName,
-                address?.Number,
-                address?.ZipCode,
-                address?.City,
-                address?.Country);
+                address.StreetName,
+                address.Number,
+                address.ZipCode,
+                address.City,
+                address.Country);
         }
 
         private static MarketRoleDto Map(MarketRole marketRole)

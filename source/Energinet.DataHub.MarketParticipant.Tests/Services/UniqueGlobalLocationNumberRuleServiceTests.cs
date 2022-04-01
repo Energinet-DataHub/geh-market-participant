@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "Test City",
             "Test Country");
 
-        private readonly CVRNumber _validCvr = new("12345678");
+        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
 
         [Fact]
         public async Task ValidateGlobalLocationNumberAvailableAsync_GlnAvailable_DoesNothing()
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
-            var organization = new Organization("fake_value", _validCvr, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
-            var organization = new Organization("fake_value", _validCvr, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), gln));
 
             organizationRepository
@@ -100,7 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         Enumerable.Empty<MarketRole>(),
                         Enumerable.Empty<MeteringPointType>())
                 },
-                _validCvr,
+                _validCvrBusinessRegisterIdentifier,
                 _validAddress);
 
             organizationRepository
@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvr, _validAddress), gln))
+                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress), gln))
                 .ConfigureAwait(false);
         }
     }

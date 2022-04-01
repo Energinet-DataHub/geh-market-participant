@@ -21,12 +21,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class Organization
     {
-        public Organization(string name, CVRNumber cvr, Address address)
+        public Organization(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address)
         {
             Id = new OrganizationId(Guid.Empty);
             Name = name;
             Actors = new Collection<Actor>();
-            CVR = cvr;
+            BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
         }
 
@@ -34,13 +34,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             OrganizationId id,
             string name,
             IEnumerable<Actor> actors,
-            CVRNumber cvrNumber,
+            BusinessRegisterIdentifier businessRegisterIdentifier,
             Address address)
         {
             Id = id;
             Name = name;
             Actors = actors.ToList();
-            CVR = cvrNumber;
+            BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
         }
 
@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public string Name { get; set; }
 
-        public CVRNumber CVR { get; set; }
+        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; }
 
         public Address Address { get; set; }
 

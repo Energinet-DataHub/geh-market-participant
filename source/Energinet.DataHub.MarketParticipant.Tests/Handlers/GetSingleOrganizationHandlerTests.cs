@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { marketRole },
                 Enumerable.Empty<MeteringPointType>());
 
-            var validCvr = new CVRNumber("123");
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
                 "1",
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new OrganizationId(orgId),
                 "fake_value",
                 new[] { actor },
-                validCvr,
+                validBusinessRegisterIdentifier,
                 validAddress);
 
             organizationExistsHelperService

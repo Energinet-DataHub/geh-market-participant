@@ -1,5 +1,5 @@
 ALTER TABLE [dbo].[OrganizationInfo]
-    ADD Cvr nvarchar(8),
+    ADD BusinessRegisterIdentifier nvarchar(8) default N'',
         Address_StreetName nvarchar(250) NULL,
         Address_Number nvarchar(15) NULL,
         Address_ZipCode nvarchar(15) NULL,
