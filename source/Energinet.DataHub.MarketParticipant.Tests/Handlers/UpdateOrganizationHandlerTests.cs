@@ -17,7 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
-using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -59,6 +59,21 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
 
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var validAddressDto = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
             var actor = new Actor(
                 Guid.NewGuid(),
                 new ExternalActorId(Guid.NewGuid()),
@@ -71,7 +86,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organization = new Organization(
                 new OrganizationId(orgId),
                 "fake_value",
-                new[] { actor });
+                new[] { actor },
+                validBusinessRegisterIdentifier,
+                validAddress);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -81,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
-            var changeDto = new ChangeOrganizationDto("New name");
+            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto);
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 

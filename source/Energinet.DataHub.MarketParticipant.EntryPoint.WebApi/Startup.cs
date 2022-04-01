@@ -54,7 +54,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseMiddleware<JwtTokenMiddleware>();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -121,6 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 "Frontend OpenID URL not found.");
             var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
                 "Frontend service app id not found.");
+
             Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }

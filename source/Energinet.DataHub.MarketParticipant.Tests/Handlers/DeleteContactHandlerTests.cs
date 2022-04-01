@@ -29,6 +29,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class DeleteContactHandlerTests
     {
+        private readonly Address _validAddress = new(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
+
+        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
+
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
@@ -58,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
-                .ReturnsAsync(new Organization("fake_value"));
+                .ReturnsAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress));
 
             contactRepository
                 .Setup(x => x.GetAsync(contactId))
@@ -85,7 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
-                .ReturnsAsync(new Organization("fake_value"));
+                .ReturnsAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress));
 
             var contactToDelete = new Contact(
                 contactId,

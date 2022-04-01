@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
 {
     public sealed class GetOrganizationsHandler : IRequestHandler<GetOrganizationsCommand, GetOrganizationsResponse>
     {

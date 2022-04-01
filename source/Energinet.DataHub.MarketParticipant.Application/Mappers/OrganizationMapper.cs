@@ -28,7 +28,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             return new OrganizationDto(
                 organization.Id.ToString(),
                 organization.Name,
-                organization.Actors.Select(Map).ToList());
+                organization.Actors.Select(Map).ToList(),
+                organization.BusinessRegisterIdentifier.Identifier,
+                Map(organization.Address));
         }
 
         public static ActorDto Map(Actor actor)
@@ -40,6 +42,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 new GlobalLocationNumberDto(actor.Gln.Value),
                 actor.Status.ToString(),
                 actor.MarketRoles.Select(Map).ToList());
+        }
+
+        private static AddressDto Map(Address address)
+        {
+            return new AddressDto(
+                address.StreetName,
+                address.Number,
+                address.ZipCode,
+                address.City,
+                address.Country);
         }
 
         private static MarketRoleDto Map(MarketRole marketRole)

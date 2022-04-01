@@ -55,11 +55,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 contactRepository.Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
 
             var organization = new Organization(
                 organizationId,
                 "fake_value",
-                Enumerable.Empty<Actor>());
+                Enumerable.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress);
 
             organizationRepository
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))

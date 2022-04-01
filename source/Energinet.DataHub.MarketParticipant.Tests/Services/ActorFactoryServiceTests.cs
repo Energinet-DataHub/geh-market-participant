@@ -29,6 +29,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     [UnitTest]
     public sealed class ActorFactoryServiceTests
     {
+        private readonly Address _validAddress = new(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
+
+        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
+
         [Fact]
         public async Task CreateAsync_NullOrganization_ThrowsException()
         {
@@ -64,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
-                new Organization("fake_value"),
+                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 null!,
                 Array.Empty<MarketRole>())).ConfigureAwait(false);
         }
@@ -84,7 +93,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
-                new Organization("fake_value"),
+                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 new GlobalLocationNumber("fake_value"),
                 null!)).ConfigureAwait(false);
         }
@@ -103,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 activeDirectory.Object);
 
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
@@ -140,10 +149,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var expectedId = Guid.NewGuid();
             var expectedExternalId = Guid.NewGuid();
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
             var organizationBeforeUpdate = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "fake_value",
-                Array.Empty<Actor>());
+                Array.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress);
 
             var organizationAfterUpdate = new Organization(
                 organizationBeforeUpdate.Id,
@@ -158,7 +176,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         Enumerable.Empty<GridArea>(),
                         Enumerable.Empty<MarketRole>(),
                         Enumerable.Empty<MeteringPointType>())
-                });
+                },
+                validBusinessRegisterIdentifier,
+                validAddress);
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
@@ -196,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 globalLocationNumberUniquenessService.Object,
                 activeDirectory.Object);
 
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
 
             activeDirectory
@@ -233,7 +253,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 activeDirectory.Object);
 
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
             var marketRoles = new[] { new MarketRole(EicFunction.BalanceResponsibleParty) };
 

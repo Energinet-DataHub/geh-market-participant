@@ -15,41 +15,40 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
-using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
 {
-    public sealed class UpdateOrganizationHandler : IRequestHandler<UpdateOrganizationCommand>
+    public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
 
-        public UpdateOrganizationHandler(
-            IOrganizationRepository organizationRepository,
-            IOrganizationExistsHelperService organizationExistsHelperService)
+        public CreateOrganizationHandler(IOrganizationRepository organizationRepository)
         {
             _organizationRepository = organizationRepository;
-            _organizationExistsHelperService = organizationExistsHelperService;
         }
 
-        public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
+        public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
-                .ConfigureAwait(false);
+            var address = new Address(
+                request.Organization.Address.StreetName,
+                request.Organization.Address.Number,
+                request.Organization.Address.ZipCode,
+                request.Organization.Address.City,
+                request.Organization.Address.Country);
+            var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
+            var organization = new Domain.Model.Organization(request.Organization.Name, cvr, address);
 
-            organization.Name = request.Organization.Name;
-
-            await _organizationRepository
+            var organizationId = await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            return Unit.Value;
+            return new CreateOrganizationResponse(organizationId.Value.ToString());
         }
     }
 }
