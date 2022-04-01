@@ -90,5 +90,52 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Assert
             Assert.Equal(actor.Id.ToString(), response.ActorId);
         }
+
+        [Fact]
+        public async Task Handle_NewActorWithMarketRoles_ActorIdReturned()
+        {
+            // Arrange
+            const string orgName = "SomeName";
+            const string actorGln = "SomeGln";
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorFactory = new Mock<IActorFactoryService>();
+            var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
+            var orgId = Guid.NewGuid();
+            var actorId = Guid.NewGuid();
+            var validCvr = new CVRNumber("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validCvr, validAddress);
+            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+                .ReturnsAsync(organization);
+
+            actorFactory
+                .Setup(x => x.CreateAsync(
+                    organization,
+                    It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<MarketRole>>()))
+                .ReturnsAsync(actor);
+
+            var command = new CreateActorCommand(
+                orgId,
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }));
+
+            // Act
+            var response = await target
+                .Handle(command, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(actor.Id.ToString(), response.ActorId);
+        }
     }
 }
