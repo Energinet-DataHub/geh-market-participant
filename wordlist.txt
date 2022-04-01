@@ -19,3 +19,4 @@ CreateActorAsync
 GetActorAsync
 GetActorsAsync
 codecov
+CVR

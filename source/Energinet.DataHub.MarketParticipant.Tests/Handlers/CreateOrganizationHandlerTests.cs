@@ -16,7 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
-using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -48,12 +48,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationRepositoryService = new Mock<IOrganizationRepository>();
             var target = new CreateOrganizationHandler(organizationRepositoryService.Object);
+            const string validCvr = "123";
+            var validAddress = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
 
             organizationRepositoryService
                 .Setup(x => x.AddOrUpdateAsync(It.Is<Organization>(g => g.Name == name)))
                 .ReturnsAsync(new OrganizationId(Guid.NewGuid()));
 
-            var command = new CreateOrganizationCommand(new ChangeOrganizationDto(name));
+            var command = new CreateOrganizationCommand(new ChangeOrganizationDto(name, validCvr, validAddress));
 
             // Act
             var response = await target

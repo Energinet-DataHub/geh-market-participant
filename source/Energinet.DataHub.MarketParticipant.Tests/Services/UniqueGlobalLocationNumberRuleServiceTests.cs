@@ -28,6 +28,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     [UnitTest]
     public sealed class UniqueGlobalLocationNumberRuleServiceTests
     {
+        private readonly Address _validAddress = new(
+            "test Street",
+            "1",
+            "1111",
+            "Test City",
+            "Test Country");
+
+        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
+
         [Fact]
         public async Task ValidateGlobalLocationNumberAvailableAsync_GlnAvailable_DoesNothing()
         {
@@ -36,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -56,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
-            var organization = new Organization("fake_value");
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), gln));
 
             organizationRepository
@@ -77,17 +86,22 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new GlobalLocationNumber("fake_value");
-            var organization = new Organization(new OrganizationId(Guid.NewGuid()), "fake_value", new[]
-            {
-                new Actor(
-                    Guid.NewGuid(),
-                    new ExternalActorId(Guid.NewGuid()),
-                    gln,
-                    ActorStatus.Active,
-                    Enumerable.Empty<GridArea>(),
-                    Enumerable.Empty<MarketRole>(),
-                    Enumerable.Empty<MeteringPointType>())
-            });
+            var organization = new Organization(
+                new OrganizationId(Guid.NewGuid()),
+                "fake_value",
+                new[]
+                {
+                    new Actor(
+                        Guid.NewGuid(),
+                        new ExternalActorId(Guid.NewGuid()),
+                        gln,
+                        ActorStatus.Active,
+                        Enumerable.Empty<GridArea>(),
+                        Enumerable.Empty<MarketRole>(),
+                        Enumerable.Empty<MeteringPointType>())
+                },
+                _validCvrBusinessRegisterIdentifier,
+                _validAddress);
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -95,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value"), gln))
+                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress), gln))
                 .ConfigureAwait(false);
         }
     }

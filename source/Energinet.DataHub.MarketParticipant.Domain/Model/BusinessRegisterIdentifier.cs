@@ -12,15 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record OrganizationDto(
-        Guid OrganizationId,
-        string Name,
-        IReadOnlyList<ActorDto> Actors,
-        string BusinessRegisterIdentifier,
-        AddressDto Address);
+    public sealed record BusinessRegisterIdentifier(string Identifier);
 }

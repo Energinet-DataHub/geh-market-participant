@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -49,16 +50,22 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewActor_ActorIdReturned()
         {
             // Arrange
+            const string orgName = "SomeName";
+            const string actorGln = "SomeGln";
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
             var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
-
             var orgId = Guid.NewGuid();
-            const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
-            const string actorGln = "SomeGln";
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>());
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
 
             organizationExistsHelperService
@@ -75,6 +82,53 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateActorCommand(
                 orgId,
                 new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>()));
+
+            // Act
+            var response = await target
+                .Handle(command, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(actor.Id.ToString(), response.ActorId);
+        }
+
+        [Fact]
+        public async Task Handle_NewActorWithMarketRoles_ActorIdReturned()
+        {
+            // Arrange
+            const string orgName = "SomeName";
+            const string actorGln = "SomeGln";
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorFactory = new Mock<IActorFactoryService>();
+            var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
+            var orgId = Guid.NewGuid();
+            var actorId = Guid.NewGuid();
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
+            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+                .ReturnsAsync(organization);
+
+            actorFactory
+                .Setup(x => x.CreateAsync(
+                    organization,
+                    It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<MarketRole>>()))
+                .ReturnsAsync(actor);
+
+            var command = new CreateActorCommand(
+                orgId,
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }));
 
             // Act
             var response = await target

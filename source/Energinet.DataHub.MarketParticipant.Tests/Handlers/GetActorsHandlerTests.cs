@@ -29,13 +29,13 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
     [UnitTest]
-    public sealed class GetActorHandlerTests
+    public sealed class GetActorsHandlerTests
     {
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new GetActorHandler(new Mock<IOrganizationExistsHelperService>().Object);
+            var target = new GetActorsHandler(new Mock<IOrganizationExistsHelperService>().Object);
 
             // Act + Assert
             await Assert
@@ -44,11 +44,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_NoActor_ThrowsNotFoundException()
+        public async Task Handle_NoActors_ReturnsEmptyList()
         {
             // Arrange
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorHandler(organizationExistsHelperService.Object);
+            var target = new GetActorsHandler(organizationExistsHelperService.Object);
 
             var organizationId = Guid.NewGuid();
             const string orgName = "SomeName";
@@ -70,24 +70,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleActorCommand(Guid.NewGuid(), organizationId);
+            var command = new GetActorsCommand(organizationId);
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
+            var actual = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            Assert.NotNull(actual.Actors);
+            Assert.Empty(actual.Actors);
         }
 
         [Fact]
-        public async Task Handle_HasActor_ReturnsActor()
+        public async Task Handle_HasActors_ReturnsActors()
         {
             // Arrange
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorHandler(organizationExistsHelperService.Object);
+            var target = new GetActorsHandler(organizationExistsHelperService.Object);
 
             var orgId = Guid.NewGuid();
             const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
+            var actorId2 = Guid.NewGuid();
             const string actorGln = "SomeGln";
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -106,10 +107,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
 
+            var actor2 = new Actor(
+                actorId2,
+                new ExternalActorId(actorId2),
+                new GlobalLocationNumber(actorGln),
+                ActorStatus.Active,
+                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<MarketRole>(),
+                Enumerable.Empty<MeteringPointType>());
+
             var organization = new Organization(
                 new OrganizationId(orgId),
                 orgName,
-                new[] { actor },
+                new[] { actor, actor2 },
                 validBusinessRegisterIdentifier,
                 validAddress);
 
@@ -117,14 +127,21 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
                 .ReturnsAsync(organization);
 
-            var command = new GetSingleActorCommand(actorId, orgId);
+            var command = new GetActorsCommand(orgId);
 
             // Act
             var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(response.Actor);
-            Assert.Equal(actorId.ToString(), response.Actor?.ActorId);
+            Assert.NotNull(response.Actors);
+            Assert.NotEmpty(response.Actors);
+            Assert.Equal(2, response.Actors.Count());
+
+            var firstActor = response.Actors.First();
+            var secondActor = response.Actors.Skip(1).First();
+
+            Assert.Equal(actor.Id.ToString(), firstActor.ActorId);
+            Assert.Equal(actor2.Id.ToString(), secondActor.ActorId);
         }
     }
 }
