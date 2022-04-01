@@ -71,6 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         public async Task<IEnumerable<Organization>> GetAsync()
         {
             var entities = await GetOrganizationQuery()
+                .OrderBy(x => x.Name)
                 .ToListAsync()
                 .ConfigureAwait(false);
 
