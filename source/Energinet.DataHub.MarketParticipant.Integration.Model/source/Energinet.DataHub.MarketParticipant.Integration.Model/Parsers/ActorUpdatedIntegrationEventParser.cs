@@ -30,14 +30,14 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
                 return new ActorUpdatedIntegrationEvent(
-                    id: Guid.Parse(contract.Id),
-                    actorId: Guid.Parse(contract.ActorId),
-                    organizationId: Guid.Parse(contract.OrganizationId),
-                    externalActorId: Guid.Parse(contract.ExternalActorId),
-                    gln: contract.Gln,
-                    status: (ActorStatus)contract.Status,
-                    businessRoles: contract.BusinessRoles.Select(x => (BusinessRoleCode)x).ToList(),
-                    marketRoles: contract.MarketRoles.Select(x => (EicFunction)x).ToList());
+                    Guid.Parse(contract.Id),
+                    Guid.Parse(contract.ActorId),
+                    Guid.Parse(contract.OrganizationId),
+                    Guid.Parse(contract.ExternalActorId),
+                    contract.Gln,
+                    (ActorStatus)contract.Status,
+                    contract.BusinessRoles.Select(x => (BusinessRoleCode)x).ToList(),
+                    contract.MarketRoles.Select(x => (EicFunction)x).ToList());
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {

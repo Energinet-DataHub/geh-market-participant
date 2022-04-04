@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
@@ -30,13 +29,13 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 var contract = GridAreaUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
                 return new GridAreaUpdatedIntegrationEvent(
-                    id: Guid.Parse(contract.Id),
-                    gridAreaId: Guid.Parse(contract.GridAreaId),
-                    actorId: Guid.Parse(contract.ActorId),
-                    name: contract.Name,
-                    code: contract.Code,
-                    priceAreaCode: (PriceAreaCode)contract.PriceAreaCode,
-                    active: contract.Active);
+                    Guid.Parse(contract.Id),
+                    Guid.Parse(contract.GridAreaId),
+                    Guid.Parse(contract.ActorId),
+                    contract.Name,
+                    contract.Code,
+                    (PriceAreaCode)contract.PriceAreaCode,
+                    contract.Active);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
