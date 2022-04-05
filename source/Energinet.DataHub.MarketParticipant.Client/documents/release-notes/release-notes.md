@@ -27,6 +27,6 @@
 
 - Added CVR and Address to organization
 
-## Version 0.5.0
+## Version 0.5.1
 
 - Added contacts
