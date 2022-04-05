@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
@@ -24,12 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
         public Guid ActorId { get; set; }
         public GridAreaName Name { get; set; } = null!;
         public GridAreaCode Code { get; set; } = null!;
-        public gri Status { get; set; }
-
-        [JsonInclude]
-        public ICollection<BusinessRoleCode> BusinessRoles { get; private set; } = new List<BusinessRoleCode>();
-
-        [JsonInclude]
-        public ICollection<EicFunction> MarketRoles { get; private set; } = new List<EicFunction>();
+        public PriceAreaCode PriceAreaCode { get; set; }
+        public bool Active { get; set; }
     }
 }

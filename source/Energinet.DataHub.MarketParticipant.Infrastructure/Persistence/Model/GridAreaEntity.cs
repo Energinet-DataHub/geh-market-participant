@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
@@ -27,5 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
+        public PriceAreaCode PriceAreaCode { get; set; }
+        public bool Active { get; set; }
     }
 }
