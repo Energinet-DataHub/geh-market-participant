@@ -37,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             "Testland");
 
         private readonly string _validBusinessRegisterIdentifier = "87654321";
+
         [Fact]
         public async Task GetOrganizationsAsync_Unauthorized_ThrowsException()
         {
@@ -336,11 +337,10 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                 .ConfigureAwait(false);
 
             var createdOrg = await target
-                .GetOrganizationAsync(orgId.GetValueOrDefault())
+                .GetOrganizationAsync(orgId)
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(orgId);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), orgId);
             Assert.NotNull(createdOrg);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), createdOrg.OrganizationId);
@@ -570,7 +570,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                 .ConfigureAwait(false);
 
             var actual = await target
-                .GetActorAsync(orgId, createdActorId.GetValueOrDefault())
+                .GetActorAsync(orgId, createdActorId)
                 .ConfigureAwait(false);
 
             // Assert
@@ -634,6 +634,57 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             var marketRole = actual.MarketRoles[0];
             Assert.Equal(EicFunction.BillingAgent, marketRole.Function);
+        }
+
+        [Fact]
+        public async Task GetContactsAsync_All_ReturnsContacts()
+        {
+            // Arrange
+            const string incomingJson = @"
+    [
+        {
+            ""ContactId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
+            ""Category"": ""Default"", 
+            ""Name"": ""unit test"",
+            ""Email"": ""unit@test.com"",
+            ""Phone"": ""20202030""
+        }
+    ]}";
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            httpTest.RespondWith(incomingJson);
+
+            // Act
+            var actual = await target.GetContactsAsync(Guid.NewGuid()).ConfigureAwait(false);
+
+            // Assert
+            var actualContact = actual.Single();
+            Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), actualContact.ContactId);
+            Assert.Equal(ContactCategory.Default, actualContact.Category);
+            Assert.Equal("unit test", actualContact.Name);
+            Assert.Equal("unit@test.com", actualContact.Email);
+            Assert.Equal("20202030", actualContact.Phone);
+        }
+
+        [Fact]
+        public async Task CreateContactAsync_ValidContact_ReturnsId()
+        {
+            // Arrange
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
+            httpTest.RespondWith("361fb10a-4204-46b6-bf9e-171ab2e61a59");
+
+            // Act
+            var contactId = await target.CreateContactAsync(
+                    orgId,
+                    new CreateContactDto("unit test", ContactCategory.Charges, "email", "phone"))
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), contactId);
         }
     }
 }
