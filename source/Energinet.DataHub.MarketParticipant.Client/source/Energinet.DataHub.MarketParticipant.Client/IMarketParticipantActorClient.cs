@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// Updates the specified actor.
         /// </summary>
-        /// <param name="organizationId">The if of the organization the actor belongs to.</param>
+        /// <param name="organizationId">The id of the organization the actor belongs to.</param>
         /// <param name="actorId">The id of the actor to update.</param>
         /// <param name="changeActorDto">The data to update.</param>
         Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto);
