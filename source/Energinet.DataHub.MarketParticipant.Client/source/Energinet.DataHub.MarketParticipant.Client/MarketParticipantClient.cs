@@ -24,6 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
     {
         private const string OrganizationsBaseUrl = "Organization";
         private const string ActorBaseUrl = "Actor";
+        private const string ContactBaseUrl = "Contact";
 
         private readonly IFlurlClient _httpClient;
 
@@ -39,10 +40,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetAsync()
                 .ConfigureAwait(false);
 
-            var listAllOrganizationsResult = await response.GetJsonAsync<IEnumerable<OrganizationDto>>()
+            var listAllOrganizationsResult = await response
+                .GetJsonAsync<IEnumerable<OrganizationDto>>()
                 .ConfigureAwait(false);
 
-            return listAllOrganizationsResult ?? Array.Empty<OrganizationDto>();
+            return listAllOrganizationsResult;
         }
 
         public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
@@ -52,43 +54,43 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetAsync()
                 .ConfigureAwait(false);
 
-            var singleOrganizationsResult = await response.GetJsonAsync<OrganizationDto>()
+            var singleOrganizationsResult = await response
+                .GetJsonAsync<OrganizationDto>()
                 .ConfigureAwait(false);
 
             return singleOrganizationsResult;
         }
 
-        public async Task<Guid?> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
+        public async Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
         {
             var response = await _httpClient
                 .Request(OrganizationsBaseUrl)
                 .PostJsonAsync(organizationDto)
                 .ConfigureAwait(false);
 
-            var orgId = await response.GetStringAsync()
+            var orgId = await response
+                .GetStringAsync()
                 .ConfigureAwait(false);
 
             return Guid.Parse(orgId);
         }
 
-        public async Task<bool> UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
+        public Task UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
         {
-            await _httpClient
+            return _httpClient
                 .Request(OrganizationsBaseUrl, organizationId)
-                .PutJsonAsync(organizationDto)
-                .ConfigureAwait(false);
-
-            return true;
+                .PutJsonAsync(organizationDto);
         }
 
-        public async Task<IEnumerable<ActorDto>?> GetActorsAsync(Guid organizationId)
+        public async Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId)
         {
             var response = await _httpClient
                 .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
                 .GetAsync()
                 .ConfigureAwait(false);
 
-            var actors = await response.GetJsonAsync<IEnumerable<ActorDto>>()
+            var actors = await response
+                .GetJsonAsync<IEnumerable<ActorDto>>()
                 .ConfigureAwait(false);
 
             return actors;
@@ -101,33 +103,67 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetAsync()
                 .ConfigureAwait(false);
 
-            var actor = await response.GetJsonAsync<ActorDto>()
+            var actor = await response
+                .GetJsonAsync<ActorDto>()
                 .ConfigureAwait(false);
 
             return actor;
         }
 
-        public async Task<Guid?> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
+        public async Task<Guid> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
         {
             var response = await _httpClient
                 .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
                 .PostJsonAsync(createActorDto)
                 .ConfigureAwait(false);
 
-            var actor = await response.GetStringAsync()
+            var actor = await response
+                .GetStringAsync()
                 .ConfigureAwait(false);
 
             return Guid.Parse(actor);
         }
 
-        public async Task<bool?> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto createActorDto)
+        public Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto)
         {
-            await _httpClient
+            return _httpClient
                 .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
-                .PutJsonAsync(createActorDto)
+                .PutJsonAsync(changeActorDto);
+        }
+
+        public async Task<IEnumerable<ContactDto>> GetContactsAsync(Guid organizationId)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl)
+                .GetAsync()
                 .ConfigureAwait(false);
 
-            return true;
+            var contacts = await response
+                .GetJsonAsync<IEnumerable<ContactDto>>()
+                .ConfigureAwait(false);
+
+            return contacts;
+        }
+
+        public async Task<Guid> CreateContactAsync(Guid organizationId, CreateContactDto contactDto)
+        {
+            var response = await _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl)
+                .PostJsonAsync(contactDto)
+                .ConfigureAwait(false);
+
+            var contact = await response
+                .GetStringAsync()
+                .ConfigureAwait(false);
+
+            return Guid.Parse(contact);
+        }
+
+        public Task DeleteContactAsync(Guid organizationId, Guid contactId)
+        {
+            return _httpClient
+                .Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl, contactId)
+                .DeleteAsync();
         }
     }
 }
