@@ -6,7 +6,7 @@ GO
 UPDATE GridAreaInfo
 SET
     ActorId = 'e0a90bab-0029-402b-81dd-eb46c9e4db62'
-WHERE ActorIdId = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
+WHERE ActorId = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
 GO
 
 INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name]) VALUES (N'3437964d-ebaa-448a-abfd-eb589228f0e9', N'5790001088460', 1, N'DDM', 1, N'Nakskov Elnet A/S')
