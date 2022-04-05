@@ -26,30 +26,26 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 {
     [UnitTest]
-    public sealed class ActorUpdatedEventDispatcherTests
+    public sealed class GridAreaUpdatedEventDispatcherTests
     {
         [Fact]
-        public async Task Ctor_NewRole_HasStatusNew()
+        public async Task GridAreaUpdated_IntegrationEventDispatcher_CanReadEvent()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var eventParser = new ActorUpdatedIntegrationEventParser();
-            var target = new ActorUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var eventParser = new GridAreaUpdatedIntegrationEventParser();
+            var target = new GridAreaUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
 
-            var integrationEvent = new ActorUpdatedIntegrationEvent
+            var integrationEvent = new GridAreaUpdatedIntegrationEvent
             {
-                ActorId = Guid.NewGuid(),
-                OrganizationId = new OrganizationId(Guid.NewGuid()),
-                ExternalActorId = new ExternalActorId(Guid.NewGuid()),
-                Gln = new GlobalLocationNumber("gln"),
-                Status = ActorStatus.Active
+                GridAreaId = new GridAreaId(Guid.NewGuid()),
+                Name = new GridAreaName("fake_value"),
+                Code = new GridAreaCode("123"),
+                PriceAreaCode = PriceAreaCode.DK1
             };
-            integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
-            integrationEvent.MarketRoles.Add(EicFunction.BalancingServiceProvider);
-            integrationEvent.GridAreas.Add(new GridAreaId(Guid.NewGuid()));
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
@@ -60,13 +56,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.True(actual);
             Assert.NotNull(actualEvent);
             Assert.Equal(integrationEvent.Id, actualEvent.Id);
-            Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
-            Assert.Equal(integrationEvent.ExternalActorId.Value, actualEvent.ExternalActorId);
-            Assert.Equal(integrationEvent.Gln.Value, actualEvent.Gln);
-            Assert.Equal((int)integrationEvent.Status, (int)actualEvent.Status);
-            Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
-            Assert.Equal((int)integrationEvent.MarketRoles.Single(), (int)actualEvent.MarketRoles.Single());
-            Assert.Equal(integrationEvent.GridAreas.Single().Value.ToString(), actualEvent.GridAreas.Single().ToString());
+            Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);
+            Assert.Equal(integrationEvent.Code.Value, actualEvent.Code);
+            Assert.Equal(integrationEvent.PriceAreaCode, PriceAreaCode.FromValue((int)actualEvent.PriceAreaCode));
         }
     }
 }

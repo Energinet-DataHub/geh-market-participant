@@ -25,13 +25,13 @@ using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActorUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class GridAreaUpdatedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IActorUpdatedIntegrationEventParser _eventParser;
+        private readonly IGridAreaUpdatedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public ActorUpdatedEventDispatcher(
-            IActorUpdatedIntegrationEventParser eventParser,
+        public GridAreaUpdatedEventDispatcher(
+            IGridAreaUpdatedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -42,19 +42,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaUpdatedIntegrationEvent gridAreaaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
-                actorUpdatedIntegrationEvent.Id,
-                actorUpdatedIntegrationEvent.ActorId,
-                actorUpdatedIntegrationEvent.OrganizationId.Value,
-                actorUpdatedIntegrationEvent.ExternalActorId.Value,
-                actorUpdatedIntegrationEvent.Gln.Value,
-                (ActorStatus)actorUpdatedIntegrationEvent.Status,
-                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
-                actorUpdatedIntegrationEvent.MarketRoles.Select(x => (EicFunction)x),
-                actorUpdatedIntegrationEvent.GridAreas.Select(x => x.Value));
+            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaUpdatedIntegrationEvent(
+                gridAreaaUpdatedIntegrationEvent.Id,
+                gridAreaaUpdatedIntegrationEvent.GridAreaId.Value,
+                gridAreaaUpdatedIntegrationEvent.Name.Value,
+                gridAreaaUpdatedIntegrationEvent.Code.Value,
+                (PriceAreaCode)gridAreaaUpdatedIntegrationEvent.PriceAreaCode.Value);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);

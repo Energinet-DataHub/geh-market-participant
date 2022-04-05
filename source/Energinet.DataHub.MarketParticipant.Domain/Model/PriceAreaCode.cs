@@ -19,9 +19,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class PriceAreaCode : SmartEnum<PriceAreaCode>
     {
-        public static readonly PriceAreaCode DK1 = new(0);
+        public static readonly PriceAreaCode DK1 = new(1);
 
-        public static readonly PriceAreaCode DK2 = new(1);
+        public static readonly PriceAreaCode DK2 = new(2);
 
         private PriceAreaCode(int value, [CallerMemberName] string name = "")
             : base(name, value)
