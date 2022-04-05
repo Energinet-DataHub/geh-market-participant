@@ -12,11 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Runtime.CompilerServices;
+using Ardalis.SmartEnum;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public enum PriceAreaCode
+    public sealed class PriceAreaCode : SmartEnum<PriceAreaCode>
     {
-        DK1 = 1,
-        DK2 = 2
+        public static readonly PriceAreaCode DK1 = new(0);
+
+        public static readonly PriceAreaCode DK2 = new(1);
+
+        private PriceAreaCode(int value, [CallerMemberName] string name = "")
+            : base(name, value)
+        {
+        }
     }
 }

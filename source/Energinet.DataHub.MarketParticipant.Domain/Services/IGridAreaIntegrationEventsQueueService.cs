@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed class GridAreaUpdatedIntegrationEvent : IntegrationEventBase
+    /// <summary>
+    /// Creates and enqueues integration events for GridAreas.
+    /// </summary>
+    public interface IGridAreaIntegrationEventsQueueService
     {
-        public GridAreaId GridAreaId { get; set; } = null!;
-        public GridAreaName Name { get; set; } = null!;
-        public GridAreaCode Code { get; set; } = null!;
-        public PriceAreaCode PriceAreaCode { get; set; } = PriceAreaCode.DK1;
+        /// <summary>
+        /// Creates and enqueues an ActorUpdated integration event for the specified actor.
+        /// </summary>
+        /// <param name="gridArea">The GridArea to publish an integration event for.</param>
+        Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea);
     }
 }

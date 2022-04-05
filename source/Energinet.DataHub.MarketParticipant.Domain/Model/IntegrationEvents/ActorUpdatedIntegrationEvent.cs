@@ -31,5 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 
         [JsonInclude]
         public ICollection<EicFunction> MarketRoles { get; private set; } = new List<EicFunction>();
+
+        [JsonInclude]
+        public ICollection<GridAreaId> GridAreas { get; private set; } = new List<GridAreaId>();
     }
 }

@@ -34,11 +34,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var @event = new GridAreaUpdatedIntegrationEvent(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
                 "TestArea",
                 "123",
-                PriceAreaCode.DK1,
-                true);
+                PriceAreaCode.DK1);
 
             // act
             var actualBytes = target.Parse(@event);
@@ -46,10 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
-            Assert.Equal(@event.Active, actualEvent.Active);
             Assert.Equal(@event.Code, actualEvent.Code);
             Assert.Equal(@event.Name, actualEvent.Name);
-            Assert.Equal(@event.ActorId, actualEvent.ActorId);
             Assert.Equal(@event.GridAreaId, actualEvent.GridAreaId);
             Assert.Equal(@event.PriceAreaCode, actualEvent.PriceAreaCode);
         }
@@ -62,10 +58,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var contract = new GridAreaUpdatedIntegrationEventContract
             {
                 Id = "Not_A_Giud",
-                Active = false,
                 Name = "fake_value",
                 Code = "123",
-                ActorId = Guid.NewGuid().ToString(),
                 GridAreaId = Guid.NewGuid().ToString(),
                 PriceAreaCode = (int)PriceAreaCode.DK1
             };
@@ -82,10 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var contract = new GridAreaUpdatedIntegrationEventContract
             {
                 Id = Guid.NewGuid().ToString(),
-                Active = false,
                 Name = "fake_value",
                 Code = "123",
-                ActorId = Guid.NewGuid().ToString(),
                 GridAreaId = Guid.NewGuid().ToString(),
                 PriceAreaCode = 34
             };

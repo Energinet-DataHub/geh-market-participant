@@ -21,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public GridAreaEntity()
         {
+            PriceAreaCode = PriceAreaCode.DK1;
             Code = string.Empty;
             Name = string.Empty;
         }
@@ -29,6 +30,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public string Name { get; set; }
         public string Code { get; set; }
         public PriceAreaCode PriceAreaCode { get; set; }
-        public bool Active { get; set; }
     }
 }

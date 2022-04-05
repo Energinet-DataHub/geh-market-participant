@@ -23,36 +23,27 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
         /// <param name="gridAreaId">Grid Area ID.</param>
-        /// <param name="actorId">The internal actor ID.</param>
         /// <param name="name">Name of the Grid Area.</param>
         /// <param name="code">The code for the Grid Area</param>
         /// <param name="priceAreaCode">The price area code for this Grid Area</param>
-        /// <param name="active">Whether this Grid Area is active</param>
         public GridAreaUpdatedIntegrationEvent(
             Guid id,
             Guid gridAreaId,
-            Guid actorId,
             string name,
             string code,
-            PriceAreaCode priceAreaCode,
-            bool active)
+            PriceAreaCode priceAreaCode)
         {
             Id = id;
-            ActorId = actorId;
             GridAreaId = gridAreaId;
             Name = name;
             Code = code;
             PriceAreaCode = priceAreaCode;
-            Active = active;
         }
 
         public Guid Id { get; }
         public Guid GridAreaId { get; }
-        public Guid ActorId { get; }
-
         public string Name { get; }
         public string Code { get; }
         public PriceAreaCode PriceAreaCode { get; }
-        public bool Active { get; }
     }
 }

@@ -39,7 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "0123456789012",
                 ActorStatus.Active,
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty });
+                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty },
+                new[] { Guid.NewGuid(), Guid.NewGuid() });
 
             // act
             var actualBytes = target.Parse(@event);
@@ -54,6 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             Assert.Equal(@event.Status, actualEvent.Status);
             Assert.Equal(@event.BusinessRoles, actualEvent.BusinessRoles);
             Assert.Equal(@event.MarketRoles, actualEvent.MarketRoles);
+            Assert.Equal(@event.GridAreas, actualEvent.GridAreas);
         }
 
         [Fact]
@@ -70,7 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 BusinessRoles = { 1 },
                 MarketRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString()
+                ExternalActorId = Guid.NewGuid().ToString(),
+                GridAreaIds = { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() }
             };
 
             // Act + Assert
@@ -91,7 +94,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 BusinessRoles = { 1 },
                 MarketRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString()
+                ExternalActorId = Guid.NewGuid().ToString(),
+                GridAreaIds = { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() }
             };
 
             // Act + Assert
@@ -112,7 +116,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 BusinessRoles = { -1 },
                 MarketRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString()
+                ExternalActorId = Guid.NewGuid().ToString(),
+                GridAreaIds = { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() }
             };
 
             // Act + Assert
@@ -133,7 +138,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 BusinessRoles = { 1 },
                 MarketRoles = { -1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString()
+                ExternalActorId = Guid.NewGuid().ToString(),
+                GridAreaIds = { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() }
             };
 
             // Act + Assert

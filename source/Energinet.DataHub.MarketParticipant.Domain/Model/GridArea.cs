@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code, PriceAreaCode PriceAreaCode, bool Active);
+    public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code, PriceAreaCode PriceAreaCode);
 
     public sealed record GridAreaId(Guid Value);
 

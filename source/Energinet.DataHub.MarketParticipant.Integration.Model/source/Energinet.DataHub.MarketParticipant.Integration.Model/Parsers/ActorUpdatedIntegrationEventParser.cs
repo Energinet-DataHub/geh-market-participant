@@ -39,7 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     contract.BusinessRoles.Select(
                         x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
                     contract.MarketRoles.Select(
-                        x => Enum.IsDefined((EicFunction)x) ? (EicFunction)x : throw new FormatException(nameof(contract.MarketRoles))).ToList());
+                        x => Enum.IsDefined((EicFunction)x) ? (EicFunction)x : throw new FormatException(nameof(contract.MarketRoles))).ToList(),
+                    contract.GridAreaIds.Select(x => Guid.Parse(x)));
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
@@ -61,6 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Gln = integrationEvent.Gln,
                     Status = (int)integrationEvent.Status,
+                    GridAreaIds = { integrationEvent.GridAreas.Select(x => x.ToString()) }
                 };
 
                 foreach (var x in integrationEvent.BusinessRoles)

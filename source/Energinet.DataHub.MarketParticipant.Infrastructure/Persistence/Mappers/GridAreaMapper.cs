@@ -24,7 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Code = from.Code.Value;
             to.Id = from.Id.Value;
             to.Name = from.Name.Value;
-            to.Active = from.Active;
             to.PriceAreaCode = from.PriceAreaCode;
         }
 
@@ -34,8 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 new GridAreaId(from.Id),
                 new GridAreaName(from.Name),
                 new GridAreaCode(from.Code),
-                from.PriceAreaCode,
-                from.Active);
+                from.PriceAreaCode);
         }
     }
 }

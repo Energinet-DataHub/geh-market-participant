@@ -20,9 +20,7 @@ option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model
 message GridAreaUpdatedIntegrationEventContract {
   string Id = 1;
   string GridAreaId = 2;
-  string ActorId = 3;
-  string Name = 4;
-  string Code = 5;
-  int32 PriceAreaCode = 6;
-  bool Active = 7;
+  string Name = 3;
+  string Code = 4;
+  int32 PriceAreaCode = 5;
 }

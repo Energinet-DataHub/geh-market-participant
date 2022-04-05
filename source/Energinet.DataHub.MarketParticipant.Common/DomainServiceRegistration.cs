@@ -25,6 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
         public static void AddServices(this Container container)
         {
             container.Register<IActorIntegrationEventsQueueService, ActorIntegrationEventsQueueService>(Lifestyle.Scoped);
+            container.Register<IGridAreaIntegrationEventsQueueService, GridAreaIntegrationEventsQueueService>(Lifestyle.Scoped);
             container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
             container.Register<IOverlappingBusinessRolesRuleService, OverlappingBusinessRolesRuleService>(Lifestyle.Scoped);
             container.Register<IOverlappingContactCategoriesRuleService, OverlappingContactCategoriesRuleService>(Lifestyle.Scoped);

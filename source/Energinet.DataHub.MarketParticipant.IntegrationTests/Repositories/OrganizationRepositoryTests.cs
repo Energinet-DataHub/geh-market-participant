@@ -179,7 +179,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                     new GridArea(
                         new GridAreaId(Guid.Empty),
                         new GridAreaName("fake_value"),
-                        new GridAreaCode("1234"))
+                        new GridAreaCode("1234"),
+                        PriceAreaCode.DK1)
                 },
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
@@ -218,7 +219,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var expected = new GridArea(
                 new GridAreaId(Guid.Empty),
                 new GridAreaName("fake_value"),
-                new GridAreaCode("1234"));
+                new GridAreaCode("1234"),
+                PriceAreaCode.DK1);
 
             organization.Actors.Add(new Actor(
                 Guid.Empty,

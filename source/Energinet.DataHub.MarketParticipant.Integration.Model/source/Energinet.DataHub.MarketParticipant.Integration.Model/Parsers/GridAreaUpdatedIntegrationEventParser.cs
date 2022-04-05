@@ -31,11 +31,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return new GridAreaUpdatedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     Guid.Parse(contract.GridAreaId),
-                    Guid.Parse(contract.ActorId),
                     contract.Name,
                     contract.Code,
-                    Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
-                    contract.Active);
+                    Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)));
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
@@ -53,11 +51,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 {
                     Id = integrationEvent.Id.ToString(),
                     GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    ActorId = integrationEvent.ActorId.ToString(),
                     Name = integrationEvent.Name,
                     Code = integrationEvent.Code,
-                    PriceAreaCode = (int)integrationEvent.PriceAreaCode,
-                    Active = integrationEvent.Active
+                    PriceAreaCode = (int)integrationEvent.PriceAreaCode
                 };
 
                 return contract.ToByteArray();
