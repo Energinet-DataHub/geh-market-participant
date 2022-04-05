@@ -14,7 +14,10 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
+using Google.Protobuf;
 using Xunit;
 using Xunit.Categories;
 
@@ -54,6 +57,41 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             Assert.Equal(@event.Address.Number, actualEvent.Address.Number);
             Assert.Equal(@event.Address.StreetName, actualEvent.Address.StreetName);
             Assert.Equal(@event.Address.ZipCode, actualEvent.Address.ZipCode);
+        }
+
+        [Fact]
+        public void Parse_InvalidGuid_ThrowsException()
+        {
+            // Arrange
+            var target = new OrganizationUpdatedIntegrationEventParser();
+            var contract = new OrganizationUpdatedIntegrationEventContract
+            {
+                Address = new OrganizationAddress()
+                {
+                    City = "fake_value",
+                    Country = "fake_value",
+                    Number = "fake_value",
+                    StreetName = "fake_value",
+                    ZipCode = "fake_value"
+                },
+                Id = "Not_A_Giud",
+                BusinessRegisterIdentifier = "12345678",
+                Name = "fake_value",
+                OrganizationId = Guid.NewGuid().ToString()
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
+        public void Parse_InvalidInput_ThrowsException()
+        {
+            // Arrange
+            var target = new OrganizationUpdatedIntegrationEventParser();
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
         }
     }
 }

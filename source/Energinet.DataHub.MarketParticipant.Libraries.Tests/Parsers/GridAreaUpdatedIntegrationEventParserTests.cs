@@ -14,7 +14,10 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
+using Google.Protobuf;
 using Xunit;
 using Xunit.Categories;
 
@@ -49,6 +52,56 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             Assert.Equal(@event.ActorId, actualEvent.ActorId);
             Assert.Equal(@event.GridAreaId, actualEvent.GridAreaId);
             Assert.Equal(@event.PriceAreaCode, actualEvent.PriceAreaCode);
+        }
+
+        [Fact]
+        public void Parse_InvalidGuid_ThrowsException()
+        {
+            // Arrange
+            var target = new GridAreaUpdatedIntegrationEventParser();
+            var contract = new GridAreaUpdatedIntegrationEventContract
+            {
+                Id = "Not_A_Giud",
+                Active = false,
+                Name = "fake_value",
+                Code = "123",
+                ActorId = Guid.NewGuid().ToString(),
+                GridAreaId = Guid.NewGuid().ToString(),
+                PriceAreaCode = (int)PriceAreaCode.DK1
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
+        public void Parse_InvalidEnum_ThrowsException()
+        {
+            // Arrange
+            var target = new GridAreaUpdatedIntegrationEventParser();
+            var contract = new GridAreaUpdatedIntegrationEventContract
+            {
+                Id = Guid.NewGuid().ToString(),
+                Active = false,
+                Name = "fake_value",
+                Code = "123",
+                ActorId = Guid.NewGuid().ToString(),
+                GridAreaId = Guid.NewGuid().ToString(),
+                PriceAreaCode = 34
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
+        public void Parse_InvalidInput_ThrowsException()
+        {
+            // Arrange
+            var target = new GridAreaUpdatedIntegrationEventParser();
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
         }
     }
 }

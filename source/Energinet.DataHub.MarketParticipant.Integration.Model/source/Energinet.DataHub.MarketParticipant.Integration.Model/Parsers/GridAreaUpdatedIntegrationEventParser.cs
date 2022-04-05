@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     Guid.Parse(contract.ActorId),
                     contract.Name,
                     contract.Code,
-                    (PriceAreaCode)contract.PriceAreaCode,
+                    Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
                     contract.Active);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
