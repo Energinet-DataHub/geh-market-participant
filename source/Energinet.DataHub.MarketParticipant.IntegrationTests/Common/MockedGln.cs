@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common

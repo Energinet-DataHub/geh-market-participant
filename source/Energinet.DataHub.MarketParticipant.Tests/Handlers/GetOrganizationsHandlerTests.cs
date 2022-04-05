@@ -16,8 +16,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Handlers;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -47,10 +47,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { marketRole },
                 Enumerable.Empty<MeteringPointType>());
 
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
             var organization = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "fake_value",
-                new[] { actor });
+                new[] { actor },
+                validBusinessRegisterIdentifier,
+                validAddress);
 
             organizationRepository
                 .Setup(x => x.GetAsync())

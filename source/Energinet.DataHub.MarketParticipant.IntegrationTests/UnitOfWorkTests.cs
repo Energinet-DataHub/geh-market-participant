@@ -80,7 +80,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
         private static Organization CreateEntity()
         {
-            return new Organization("Test");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
+            return new Organization("Test", validBusinessRegisterIdentifier, validAddress);
         }
     }
 }

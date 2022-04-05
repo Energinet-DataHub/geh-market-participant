@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -29,6 +30,45 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(organization => organization.Name)
                         .NotEmpty()
                         .Length(1, 50);
+
+                    validator
+                        .RuleFor(organization => organization.BusinessRegisterIdentifier)
+                        .NotEmpty()
+                        .Length(1, 8);
+
+                    validator
+                        .RuleFor(organization => organization.Address)
+                        .ChildRules(addressValidator =>
+                        {
+                            addressValidator
+                                .RuleFor(address => address.City)
+                                .NotEmpty()
+                                .Length(1, 50)
+                                .When(address => !string.IsNullOrEmpty(address.City));
+
+                            addressValidator
+                                .RuleFor(address => address.Country)
+                                .NotEmpty()
+                                .Length(1, 50)
+                                .When(address => !string.IsNullOrEmpty(address.Country));
+
+                            addressValidator
+                                .RuleFor(address => address.Number)
+                                .NotEmpty()
+                                .Length(1, 15);
+
+                            addressValidator
+                                .RuleFor(address => address.StreetName)
+                                .NotEmpty()
+                                .Length(1, 250)
+                                .When(address => !string.IsNullOrEmpty(address.StreetName));
+
+                            addressValidator
+                                .RuleFor(address => address.ZipCode)
+                                .NotEmpty()
+                                .Length(1, 15)
+                                .When(address => !string.IsNullOrEmpty(address.ZipCode));
+                        });
                 });
         }
     }

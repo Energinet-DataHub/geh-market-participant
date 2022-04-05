@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
@@ -24,8 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         public CreateActorCommandRuleSet()
         {
             RuleFor(command => command.OrganizationId)
-                .NotEmpty()
-                .SetValidator(new GuidValidationRule<CreateActorCommand>());
+                .NotEmpty();
 
             RuleFor(command => command.Actor)
                 .NotNull()
@@ -33,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 {
                     validator
                         .RuleFor(actor => actor.Gln)
-                        .SetValidator(new GlobalLocationNumberValidationRule<ChangeActorDto>());
+                        .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>());
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)

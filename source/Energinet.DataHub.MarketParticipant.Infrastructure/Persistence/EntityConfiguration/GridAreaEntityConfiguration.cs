@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public class GridAreEntityConfiguration : IEntityTypeConfiguration<GridAreaEntity>
+    public class GridAreaEntityConfiguration : IEntityTypeConfiguration<GridAreaEntity>
     {
         public void Configure(EntityTypeBuilder<GridAreaEntity> builder)
         {

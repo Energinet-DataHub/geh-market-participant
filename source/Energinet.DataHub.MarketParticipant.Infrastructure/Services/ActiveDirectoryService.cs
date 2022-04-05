@@ -41,9 +41,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             const string param = "GLN";
             const string query = @"SELECT TOP 1 [Id]
                         FROM  [dbo].[ActorInfo]
-                        WHERE [dbo].[IdentificationNumber] = @" + param;
+                        WHERE [IdentificationNumber] = @" + param;
 
-            await using var connection = new SqlConnection(_configuration.GetConnectionString("SQL_MP_DB_CONNECTION_STRING"));
+            await using var connection = new SqlConnection(_configuration["SQL_MP_DB_CONNECTION_STRING"]);
             await connection.OpenAsync().ConfigureAwait(false);
 
             await using var command = new SqlCommand(query, connection)

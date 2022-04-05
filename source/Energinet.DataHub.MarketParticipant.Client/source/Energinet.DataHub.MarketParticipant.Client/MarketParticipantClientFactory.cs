@@ -14,35 +14,39 @@
 
 using System;
 using System.Linq;
-using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Flurl.Http;
+using Flurl.Http.Configuration;
+using Flurl.Serialization.TextJson;
 using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantClientFactory
     {
-        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IFlurlClientFactory _flurlClientFactory;
 
-        public MarketParticipantClientFactory(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
+        public MarketParticipantClientFactory(IHttpContextAccessor httpContextAccessor, IFlurlClientFactory flurlClientFactory)
         {
-            _httpClientFactory = httpClientFactory;
+            _flurlClientFactory = flurlClientFactory;
             _httpContextAccessor = httpContextAccessor;
-        }
-
-        public IMarketParticipantClient CreateClient()
-        {
-            var httpClient = _httpClientFactory.CreateClient();
-            SetAuthorizationHeader(httpClient);
-            return new MarketParticipantClient(httpClient);
         }
 
         public IMarketParticipantClient CreateClient(Uri baseUrl)
         {
-            var httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = baseUrl;
-            SetAuthorizationHeader(httpClient);
+            var httpClient = _flurlClientFactory.Get(baseUrl);
+            ConfigureClient(httpClient);
             return new MarketParticipantClient(httpClient);
+        }
+
+        private void ConfigureClient(IFlurlClient client)
+        {
+            var jsonSettings = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonSettings.Converters.Add(new JsonStringEnumConverter());
+            client.Configure(settings => settings.WithTextJsonSerializer(jsonSettings));
+            SetAuthorizationHeader(client);
         }
 
         private string GetAuthorizationHeaderValue()
@@ -53,10 +57,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .Single();
         }
 
-        private void SetAuthorizationHeader(HttpClient httpClient)
+        private void SetAuthorizationHeader(IFlurlClient httpClient)
         {
             var authHeaderValue = GetAuthorizationHeaderValue();
-            httpClient.DefaultRequestHeaders.Add("Authorization", authHeaderValue);
+            httpClient.WithHeader("Authorization", authHeaderValue);
         }
     }
 }
