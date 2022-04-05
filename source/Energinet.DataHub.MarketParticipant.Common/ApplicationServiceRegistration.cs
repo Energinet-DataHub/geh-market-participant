@@ -45,7 +45,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<DeleteContactCommand>, DeleteContactCommandRuleSet>(Lifestyle.Scoped);
 
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
-            container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
 
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);

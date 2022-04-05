@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
-    public sealed record CreateAppRegistrationResponse(
-        ExternalActorId ExternalActorId,
-        string AppObjectId,
-        string ServicePrincipalObjectId);
+    public static class ActiveDirectoryB2CRoles
+    {
+        public static string DdkId { get; set; } = null!;
+        public static string DdmId { get; set; } = null!;
+        public static string DdqId { get; set; } = null!;
+        public static string EzId { get; set; } = null!;
+        public static string MdrId { get; set; } = null!;
+        public static string StsId { get; set; } = null!;
+    }
 }

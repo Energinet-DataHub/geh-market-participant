@@ -122,7 +122,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
                     "fake_value",
-                    "fake_value",
                     "fake_value"));
 
             organizationRepository
@@ -194,7 +193,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(expectedExternalId),
                     "fake_value",
-                    "fake_value",
                     "fake_value"));
 
             organizationRepository
@@ -239,7 +237,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
                     "fake_value",
-                    "fake_value",
                     "fake_value"));
 
             organizationRepository
@@ -282,7 +279,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.IsAny<string[]>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
-                    "fake_value",
                     "fake_value",
                     "fake_value"));
 

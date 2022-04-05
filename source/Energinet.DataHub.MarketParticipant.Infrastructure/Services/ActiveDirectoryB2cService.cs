@@ -43,14 +43,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
             string consumerAppName,
-            IReadOnlyList<string> permissions)
+            IReadOnlyCollection<string> permissions)
         {
             Guard.ThrowIfNull(consumerAppName, nameof(consumerAppName));
             Guard.ThrowIfNull(permissions, nameof(permissions));
 
+            // var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
             try
             {
-                var app = await CreateConsumerAppInB2CAsync(consumerAppName, permissions).ConfigureAwait(false);
+                var app = await CreateConsumerAppInB2CAsync(consumerAppName, (List<string>)permissions).ConfigureAwait(false);
 
                 var servicePrincipal = await AddServicePrincipalToConsumerAppInB2CAsync(app.AppId).ConfigureAwait(false);
 
@@ -66,7 +67,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 return new CreateAppRegistrationResponse(
                     new ExternalActorId(app.AppId),
                     app.Id,
-                    app.AppId,
                     servicePrincipal.Id);
             }
             catch (Exception e)
@@ -118,6 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             string consumerServicePrincipalObjectId)
         {
             Guard.ThrowIfNull(consumerAppObjectId, nameof(consumerAppObjectId));
+            Guard.ThrowIfNull(consumerServicePrincipalObjectId, nameof(consumerServicePrincipalObjectId));
 
             try
             {
@@ -143,7 +144,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         private async Task<ActiveDirectoryRoles> GetRolesAsync(string servicePrincipalObjectId)
         {
-            Guard.ThrowIfNull(servicePrincipalObjectId, nameof(servicePrincipalObjectId));
             try
             {
                 var roles = await _graphClient.ServicePrincipals[servicePrincipalObjectId]

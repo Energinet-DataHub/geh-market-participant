@@ -13,13 +13,12 @@
 // limitations under the License.
 
 using Azure.Identity;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.Common
+namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 {
     internal static class GraphServiceClientRegistration
     {
@@ -30,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
                 {
                     var configuration = container.GetService<IConfiguration>();
                     var clientSecretCredential = new ClientSecretCredential(
-                        configuration.GetValue<string>("TENANT"),
+                        configuration.GetValue<string>("Tenant"),
                         configuration.GetValue<string>("ResourceServicePrincipalAppId"),
                         configuration.GetValue<string>("ClientSecret"));
 

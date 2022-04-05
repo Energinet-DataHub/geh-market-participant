@@ -47,6 +47,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         }
 
         [Fact]
+        public async Task GetAllRoles()
+        {
+            var app = await _activeDirectoryService.GetExistingAppRegistrationAsync(
+                    "b1ce2b68-518f-4989-aae7-2d612992d8ab",
+                    "178010e1-8784-4656-b98c-066b8fcca278")
+                .ConfigureAwait(false);
+
+            _b2cAppRegistrationIds.Add(app.AppObjectId);
+
+            // Assert
+            Assert.Equal("roles[0]", app.AppRoles.Roles[0].RoleId);
+        }
+
+        [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
         {
             // Arrange
@@ -69,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             _b2cAppRegistrationIds.Add(app.AppObjectId);
 
             // Assert
-            Assert.Equal(response.AppId, app.AppId);
+            Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
         }
 
         [Fact]

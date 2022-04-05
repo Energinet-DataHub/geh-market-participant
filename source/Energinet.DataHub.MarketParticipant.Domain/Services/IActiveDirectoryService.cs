@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
@@ -29,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="consumerAppName">The name of the app to create.</param>
         /// <param name="permissions">Roles to be assigned to the app.</param>
         /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
-        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(string consumerAppName, IReadOnlyList<string> permissions);
+        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(string consumerAppName, IReadOnlyCollection<string> permissions);
 
         /// <summary>
         /// Creates a new secret for the already registered app.
