@@ -20,4 +20,7 @@ GO
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId]) VALUES (N'8a8d565b-f122-445c-ba28-eeec3afae608', 33, N'853', N'Nakskov', N'DK1', 1, N'3437964d-ebaa-448a-abfd-eb589228f0e9')
 
 --Grid Area Links
+SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] ON
 INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'073fb26a-b29d-4083-9a78-3b346e3db547', N'8a8d565b-f122-445c-ba28-eeec3afae608', 33)
+SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] OFF
+GO
