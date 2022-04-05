@@ -70,3 +70,8 @@ variable b2c_backend_id {
   type          = string
   description   = "(Required) The app id for the backend app in the B2C Tenant."
 }
+
+variable b2c_backend_object_id {
+  type = string
+  description = "(Required) The app object id for the backend app in the B2C Tenant."
+}

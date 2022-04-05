@@ -37,6 +37,7 @@ resource "azurerm_app_service" "webapi" {
     "B2C_SPN_SECRET" = "${var.b2c_spn_secret}"
     "B2C_BACKEND_SPN_OBJECT_ID" = "${var.b2c_backend_spn_object_id}"
     "B2C_BACKEND_ID" = "${var.b2c_backend_id}"
+    "B2C_BACKEND_OBJECT_ID" = "${var.b2c_backend_object_id}"
   }
 
   tags              = azurerm_resource_group.this.tags
