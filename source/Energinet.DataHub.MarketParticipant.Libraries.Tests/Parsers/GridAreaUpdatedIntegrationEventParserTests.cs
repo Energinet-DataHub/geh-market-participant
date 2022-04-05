@@ -21,22 +21,21 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 {
     [UnitTest]
-    public class OrganizationChangedEventParserTests
+    public class GridAreaUpdatedIntegrationEventParserTests
     {
         [Fact]
         public void Parse_InputValid_ParsesCorrectly()
         {
             // arrange
-            var target = new ActorUpdatedIntegrationEventParser();
-            var @event = new ActorUpdatedIntegrationEvent(
+            var target = new GridAreaUpdatedIntegrationEventParser();
+            var @event = new GridAreaUpdatedIntegrationEvent(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
-                "0123456789012",
-                ActorStatus.Active,
-                new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty });
+                "TestArea",
+                "123",
+                PriceAreaCode.DK1,
+                true);
 
             // act
             var actualBytes = target.Parse(@event);
@@ -44,13 +43,12 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
+            Assert.Equal(@event.Active, actualEvent.Active);
+            Assert.Equal(@event.Code, actualEvent.Code);
+            Assert.Equal(@event.Name, actualEvent.Name);
             Assert.Equal(@event.ActorId, actualEvent.ActorId);
-            Assert.Equal(@event.ExternalActorId, actualEvent.ExternalActorId);
-            Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
-            Assert.Equal(@event.Gln, actualEvent.Gln);
-            Assert.Equal(@event.Status, actualEvent.Status);
-            Assert.Equal(@event.BusinessRoles, actualEvent.BusinessRoles);
-            Assert.Equal(@event.MarketRoles, actualEvent.MarketRoles);
+            Assert.Equal(@event.GridAreaId, actualEvent.GridAreaId);
+            Assert.Equal(@event.PriceAreaCode, actualEvent.PriceAreaCode);
         }
     }
 }
