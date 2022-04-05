@@ -3,10 +3,10 @@ SET Id = 'e0a90bab-0029-402b-81dd-eb46c9e4db62'
 WHERE Id = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
 GO
 
-UPDATE GridAdreaInfo
+UPDATE GridAreaInfo
 SET
     ActorId = 'e0a90bab-0029-402b-81dd-eb46c9e4db62'
-WHERE ActorIdId = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
+WHERE ActorId = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
 GO
 
 INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name]) VALUES (N'3437964d-ebaa-448a-abfd-eb589228f0e9', N'5790001088460', 1, N'DDM', 1, N'Nakskov Elnet A/S')
@@ -20,4 +20,7 @@ GO
 INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId]) VALUES (N'8a8d565b-f122-445c-ba28-eeec3afae608', 33, N'853', N'Nakskov', N'DK1', 1, N'3437964d-ebaa-448a-abfd-eb589228f0e9')
 
 --Grid Area Links
+SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] ON
 INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'073fb26a-b29d-4083-9a78-3b346e3db547', N'8a8d565b-f122-445c-ba28-eeec3afae608', 33)
+SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] OFF
+GO
