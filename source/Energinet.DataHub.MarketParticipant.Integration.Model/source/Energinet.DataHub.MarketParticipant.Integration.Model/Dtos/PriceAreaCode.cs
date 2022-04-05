@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
-
-[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.Libraries.Tests")]
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
+{
+    public enum PriceAreaCode
+    {
+        DK1 = 1,
+        DK2 = 2
+    }
+}

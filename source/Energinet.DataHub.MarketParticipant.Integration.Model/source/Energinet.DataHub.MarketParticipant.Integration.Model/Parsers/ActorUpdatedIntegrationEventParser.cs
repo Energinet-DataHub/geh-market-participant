@@ -30,14 +30,16 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
                 return new ActorUpdatedIntegrationEvent(
-                    id: Guid.Parse(contract.Id),
-                    actorId: Guid.Parse(contract.ActorId),
-                    organizationId: Guid.Parse(contract.OrganizationId),
-                    externalActorId: Guid.Parse(contract.ExternalActorId),
-                    gln: contract.Gln,
-                    status: (ActorStatus)contract.Status,
-                    businessRoles: contract.BusinessRoles.Select(x => (BusinessRoleCode)x).ToList(),
-                    marketRoles: contract.MarketRoles.Select(x => (EicFunction)x).ToList());
+                    Guid.Parse(contract.Id),
+                    Guid.Parse(contract.ActorId),
+                    Guid.Parse(contract.OrganizationId),
+                    Guid.Parse(contract.ExternalActorId),
+                    contract.Gln,
+                    Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
+                    contract.BusinessRoles.Select(
+                        x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
+                    contract.MarketRoles.Select(
+                        x => Enum.IsDefined((EicFunction)x) ? (EicFunction)x : throw new FormatException(nameof(contract.MarketRoles))).ToList());
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {

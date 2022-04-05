@@ -80,6 +80,20 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <CompileOutputs>True</CompileOutputs>
       <OutputDir>obj\Debug\net5.0\</OutputDir>
     </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net5.0\</OutputDir>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net5.0\</OutputDir>
+    </Protobuf>
   </ItemGroup>
 
 </Project>
