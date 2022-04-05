@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code, PriceAreaCode PriceAreaCode, bool Active);
-
-    public sealed record GridAreaId(Guid Value);
-
-    public sealed record GridAreaCode(string Value);
-
-    public sealed record GridAreaName(string Value);
+    public enum PriceAreaCode
+    {
+        DK1 = 1,
+        DK2 = 2
+    }
 }
