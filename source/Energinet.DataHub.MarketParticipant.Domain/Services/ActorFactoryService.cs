@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -64,11 +65,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
-            var appRegistrationId = await _activeDirectoryService
-                .EnsureAppRegistrationIdAsync(gln)
+            var roles = marketRoles.Select(role => role.Function.ToString()).ToList();
+
+            var appRegistrationResponse = await _activeDirectoryService
+                .CreateAppRegistrationAsync(gln + "_" + Guid.NewGuid(), roles)
                 .ConfigureAwait(false);
 
-            var newActor = new Actor(appRegistrationId, gln);
+            var newActor = new Actor(appRegistrationResponse.ExternalActorId, gln);
 
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
@@ -79,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
-            var savedActor = await SaveActorAsync(organization, appRegistrationId).ConfigureAwait(false);
+            var savedActor = await SaveActorAsync(organization, appRegistrationResponse.ExternalActorId).ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
                 .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)

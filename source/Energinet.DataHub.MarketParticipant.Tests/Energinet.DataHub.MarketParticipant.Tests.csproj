@@ -48,8 +48,4 @@ limitations under the License.
     <PackageReference Include="xunit.categories" Version="2.0.6" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj" />
-  </ItemGroup>
-
 </Project>

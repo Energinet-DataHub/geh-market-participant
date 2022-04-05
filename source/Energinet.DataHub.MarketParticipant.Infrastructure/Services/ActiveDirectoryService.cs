@@ -13,17 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActiveDirectoryService : IActiveDirectoryService
+    public sealed class ActiveDirectoryService
     {
         private readonly IConfiguration _configuration;
 

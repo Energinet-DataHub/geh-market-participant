@@ -50,6 +50,8 @@ namespace Energinet.DataHub.MarketParticipant.Common
             Container.AddServiceBus();
             Container.AddServices();
             Container.AddUnitOfWorkProvider();
+            Container.AddAzureAdConfiguration();
+            Container.AddGraphServiceClient();
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });

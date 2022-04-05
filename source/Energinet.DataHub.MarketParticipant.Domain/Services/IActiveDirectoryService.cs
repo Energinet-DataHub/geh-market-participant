@@ -12,19 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Service for accessing Azure AD
+    /// Service for accessing Azure AD.
     /// </summary>
     public interface IActiveDirectoryService
     {
         /// <summary>
-        /// Ensures an App registration ID for the given GLN number
+        /// Creates a consumer app registration.
         /// </summary>
-        Task<ExternalActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln);
+        /// <param name="consumerAppName">The name of the app to create.</param>
+        /// <param name="permissions">Roles to be assigned to the app.</param>
+        /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
+        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(string consumerAppName, IReadOnlyList<string> permissions);
+
+        /// <summary>
+        /// Creates a new secret for the already registered app.
+        /// </summary>
+        /// <param name="appRegistrationObjectId">The id for the registered app.</param>
+        /// <returns>A <see cref="AppRegistrationSecret"/> representing the secret.</returns>
+        Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(string appRegistrationObjectId);
+
+        /// <summary>
+        /// Gets an existing app from active directory.
+        /// </summary>
+        /// <param name="consumerAppObjectId">The app to retrieve from active directory.</param>
+        /// <param name="consumerServicePrincipalObjectId">The object id representing the service principal.</param>
+        /// <returns>A <see cref="ActiveDirectoryAppInformation"/> representing the retrieved app.</returns>
+        Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
+            string consumerAppObjectId,
+            string consumerServicePrincipalObjectId);
+
+        /// <summary>
+        /// Delete registered app from active directory.
+        /// </summary>
+        /// <param name="appId">The unique id for the app.</param>
+        /// <returns>A <see cref="Task{boolean}"/> representing whether the deletion of the app was successful or not. The value 'true' indicates the app was deleted successfully.</returns>
+        Task DeleteAppRegistrationAsync(string appId);
     }
 }
