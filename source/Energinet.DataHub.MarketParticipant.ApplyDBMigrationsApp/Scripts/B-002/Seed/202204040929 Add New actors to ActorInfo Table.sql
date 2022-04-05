@@ -3,7 +3,7 @@ SET Id = 'e0a90bab-0029-402b-81dd-eb46c9e4db62'
 WHERE Id = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
 GO
 
-UPDATE GridAdreaInfo
+UPDATE GridAreaInfo
 SET
     ActorId = 'e0a90bab-0029-402b-81dd-eb46c9e4db62'
 WHERE ActorIdId = '81ad2de5-57d5-48e3-83dc-35f3488afa6f'
