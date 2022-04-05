@@ -13,35 +13,60 @@
 # limitations under the License.
 variable subscription_id {
   type        = string
-  description = "Subscription that the infrastructure code is deployed into."
+  description = "(Required) Subscription that the infrastructure code is deployed into."
 }
 
 variable resource_group_name {
   type        = string
-  description = "Resource Group that the infrastructure code is deployed into."
+  description = "(Required) Resource Group that the infrastructure code is deployed into."
 }
 
 variable environment_short {
   type          = string
-  description   = "1 character name of the enviroment that the infrastructure code is deployed into."
+  description   = "(Required) 1 character name of the enviroment that the infrastructure code is deployed into."
 }
 
 variable environment_instance {
   type          = string
-  description   = "Enviroment instance that the infrastructure code is deployed into."
+  description   = "(Required) Enviroment instance that the infrastructure code is deployed into."
 }
 
 variable domain_name_short {
   type          = string
-  description   = "Shortest possible edition of the domain name."
+  description   = "(Required) Shortest possible edition of the domain name."
 }
 
 variable shared_resources_keyvault_name {
   type          = string
-  description   = "Name of the KeyVault, that contains the shared secrets"
+  description   = "(Required) Name of the KeyVault, that contains the shared secrets"
 }
 
 variable shared_resources_resource_group_name {
   type          = string
-  description   = "Name of the Resource Group, that contains the shared resources."
+  description   = "(Required) Name of the Resource Group, that contains the shared resources."
+}
+
+variable b2c_tenant {
+  type          = string
+  description   = "(Required) The URL for the B2C Tenant."
+}
+
+variable b2c_spn_id {
+  type          = string
+  description   = "(Required) The app id for the service principal with global admin rights in the B2C Tenant."
+}
+
+variable b2c_spn_secret {
+  type          = string
+  description   = "(Required) The secret for the service principal with global admin rights in the B2C Tenant."
+}
+
+variable b2c_backend_spn_object_id {
+  type          = string
+  description   = "(Required) The object id for the backend app service principal in the B2C Tenant."
+}
+
+variable b2c_backend_id {
+  type          = string
+  description   = "(Required) The app id for the backend app in the B2C Tenant."
 }
