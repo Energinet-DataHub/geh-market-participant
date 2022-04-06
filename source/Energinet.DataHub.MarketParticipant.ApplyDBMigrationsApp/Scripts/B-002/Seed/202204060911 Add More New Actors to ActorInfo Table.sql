@@ -19,5 +19,6 @@ INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], 
 SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] ON
 INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'f1a06e61-294a-46cd-8800-416b642c060b', N'99775019-80f1-4587-aaee-88f1b4fcea4c', 34)
 INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'70f9ee21-7f82-4602-b835-7d031bb98e85', N'4fcb017d-3721-41ee-8f69-f984b4f190f2', 35)
+
 SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] OFF
 GO
