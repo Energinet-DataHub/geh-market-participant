@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -24,27 +25,33 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
     [UnitTest]
-    public sealed class GridAreaIntegrationEventsQueueServiceTests
+    public sealed class OrganizationIntegrationEventsQueueServiceTests
     {
         [Fact]
-        public async Task EnqueueGridAreaUpdatedEventAsync_CreatesEvent()
+        public async Task EnqueueOrganizationUpdatedEventAsync_CreatesEvent()
         {
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
-            var target = new GridAreaIntegrationEventsQueueService(domainEventRepository.Object);
+            var target = new OrganizationIntegrationEventsQueueService(domainEventRepository.Object);
 
-            var gridArea = new GridArea(
-                new GridAreaId(Guid.NewGuid()),
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.DK1);
+            var organizationArea = new Organization(
+                new OrganizationId(Guid.NewGuid()),
+                "fake_value",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("12345678"),
+                new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"));
 
             // Act
-            await target.EnqueueGridAreaUpdatedEventAsync(gridArea).ConfigureAwait(false);
+            await target.EnqueueOrganizationUpdatedEventAsync(organizationArea).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
-                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == gridArea.Id.Value)),
+                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == organizationArea.Id.Value)),
                 Times.Once);
         }
     }

@@ -18,14 +18,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Creates and enqueues integration events for GridAreas.
+    /// Creates and enqueues integration events for Organizations.
     /// </summary>
-    public interface IGridAreaIntegrationEventsQueueService
+    public interface IOrganizationIntegrationEventsQueueService
     {
         /// <summary>
-        /// Creates and enqueues an GridAreaUpdated integration event for the specified Grid Area.
+        /// Creates and enqueues an Organization Updated integration event for the specified Organization.
         /// </summary>
-        /// <param name="gridArea">The GridArea to publish an integration event for.</param>
-        Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea);
+        /// <param name="organization">The Organization to publish an integration event for.</param>
+        Task EnqueueOrganizationUpdatedEventAsync(Organization organization);
     }
 }

@@ -25,13 +25,13 @@ using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class GridAreaUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class OrganizationUpdatedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IGridAreaUpdatedIntegrationEventParser _eventParser;
+        private readonly IOrganizationUpdatedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public GridAreaUpdatedEventDispatcher(
-            IGridAreaUpdatedIntegrationEventParser eventParser,
+        public OrganizationUpdatedEventDispatcher(
+            IOrganizationUpdatedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -42,15 +42,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaUpdatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaUpdatedIntegrationEvent(
-                gridAreaUpdatedIntegrationEvent.Id,
-                gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
-                gridAreaUpdatedIntegrationEvent.Name.Value,
-                gridAreaUpdatedIntegrationEvent.Code.Value,
-                (PriceAreaCode)gridAreaUpdatedIntegrationEvent.PriceAreaCode.Value);
+            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent(
+                organizationUpdatedIntegrationEvent.Id,
+                organizationUpdatedIntegrationEvent.OrganizationId.Value,
+                organizationUpdatedIntegrationEvent.Name,
+                organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
+                new Address(
+                    organizationUpdatedIntegrationEvent.Address.StreetName,
+                    organizationUpdatedIntegrationEvent.Address.Number,
+                    organizationUpdatedIntegrationEvent.Address.ZipCode,
+                    organizationUpdatedIntegrationEvent.Address.City,
+                    organizationUpdatedIntegrationEvent.Address.Country
+                    )
+                );
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
