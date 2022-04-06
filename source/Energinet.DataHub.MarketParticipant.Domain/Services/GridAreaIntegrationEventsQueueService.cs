@@ -23,22 +23,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public sealed class GridAreaIntegrationEventsQueueService : IGridAreaIntegrationEventsQueueService
     {
         private readonly IDomainEventRepository _domainEventRepository;
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
 
         public GridAreaIntegrationEventsQueueService(
-            IDomainEventRepository domainEventRepository,
-            IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+            IDomainEventRepository domainEventRepository)
         {
             _domainEventRepository = domainEventRepository;
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
         }
 
         public Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea)
         {
             Guard.ThrowIfNull(gridArea, nameof(gridArea));
-            Guard.ThrowIfNull(gridArea, nameof(gridArea));
 
-            var gridAreaUpdatedEvent = new GridAreaUpdatedIntegrationEvent()
+            var gridAreaUpdatedEvent = new GridAreaUpdatedIntegrationEvent
             {
                 GridAreaId = gridArea.Id,
                 Code = gridArea.Code,
