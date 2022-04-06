@@ -50,17 +50,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var orgRepository2 = new OrganizationRepository(context2);
+            var testOrg = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress, "Test Comment");
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg).ConfigureAwait(false);
-            var newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+            var newOrg = await orgRepository2.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
             Assert.Equal(testOrg.Name, newOrg?.Name);
+            Assert.Equal(testOrg.Comment, newOrg?.Comment);
         }
 
         [Fact]
@@ -149,7 +152,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 "NewName",
                 newOrg.Actors,
                 newOrg.BusinessRegisterIdentifier,
-                newOrg.Address);
+                newOrg.Address,
+                "Test Comment 2");
 
             await orgRepository.AddOrUpdateAsync(newOrg).ConfigureAwait(false);
             newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -158,6 +162,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
             Assert.Equal("NewName", newOrg?.Name);
+            Assert.Equal("Test Comment 2", newOrg?.Comment);
         }
 
         [Fact]

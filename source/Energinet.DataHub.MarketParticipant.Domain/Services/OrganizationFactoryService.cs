@@ -41,13 +41,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         public async Task<Organization> CreateAsync(
             string name,
             BusinessRegisterIdentifier businessRegisterIdentifier,
-            Address address)
+            Address address,
+            string? comment)
         {
             Guard.ThrowIfNull(name, nameof(name));
             Guard.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
             Guard.ThrowIfNull(address, nameof(address));
 
-            var newOrganization = new Organization(name, businessRegisterIdentifier, address);
+            var newOrganization = new Organization(name, businessRegisterIdentifier, address, comment);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -66,12 +67,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         private async Task<Organization> SaveOrganizationAsync(Organization organization)
         {
-            await _organizationRepository
+            var orgId = await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
             var savedOrganization = await _organizationRepository
-                .GetAsync(organization.Id)
+                .GetAsync(orgId)
                 .ConfigureAwait(false);
 
             return savedOrganization!;

@@ -101,7 +101,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         Enumerable.Empty<MeteringPointType>())
                 },
                 _validCvrBusinessRegisterIdentifier,
-                _validAddress);
+                _validAddress,
+                "Test Comment");
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))

@@ -60,7 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 "Test City",
                 "Test Country");
 
-            var organizationDto = new ChangeOrganizationDto(value, validCvr, validAddress);
+            var organizationDto = new ChangeOrganizationDto(
+                value,
+                validCvr,
+                validAddress,
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);

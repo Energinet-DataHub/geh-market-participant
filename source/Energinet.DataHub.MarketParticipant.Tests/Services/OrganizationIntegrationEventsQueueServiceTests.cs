@@ -44,7 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value",
-                    "fake_value"));
+                    "fake_value"),
+                "Test Comment");
 
             // Act
             await target.EnqueueOrganizationUpdatedEventAsync(organizationArea).ConfigureAwait(false);

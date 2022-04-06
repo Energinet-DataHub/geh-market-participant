@@ -28,7 +28,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="name">The name of the organization.</param>
         /// <param name="businessRegisterIdentifier">The Business Register Identifier of the new organization.</param>
         /// <param name="address">The address of the new organization.</param>
+        /// <param name="comment">The comment for the new organization.</param>
         /// <returns>The created actor.</returns>
-        Task<Organization> CreateAsync(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address);
+        Task<Organization> CreateAsync(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address, string? comment);
     }
 }

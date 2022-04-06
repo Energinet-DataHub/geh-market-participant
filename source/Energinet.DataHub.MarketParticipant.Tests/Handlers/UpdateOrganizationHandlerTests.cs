@@ -88,7 +88,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 new[] { actor },
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment");
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -98,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
-            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto);
+            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2");
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 

@@ -65,15 +65,24 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test Country");
             const string validCvr = "123";
             const string orgName = "fake_value";
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
+
+            var organization = new Organization(
+                new OrganizationId(orgId),
+                orgName,
+                Enumerable.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment");
+
             orgFactory
                 .Setup(x => x.CreateAsync(
                     It.IsAny<string>(),
                     It.Is<BusinessRegisterIdentifier>(y => y.Identifier == validCvr),
-                    It.IsAny<Address>()))
+                    It.IsAny<Address>(),
+                    It.IsAny<string>()))
                 .ReturnsAsync(organization);
 
-            var command = new CreateOrganizationCommand(new ChangeOrganizationDto(orgName, validCvr, validAddressDto));
+            var command = new CreateOrganizationCommand(new ChangeOrganizationDto(orgName, validCvr, validAddressDto, "Test Comment"));
 
             // Act
             var response = await target

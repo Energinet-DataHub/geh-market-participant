@@ -52,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.ZipCode,
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
+            organization.Comment = request.Organization.Comment;
 
             await _organizationRepository
                 .AddOrUpdateAsync(organization)

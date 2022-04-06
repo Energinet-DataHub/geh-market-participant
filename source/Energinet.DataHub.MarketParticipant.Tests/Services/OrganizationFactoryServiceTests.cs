@@ -52,7 +52,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 null!,
                 _validCvrBusinessRegisterIdentifier,
-                _validAddress))
+                _validAddress,
+                "Test Comment"))
                 .ConfigureAwait(false);
         }
 
@@ -70,7 +71,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                     "fake_value",
                     null!,
-                    _validAddress))
+                    _validAddress,
+                    "Test Comment"))
                 .ConfigureAwait(false);
         }
 
@@ -88,7 +90,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
-                    null!))
+                    null!,
+                    "Test Comment"))
                 .ConfigureAwait(false);
         }
 
@@ -113,7 +116,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
-                    _validAddress)
+                    _validAddress,
+                    "Test Comment")
                 .ConfigureAwait(false);
 
             // Assert
@@ -149,7 +153,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
-                    _validAddress)
+                    _validAddress,
+                    "Test Comment")
                 .ConfigureAwait(false);
 
             // Assert
