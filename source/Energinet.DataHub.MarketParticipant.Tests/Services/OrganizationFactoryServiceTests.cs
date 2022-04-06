@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -105,7 +106,18 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOrganizationIntegrationEventsQueueService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var orgId = new OrganizationId(Guid.NewGuid());
+            var organization = new Organization(
+                orgId,
+                "fake_value",
+                Enumerable.Empty<Actor>(),
+                _validCvrBusinessRegisterIdentifier,
+                _validAddress,
+                "Test Comment");
+
+            organizationRepository
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(organization.Id);
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -142,7 +154,18 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 organizationIntegrationEventsQueueService.Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var orgId = new OrganizationId(Guid.NewGuid());
+            var organization = new Organization(
+                orgId,
+                "fake_value",
+                Enumerable.Empty<Actor>(),
+                _validCvrBusinessRegisterIdentifier,
+                _validAddress,
+                "Test Comment");
+
+            organizationRepository
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(organization.Id);
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
