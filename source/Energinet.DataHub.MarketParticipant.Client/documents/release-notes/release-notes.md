@@ -30,3 +30,7 @@
 ## Version 0.5.1
 
 - Added contacts
+
+## Version 0.5.2
+
+- Added Comment to Organization
