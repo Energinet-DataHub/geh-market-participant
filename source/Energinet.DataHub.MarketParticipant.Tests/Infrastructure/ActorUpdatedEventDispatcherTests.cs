@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
     public sealed class ActorUpdatedEventDispatcherTests
     {
         [Fact]
-        public async Task Ctor_NewRole_HasStatusNew()
+        public async Task ActorUpdated_IntegrationEventDispatcher_CanReadEvent()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
@@ -67,6 +67,37 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
             Assert.Equal((int)integrationEvent.MarketRoles.Single(), (int)actualEvent.MarketRoles.Single());
             Assert.Equal(integrationEvent.GridAreas.Single().Value.ToString(), actualEvent.GridAreas.Single().ToString());
+        }
+
+        [Fact]
+        public async Task ActorUpdatedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
+        {
+            // arrange
+            await using var serviceBusSenderMock = new MockedServiceBusSender();
+            var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
+            serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
+
+            var eventParser = new ActorUpdatedIntegrationEventParser();
+            var target = new ActorUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+
+            var integrationEvent = new OrganizationUpdatedIntegrationEvent
+            {
+                Address = new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                Name = "fake_value",
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678")
+            };
+
+            // act
+            var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
+
+            // assert
+            Assert.False(actual);
         }
     }
 }

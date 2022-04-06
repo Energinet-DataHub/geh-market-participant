@@ -60,5 +60,35 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal(integrationEvent.Code.Value, actualEvent.Code);
             Assert.Equal(integrationEvent.PriceAreaCode, PriceAreaCode.FromValue((int)actualEvent.PriceAreaCode));
         }
+
+        [Fact]
+        public async Task GridAreaUpdatedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
+        {
+            // arrange
+            await using var serviceBusSenderMock = new MockedServiceBusSender();
+            var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
+            serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
+
+            var eventParser = new GridAreaUpdatedIntegrationEventParser();
+            var target = new GridAreaUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+
+            var integrationEvent = new ActorUpdatedIntegrationEvent
+            {
+                Gln = new GlobalLocationNumber("fake_value"),
+                Status = ActorStatus.Active,
+                ActorId = Guid.NewGuid(),
+                BusinessRoles = { BusinessRoleCode.Ddk },
+                GridAreas = { new GridAreaId(Guid.NewGuid()) },
+                MarketRoles = { EicFunction.Agent },
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                ExternalActorId = new ExternalActorId(Guid.NewGuid())
+            };
+
+            // act
+            var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
+
+            // assert
+            Assert.False(actual);
+        }
     }
 }
