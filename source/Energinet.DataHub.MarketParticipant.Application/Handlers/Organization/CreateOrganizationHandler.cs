@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -24,11 +25,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
 {
     public sealed class CreateOrganizationHandler : IRequestHandler<CreateOrganizationCommand, CreateOrganizationResponse>
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IOrganizationFactoryService _organizationFactoryService;
 
-        public CreateOrganizationHandler(IOrganizationRepository organizationRepository)
+        public CreateOrganizationHandler(IOrganizationFactoryService organizationFactoryService)
         {
-            _organizationRepository = organizationRepository;
+            _organizationFactoryService = organizationFactoryService;
         }
 
         public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
@@ -42,13 +43,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
             var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
-            var organization = new Domain.Model.Organization(request.Organization.Name, cvr, address);
 
-            var organizationId = await _organizationRepository
-                .AddOrUpdateAsync(organization)
+            var organization = await _organizationFactoryService
+                .CreateAsync(request.Organization.Name, cvr, address)
                 .ConfigureAwait(false);
 
-            return new CreateOrganizationResponse(organizationId.Value.ToString());
+            return new CreateOrganizationResponse(organization.Id.ToString());
         }
     }
 }
