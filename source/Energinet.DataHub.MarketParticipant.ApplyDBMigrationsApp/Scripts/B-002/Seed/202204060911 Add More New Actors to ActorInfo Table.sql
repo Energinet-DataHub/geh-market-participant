@@ -11,10 +11,13 @@ INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [R
 INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [Roles], [Active], [Name]) VALUES (N'eb99aad6-6fa0-4925-85f5-c8269c92fdb8', N'5790001095383', 1, N'MDR', 1, N'SEAS-NVE Strømmen (SAP) - Måledataansvarlig')
 GO
 
--- INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId]) VALUES (N'8a8d565b-f122-445c-ba28-eeec3afae608', 33, N'853', N'Nakskov', N'DK1', 1, N'3437964d-ebaa-448a-abfd-eb589228f0e9')
---
--- --Grid Area Links
--- SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] ON
--- INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'073fb26a-b29d-4083-9a78-3b346e3db547', N'8a8d565b-f122-445c-ba28-eeec3afae608', 33)
--- SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] OFF
--- GO
+--Create Grid Areas for Openminds
+INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId]) VALUES (N'99775019-80f1-4587-aaee-88f1b4fcea4c', 34, N'151', N'Openminds 1', N'DK1', 1, N'd5581195-92c0-400c-86b3-6d5915cf2536')
+INSERT [dbo].[GridAreaInfo] ([Id], [RecordId], [Code], [Name], [PriceAreaCode], [Active], [ActorId]) VALUES (N'4fcb017d-3721-41ee-8f69-f984b4f190f2', 35, N'245', N'Openminds 2', N'DK1', 1, N'd5581195-92c0-400c-86b3-6d5915cf2536')
+
+--Grid Area Links for Openminds
+SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] ON
+INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'f1a06e61-294a-46cd-8800-416b642c060b', N'99775019-80f1-4587-aaee-88f1b4fcea4c', 34)
+INSERT [dbo].[GridAreaLinkInfo] ([GridLinkId], [GridAreaId], [RecordId]) VALUES (N'70f9ee21-7f82-4602-b835-7d031bb98e85', N'4fcb017d-3721-41ee-8f69-f984b4f190f2', 35)
+SET IDENTITY_INSERT [dbo].[GridAreaLinkInfo] OFF
+GO
