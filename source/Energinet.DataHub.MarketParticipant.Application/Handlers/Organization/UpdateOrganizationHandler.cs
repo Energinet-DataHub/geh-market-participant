@@ -16,8 +16,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
@@ -27,13 +29,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
+        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         public UpdateOrganizationHandler(
             IOrganizationRepository organizationRepository,
+            IUnitOfWorkProvider unitOfWorkProvider,
+            IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
             IOrganizationExistsHelperService organizationExistsHelperService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
+            _unitOfWorkProvider = unitOfWorkProvider;
+            _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
         }
 
         public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
@@ -54,9 +62,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.Country);
             organization.Comment = request.Organization.Comment;
 
+            await using var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
+
             await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
+
+            await _organizationIntegrationEventsQueueService
+                .EnqueueOrganizationUpdatedEventAsync(organization)
+                .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
 
             return Unit.Value;
         }
