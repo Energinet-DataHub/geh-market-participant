@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -49,13 +48,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                             addressValidator
                                 .RuleFor(address => address.Country)
                                 .NotEmpty()
-                                .Length(1, 50)
-                                .When(address => !string.IsNullOrEmpty(address.Country));
+                                .Length(1, 50);
 
                             addressValidator
                                 .RuleFor(address => address.Number)
                                 .NotEmpty()
-                                .Length(1, 15);
+                                .Length(1, 15)
+                                .When(address => !string.IsNullOrEmpty(address.Number));
 
                             addressValidator
                                 .RuleFor(address => address.StreetName)
