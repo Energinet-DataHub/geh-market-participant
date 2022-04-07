@@ -14,10 +14,10 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public record AddressDto(
-        string StreetName,
-        string Number,
-        string ZipCode,
-        string City,
+    public sealed record AddressDto(
+        string? StreetName,
+        string? Number,
+        string? ZipCode,
+        string? City,
         string Country);
 }
