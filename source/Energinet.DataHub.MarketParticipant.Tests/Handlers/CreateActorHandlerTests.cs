@@ -65,7 +65,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
+            var organization = new Organization(
+                new OrganizationId(orgId),
+                orgName,
+                Enumerable.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment");
+
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
 
             organizationExistsHelperService
@@ -111,7 +118,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var organization = new Organization(new OrganizationId(orgId), orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
+            var organization = new Organization(
+                new OrganizationId(orgId),
+                orgName,
+                Enumerable.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment");
+
             var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
             var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
 

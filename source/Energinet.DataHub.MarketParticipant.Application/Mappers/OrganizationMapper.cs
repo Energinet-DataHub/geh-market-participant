@@ -30,7 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Name,
                 organization.Actors.Select(Map).ToList(),
                 organization.BusinessRegisterIdentifier.Identifier,
-                Map(organization.Address));
+                Map(organization.Address),
+                organization.Comment);
         }
 
         public static ActorDto Map(Actor actor)
