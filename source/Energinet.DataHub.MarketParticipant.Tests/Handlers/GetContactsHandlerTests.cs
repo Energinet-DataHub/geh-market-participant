@@ -68,7 +68,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment");
 
             organizationRepository
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))

@@ -69,7 +69,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test Country");
             const string orgName = "SomeName";
 
-            var organization = new Organization(orgId, orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
+            var organization = new Organization(
+                orgId,
+                orgName,
+                Enumerable.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment");
+
             var contact = new Contact(
                 new ContactId(Guid.NewGuid()),
                 orgId,
@@ -124,7 +131,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var orgId = new OrganizationId(Guid.NewGuid());
             const string orgName = "SomeName";
 
-            var organization = new Organization(orgId, orgName, Enumerable.Empty<Actor>(), validBusinessRegisterIdentifier, validAddress);
+            var organization = new Organization(
+                orgId,
+                orgName,
+                Enumerable.Empty<Actor>(),
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment");
+
             var contact = new Contact(
                 new ContactId(Guid.NewGuid()),
                 orgId,

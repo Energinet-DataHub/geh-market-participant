@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +29,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("GridAreaNew");
             builder.HasKey(gridArea => gridArea.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.Property(p => p.PriceAreaCode).HasConversion(
+                to => to.Name,
+                from => PriceAreaCode.FromName(from, true));
         }
     }
 }

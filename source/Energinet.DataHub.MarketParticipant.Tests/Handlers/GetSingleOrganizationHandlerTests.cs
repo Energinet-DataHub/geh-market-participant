@@ -74,7 +74,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 new[] { actor },
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment");
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))

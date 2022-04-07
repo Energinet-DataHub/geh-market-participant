@@ -85,7 +85,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                 ""zipCode"": ""4321"",
                 ""city"": ""Testby"",
                 ""country"": ""Testland""
-            }
+            },
+            ""comment"": ""Test Comment""
         }
     ]}";
             using var httpTest = new HttpTest();
@@ -112,6 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, actualOrganization.Address.Number);
             Assert.Equal(_validAddress.StreetName, actualOrganization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, actualOrganization.Address.ZipCode);
+            Assert.Equal("Test Comment", actualOrganization.Comment);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
             Assert.Equal(EicFunction.Consumer, actualMarketRole.Function);
@@ -148,7 +150,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                             ""zipCode"": ""4321"",
                             ""city"": ""Testby"",
                             ""country"": ""Testland""
-                        }
+                        },
+                        ""comment"": ""Test Comment""
                     },
                     {
                         ""OrganizationId"": ""c4d950f7-0acf-439b-9bb6-610255218c6e"",
@@ -175,7 +178,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                             ""zipCode"": ""4321"",
                             ""city"": ""Testby"",
                             ""country"": ""Testland""
-                        }
+                        },
+                        ""comment"": ""Test Comment 2""
                     }
                 ]";
 
@@ -200,6 +204,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, firstOrganization.Address.Number);
             Assert.Equal(_validAddress.StreetName, firstOrganization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, firstOrganization.Address.ZipCode);
+            Assert.Equal("Test Comment", firstOrganization.Comment);
 
             var firstActor = firstOrganization.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), firstActor.ActorId);
@@ -219,6 +224,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, secondOrganization.Address.Number);
             Assert.Equal(_validAddress.StreetName, secondOrganization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, secondOrganization.Address.ZipCode);
+            Assert.Equal("Test Comment 2", secondOrganization.Comment);
 
             var secondActor = secondOrganization.Actors.Single();
             Assert.Equal(Guid.Parse("f6792b0b-7dee-4e70-b9d9-46b727e6748b"), secondActor.ActorId);
@@ -260,7 +266,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""zipCode"": ""4321"",
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
-                    }
+                    },
+                    ""comment"": ""Test Comment""
                 }";
 
             using var httpTest = new HttpTest();
@@ -281,6 +288,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, actual.Address.Number);
             Assert.Equal(_validAddress.StreetName, actual.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, actual.Address.ZipCode);
+            Assert.Equal("Test Comment", actual.Comment);
 
             var actualActor = actual.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -322,7 +330,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""zipCode"": ""4321"",
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
-                    }
+                    },
+                    ""comment"": ""Test Comment""
                 }";
 
             using var httpTest = new HttpTest();
@@ -333,7 +342,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             var orgId = await target
-                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress))
+                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "Test Comment"))
                 .ConfigureAwait(false);
 
             var createdOrg = await target
@@ -351,6 +360,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, createdOrg.Address.Number);
             Assert.Equal(_validAddress.StreetName, createdOrg.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, createdOrg.Address.ZipCode);
+            Assert.Equal("Test Comment", createdOrg.Comment);
 
             var actualActor = createdOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -392,7 +402,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""zipCode"": ""1234"",
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
-                    }
+                    },
+                    ""comment"": ""Test Comment 2""
                 }";
             var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
             using var httpTest = new HttpTest();
@@ -405,7 +416,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             await target
-                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress))
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2"))
                 .ConfigureAwait(false);
 
             var changedOrg = await target
@@ -422,6 +433,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, changedOrg.Address.Number);
             Assert.Equal(_validAddress.StreetName, changedOrg.Address.StreetName);
             Assert.Equal(changedAddress.ZipCode, changedOrg.Address.ZipCode);
+            Assert.Equal("Test Comment 2", changedOrg.Comment);
 
             var actualActor = changedOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -644,7 +656,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
     [
         {
             ""ContactId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
-            ""Category"": ""Default"", 
+            ""Category"": ""Default"",
             ""Name"": ""unit test"",
             ""Email"": ""unit@test.com"",
             ""Phone"": ""20202030""

@@ -14,4 +14,4 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.Integration.Model.Tests")]
+[assembly: InternalsVisibleTo("Energinet.DataHub.MarketParticipant.Libraries.Tests")]
