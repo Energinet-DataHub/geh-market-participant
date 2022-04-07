@@ -107,7 +107,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     string.Empty,
-                    "Denmark"));
+                    "Denmark"),
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -147,7 +148,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     string.Empty,
-                    "Denmark"));
+                    "Denmark"),
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -187,7 +189,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     value,
-                    "Denmark"));
+                    "Denmark"),
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -227,7 +230,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     string.Empty,
-                    value));
+                    value),
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -267,7 +271,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     value,
                     string.Empty,
                     string.Empty,
-                    "Denmark"));
+                    "Denmark"),
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -307,7 +312,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     value,
                     string.Empty,
-                    "Denmark"));
+                    "Denmark"),
+                "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);

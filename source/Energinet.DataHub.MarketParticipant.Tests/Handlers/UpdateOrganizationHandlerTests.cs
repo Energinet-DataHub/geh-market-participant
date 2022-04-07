@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 using Moq;
 using Xunit;
@@ -37,6 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var target = new UpdateOrganizationHandler(
                 new Mock<IOrganizationRepository>().Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
                 new Mock<IOrganizationExistsHelperService>().Object);
 
             // Act + Assert
@@ -51,8 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var organizationIntegrationEventsQueueService = new Mock<IOrganizationIntegrationEventsQueueService>();
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
+                UnitOfWorkProviderMock.Create(),
+                organizationIntegrationEventsQueueService.Object,
                 organizationExistsHelperService.Object);
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
