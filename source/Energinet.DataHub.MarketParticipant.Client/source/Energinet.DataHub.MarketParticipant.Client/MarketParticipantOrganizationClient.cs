@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Extensions;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
@@ -36,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             var response = await _httpClient
                 .Request(OrganizationsBaseUrl)
                 .GetAsync()
+                .HandleValidationExceptionAsync()
                 .ConfigureAwait(false);
 
             var listAllOrganizationsResult = await response
@@ -50,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             var response = await _httpClient
                 .Request(OrganizationsBaseUrl, organizationId)
                 .GetAsync()
+                .HandleValidationExceptionAsync()
                 .ConfigureAwait(false);
 
             var singleOrganizationsResult = await response
@@ -64,6 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             var response = await _httpClient
                 .Request(OrganizationsBaseUrl)
                 .PostJsonAsync(organizationDto)
+                .HandleValidationExceptionAsync()
                 .ConfigureAwait(false);
 
             var orgId = await response
@@ -77,7 +81,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             return _httpClient
                 .Request(OrganizationsBaseUrl, organizationId)
-                .PutJsonAsync(organizationDto);
+                .PutJsonAsync(organizationDto)
+                .HandleValidationExceptionAsync();
         }
     }
 }
