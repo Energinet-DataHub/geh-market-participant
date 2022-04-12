@@ -21,7 +21,7 @@ module "func_entrypoint_marketparticipant" {
   resource_group_name                       = azurerm_resource_group.this.name
   location                                  = azurerm_resource_group.this.location
   app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
-  application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_instrumentation_key.value
+  application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value
   always_on                                 = true
   app_settings                              = {
     # Region: Default Values
@@ -34,6 +34,6 @@ module "func_entrypoint_marketparticipant" {
     SERVICE_BUS_CONNECTION_STRING           = data.azurerm_key_vault_secret.sb_domain_relay_send_connection_string.value
     SBT_MARKET_PARTICIPANT_CHANGED_NAME     = data.azurerm_key_vault_secret.sbt-market-participant-changed-name.value
   }
-  
+
   tags                                      = azurerm_resource_group.this.tags
 }
