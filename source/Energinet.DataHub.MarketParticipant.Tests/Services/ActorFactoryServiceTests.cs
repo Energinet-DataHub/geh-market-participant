@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -114,11 +115,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 activeDirectory.Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
                     It.IsAny<string>(),
-                    It.IsAny<string[]>()))
+                    It.IsAny<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
                     "fake_value",
@@ -130,7 +132,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             var response = await target
-                .CreateAsync(organization, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>())
+                .CreateAsync(organization, new GlobalLocationNumber("fake_value"), marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -186,10 +188,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 validBusinessRegisterIdentifier,
                 validAddress);
 
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
+
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
                     It.IsAny<string>(),
-                    It.IsNotNull<string[]>()))
+                    It.IsNotNull<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(expectedExternalId),
                     "fake_value",
@@ -201,7 +205,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organizationBeforeUpdate, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>())
+                .CreateAsync(organizationBeforeUpdate, new GlobalLocationNumber("fake_value"), marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -229,11 +233,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
                     It.IsAny<string>(),
-                    It.IsAny<string[]>()))
+                    It.IsAny<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
                     "fake_value",
@@ -245,7 +250,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organization, globalLocationNumber, Array.Empty<MarketRole>())
+                .CreateAsync(organization, globalLocationNumber, marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -271,12 +276,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
-            var marketRoles = new[] { new MarketRole(EicFunction.BalanceResponsibleParty) };
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
                     It.IsAny<string>(),
-                    It.IsAny<string[]>()))
+                    It.IsAny<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
                     "fake_value",

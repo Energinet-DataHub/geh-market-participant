@@ -13,7 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
@@ -33,9 +36,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var target = MockActiveDirectoryB2CService();
 
+            var permissions = new List<MarketRole>() { new MarketRole(EicFunction.EnergySupplier) };
+
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.CreateAppRegistrationAsync(null!, new[] { "fake_permissions" }))
+                .ThrowsAsync<ArgumentNullException>(() => target.CreateAppRegistrationAsync(null!, permissions))
                 .ConfigureAwait(false);
         }
 
@@ -56,12 +61,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var mockAuthProvider = new Mock<IAuthenticationProvider>();
             var mockHttpProvider = new Mock<IHttpProvider>();
             var mockGraphClient = new Mock<GraphServiceClient>(mockAuthProvider.Object, mockHttpProvider.Object);
+            var mockBusinessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
 
             var target = new ActiveDirectoryB2cService(
                 mockGraphClient.Object,
                 new AzureAdConfig(
                     "fake_value",
                     "fake_value"),
+                mockBusinessRoleCodeDomainService.Object,
                 new Mock<ILogger<ActiveDirectoryB2cService>>().Object);
 
             return target;

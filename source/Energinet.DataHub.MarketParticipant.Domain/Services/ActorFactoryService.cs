@@ -65,10 +65,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
-            var roles = marketRoles.Select(role => role.Function.ToString()).ToList();
-
+            //var roles = marketRoles.Select(role => role.Function.ToString()).ToList();
             var appRegistrationResponse = await _activeDirectoryService
-                .CreateAppRegistrationAsync(gln + "_" + Guid.NewGuid(), roles)
+                .CreateAppRegistrationAsync(gln + "_" + Guid.NewGuid(), marketRoles)
                 .ConfigureAwait(false);
 
             var newActor = new Actor(appRegistrationResponse.ExternalActorId, gln);

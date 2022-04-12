@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Microsoft.Extensions.Configuration;
@@ -60,6 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             host._startup.Container.RegisterSingleton(() => new AzureAdConfig(
                 integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
                 integrationTestConfig.B2CSettings.BackendAppId));
+            host._startup.Container.GetActiveDirectoryRoles();
 
             return host;
         }

@@ -19,9 +19,11 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using CreateAppRegistrationResponse = Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory.CreateAppRegistrationResponse;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -29,36 +31,41 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     {
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
+        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
         private readonly ILogger<ActiveDirectoryB2cService> _logger;
 
         public ActiveDirectoryB2cService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
+            IBusinessRoleCodeDomainService businessRoleCodeDomainService,
             ILogger<ActiveDirectoryB2cService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
+            _businessRoleCodeDomainService = businessRoleCodeDomainService;
             _logger = logger;
         }
 
         public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
             string consumerAppName,
-            IReadOnlyCollection<string> permissions)
+            IReadOnlyCollection<MarketRole> permissions)
         {
             Guard.ThrowIfNull(consumerAppName, nameof(consumerAppName));
             Guard.ThrowIfNull(permissions, nameof(permissions));
 
-            // var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
+            var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
+            var b2cPermissions = MapBusinessRoleCodesToB2CRoleIds(roles);
+            var permissionsToPass = b2cPermissions.Select(x => x.ToString()).ToList();
             try
             {
-                var app = await CreateConsumerAppInB2CAsync(consumerAppName, (List<string>)permissions).ConfigureAwait(false);
+                var app = await CreateAppInB2CAsync(consumerAppName, permissionsToPass).ConfigureAwait(false);
 
-                var servicePrincipal = await AddServicePrincipalToConsumerAppInB2CAsync(app.AppId).ConfigureAwait(false);
+                var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId).ConfigureAwait(false);
 
                 // What should be done with this role? To database? Integration event?
-                foreach (var permission in permissions)
+                foreach (var permission in b2cPermissions)
                 {
-                    await GrantAddedRoleToConsumerServicePrincipalAsync(
+                    await GrantAddedRoleToServicePrincipalAsync(
                         servicePrincipal.Id,
                         permission)
                         .ConfigureAwait(false);
@@ -142,6 +149,39 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
+        private static IEnumerable<Guid> MapBusinessRoleCodesToB2CRoleIds(IEnumerable<BusinessRoleCode> businessRoleCodes)
+        {
+            var b2CIds = new List<Guid>();
+            foreach (var roleCode in businessRoleCodes)
+            {
+                switch (roleCode)
+                {
+                    case BusinessRoleCode.Ddk:
+                        b2CIds.Add(ActiveDirectoryB2CRoles.DdkId);
+                        break;
+                    case BusinessRoleCode.Ddm:
+                        b2CIds.Add(ActiveDirectoryB2CRoles.DdmId);
+                        break;
+                    case BusinessRoleCode.Ddq:
+                        b2CIds.Add(ActiveDirectoryB2CRoles.DdqId);
+                        break;
+                    case BusinessRoleCode.Ez:
+                        b2CIds.Add(ActiveDirectoryB2CRoles.EzId);
+                        break;
+                    case BusinessRoleCode.Mdr:
+                        b2CIds.Add(ActiveDirectoryB2CRoles.MdrId);
+                        break;
+                    case BusinessRoleCode.Sts:
+                        b2CIds.Add(ActiveDirectoryB2CRoles.MdrId);
+                        break;
+                    default:
+                        throw new ArgumentNullException(nameof(businessRoleCodes));
+                }
+            }
+
+            return b2CIds;
+        }
+
         private async Task<ActiveDirectoryRoles> GetRolesAsync(string servicePrincipalObjectId)
         {
             try
@@ -172,15 +212,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private async Task<AppRegistrationRole> GrantAddedRoleToConsumerServicePrincipalAsync(
+        private async Task<AppRegistrationRole> GrantAddedRoleToServicePrincipalAsync(
             string consumerServicePrincipalObjectId,
-            string roleId)
+            Guid roleId)
         {
             var appRole = new AppRoleAssignment
             {
                 PrincipalId = Guid.Parse(consumerServicePrincipalObjectId),
                 ResourceId = Guid.Parse(_azureAdConfig.BackendAppServicePrincipalObjectId),
-                AppRoleId = Guid.Parse(roleId) // Id for the role to assign to the service principal
+                AppRoleId = roleId
             };
 
             var role = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
@@ -196,7 +236,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return new AppRegistrationRole(role.AppRoleId!.Value);
         }
 
-        private async Task<Application> CreateConsumerAppInB2CAsync(
+        private async Task<Application> CreateAppInB2CAsync(
             string consumerAppName,
             IReadOnlyList<string> permissions)
         {
@@ -229,7 +269,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 }).ConfigureAwait(false);
         }
 
-        private async Task<ServicePrincipal> AddServicePrincipalToConsumerAppInB2CAsync(string consumerAppId)
+        private async Task<ServicePrincipal> AddServicePrincipalToAppInB2CAsync(string consumerAppId)
         {
             var consumerServicePrincipal = new ServicePrincipal
             {

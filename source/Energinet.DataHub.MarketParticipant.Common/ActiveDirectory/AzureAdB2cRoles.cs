@@ -13,9 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,29 +45,29 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 
                 foreach (var appRole in application.AppRoles)
                 {
-                    if (string.Equals(appRole.DisplayName, "DDK", StringComparison.Ordinal))
+                    switch (appRole.DisplayName)
                     {
-                        ActiveDirectoryB2CRoles.DdkId = appRole.Id.ToString()!;
-                    }
-                    else if (string.Equals(appRole.DisplayName, "DDM", StringComparison.Ordinal))
-                    {
-                        ActiveDirectoryB2CRoles.DdmId = appRole.Id.ToString()!;
-                    }
-                    else if (string.Equals(appRole.DisplayName, "DDQ", StringComparison.Ordinal))
-                    {
-                        ActiveDirectoryB2CRoles.DdqId = appRole.Id.ToString()!;
-                    }
-                    else if (string.Equals(appRole.DisplayName, "EZ", StringComparison.Ordinal))
-                    {
-                        ActiveDirectoryB2CRoles.EzId = appRole.Id.ToString()!;
-                    }
-                    else if (string.Equals(appRole.DisplayName, "MDR", StringComparison.Ordinal))
-                    {
-                        ActiveDirectoryB2CRoles.MdrId = appRole.Id.ToString()!;
-                    }
-                    else if (string.Equals(appRole.DisplayName, "STS", StringComparison.Ordinal))
-                    {
-                        ActiveDirectoryB2CRoles.StsId = appRole.Id.ToString()!;
+                        case "Balance Responsible Party":
+                            ActiveDirectoryB2CRoles.DdkId = appRole.Id ?? Guid.Empty;
+                            break;
+                        case "Grid operator":
+                            ActiveDirectoryB2CRoles.DdmId = appRole.Id ?? Guid.Empty;
+                            break;
+                        case "Electrical supplier":
+                            ActiveDirectoryB2CRoles.DdqId = appRole.Id ?? Guid.Empty;
+                            break;
+                        case "Transmission system operator":
+                            ActiveDirectoryB2CRoles.EzId = appRole.Id ?? Guid.Empty;
+                            break;
+                        case "Meter data responsible":
+                            ActiveDirectoryB2CRoles.MdrId = appRole.Id ?? Guid.Empty;
+                            break;
+                        case "STS":
+                            ActiveDirectoryB2CRoles.StsId = appRole.Id ?? Guid.Empty;
+                            break;
+                        default:
+                            throw new InvalidOperationException(
+                                $"Could not find an id associated with the provided role name '{appRole.DisplayName}'.");
                     }
                 }
             });

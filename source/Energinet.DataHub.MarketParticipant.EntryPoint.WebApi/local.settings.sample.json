@@ -1,0 +1,12 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "Tenant": "<Active Directory Tenant URL>",
+    "ResourceServicePrincipalAppId":  "<Active Directory Service Principal App Id>",
+    "ClientSecret": "<Active Directory Client Secret>",
+    "ResourceServicePrincipalObjectId": "<Active Directory Resource Service Principal Object Id>",
+    "BackendAppId": "<Active Directory Backend App Id>",
+    "BackendAppObjectId": "<Active Directory Backend App Object Id>",
+    "AZURE_KEYVAULT_URL": "<URL To Key Vault>"
+  }
+}

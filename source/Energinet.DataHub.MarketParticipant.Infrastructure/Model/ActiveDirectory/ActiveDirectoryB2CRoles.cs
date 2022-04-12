@@ -12,15 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
     public static class ActiveDirectoryB2CRoles
     {
-        public static string DdkId { get; set; } = null!;
-        public static string DdmId { get; set; } = null!;
-        public static string DdqId { get; set; } = null!;
-        public static string EzId { get; set; } = null!;
-        public static string MdrId { get; set; } = null!;
-        public static string StsId { get; set; } = null!;
+        public static Guid DdkId { get; set; }
+        public static Guid DdmId { get; set; }
+        public static Guid DdqId { get; set; }
+        public static Guid EzId { get; set; }
+        public static Guid MdrId { get; set; }
+        public static Guid StsId { get; set; }
     }
 }

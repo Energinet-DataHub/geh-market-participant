@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Microsoft.Graph;
 using Xunit;
@@ -47,26 +48,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         }
 
         [Fact]
-        public async Task GetAllRoles()
-        {
-            var app = await _activeDirectoryService.GetExistingAppRegistrationAsync(
-                    "b1ce2b68-518f-4989-aae7-2d612992d8ab",
-                    "178010e1-8784-4656-b98c-066b8fcca278")
-                .ConfigureAwait(false);
-
-            _b2cAppRegistrationIds.Add(app.AppObjectId);
-
-            // Assert
-            Assert.Equal("roles[0]", app.AppRoles.Roles[0].RoleId);
-        }
-
-        [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
         {
             // Arrange
-            var roles = new[]
+            var roles = new List<MarketRole>
             {
-                "11b79733-b588-413d-9833-8adedce991aa", // transmission system operator
+                new(EicFunction.SystemOperator), // transmission system operator
             };
 
             // Act
@@ -90,10 +77,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         public async Task GetExistingAppRegistrationAsync_AddTwoRolesToAppRegistration_Success()
         {
             // Arrange
-            var roles = new[]
+            var roles = new List<MarketRole>
             {
-                "11b79733-b588-413d-9833-8adedce991aa", // transmission system operator
-                "9ec90757-aac3-40c4-bcb3-8bffcb642996" // Electrical supplier
+                new(EicFunction.SystemOperator), // transmission system operator
+                new(EicFunction.EnergySupplier)
             };
 
             var createAppRegistrationResponse = await _activeDirectoryService.CreateAppRegistrationAsync(
@@ -110,17 +97,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             _b2cAppRegistrationIds.Add(app.AppObjectId);
 
             // Assert
-            Assert.Equal(roles[0], app.AppRoles.Roles[0].RoleId);
-            Assert.Equal(roles[1], app.AppRoles.Roles[1].RoleId);
+            Assert.Equal("11b79733-b588-413d-9833-8adedce991aa", app.AppRoles.Roles[0].RoleId);
+            Assert.Equal("9ec90757-aac3-40c4-bcb3-8bffcb642996", app.AppRoles.Roles[1].RoleId);
         }
 
         [Fact]
         public async Task DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
         {
             // Arrange
-            var roles = new[]
+            var roles = new List<MarketRole>
             {
-                "11b79733-b588-413d-9833-8adedce991aa", // transmission system operator
+                new(EicFunction.SystemOperator), // transmission system operator
             };
 
             var createAppRegistrationResponse = await _activeDirectoryService.CreateAppRegistrationAsync(
