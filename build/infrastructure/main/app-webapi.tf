@@ -24,16 +24,16 @@ module "app_webapi" {
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value
   dotnet_framework_version                  = "v5.0"
 
-  app_settings = {
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = "${data.azurerm_key_vault_secret.appi_instrumentation_key.value}"
-    "FRONTEND_OPEN_ID_URL" = "${data.azurerm_key_vault_secret.frontend_open_id_url.value}"
-    "FRONTEND_SERVICE_APP_ID" = "${data.azurerm_key_vault_secret.frontend_service_app_id.value}"
-	  "SQL_MP_DB_CONNECTION_STRING" = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
-	  "SERVICE_BUS_CONNECTION_STRING" = "${data.azurerm_key_vault_secret.sb_domain_relay_send_connection_string.value}"
-	  "SBT_MARKET_PARTICIPANT_CHANGED_NAME" = "${data.azurerm_key_vault_secret.sbt-market-participant-changed-name.value}"
+  app_settings                              = {
+    APPINSIGHTS_INSTRUMENTATIONKEY          = "${data.azurerm_key_vault_secret.appi_instrumentation_key.value}"
+    FRONTEND_OPEN_ID_URL                    = "${data.azurerm_key_vault_secret.frontend_open_id_url.value}"
+    FRONTEND_SERVICE_APP_ID                 = "${data.azurerm_key_vault_secret.frontend_service_app_id.value}"
+	  SQL_MP_DB_CONNECTION_STRING             = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
+	  SERVICE_BUS_CONNECTION_STRING           = "${data.azurerm_key_vault_secret.sb_domain_relay_send_connection_string.value}"
+	  SBT_MARKET_PARTICIPANT_CHANGED_NAME     = "${data.azurerm_key_vault_secret.sbt-market-participant-changed-name.value}"
   }
 
-  tags               = azurerm_resource_group.this.tags
+  tags                                      = azurerm_resource_group.this.tags
 }
 
 module "kvs_app_markpart_webapi_base_url" {
