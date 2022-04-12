@@ -22,112 +22,70 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantClient : IMarketParticipantClient
     {
-        private const string OrganizationsBaseUrl = "Organization";
-        private const string ActorBaseUrl = "Actor";
-
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantOrganizationClient _marketParticipantOrganizationClient;
+        private readonly IMarketParticipantActorClient _marketParticipantActorClient;
+        private readonly IMarketParticipantContactClient _marketParticipantContactClient;
 
         public MarketParticipantClient(IFlurlClient client)
         {
-            _httpClient = client;
+            _marketParticipantOrganizationClient = new MarketParticipantOrganizationClient(client);
+            _marketParticipantActorClient = new MarketParticipantActorClient(client);
+            _marketParticipantContactClient = new MarketParticipantContactClient(client);
         }
 
-        public async Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
+        public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl)
-                .GetAsync()
-                .ConfigureAwait(false);
-
-            var listAllOrganizationsResult = await response.GetJsonAsync<IEnumerable<OrganizationDto>>()
-                .ConfigureAwait(false);
-
-            return listAllOrganizationsResult ?? Array.Empty<OrganizationDto>();
+            return _marketParticipantOrganizationClient.GetOrganizationsAsync();
         }
 
-        public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
+        public Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId)
-                .GetAsync()
-                .ConfigureAwait(false);
-
-            var singleOrganizationsResult = await response.GetJsonAsync<OrganizationDto>()
-                .ConfigureAwait(false);
-
-            return singleOrganizationsResult;
+            return _marketParticipantOrganizationClient.GetOrganizationAsync(organizationId);
         }
 
-        public async Task<Guid?> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
+        public Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl)
-                .PostJsonAsync(organizationDto)
-                .ConfigureAwait(false);
-
-            var orgId = await response.GetStringAsync()
-                .ConfigureAwait(false);
-
-            return Guid.Parse(orgId);
+            return _marketParticipantOrganizationClient.CreateOrganizationAsync(organizationDto);
         }
 
-        public async Task<bool> UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
+        public Task UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
         {
-            await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId)
-                .PutJsonAsync(organizationDto)
-                .ConfigureAwait(false);
-
-            return true;
+            return _marketParticipantOrganizationClient.UpdateOrganizationAsync(organizationId, organizationDto);
         }
 
-        public async Task<IEnumerable<ActorDto>?> GetActorsAsync(Guid organizationId)
+        public Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
-                .GetAsync()
-                .ConfigureAwait(false);
-
-            var actors = await response.GetJsonAsync<IEnumerable<ActorDto>>()
-                .ConfigureAwait(false);
-
-            return actors;
+            return _marketParticipantActorClient.GetActorsAsync(organizationId);
         }
 
-        public async Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId)
+        public Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
-                .GetAsync()
-                .ConfigureAwait(false);
-
-            var actor = await response.GetJsonAsync<ActorDto>()
-                .ConfigureAwait(false);
-
-            return actor;
+            return _marketParticipantActorClient.GetActorAsync(organizationId, actorId);
         }
 
-        public async Task<Guid?> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
+        public Task<Guid> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
-                .PostJsonAsync(createActorDto)
-                .ConfigureAwait(false);
-
-            var actor = await response.GetStringAsync()
-                .ConfigureAwait(false);
-
-            return Guid.Parse(actor);
+            return _marketParticipantActorClient.CreateActorAsync(organizationId, createActorDto);
         }
 
-        public async Task<bool?> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto createActorDto)
+        public Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto)
         {
-            await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
-                .PutJsonAsync(createActorDto)
-                .ConfigureAwait(false);
+            return _marketParticipantActorClient.UpdateActorAsync(organizationId, actorId, changeActorDto);
+        }
 
-            return true;
+        public Task<IEnumerable<ContactDto>> GetContactsAsync(Guid organizationId)
+        {
+            return _marketParticipantContactClient.GetContactsAsync(organizationId);
+        }
+
+        public Task<Guid> CreateContactAsync(Guid organizationId, CreateContactDto contactDto)
+        {
+            return _marketParticipantContactClient.CreateContactAsync(organizationId, contactDto);
+        }
+
+        public Task DeleteContactAsync(Guid organizationId, Guid contactId)
+        {
+            return _marketParticipantContactClient.DeleteContactAsync(organizationId, contactId);
         }
     }
 }

@@ -12,76 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
     /// BFF client for Energinet.DataHub.MarketParticipant.
     /// </summary>
-    public interface IMarketParticipantClient
+    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantContactClient
     {
-        /// <summary>
-        /// Gets all organizations.
-        /// </summary>
-        /// <returns>All organizations.</returns>
-        Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync();
-
-        /// <summary>
-        /// Gets a specific organization with the specified Id
-        /// </summary>
-        /// <param name="organizationId">The Id of the organization to get</param>
-        /// <returns>The organization <see cref="OrganizationDto" /> with the specified id, or null if it wasn't found/></returns>
-        Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId);
-
-        /// <summary>
-        /// Creates a new organization
-        /// </summary>
-        /// <param name="organizationDto"></param>
-        /// <returns>The Id <see cref="Guid"/> of the created organization/></returns>
-        Task<Guid?> CreateOrganizationAsync(ChangeOrganizationDto organizationDto);
-
-        /// <summary>
-        /// Updates an organization
-        /// </summary>
-        /// <param name="organizationId"></param>
-        /// <param name="organizationDto"></param>
-        /// <returns>nothing</returns>
-        Task<bool> UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto);
-
-        /// <summary>
-        /// Gets an actor
-        /// </summary>
-        /// <param name="organizationId"></param>
-        /// <param name="actorId"></param>
-        /// <returns>An <see cref="ActorDto" /> actor or null if not found/></returns>
-        Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId);
-
-        /// <summary>
-        /// List all actors to an organization
-        /// </summary>
-        /// <param name="organizationId"></param>
-        /// <returns>A List of Actors <see cref="ActorDto"/> belonging to the organization></returns>
-        Task<IEnumerable<ActorDto>?> GetActorsAsync(Guid organizationId);
-
-        /// <summary>
-        /// Creates an actor in a specific organization
-        /// </summary>
-        /// <param name="organizationId">The id of the organization to create the actor in</param>
-        /// <param name="createActorDto">The details of the actor to be created</param>
-        /// <returns>The id of the created actor</returns>
-        Task<Guid?> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto);
-
-        /// <summary>
-        /// Updates an actor
-        /// </summary>
-        /// <param name="organizationId">The organization the actor belongs to</param>
-        /// <param name="actorId">The id of the actor to update</param>
-        /// <param name="createActorDto">The data to update</param>
-        /// <returns>True if the update was succesfull, otherwise false</returns>
-        Task<bool?> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto createActorDto);
     }
 }

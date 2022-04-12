@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="status">The status of the current actor.</param>
         /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
         /// <param name="marketRoles">The roles (functions) assigned to the current actor.</param>
+        /// <param name="gridAreas">The roles (grid areas) assigned to the current actor.</param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
             Guid actorId,
@@ -38,7 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             string gln,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
-            IEnumerable<EicFunction> marketRoles)
+            IEnumerable<EicFunction> marketRoles,
+            IEnumerable<Guid> gridAreas)
         {
             Id = id;
             ActorId = actorId;
@@ -48,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Status = status;
             BusinessRoles = businessRoles;
             MarketRoles = marketRoles;
+            GridAreas = gridAreas;
         }
 
         public Guid Id { get; }
@@ -60,5 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
         public IEnumerable<EicFunction> MarketRoles { get; }
+        public IEnumerable<Guid> GridAreas { get; }
     }
 }

@@ -59,12 +59,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "1111",
                 "Test City",
                 "Test Country");
+
             var organization = new Organization(
                 new OrganizationId(organizationId),
                 orgName,
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment");
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -121,7 +123,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 orgName,
                 new[] { actor, actor2 },
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment");
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))

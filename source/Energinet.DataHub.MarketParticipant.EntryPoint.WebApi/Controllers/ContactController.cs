@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                             .Send(getOrganizationsCommand)
                             .ConfigureAwait(false);
 
-                        return Ok(response);
+                        return Ok(response.Contacts);
                     },
                 _logger).ConfigureAwait(false);
         }
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(createContactCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok(response.ContactId.ToString());
                 },
                 _logger).ConfigureAwait(false);
         }

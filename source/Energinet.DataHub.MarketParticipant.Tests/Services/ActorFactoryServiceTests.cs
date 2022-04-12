@@ -164,12 +164,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 "1111",
                 "Test City",
                 "Test Country");
+
             var organizationBeforeUpdate = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "fake_value",
                 Array.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment 2");
 
             var organizationAfterUpdate = new Organization(
                 organizationBeforeUpdate.Id,
@@ -186,7 +188,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         Enumerable.Empty<MeteringPointType>())
                 },
                 validBusinessRegisterIdentifier,
-                validAddress);
+                validAddress,
+                "Test Comment");
 
             var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 

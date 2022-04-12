@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Integration.Model</PackageId>
-    <PackageVersion>1.1.1$(VersionSuffix)</PackageVersion>
+    <PackageVersion>1.2.0$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Integration.Model library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -74,6 +74,20 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
 
   <ItemGroup>
     <Protobuf Include="Protobuf\ActorUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net5.0\</OutputDir>
+    </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net5.0\</OutputDir>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationUpdatedIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Internal</Access>
       <ProtoCompile>True</ProtoCompile>

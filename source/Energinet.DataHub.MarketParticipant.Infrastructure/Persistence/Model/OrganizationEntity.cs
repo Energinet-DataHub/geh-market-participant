@@ -33,5 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public AddressEntity Address { get; set; }
 
         public Collection<ActorEntity> Actors { get; }
+        public string? Comment { get; set; }
     }
 }

@@ -30,18 +30,30 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Address = address;
         }
 
+        public Organization(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address, string? comment)
+        {
+            Id = new OrganizationId(Guid.Empty);
+            Name = name;
+            Actors = new Collection<Actor>();
+            BusinessRegisterIdentifier = businessRegisterIdentifier;
+            Address = address;
+            Comment = comment;
+        }
+
         public Organization(
             OrganizationId id,
             string name,
             IEnumerable<Actor> actors,
             BusinessRegisterIdentifier businessRegisterIdentifier,
-            Address address)
+            Address address,
+            string? comment)
         {
             Id = id;
             Name = name;
             Actors = actors.ToList();
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
+            Comment = comment;
         }
 
         public OrganizationId Id { get; }
@@ -53,5 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public Address Address { get; set; }
 
         public ICollection<Actor> Actors { get; }
+
+        public string? Comment { get; set; }
     }
 }

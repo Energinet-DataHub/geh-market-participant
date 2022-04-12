@@ -17,5 +17,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
     public sealed record ChangeOrganizationDto(
         string Name,
         string BusinessRegisterIdentifier,
-        AddressDto Address);
+        AddressDto Address,
+        string? Comment);
 }

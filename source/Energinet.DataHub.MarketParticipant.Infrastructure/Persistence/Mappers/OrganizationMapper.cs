@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Id = from.Id.Value;
             to.Name = from.Name;
             to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
+            to.Comment = from.Comment;
             MapAddressToEntity(from.Address, to.Address);
 
             var actorEntities = to.Actors.ToDictionary(x => x.Id);
@@ -53,7 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 from.Name,
                 MapEntitiesToActors(from.Actors),
                 new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier ?? string.Empty),
-                MapAddress(from.Address));
+                MapAddress(from.Address),
+                from.Comment);
         }
 
         private static Address MapAddress(AddressEntity from)

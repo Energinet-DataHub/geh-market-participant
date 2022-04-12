@@ -37,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             "Testland");
 
         private readonly string _validBusinessRegisterIdentifier = "87654321";
+
         [Fact]
         public async Task GetOrganizationsAsync_Unauthorized_ThrowsException()
         {
@@ -84,7 +85,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                 ""zipCode"": ""4321"",
                 ""city"": ""Testby"",
                 ""country"": ""Testland""
-            }
+            },
+            ""comment"": ""Test Comment""
         }
     ]}";
             using var httpTest = new HttpTest();
@@ -111,6 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, actualOrganization.Address.Number);
             Assert.Equal(_validAddress.StreetName, actualOrganization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, actualOrganization.Address.ZipCode);
+            Assert.Equal("Test Comment", actualOrganization.Comment);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
             Assert.Equal(EicFunction.Consumer, actualMarketRole.Function);
@@ -147,7 +150,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                             ""zipCode"": ""4321"",
                             ""city"": ""Testby"",
                             ""country"": ""Testland""
-                        }
+                        },
+                        ""comment"": ""Test Comment""
                     },
                     {
                         ""OrganizationId"": ""c4d950f7-0acf-439b-9bb6-610255218c6e"",
@@ -174,7 +178,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                             ""zipCode"": ""4321"",
                             ""city"": ""Testby"",
                             ""country"": ""Testland""
-                        }
+                        },
+                        ""comment"": ""Test Comment 2""
                     }
                 ]";
 
@@ -199,6 +204,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, firstOrganization.Address.Number);
             Assert.Equal(_validAddress.StreetName, firstOrganization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, firstOrganization.Address.ZipCode);
+            Assert.Equal("Test Comment", firstOrganization.Comment);
 
             var firstActor = firstOrganization.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), firstActor.ActorId);
@@ -218,6 +224,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, secondOrganization.Address.Number);
             Assert.Equal(_validAddress.StreetName, secondOrganization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, secondOrganization.Address.ZipCode);
+            Assert.Equal("Test Comment 2", secondOrganization.Comment);
 
             var secondActor = secondOrganization.Actors.Single();
             Assert.Equal(Guid.Parse("f6792b0b-7dee-4e70-b9d9-46b727e6748b"), secondActor.ActorId);
@@ -259,7 +266,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""zipCode"": ""4321"",
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
-                    }
+                    },
+                    ""comment"": ""Test Comment""
                 }";
 
             using var httpTest = new HttpTest();
@@ -280,6 +288,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, actual.Address.Number);
             Assert.Equal(_validAddress.StreetName, actual.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, actual.Address.ZipCode);
+            Assert.Equal("Test Comment", actual.Comment);
 
             var actualActor = actual.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -321,7 +330,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""zipCode"": ""4321"",
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
-                    }
+                    },
+                    ""comment"": ""Test Comment""
                 }";
 
             using var httpTest = new HttpTest();
@@ -332,15 +342,14 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             var orgId = await target
-                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress))
+                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "Test Comment"))
                 .ConfigureAwait(false);
 
             var createdOrg = await target
-                .GetOrganizationAsync(orgId.GetValueOrDefault())
+                .GetOrganizationAsync(orgId)
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(orgId);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), orgId);
             Assert.NotNull(createdOrg);
             Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), createdOrg.OrganizationId);
@@ -351,6 +360,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, createdOrg.Address.Number);
             Assert.Equal(_validAddress.StreetName, createdOrg.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, createdOrg.Address.ZipCode);
+            Assert.Equal("Test Comment", createdOrg.Comment);
 
             var actualActor = createdOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -392,7 +402,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""zipCode"": ""1234"",
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
-                    }
+                    },
+                    ""comment"": ""Test Comment 2""
                 }";
             var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
             using var httpTest = new HttpTest();
@@ -405,7 +416,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             await target
-                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress))
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2"))
                 .ConfigureAwait(false);
 
             var changedOrg = await target
@@ -422,6 +433,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.Number, changedOrg.Address.Number);
             Assert.Equal(_validAddress.StreetName, changedOrg.Address.StreetName);
             Assert.Equal(changedAddress.ZipCode, changedOrg.Address.ZipCode);
+            Assert.Equal("Test Comment 2", changedOrg.Comment);
 
             var actualActor = changedOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -570,7 +582,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                 .ConfigureAwait(false);
 
             var actual = await target
-                .GetActorAsync(orgId, createdActorId.GetValueOrDefault())
+                .GetActorAsync(orgId, createdActorId)
                 .ConfigureAwait(false);
 
             // Assert
@@ -634,6 +646,57 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             var marketRole = actual.MarketRoles[0];
             Assert.Equal(EicFunction.BillingAgent, marketRole.Function);
+        }
+
+        [Fact]
+        public async Task GetContactsAsync_All_ReturnsContacts()
+        {
+            // Arrange
+            const string incomingJson = @"
+    [
+        {
+            ""ContactId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
+            ""Category"": ""Default"",
+            ""Name"": ""unit test"",
+            ""Email"": ""unit@test.com"",
+            ""Phone"": ""20202030""
+        }
+    ]}";
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            httpTest.RespondWith(incomingJson);
+
+            // Act
+            var actual = await target.GetContactsAsync(Guid.NewGuid()).ConfigureAwait(false);
+
+            // Assert
+            var actualContact = actual.Single();
+            Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), actualContact.ContactId);
+            Assert.Equal(ContactCategory.Default, actualContact.Category);
+            Assert.Equal("unit test", actualContact.Name);
+            Assert.Equal("unit@test.com", actualContact.Email);
+            Assert.Equal("20202030", actualContact.Phone);
+        }
+
+        [Fact]
+        public async Task CreateContactAsync_ValidContact_ReturnsId()
+        {
+            // Arrange
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
+            httpTest.RespondWith("361fb10a-4204-46b6-bf9e-171ab2e61a59");
+
+            // Act
+            var contactId = await target.CreateContactAsync(
+                    orgId,
+                    new CreateContactDto("unit test", ContactCategory.Charges, "email", "phone"))
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), contactId);
         }
     }
 }
