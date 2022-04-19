@@ -22,7 +22,7 @@ on:
 
 jobs:
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@6.0.0
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@6.3.0
 
   terraform_validate:
     uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@6.0.0

@@ -34,9 +34,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<IEnumerable<ContactDto>> GetContactsAsync(Guid organizationId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl)
-                .GetAsync()
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl).GetAsync())
                 .ConfigureAwait(false);
 
             var contacts = await response
@@ -48,9 +48,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<Guid> CreateContactAsync(Guid organizationId, CreateContactDto contactDto)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl)
-                .PostJsonAsync(contactDto)
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl).PostJsonAsync(contactDto))
                 .ConfigureAwait(false);
 
             var contact = await response
@@ -62,9 +62,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task DeleteContactAsync(Guid organizationId, Guid contactId)
         {
-            return _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl, contactId)
-                .DeleteAsync();
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ContactBaseUrl, contactId).DeleteAsync());
         }
     }
 }
