@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                     throw new MarketParticipantException(statusCode, string.Empty);
                 }
 
-                throw new MarketParticipantException(500, string.Empty);
+                throw new MarketParticipantException(408, string.Empty);
             }
         }
     }
