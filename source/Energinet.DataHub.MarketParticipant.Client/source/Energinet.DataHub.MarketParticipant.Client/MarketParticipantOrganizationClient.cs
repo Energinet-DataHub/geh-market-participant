@@ -33,10 +33,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl)
-                .GetAsync()
-                .ConfigureAwait(false);
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl).GetAsync()).ConfigureAwait(false);
 
             var listAllOrganizationsResult = await response
                 .GetJsonAsync<IEnumerable<OrganizationDto>>()
@@ -47,10 +46,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId)
-                .GetAsync()
-                .ConfigureAwait(false);
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId).GetAsync())
+                 .ConfigureAwait(false);
 
             var singleOrganizationsResult = await response
                 .GetJsonAsync<OrganizationDto>()
@@ -61,9 +60,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl)
-                .PostJsonAsync(organizationDto)
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl).PostJsonAsync(organizationDto))
                 .ConfigureAwait(false);
 
             var orgId = await response
@@ -75,9 +74,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
         {
-            return _httpClient
-                .Request(OrganizationsBaseUrl, organizationId)
-                .PutJsonAsync(organizationDto);
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId)
+                .PutJsonAsync(organizationDto));
         }
     }
 }
