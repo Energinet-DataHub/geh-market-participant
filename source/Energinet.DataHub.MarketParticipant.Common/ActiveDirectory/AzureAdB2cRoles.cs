@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
             {
                 var configuration = container.GetService<IConfiguration>();
                 var graphClient = container.GetInstance<GraphServiceClient>();
-                var appObjectId = configuration.GetValue<string>("BackendAppObjectId");
+                var appObjectId = configuration!["AZURE_B2C_BACKEND_OBJECT_ID"];
 
                 var application = await graphClient.Applications[appObjectId]
                     .Request()

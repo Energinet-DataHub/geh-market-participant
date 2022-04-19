@@ -26,8 +26,8 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
             container.RegisterSingleton(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
-                var resourceServicePrincipalObjectId = configuration.GetValue<string>("ResourceServicePrincipalObjectId");
-                var backendAppId = configuration.GetValue<string>("BackendAppId");
+                var resourceServicePrincipalObjectId = configuration!["AZURE_B2C_BACKEND_SPN_OBJECT_ID"]; // ResourceServicePrincipalObjectId
+                var backendAppId = configuration["AZURE_B2C_BACKEND_ID"]; // BackendAppId
 
                 return new AzureAdConfig(
                     resourceServicePrincipalObjectId,

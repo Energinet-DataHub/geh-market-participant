@@ -15,11 +15,10 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
     public sealed class UnitOfWorkProvider : IUnitOfWorkProvider
     {

@@ -29,9 +29,9 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                 {
                     var configuration = container.GetService<IConfiguration>();
                     var clientSecretCredential = new ClientSecretCredential(
-                        configuration.GetValue<string>("Tenant"),
-                        configuration.GetValue<string>("ResourceServicePrincipalAppId"),
-                        configuration.GetValue<string>("ClientSecret"));
+                        configuration!["AZURE_B2C_TENANT"], // Tenant URL
+                        configuration["AZURE_B2C_SPN_ID"], // Resource service principal app id
+                        configuration["AZURE_B2C_SPN_SECRET"]); // Client secret
 
                     return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
                 },

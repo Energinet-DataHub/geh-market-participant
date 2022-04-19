@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common

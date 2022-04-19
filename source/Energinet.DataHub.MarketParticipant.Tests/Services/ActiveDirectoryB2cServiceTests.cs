@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var target = MockActiveDirectoryB2CService();
 
-            var permissions = new List<MarketRole>() { new MarketRole(EicFunction.EnergySupplier) };
+            var permissions = new List<MarketRole>() { new(EicFunction.EnergySupplier) };
 
             // Act + Assert
             await Assert
