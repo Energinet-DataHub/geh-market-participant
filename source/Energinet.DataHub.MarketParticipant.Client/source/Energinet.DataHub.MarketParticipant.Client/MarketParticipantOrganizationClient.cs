@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Extensions;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
@@ -34,11 +33,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl)
-                .GetAsync()
-                .HandleValidationExceptionAsync()
-                .ConfigureAwait(false);
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl).GetAsync()).ConfigureAwait(false);
 
             var listAllOrganizationsResult = await response
                 .GetJsonAsync<IEnumerable<OrganizationDto>>()
@@ -49,11 +46,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId)
-                .GetAsync()
-                .HandleValidationExceptionAsync()
-                .ConfigureAwait(false);
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId).GetAsync())
+                 .ConfigureAwait(false);
 
             var singleOrganizationsResult = await response
                 .GetJsonAsync<OrganizationDto>()
@@ -64,10 +60,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl)
-                .PostJsonAsync(organizationDto)
-                .HandleValidationExceptionAsync()
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl).PostJsonAsync(organizationDto))
                 .ConfigureAwait(false);
 
             var orgId = await response
@@ -79,10 +74,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto)
         {
-            return _httpClient
-                .Request(OrganizationsBaseUrl, organizationId)
-                .PutJsonAsync(organizationDto)
-                .HandleValidationExceptionAsync();
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId)
+                .PutJsonAsync(organizationDto));
         }
     }
 }

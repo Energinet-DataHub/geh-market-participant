@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Extensions;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
@@ -35,10 +34,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
-                .GetAsync()
-                .HandleValidationExceptionAsync()
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl).GetAsync())
                 .ConfigureAwait(false);
 
             var actors = await response
@@ -50,10 +48,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
-                .GetAsync()
-                .HandleValidationExceptionAsync()
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId).GetAsync())
                 .ConfigureAwait(false);
 
             var actor = await response
@@ -65,10 +62,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public async Task<Guid> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
         {
-            var response = await _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
-                .PostJsonAsync(createActorDto)
-                .HandleValidationExceptionAsync()
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl).PostJsonAsync(createActorDto))
                 .ConfigureAwait(false);
 
             var actor = await response
@@ -80,10 +76,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto)
         {
-            return _httpClient
-                .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
-                .PutJsonAsync(changeActorDto)
-                .HandleValidationExceptionAsync();
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId).PutJsonAsync(changeActorDto));
         }
     }
 }

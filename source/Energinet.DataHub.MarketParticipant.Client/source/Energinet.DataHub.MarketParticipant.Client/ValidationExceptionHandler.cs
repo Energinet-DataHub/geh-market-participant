@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Extensions
+namespace Energinet.DataHub.MarketParticipant.Client
 {
-    internal static class TaskExtensions
+    internal static class ValidationExceptionHandler
     {
-        public static async Task<T> HandleValidationExceptionAsync<T>(this Task<T> task)
+        public static async Task<T> HandleAsync<T>(Func<Task<T>> func)
         {
             try
             {
-#pragma warning disable VSTHRD003
-                return await task.ConfigureAwait(false);
-#pragma warning restore VSTHRD003
+                return await func().ConfigureAwait(false);
             }
             catch (FlurlHttpException e)
             {
