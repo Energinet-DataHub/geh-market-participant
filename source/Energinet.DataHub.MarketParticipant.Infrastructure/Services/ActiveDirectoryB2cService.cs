@@ -172,7 +172,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                         b2CIds.Add(ActiveDirectoryB2CRoles.MdrId);
                         break;
                     case BusinessRoleCode.Sts:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.MdrId);
+                        b2CIds.Add(ActiveDirectoryB2CRoles.StsId);
                         break;
                     default:
                         throw new ArgumentNullException(nameof(businessRoleCodes));
