@@ -12,11 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment);
+    public sealed class MarketParticipantException : Exception
+    {
+        public MarketParticipantException() { }
+
+        public MarketParticipantException(string message)
+            : base(message) { }
+
+        public MarketParticipantException(string message, Exception innerException)
+            : base(message, innerException) { }
+
+        public MarketParticipantException(int statusCode, string message)
+            : base(message)
+        {
+            StatusCode = statusCode;
+        }
+
+        public int StatusCode { get; }
+    }
 }

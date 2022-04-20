@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -95,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(actor.Id.ToString(), response.ActorId);
+            Assert.Equal(actor.Id, response.ActorId);
         }
 
         [Fact]
@@ -149,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(actor.Id.ToString(), response.ActorId);
+            Assert.Equal(actor.Id, response.ActorId);
         }
     }
 }

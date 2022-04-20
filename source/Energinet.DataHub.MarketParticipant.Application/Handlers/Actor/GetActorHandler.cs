@@ -22,7 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class GetActorHandler : IRequestHandler<GetSingleActorCommand, GetSingleActorResponse>
     {

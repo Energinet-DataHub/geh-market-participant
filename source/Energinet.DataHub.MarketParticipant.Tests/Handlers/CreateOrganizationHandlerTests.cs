@@ -88,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(response.OrganizationId);
+            Assert.NotEqual(Guid.Empty, response.OrganizationId);
         }
     }
 }

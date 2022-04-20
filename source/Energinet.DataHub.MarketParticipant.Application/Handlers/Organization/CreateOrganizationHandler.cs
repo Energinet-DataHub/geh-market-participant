@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .CreateAsync(request.Organization.Name, cvr, address, request.Organization.Comment)
                 .ConfigureAwait(false);
 
-            return new CreateOrganizationResponse(organization.Id.ToString());
+            return new CreateOrganizationResponse(organization.Id.Value);
         }
     }
 }
