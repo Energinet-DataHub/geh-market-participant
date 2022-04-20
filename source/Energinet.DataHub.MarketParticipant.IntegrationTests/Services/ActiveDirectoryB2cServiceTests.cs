@@ -170,7 +170,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             });
 
             // Active Directory Roles
-            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles();
+            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
             // Logger
             var logger = Mock.Of<ILogger<ActiveDirectoryB2cService>>();

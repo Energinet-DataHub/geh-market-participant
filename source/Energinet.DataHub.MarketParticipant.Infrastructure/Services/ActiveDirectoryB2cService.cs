@@ -32,20 +32,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
-        private readonly ActiveDirectoryB2CRoles _activeDirectoryB2CRoles;
+        private readonly ActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
         private readonly ILogger<ActiveDirectoryB2cService> _logger;
 
         public ActiveDirectoryB2cService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
             IBusinessRoleCodeDomainService businessRoleCodeDomainService,
-            ActiveDirectoryB2CRoles activeDirectoryB2CRoles,
+            ActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
             ILogger<ActiveDirectoryB2cService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
             _businessRoleCodeDomainService = businessRoleCodeDomainService;
-            _activeDirectoryB2CRoles = activeDirectoryB2CRoles;
+            _activeDirectoryB2CRolesProvider = activeDirectoryB2CRolesProvider;
             _logger = logger;
         }
 
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             Guard.ThrowIfNull(permissions, nameof(permissions));
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
-            var b2CPermissions = MapBusinessRoleCodesToB2CRoleIds(roles);
+            var b2CPermissions = await MapBusinessRoleCodesToB2CRoleIdsAsync(roles).ConfigureAwait(false);
             var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
             try
             {
@@ -152,30 +152,31 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private IEnumerable<Guid> MapBusinessRoleCodesToB2CRoleIds(IEnumerable<BusinessRoleCode> businessRoleCodes)
+        private async Task<IEnumerable<Guid>> MapBusinessRoleCodesToB2CRoleIdsAsync(IEnumerable<BusinessRoleCode> businessRoleCodes)
         {
+            var roles = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
             var b2CIds = new List<Guid>();
             foreach (var roleCode in businessRoleCodes)
             {
                 switch (roleCode)
                 {
                     case BusinessRoleCode.Ddk:
-                        b2CIds.Add(_activeDirectoryB2CRoles.DdkId);
+                        b2CIds.Add(roles.DdkId);
                         break;
                     case BusinessRoleCode.Ddm:
-                        b2CIds.Add(_activeDirectoryB2CRoles.DdmId);
+                        b2CIds.Add(roles.DdmId);
                         break;
                     case BusinessRoleCode.Ddq:
-                        b2CIds.Add(_activeDirectoryB2CRoles.DdqId);
+                        b2CIds.Add(roles.DdqId);
                         break;
                     case BusinessRoleCode.Ez:
-                        b2CIds.Add(_activeDirectoryB2CRoles.EzId);
+                        b2CIds.Add(roles.EzId);
                         break;
                     case BusinessRoleCode.Mdr:
-                        b2CIds.Add(_activeDirectoryB2CRoles.MdrId);
+                        b2CIds.Add(roles.MdrId);
                         break;
                     case BusinessRoleCode.Sts:
-                        b2CIds.Add(_activeDirectoryB2CRoles.StsId);
+                        b2CIds.Add(roles.StsId);
                         break;
                     default:
                         throw new ArgumentNullException(nameof(businessRoleCodes));

@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
     public class ActiveDirectoryB2CRoles
     {
+        public bool IsLoaded { get; set; }
         public Guid DdkId { get; set; }
         public Guid DdmId { get; set; }
         public Guid DdqId { get; set; }

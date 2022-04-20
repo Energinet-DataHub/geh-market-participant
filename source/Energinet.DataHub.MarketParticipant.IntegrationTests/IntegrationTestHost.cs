@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             host._startup.Container.RegisterSingleton(() => new AzureAdConfig(
                 integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
                 integrationTestConfig.B2CSettings.BackendAppId));
-            host._startup.Container.GetActiveDirectoryRoles();
+            host._startup.Container.AddActiveDirectoryRoles();
 
             return host;
         }

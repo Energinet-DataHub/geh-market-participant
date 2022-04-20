@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var mockAuthProvider = new Mock<IAuthenticationProvider>();
             var mockHttpProvider = Mock.Of<IHttpProvider>();
             var mockGraphClient = new Mock<GraphServiceClient>(mockAuthProvider.Object, mockHttpProvider);
-            var activeDirectoryB2CRoles = Mock.Of<ActiveDirectoryB2CRoles>();
+            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRolesProvider(mockGraphClient.Object, "Backend App Object Id");
             var mockBusinessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
 
             var target = new ActiveDirectoryB2cService(
