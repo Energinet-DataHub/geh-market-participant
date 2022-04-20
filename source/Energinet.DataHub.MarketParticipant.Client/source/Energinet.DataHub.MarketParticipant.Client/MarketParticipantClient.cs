@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantOrganizationClient.GetOrganizationsAsync();
         }
 
-        public Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
+        public Task<OrganizationDto> GetOrganizationAsync(Guid organizationId)
         {
             return _marketParticipantOrganizationClient.GetOrganizationAsync(organizationId);
         }
@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantActorClient.GetActorsAsync(organizationId);
         }
 
-        public Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId)
+        public Task<ActorDto> GetActorAsync(Guid organizationId, Guid actorId)
         {
             return _marketParticipantActorClient.GetActorAsync(organizationId, actorId);
         }

@@ -34,8 +34,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Gets an organization with the specified id.
         /// </summary>
         /// <param name="organizationId">The id of the organization to get.</param>
-        /// <returns>The organization <see cref="OrganizationDto" /> with the specified id; or null if it wasn't found.</returns>
-        Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId);
+        /// <returns>The organization <see cref="OrganizationDto" /> with the specified id.</returns>
+        Task<OrganizationDto> GetOrganizationAsync(Guid organizationId);
 
         /// <summary>
         /// Creates a new organization.

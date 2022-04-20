@@ -628,7 +628,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     orgId,
                     actorId,
                     new ChangeActorDto(
-                        ActorStatus.Active.ToString(),
+                        ActorStatus.Active,
                         new[] { new MarketRoleDto(EicFunction.EnergySupplier) }))
                 .ConfigureAwait(false);
 

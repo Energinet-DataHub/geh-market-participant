@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return listAllOrganizationsResult;
         }
 
-        public async Task<OrganizationDto?> GetOrganizationAsync(Guid organizationId)
+        public async Task<OrganizationDto> GetOrganizationAsync(Guid organizationId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(

@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return actors;
         }
 
-        public async Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId)
+        public async Task<ActorDto> GetActorAsync(Guid organizationId, Guid actorId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(

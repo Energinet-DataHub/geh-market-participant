@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record CreateActorResponse(string ActorId);
+    public sealed record CreateActorResponse(Guid ActorId);
 }
