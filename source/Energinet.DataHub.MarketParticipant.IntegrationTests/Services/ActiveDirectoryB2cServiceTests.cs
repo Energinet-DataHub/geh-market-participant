@@ -34,22 +34,25 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 {
     [Collection("IntegrationTest")]
     [IntegrationTest]
-    public sealed class ActiveDirectoryB2cServiceTests : IAsyncDisposable
+    public sealed class ActiveDirectoryB2CServiceTests : IAsyncDisposable
     {
-        private readonly IActiveDirectoryService _sut = null!;
-        private readonly List<string> _b2cAppRegistrationIds = null!;
+        private readonly IActiveDirectoryService _sut;
+        private readonly List<string> _b2CAppRegistrationIds;
 
-        public ActiveDirectoryB2cServiceTests()
+        public ActiveDirectoryB2CServiceTests()
         {
             _sut = CreateActiveDirectoryService();
-            _b2cAppRegistrationIds = new List<string>();
-            ActiveDirectoryB2CRoles.EzId = Guid.Parse("11b79733-b588-413d-9833-8adedce991aa");
-            ActiveDirectoryB2CRoles.MdrId = Guid.Parse("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2");
+            _b2CAppRegistrationIds = new List<string>();
+            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles
+            {
+                EzId = Guid.Parse("11b79733-b588-413d-9833-8adedce991aa"),
+                MdrId = Guid.Parse("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2")
+            };
         }
 
         public async ValueTask DisposeAsync()
         {
-            foreach (var appRegistrationId in _b2cAppRegistrationIds)
+            foreach (var appRegistrationId in _b2CAppRegistrationIds)
             {
                 await _sut.DeleteAppRegistrationAsync(appRegistrationId).ConfigureAwait(false);
             }
@@ -66,17 +69,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             // Act
             var response = await _sut.CreateAppRegistrationAsync(
-                "TemporaryTestApp",
-                roles)
+                    "TemporaryTestApp",
+                    roles)
                 .ConfigureAwait(false);
 
             // Assert
             var app = await _sut.GetExistingAppRegistrationAsync(
-                response.AppObjectId,
-                response.ServicePrincipalObjectId)
+                    response.AppObjectId,
+                    response.ServicePrincipalObjectId)
                 .ConfigureAwait(false);
 
-            _b2cAppRegistrationIds.Add(app.AppObjectId);
+            _b2CAppRegistrationIds.Add(app.AppObjectId);
 
             Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
         }
@@ -103,14 +106,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 .ConfigureAwait(false);
 
             // Assert
-            _b2cAppRegistrationIds.Add(app.AppObjectId);
+            _b2CAppRegistrationIds.Add(app.AppObjectId);
 
             Assert.Equal("11b79733-b588-413d-9833-8adedce991aa", app.AppRoles.Roles[0].RoleId);
             Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.Roles[1].RoleId);
         }
 
         [Fact]
-        public async Task DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
+        public async Task
+            DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
         {
             // Arrange
             var roles = new List<MarketRole>
@@ -131,9 +135,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             // Assert
             var ex = await Assert.ThrowsAsync<ServiceException>(async () => await _sut
                     .GetExistingAppRegistrationAsync(
-                    createAppRegistrationResponse.AppObjectId,
-                    createAppRegistrationResponse.ServicePrincipalObjectId)
-                .ConfigureAwait(false))
+                        createAppRegistrationResponse.AppObjectId,
+                        createAppRegistrationResponse.ServicePrincipalObjectId)
+                    .ConfigureAwait(false))
                 .ConfigureAwait(false);
 
             Assert.Equal(HttpStatusCode.NotFound, ex.StatusCode);
@@ -162,8 +166,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
                 new MeteredDataResponsibleRole(),
-                new SystemOperatorRole(),
+                new SystemOperatorRole()
             });
+
+            // Active Directory Roles
+            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles();
 
             // Logger
             var logger = Mock.Of<ILogger<ActiveDirectoryB2cService>>();
@@ -172,6 +179,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 graphClient,
                 config,
                 businessRoleCodeDomainService,
+                activeDirectoryB2CRoles,
                 logger);
         }
     }

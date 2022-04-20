@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                 var configuration = container.GetService<IConfiguration>();
                 var graphClient = container.GetInstance<GraphServiceClient>();
                 var appObjectId = configuration!["AZURE_B2C_BACKEND_OBJECT_ID"];
+                var activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles();
 
                 var application = await graphClient.Applications[appObjectId]
                     .Request()
@@ -48,28 +49,30 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                     switch (appRole.DisplayName)
                     {
                         case "Balance Responsible Party":
-                            ActiveDirectoryB2CRoles.DdkId = appRole.Id ?? Guid.Empty;
+                            activeDirectoryB2CRoles.DdkId = appRole.Id ?? Guid.Empty;
                             break;
                         case "Grid operator":
-                            ActiveDirectoryB2CRoles.DdmId = appRole.Id ?? Guid.Empty;
+                            activeDirectoryB2CRoles.DdmId = appRole.Id ?? Guid.Empty;
                             break;
                         case "Electrical supplier":
-                            ActiveDirectoryB2CRoles.DdqId = appRole.Id ?? Guid.Empty;
+                            activeDirectoryB2CRoles.DdqId = appRole.Id ?? Guid.Empty;
                             break;
                         case "Transmission system operator":
-                            ActiveDirectoryB2CRoles.EzId = appRole.Id ?? Guid.Empty;
+                            activeDirectoryB2CRoles.EzId = appRole.Id ?? Guid.Empty;
                             break;
                         case "Meter data responsible":
-                            ActiveDirectoryB2CRoles.MdrId = appRole.Id ?? Guid.Empty;
+                            activeDirectoryB2CRoles.MdrId = appRole.Id ?? Guid.Empty;
                             break;
                         case "STS":
-                            ActiveDirectoryB2CRoles.StsId = appRole.Id ?? Guid.Empty;
+                            activeDirectoryB2CRoles.StsId = appRole.Id ?? Guid.Empty;
                             break;
                         default:
                             throw new InvalidOperationException(
                                 $"Could not find an id associated with the provided role name '{appRole.DisplayName}'.");
                     }
                 }
+
+                return activeDirectoryB2CRoles;
             });
         }
     }

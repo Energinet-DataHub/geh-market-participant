@@ -16,13 +16,13 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
-    public static class ActiveDirectoryB2CRoles
+    public class ActiveDirectoryB2CRoles
     {
-        public static Guid DdkId { get; set; }
-        public static Guid DdmId { get; set; }
-        public static Guid DdqId { get; set; }
-        public static Guid EzId { get; set; }
-        public static Guid MdrId { get; set; }
-        public static Guid StsId { get; set; }
+        public Guid DdkId { get; set; }
+        public Guid DdmId { get; set; }
+        public Guid DdqId { get; set; }
+        public Guid EzId { get; set; }
+        public Guid MdrId { get; set; }
+        public Guid StsId { get; set; }
     }
 }

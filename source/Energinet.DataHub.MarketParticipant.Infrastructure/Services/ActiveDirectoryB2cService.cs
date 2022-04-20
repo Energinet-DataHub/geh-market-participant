@@ -32,17 +32,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
+        private readonly ActiveDirectoryB2CRoles _activeDirectoryB2CRoles;
         private readonly ILogger<ActiveDirectoryB2cService> _logger;
 
         public ActiveDirectoryB2cService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
             IBusinessRoleCodeDomainService businessRoleCodeDomainService,
+            ActiveDirectoryB2CRoles activeDirectoryB2CRoles,
             ILogger<ActiveDirectoryB2cService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
             _businessRoleCodeDomainService = businessRoleCodeDomainService;
+            _activeDirectoryB2CRoles = activeDirectoryB2CRoles;
             _logger = logger;
         }
 
@@ -54,8 +57,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             Guard.ThrowIfNull(permissions, nameof(permissions));
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
-            var b2cPermissions = MapBusinessRoleCodesToB2CRoleIds(roles);
-            var permissionsToPass = b2cPermissions.Select(x => x.ToString()).ToList();
+            var b2CPermissions = MapBusinessRoleCodesToB2CRoleIds(roles);
+            var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
             try
             {
                 var app = await CreateAppInB2CAsync(consumerAppName, permissionsToPass).ConfigureAwait(false);
@@ -63,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId).ConfigureAwait(false);
 
                 // What should be done with this role? To database? Integration event?
-                foreach (var permission in b2cPermissions)
+                foreach (var permission in b2CPermissions)
                 {
                     await GrantAddedRoleToServicePrincipalAsync(
                         servicePrincipal.Id,
@@ -149,7 +152,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private static IEnumerable<Guid> MapBusinessRoleCodesToB2CRoleIds(IEnumerable<BusinessRoleCode> businessRoleCodes)
+        private IEnumerable<Guid> MapBusinessRoleCodesToB2CRoleIds(IEnumerable<BusinessRoleCode> businessRoleCodes)
         {
             var b2CIds = new List<Guid>();
             foreach (var roleCode in businessRoleCodes)
@@ -157,22 +160,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 switch (roleCode)
                 {
                     case BusinessRoleCode.Ddk:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.DdkId);
+                        b2CIds.Add(_activeDirectoryB2CRoles.DdkId);
                         break;
                     case BusinessRoleCode.Ddm:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.DdmId);
+                        b2CIds.Add(_activeDirectoryB2CRoles.DdmId);
                         break;
                     case BusinessRoleCode.Ddq:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.DdqId);
+                        b2CIds.Add(_activeDirectoryB2CRoles.DdqId);
                         break;
                     case BusinessRoleCode.Ez:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.EzId);
+                        b2CIds.Add(_activeDirectoryB2CRoles.EzId);
                         break;
                     case BusinessRoleCode.Mdr:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.MdrId);
+                        b2CIds.Add(_activeDirectoryB2CRoles.MdrId);
                         break;
                     case BusinessRoleCode.Sts:
-                        b2CIds.Add(ActiveDirectoryB2CRoles.StsId);
+                        b2CIds.Add(_activeDirectoryB2CRoles.StsId);
                         break;
                     default:
                         throw new ArgumentNullException(nameof(businessRoleCodes));
