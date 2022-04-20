@@ -41,4 +41,4 @@
 
 ## Version 0.5.4
 
-- Fixed incorrect nullable properties.
+- Fixed incorrect null properties.
