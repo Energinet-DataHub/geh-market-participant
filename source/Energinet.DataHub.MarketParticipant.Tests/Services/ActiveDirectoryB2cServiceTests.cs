@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
@@ -59,8 +60,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         private static ActiveDirectoryB2cService MockActiveDirectoryB2CService()
         {
             var mockAuthProvider = new Mock<IAuthenticationProvider>();
-            var mockHttpProvider = new Mock<IHttpProvider>();
-            var mockGraphClient = new Mock<GraphServiceClient>(mockAuthProvider.Object, mockHttpProvider.Object);
+            var mockHttpProvider = Mock.Of<IHttpProvider>();
+            var mockGraphClient = new Mock<GraphServiceClient>(mockAuthProvider.Object, mockHttpProvider);
+            var activeDirectoryB2CRoles = Mock.Of<ActiveDirectoryB2CRoles>();
             var mockBusinessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
 
             var target = new ActiveDirectoryB2cService(
@@ -69,6 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value"),
                 mockBusinessRoleCodeDomainService.Object,
+                activeDirectoryB2CRoles,
                 new Mock<ILogger<ActiveDirectoryB2cService>>().Object);
 
             return target;

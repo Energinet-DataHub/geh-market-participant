@@ -24,6 +24,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
     [IntegrationTest]
     public class AzureAdB2cRolesTests
     {
+        private readonly ActiveDirectoryB2CRoles _activeDirectoryB2CRoles;
+
+        public AzureAdB2cRolesTests(ActiveDirectoryB2CRoles activeDirectoryB2CRoles)
+        {
+            _activeDirectoryB2CRoles = activeDirectoryB2CRoles;
+        }
+
         [Fact]
         public async Task GetActiveDirectoryRoles_AllActiveDirectoryRolesAreDownloaded_Success()
         {
@@ -32,11 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
             await using var scope = host.BeginScope();
 
             // Act + Assert
-            Assert.Equal(Guid.Parse("882f1309-f696-4055-9b1d-70bd3abd6aec"), ActiveDirectoryB2CRoles.DdkId);
-            Assert.Equal(Guid.Parse("3ba88b9a-9179-4f03-9281-3e43757b54c7"), ActiveDirectoryB2CRoles.DdmId);
-            Assert.Equal(Guid.Parse("9ec90757-aac3-40c4-bcb3-8bffcb642996"), ActiveDirectoryB2CRoles.DdqId);
-            Assert.Equal(Guid.Parse("11b79733-b588-413d-9833-8adedce991aa"), ActiveDirectoryB2CRoles.EzId);
-            Assert.Equal(Guid.Parse("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2"), ActiveDirectoryB2CRoles.MdrId);
+            Assert.Equal(Guid.Parse("882f1309-f696-4055-9b1d-70bd3abd6aec"), _activeDirectoryB2CRoles.DdkId);
+            Assert.Equal(Guid.Parse("3ba88b9a-9179-4f03-9281-3e43757b54c7"), _activeDirectoryB2CRoles.DdmId);
+            Assert.Equal(Guid.Parse("9ec90757-aac3-40c4-bcb3-8bffcb642996"), _activeDirectoryB2CRoles.DdqId);
+            Assert.Equal(Guid.Parse("11b79733-b588-413d-9833-8adedce991aa"), _activeDirectoryB2CRoles.EzId);
+            Assert.Equal(Guid.Parse("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2"), _activeDirectoryB2CRoles.MdrId);
         }
     }
 }
