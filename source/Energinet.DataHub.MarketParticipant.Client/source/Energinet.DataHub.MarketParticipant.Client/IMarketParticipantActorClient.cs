@@ -36,8 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="organizationId">The organization the actor belongs to.</param>
         /// <param name="actorId">The id of the actor to get.</param>
-        /// <returns>An <see cref="ActorDto" /> actor; or null if actor does not exist.</returns>
-        Task<ActorDto?> GetActorAsync(Guid organizationId, Guid actorId);
+        /// <returns>An <see cref="ActorDto" /> actor.</returns>
+        Task<ActorDto> GetActorAsync(Guid organizationId, Guid actorId);
 
         /// <summary>
         /// Creates an actor in a specific organization.

@@ -16,7 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
@@ -48,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .CreateAsync(request.Organization.Name, cvr, address, request.Organization.Comment)
                 .ConfigureAwait(false);
 
-            return new CreateOrganizationResponse(organization.Id.ToString());
+            return new CreateOrganizationResponse(organization.Id.Value);
         }
     }
 }

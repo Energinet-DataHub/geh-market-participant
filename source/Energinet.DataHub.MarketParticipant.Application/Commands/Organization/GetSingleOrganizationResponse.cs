@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
 {
-    public sealed record GetSingleOrganizationResponse(OrganizationDto? Organization);
+    public sealed record GetSingleOrganizationResponse(OrganizationDto Organization);
 }

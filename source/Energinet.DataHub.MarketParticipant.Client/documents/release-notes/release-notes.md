@@ -34,3 +34,11 @@
 ## Version 0.5.2
 
 - Added Comment to Organization
+
+## Version 0.5.3
+
+- Added error handling.
+
+## Version 0.5.4
+
+- Fixed incorrect nullable properties.

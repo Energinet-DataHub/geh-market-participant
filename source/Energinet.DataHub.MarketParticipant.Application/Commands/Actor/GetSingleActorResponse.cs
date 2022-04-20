@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record GetSingleActorResponse(ActorDto? Actor);
+    public sealed record GetSingleActorResponse(ActorDto Actor);
 }
