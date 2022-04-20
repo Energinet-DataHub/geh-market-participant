@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
-using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {

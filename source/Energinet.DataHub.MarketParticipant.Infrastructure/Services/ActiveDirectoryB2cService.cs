@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
