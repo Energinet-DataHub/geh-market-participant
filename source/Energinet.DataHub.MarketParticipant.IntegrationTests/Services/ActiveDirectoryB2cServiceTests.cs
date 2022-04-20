@@ -43,11 +43,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         {
             _sut = CreateActiveDirectoryService();
             _b2CAppRegistrationIds = new List<string>();
-            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles
-            {
-                EzId = Guid.Parse("11b79733-b588-413d-9833-8adedce991aa"),
-                MdrId = Guid.Parse("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2")
-            };
         }
 
         public async ValueTask DisposeAsync()
@@ -145,9 +140,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
         private static IActiveDirectoryService CreateActiveDirectoryService()
         {
-            // Graph Client
             var integrationTestConfig = new IntegrationTestConfiguration();
 
+            // Graph Service Client
             var clientSecretCredential = new ClientSecretCredential(
                 integrationTestConfig.B2CSettings.Tenant,
                 integrationTestConfig.B2CSettings.ServicePrincipalId,
