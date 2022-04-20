@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
     {
