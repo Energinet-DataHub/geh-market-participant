@@ -42,7 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 actor.ExternalActorId.ToString(),
                 new GlobalLocationNumberDto(actor.Gln.Value),
                 actor.Status.ToString(),
-                actor.MarketRoles.Select(Map).ToList());
+                actor.MarketRoles.Select(Map).ToList(),
+                actor.MeteringPointTypes);
         }
 
         private static AddressDto Map(Address address)

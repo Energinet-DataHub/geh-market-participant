@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             var actorRoles = CreateMarketRoles(request.Actor).ToList();
 
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles)
+                .CreateAsync(organization, actorGln, actorRoles, request.Actor.MeteringPointTypes.ToList())
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id.ToString());

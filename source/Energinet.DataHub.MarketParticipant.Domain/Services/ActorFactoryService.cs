@@ -50,11 +50,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         public async Task<Actor> CreateAsync(
             Organization organization,
             GlobalLocationNumber gln,
-            IReadOnlyCollection<MarketRole> marketRoles)
+            IReadOnlyCollection<MarketRole> marketRoles,
+            IReadOnlyCollection<MeteringPointType> meteringPointTypes)
         {
             Guard.ThrowIfNull(organization, nameof(organization));
             Guard.ThrowIfNull(gln, nameof(gln));
             Guard.ThrowIfNull(marketRoles, nameof(marketRoles));
+            Guard.ThrowIfNull(marketRoles, nameof(meteringPointTypes));
 
             await _uniqueGlobalLocationNumberRuleService
                 .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
