@@ -34,14 +34,14 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                 {
                     throw new ArgumentNullException(
                         nameof(resourceServicePrincipalObjectId),
-                        "Value is null or whitespace");
+                        "Value is null, empty or whitespace");
                 }
 
                 if (string.IsNullOrWhiteSpace(backendAppId))
                 {
                     throw new ArgumentNullException(
                         nameof(backendAppId),
-                        "Value is null or empty");
+                        "Value is null, empty or whitespace");
                 }
 
                 return new AzureAdConfig(
