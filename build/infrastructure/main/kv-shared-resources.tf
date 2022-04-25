@@ -56,6 +56,10 @@ data "azurerm_key_vault_secret" "plan_shared_id" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
+data "azurerm_key_vault_secret" "log_shared_id" {
+  name         = "log-shared-id"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
 data "azurerm_key_vault_secret" "frontend_open_id_url" {
   name         = "frontend-open-id-url"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
