@@ -32,15 +32,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new GridAreaIntegrationEventsQueueService(domainEventRepository.Object);
-
+            var gridAreaId = new GridAreaId(Guid.NewGuid());
             var gridArea = new GridArea(
-                new GridAreaId(Guid.NewGuid()),
+                gridAreaId,
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
                 PriceAreaCode.DK1);
-
+            var gridAreaLink = new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), gridAreaId);
             // Act
-            await target.EnqueueGridAreaUpdatedEventAsync(gridArea).ConfigureAwait(false);
+            await target.EnqueueGridAreaUpdatedEventAsync(gridArea, gridAreaLink).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
