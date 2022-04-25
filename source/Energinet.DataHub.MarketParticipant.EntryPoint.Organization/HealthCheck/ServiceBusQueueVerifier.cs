@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 
@@ -20,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthChec
 {
     public sealed class ServiceBusQueueVerifier : IServiceBusQueueVerifier
     {
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<bool> VerifyAsync(string connectionString, string name)
         {
             try
