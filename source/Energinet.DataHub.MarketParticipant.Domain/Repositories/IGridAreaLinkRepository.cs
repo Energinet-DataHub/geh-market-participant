@@ -15,18 +15,25 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    /// Creates and enqueues integration events for GridAreas.
+    /// Provides access to the Grid Areas Links.
     /// </summary>
-    public interface IGridAreaIntegrationEventsQueueService
+    public interface IGridAreaLinkRepository
     {
         /// <summary>
-        /// Creates and enqueues an GridAreaUpdated integration event for the specified Grid Area.
+        /// Updates a Grid Area Link, or adds it if it's not already present.
         /// </summary>
-        /// <param name="gridArea">The GridArea to publish an integration event for.</param>
-        /// <param name="gridAreaLink">The GridAreaLink to include in the integration event</param>
-        Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink);
+        /// <param name="gridAreaLink">The GridAreaLink to add or update</param>
+        /// <returns>The id of the added GridAreaLink</returns>
+        Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink);
+
+        /// <summary>
+        /// Gets an GridAreaLink with the specified Id
+        /// </summary>
+        /// <param name="id">The Id of the GridAreaLink to get.</param>
+        /// <returns>The specified grid area link or null if not found</returns>
+        Task<GridAreaLink?> GetAsync(GridAreaLinkId id);
     }
 }

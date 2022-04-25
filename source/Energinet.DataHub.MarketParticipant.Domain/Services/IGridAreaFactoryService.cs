@@ -18,15 +18,20 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Creates and enqueues integration events for GridAreas.
+    /// A factory service ensuring correct construction of a GridArea.
     /// </summary>
-    public interface IGridAreaIntegrationEventsQueueService
+    public interface IGridAreaFactoryService
     {
         /// <summary>
-        /// Creates and enqueues an GridAreaUpdated integration event for the specified Grid Area.
+        /// Creates an Organization.
         /// </summary>
-        /// <param name="gridArea">The GridArea to publish an integration event for.</param>
-        /// <param name="gridAreaLink">The GridAreaLink to include in the integration event</param>
-        Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink);
+        /// <param name="code">The code for the Grid Area</param>
+        /// <param name="name">The name of the new Grid Area.</param>
+        /// <param name="priceAreaCode">The PriceAreaCode <see cref="PriceAreaCode"/> of the new Grid Area.</param>
+        /// <returns>The created actor.</returns>
+        Task<GridArea> CreateAsync(
+            string code,
+            string name,
+            PriceAreaCode priceAreaCode);
     }
 }

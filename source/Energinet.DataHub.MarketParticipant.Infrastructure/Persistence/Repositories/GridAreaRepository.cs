@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -35,7 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             Guard.ThrowIfNull(gridArea, nameof(gridArea));
 
             GridAreaEntity destination;
-
             if (gridArea.Id.Value == default)
             {
                 destination = new GridAreaEntity();
@@ -52,6 +52,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _marketParticipantDbContext.GridAreas.Update(destination);
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            if (gridArea.Id.Value != default) return new GridAreaId(destination.Id);
+
+            // Create the GridAreaLink here if it's a new GridArea
+            var gridAreaLink = new GridAreaLinkEntity { Id = Guid.NewGuid(), GridAreaID = destination.Id };
+            _marketParticipantDbContext.GridAreaLinks.Add(gridAreaLink);
+
             return new GridAreaId(destination.Id);
         }
 
