@@ -30,7 +30,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             string appObjectId)
         {
             _graphClient = graphClient;
-            _appObjectId = appObjectId;
+            _appObjectId = string.IsNullOrWhiteSpace(appObjectId)
+                ? throw new ArgumentException("Value is null or white space", nameof(appObjectId))
+                : appObjectId;
             _activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles();
         }
 

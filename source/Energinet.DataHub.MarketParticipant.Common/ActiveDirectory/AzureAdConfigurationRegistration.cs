@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,8 +28,21 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
             {
                 var configuration = container.GetService<IConfiguration>();
                 var resourceServicePrincipalObjectId = configuration!["AZURE_B2C_BACKEND_SPN_OBJECT_ID"]; // ResourceServicePrincipalObjectId
-                var resourceObjectId = configuration!["AZURE_B2C_BACKEND_SPN_OBJECT_ID"]; // ResourceServicePrincipalObjectId
                 var backendAppId = configuration["AZURE_B2C_BACKEND_ID"]; // BackendAppId
+
+                if (string.IsNullOrWhiteSpace(resourceServicePrincipalObjectId))
+                {
+                    throw new ArgumentNullException(
+                        nameof(resourceServicePrincipalObjectId),
+                        "Value is null or whitespace");
+                }
+
+                if (string.IsNullOrWhiteSpace(backendAppId))
+                {
+                    throw new ArgumentNullException(
+                        nameof(backendAppId),
+                        "Value is null or empty");
+                }
 
                 return new AzureAdConfig(
                     resourceServicePrincipalObjectId,

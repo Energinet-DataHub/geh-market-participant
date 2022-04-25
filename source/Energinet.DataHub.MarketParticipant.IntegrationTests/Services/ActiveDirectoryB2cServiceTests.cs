@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
@@ -37,20 +36,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     public sealed class ActiveDirectoryB2CServiceTests : IAsyncDisposable
     {
         private readonly IActiveDirectoryService _sut;
-        private readonly List<string> _b2CAppRegistrationIds;
+        private string _b2CAppRegistrationId = string.Empty;
 
         public ActiveDirectoryB2CServiceTests()
         {
             _sut = CreateActiveDirectoryService();
-            _b2CAppRegistrationIds = new List<string>();
         }
 
         public async ValueTask DisposeAsync()
         {
-            foreach (var appRegistrationId in _b2CAppRegistrationIds)
-            {
-                await _sut.DeleteAppRegistrationAsync(appRegistrationId).ConfigureAwait(false);
-            }
+            await _sut.DeleteAppRegistrationAsync(_b2CAppRegistrationId).ConfigureAwait(false);
         }
 
         [Fact]
@@ -74,9 +69,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                     response.ServicePrincipalObjectId)
                 .ConfigureAwait(false);
 
-            _b2CAppRegistrationIds.Add(app.AppObjectId);
+            _b2CAppRegistrationId = app.AppObjectId;
 
             Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
+
+            await DisposeAsync().ConfigureAwait(false);
         }
 
         [Fact]
@@ -101,10 +98,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 .ConfigureAwait(false);
 
             // Assert
-            _b2CAppRegistrationIds.Add(app.AppObjectId);
+            _b2CAppRegistrationId = app.AppObjectId;
 
             Assert.Equal("11b79733-b588-413d-9833-8adedce991aa", app.AppRoles.Roles[0].RoleId);
             Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.Roles[1].RoleId);
+
+            await DisposeAsync().ConfigureAwait(false);
         }
 
         [Fact]
@@ -160,12 +159,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             // Business Role Code Domain Service
             var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
-                new MeteredDataResponsibleRole(),
-                new SystemOperatorRole()
+                new MeteredDataResponsibleRole(), new SystemOperatorRole()
             });
 
             // Active Directory Roles
-            var activeDirectoryB2CRoles = new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
+            var activeDirectoryB2CRoles =
+                new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
             // Logger
             var logger = Mock.Of<ILogger<ActiveDirectoryB2cService>>();
