@@ -341,6 +341,7 @@ dotnet_diagnostic.CA2238.severity = warning
 dotnet_diagnostic.CA2240.severity = warning
 dotnet_diagnostic.CA2241.severity = warning
 dotnet_diagnostic.CA2242.severity = warning
+dotnet_diagnostic.CA2254.severity = suggestion
 dotnet_diagnostic.CS1591.severity = none
 
 dotnet_code_quality.CA1062.null_check_validation_methods = ThrowIfNull|ThrowIfNullOrWhiteSpace
