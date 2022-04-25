@@ -45,3 +45,33 @@ variable shared_resources_resource_group_name {
   type          = string
   description   = "Name of the Resource Group, that contains the shared resources."
 }
+
+variable b2c_tenant {
+  type          = string
+  description   = "URL of the Active Directory Tenant."
+}
+
+variable b2c_spn_id {
+  type          = string
+  description   = "The Service Principal App Id of the Active Directory Tenant."
+}
+
+variable b2c_spn_secret {
+  type          = string
+  description   = "The secret of the Service Principal of the Active Directory Tenant."
+}
+
+variable b2c_backend_spn_object_id {
+  type          = string
+  description   = "The Object Id for the backend application Service Principal of the Active Directory Tenant."
+}
+
+variable b2c_backend_id {
+  type          = string
+  description   = "The App Id for the backend application of the Active Directory Tenant."
+}
+
+variable b2c_backend_object_id {
+  type          = string
+  description   = "The Object Id for the backend application of the Active Directory Tenant."
+}

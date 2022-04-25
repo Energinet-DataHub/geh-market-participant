@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         public async Task Startup_ConfigureServices_Verifies()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("AZURE_B2C_TENANT", Guid.NewGuid().ToString());
+            Environment.SetEnvironmentVariable("AZURE_B2C_TENANT", Guid.NewGuid().ToString()); // Must take a Guid as value
             Environment.SetEnvironmentVariable("AZURE_B2C_SPN_ID", "fake_value");
             Environment.SetEnvironmentVariable("AZURE_B2C_SPN_SECRET", "fake_value");
             Environment.SetEnvironmentVariable("AZURE_B2C_BACKEND_OBJECT_ID", "fake_value");
