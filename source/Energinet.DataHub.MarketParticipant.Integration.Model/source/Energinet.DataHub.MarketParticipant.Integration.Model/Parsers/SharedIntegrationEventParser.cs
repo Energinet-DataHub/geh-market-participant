@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
     public class SharedIntegrationEventParser : ISharedIntegrationEventParser
     {
-        public object Parse(byte[] protoContract)
+        public BaseIntegrationEvent Parse(byte[] protoContract)
         {
             if (TryParseActorUpdatedIntegrationEvent(protoContract, out ActorUpdatedIntegrationEvent actorUpdatedEvent))
             {

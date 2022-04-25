@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record ActorUpdatedIntegrationEvent
+    public sealed record ActorUpdatedIntegrationEvent : BaseIntegrationEvent
     {
         /// <summary>
         /// An event representing an update to a given actor.
@@ -41,8 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<EicFunction> marketRoles,
             IEnumerable<Guid> gridAreas)
+        : base(id)
         {
-            Id = id;
             ActorId = actorId;
             OrganizationId = organizationId;
             ExternalActorId = externalActorId;
@@ -53,7 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             GridAreas = gridAreas;
         }
 
-        public Guid Id { get; }
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
 

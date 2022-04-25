@@ -12,20 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    /// <summary>
-    /// Shared parser for Integration events. Try parses through known parsers.
-    /// </summary>
-    public interface ISharedIntegrationEventParser
+    public record BaseIntegrationEvent
     {
         /// <summary>
-        /// Parses the event.
+        /// A base event representing a change.
         /// </summary>
-        /// <param name="protoContract"></param>
-        /// <returns>parsed event if parser is found otherwise exception is thrown</returns>
-        BaseIntegrationEvent Parse(byte[] protoContract);
+        /// <param name="id">Unique integration event ID.</param>
+        protected BaseIntegrationEvent(Guid id)
+        {
+            Id = id;
+        }
+
+        public Guid Id { get; }
     }
 }
