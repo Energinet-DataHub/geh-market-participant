@@ -6,9 +6,9 @@
 
 ## Version 1.2.0
 
-- 
+- Added integration events.
 
 ## Version 1.3.0
 
 - Adding shared contract parser returning base integration event.
-- Contract related parsers marked as internal.
+- Use of this new parser is required.

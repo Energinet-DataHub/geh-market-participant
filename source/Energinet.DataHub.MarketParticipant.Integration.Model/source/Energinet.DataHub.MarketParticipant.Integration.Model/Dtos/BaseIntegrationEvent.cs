@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public record BaseIntegrationEvent
+    public abstract record BaseIntegrationEvent
     {
         /// <summary>
         /// A base event representing a change.
