@@ -20,3 +20,5 @@ GetActorAsync
 GetActorsAsync
 codecov
 CVR
+GridArea
+GridAreaLinkId
