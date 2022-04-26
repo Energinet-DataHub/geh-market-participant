@@ -145,7 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAsync_NewOrganization_DispatchesEvent()
+        public async Task CreateAsync_NewGridArea_DispatchesEvent()
         {
             // Arrange
             var gridAreaRepository = new Mock<IGridAreaRepository>();
