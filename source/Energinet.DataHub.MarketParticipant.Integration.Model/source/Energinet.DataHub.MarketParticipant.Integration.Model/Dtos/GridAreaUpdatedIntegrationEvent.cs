@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record GridAreaUpdatedIntegrationEvent
+    public sealed record GridAreaUpdatedIntegrationEvent : BaseIntegrationEvent
     {
         /// <summary>
         /// An event representing an update to a given GridArea.
@@ -34,8 +34,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             string code,
             PriceAreaCode priceAreaCode,
             Guid gridAreaLinkId)
+        : base(id)
         {
-            Id = id;
             GridAreaId = gridAreaId;
             Name = name;
             Code = code;
@@ -43,7 +43,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             GridAreaLinkId = gridAreaLinkId;
         }
 
-        public Guid Id { get; }
         public Guid GridAreaId { get; }
         public string Name { get; }
         public string Code { get; }
