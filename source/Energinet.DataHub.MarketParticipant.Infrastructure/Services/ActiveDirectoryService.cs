@@ -15,6 +15,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -32,6 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _configuration = configuration;
         }
 
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<ExternalActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln)
         {
             Guard.ThrowIfNull(gln, nameof(gln));
