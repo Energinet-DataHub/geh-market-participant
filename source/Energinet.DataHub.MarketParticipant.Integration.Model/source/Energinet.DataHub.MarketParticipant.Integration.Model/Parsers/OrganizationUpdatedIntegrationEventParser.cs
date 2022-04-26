@@ -20,7 +20,7 @@ using Google.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
-    public sealed class OrganizationUpdatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
+    internal sealed class OrganizationUpdatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
     {
         public OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
         {
