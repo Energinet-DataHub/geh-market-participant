@@ -1,9 +1,5 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
-## Version 2.0.0
-
-- .NET 6 upgrade
-
 ## Version 1.1.0
 
 - Preparing package for release.
@@ -20,3 +16,11 @@
 
 - Adding shared contract parser returning base integration event.
 - Use of this new parser is required.
+
+## Version 2.0.0
+
+- .NET 6 upgrade
+
+## Version 2.0.1
+
+- Public parse methods for helping with integration testing.
