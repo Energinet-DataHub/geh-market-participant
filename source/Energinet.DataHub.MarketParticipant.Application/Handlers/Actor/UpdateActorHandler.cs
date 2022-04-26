@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
         }
 
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
         {
             Guard.ThrowIfNull(request, nameof(request));
