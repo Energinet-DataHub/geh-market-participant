@@ -18,9 +18,10 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 
 message GridAreaUpdatedIntegrationEventContract {
-  string Id = 1;
-  string GridAreaId = 2;
-  string Name = 3;
-  string Code = 4;
-  int32 PriceAreaCode = 5;
+    string Id = 1;
+    string GridAreaId = 2;
+    string Name = 3;
+    string Code = 4;
+    int32 PriceAreaCode = 5;
+    string GridAreaLinkId = 6;
 }
