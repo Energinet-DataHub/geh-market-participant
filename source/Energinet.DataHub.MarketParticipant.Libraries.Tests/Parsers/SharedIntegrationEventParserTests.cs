@@ -64,7 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 "TestArea",
                 "123",
-                PriceAreaCode.DK1);
+                PriceAreaCode.DK1,
+                Guid.NewGuid());
 
             // Act
             var actualBytes = input.Parse(@event);
