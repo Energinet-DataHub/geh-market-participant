@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.SimpleInjector
 
         public object GetService(Type serviceType)
         {
-            Guard.ThrowIfNull(serviceType, nameof(serviceType));
+            ArgumentNullException.ThrowIfNull(serviceType, nameof(serviceType));
             return _container.GetInstance(serviceType);
         }
     }

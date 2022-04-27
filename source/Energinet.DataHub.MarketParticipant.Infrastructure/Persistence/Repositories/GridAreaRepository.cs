@@ -18,7 +18,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -33,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
         {
-            Guard.ThrowIfNull(gridArea, nameof(gridArea));
+            ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
 
             GridAreaEntity destination;
             if (gridArea.Id.Value == default)
@@ -58,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<GridArea?> GetAsync(GridAreaId id)
         {
-            Guard.ThrowIfNull(id, nameof(id));
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
 
             var gridArea = await _marketParticipantDbContext.GridAreas
                 .FindAsync(id.Value)
