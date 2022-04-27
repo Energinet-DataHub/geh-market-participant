@@ -12,22 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
     public class GridAreaLinkRepository : IGridAreaLinkRepository
     {
-        public Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink)
+        private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+        public GridAreaLinkRepository(IMarketParticipantDbContext marketParticipantDbContext)
         {
-            throw new System.NotImplementedException();
+            _marketParticipantDbContext = marketParticipantDbContext;
         }
 
-        public Task<GridAreaLink?> GetAsync(GridAreaLinkId id)
+        public async Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink)
         {
-            throw new System.NotImplementedException();
+            ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
+
+            GridAreaLinkEntity destination;
+            if (gridAreaLink.Id.Value == default)
+            {
+                destination = new GridAreaLinkEntity();
+            }
+            else
+            {
+                destination = await _marketParticipantDbContext
+                    .GridAreaLinks
+                    .FindAsync(gridAreaLink.Id.Value)
+                    .ConfigureAwait(false);
+            }
+
+            GridAreaLinkMapper.MapToEntity(gridAreaLink, destination);
+            _marketParticipantDbContext.GridAreaLinks.Update(destination);
+
+            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            return new GridAreaLinkId(destination.Id);
+        }
+
+        public async Task<GridAreaLink?> GetAsync(GridAreaLinkId id)
+        {
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+            var gridAreaLink = await _marketParticipantDbContext.GridAreaLinks
+                .FindAsync(id.Value)
+                .ConfigureAwait(false);
+
+            return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);
         }
     }
 }

@@ -53,12 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            if (gridArea.Id.Value != default) return new GridAreaId(destination.Id);
-
-            // Create the GridAreaLink here if it's a new GridArea
-            var gridAreaLink = new GridAreaLinkEntity { Id = Guid.NewGuid(), GridAreaID = destination.Id };
-            _marketParticipantDbContext.GridAreaLinks.Add(gridAreaLink);
-
             return new GridAreaId(destination.Id);
         }
 

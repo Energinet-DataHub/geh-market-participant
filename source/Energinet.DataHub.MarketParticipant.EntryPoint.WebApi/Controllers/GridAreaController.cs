@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -35,36 +36,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("{organizationId:guid}/contact")]
-        public async Task<IActionResult> CreateContactAsync(Guid organizationId, CreateContactDto contactDto)
+        [HttpPost]
+        public async Task<IActionResult> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    var createContactCommand = new CreateContactCommand(organizationId, contactDto);
+                    var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
 
                     var response = await _mediator
-                        .Send(createContactCommand)
+                        .Send(createGridAreaCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response.ContactId.ToString());
-                },
-                _logger).ConfigureAwait(false);
-        }
-
-        [HttpDelete("{organizationId:guid}/contact/{contactId:guid}")]
-        public async Task<IActionResult> DeleteContactAsync(Guid organizationId, Guid contactId)
-        {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var deleteContactCommand = new DeleteContactCommand(organizationId, contactId);
-
-                    var response = await _mediator
-                        .Send(deleteContactCommand)
-                        .ConfigureAwait(false);
-
-                    return Ok(response);
+                    return Ok(response.GridAreaId.ToString());
                 },
                 _logger).ConfigureAwait(false);
         }

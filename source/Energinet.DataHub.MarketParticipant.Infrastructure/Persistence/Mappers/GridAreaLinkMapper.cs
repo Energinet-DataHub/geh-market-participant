@@ -13,8 +13,23 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
-    public sealed record CreateGridAreaResponse(GridAreaId GridAreaId);
+    internal sealed class GridAreaLinkMapper
+    {
+        public static void MapToEntity(GridAreaLink from, GridAreaLinkEntity to)
+        {
+            to.Id = from.Id.Value;
+            to.GridAreaID = from.GridAreaId.Value;
+        }
+
+        public static GridAreaLink MapFromEntity(GridAreaLinkEntity from)
+        {
+            return new GridAreaLink(
+                new GridAreaLinkId(from.Id),
+                new GridAreaId(from.GridAreaID));
+        }
+    }
 }

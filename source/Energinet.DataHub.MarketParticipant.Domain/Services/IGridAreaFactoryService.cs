@@ -30,8 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="priceAreaCode">The PriceAreaCode <see cref="PriceAreaCode"/> of the new Grid Area.</param>
         /// <returns>The created actor.</returns>
         Task<GridArea> CreateAsync(
-            string code,
-            string name,
+            GridAreaCode code,
+            GridAreaName name,
             PriceAreaCode priceAreaCode);
     }
 }

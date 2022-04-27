@@ -19,5 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
     public sealed record CreateGridAreaDto(
         string Name,
         string Code,
-        PriceAreaCode PriceAreaCode);
+        string PriceAreaCode);
 }
