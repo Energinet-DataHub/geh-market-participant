@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -44,9 +41,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             Address address,
             string? comment)
         {
-            Guard.ThrowIfNull(name, nameof(name));
-            Guard.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
-            Guard.ThrowIfNull(address, nameof(address));
+            ArgumentNullException.ThrowIfNull(name, nameof(name));
+            ArgumentNullException.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
+            ArgumentNullException.ThrowIfNull(address, nameof(address));
 
             var newOrganization = new Organization(name, businessRegisterIdentifier, address, comment);
 

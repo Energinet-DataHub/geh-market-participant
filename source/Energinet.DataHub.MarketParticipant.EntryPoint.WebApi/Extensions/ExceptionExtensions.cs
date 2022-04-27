@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions
     {
         public static void Log(this Exception source, ILogger logger)
         {
-            Guard.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
 
             if (source is not FluentValidationException or DataAnnotationException)
             {
@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions
 
         public static IActionResult AsIActionResult(this Exception source)
         {
-            Guard.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
 
             return source switch
             {

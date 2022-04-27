@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         public IEnumerable<BusinessRoleCode> GetBusinessRoleCodes(IEnumerable<MarketRole> marketRoles)
         {
-            Guard.ThrowIfNull(marketRoles, nameof(marketRoles));
+            ArgumentNullException.ThrowIfNull(marketRoles, nameof(marketRoles));
 
             var lookup = new Dictionary<EicFunction, BusinessRoleCode>();
 

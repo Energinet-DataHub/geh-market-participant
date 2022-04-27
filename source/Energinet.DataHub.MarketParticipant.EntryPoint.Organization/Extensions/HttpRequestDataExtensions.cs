@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions
             Stream stream,
             HttpStatusCode statusCode = HttpStatusCode.OK)
         {
-            Guard.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
 
             var response = source.CreateResponse(statusCode);
             response.Body = stream;
@@ -45,8 +45,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions
             Func<Task<HttpResponseData>> worker,
             [CallerFilePath] string? callerFilePath = null)
         {
-            Guard.ThrowIfNull(request, nameof(request));
-            Guard.ThrowIfNull(worker, nameof(worker));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(worker, nameof(worker));
 
             var callerClass = Path.GetFileNameWithoutExtension(callerFilePath)!;
             var logger = request.FunctionContext.GetLogger(callerClass);

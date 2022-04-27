@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
         {
-            Guard.ThrowIfNull(organization, nameof(organization));
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
 
             OrganizationEntity destination;
 
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<Organization?> GetAsync(OrganizationId id)
         {
-            Guard.ThrowIfNull(id, nameof(id));
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
 
             var org = await GetOrganizationQuery()
                 .FirstOrDefaultAsync(x => x.Id == id.Value)
@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber)
         {
-            Guard.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
+            ArgumentNullException.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
 
             var organizations = await GetOrganizationQuery()
                 .Where(x => x.Actors.Any(y => y.Gln == globalLocationNumber.Value))

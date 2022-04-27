@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
     {
         public void Configure(EntityTypeBuilder<DomainEventEntity> builder)
         {
-            Guard.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
 
             builder.ToTable("DomainEvent");
             builder.HasKey(x => x.Id);

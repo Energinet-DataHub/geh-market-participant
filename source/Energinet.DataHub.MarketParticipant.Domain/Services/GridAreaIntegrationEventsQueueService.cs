@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         public Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea)
         {
-            Guard.ThrowIfNull(gridArea, nameof(gridArea));
+            ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
 
             var gridAreaUpdatedEvent = new GridAreaUpdatedIntegrationEvent
             {
