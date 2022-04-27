@@ -30,8 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions
             ILogger logger,
             [CallerFilePath] string? callerFilePath = null)
         {
-            Guard.ThrowIfNull(controller, nameof(controller));
-            Guard.ThrowIfNull(worker, nameof(worker));
+            ArgumentNullException.ThrowIfNull(controller, nameof(controller));
+            ArgumentNullException.ThrowIfNull(worker, nameof(worker));
 
             var callerClass = Path.GetFileNameWithoutExtension(callerFilePath)!;
 

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Mappers
 {
@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
     {
         public static ContactDto Map(Contact contact)
         {
-            Guard.ThrowIfNull(contact, nameof(contact));
+            ArgumentNullException.ThrowIfNull(contact, nameof(contact));
             return new ContactDto(
                 contact.Id.Value,
                 contact.Category.Name,

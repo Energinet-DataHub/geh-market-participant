@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
         public async Task<Unit> Handle(DeleteContactCommand request, CancellationToken cancellationToken)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             await _organizationExistsHelperService
                 .EnsureOrganizationExistsAsync(request.OrganizationId)

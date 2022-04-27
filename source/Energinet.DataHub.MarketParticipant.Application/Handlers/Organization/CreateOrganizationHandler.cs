@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
 
         public async Task<CreateOrganizationResponse> Handle(CreateOrganizationCommand request, CancellationToken cancellationToken)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var address = new Address(
                 request.Organization.Address.StreetName,
