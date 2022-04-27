@@ -22,7 +22,7 @@ module "app_webapi" {
   location                                  = azurerm_resource_group.this.location
   app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value
-  dotnet_framework_version                  = "v5.0"
+  dotnet_framework_version                  = "v6.0"
 
   app_settings                              = {
     APPINSIGHTS_INSTRUMENTATIONKEY          = "${data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value}"

@@ -28,10 +28,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             return new OrganizationDto(
                 organization.Id.ToString(),
                 organization.Name,
-                organization.Actors.Select(Map).ToList(),
                 organization.BusinessRegisterIdentifier.Identifier,
-                Map(organization.Address),
-                organization.Comment);
+                organization.Comment,
+                organization.Actors.Select(Map).ToList(),
+                Map(organization.Address));
         }
 
         public static ActorDto Map(Actor actor)

@@ -12,11 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment);
+    public abstract record BaseIntegrationEvent
+    {
+        /// <summary>
+        /// A base event representing a change.
+        /// </summary>
+        /// <param name="id">Unique integration event ID.</param>
+        protected BaseIntegrationEvent(Guid id)
+        {
+            Id = id;
+        }
+
+        public Guid Id { get; }
+    }
 }

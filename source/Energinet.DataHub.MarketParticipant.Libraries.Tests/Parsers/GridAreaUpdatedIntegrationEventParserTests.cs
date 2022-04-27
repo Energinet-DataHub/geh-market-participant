@@ -36,7 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 "TestArea",
                 "123",
-                PriceAreaCode.DK1);
+                PriceAreaCode.DK1,
+                Guid.NewGuid());
 
             // act
             var actualBytes = target.Parse(@event);
@@ -48,6 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             Assert.Equal(@event.Name, actualEvent.Name);
             Assert.Equal(@event.GridAreaId, actualEvent.GridAreaId);
             Assert.Equal(@event.PriceAreaCode, actualEvent.PriceAreaCode);
+            Assert.Equal(@event.GridAreaLinkId, actualEvent.GridAreaLinkId);
         }
 
         [Fact]
@@ -57,11 +59,50 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var target = new GridAreaUpdatedIntegrationEventParser();
             var contract = new GridAreaUpdatedIntegrationEventContract
             {
-                Id = "Not_A_Giud",
+                Id = "Not_A_Guid",
                 Name = "fake_value",
                 Code = "123",
                 GridAreaId = Guid.NewGuid().ToString(),
-                PriceAreaCode = (int)PriceAreaCode.DK1
+                PriceAreaCode = (int)PriceAreaCode.DK1,
+                GridAreaLinkId = Guid.NewGuid().ToString()
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
+        public void Parse_InvaliGridAreaGuid_ThrowsException()
+        {
+            // Arrange
+            var target = new GridAreaUpdatedIntegrationEventParser();
+            var contract = new GridAreaUpdatedIntegrationEventContract
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "fake_value",
+                Code = "123",
+                GridAreaId = "Not_A_Guid",
+                PriceAreaCode = (int)PriceAreaCode.DK1,
+                GridAreaLinkId = Guid.NewGuid().ToString()
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
+        public void Parse_InvaliGridAreaLinkGuid_ThrowsException()
+        {
+            // Arrange
+            var target = new GridAreaUpdatedIntegrationEventParser();
+            var contract = new GridAreaUpdatedIntegrationEventContract
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "fake_value",
+                Code = "123",
+                GridAreaId = Guid.NewGuid().ToString(),
+                PriceAreaCode = (int)PriceAreaCode.DK1,
+                GridAreaLinkId = "Not_A_Giud"
             };
 
             // Act + Assert

@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act + Assert
             var exception = await Assert
-                .ThrowsAsync<FlurlHttpException>(() => target.GetOrganizationsAsync())
+                .ThrowsAsync<MarketParticipantException>(() => target.GetOrganizationsAsync())
                 .ConfigureAwait(false);
             Assert.Equal(exception.StatusCode, (int)HttpStatusCode.Unauthorized);
         }
@@ -628,7 +628,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     orgId,
                     actorId,
                     new ChangeActorDto(
-                        ActorStatus.Active.ToString(),
+                        ActorStatus.Active,
                         new[] { new MarketRoleDto(EicFunction.EnergySupplier) }))
                 .ConfigureAwait(false);
 

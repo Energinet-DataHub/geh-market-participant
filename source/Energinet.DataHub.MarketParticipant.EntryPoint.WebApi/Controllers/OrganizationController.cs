@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(createOrganizationCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response.OrganizationId);
+                    return Ok(response.OrganizationId.ToString());
                 },
                 _logger).ConfigureAwait(false);
         }

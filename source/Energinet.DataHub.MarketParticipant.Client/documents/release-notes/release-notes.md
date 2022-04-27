@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.0.0
+
+- .NET 6 upgrade
+
 ## Version 0.2.1
 
 - Preparing package for release.
@@ -34,3 +38,11 @@
 ## Version 0.5.2
 
 - Added Comment to Organization
+
+## Version 0.5.3
+
+- Added error handling.
+
+## Version 0.5.4
+
+- Fixed incorrect null properties.

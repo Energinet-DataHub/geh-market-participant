@@ -14,12 +14,14 @@
 
 using System;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
 {
     public sealed class SqlDatabaseVerifier : ISqlDatabaseVerifier
     {
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<bool> VerifyAsync(string connectionString)
         {
             try
