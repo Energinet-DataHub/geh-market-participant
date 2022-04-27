@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>()));
+                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<MeteringPointType>()));
 
             // Act + Assert
             await Assert
@@ -116,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>()));
+                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<MeteringPointType>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -155,7 +155,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>()));
+                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<MeteringPointType>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

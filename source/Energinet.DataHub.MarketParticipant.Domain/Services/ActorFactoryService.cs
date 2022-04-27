@@ -75,6 +75,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
 
+            foreach (var meteringPointType in meteringPointTypes.DistinctBy(e => e.Value))
+                newActor.MeteringPointTypes.Add(meteringPointType);
+
             organization.Actors.Add(newActor);
 
             var uow = await _unitOfWorkProvider

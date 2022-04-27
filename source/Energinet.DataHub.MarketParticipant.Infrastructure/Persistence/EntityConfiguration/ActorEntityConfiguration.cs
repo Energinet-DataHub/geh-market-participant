@@ -41,12 +41,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         }
 
         private static void ConfigureMeteringTypes(
-            OwnedNavigationBuilder<ActorEntity, MeteringPointType> meteringPointTypeBuilder)
+            OwnedNavigationBuilder<ActorEntity, MeteringPointTypeEntity> meteringPointTypeBuilder)
         {
             meteringPointTypeBuilder.WithOwner().HasForeignKey("ActorInfoId");
             meteringPointTypeBuilder.ToTable("ActorInfoMeteringType");
             meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
-            meteringPointTypeBuilder.Property(p => p.Value).HasColumnName("MeteringTypeId");
+            meteringPointTypeBuilder.Property(p => p.MeteringTypeId).HasColumnName("MeteringTypeId");
         }
     }
 }
