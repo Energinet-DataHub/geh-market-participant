@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.SimpleInjector
 
         public object CreateInstance(Type instanceType, FunctionContext context)
         {
-            Guard.ThrowIfNull(instanceType, nameof(instanceType));
+            ArgumentNullException.ThrowIfNull(instanceType, nameof(instanceType));
 
             return _container.GetInstance(instanceType);
         }

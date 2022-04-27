@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 
         public static Func<string, bool> GetFilter(string[] args)
         {
-            Guard.ThrowIfNull(args, nameof(args));
+            ArgumentNullException.ThrowIfNull(args, nameof(args));
 
             var environment = GetEnvironmentArgument(args)
                 .Replace("-", "_", StringComparison.InvariantCulture)

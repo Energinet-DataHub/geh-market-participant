@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure
 
         public UnitOfWorkProvider(IMarketParticipantDbContext marketParticipantDbContext)
         {
-            Guard.ThrowIfNull(marketParticipantDbContext, nameof(marketParticipantDbContext));
+            ArgumentNullException.ThrowIfNull(marketParticipantDbContext, nameof(marketParticipantDbContext));
 
             if (marketParticipantDbContext is not DbContext context)
                 throw new InvalidOperationException($"{nameof(IMarketParticipantDbContext)} must inherit {nameof(DbContext)}");

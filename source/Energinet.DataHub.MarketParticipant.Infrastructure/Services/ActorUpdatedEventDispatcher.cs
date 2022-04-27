@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
@@ -19,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 #pragma warning disable
 
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
-            Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+            ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
             if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;

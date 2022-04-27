@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
         {
             try
             {
-                Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
                 var contract = new OrganizationUpdatedIntegrationEventContract()
                 {
