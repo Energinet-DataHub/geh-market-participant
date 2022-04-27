@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Mappers
 {
@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
     {
         public static OrganizationDto Map(Organization organization)
         {
-            Guard.ThrowIfNull(organization, nameof(organization));
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
             return new OrganizationDto(
                 organization.Id.ToString(),
                 organization.Name,
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
 
         public static ActorDto Map(Actor actor)
         {
-            Guard.ThrowIfNull(actor, nameof(actor));
+            ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             return new ActorDto(
                 actor.Id.ToString(),
                 actor.ExternalActorId.ToString(),

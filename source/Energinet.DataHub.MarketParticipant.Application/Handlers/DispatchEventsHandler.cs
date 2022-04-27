@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
         public async Task<Unit> Handle(DispatchEventsCommand request, CancellationToken cancellationToken)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             foreach (var domainEvent in await _domainEventRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
             {

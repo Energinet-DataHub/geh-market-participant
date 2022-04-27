@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -53,10 +53,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             IReadOnlyCollection<MarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes)
         {
-            Guard.ThrowIfNull(organization, nameof(organization));
-            Guard.ThrowIfNull(gln, nameof(gln));
-            Guard.ThrowIfNull(marketRoles, nameof(marketRoles));
-            Guard.ThrowIfNull(marketRoles, nameof(meteringPointTypes));
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+            ArgumentNullException.ThrowIfNull(gln, nameof(gln));
+            ArgumentNullException.ThrowIfNull(marketRoles, nameof(marketRoles));
+            ArgumentNullException.ThrowIfNull(meteringPointTypes, nameof(meteringPointTypes));
 
             await _uniqueGlobalLocationNumberRuleService
                 .ValidateGlobalLocationNumberAvailableAsync(organization, gln)

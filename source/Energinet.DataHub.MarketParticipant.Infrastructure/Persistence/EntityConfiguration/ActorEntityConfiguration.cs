@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
     {
         public void Configure(EntityTypeBuilder<ActorEntity> builder)
         {
-            Guard.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("ActorInfoNew");
             builder.HasKey(actor => actor.Id);
             builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
