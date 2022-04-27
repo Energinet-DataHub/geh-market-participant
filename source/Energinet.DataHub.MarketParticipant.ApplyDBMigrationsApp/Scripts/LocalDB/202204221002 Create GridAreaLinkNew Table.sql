@@ -9,7 +9,7 @@ CREATE TABLE [dbo].[GridAreaLinkNew](
          (
           [Id] ASC
              )
-         WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+         WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY],
      CONSTRAINT FK_GridAreaId_GridAreaNew FOREIGN KEY ([GridAreaId]) REFERENCES [dbo].[GridAreaNew]([Id])
 
 ) ON [PRIMARY]

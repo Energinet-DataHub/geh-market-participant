@@ -45,7 +45,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             ArgumentNullException.ThrowIfNull(priceAreaCode, nameof(priceAreaCode));
 
             var newGridArea = new GridArea(
-                new GridAreaId(Guid.Empty),
                 name,
                 code,
                 priceAreaCode);
@@ -56,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var savedGridArea = await SaveGridAreaAsync(newGridArea).ConfigureAwait(false);
 
-            var newGridAreaLink = new GridAreaLink(new GridAreaLinkId(Guid.Empty), savedGridArea.Id);
+            var newGridAreaLink = new GridAreaLink(savedGridArea.Id);
 
             var savedGridAreaLink = await SaveGridAreaLinkAsync(newGridAreaLink).ConfigureAwait(false);
 

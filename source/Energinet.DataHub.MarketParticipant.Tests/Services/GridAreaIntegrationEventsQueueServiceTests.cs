@@ -38,7 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
                 PriceAreaCode.DK1);
-            var gridAreaLink = new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), gridAreaId);
+            var gridAreaLink = new GridAreaLink(gridAreaId);
+
             // Act
             await target.EnqueueGridAreaUpdatedEventAsync(gridArea, gridAreaLink).ConfigureAwait(false);
 
@@ -55,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new GridAreaIntegrationEventsQueueService(domainEventRepository.Object);
             var gridAreaId = new GridAreaId(Guid.NewGuid());
-            var gridAreaLink = new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), gridAreaId);
+            var gridAreaLink = new GridAreaLink(gridAreaId);
 
             // Act + Assert
             await Assert
