@@ -33,6 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         public Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink)
         {
             ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
+            ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
 
             var gridAreaUpdatedEvent = new GridAreaUpdatedIntegrationEvent
             {

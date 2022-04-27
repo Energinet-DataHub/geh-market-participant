@@ -22,7 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 

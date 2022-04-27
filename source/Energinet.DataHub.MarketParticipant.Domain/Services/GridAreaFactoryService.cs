@@ -16,7 +16,6 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -41,9 +40,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         public async Task<GridArea> CreateAsync(GridAreaCode code, GridAreaName name, PriceAreaCode priceAreaCode)
         {
-            Guard.ThrowIfNull(code, nameof(code));
-            Guard.ThrowIfNull(name, nameof(name));
-            Guard.ThrowIfNull(priceAreaCode, nameof(priceAreaCode));
+            ArgumentNullException.ThrowIfNull(code, nameof(code));
+            ArgumentNullException.ThrowIfNull(name, nameof(name));
+            ArgumentNullException.ThrowIfNull(priceAreaCode, nameof(priceAreaCode));
 
             var newGridArea = new GridArea(
                 new GridAreaId(Guid.Empty),
