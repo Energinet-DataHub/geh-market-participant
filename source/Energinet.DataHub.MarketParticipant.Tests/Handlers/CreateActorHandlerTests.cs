@@ -82,12 +82,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>()))
+                    It.IsAny<IReadOnlyCollection<MarketRole>>(),
+                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>()));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>(), Array.Empty<MeteringPointType>()));
 
             // Act
             var response = await target
@@ -136,12 +137,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>()))
+                    It.IsAny<IReadOnlyCollection<MarketRole>>(),
+                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }, Array.Empty<MeteringPointType>()));
 
             // Act
             var response = await target

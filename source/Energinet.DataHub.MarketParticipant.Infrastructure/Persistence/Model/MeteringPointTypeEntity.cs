@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record ActorDto(
-        string ActorId,
-        string ExternalActorId,
-        GlobalLocationNumberDto Gln,
-        string Status,
-        IEnumerable<MarketRoleDto> MarketRoles,
-        IEnumerable<MeteringPointType> MeteringPointTypes);
+    public class MeteringPointTypeEntity
+    {
+        public Guid Id { get; set; }
+        public Guid ActorInfoId { get; set; }
+        public int MeteringTypeId { get; set; }
+    }
 }

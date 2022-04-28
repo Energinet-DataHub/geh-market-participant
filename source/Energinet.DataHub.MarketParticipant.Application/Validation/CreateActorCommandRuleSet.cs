@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -49,6 +50,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .IsEnumName(typeof(EicFunction), false);
                                 });
+                        });
+                    validator
+                        .RuleFor(actor => actor.MeteringPointTypes)
+                        .NotNull()
+                        .ChildRules(rolesValidator =>
+                        {
+                            rolesValidator
+                                .RuleForEach(x => x)
+                                .SetValidator(new MeteringPointTypeValidationRule<IEnumerable<MeteringPointType>>());
                         });
                 });
         }
