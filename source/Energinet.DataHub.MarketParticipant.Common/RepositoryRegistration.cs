@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IGridAreaRepository, GridAreaRepository>(Lifestyle.Scoped);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
             container.Register<IDomainEventRepository, DomainEventRepository>(Lifestyle.Scoped);
+            container.Register<IGridAreaLinkRepository, GridAreaLinkRepository>(Lifestyle.Scoped);
         }
     }
 }

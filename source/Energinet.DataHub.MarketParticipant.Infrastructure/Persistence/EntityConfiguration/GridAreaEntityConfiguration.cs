@@ -15,7 +15,6 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -29,9 +28,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("GridAreaNew");
             builder.HasKey(gridArea => gridArea.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
-            builder.Property(p => p.PriceAreaCode).HasConversion(
-                to => to.Name,
-                from => PriceAreaCode.FromName(from, true));
+            builder.Property(p => p.PriceAreaCode)
+                .HasConversion(
+                    to => to.Name,
+                    from => PriceAreaCode.FromName(from, true));
         }
     }
 }

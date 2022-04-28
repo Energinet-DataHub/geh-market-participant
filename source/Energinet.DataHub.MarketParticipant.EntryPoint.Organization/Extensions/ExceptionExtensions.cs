@@ -20,7 +20,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using DataAnnotationException = System.ComponentModel.DataAnnotations.ValidationException;

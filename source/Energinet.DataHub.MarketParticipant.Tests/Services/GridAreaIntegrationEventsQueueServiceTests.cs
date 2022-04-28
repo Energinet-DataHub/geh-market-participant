@@ -32,20 +32,55 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new GridAreaIntegrationEventsQueueService(domainEventRepository.Object);
-
+            var gridAreaId = new GridAreaId(Guid.NewGuid());
             var gridArea = new GridArea(
-                new GridAreaId(Guid.NewGuid()),
+                gridAreaId,
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
                 PriceAreaCode.DK1);
+            var gridAreaLink = new GridAreaLink(gridAreaId);
 
             // Act
-            await target.EnqueueGridAreaUpdatedEventAsync(gridArea).ConfigureAwait(false);
+            await target.EnqueueGridAreaUpdatedEventAsync(gridArea, gridAreaLink).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
                 x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == gridArea.Id.Value)),
                 Times.Once);
+        }
+
+        [Fact]
+        public async Task EnqueueGridAreaUpdatedEventAsync_GridAreaNull_ThrowsException()
+        {
+            // Arrange
+            var domainEventRepository = new Mock<IDomainEventRepository>();
+            var target = new GridAreaIntegrationEventsQueueService(domainEventRepository.Object);
+            var gridAreaId = new GridAreaId(Guid.NewGuid());
+            var gridAreaLink = new GridAreaLink(gridAreaId);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueGridAreaUpdatedEventAsync(null!, gridAreaLink))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task EnqueueGridAreaUpdatedEventAsync_GridAreaLinkNull_ThrowsException()
+        {
+            // Arrange
+            var domainEventRepository = new Mock<IDomainEventRepository>();
+            var target = new GridAreaIntegrationEventsQueueService(domainEventRepository.Object);
+            var gridAreaId = new GridAreaId(Guid.NewGuid());
+            var gridArea = new GridArea(
+                gridAreaId,
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.DK1);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueGridAreaUpdatedEventAsync(gridArea, null!))
+                .ConfigureAwait(false);
         }
     }
 }

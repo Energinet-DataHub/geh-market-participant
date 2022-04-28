@@ -182,7 +182,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new[]
                 {
                     new GridArea(
-                        new GridAreaId(Guid.Empty),
                         new GridAreaName("fake_value"),
                         new GridAreaCode("1234"),
                         PriceAreaCode.DK1)
@@ -222,7 +221,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var expected = new GridArea(
-                new GridAreaId(Guid.Empty),
                 new GridAreaName("fake_value"),
                 new GridAreaCode("1234"),
                 PriceAreaCode.DK1);

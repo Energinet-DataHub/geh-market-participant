@@ -35,7 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
 
             GridAreaEntity destination;
-
             if (gridArea.Id.Value == default)
             {
                 destination = new GridAreaEntity();
@@ -52,6 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _marketParticipantDbContext.GridAreas.Update(destination);
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
             return new GridAreaId(destination.Id);
         }
 
