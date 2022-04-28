@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common.SimpleInjector

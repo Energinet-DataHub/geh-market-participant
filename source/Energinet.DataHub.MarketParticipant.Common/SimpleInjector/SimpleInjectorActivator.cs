@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Azure.Functions.Worker;
 using SimpleInjector;
 

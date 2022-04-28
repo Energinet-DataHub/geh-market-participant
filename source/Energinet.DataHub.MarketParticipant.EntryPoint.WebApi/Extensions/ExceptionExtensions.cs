@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

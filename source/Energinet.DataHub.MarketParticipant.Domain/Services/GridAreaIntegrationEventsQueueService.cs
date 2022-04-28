@@ -30,16 +30,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea)
+        public Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink)
         {
             ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
+            ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
 
             var gridAreaUpdatedEvent = new GridAreaUpdatedIntegrationEvent
             {
                 GridAreaId = gridArea.Id,
                 Code = gridArea.Code,
                 Name = gridArea.Name,
-                PriceAreaCode = gridArea.PriceAreaCode
+                PriceAreaCode = gridArea.PriceAreaCode,
+                GridAreaLinkId = gridAreaLink.Id
             };
 
             var domainEvent = new DomainEvent(gridArea.Id.Value, nameof(GridArea), gridAreaUpdatedEvent);
