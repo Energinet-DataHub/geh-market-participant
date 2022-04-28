@@ -72,6 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             UpdateActorMarketRoles(organization, actor, request);
 
+            UpdateActorMeteringPointTypes(actor, request);
+
             await using var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
@@ -87,6 +89,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             await uow.CommitAsync().ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private static void UpdateActorMeteringPointTypes(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.MeteringPointTypes.Clear();
+            var meteringPointTypesToAdd = request.ChangeActor.MeteringPointTypes.DistinctBy(type => type.Value);
+
+            foreach (var meteringPointTypeDto in meteringPointTypesToAdd)
+            {
+                var meteringPintType = MeteringPointType.FromValue(meteringPointTypeDto.Value);
+                actor.MeteringPointTypes.Add(meteringPintType);
+            }
         }
 
         private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
