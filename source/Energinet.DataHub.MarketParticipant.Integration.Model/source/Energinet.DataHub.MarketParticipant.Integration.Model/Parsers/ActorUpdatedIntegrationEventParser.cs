@@ -37,7 +37,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Gln = integrationEvent.Gln,
                     Status = (int)integrationEvent.Status,
-                    GridAreaIds = { integrationEvent.GridAreas.Select(x => x.ToString()) }
+                    GridAreaIds = { integrationEvent.GridAreas.Select(x => x.ToString()) },
+                    MeteringPointTypes = { integrationEvent.MeteringPointTypes }
                 };
 
                 foreach (var x in integrationEvent.BusinessRoles)
