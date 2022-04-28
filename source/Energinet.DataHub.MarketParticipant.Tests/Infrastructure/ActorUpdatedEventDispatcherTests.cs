@@ -50,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
             integrationEvent.MarketRoles.Add(EicFunction.BalancingServiceProvider);
             integrationEvent.GridAreas.Add(new GridAreaId(Guid.NewGuid()));
+            integrationEvent.MeteringPointTypes.Add(MeteringPointType.E17Consumption.Name);
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
@@ -67,6 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
             Assert.Equal((int)integrationEvent.MarketRoles.Single(), (int)actualEvent.MarketRoles.Single());
             Assert.Equal(integrationEvent.GridAreas.Single().Value.ToString(), actualEvent.GridAreas.Single().ToString());
+            Assert.Equal(integrationEvent.MeteringPointTypes.Single(), actualEvent.MeteringPointTypes.Single());
         }
 
         [Fact]
