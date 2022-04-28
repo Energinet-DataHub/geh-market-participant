@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
@@ -34,7 +35,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(gridArea => gridArea.Code)
                         .NotEmpty()
-                        .Length(1, 4);
+                        .Length(1, 3)
+                        .Must(code => int.TryParse(code, NumberStyles.None, CultureInfo.InvariantCulture, out _));
 
                     validator
                         .RuleFor(gridArea => gridArea.PriceAreaCode)
