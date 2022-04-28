@@ -54,7 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
                 actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
                 actorUpdatedIntegrationEvent.MarketRoles.Select(x => (EicFunction)x),
-                actorUpdatedIntegrationEvent.GridAreas.Select(x => x.Value));
+                actorUpdatedIntegrationEvent.GridAreas.Select(x => x.Value),
+                actorUpdatedIntegrationEvent.MeteringPointTypes);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
