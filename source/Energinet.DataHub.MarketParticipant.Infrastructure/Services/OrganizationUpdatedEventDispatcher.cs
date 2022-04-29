@@ -50,10 +50,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 organizationUpdatedIntegrationEvent.Name,
                 organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
                 new Address(
-                    organizationUpdatedIntegrationEvent.Address.StreetName,
-                    organizationUpdatedIntegrationEvent.Address.Number,
-                    organizationUpdatedIntegrationEvent.Address.ZipCode,
-                    organizationUpdatedIntegrationEvent.Address.City,
+                    organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
                     organizationUpdatedIntegrationEvent.Address.Country
                     )
                 );
