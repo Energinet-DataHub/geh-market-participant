@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 destination = await _marketParticipantDbContext
                     .GridAreas
                     .FindAsync(gridArea.Id.Value)
-                    .ConfigureAwait(false);
+                    .ConfigureAwait(false) ?? throw new InvalidOperationException($"GridArea with id {gridArea.Id.Value} is missing, even though it cannot be deleted.");
             }
 
             GridAreaMapper.MapToEntity(gridArea, destination);
