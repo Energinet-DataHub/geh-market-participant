@@ -24,3 +24,11 @@
 ## Version 2.0.1
 
 - Public parse methods for helping with integration testing.
+
+## Version 2.0.3
+
+- Added metering point types.
+
+## Version 2.0.4
+
+- Address fields can no longer be null, but may be empty.
