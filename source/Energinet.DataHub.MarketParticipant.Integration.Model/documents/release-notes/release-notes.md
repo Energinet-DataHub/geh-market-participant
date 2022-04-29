@@ -31,4 +31,4 @@
 
 ## Version 2.0.4
 
-- Adress fields can no longer be null, but may be empty.
+- Address fields can no longer be null, but may be empty.
