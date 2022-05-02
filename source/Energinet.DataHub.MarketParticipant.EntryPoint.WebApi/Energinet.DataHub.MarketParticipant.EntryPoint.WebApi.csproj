@@ -40,11 +40,4 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Common\Energinet.DataHub.MarketParticipant.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
