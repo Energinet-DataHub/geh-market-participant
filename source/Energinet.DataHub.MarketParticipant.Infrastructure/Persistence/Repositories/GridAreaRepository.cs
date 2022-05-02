@@ -42,10 +42,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
             else
             {
-                destination = await _marketParticipantDbContext
+                destination = (await _marketParticipantDbContext
                     .GridAreas
                     .FindAsync(gridArea.Id.Value)
-                    .ConfigureAwait(false);
+                    .ConfigureAwait(false))!;
             }
 
             GridAreaMapper.MapToEntity(gridArea, destination);

@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                  .FindAsync(contact.Id.Value)
                  .ConfigureAwait(false);
 
-            _marketParticipantDbContext.Contacts.Remove(entity);
+            _marketParticipantDbContext.Contacts.Remove(entity!);
 
             await _marketParticipantDbContext
                 .SaveChangesAsync()
