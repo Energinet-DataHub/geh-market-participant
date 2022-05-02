@@ -20,7 +20,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
 using DataAnnotationException = System.ComponentModel.DataAnnotations.ValidationException;
@@ -33,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions
     {
         public static void Log(this Exception source, ILogger logger)
         {
-            Guard.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
 
             if (source is not FluentValidationException or DataAnnotationException)
             {
@@ -65,8 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Extensions
                 return request.CreateResponse(stream, httpStatusCode);
             }
 
-            Guard.ThrowIfNull(source, nameof(source));
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             return source switch
             {

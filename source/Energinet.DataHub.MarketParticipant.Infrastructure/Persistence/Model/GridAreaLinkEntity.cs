@@ -13,28 +13,12 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Utilities;
-using Xunit;
-using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Utilities
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    [UnitTest]
-    public class GuardTests
+    public sealed class GridAreaLinkEntity
     {
-        [Fact]
-        public void ThrowIfNull_UsesCorrectParameterName()
-        {
-            // Arrange + Act
-            var exception = Assert.Throws<ArgumentNullException>(() => TestMethod(null!));
-
-            // Assert
-            Assert.Equal("str", exception.ParamName);
-        }
-
-        private static void TestMethod(string str)
-        {
-            Guard.ThrowIfNull(str, nameof(str));
-        }
+        public Guid Id { get; set; }
+        public Guid GridAreaID { get; set; }
     }
 }

@@ -55,7 +55,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 null!,
                 new GlobalLocationNumber("fake_value"),
-                Array.Empty<MarketRole>())).ConfigureAwait(false);
+                Array.Empty<MarketRole>(),
+                Array.Empty<MeteringPointType>())).ConfigureAwait(false);
         }
 
         [Fact]
@@ -75,7 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 null!,
-                Array.Empty<MarketRole>())).ConfigureAwait(false);
+                Array.Empty<MarketRole>(),
+                Array.Empty<MeteringPointType>())).ConfigureAwait(false);
         }
 
         [Fact]
@@ -95,7 +97,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 new GlobalLocationNumber("fake_value"),
-                null!)).ConfigureAwait(false);
+                null!,
+                Array.Empty<MeteringPointType>())).ConfigureAwait(false);
         }
 
         [Fact]
@@ -124,7 +127,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             var response = await target
-                .CreateAsync(organization, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>())
+                .CreateAsync(organization, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>(), Array.Empty<MeteringPointType>())
                 .ConfigureAwait(false);
 
             // Assert
@@ -193,7 +196,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organizationBeforeUpdate, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>())
+                .CreateAsync(organizationBeforeUpdate, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>(), Array.Empty<MeteringPointType>())
                 .ConfigureAwait(false);
 
             // Assert
@@ -232,7 +235,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organization, globalLocationNumber, Array.Empty<MarketRole>())
+                .CreateAsync(organization, globalLocationNumber, Array.Empty<MarketRole>(), Array.Empty<MeteringPointType>())
                 .ConfigureAwait(false);
 
             // Assert
@@ -259,6 +262,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
             var marketRoles = new[] { new MarketRole(EicFunction.BalanceResponsibleParty) };
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
 
             activeDirectory
                 .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
@@ -270,7 +274,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organization, globalLocationNumber, marketRoles)
+                .CreateAsync(organization, globalLocationNumber, marketRoles, meteringPointTypes)
                 .ConfigureAwait(false);
 
             // Assert

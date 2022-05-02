@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    internal static class Guard
+    public class MeteringPointTypeEntity
     {
-        public static void ThrowIfNull(object element, string name)
-        {
-            if (element is null)
-            {
-                throw new System.ArgumentNullException(name);
-            }
-        }
+        public Guid Id { get; set; }
+        public Guid ActorInfoId { get; set; }
+        public int MeteringTypeId { get; set; }
     }
 }

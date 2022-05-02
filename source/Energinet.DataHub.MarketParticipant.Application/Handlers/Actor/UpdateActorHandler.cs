@@ -25,7 +25,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -55,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var organization = await _organizationExistsHelperService
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
@@ -73,6 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             UpdateActorMarketRoles(organization, actor, request);
 
+            UpdateActorMeteringPointTypes(actor, request);
+
             await using var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
@@ -88,6 +89,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             await uow.CommitAsync().ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private static void UpdateActorMeteringPointTypes(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.MeteringPointTypes.Clear();
+            var meteringPointTypesToAdd = request.ChangeActor.MeteringPointTypes.DistinctBy(type => type.Value);
+
+            foreach (var meteringPointTypeDto in meteringPointTypesToAdd)
+            {
+                var meteringPintType = MeteringPointType.FromValue(meteringPointTypeDto.Value);
+                actor.MeteringPointTypes.Add(meteringPintType);
+            }
         }
 
         private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)

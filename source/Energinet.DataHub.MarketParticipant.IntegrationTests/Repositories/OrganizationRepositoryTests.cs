@@ -182,7 +182,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new[]
                 {
                     new GridArea(
-                        new GridAreaId(Guid.Empty),
                         new GridAreaName("fake_value"),
                         new GridAreaCode("1234"),
                         PriceAreaCode.DK1)
@@ -222,7 +221,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var expected = new GridArea(
-                new GridAreaId(Guid.Empty),
                 new GridAreaName("fake_value"),
                 new GridAreaCode("1234"),
                 PriceAreaCode.DK1);
@@ -286,6 +284,43 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Contains(
                 organization.Actors,
                 x => x.MarketRoles.All(y => y.Function == EicFunction.MeteringPointAdministrator));
+        }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_MeteringPointAdded_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+
+            var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
+
+            var someActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            someActor.MeteringPointTypes.Add(MeteringPointType.D02Analysis);
+            organization.Actors.Add(someActor);
+
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Act
+            var meteringPointAdministratorActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            meteringPointAdministratorActor.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
+            organization!.Actors.Add(meteringPointAdministratorActor);
+
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Equal(2, organization!.Actors.Count);
+            Assert.Contains(
+                organization.Actors,
+                x => x.MeteringPointTypes.Any(y => y.Value == MeteringPointType.D02Analysis.Value));
+            Assert.Contains(
+                organization.Actors,
+                x => x.MeteringPointTypes.Any(y => y.Value == MeteringPointType.D05NetProduction.Value));
         }
 
         [Fact]

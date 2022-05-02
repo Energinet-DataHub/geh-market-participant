@@ -19,7 +19,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
@@ -36,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<ExternalActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln)
         {
-            Guard.ThrowIfNull(gln, nameof(gln));
+            ArgumentNullException.ThrowIfNull(gln, nameof(gln));
 
             // This is a temporary implementation using the actor DB.
             // Will be replaced by Azure AD integration at a later time.

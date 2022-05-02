@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -30,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions
     {
         public static void Log(this Exception source, ILogger logger)
         {
-            Guard.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
 
             if (source is not FluentValidationException or DataAnnotationException)
             {
@@ -43,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions
 
         public static IActionResult AsIActionResult(this Exception source)
         {
-            Guard.ThrowIfNull(source, nameof(source));
+            ArgumentNullException.ThrowIfNull(source, nameof(source));
 
             return source switch
             {

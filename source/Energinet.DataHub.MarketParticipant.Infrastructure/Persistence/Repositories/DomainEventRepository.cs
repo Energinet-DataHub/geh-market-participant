@@ -25,7 +25,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -45,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<DomainEventId> InsertAsync(DomainEvent domainEvent)
         {
-            Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
+            ArgumentNullException.ThrowIfNull(domainEvent, nameof(domainEvent));
 
             var integrationEvent = domainEvent.IntegrationEvent;
 
@@ -71,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task UpdateAsync(DomainEvent domainEvent)
         {
-            Guard.ThrowIfNull(domainEvent, nameof(domainEvent));
+            ArgumentNullException.ThrowIfNull(domainEvent, nameof(domainEvent));
 
             var entity = await _context.DomainEvents.FindAsync(domainEvent.Id.Value).ConfigureAwait(false);
             if (entity == null)

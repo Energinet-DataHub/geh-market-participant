@@ -15,6 +15,7 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
@@ -42,13 +43,13 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetContactsCommand>, GetContactsCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateContactCommand>, CreateContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<DeleteContactCommand>, DeleteContactCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>(Lifestyle.Scoped);
 
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
             container.Register<IActiveDirectoryService, ActiveDirectoryService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IGridAreaUpdatedIntegrationEventParser, GridAreaUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationUpdatedIntegrationEventParser, OrganizationUpdatedIntegrationEventParser>(Lifestyle.Scoped);
-
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
         }
     }

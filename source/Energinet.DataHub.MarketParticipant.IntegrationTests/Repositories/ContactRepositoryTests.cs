@@ -174,6 +174,28 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
+        public async Task RemoveAsync_NonExistentContact_DoesNothing()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+            var contactRepository = new ContactRepository(context);
+
+            var testContact = new Contact(
+                new ContactId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                "fake_value",
+                ContactCategory.Charges,
+                new EmailAddress("fake@fake.dk"),
+                new PhoneNumber("1234567"));
+
+            // Act + Assert
+            await contactRepository.RemoveAsync(testContact).ConfigureAwait(false);
+        }
+
+        [Fact]
         public async Task GetAsync_DifferentContexts_CanReadBack()
         {
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);

@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 #pragma warning disable
 
@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
-            Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+            ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
             if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
@@ -50,10 +50,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 organizationUpdatedIntegrationEvent.Name,
                 organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
                 new Address(
-                    organizationUpdatedIntegrationEvent.Address.StreetName,
-                    organizationUpdatedIntegrationEvent.Address.Number,
-                    organizationUpdatedIntegrationEvent.Address.ZipCode,
-                    organizationUpdatedIntegrationEvent.Address.City,
+                    organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
                     organizationUpdatedIntegrationEvent.Address.Country
                     )
                 );

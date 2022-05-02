@@ -29,4 +29,5 @@ message ActorUpdatedIntegrationEventContract {
   repeated int32 BusinessRoles = 7;
   repeated int32 MarketRoles = 8;
   repeated string GridAreaIds = 9;
+  repeated string MeteringPointTypes = 10;
 }

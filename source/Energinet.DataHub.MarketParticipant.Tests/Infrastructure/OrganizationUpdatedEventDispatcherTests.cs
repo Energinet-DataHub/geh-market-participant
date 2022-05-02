@@ -36,8 +36,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var eventParser = new OrganizationUpdatedIntegrationEventParser();
-            var target = new OrganizationUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var organizationEventParser = new OrganizationUpdatedIntegrationEventParser();
+            var eventParser = new SharedIntegrationEventParser();
+            var target = new OrganizationUpdatedEventDispatcher(organizationEventParser, serviceBusClient.Object);
 
             var integrationEvent = new OrganizationUpdatedIntegrationEvent
             {
@@ -55,12 +56,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray());
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.Name, actualEvent.Name);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.Address.City, actualEvent.Address.City);

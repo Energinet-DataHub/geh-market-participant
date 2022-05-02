@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
@@ -39,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
         public async Task<Unit> Handle(DispatchEventsCommand request, CancellationToken cancellationToken)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             foreach (var domainEvent in await _domainEventRepository.GetOldestUnsentDomainEventsAsync(100).ConfigureAwait(false))
             {
