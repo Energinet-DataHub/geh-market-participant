@@ -15,7 +15,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using FluentValidation;
 using FluentValidation.Validators;
 

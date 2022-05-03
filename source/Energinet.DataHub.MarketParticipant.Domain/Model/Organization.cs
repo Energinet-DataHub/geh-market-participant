@@ -21,24 +21,51 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class Organization
     {
-        public Organization(string name)
+        public Organization(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address)
         {
             Id = new OrganizationId(Guid.Empty);
             Name = name;
             Actors = new Collection<Actor>();
+            BusinessRegisterIdentifier = businessRegisterIdentifier;
+            Address = address;
         }
 
-        public Organization(OrganizationId id, string name, IEnumerable<Actor> actors)
+        public Organization(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address, string? comment)
+        {
+            Id = new OrganizationId(Guid.Empty);
+            Name = name;
+            Actors = new Collection<Actor>();
+            BusinessRegisterIdentifier = businessRegisterIdentifier;
+            Address = address;
+            Comment = comment;
+        }
+
+        public Organization(
+            OrganizationId id,
+            string name,
+            IEnumerable<Actor> actors,
+            BusinessRegisterIdentifier businessRegisterIdentifier,
+            Address address,
+            string? comment)
         {
             Id = id;
             Name = name;
             Actors = actors.ToList();
+            BusinessRegisterIdentifier = businessRegisterIdentifier;
+            Address = address;
+            Comment = comment;
         }
 
         public OrganizationId Id { get; }
 
         public string Name { get; set; }
 
+        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; }
+
+        public Address Address { get; set; }
+
         public ICollection<Actor> Actors { get; }
+
+        public string? Comment { get; set; }
     }
 }

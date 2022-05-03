@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -30,7 +29,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="organization">The organization that will contain the new actor.</param>
         /// <param name="gln">The global location number of the new actor.</param>
         /// <param name="marketRoles">The market roles assigned to the new actor.</param>
+        /// <param name="meteringPointTypes">The meteringpoint types that are assigned to this actor</param>
         /// <returns>The created actor.</returns>
-        Task<Actor> CreateAsync(Organization organization, GlobalLocationNumber gln, IReadOnlyCollection<MarketRole> marketRoles);
+        Task<Actor> CreateAsync(
+            Organization organization,
+            GlobalLocationNumber gln,
+            IReadOnlyCollection<MarketRole> marketRoles,
+            IReadOnlyCollection<MeteringPointType> meteringPointTypes);
     }
 }

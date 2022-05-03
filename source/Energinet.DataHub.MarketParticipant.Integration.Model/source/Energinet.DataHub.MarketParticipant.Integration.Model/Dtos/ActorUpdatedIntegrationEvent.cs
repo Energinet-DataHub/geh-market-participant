@@ -17,7 +17,7 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record ActorUpdatedIntegrationEvent
+    public sealed record ActorUpdatedIntegrationEvent : BaseIntegrationEvent
     {
         /// <summary>
         /// An event representing an update to a given actor.
@@ -30,6 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="status">The status of the current actor.</param>
         /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
         /// <param name="marketRoles">The roles (functions) assigned to the current actor.</param>
+        /// <param name="gridAreas">The roles (grid areas) assigned to the current actor.</param>
+        /// <param name="meteringPointTypes"></param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
             Guid actorId,
@@ -38,9 +40,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             string gln,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
-            IEnumerable<EicFunction> marketRoles)
+            IEnumerable<EicFunction> marketRoles,
+            IEnumerable<Guid> gridAreas,
+            IEnumerable<string> meteringPointTypes)
+        : base(id)
         {
-            Id = id;
             ActorId = actorId;
             OrganizationId = organizationId;
             ExternalActorId = externalActorId;
@@ -48,9 +52,10 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Status = status;
             BusinessRoles = businessRoles;
             MarketRoles = marketRoles;
+            GridAreas = gridAreas;
+            MeteringPointTypes = meteringPointTypes;
         }
 
-        public Guid Id { get; }
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
 
@@ -60,5 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
         public IEnumerable<EicFunction> MarketRoles { get; }
+        public IEnumerable<Guid> GridAreas { get; }
+        public IEnumerable<string> MeteringPointTypes { get; }
     }
 }

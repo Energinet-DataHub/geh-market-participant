@@ -22,7 +22,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -50,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
         public async Task<HttpResponseData> RunAsync(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData request)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var results = await _health
                 .CreateFluentValidator()

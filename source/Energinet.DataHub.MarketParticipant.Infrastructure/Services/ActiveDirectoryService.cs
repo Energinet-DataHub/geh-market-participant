@@ -15,10 +15,10 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Configuration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
@@ -32,18 +32,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _configuration = configuration;
         }
 
+        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<ExternalActorId> EnsureAppRegistrationIdAsync(GlobalLocationNumber gln)
         {
-            Guard.ThrowIfNull(gln, nameof(gln));
+            ArgumentNullException.ThrowIfNull(gln, nameof(gln));
 
             // This is a temporary implementation using the actor DB.
             // Will be replaced by Azure AD integration at a later time.
             const string param = "GLN";
             const string query = @"SELECT TOP 1 [Id]
                         FROM  [dbo].[ActorInfo]
-                        WHERE [dbo].[IdentificationNumber] = @" + param;
+                        WHERE [IdentificationNumber] = @" + param;
 
-            await using var connection = new SqlConnection(_configuration.GetConnectionString("SQL_MP_DB_CONNECTION_STRING"));
+            await using var connection = new SqlConnection(_configuration["SQL_MP_DB_CONNECTION_STRING"]);
             await connection.OpenAsync().ConfigureAwait(false);
 
             await using var command = new SqlCommand(query, connection)

@@ -34,17 +34,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_GridNotExists_ReturnsNull()
+        public async Task GetAsync_GridNotExists_ReturnsNull()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
+            var gridAreaRepository = new GridAreaRepository(context);
 
             // Act
-            var testOrg = await orgRepository
-                .GetAsync(new OrganizationId(Guid.NewGuid()))
+            var testOrg = await gridAreaRepository
+                .GetAsync(new GridAreaId(Guid.NewGuid()))
                 .ConfigureAwait(false);
 
             // Assert
@@ -60,9 +60,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
             var testGrid = new GridArea(
-                new GridAreaId(Guid.Empty),
                 new GridAreaName("Test Grid Area"),
-                new GridAreaCode("801"));
+                new GridAreaCode("801"),
+                PriceAreaCode.DK1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
@@ -73,6 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
             Assert.Equal(testGrid.Name.Value, newGrid?.Name.Value);
             Assert.Equal(testGrid.Code, newGrid?.Code);
+            Assert.Equal(testGrid.PriceAreaCode, newGrid?.PriceAreaCode);
         }
 
         [Fact]
@@ -84,46 +85,63 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
             var testGrid = new GridArea(
-                new GridAreaId(Guid.Empty),
                 new GridAreaName("Test Grid Area"),
-                new GridAreaCode("801"));
+                new GridAreaCode("801"),
+                PriceAreaCode.DK1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
             var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
-            newGrid = newGrid! with { Code = new GridAreaCode("234"), Name = new GridAreaName("NewName") };
+            newGrid = new GridArea(
+                gridId,
+                new GridAreaName("NewName"),
+                new GridAreaCode("234"),
+                PriceAreaCode.DK2);
             await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
             newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(newGrid);
             Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
+            Assert.Equal(gridId.Value, newGrid?.Id.Value);
             Assert.Equal("234", newGrid?.Code.Value);
             Assert.Equal("NewName", newGrid?.Name.Value);
+            Assert.Equal(PriceAreaCode.DK2, newGrid?.PriceAreaCode);
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_AddGridAreaToOrganizationRole_CanReadBack()
+        public async Task AddOrUpdateAsync_GridAreaChanged_NewContextCanReadBack()
         {
             // Arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
+            await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
+            var gridRepository2 = new GridAreaRepository(context2);
             var testGrid = new GridArea(
-                new GridAreaId(Guid.Empty),
                 new GridAreaName("Test Grid Area"),
-                new GridAreaCode("801"));
+                new GridAreaCode("801"),
+                PriceAreaCode.DK1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
             var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+            newGrid = new GridArea(
+                gridId,
+                new GridAreaName("NewName"),
+                new GridAreaCode("234"),
+                PriceAreaCode.DK2);
+            await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
+            newGrid = await gridRepository2.GetAsync(gridId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(newGrid);
             Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
-            Assert.Equal("801", newGrid?.Code.Value);
-            Assert.Equal("Test Grid Area", newGrid?.Name.Value);
+            Assert.Equal(gridId.Value, newGrid?.Id.Value);
+            Assert.Equal("234", newGrid?.Code.Value);
+            Assert.Equal("NewName", newGrid?.Name.Value);
+            Assert.Equal(PriceAreaCode.DK2, newGrid?.PriceAreaCode);
         }
     }
 }

@@ -38,3 +38,9 @@ runs:
       with:
         name: organization
         path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/organization
+        
+    - name: Publish Wep api to release folder
+      uses: actions/download-artifact@v2
+      with:
+        name: webapi
+        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/webapi

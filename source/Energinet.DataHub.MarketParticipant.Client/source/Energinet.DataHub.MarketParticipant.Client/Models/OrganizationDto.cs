@@ -17,5 +17,11 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record OrganizationDto(Guid OrganizationId, string Name, IReadOnlyList<ActorDto> Actors);
+    public sealed record OrganizationDto(
+        Guid OrganizationId,
+        string Name,
+        string BusinessRegisterIdentifier,
+        string Comment,
+        AddressDto Address,
+        IReadOnlyList<ActorDto> Actors);
 }

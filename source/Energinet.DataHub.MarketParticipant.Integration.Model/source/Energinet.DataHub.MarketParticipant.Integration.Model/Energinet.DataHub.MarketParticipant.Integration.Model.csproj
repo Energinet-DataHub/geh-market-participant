@@ -16,7 +16,7 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
     <AssemblyName>Energinet.DataHub.MarketParticipant.Integration.Model</AssemblyName>
@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Integration.Model</PackageId>
-    <PackageVersion>1.1.0$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.0.4$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Integration.Model library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -64,8 +64,8 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.19.1" />
-    <PackageReference Include="Grpc.Tools" Version="2.41.1">
+    <PackageReference Include="Google.Protobuf" Version="3.20.1" />
+    <PackageReference Include="Grpc.Tools" Version="2.45.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -78,7 +78,18 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <Access>Internal</Access>
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
-      <OutputDir>obj\Debug\net5.0\</OutputDir>
+    </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
     </Protobuf>
   </ItemGroup>
 

@@ -23,33 +23,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
     public sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
     {
-        public ActorUpdatedIntegrationEvent Parse(byte[] protoContract)
-        {
-            try
-            {
-                var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return new ActorUpdatedIntegrationEvent(
-                    id: Guid.Parse(contract.Id),
-                    actorId: Guid.Parse(contract.ActorId),
-                    organizationId: Guid.Parse(contract.OrganizationId),
-                    externalActorId: Guid.Parse(contract.ExternalActorId),
-                    gln: contract.Gln,
-                    status: (ActorStatus)contract.Status,
-                    businessRoles: contract.BusinessRoles.Select(x => (BusinessRoleCode)x).ToList(),
-                    marketRoles: contract.MarketRoles.Select(x => (EicFunction)x).ToList());
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array  {nameof(ActorUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
         public byte[] Parse(ActorUpdatedIntegrationEvent integrationEvent)
         {
             try
             {
-                Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
                 var contract = new ActorUpdatedIntegrationEventContract
                 {
@@ -59,6 +37,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Gln = integrationEvent.Gln,
                     Status = (int)integrationEvent.Status,
+                    GridAreaIds = { integrationEvent.GridAreas.Select(x => x.ToString()) },
+                    MeteringPointTypes = { integrationEvent.MeteringPointTypes }
                 };
 
                 foreach (var x in integrationEvent.BusinessRoles)
@@ -76,6 +56,32 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
+            }
+        }
+
+        internal ActorUpdatedIntegrationEvent Parse(byte[] protoContract)
+        {
+            try
+            {
+                var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+
+                return new ActorUpdatedIntegrationEvent(
+                    Guid.Parse(contract.Id),
+                    Guid.Parse(contract.ActorId),
+                    Guid.Parse(contract.OrganizationId),
+                    Guid.Parse(contract.ExternalActorId),
+                    contract.Gln,
+                    Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
+                    contract.BusinessRoles.Select(
+                        x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
+                    contract.MarketRoles.Select(
+                        x => Enum.IsDefined((EicFunction)x) ? (EicFunction)x : throw new FormatException(nameof(contract.MarketRoles))).ToList(),
+                    contract.GridAreaIds.Select(x => Guid.Parse(x)),
+                    contract.MeteringPointTypes);
+            }
+            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+            {
+                throw new MarketParticipantException($"Error parsing byte array  {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
     }

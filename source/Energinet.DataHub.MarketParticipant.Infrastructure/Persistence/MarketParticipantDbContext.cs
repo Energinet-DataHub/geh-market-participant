@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using SmartEnum.EFCore;
 
@@ -35,7 +35,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
         public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
+        public DbSet<ContactEntity> Contacts { get; private set; } = null!;
         public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
+        public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
 
         public Task<int> SaveChangesAsync()
         {
@@ -44,12 +46,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            Guard.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+            ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
             modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new ContactEntityConfiguration());
             modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
         }

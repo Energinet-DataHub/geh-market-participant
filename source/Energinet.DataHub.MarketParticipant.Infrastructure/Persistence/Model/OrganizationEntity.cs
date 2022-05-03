@@ -23,11 +23,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         {
             Name = string.Empty;
             Actors = new Collection<ActorEntity>();
+            BusinessRegisterIdentifier = string.Empty;
+            Address = new AddressEntity();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public string BusinessRegisterIdentifier { get; set; }
+        public AddressEntity Address { get; set; }
 
         public Collection<ActorEntity> Actors { get; }
+        public string? Comment { get; set; }
     }
 }

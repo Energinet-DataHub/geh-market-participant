@@ -1,0 +1,68 @@
+﻿// Copyright 2020 Energinet DataHub A/S
+//
+// Licensed under the Apache License, Version 2.0 (the "License2");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using MediatR;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
+{
+    public sealed class CreateActorHandler : IRequestHandler<CreateActorCommand, CreateActorResponse>
+    {
+        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IActorFactoryService _actorFactoryService;
+
+        public CreateActorHandler(
+            IOrganizationExistsHelperService organizationExistsHelperService,
+            IActorFactoryService actorFactoryService)
+        {
+            _organizationExistsHelperService = organizationExistsHelperService;
+            _actorFactoryService = actorFactoryService;
+        }
+
+        public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
+        {
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
+
+            var organization = await _organizationExistsHelperService
+                .EnsureOrganizationExistsAsync(request.OrganizationId)
+                .ConfigureAwait(false);
+
+            var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
+            var actorRoles = CreateMarketRoles(request.Actor).ToList();
+
+            var actor = await _actorFactoryService
+                .CreateAsync(organization, actorGln, actorRoles, request.Actor.MeteringPointTypes.ToList())
+                .ConfigureAwait(false);
+
+            return new CreateActorResponse(actor.Id);
+        }
+
+        private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto actorDto)
+        {
+            foreach (var marketRole in actorDto.MarketRoles)
+            {
+                var function = Enum.Parse<EicFunction>(marketRole.Function, true);
+                yield return new MarketRole(function);
+            }
+        }
+    }
+}

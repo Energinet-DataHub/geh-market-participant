@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -35,8 +35,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         public Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Actor actor)
         {
-            Guard.ThrowIfNull(organizationId, nameof(organizationId));
-            Guard.ThrowIfNull(actor, nameof(actor));
+            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
+            ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
             var actorUpdatedEvent = new ActorUpdatedIntegrationEvent
             {
@@ -55,6 +55,16 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles))
             {
                 actorUpdatedEvent.BusinessRoles.Add(businessRole);
+            }
+
+            foreach (var gridArea in actor.Areas)
+            {
+                actorUpdatedEvent.GridAreas.Add(gridArea.Id);
+            }
+
+            foreach (var meteringPointTypes in actor.MeteringPointTypes)
+            {
+                actorUpdatedEvent.MeteringPointTypes.Add(meteringPointTypes.Name);
             }
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);

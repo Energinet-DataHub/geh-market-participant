@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -17,13 +17,13 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="1.3.1" />
-      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
+      <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="2.2.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
       <PackageReference Include="xunit" Version="2.4.1" />
       <PackageReference Include="xunit.categories" Version="2.0.6" />
       <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">

@@ -12,21 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public class GridAreEntityConfiguration : IEntityTypeConfiguration<GridAreaEntity>
+    public class GridAreaEntityConfiguration : IEntityTypeConfiguration<GridAreaEntity>
     {
         public void Configure(EntityTypeBuilder<GridAreaEntity> builder)
         {
-            Guard.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("GridAreaNew");
             builder.HasKey(gridArea => gridArea.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.Property(p => p.PriceAreaCode)
+                .HasConversion(
+                    to => to.Name,
+                    from => PriceAreaCode.FromName(from, true));
         }
     }
 }

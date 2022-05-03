@@ -13,28 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using System.Net.Http;
+using Flurl.Http.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Client.Extensions
 {
     public static class ContainerExtensions
     {
         public static IServiceCollection AddMarketParticipantClient(this IServiceCollection source, Uri baseUrl)
         {
             source.AddHttpContextAccessor();
-
-            source.AddScoped<IMarketParticipantClient>(x =>
+            source.AddScoped(x =>
                 new MarketParticipantClientFactory(
-                    x.GetRequiredService<IHttpClientFactory>(),
-                    x.GetRequiredService<IHttpContextAccessor>())
+                    x.GetRequiredService<IHttpContextAccessor>(),
+                    new PerBaseUrlFlurlClientFactory())
                 .CreateClient(baseUrl));
-
-            return !source.Any(x => x.ServiceType == typeof(IHttpClientFactory))
-                ? source.AddHttpClient()
-                : source;
+            return source;
         }
     }
 }

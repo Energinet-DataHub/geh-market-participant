@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -32,10 +32,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
         {
-            Guard.ThrowIfNull(gridArea, nameof(gridArea));
+            ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
 
             GridAreaEntity destination;
-
             if (gridArea.Id.Value == default)
             {
                 destination = new GridAreaEntity();
@@ -45,19 +44,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 destination = await _marketParticipantDbContext
                     .GridAreas
                     .FindAsync(gridArea.Id.Value)
-                    .ConfigureAwait(false);
+                    .ConfigureAwait(false) ?? throw new InvalidOperationException($"GridArea with id {gridArea.Id.Value} is missing, even though it cannot be deleted.");
             }
 
             GridAreaMapper.MapToEntity(gridArea, destination);
             _marketParticipantDbContext.GridAreas.Update(destination);
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
             return new GridAreaId(destination.Id);
         }
 
         public async Task<GridArea?> GetAsync(GridAreaId id)
         {
-            Guard.ThrowIfNull(id, nameof(id));
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
 
             var gridArea = await _marketParticipantDbContext.GridAreas
                 .FindAsync(id.Value)

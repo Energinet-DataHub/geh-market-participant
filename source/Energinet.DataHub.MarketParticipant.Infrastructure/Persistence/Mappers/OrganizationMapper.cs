@@ -26,6 +26,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         {
             to.Id = from.Id.Value;
             to.Name = from.Name;
+            to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
+            to.Comment = from.Comment;
+            MapAddressToEntity(from.Address, to.Address);
 
             var actorEntities = to.Actors.ToDictionary(x => x.Id);
 
@@ -49,7 +52,29 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             return new Organization(
                 new OrganizationId(from.Id),
                 from.Name,
-                MapEntitiesToActors(from.Actors));
+                MapEntitiesToActors(from.Actors),
+                new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier ?? string.Empty),
+                MapAddress(from.Address),
+                from.Comment);
+        }
+
+        private static Address MapAddress(AddressEntity from)
+        {
+            return new Address(
+                from.StreetName,
+                from.Number,
+                from.ZipCode,
+                from.City,
+                from.Country ?? string.Empty);
+        }
+
+        private static void MapAddressToEntity(Address from, AddressEntity to)
+        {
+            to.StreetName = from.StreetName;
+            to.Number = from.Number;
+            to.ZipCode = from.ZipCode;
+            to.City = from.City;
+            to.Country = from.Country;
         }
 
         private static void MapActorEntity(Actor from, ActorEntity to)
@@ -70,7 +95,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.MeteringPointTypes.Clear();
             foreach (var meteringPointType in from.MeteringPointTypes)
             {
-                to.MeteringPointTypes.Add(meteringPointType);
+                to.MeteringPointTypes.Add(new MeteringPointTypeEntity
+                {
+                    MeteringTypeId = meteringPointType.Value,
+                    ActorInfoId = from.Id
+                });
             }
 
             // Market roles are currently treated as value types, so they are deleted and recreated with each update.
@@ -91,6 +120,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     return new MarketRole(function);
                 });
 
+                var meteringPointTypes = actor.MeteringPointTypes
+                    .Select(m => MeteringPointType.FromValue(m.MeteringTypeId));
+
                 var actorGln = new GlobalLocationNumber(actor.Gln);
                 var actorStatus = (ActorStatus)actor.Status;
                 var gridArea = actor.SingleGridArea != null
@@ -104,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     actorStatus,
                     gridArea,
                     marketRoles,
-                    actor.MeteringPointTypes);
+                    meteringPointTypes);
             }).ToList();
         }
     }
