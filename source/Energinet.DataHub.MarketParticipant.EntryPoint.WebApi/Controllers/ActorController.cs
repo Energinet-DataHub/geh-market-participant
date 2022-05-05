@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(createActorCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response.ActorId);
+                    return Ok(response.ActorId.ToString());
                 },
                 _logger).ConfigureAwait(false);
         }
