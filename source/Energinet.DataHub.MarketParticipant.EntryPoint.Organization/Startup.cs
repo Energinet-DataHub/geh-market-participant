@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
@@ -38,6 +43,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
             services.Replace(descriptor);
 
+            var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+
+            // Health check
+            services
+                .AddHealthChecks()
+                .AddLiveCheck()
+                .AddDbContextCheck<MarketParticipantDbContext>()
+                .AddAzureServiceBusTopic(config["SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING"], config["SBT_MARKET_PARTICIPANT_CHANGED_NAME"]);
+
             services.AddSimpleInjector(Container, x =>
             {
                 x.DisposeContainerWithServiceProvider = false;
@@ -50,7 +64,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
             Container.Register<HealthFunction>();
             Container.Register<DispatchEventsTimerTrigger>();
 
-            // health check
+            // Health check
+            container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
+            container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
+
             container.Register<ISqlDatabaseVerifier, SqlDatabaseVerifier>(Lifestyle.Scoped);
             container.Register<IServiceBusQueueVerifier, ServiceBusQueueVerifier>(Lifestyle.Scoped);
             container.Register<IHealth, Health>(Lifestyle.Scoped);
