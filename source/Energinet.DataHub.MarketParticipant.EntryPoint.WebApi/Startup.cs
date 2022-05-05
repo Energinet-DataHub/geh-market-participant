@@ -14,8 +14,11 @@
 
 using System;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -57,6 +60,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                // Health check
+                endpoints.MapLiveHealthChecks();
+                endpoints.MapReadyHealthChecks();
             });
 
             app.UseSimpleInjector(Container);
@@ -68,6 +75,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services.AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
+            // Health check
+            services
+                .AddHealthChecks()
+                .AddLiveCheck()
+                .AddDbContextCheck<MarketParticipantDbContext>()
+                .AddAzureServiceBusTopic(Configuration["SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING"], Configuration["SBT_MARKET_PARTICIPANT_CHANGED_NAME"]);
+
             services.AddSwaggerGen(c =>
             {
                 c.SupportNonNullableReferenceTypes();
@@ -75,8 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     "v1",
                     new OpenApiInfo
                     {
-                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi",
-                        Version = "v1"
+                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi", Version = "v1"
                     });
 
                 var securitySchema = new OpenApiSecurityScheme
