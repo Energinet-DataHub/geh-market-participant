@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 new GlobalLocationNumberDto(actor.Gln.Value),
                 actor.Status.ToString(),
                 actor.MarketRoles.Select(Map).ToList(),
-                actor.MeteringPointTypes);
+                actor.MeteringPointTypes.Select(mp => mp.Name).ToList());
         }
 
         private static AddressDto Map(Address address)
