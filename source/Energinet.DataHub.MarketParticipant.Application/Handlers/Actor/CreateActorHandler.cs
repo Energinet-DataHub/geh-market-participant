@@ -53,6 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .Actor
                 .MeteringPointTypes
                 .Select(mp => MeteringPointType.FromName(mp, true))
+                .Distinct()
                 .ToList();
 
             var actor = await _actorFactoryService
