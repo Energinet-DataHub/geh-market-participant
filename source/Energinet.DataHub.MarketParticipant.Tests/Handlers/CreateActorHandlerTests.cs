@@ -21,7 +21,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -143,7 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }, Array.Empty<string>()));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }, new[] { MeteringPointType.D06SupplyToGrid.Name }));
 
             // Act
             var response = await target
