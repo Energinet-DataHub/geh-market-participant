@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                 if (string.IsNullOrWhiteSpace(resourceServicePrincipalObjectId))
                 {
                     throw new InvalidOperationException(
-                        "Key 'AZURE_B2C_BACKEND_SPN_OBJECT_ID' is null, empty or whitespace");
+                        "Key 'AZURE_B2C_BACKEND_SPN_OBJECT_ID' is null, empty or whitespac");
                 }
 
                 if (string.IsNullOrWhiteSpace(backendAppId))
