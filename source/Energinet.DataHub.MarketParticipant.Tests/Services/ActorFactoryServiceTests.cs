@@ -119,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
-                    It.IsAny<string>(),
+                    It.IsAny<GlobalLocationNumber>(),
                     It.IsAny<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
@@ -195,7 +195,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
-                    It.IsAny<string>(),
+                    It.IsAny<GlobalLocationNumber>(),
                     It.IsNotNull<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(expectedExternalId),
@@ -240,7 +240,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
-                    It.IsAny<string>(),
+                    It.IsAny<GlobalLocationNumber>(),
                     It.IsAny<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),
@@ -283,7 +283,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             activeDirectory
                 .Setup(x => x.CreateAppRegistrationAsync(
-                    It.IsAny<string>(),
+                    It.IsAny<GlobalLocationNumber>(),
                     It.IsAny<List<MarketRole>>()))
                 .ReturnsAsync(new CreateAppRegistrationResponse(
                     new ExternalActorId(Guid.NewGuid()),

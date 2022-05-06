@@ -49,10 +49,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         }
 
         public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            string consumerAppName,
+            GlobalLocationNumber appName,
             IReadOnlyCollection<MarketRole> permissions)
         {
-            Guard.ThrowIfNull(consumerAppName, nameof(consumerAppName));
+            Guard.ThrowIfNull(appName, nameof(appName));
             Guard.ThrowIfNull(permissions, nameof(permissions));
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
@@ -60,11 +60,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
             try
             {
-                var app = await CreateAppInB2CAsync(consumerAppName, permissionsToPass).ConfigureAwait(false);
+                var app = await CreateAppInB2CAsync(appName.Value, permissionsToPass).ConfigureAwait(false);
 
                 var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId).ConfigureAwait(false);
 
-                // What should be done with this role? To database? Integration event?
                 foreach (var permission in b2CPermissions)
                 {
                     await GrantAddedRoleToServicePrincipalAsync(
@@ -85,8 +84,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(string appRegistrationObjectId)
+        public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId)
         {
+            if (appRegistrationObjectId is null)
+            {
+                throw new ArgumentNullException(nameof(appRegistrationObjectId));
+            }
+
             var passwordCredential = new PasswordCredential
             {
                 DisplayName = "App secret",
@@ -96,7 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 CustomKeyIdentifier = null,
             };
 
-            var secret = await _graphClient.Applications[appRegistrationObjectId]
+            var secret = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
                 .AddPassword(passwordCredential)
                 .Request()
                 .PostAsync().ConfigureAwait(false);
@@ -104,13 +108,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return new AppRegistrationSecret(secret.SecretText);
         }
 
-        public async Task DeleteAppRegistrationAsync(string appId)
+        public async Task DeleteAppRegistrationAsync(AppRegistrationId appId)
         {
             Guard.ThrowIfNull(appId, nameof(appId));
 
             try
             {
-                await _graphClient.Applications[appId]
+                await _graphClient.Applications[appId.Value]
                     .Request()
                     .DeleteAsync()
                     .ConfigureAwait(false);
@@ -123,20 +127,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         }
 
         public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
-            string consumerAppObjectId,
-            string consumerServicePrincipalObjectId)
+            AppRegistrationObjectId appRegistrationObjectId,
+            AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId)
         {
-            Guard.ThrowIfNull(consumerAppObjectId, nameof(consumerAppObjectId));
-            Guard.ThrowIfNull(consumerServicePrincipalObjectId, nameof(consumerServicePrincipalObjectId));
+            Guard.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
+            Guard.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
 
             try
             {
-                var retrievedApp = await _graphClient.Applications[consumerAppObjectId]
+                var retrievedApp = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
                     .Request()
                     .Select(a => new { a.AppId, a.Id, a.DisplayName, a.AppRoles })
                     .GetAsync().ConfigureAwait(false);
 
-                var appRoles = await GetRolesAsync(consumerServicePrincipalObjectId).ConfigureAwait(false);
+                var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
 
                 return new ActiveDirectoryAppInformation(
                     retrievedApp.AppId,
@@ -185,7 +189,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return b2CIds;
         }
 
-        private async Task<ActiveDirectoryRoles> GetRolesAsync(string servicePrincipalObjectId)
+        private async Task<IEnumerable<ActiveDirectoryRole>> GetRolesAsync(string servicePrincipalObjectId)
         {
             try
             {
@@ -200,10 +204,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     throw new InvalidOperationException($"'{nameof(roles)}' is null");
                 }
 
-                var roleIds = new ActiveDirectoryRoles();
+                var roleIds = new List<ActiveDirectoryRole>();
                 foreach (var role in roles)
                 {
-                    roleIds.Roles.Add(new ActiveDirectoryRole(role.AppRoleId.ToString()!));
+                    roleIds.Add(new ActiveDirectoryRole(role.AppRoleId.ToString()!));
                 }
 
                 return roleIds;
@@ -265,7 +269,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                         new RequiredResourceAccess
                         {
                             ResourceAppId = _azureAdConfig.BackendAppId,
-                            ResourceAccess = resourceAccesses.Select(resourceAccess => new ResourceAccess { Id = resourceAccess.Id, Type = "Role" }).ToList(),
+                            ResourceAccess = resourceAccesses
                         }
                     },
                     SignInAudience = "AzureADMultipleOrgs"

@@ -12,13 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
 {
-    public sealed record ActiveDirectoryAppInformation(
-        string AppId,
-        string AppObjectId,
-        string AppName,
-        IEnumerable<ActiveDirectoryRole> AppRoles);
+    public record AppRegistrationId(string Value);
 }

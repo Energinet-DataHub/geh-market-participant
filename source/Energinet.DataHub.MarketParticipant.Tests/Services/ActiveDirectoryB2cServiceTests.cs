@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Moq;
@@ -52,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.CreateAppRegistrationAsync("MyConsumerAppName", null!))
+                .ThrowsAsync<ArgumentNullException>(() => target.CreateAppRegistrationAsync(new MockedGln(), null!))
                 .ConfigureAwait(false);
         }
 

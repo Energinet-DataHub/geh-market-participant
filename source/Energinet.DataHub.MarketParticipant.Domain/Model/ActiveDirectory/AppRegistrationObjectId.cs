@@ -12,22 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
 {
-    public sealed record ActiveDirectoryRoles
-    {
-        public ActiveDirectoryRoles()
-        {
-            Roles = new List<ActiveDirectoryRole>();
-        }
-
-        public ActiveDirectoryRoles(IList<ActiveDirectoryRole> roles)
-        {
-            Roles = roles;
-        }
-
-        public IList<ActiveDirectoryRole> Roles { get; }
-    }
+    public record AppRegistrationObjectId(Guid Value);
 }

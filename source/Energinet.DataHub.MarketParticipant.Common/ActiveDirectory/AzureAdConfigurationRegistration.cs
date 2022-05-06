@@ -32,16 +32,14 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 
                 if (string.IsNullOrWhiteSpace(resourceServicePrincipalObjectId))
                 {
-                    throw new ArgumentNullException(
-                        nameof(resourceServicePrincipalObjectId),
-                        "Value is null, empty or whitespace");
+                    throw new InvalidOperationException(
+                        "Key 'AZURE_B2C_BACKEND_SPN_OBJECT_ID' is null, empty or whitespace");
                 }
 
                 if (string.IsNullOrWhiteSpace(backendAppId))
                 {
-                    throw new ArgumentNullException(
-                        nameof(backendAppId),
-                        "Value is null, empty or whitespace");
+                    throw new InvalidOperationException(
+                        "Key 'AZURE_B2C_BACKEND_ID' is null, empty or whitespace");
                 }
 
                 return new AzureAdConfig(

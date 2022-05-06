@@ -14,15 +14,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Moq;
@@ -45,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
         public async ValueTask DisposeAsync()
         {
-            await _sut.DeleteAppRegistrationAsync(_b2CAppRegistrationId).ConfigureAwait(false);
+            await _sut.DeleteAppRegistrationAsync(new AppRegistrationId(_b2CAppRegistrationId)).ConfigureAwait(false);
         }
 
         [Fact]
@@ -59,14 +62,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             // Act
             var response = await _sut.CreateAppRegistrationAsync(
-                    "TemporaryTestApp",
+                    new MockedGln(),
                     roles)
                 .ConfigureAwait(false);
 
             // Assert
             var app = await _sut.GetExistingAppRegistrationAsync(
-                    response.AppObjectId,
-                    response.ServicePrincipalObjectId)
+                    new AppRegistrationObjectId(Guid.Parse(response.AppObjectId)),
+                    new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId))
                 .ConfigureAwait(false);
 
             _b2CAppRegistrationId = app.AppObjectId;
@@ -87,21 +90,21 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             };
 
             var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
-                    "TemporaryTestAppWithTwoRoles",
+                    new MockedGln(),
                     roles)
                 .ConfigureAwait(false);
 
             // Act
             var app = await _sut.GetExistingAppRegistrationAsync(
-                    createAppRegistrationResponse.AppObjectId,
-                    createAppRegistrationResponse.ServicePrincipalObjectId)
+                    new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
+                    new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
                 .ConfigureAwait(false);
 
             // Assert
             _b2CAppRegistrationId = app.AppObjectId;
 
-            Assert.Equal("11b79733-b588-413d-9833-8adedce991aa", app.AppRoles.Roles[0].RoleId);
-            Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.Roles[1].RoleId);
+            Assert.Equal("11b79733-b588-413d-9833-8adedce991aa", app.AppRoles.First().RoleId);
+            Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.ElementAt(1).RoleId);
 
             await DisposeAsync().ConfigureAwait(false);
         }
@@ -117,20 +120,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             };
 
             var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
-                    "TemporaryTestAppWithTwoRoles",
+                    new MockedGln(),
                     roles)
                 .ConfigureAwait(false);
 
             // Act
             await _sut
-                .DeleteAppRegistrationAsync(createAppRegistrationResponse.AppObjectId)
+                .DeleteAppRegistrationAsync(new AppRegistrationId(createAppRegistrationResponse.AppObjectId))
                 .ConfigureAwait(false);
 
             // Assert
             var ex = await Assert.ThrowsAsync<ServiceException>(async () => await _sut
                     .GetExistingAppRegistrationAsync(
-                        createAppRegistrationResponse.AppObjectId,
-                        createAppRegistrationResponse.ServicePrincipalObjectId)
+                        new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
+                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
                     .ConfigureAwait(false))
                 .ConfigureAwait(false);
 

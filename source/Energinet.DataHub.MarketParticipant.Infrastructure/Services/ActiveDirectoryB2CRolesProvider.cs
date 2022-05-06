@@ -30,15 +30,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             string appObjectId)
         {
             _graphClient = graphClient;
-            _appObjectId = string.IsNullOrWhiteSpace(appObjectId)
-                ? throw new ArgumentException("Value is null or white space", nameof(appObjectId))
-                : appObjectId;
+            _appObjectId = appObjectId;
             _activeDirectoryB2CRoles = new ActiveDirectoryB2CRoles();
         }
 
         public async Task<ActiveDirectoryB2CRoles> GetB2CRolesAsync()
         {
-            if (_activeDirectoryB2CRoles.IsLoaded is true)
+            if (_activeDirectoryB2CRoles.IsLoaded)
             {
                 return _activeDirectoryB2CRoles;
             }
@@ -57,25 +55,25 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             foreach (var appRole in application.AppRoles)
             {
-                switch (appRole.DisplayName)
+                switch (appRole.Value)
                 {
-                    case "Balance Responsible Party":
-                        _activeDirectoryB2CRoles.DdkId = appRole.Id ?? Guid.Empty;
+                    case "balanceresponsibleparty":
+                        _activeDirectoryB2CRoles.DdkId = appRole.Id!.Value;
                         break;
-                    case "Grid operator":
-                        _activeDirectoryB2CRoles.DdmId = appRole.Id ?? Guid.Empty;
+                    case "gridoperator":
+                        _activeDirectoryB2CRoles.DdmId = appRole.Id!.Value;
                         break;
-                    case "Electrical supplier":
-                        _activeDirectoryB2CRoles.DdqId = appRole.Id ?? Guid.Empty;
+                    case "electricalsupplier":
+                        _activeDirectoryB2CRoles.DdqId = appRole.Id!.Value;
                         break;
-                    case "Transmission system operator":
-                        _activeDirectoryB2CRoles.EzId = appRole.Id ?? Guid.Empty;
+                    case "transmissionsystemoperator":
+                        _activeDirectoryB2CRoles.EzId = appRole.Id!.Value;
                         break;
-                    case "Meter data responsible":
-                        _activeDirectoryB2CRoles.MdrId = appRole.Id ?? Guid.Empty;
+                    case "meterdataresponsible":
+                        _activeDirectoryB2CRoles.MdrId = appRole.Id!.Value;
                         break;
                     case "STS":
-                        _activeDirectoryB2CRoles.StsId = appRole.Id ?? Guid.Empty;
+                        _activeDirectoryB2CRoles.StsId = appRole.Id!.Value;
                         break;
                     default:
                         throw new InvalidOperationException(

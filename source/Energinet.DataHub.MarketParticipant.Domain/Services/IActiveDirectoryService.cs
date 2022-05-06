@@ -27,33 +27,32 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Creates a consumer app registration.
         /// </summary>
-        /// <param name="consumerAppName">The name of the app to create.</param>
+        /// <param name="appName">The name of the app to create.</param>
         /// <param name="permissions">Roles to be assigned to the app.</param>
         /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
-        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(string consumerAppName, IReadOnlyCollection<MarketRole> permissions);
+        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(GlobalLocationNumber appName, IReadOnlyCollection<MarketRole> permissions);
 
         /// <summary>
         /// Creates a new secret for the already registered app.
         /// </summary>
-        /// <param name="appRegistrationObjectId">The id for the registered app.</param>
+        /// <param name="appRegistrationObjectId">The object id for the registered app.</param>
         /// <returns>A <see cref="AppRegistrationSecret"/> representing the secret.</returns>
-        Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(string appRegistrationObjectId);
+        Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId);
 
         /// <summary>
         /// Gets an existing app from active directory.
         /// </summary>
-        /// <param name="consumerAppObjectId">The app to retrieve from active directory.</param>
-        /// <param name="consumerServicePrincipalObjectId">The object id representing the service principal.</param>
+        /// <param name="appRegistrationObjectId">The object id for the registered app.</param>
+        /// <param name="appRegistrationServicePrincipalObjectId">The object id representing the service principal.</param>
         /// <returns>A <see cref="ActiveDirectoryAppInformation"/> representing the retrieved app.</returns>
         Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
-            string consumerAppObjectId,
-            string consumerServicePrincipalObjectId);
+            AppRegistrationObjectId appRegistrationObjectId,
+            AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId);
 
         /// <summary>
-        /// Delete registered app from active directory.
+        /// Deletes the registered app from active directory.
         /// </summary>
         /// <param name="appId">The unique id for the app.</param>
-        /// <returns>A <see cref="Task{boolean}"/> representing whether the deletion of the app was successful or not. The value 'true' indicates the app was deleted successfully.</returns>
-        Task DeleteAppRegistrationAsync(string appId);
+        Task DeleteAppRegistrationAsync(AppRegistrationId appId);
     }
 }

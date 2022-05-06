@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,10 +29,33 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                 () =>
                 {
                     var configuration = container.GetService<IConfiguration>();
+
+                    var azureB2CTenant = configuration!["AZURE_B2C_TENANT"]; // Tenant URL
+                    var azureB2CSpnId = configuration["AZURE_B2C_SPN_ID"]; // Resource service principal app id
+                    var azureB2CSpnSecret = configuration["AZURE_B2C_SPN_SECRET"]; // Client secret
+
+                    if (string.IsNullOrWhiteSpace(azureB2CTenant))
+                    {
+                        throw new InvalidOperationException(
+                            "Key 'AZURE_B2C_TENANT' is null, empty or whitespace");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(azureB2CSpnId))
+                    {
+                        throw new InvalidOperationException(
+                            "Key 'AZURE_B2C_SPN_ID' is null, empty or whitespace");
+                    }
+
+                    if (string.IsNullOrWhiteSpace(azureB2CSpnSecret))
+                    {
+                        throw new InvalidOperationException(
+                            "Key 'AZURE_B2C_SPN_SECRET' is null, empty or whitespace");
+                    }
+
                     var clientSecretCredential = new ClientSecretCredential(
-                        configuration!["AZURE_B2C_TENANT"], // Tenant URL
-                        configuration["AZURE_B2C_SPN_ID"], // Resource service principal app id
-                        configuration["AZURE_B2C_SPN_SECRET"]); // Client secret
+                        azureB2CTenant,
+                        azureB2CSpnId,
+                        azureB2CSpnSecret);
 
                     return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
                 },
