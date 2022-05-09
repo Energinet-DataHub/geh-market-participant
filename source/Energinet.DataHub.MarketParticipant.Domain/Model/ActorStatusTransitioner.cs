@@ -13,53 +13,88 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     internal sealed class ActorStatusTransitioner
     {
+        private ActorStatus _status;
+
         public ActorStatusTransitioner()
         {
-            Status = ActorStatus.New;
+            _status = ActorStatus.New;
         }
 
         public ActorStatusTransitioner(ActorStatus status)
         {
-            Status = status;
+            _status = status;
         }
 
-        public ActorStatus Status { get; private set; }
+        public ActorStatus Status
+        {
+            get => _status;
+            set
+            {
+                switch (value)
+                {
+                    case ActorStatus.New:
+                        New();
+                        break;
+                    case ActorStatus.Active:
+                        Activate();
+                        break;
+                    case ActorStatus.Inactive:
+                        Deactivate();
+                        break;
+                    case ActorStatus.Passive:
+                        SetAsPassive();
+                        break;
+                    case ActorStatus.Deleted:
+                        Delete();
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(value));
+                }
+            }
+        }
 
         public void Activate()
         {
             EnsureCorrectState(ActorStatus.Active, ActorStatus.New, ActorStatus.Inactive, ActorStatus.Passive);
-            Status = ActorStatus.Active;
+            _status = ActorStatus.Active;
         }
 
         public void Deactivate()
         {
             EnsureCorrectState(ActorStatus.Inactive, ActorStatus.Active, ActorStatus.Passive);
-            Status = ActorStatus.Inactive;
+            _status = ActorStatus.Inactive;
         }
 
         public void SetAsPassive()
         {
             EnsureCorrectState(ActorStatus.Passive, ActorStatus.Active, ActorStatus.Inactive);
-            Status = ActorStatus.Passive;
+            _status = ActorStatus.Passive;
         }
 
         public void Delete()
         {
             EnsureCorrectState(ActorStatus.Deleted, ActorStatus.New, ActorStatus.Active, ActorStatus.Inactive, ActorStatus.Passive);
-            Status = ActorStatus.Deleted;
+            _status = ActorStatus.Deleted;
+        }
+
+        private void New()
+        {
+            EnsureCorrectState(ActorStatus.New, ActorStatus.New);
+            _status = ActorStatus.New;
         }
 
         private void EnsureCorrectState(ActorStatus targetState, params ActorStatus[] allowedStates)
         {
-            if (!allowedStates.Contains(Status) && targetState != Status)
+            if (!allowedStates.Contains(_status) && targetState != _status)
             {
-                throw new InvalidOperationException($"Cannot change state from {Status} to {targetState}.");
+                throw new ValidationException($"Cannot change state from {_status} to {targetState}.");
             }
         }
     }
