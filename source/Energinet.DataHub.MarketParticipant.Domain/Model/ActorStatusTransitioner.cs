@@ -20,8 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     internal sealed class ActorStatusTransitioner
     {
-        private ActorStatus _status = ActorStatus.New;
-
         public ActorStatusTransitioner()
         {
             _status = ActorStatus.New;
