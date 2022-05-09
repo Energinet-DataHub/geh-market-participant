@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.0.1
+
+- Added missing metering point types.
+
 ## Version 2.0.0
 
 - .NET 6 upgrade

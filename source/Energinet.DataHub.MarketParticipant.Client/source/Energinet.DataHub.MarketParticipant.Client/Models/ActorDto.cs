@@ -22,5 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Guid ExternalActorId,
         GlobalLocationNumberDto Gln,
         ActorStatus Status,
-        IReadOnlyList<MarketRoleDto> MarketRoles);
+        IReadOnlyList<MarketRoleDto> MarketRoles,
+        IReadOnlyList<MarketParticipantMeteringPointType> MeteringPointTypes);
 }
