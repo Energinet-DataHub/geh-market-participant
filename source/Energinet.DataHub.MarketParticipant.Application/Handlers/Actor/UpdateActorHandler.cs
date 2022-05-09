@@ -70,6 +70,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 throw new NotFoundValidationException(actorId);
             }
 
+            UpdateActorStatus(actor, request);
+
             UpdateActorMarketRoles(organization, actor, request);
 
             UpdateActorMeteringPointTypes(actor, request);
@@ -89,6 +91,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             await uow.CommitAsync().ConfigureAwait(false);
 
             return Unit.Value;
+        }
+
+        private static void UpdateActorStatus(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
         }
 
         private static void UpdateActorMeteringPointTypes(Domain.Model.Actor actor, UpdateActorCommand request)
