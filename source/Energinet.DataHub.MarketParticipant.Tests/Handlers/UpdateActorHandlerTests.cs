@@ -151,11 +151,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
                 .ReturnsAsync(organization);
-
+            var marketRole = new MarketRoleDto(EicFunction.Consumer.ToString());
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<MeteringPointType>()));
+                new ChangeActorDto("Active", new[] { marketRole }, new[] { MeteringPointType.D03NotUsed,  }));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
