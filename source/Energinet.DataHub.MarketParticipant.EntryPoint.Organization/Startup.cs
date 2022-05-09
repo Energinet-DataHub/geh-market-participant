@@ -17,7 +17,6 @@ using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Azure.Functions.Worker;
@@ -61,16 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 
         protected override void Configure(Container container)
         {
-            Container.Register<HealthFunction>();
             Container.Register<DispatchEventsTimerTrigger>();
 
             // Health check
             container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
             container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
-
-            container.Register<ISqlDatabaseVerifier, SqlDatabaseVerifier>(Lifestyle.Scoped);
-            container.Register<IServiceBusQueueVerifier, ServiceBusQueueVerifier>(Lifestyle.Scoped);
-            container.Register<IHealth, Health>(Lifestyle.Scoped);
         }
     }
 }
