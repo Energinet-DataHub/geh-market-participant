@@ -49,8 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
             var actorRoles = CreateMarketRoles(request.Actor).ToList();
 
+            var meteringPointTypes = request.Actor.MeteringPointTypes.Select(e => MeteringPointType.FromName(e));
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles, request.Actor.MeteringPointTypes.ToList())
+                .CreateAsync(organization, actorGln, actorRoles, meteringPointTypes.ToList())
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);

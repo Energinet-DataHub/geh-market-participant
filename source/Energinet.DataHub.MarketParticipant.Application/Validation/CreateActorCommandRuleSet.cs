@@ -54,11 +54,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(actor => actor.MeteringPointTypes)
                         .NotNull()
+                        .NotEmpty()
                         .ChildRules(rolesValidator =>
                         {
                             rolesValidator
                                 .RuleForEach(x => x)
-                                .SetValidator(new MeteringPointTypeValidationRule<IEnumerable<MeteringPointType>>());
+                                .SetValidator(new MeteringPointTypeValidationRule<IEnumerable<string>>());
                         });
                 });
         }
