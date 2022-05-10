@@ -13,12 +13,11 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
     public sealed record ChangeActorDto(
         string Status,
         IEnumerable<MarketRoleDto> MarketRoles,
-        IEnumerable<MeteringPointType> MeteringPointTypes);
+        IEnumerable<string> MeteringPointTypes);
 }
