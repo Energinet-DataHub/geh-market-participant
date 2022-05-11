@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public interface ISqlDatabaseVerifier
+    public class MeteringPointTypeEntity
     {
-        Task<bool> VerifyAsync(string connectionString);
+        public Guid Id { get; set; }
+        public Guid ActorInfoId { get; set; }
+        public int MeteringTypeId { get; set; }
     }
 }

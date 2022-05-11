@@ -15,7 +15,6 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
     {
         public void Configure(EntityTypeBuilder<ActorEntity> builder)
         {
-            Guard.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("ActorInfoNew");
             builder.HasKey(actor => actor.Id);
             builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
@@ -41,12 +40,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         }
 
         private static void ConfigureMeteringTypes(
-            OwnedNavigationBuilder<ActorEntity, MeteringPointType> meteringPointTypeBuilder)
+            OwnedNavigationBuilder<ActorEntity, MeteringPointTypeEntity> meteringPointTypeBuilder)
         {
             meteringPointTypeBuilder.WithOwner().HasForeignKey("ActorInfoId");
             meteringPointTypeBuilder.ToTable("ActorInfoMeteringType");
             meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
-            meteringPointTypeBuilder.Property(p => p.Value).HasColumnName("MeteringTypeId");
+            meteringPointTypeBuilder.Property(p => p.MeteringTypeId).HasColumnName("MeteringTypeId");
         }
     }
 }

@@ -36,29 +36,32 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var eventParser = new GridAreaUpdatedIntegrationEventParser();
-            var target = new GridAreaUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var gridAreaEventParser = new GridAreaUpdatedIntegrationEventParser();
+            var eventParser = new SharedIntegrationEventParser();
+            var target = new GridAreaUpdatedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
 
             var integrationEvent = new GridAreaUpdatedIntegrationEvent
             {
                 GridAreaId = new GridAreaId(Guid.NewGuid()),
                 Name = new GridAreaName("fake_value"),
                 Code = new GridAreaCode("123"),
-                PriceAreaCode = PriceAreaCode.DK1
+                PriceAreaCode = PriceAreaCode.DK1,
+                GridAreaLinkId = new GridAreaLinkId(Guid.NewGuid())
             };
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray());
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.GridAreaUpdatedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);
             Assert.Equal(integrationEvent.Code.Value, actualEvent.Code);
             Assert.Equal(integrationEvent.PriceAreaCode, PriceAreaCode.FromValue((int)actualEvent.PriceAreaCode));
+            Assert.Equal(integrationEvent.GridAreaLinkId.Value, actualEvent.GridAreaLinkId);
         }
 
         [Fact]

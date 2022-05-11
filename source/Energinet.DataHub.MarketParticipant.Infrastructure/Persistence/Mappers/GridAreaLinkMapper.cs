@@ -12,24 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
-{
-    public sealed class Health : IHealth
-    {
-        private readonly ISqlDatabaseVerifier _sqlDatabaseVerifier;
-        private readonly IServiceBusQueueVerifier _serviceBusVerifier;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public Health(
-            ISqlDatabaseVerifier sqlDatabaseVerifier,
-            IServiceBusQueueVerifier serviceBusVerifier)
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
+{
+    internal sealed class GridAreaLinkMapper
+    {
+        public static void MapToEntity(GridAreaLink from, GridAreaLinkEntity to)
         {
-            _sqlDatabaseVerifier = sqlDatabaseVerifier;
-            _serviceBusVerifier = serviceBusVerifier;
+            to.Id = from.Id.Value;
+            to.GridAreaID = from.GridAreaId.Value;
         }
 
-        public IFluentHealth CreateFluentValidator()
+        public static GridAreaLink MapFromEntity(GridAreaLinkEntity from)
         {
-            return new FluentHealth(_sqlDatabaseVerifier, _serviceBusVerifier);
+            return new GridAreaLink(
+                new GridAreaLinkId(from.Id),
+                new GridAreaId(from.GridAreaID));
         }
     }
 }

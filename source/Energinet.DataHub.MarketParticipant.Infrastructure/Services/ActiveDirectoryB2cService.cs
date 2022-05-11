@@ -52,8 +52,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             GlobalLocationNumber appName,
             IReadOnlyCollection<MarketRole> permissions)
         {
-            Guard.ThrowIfNull(appName, nameof(appName));
-            Guard.ThrowIfNull(permissions, nameof(permissions));
+            ArgumentNullException.ThrowIfNull(appName, nameof(appName));
+            ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
             var b2CPermissions = await MapBusinessRoleCodesToB2CRoleIdsAsync(roles).ConfigureAwait(false);
@@ -86,11 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId)
         {
-            if (appRegistrationObjectId is null)
-            {
-                throw new ArgumentNullException(nameof(appRegistrationObjectId));
-            }
-
+            ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
             var passwordCredential = new PasswordCredential
             {
                 DisplayName = "App secret",
@@ -110,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task DeleteAppRegistrationAsync(AppRegistrationId appId)
         {
-            Guard.ThrowIfNull(appId, nameof(appId));
+            ArgumentNullException.ThrowIfNull(appId, nameof(appId));
 
             try
             {
@@ -130,8 +126,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             AppRegistrationObjectId appRegistrationObjectId,
             AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId)
         {
-            Guard.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-            Guard.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
+            ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
+            ArgumentNullException.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
 
             try
             {

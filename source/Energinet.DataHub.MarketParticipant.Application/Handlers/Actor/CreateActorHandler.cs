@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -41,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
         {
-            Guard.ThrowIfNull(request, nameof(request));
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var organization = await _organizationExistsHelperService
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
@@ -50,8 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
             var actorRoles = CreateMarketRoles(request.Actor).ToList();
 
+            var meteringPointTypes = request.Actor.MeteringPointTypes.Select(e => MeteringPointType.FromName(e));
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles)
+                .CreateAsync(organization, actorGln, actorRoles, meteringPointTypes.ToList())
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);

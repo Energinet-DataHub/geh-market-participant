@@ -16,11 +16,27 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record GridArea(GridAreaId Id, GridAreaName Name, GridAreaCode Code, PriceAreaCode PriceAreaCode);
+    public sealed class GridArea
+    {
+        public GridArea(GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode)
+        {
+            Id = new GridAreaId(Guid.Empty);
+            Name = name;
+            Code = code;
+            PriceAreaCode = priceAreaCode;
+        }
 
-    public sealed record GridAreaId(Guid Value);
+        public GridArea(GridAreaId id, GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode)
+        {
+            Id = id;
+            Name = name;
+            Code = code;
+            PriceAreaCode = priceAreaCode;
+        }
 
-    public sealed record GridAreaCode(string Value);
-
-    public sealed record GridAreaName(string Value);
+        public GridAreaId Id { get; init; }
+        public GridAreaName Name { get; init; }
+        public GridAreaCode Code { get; init; }
+        public PriceAreaCode PriceAreaCode { get; init; }
+    }
 }

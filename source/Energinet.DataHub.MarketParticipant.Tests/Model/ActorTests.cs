@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
@@ -52,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
             else
             {
-                Assert.Throws<InvalidOperationException>(() => target.Activate());
+                Assert.Throws<ValidationException>(() => target.Activate());
             }
         }
 
@@ -75,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
             else
             {
-                Assert.Throws<InvalidOperationException>(() => target.Deactivate());
+                Assert.Throws<ValidationException>(() => target.Deactivate());
             }
         }
 
@@ -98,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
             else
             {
-                Assert.Throws<InvalidOperationException>(() => target.SetAsPassive());
+                Assert.Throws<ValidationException>(() => target.SetAsPassive());
             }
         }
 
@@ -121,7 +122,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             }
             else
             {
-                Assert.Throws<InvalidOperationException>(() => target.Delete());
+                Assert.Throws<ValidationException>(() => target.Delete());
             }
         }
 

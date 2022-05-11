@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public interface IServiceBusQueueVerifier
-    {
-        Task<bool> VerifyAsync(string connectionString, string name);
-    }
+    public sealed record CreateGridAreaResponse(GridAreaId GridAreaId);
 }

@@ -13,28 +13,20 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Utilities;
-using Xunit;
-using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Utilities
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    [UnitTest]
-    public class GuardTests
+    public abstract record BaseIntegrationEvent
     {
-        [Fact]
-        public void ThrowIfNull_UsesCorrectParameterName()
+        /// <summary>
+        /// A base event representing a change.
+        /// </summary>
+        /// <param name="id">Unique integration event ID.</param>
+        protected BaseIntegrationEvent(Guid id)
         {
-            // Arrange + Act
-            var exception = Assert.Throws<ArgumentNullException>(() => TestMethod(null!));
-
-            // Assert
-            Assert.Equal("str", exception.ParamName);
+            Id = id;
         }
 
-        private static void TestMethod(string str)
-        {
-            Guard.ThrowIfNull(str, nameof(str));
-        }
+        public Guid Id { get; }
     }
 }

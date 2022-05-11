@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -53,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(UpdateActorCommand.OrganizationId);
 
-            var actorDto = new ChangeActorDto(ValidStatus, Array.Empty<MarketRoleDto>());
+            var actorDto = new ChangeActorDto(ValidStatus, Array.Empty<MarketRoleDto>(), new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(Guid.Empty, _validActorId, actorDto);
@@ -72,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(UpdateActorCommand.ActorId);
 
-            var actorDto = new ChangeActorDto(ValidStatus, Array.Empty<MarketRoleDto>());
+            var actorDto = new ChangeActorDto(ValidStatus, Array.Empty<MarketRoleDto>(), new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, Guid.Empty, actorDto);
@@ -98,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.Status)}";
 
-            var actorDto = new ChangeActorDto(value, Array.Empty<MarketRoleDto>());
+            var actorDto = new ChangeActorDto(value, Array.Empty<MarketRoleDto>(), new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
@@ -125,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}";
 
-            var actorDto = new ChangeActorDto(ValidStatus, null!);
+            var actorDto = new ChangeActorDto(ValidStatus, null!, new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
@@ -144,7 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0]";
 
-            var actorDto = new ChangeActorDto(ValidStatus, new MarketRoleDto[] { null! });
+            var actorDto = new ChangeActorDto(ValidStatus, new MarketRoleDto[] { null! }, new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
@@ -171,7 +172,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
 
-            var actorDto = new ChangeActorDto(ValidStatus, new[] { new MarketRoleDto(value) });
+            var actorDto = new ChangeActorDto(ValidStatus, new[] { new MarketRoleDto(value) }, new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);

@@ -15,9 +15,9 @@
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
     public record Address(
-        string? StreetName,
-        string? Number,
-        string? ZipCode,
-        string? City,
+        string StreetName,
+        string Number,
+        string ZipCode,
+        string City,
         string Country);
 }

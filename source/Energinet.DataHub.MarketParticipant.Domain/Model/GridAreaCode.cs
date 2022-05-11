@@ -12,16 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    internal static class Guard
-    {
-        public static void ThrowIfNull(object element, string name)
-        {
-            if (element is null)
-            {
-                throw new System.ArgumentNullException(name);
-            }
-        }
-    }
+    public sealed record GridAreaCode(string Value);
 }

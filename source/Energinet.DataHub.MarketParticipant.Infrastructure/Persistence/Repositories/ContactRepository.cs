@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<Contact?> GetAsync(ContactId contactId)
         {
-            Guard.ThrowIfNull(contactId, nameof(contactId));
+            ArgumentNullException.ThrowIfNull(contactId, nameof(contactId));
 
             var contact = await _marketParticipantDbContext.Contacts
                 .FindAsync(contactId.Value)
@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<Contact>> GetAsync(OrganizationId organizationId)
         {
-            Guard.ThrowIfNull(organizationId, nameof(organizationId));
+            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
 
             var query =
                 from contact in _marketParticipantDbContext.Contacts
@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<ContactId> AddAsync(Contact contact)
         {
-            Guard.ThrowIfNull(contact, nameof(contact));
+            ArgumentNullException.ThrowIfNull(contact, nameof(contact));
 
             var destination = new ContactEntity();
             ContactMapper.MapToEntity(contact, destination);
@@ -74,12 +74,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task RemoveAsync(Contact contact)
         {
-            Guard.ThrowIfNull(contact, nameof(contact));
+            ArgumentNullException.ThrowIfNull(contact, nameof(contact));
 
             var entity = await _marketParticipantDbContext
                  .Contacts
                  .FindAsync(contact.Id.Value)
                  .ConfigureAwait(false);
+
+            if (entity == null)
+                return;
 
             _marketParticipantDbContext.Contacts.Remove(entity);
 

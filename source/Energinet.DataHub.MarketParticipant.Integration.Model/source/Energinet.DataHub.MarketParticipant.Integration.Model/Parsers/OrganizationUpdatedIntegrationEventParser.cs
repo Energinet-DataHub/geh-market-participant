@@ -22,35 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
     public sealed class OrganizationUpdatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
     {
-        public OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
-        {
-            try
-            {
-                var contract = OrganizationUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return new OrganizationUpdatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Name,
-                    contract.BusinessRegisterIdentifier,
-                    new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country));
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
         public byte[] Parse(OrganizationUpdatedIntegrationEvent integrationEvent)
         {
             try
             {
-                Guard.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
                 var contract = new OrganizationUpdatedIntegrationEventContract()
                 {
@@ -73,6 +49,30 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
+            }
+        }
+
+        internal OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
+        {
+            try
+            {
+                var contract = OrganizationUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+
+                return new OrganizationUpdatedIntegrationEvent(
+                    Guid.Parse(contract.Id),
+                    Guid.Parse(contract.OrganizationId),
+                    contract.Name,
+                    contract.BusinessRegisterIdentifier,
+                    new Address(
+                        contract.Address.StreetName,
+                        contract.Address.Number,
+                        contract.Address.ZipCode,
+                        contract.Address.City,
+                        contract.Address.Country));
+            }
+            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+            {
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
             }
         }
     }

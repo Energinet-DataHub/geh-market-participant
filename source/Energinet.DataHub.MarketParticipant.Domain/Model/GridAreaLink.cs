@@ -13,27 +13,24 @@
 // limitations under the License.
 
 using System;
-using System.Data.SqlClient;
-using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed class SqlDatabaseVerifier : ISqlDatabaseVerifier
+    public sealed class GridAreaLink
     {
-        public async Task<bool> VerifyAsync(string connectionString)
+        public GridAreaLink(GridAreaId gridAreaId)
         {
-            try
-            {
-                await using var connection = new SqlConnection(connectionString);
-                await connection.OpenAsync().ConfigureAwait(false);
-                return true;
-            }
-#pragma warning disable CA1031
-            catch (Exception)
-#pragma warning restore CA1031
-            {
-                return false;
-            }
+            Id = new GridAreaLinkId(Guid.Empty);
+            GridAreaId = gridAreaId;
         }
+
+        public GridAreaLink(GridAreaLinkId id, GridAreaId gridAreaId)
+        {
+            Id = id;
+            GridAreaId = gridAreaId;
+        }
+
+        public GridAreaLinkId Id { get; init; }
+        public GridAreaId GridAreaId { get; init; }
     }
 }

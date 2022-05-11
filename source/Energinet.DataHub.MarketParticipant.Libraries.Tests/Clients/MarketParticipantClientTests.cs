@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act + Assert
             var exception = await Assert
-                .ThrowsAsync<FlurlHttpException>(() => target.GetOrganizationsAsync())
+                .ThrowsAsync<MarketParticipantException>(() => target.GetOrganizationsAsync())
                 .ConfigureAwait(false);
             Assert.Equal(exception.StatusCode, (int)HttpStatusCode.Unauthorized);
         }
@@ -578,7 +578,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             // Act
             var createdActorId = await target.CreateActorAsync(
                     orgId,
-                    new CreateActorDto(new GlobalLocationNumberDto("123456"), Array.Empty<MarketRoleDto>()))
+                    new CreateActorDto(new GlobalLocationNumberDto("123456"), Array.Empty<MarketRoleDto>(), Array.Empty<MarketParticipantMeteringPointType>()))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -629,7 +629,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     actorId,
                     new ChangeActorDto(
                         ActorStatus.Active,
-                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) }))
+                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) },
+                        Array.Empty<MarketParticipantMeteringPointType>()))
                 .ConfigureAwait(false);
 
             var actual = await target

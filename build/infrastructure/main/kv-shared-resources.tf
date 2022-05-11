@@ -46,6 +46,11 @@ data "azurerm_key_vault_secret" "sb_domain_relay_send_connection_string" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
+data "azurerm_key_vault_secret" "sb_domain_relay_manage_connection_string" {
+  name         = "sb-domain-relay-manage-connection-string"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
 data "azurerm_key_vault_secret" "sbt-market-participant-changed-name" {
   name         = "sbt-market-participant-changed-name"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
@@ -56,6 +61,10 @@ data "azurerm_key_vault_secret" "plan_shared_id" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
+data "azurerm_key_vault_secret" "log_shared_id" {
+  name         = "log-shared-id"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
 data "azurerm_key_vault_secret" "frontend_open_id_url" {
   name         = "frontend-open-id-url"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
@@ -63,5 +72,10 @@ data "azurerm_key_vault_secret" "frontend_open_id_url" {
 
 data "azurerm_key_vault_secret" "frontend_service_app_id" {
   name         = "frontend-service-app-id"
+  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
+}
+
+data "azurerm_key_vault_secret" "primary_action_group_id" {
+  name         = "ag-primary-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }

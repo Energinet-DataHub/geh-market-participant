@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
     {
         public void ValidateCategoriesAcrossContacts(IEnumerable<Contact> contacts)
         {
-            Guard.ThrowIfNull(contacts, nameof(contacts));
+            ArgumentNullException.ThrowIfNull(contacts, nameof(contacts));
 
             var categories = new HashSet<ContactCategory>();
 

@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Utilities;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
@@ -36,8 +36,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
         public void ValidateRolesAcrossActors(IEnumerable<Actor> actors, IEnumerable<MarketRole> newActorRoles)
         {
-            Guard.ThrowIfNull(actors, nameof(actors));
-            Guard.ThrowIfNull(newActorRoles, nameof(newActorRoles));
+            ArgumentNullException.ThrowIfNull(actors, nameof(actors));
+            ArgumentNullException.ThrowIfNull(newActorRoles, nameof(newActorRoles));
 
             var setOfSets = actors
                 .Select(x => AreRolesUnique(x.MarketRoles))

@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public interface IFluentHealth
+    public sealed class GridAreaLinkEntity
     {
-        Task<IReadOnlyCollection<(string Key, bool Result)>> RunAsync();
-        Task<IReadOnlyCollection<(string Key, bool Result)>> RunInParallelAsync();
-        IFluentHealth AddSqlDatabase(string verficationKey, string connectionString);
-        IFluentHealth AddMessageBus(string verficationKey, string connectionString, string queueName);
+        public Guid Id { get; set; }
+        public Guid GridAreaID { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -17,17 +17,23 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="1.0.3" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="2.3.3" />
+    <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.0.3" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="2.3.3" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="2.3.3" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="2.3.3" />
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.4" />
     <PackageReference Include="SimpleInjector.Integration.AspNetCore.Mvc.Core" Version="5.3.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
   </ItemGroup>
 
   <ItemGroup>

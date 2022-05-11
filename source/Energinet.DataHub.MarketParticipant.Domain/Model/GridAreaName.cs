@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public interface IHealth
-    {
-        IFluentHealth CreateFluentValidator();
-    }
+    public sealed record GridAreaName(string Value);
 }
