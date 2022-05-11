@@ -23,5 +23,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
         GlobalLocationNumberDto Gln,
         string Status,
         IEnumerable<MarketRoleDto> MarketRoles,
-        IEnumerable<MeteringPointType> MeteringPointTypes);
+        IEnumerable<string> MeteringPointTypes);
 }
