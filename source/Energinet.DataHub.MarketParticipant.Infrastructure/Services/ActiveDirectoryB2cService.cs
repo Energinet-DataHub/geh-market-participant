@@ -219,7 +219,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private async Task<AppRegistrationRole> GrantAddedRoleToServicePrincipalAsync(
+        private async ValueTask GrantAddedRoleToServicePrincipalAsync(
             string consumerServicePrincipalObjectId,
             Guid roleId)
         {
@@ -239,8 +239,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             {
                 throw new InvalidOperationException($"The object: '{nameof(role)}' is null.");
             }
-
-            return new AppRegistrationRole(role.AppRoleId!.Value);
         }
 
         private async Task<Application> CreateAppInB2CAsync(
