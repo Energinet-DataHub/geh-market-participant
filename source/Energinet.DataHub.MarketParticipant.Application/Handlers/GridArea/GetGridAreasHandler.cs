@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,6 +33,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 
         public async Task<GetGridAreasResponse> Handle(GetGridAreasCommand request, CancellationToken cancellationToken)
         {
+            ArgumentNullException.ThrowIfNull(request, nameof(request));
+
             var gridAreas = await _repository.GetAsync().ConfigureAwait(false);
             return new GetGridAreasResponse(gridAreas.Select(gridArea => new GridAreaDto(gridArea.Id.Value, gridArea.Name.Value)));
         }
