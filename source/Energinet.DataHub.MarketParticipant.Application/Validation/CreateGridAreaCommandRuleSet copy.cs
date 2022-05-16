@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed record GridAreaDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode);
+    public sealed class GetGridAreasCommandRuleSet : AbstractValidator<GetGridAreasCommand>
+    {
+    }
 }

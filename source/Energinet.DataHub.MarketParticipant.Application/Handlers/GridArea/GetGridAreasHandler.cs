@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var gridAreas = await _repository.GetAsync().ConfigureAwait(false);
-            return new GetGridAreasResponse(gridAreas.Select(gridArea => new GridAreaDto(gridArea.Id.Value, gridArea.Name.Value)));
+            return new GetGridAreasResponse(gridAreas.Select(gridArea => new GridAreaDto(gridArea.Id.Value, gridArea.Code.Value, gridArea.Name.Value, gridArea.PriceAreaCode.Name)));
         }
     }
 }
