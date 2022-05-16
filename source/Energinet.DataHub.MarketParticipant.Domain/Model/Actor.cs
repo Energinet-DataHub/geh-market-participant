@@ -71,7 +71,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The status of the current actor.
         /// </summary>
-        public ActorStatus Status => _actorStatusTransitioner.Status;
+        public ActorStatus Status
+        {
+            get => _actorStatusTransitioner.Status;
+            set => _actorStatusTransitioner.Status = value;
+        }
 
         /// <summary>
         /// The grid area that the actor has access to.

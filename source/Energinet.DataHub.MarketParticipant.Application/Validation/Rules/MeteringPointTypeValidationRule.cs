@@ -22,18 +22,18 @@ using FluentValidation.Validators;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
-    public sealed class MeteringPointTypeValidationRule<T> : PropertyValidator<T, MeteringPointType>
+    public sealed class MeteringPointTypeValidationRule<T> : PropertyValidator<T, string>
     {
-        public override string Name => "GlobalLocationNumberValidation";
+        public override string Name => "MeteringPointTypeValidation";
 
-        public override bool IsValid(ValidationContext<T> context, MeteringPointType value)
+        public override bool IsValid(ValidationContext<T> context, string value)
         {
-            return value is not null && MeteringPointType.TryFromValue(value.Value, out _);
+            return MeteringPointType.TryFromName(value, out _);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)
         {
-            return "'{PropertyName}' must have a valid GLN.";
+            return "'{PropertyName}' must have a valid MeteringPointType.";
         }
     }
 }
