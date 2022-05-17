@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""Status"": ""Active"",
                     ""MarketRoles"": [
                         {
-                            ""Function"": ""Consumer""
+                            ""EicFunction"": ""Consumer""
                         }
                     ]
                 }
@@ -137,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""Active"",
                                 ""MarketRoles"": [
                                     {
-                                        ""Function"": ""Consumer""
+                                        ""EicFunction"": ""Consumer""
                                     }
                                 ]
                             }
@@ -165,7 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""New"",
                                 ""MarketRoles"": [
                                     {
-                                        ""Function"": ""Producer""
+                                        ""EicFunction"": ""Producer""
                                     }
                                 ]
                             }
@@ -253,7 +253,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ""Status"": ""Active"",
 			                ""MarketRoles"": [
 				                {
-					                ""Function"": ""Consumer""
+					                ""EicFunction"": ""Consumer""
 				                }
 			                ]
 		                }
@@ -317,7 +317,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ""Status"": ""Active"",
 			                ""MarketRoles"": [
 				                {
-					                ""Function"": ""Consumer""
+					                ""EicFunction"": ""Consumer""
 				                }
 			                ]
 		                }
@@ -389,7 +389,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ""Status"": ""Active"",
 			                ""MarketRoles"": [
 				                {
-					                ""Function"": ""Consumer""
+					                ""EicFunction"": ""Consumer""
 				                }
 			                ]
 		                }
@@ -494,7 +494,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""status"": ""New"",
                         ""marketRoles"": [
                           {
-                            ""function"": ""MarketOperator""
+                            ""EicFunction"": ""MarketOperator""
                           }
                         ]
                       },
@@ -507,7 +507,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""status"": ""Active"",
                         ""marketRoles"": [
                           {
-                            ""function"": ""EnergySupplier""
+                            ""EicFunction"": ""EnergySupplier""
                           }
                         ]
                     }
@@ -562,7 +562,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""status"": ""New"",
                     ""marketRoles"": [
                         {
-                            ""function"": ""EnergySupplier""
+                            ""EicFunction"": ""EnergySupplier""
                         }
                     ]
                 }";
@@ -610,7 +610,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""status"": ""Active"",
                     ""marketRoles"": [
                         {
-                            ""function"": ""BillingAgent""
+                            ""EicFunction"": ""BillingAgent""
                         }
                     ]
                 }";
