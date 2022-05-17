@@ -699,5 +699,34 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             // Assert
             Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), contactId);
         }
+
+        [Fact]
+        public async Task GetGridAreasAsync_All_ReturnsGridAreas()
+        {
+            // Arrange
+            const string incomingJson = @"
+    [
+        {
+            ""Id"": ""2ac38237-9612-4ea5-8cf5-bac3734c10fd"",
+            ""Code"": ""Code"",
+            ""Name"": ""Name"",
+            ""PriceAreaCode"": ""PriceAreaCode""
+        }
+    ]}";
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            httpTest.RespondWith(incomingJson);
+
+            // Act
+            var actual = await target.GetGridAreasAsync().ConfigureAwait(false);
+
+            // Assert
+            var actualContact = actual.Single();
+            Assert.Equal(Guid.Parse("2ac38237-9612-4ea5-8cf5-bac3734c10fd"), actualContact.Id);
+            Assert.Equal("Code", actualContact.Code);
+            Assert.Equal("Name", actualContact.Name);
+            Assert.Equal("PriceAreaCode", actualContact.PriceAreaCode);
+        }
     }
 }
