@@ -101,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             Assert.Equal(actor.Status.ToString(), actualActor.Status);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(marketRole.Function.ToString(), actualMarketRole.Function);
+            Assert.Equal(marketRole.Function.ToString(), actualMarketRole.EicFunction);
         }
     }
 }

@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
-                var function = Enum.Parse<EicFunction>(marketRoleDto.Function, true);
+                var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
                 actor.MarketRoles.Add(new MarketRole(function));
             }
 

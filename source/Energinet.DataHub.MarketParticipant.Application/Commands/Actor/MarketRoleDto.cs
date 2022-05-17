@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record MarketRoleDto(string Function);
+    public sealed record MarketRoleDto(string EicFunction);
 }
