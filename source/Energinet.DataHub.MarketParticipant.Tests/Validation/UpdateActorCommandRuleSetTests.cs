@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.Status)}";
 
-            var actorDto = new ChangeActorDto(value, Array.Empty<MarketRoleDto>(), new List<string> { "D01VeProduction" });
+            var actorDto = new ChangeActorDto(value, new List<MarketRoleDto> { new("BalanceResponsibleParty") }, new List<string> { "D01VeProduction" });
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
