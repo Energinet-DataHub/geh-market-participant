@@ -25,12 +25,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private readonly IMarketParticipantOrganizationClient _marketParticipantOrganizationClient;
         private readonly IMarketParticipantActorClient _marketParticipantActorClient;
         private readonly IMarketParticipantContactClient _marketParticipantContactClient;
+        private readonly IMarketParticipantGridAreaClient _marketParticipantGridAreaClient;
 
         public MarketParticipantClient(IFlurlClient client)
         {
             _marketParticipantOrganizationClient = new MarketParticipantOrganizationClient(client);
             _marketParticipantActorClient = new MarketParticipantActorClient(client);
             _marketParticipantContactClient = new MarketParticipantContactClient(client);
+            _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
@@ -86,6 +88,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public Task DeleteContactAsync(Guid organizationId, Guid contactId)
         {
             return _marketParticipantContactClient.DeleteContactAsync(organizationId, contactId);
+        }
+
+        public Task<IEnumerable<GridAreaDto>> GetGridAreasAsync()
+        {
+            return _marketParticipantGridAreaClient.GetGridAreasAsync();
         }
     }
 }

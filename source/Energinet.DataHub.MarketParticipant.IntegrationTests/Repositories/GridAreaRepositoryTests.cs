@@ -143,5 +143,27 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal("NewName", newGrid?.Name.Value);
             Assert.Equal(PriceAreaCode.DK2, newGrid?.PriceAreaCode);
         }
+
+        [Fact]
+        public async Task GetGridAreasAsync_ReturnsGridAreas()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var repository = new GridAreaRepository(context);
+            var gridArea = new GridArea(
+                new GridAreaName("Test Grid Area"),
+                new GridAreaCode("801"),
+                PriceAreaCode.DK1);
+
+            await repository.AddOrUpdateAsync(gridArea).ConfigureAwait(false);
+
+            // Act
+            var actual = await repository.GetAsync().ConfigureAwait(false);
+
+            // Assert
+            Assert.NotEmpty(actual);
+        }
     }
 }
