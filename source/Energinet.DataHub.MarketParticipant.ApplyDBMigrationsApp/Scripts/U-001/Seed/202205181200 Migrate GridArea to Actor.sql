@@ -1,4 +1,7 @@
 INSERT INTO [dbo].[GridAreaActorInfoLink]
-SELECT [GridAreaId], [ActorInfoId]
+SELECT
+	NEWID() AS [Id],
+	[GridAreaId],
+	[dbo].[ActorInfoNew].[Id] AS [ActorInfoId]
 FROM [dbo].[ActorInfoNew] INNER JOIN [dbo].[GridAreaInfo]
 	ON [dbo].[ActorInfoNew].[ActorId] = [dbo].[GridAreaInfo].[ActorId]

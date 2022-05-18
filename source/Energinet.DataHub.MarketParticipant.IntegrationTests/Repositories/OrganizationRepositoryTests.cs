@@ -173,6 +173,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
+            var gridAreaRepository = new GridAreaRepository(context);
+
+            var gridArea = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.DK1);
+
+            var testGridArea = await gridAreaRepository
+                .AddOrUpdateAsync(gridArea)
+                .ConfigureAwait(false);
 
             var initialActor = new Actor(
                 Guid.Empty,
@@ -181,7 +191,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 ActorStatus.New,
                 new[]
                 {
-                    new GridAreaId(Guid.NewGuid())
+                    testGridArea
                 },
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
@@ -214,10 +224,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
+            var gridAreaRepository = new GridAreaRepository(context);
+
+            var gridArea = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.DK1);
+
+            var expected = await gridAreaRepository
+                .AddOrUpdateAsync(gridArea)
+                .ConfigureAwait(false);
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            var expected = new GridAreaId(Guid.NewGuid());
 
             organization.Actors.Add(new Actor(
                 Guid.Empty,
