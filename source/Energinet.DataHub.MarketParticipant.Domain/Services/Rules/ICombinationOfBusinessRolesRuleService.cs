@@ -13,16 +13,19 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
-    public sealed class MeteredDataAdministratorRole : IBusinessRole
+    /// <summary>
+    /// Service to validate that the chosen combination of roles is valid.
+    /// </summary>
+    public interface ICombinationOfBusinessRolesRuleService
     {
-        public BusinessRoleCode Code => BusinessRoleCode.Dgl;
-
-        public IEnumerable<EicFunction> Functions { get; } = new[]
-        {
-            EicFunction.MeteredDataAdministrator
-        };
+        /// <summary>
+        /// Validates that the chosen combination of roles is valid.
+        /// </summary>
+        /// <param name="marketRoles"></param>
+        void ValidateCombinationOfBusinessRoles(IEnumerable<MarketRole> marketRoles);
     }
 }

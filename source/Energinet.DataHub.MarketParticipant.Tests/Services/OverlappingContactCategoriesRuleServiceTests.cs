@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var target = new OverlappingContactCategoriesRuleService();
 
-            // Act
+            // Act + Assert
             Assert.Throws<ArgumentNullException>(() => target.ValidateCategoriesAcrossContacts(null!));
         }
 
