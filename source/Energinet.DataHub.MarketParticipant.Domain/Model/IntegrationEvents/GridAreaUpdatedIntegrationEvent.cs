@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
         public GridAreaId GridAreaId { get; set; } = null!;
         public GridAreaName Name { get; set; } = null!;
         public GridAreaCode Code { get; set; } = null!;
-        public PriceAreaCode PriceAreaCode { get; set; } = PriceAreaCode.DK1;
+        public PriceAreaCode PriceAreaCode { get; set; } = PriceAreaCode.Dk1;
         public GridAreaLinkId GridAreaLinkId { get; set; } = null!;
     }
 }

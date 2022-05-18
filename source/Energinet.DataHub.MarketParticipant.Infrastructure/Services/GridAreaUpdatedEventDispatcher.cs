@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
                 gridAreaUpdatedIntegrationEvent.Name.Value,
                 gridAreaUpdatedIntegrationEvent.Code.Value,
-                (PriceAreaCode)gridAreaUpdatedIntegrationEvent.PriceAreaCode.Value,
+                (PriceAreaCode)gridAreaUpdatedIntegrationEvent.PriceAreaCode,
                 gridAreaUpdatedIntegrationEvent.GridAreaLinkId.Value);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
