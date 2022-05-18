@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
 {
-    /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
-    /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantContactClient, IMarketParticipantGridAreaClient
-    {
-    }
+    public sealed record ActiveDirectoryRole(string RoleId);
 }

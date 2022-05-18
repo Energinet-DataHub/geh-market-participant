@@ -28,6 +28,9 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Core" Version="1.4.0" />
+    <PackageReference Include="Microsoft.Graph" Version="4.21.0" />
+    <PackageReference Include="Microsoft.Graph.Core" Version="2.0.8" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.categories" Version="2.0.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
@@ -38,7 +41,8 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Common\Energinet.DataHub.MarketParticipant.Common.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Infrastructure\Energinet.DataHub.MarketParticipant.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
