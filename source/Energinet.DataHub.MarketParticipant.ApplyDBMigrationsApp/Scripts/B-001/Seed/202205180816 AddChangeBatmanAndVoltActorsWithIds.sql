@@ -3,5 +3,6 @@ INSERT [dbo].[ActorInfo] ([Id], [IdentificationNumber], [IdentificationType], [R
 
 UPDATE ActorInfo
 SET Id = 'b249170b-92bd-476d-9255-4290d599d384',
-    IdentificationNumber = '3217200416389'
+    IdentificationNumber = '3217200416389',
+    Name = 'Volt - Test -'
 WHERE Id = 'e009b9b2-edce-4f74-b466-98d0bbb0a94a'
