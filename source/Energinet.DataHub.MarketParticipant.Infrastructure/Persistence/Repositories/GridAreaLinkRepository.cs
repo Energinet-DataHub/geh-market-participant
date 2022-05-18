@@ -13,15 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
-    public class GridAreaLinkRepository : IGridAreaLinkRepository
+    public sealed class GridAreaLinkRepository : IGridAreaLinkRepository
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
@@ -62,6 +64,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var gridAreaLink = await _marketParticipantDbContext.GridAreaLinks
                 .FindAsync(id.Value)
+                .ConfigureAwait(false);
+
+            return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);
+        }
+
+        public async Task<GridAreaLink?> GetAsync(GridAreaId id)
+        {
+            ArgumentNullException.ThrowIfNull(id, nameof(id));
+
+            var query =
+                from link in _marketParticipantDbContext.GridAreaLinks
+                where link.GridAreaId == id.Value
+                select link;
+
+            var gridAreaLink = await query
+                .SingleOrDefaultAsync()
                 .ConfigureAwait(false);
 
             return gridAreaLink is null ? null : GridAreaLinkMapper.MapFromEntity(gridAreaLink);

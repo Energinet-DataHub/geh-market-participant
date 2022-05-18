@@ -37,7 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<DispatchEventsCommand>, DispatchEventsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IActiveDirectoryService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>(Lifestyle.Scoped);
@@ -46,7 +45,9 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<DeleteContactCommand>, DeleteContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<ForceSendIntegrationEventsCommand>, ForceSendIntegrationEventsCommandRuleSet>();
 
+            container.Register<IActiveDirectoryService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IGridAreaUpdatedIntegrationEventParser, GridAreaUpdatedIntegrationEventParser>(Lifestyle.Scoped);
