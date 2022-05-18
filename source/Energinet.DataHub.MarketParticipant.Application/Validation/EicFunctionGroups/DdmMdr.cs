@@ -12,24 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using FluentValidation;
-using FluentValidation.Validators;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
+namespace Energinet.DataHub.MarketParticipant.Application.Validation.EicFunctionGroups
 {
-    public sealed class MeteringPointTypeValidationRule<T> : PropertyValidator<T, string>
+    public static class DdmMdr
     {
-        public override string Name => "MeteringPointTypeValidation";
-
-        public override bool IsValid(ValidationContext<T> context, string value)
+        public static HashSet<string> Roles { get; } = new()
         {
-            return MeteringPointType.TryFromName(value, out _);
-        }
-
-        protected override string GetDefaultMessageTemplate(string errorCode)
-        {
-            return "'{PropertyName}' must have a valid MeteringPointType.";
-        }
+            "GridAccessProvider",
+            "MeterAdministrator",
+            "MeterOperator",
+            "MeteredDataCollector",
+            "PartyConnectedToTheGrid",
+            "MeteredDataResponsible"
+        };
     }
 }

@@ -61,6 +61,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 .RuleForEach(x => x)
                                 .SetValidator(new MeteringPointTypeValidationRule<IEnumerable<string>>());
                         });
+                    validator
+                        .RuleFor(actor => actor.MarketRoles)
+                        .ChildRules(roleValidator =>
+                        {
+                            roleValidator
+                                .RuleFor(x => x)
+                                .SetValidator(new RolesValidationRule<IEnumerable<MarketRoleDto>>());
+                        });
                 });
         }
     }
