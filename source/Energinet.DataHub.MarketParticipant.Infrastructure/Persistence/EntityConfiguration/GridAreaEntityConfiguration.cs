@@ -30,8 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
             builder.Property(p => p.PriceAreaCode)
                 .HasConversion(
-                    to => to.Name,
-                    from => PriceAreaCode.FromName(from, true));
+                    to => to.ToString(),
+                    from => Enum.Parse<PriceAreaCode>(from, true));
         }
     }
 }

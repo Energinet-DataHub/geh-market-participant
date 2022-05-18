@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new GridAreaId(gridId),
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             gridAreaFactoryService
                 .Setup(x => x.CreateAsync(
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateGridAreaCommand(new CreateGridAreaDto(
                 "fake_value",
                 "123",
-                "DK1"));
+                "Dk1"));
 
             // Act
             var response = await target
