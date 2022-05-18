@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record GetGridAreasCommand : IRequest<GetGridAreasResponse>;
+    public sealed class GridAreaActorInfoLinkEntity
+    {
+        public Guid Id { get; set; }
+        public Guid GridAreaId { get; set; }
+        public Guid ActorInfoId { get; set; }
+    }
 }

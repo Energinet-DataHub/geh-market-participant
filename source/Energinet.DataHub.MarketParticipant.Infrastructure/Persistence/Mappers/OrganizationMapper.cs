@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -53,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 new OrganizationId(from.Id),
                 from.Name,
                 MapEntitiesToActors(from.Actors),
-                new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier ?? string.Empty),
+                new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
                 MapAddress(from.Address),
                 from.Comment);
         }
@@ -65,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 from.Number,
                 from.ZipCode,
                 from.City,
-                from.Country ?? string.Empty);
+                from.Country);
         }
 
         private static void MapAddressToEntity(Address from, AddressEntity to)
@@ -84,11 +83,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Gln = from.Gln.Value;
             to.Status = (int)from.Status;
 
-            if (from.Areas.Any())
+            // GridArea linking is currently treated as value type, so they are deleted and recreated with each update.
+            to.GridAreas.Clear();
+            foreach (var gridAreaId in from.GridAreas)
             {
-                var gridArea = to.SingleGridArea ?? new GridAreaEntity();
-                GridAreaMapper.MapToEntity(from.Areas.Single(), gridArea);
-                to.SingleGridArea = gridArea;
+                to.GridAreas.Add(new GridAreaActorInfoLinkEntity
+                {
+                    GridAreaId = gridAreaId.Value,
+                    ActorInfoId = from.Id
+                });
             }
 
             // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
@@ -125,16 +128,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 var actorGln = new GlobalLocationNumber(actor.Gln);
                 var actorStatus = (ActorStatus)actor.Status;
-                var gridArea = actor.SingleGridArea != null
-                    ? new[] { GridAreaMapper.MapFromEntity(actor.SingleGridArea) }
-                    : Array.Empty<GridArea>();
+                var gridAreas = actor
+                    .GridAreas
+                    .Select(ga => new GridAreaId(ga.GridAreaId))
+                    .ToList();
 
                 return new Actor(
                     actor.Id,
                     new ExternalActorId(actor.ActorId),
                     actorGln,
                     actorStatus,
-                    gridArea,
+                    gridAreas,
                     marketRoles,
                     meteringPointTypes);
             }).ToList();
