@@ -85,7 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
             // GridArea linking is currently treated as value type, so they are deleted and recreated with each update.
             to.GridAreas.Clear();
-            foreach (var gridAreaId in from.Areas)
+            foreach (var gridAreaId in from.GridAreas)
             {
                 to.GridAreas.Add(new GridAreaActorInfoLinkEntity
                 {

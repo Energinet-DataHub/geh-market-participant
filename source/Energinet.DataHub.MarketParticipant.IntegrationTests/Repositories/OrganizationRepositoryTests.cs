@@ -252,7 +252,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var actual = organization!
                 .Actors
                 .Single()
-                .Areas
+                .GridAreas
                 .Single();
 
             // Assert
