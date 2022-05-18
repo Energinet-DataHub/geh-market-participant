@@ -97,6 +97,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Include(x => x.Actors)
                 .ThenInclude(x => x.MeteringPointTypes)
                 .Include(x => x.Actors)
+                .ThenInclude(x => x.GridAreas)
+                .Include(x => x.Actors)
                 .ThenInclude(x => x.MarketRoles)
                 .Include(x => x.Address)
                 .AsSingleQuery();
