@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class GridAreaLinkEntity
+    public sealed class ForceSendIntegrationEventsCommandRuleSet : AbstractValidator<ForceSendIntegrationEventsCommand>
     {
-        public Guid Id { get; set; }
-        public Guid GridAreaId { get; set; }
     }
 }
