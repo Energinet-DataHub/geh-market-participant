@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
-using SimpleInjector;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Common
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
-    internal static class UnitOfWorkRegistrations
+    public class ActiveDirectoryB2CRoles
     {
-        public static void AddUnitOfWorkProvider(this Container container)
-        {
-            container.Register<IUnitOfWorkProvider, UnitOfWorkProvider>();
-        }
+        public bool IsLoaded { get; set; }
+        public Guid DdkId { get; set; }
+        public Guid DdmId { get; set; }
+        public Guid DdqId { get; set; }
+        public Guid EzId { get; set; }
+        public Guid MdrId { get; set; }
+        public Guid StsId { get; set; }
     }
 }
