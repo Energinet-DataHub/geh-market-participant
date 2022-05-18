@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             Ddx = ImbalanceSettlementResponsibleRole.Functions.ToHashSet();
             Dgl = MeteredDataAdministratorRole.Functions.ToHashSet();
             Ez = SystemOperatorRole.Functions.ToHashSet();
-            AllSets = new[] { DdkDdqMdr, DdmMdr, Ddz, Ddx, Dgl, Ez };
+            AllSets = new List<HashSet<EicFunction>> { DdkDdqMdr, DdmMdr, Ddz, Ddx, Dgl, Ez };
         }
 
         private MeteredDataResponsibleRole MeteredDataResponsibleRole { get; }
@@ -68,9 +68,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         public void ValidateCombinationOfBusinessRoles(IList<MarketRole> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(marketRoles);
-            var marketRolesHashSet = new HashSet<MarketRole>(marketRoles);
+            var marketRolesHashSet = new HashSet<EicFunction>();
 
-            if (AllSets.All(knownSet => marketRolesHashSet.IsSubsetOf(knownSet)))
+            foreach (var marketRole in marketRoles)
+            {
+                marketRolesHashSet.Add(marketRole.Function);
+            }
+
+            if (AllSets.All(knownSet => !marketRolesHashSet.IsSubsetOf(knownSet)))
             {
                 throw new ValidationException(
                     "Cannot assign market roles, as the chosen combination of roles is not valid.");

@@ -31,7 +31,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
     public void ValidateCombinationOfBusinessRoles_NullMarketRolesArgument_ThrowsException()
     {
         // Arrange
-        var target = CreateTarget();
+        var target = new CombinationOfBusinessRolesRuleService();
 
         // Act + Assert
         Assert.Throws<ArgumentNullException>(() => target.ValidateCombinationOfBusinessRoles(null!));
@@ -41,7 +41,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
     public void ValidateCombinationOfBusinessRoles_InvalidCombinationOfRoles_ThrowsException()
     {
         // Arrange
-        var target = CreateTarget();
+        var target = new CombinationOfBusinessRolesRuleService();
 
         var ez = new SystemOperatorRole();
         var dgl = new MeteredDataAdministratorRole();
@@ -56,7 +56,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
     public void ValidateCombinationOfBusinessRoles_ValidCombinationOfRoles_Ok()
     {
         // Arrange
-        var target = CreateTarget();
+        var target = new CombinationOfBusinessRolesRuleService();
 
         var ddk = new BalanceResponsiblePartyRole();
 
@@ -64,18 +64,5 @@ public class CombinationOfBusinessRolesRuleServiceTests
 
         // Act + Assert
         target.ValidateCombinationOfBusinessRoles(combinationofBusinessRoles);
-    }
-
-    private static CombinationOfBusinessRolesRuleService CreateTarget()
-    {
-        return new CombinationOfBusinessRolesRuleService(
-            new BalanceResponsiblePartyRole(),
-            new GridAccessProviderRole(),
-            new BalancePowerSupplierRole(),
-            new ImbalanceSettlementResponsibleRole(),
-            new MeteringPointAdministratorRole(),
-            new MeteredDataAdministratorRole(),
-            new SystemOperatorRole(),
-            new MeteredDataResponsibleRole());
     }
 }
