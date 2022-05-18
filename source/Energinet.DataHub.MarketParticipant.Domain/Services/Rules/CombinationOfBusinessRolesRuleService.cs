@@ -14,47 +14,39 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
+using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     public sealed class CombinationOfBusinessRolesRuleService : ICombinationOfBusinessRolesRuleService
     {
-        public CombinationOfBusinessRolesRuleService(
-            BalanceResponsiblePartyRole balanceResponsiblePartyRole,
-            GridAccessProviderRole gridAccessProviderRole,
-            BalancePowerSupplierRole balancePowerSupplierRole,
-            ImbalanceSettlementResponsibleRole imbalanceSettlementResponsibleRole,
-            MeteringPointAdministratorRole meteringPointAdministratorRole,
-            MeteredDataAdministratorRole meteredDataAdministratorRole,
-            SystemOperatorRole systemOperatorRole,
-            MeteredDataResponsibleRole meteredDataResponsibleRole)
+        public CombinationOfBusinessRolesRuleService()
         {
-            BalanceResponsiblePartyRole = balanceResponsiblePartyRole;
-            GridAccessProviderRole = gridAccessProviderRole;
-            BalancePowerSupplierRole = balancePowerSupplierRole;
-            ImbalanceSettlementResponsibleRole = imbalanceSettlementResponsibleRole;
-            MeteringPointAdministratorRole = meteringPointAdministratorRole;
-            MeteredDataAdministratorRole = meteredDataAdministratorRole;
-            SystemOperatorRole = systemOperatorRole;
-            MeteredDataResponsibleRole = meteredDataResponsibleRole;
+            BalanceResponsiblePartyRole = new BalanceResponsiblePartyRole();
+            GridAccessProviderRole = new GridAccessProviderRole();
+            BalancePowerSupplierRole = new BalancePowerSupplierRole();
+            ImbalanceSettlementResponsibleRole = new ImbalanceSettlementResponsibleRole();
+            MeteringPointAdministratorRole = new MeteringPointAdministratorRole();
+            MeteredDataAdministratorRole = new MeteredDataAdministratorRole();
+            SystemOperatorRole = new SystemOperatorRole();
+            MeteredDataResponsibleRole = new MeteredDataResponsibleRole();
 
-            DdkDdqMdr = BalanceResponsiblePartyRole.Functions
-                .Concat(BalancePowerSupplierRole.Functions)
-                .Concat(MeteredDataResponsibleRole.Functions)
-                .ToList();
+            var ddkDdqMdrHashSets = BalanceResponsiblePartyRole.Functions.ToHashSet();
+            ddkDdqMdrHashSets.UnionWith(BalancePowerSupplierRole.Functions.Concat(MeteredDataResponsibleRole.Functions));
+            DdkDdqMdr = new HashSet<EicFunction>(ddkDdqMdrHashSets);
 
-            DdmMdr = GridAccessProviderRole.Functions
-                .Concat(MeteredDataResponsibleRole.Functions)
-                .ToList();
+            var ddmMdrHashSets = BalanceResponsiblePartyRole.Functions.ToHashSet();
+            ddmMdrHashSets.UnionWith(BalancePowerSupplierRole.Functions.Concat(MeteredDataResponsibleRole.Functions));
+            DdmMdr = new HashSet<EicFunction>(ddmMdrHashSets);
 
-            Ddz = MeteringPointAdministratorRole.Functions.ToList();
-            Ddx = ImbalanceSettlementResponsibleRole.Functions.ToList();
-            Dgl = MeteredDataAdministratorRole.Functions.ToList();
-            Ez = SystemOperatorRole.Functions.ToList();
+            Ddz = MeteringPointAdministratorRole.Functions.ToHashSet();
+            Ddx = ImbalanceSettlementResponsibleRole.Functions.ToHashSet();
+            Dgl = MeteredDataAdministratorRole.Functions.ToHashSet();
+            Ez = SystemOperatorRole.Functions.ToHashSet();
+            AllSets = new[] { DdkDdqMdr, DdmMdr, Ddz, Ddx, Dgl, Ez };
         }
 
         private MeteredDataResponsibleRole MeteredDataResponsibleRole { get; }
@@ -65,58 +57,20 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         private MeteringPointAdministratorRole MeteringPointAdministratorRole { get; }
         private MeteredDataAdministratorRole MeteredDataAdministratorRole { get; }
         private SystemOperatorRole SystemOperatorRole { get; }
-        private List<EicFunction> DdkDdqMdr { get; }
-        private List<EicFunction> DdmMdr { get; }
-        private List<EicFunction> Ddz { get; }
-        private List<EicFunction> Ddx { get; }
-        private List<EicFunction> Dgl { get; }
-        private List<EicFunction> Ez { get; }
+        private HashSet<EicFunction> DdkDdqMdr { get; }
+        private HashSet<EicFunction> DdmMdr { get; }
+        private HashSet<EicFunction> Ddz { get; }
+        private HashSet<EicFunction> Ddx { get; }
+        private HashSet<EicFunction> Dgl { get; }
+        private HashSet<EicFunction> Ez { get; }
+        private List<HashSet<EicFunction>> AllSets { get; }
 
         public void ValidateCombinationOfBusinessRoles(IList<MarketRole> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(marketRoles);
+            var marketRolesHashSet = new HashSet<MarketRole>(marketRoles);
 
-            var marketRolesWithoutMdr = new List<MarketRole>();
-            foreach (var marketRole in marketRoles)
-            {
-                if (marketRole.Function == EicFunction.MeteredDataResponsible)
-                {
-                }
-            }
-
-            List<bool> isContained = new();
-
-            if (marketRoles.All(x => DdkDdqMdr.Contains(x.Function)))
-            {
-                isContained.Add(true);
-            }
-
-            if (marketRoles.All(x => DdmMdr.Contains(x.Function)))
-            {
-                isContained.Add(true);
-            }
-
-            if (marketRoles.All(x => Ddx.Contains(x.Function)))
-            {
-                isContained.Add(true);
-            }
-
-            if (marketRoles.All(x => Ddz.Contains(x.Function)))
-            {
-                isContained.Add(true);
-            }
-
-            if (marketRoles.All(x => Dgl.Contains(x.Function)))
-            {
-                isContained.Add(true);
-            }
-
-            if (marketRoles.All(x => Ez.Contains(x.Function)))
-            {
-                isContained.Add(true);
-            }
-
-            if (isContained.Count > 1)
+            if (AllSets.All(knownSet => marketRolesHashSet.IsSubsetOf(knownSet)))
             {
                 throw new ValidationException(
                     "Cannot assign market roles, as the chosen combination of roles is not valid.");

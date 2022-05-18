@@ -19,7 +19,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using FluentValidation;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -32,15 +31,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
     public void ValidateCombinationOfBusinessRoles_NullMarketRolesArgument_ThrowsException()
     {
         // Arrange
-        var target = new CombinationOfBusinessRolesRuleService(
-            new BalanceResponsiblePartyRole(),
-            new GridAccessProviderRole(),
-            new BalancePowerSupplierRole(),
-            new ImbalanceSettlementResponsibleRole(),
-            new MeteringPointAdministratorRole(),
-            new MeteredDataAdministratorRole(),
-            new SystemOperatorRole(),
-            new MeteredDataResponsibleRole());
+        var target = CreateTarget();
 
         // Act + Assert
         Assert.Throws<ArgumentNullException>(() => target.ValidateCombinationOfBusinessRoles(null!));
@@ -50,15 +41,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
     public void ValidateCombinationOfBusinessRoles_InvalidCombinationOfRoles_ThrowsException()
     {
         // Arrange
-        var target = new CombinationOfBusinessRolesRuleService(
-            new BalanceResponsiblePartyRole(),
-            new GridAccessProviderRole(),
-            new BalancePowerSupplierRole(),
-            new ImbalanceSettlementResponsibleRole(),
-            new MeteringPointAdministratorRole(),
-            new MeteredDataAdministratorRole(),
-            new SystemOperatorRole(),
-            new MeteredDataResponsibleRole());
+        var target = CreateTarget();
 
         var ez = new SystemOperatorRole();
         var dgl = new MeteredDataAdministratorRole();
@@ -67,5 +50,32 @@ public class CombinationOfBusinessRolesRuleServiceTests
 
         // Act + Assert
         Assert.Throws<ValidationException>(() => target.ValidateCombinationOfBusinessRoles(invalidCombinationOfBusinessRoles));
+    }
+
+    [Fact]
+    public void ValidateCombinationOfBusinessRoles_ValidCombinationOfRoles_Ok()
+    {
+        // Arrange
+        var target = CreateTarget();
+
+        var ddk = new BalanceResponsiblePartyRole();
+
+        var combinationofBusinessRoles = ddk.Functions.Select(eicFunction => new MarketRole(eicFunction)).ToList();
+
+        // Act + Assert
+        target.ValidateCombinationOfBusinessRoles(combinationofBusinessRoles);
+    }
+
+    private static CombinationOfBusinessRolesRuleService CreateTarget()
+    {
+        return new CombinationOfBusinessRolesRuleService(
+            new BalanceResponsiblePartyRole(),
+            new GridAccessProviderRole(),
+            new BalancePowerSupplierRole(),
+            new ImbalanceSettlementResponsibleRole(),
+            new MeteringPointAdministratorRole(),
+            new MeteredDataAdministratorRole(),
+            new SystemOperatorRole(),
+            new MeteredDataResponsibleRole());
     }
 }
