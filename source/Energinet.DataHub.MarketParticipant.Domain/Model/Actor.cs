@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId = externalActorId;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner();
-            Areas = new Collection<GridArea>();
+            Areas = new Collection<GridAreaId>();
             MarketRoles = new Collection<MarketRole>();
             MeteringPointTypes = new Collection<MeteringPointType>();
         }
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId externalActorId,
             GlobalLocationNumber gln,
             ActorStatus actorStatus,
-            IEnumerable<GridArea> gridAreas,
+            IEnumerable<GridAreaId> gridAreas,
             IEnumerable<MarketRole> marketRoles,
             IEnumerable<MeteringPointType> meteringPointTypes)
         {
@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId = externalActorId;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-            Areas = new List<GridArea>(gridAreas);
+            Areas = new List<GridAreaId>(gridAreas);
             MarketRoles = new List<MarketRole>(marketRoles);
             MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
         }
@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The grid area that the actor has access to.
         /// </summary>
-        public ICollection<GridArea> Areas { get; }
+        public ICollection<GridAreaId> Areas { get; }
 
         /// <summary>
         /// The roles (functions and permissions) assigned to the current actor.

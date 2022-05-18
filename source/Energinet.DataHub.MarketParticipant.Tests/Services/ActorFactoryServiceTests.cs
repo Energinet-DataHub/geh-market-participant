@@ -186,7 +186,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         new ExternalActorId(expectedExternalId),
                         new GlobalLocationNumber("fake_value"),
                         ActorStatus.New,
-                        Enumerable.Empty<GridArea>(),
+                        Enumerable.Empty<GridAreaId>(),
                         Enumerable.Empty<MarketRole>(),
                         Enumerable.Empty<MeteringPointType>())
                 },

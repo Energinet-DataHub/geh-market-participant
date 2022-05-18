@@ -5,8 +5,3 @@ FROM [dbo].[GridAreaInfo]
 INSERT INTO [dbo].[GridAreaLinkNew]
 SELECT [GridLinkId], [GridAreaId]
 FROM [dbo].[GridAreaLinkInfo]
-
-UPDATE [dbo].[ActorInfoNew]
-SET [GridAreaId] = [dbo].[GridAreaInfo].[Id]
-FROM [dbo].[ActorInfoNew] INNER JOIN [dbo].[GridAreaInfo]
-	ON [dbo].[ActorInfoNew].[ActorId] = [dbo].[GridAreaInfo].[ActorId]

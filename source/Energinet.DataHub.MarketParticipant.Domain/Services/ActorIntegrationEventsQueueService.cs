@@ -57,9 +57,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 actorUpdatedEvent.BusinessRoles.Add(businessRole);
             }
 
-            foreach (var gridArea in actor.Areas)
+            foreach (var gridAreaId in actor.Areas)
             {
-                actorUpdatedEvent.GridAreas.Add(gridArea.Id);
+                actorUpdatedEvent.GridAreas.Add(gridAreaId);
             }
 
             foreach (var meteringPointTypes in actor.MeteringPointTypes)

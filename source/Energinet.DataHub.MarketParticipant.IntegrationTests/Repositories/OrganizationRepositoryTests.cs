@@ -181,10 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 ActorStatus.New,
                 new[]
                 {
-                    new GridArea(
-                        new GridAreaName("fake_value"),
-                        new GridAreaCode("1234"),
-                        PriceAreaCode.DK1)
+                    new GridAreaId(Guid.NewGuid())
                 },
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
@@ -220,10 +217,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var expected = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("1234"),
-                PriceAreaCode.DK1);
+            var expected = new GridAreaId(Guid.NewGuid());
 
             organization.Actors.Add(new Actor(
                 Guid.Empty,
@@ -244,9 +238,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .Single();
 
             // Assert
-            Assert.NotEqual(Guid.Empty, actual.Id.Value);
-            Assert.Equal(expected.Name, actual.Name);
-            Assert.Equal(expected.Code, actual.Code);
+            Assert.Equal(expected, actual);
         }
 
         [Fact]

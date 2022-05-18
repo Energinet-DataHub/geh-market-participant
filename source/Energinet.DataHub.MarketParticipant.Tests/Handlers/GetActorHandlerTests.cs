@@ -103,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(actorId),
                 new GlobalLocationNumber(actorGln),
                 ActorStatus.Active,
-                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<GridAreaId>(),
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
 
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(response.Actor);
-            Assert.Equal(actorId.ToString(), response.Actor?.ActorId);
+            Assert.Equal(actorId.ToString(), response.Actor.ActorId);
         }
     }
 }

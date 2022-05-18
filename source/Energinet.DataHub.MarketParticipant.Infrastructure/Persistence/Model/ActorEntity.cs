@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
@@ -23,8 +22,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public ActorEntity()
         {
             Gln = string.Empty;
-            MarketRoles = new Collection<MarketRoleEntity>();
             MeteringPointTypes = new Collection<MeteringPointTypeEntity>();
+            MarketRoles = new Collection<MarketRoleEntity>();
+            GridAreas = new Collection<GridAreaActorInfoLinkEntity>();
         }
 
         public Guid Id { get; set; }
@@ -32,13 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public string Gln { get; set; }
         public int Status { get; set; }
 
-        public GridAreaEntity? SingleGridArea { get; set; }
-
         public Collection<MeteringPointTypeEntity> MeteringPointTypes { get; }
         public Collection<MarketRoleEntity> MarketRoles { get; }
+        public Collection<GridAreaActorInfoLinkEntity> GridAreas { get; }
 
         public Guid OrganizationId { get; set; }
-
-        private Guid GridAreaId { get; set; }
     }
 }
