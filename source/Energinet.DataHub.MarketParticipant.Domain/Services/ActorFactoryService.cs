@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
+        private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IActiveDirectoryService _activeDirectoryService;
 
         public ActorFactoryService(
@@ -37,6 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
+            IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IActiveDirectoryService activeDirectoryService)
         {
             _organizationRepository = organizationRepository;
@@ -44,19 +46,22 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
+            _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _activeDirectoryService = activeDirectoryService;
         }
 
         public async Task<Actor> CreateAsync(
             Organization organization,
             GlobalLocationNumber gln,
+            IReadOnlyCollection<GridAreaId> gridAreas,
             IReadOnlyCollection<MarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes)
         {
-            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
-            ArgumentNullException.ThrowIfNull(gln, nameof(gln));
-            ArgumentNullException.ThrowIfNull(marketRoles, nameof(marketRoles));
-            ArgumentNullException.ThrowIfNull(meteringPointTypes, nameof(meteringPointTypes));
+            ArgumentNullException.ThrowIfNull(organization);
+            ArgumentNullException.ThrowIfNull(gln);
+            ArgumentNullException.ThrowIfNull(gridAreas);
+            ArgumentNullException.ThrowIfNull(marketRoles);
+            ArgumentNullException.ThrowIfNull(meteringPointTypes);
 
             await _uniqueGlobalLocationNumberRuleService
                 .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
@@ -66,11 +71,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
+            _allowedGridAreasRuleService.ValidateGridAreas(
+                gridAreas,
+                marketRoles);
+
             var appRegistrationResponse = await _activeDirectoryService
                 .CreateAppRegistrationAsync(gln, marketRoles)
                 .ConfigureAwait(false);
 
             var newActor = new Actor(appRegistrationResponse.ExternalActorId, gln);
+
+            foreach (var gridAreaId in gridAreas)
+                newActor.GridAreas.Add(gridAreaId);
 
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
