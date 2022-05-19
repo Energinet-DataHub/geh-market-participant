@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 GridAreaId = new GridAreaId(Guid.NewGuid()),
                 Name = new GridAreaName("fake_value"),
                 Code = new GridAreaCode("123"),
-                PriceAreaCode = PriceAreaCode.DK1,
+                PriceAreaCode = PriceAreaCode.Dk1,
                 GridAreaLinkId = new GridAreaLinkId(Guid.NewGuid())
             };
 
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);
             Assert.Equal(integrationEvent.Code.Value, actualEvent.Code);
-            Assert.Equal(integrationEvent.PriceAreaCode, PriceAreaCode.FromValue((int)actualEvent.PriceAreaCode));
+            Assert.Equal(integrationEvent.PriceAreaCode, (PriceAreaCode)actualEvent.PriceAreaCode);
             Assert.Equal(integrationEvent.GridAreaLinkId.Value, actualEvent.GridAreaLinkId);
         }
 

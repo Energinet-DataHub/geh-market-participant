@@ -17,7 +17,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
     /// <summary>
     /// BFF client for Energinet.DataHub.MarketParticipant.
     /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantContactClient
+    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantContactClient, IMarketParticipantGridAreaClient
     {
     }
 }

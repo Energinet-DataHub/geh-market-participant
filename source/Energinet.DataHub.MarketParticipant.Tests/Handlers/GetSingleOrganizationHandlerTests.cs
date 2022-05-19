@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(Guid.NewGuid()),
                 new GlobalLocationNumber("fake_value"),
                 ActorStatus.Active,
-                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<GridAreaId>(),
                 new[] { marketRole },
                 Enumerable.Empty<MeteringPointType>());
 
@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Assert
             Assert.NotNull(response.Organization);
 
-            var actualOrganization = response.Organization!;
+            var actualOrganization = response.Organization;
             Assert.Equal(organization.Id.ToString(), actualOrganization.OrganizationId);
 
             var actualActor = actualOrganization.Actors.Single();

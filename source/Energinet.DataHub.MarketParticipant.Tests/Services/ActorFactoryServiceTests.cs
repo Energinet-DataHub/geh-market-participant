@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -116,10 +118,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 activeDirectory.Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 
             activeDirectory
-                .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
+                .Setup(x => x.CreateAppRegistrationAsync(
+                    It.IsAny<GlobalLocationNumber>(),
+                    It.IsAny<List<MarketRole>>()))
+                .ReturnsAsync(new CreateAppRegistrationResponse(
+                    new ExternalActorId(Guid.NewGuid()),
+                    "fake_value",
+                    "fake_value"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -127,7 +135,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             var response = await target
-                .CreateAsync(organization, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>(), Array.Empty<MeteringPointType>())
+                .CreateAsync(organization, new GlobalLocationNumber("fake_value"), marketRoles, Array.Empty<MeteringPointType>())
                 .ConfigureAwait(false);
 
             // Assert
@@ -178,7 +186,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         new ExternalActorId(expectedExternalId),
                         new GlobalLocationNumber("fake_value"),
                         ActorStatus.New,
-                        Enumerable.Empty<GridArea>(),
+                        Enumerable.Empty<GridAreaId>(),
                         Enumerable.Empty<MarketRole>(),
                         Enumerable.Empty<MeteringPointType>())
                 },
@@ -186,9 +194,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 validAddress,
                 "Test Comment");
 
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
+
             activeDirectory
-                .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ExternalActorId(expectedExternalId));
+                .Setup(x => x.CreateAppRegistrationAsync(
+                    It.IsAny<GlobalLocationNumber>(),
+                    It.IsNotNull<List<MarketRole>>()))
+                .ReturnsAsync(new CreateAppRegistrationResponse(
+                    new ExternalActorId(expectedExternalId),
+                    "fake_value",
+                    "fake_value"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organizationAfterUpdate.Id))
@@ -196,7 +211,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organizationBeforeUpdate, new GlobalLocationNumber("fake_value"), Array.Empty<MarketRole>(), Array.Empty<MeteringPointType>())
+                .CreateAsync(organizationBeforeUpdate, new GlobalLocationNumber("fake_value"), marketRoles, Array.Empty<MeteringPointType>())
                 .ConfigureAwait(false);
 
             // Assert
@@ -224,10 +239,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 
             activeDirectory
-                .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
+                .Setup(x => x.CreateAppRegistrationAsync(
+                    It.IsAny<GlobalLocationNumber>(),
+                    It.IsAny<List<MarketRole>>()))
+                .ReturnsAsync(new CreateAppRegistrationResponse(
+                    new ExternalActorId(Guid.NewGuid()),
+                    "fake_value",
+                    "fake_value"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -235,7 +256,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target
-                .CreateAsync(organization, globalLocationNumber, Array.Empty<MarketRole>(), Array.Empty<MeteringPointType>())
+                .CreateAsync(organization, globalLocationNumber, marketRoles, Array.Empty<MeteringPointType>())
                 .ConfigureAwait(false);
 
             // Assert
@@ -261,12 +282,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
-            var marketRoles = new[] { new MarketRole(EicFunction.BalanceResponsibleParty) };
+            var marketRoles = new List<MarketRole> { new(EicFunction.BalanceResponsibleParty) };
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
 
             activeDirectory
-                .Setup(x => x.EnsureAppRegistrationIdAsync(It.IsAny<GlobalLocationNumber>()))
-                .ReturnsAsync(new ExternalActorId(Guid.NewGuid()));
+                .Setup(x => x.CreateAppRegistrationAsync(
+                    It.IsAny<GlobalLocationNumber>(),
+                    It.IsAny<List<MarketRole>>()))
+                .ReturnsAsync(new CreateAppRegistrationResponse(
+                    new ExternalActorId(Guid.NewGuid()),
+                    "fake_value",
+                    "fake_value"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
