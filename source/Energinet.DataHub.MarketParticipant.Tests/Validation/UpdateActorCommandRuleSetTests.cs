@@ -123,25 +123,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Fact]
-        public async Task Validate_GridAreas_ValidatesProperty()
-        {
-            // Arrange
-            var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.GridAreas)}";
-
-            var actorDto = new ChangeActorDto(ValidStatus, null!, _validMarketRoles, _validMeteringPointTypes);
-
-            var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-
-        [Fact]
         public async Task Validate_MarketRole_ValidatesProperty()
         {
             // Arrange
