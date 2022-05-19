@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    // todo: IAllowedGridAreasRuleService is called
     public sealed class ActorFactoryService : IActorFactoryService
     {
         private readonly IOrganizationRepository _organizationRepository;

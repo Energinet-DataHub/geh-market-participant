@@ -29,7 +29,6 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
-    // todo: UT
     public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
         private readonly IOrganizationRepository _organizationRepository;
