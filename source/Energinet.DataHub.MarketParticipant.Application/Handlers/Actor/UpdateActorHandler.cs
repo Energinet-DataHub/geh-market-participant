@@ -70,6 +70,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 throw new NotFoundValidationException(actorId);
             }
 
+            UpdateActorStatus(actor, request);
+
             UpdateActorMarketRoles(organization, actor, request);
 
             UpdateActorMeteringPointTypes(actor, request);
@@ -91,10 +93,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             return Unit.Value;
         }
 
+        private static void UpdateActorStatus(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
+        }
+
         private static void UpdateActorMeteringPointTypes(Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MeteringPointTypes.Clear();
-            var meteringPointTypesToAdd = request.ChangeActor.MeteringPointTypes.DistinctBy(type => type.Value);
+
+            var meteringPointTypes = request.ChangeActor.MeteringPointTypes.Select(t => MeteringPointType.FromName(t));
+            var meteringPointTypesToAdd = meteringPointTypes.DistinctBy(type => type.Value);
 
             foreach (var meteringPointTypeDto in meteringPointTypesToAdd)
             {

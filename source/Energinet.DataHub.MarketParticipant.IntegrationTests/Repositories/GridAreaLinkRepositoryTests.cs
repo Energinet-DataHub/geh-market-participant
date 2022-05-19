@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);

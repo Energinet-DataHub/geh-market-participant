@@ -66,11 +66,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
-            var appRegistrationId = await _activeDirectoryService
-                .EnsureAppRegistrationIdAsync(gln)
+            var appRegistrationResponse = await _activeDirectoryService
+                .CreateAppRegistrationAsync(gln, marketRoles)
                 .ConfigureAwait(false);
 
-            var newActor = new Actor(appRegistrationId, gln);
+            var newActor = new Actor(appRegistrationResponse.ExternalActorId, gln);
 
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
-            var savedActor = await SaveActorAsync(organization, appRegistrationId).ConfigureAwait(false);
+            var savedActor = await SaveActorAsync(organization, appRegistrationResponse.ExternalActorId).ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
                 .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)

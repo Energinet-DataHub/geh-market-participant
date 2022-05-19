@@ -50,5 +50,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 },
                 _logger).ConfigureAwait(false);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetGridAreasAsync()
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var command = new GetGridAreasCommand();
+                    var response = await _mediator.Send(command).ConfigureAwait(false);
+                    return Ok(response.GridAreas);
+                },
+                _logger).ConfigureAwait(false);
+        }
     }
 }

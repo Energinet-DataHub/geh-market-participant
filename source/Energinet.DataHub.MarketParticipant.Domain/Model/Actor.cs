@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId = externalActorId;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner();
-            Areas = new Collection<GridArea>();
+            GridAreas = new Collection<GridAreaId>();
             MarketRoles = new Collection<MarketRole>();
             MeteringPointTypes = new Collection<MeteringPointType>();
         }
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId externalActorId,
             GlobalLocationNumber gln,
             ActorStatus actorStatus,
-            IEnumerable<GridArea> gridAreas,
+            IEnumerable<GridAreaId> gridAreas,
             IEnumerable<MarketRole> marketRoles,
             IEnumerable<MeteringPointType> meteringPointTypes)
         {
@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId = externalActorId;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-            Areas = new List<GridArea>(gridAreas);
+            GridAreas = new List<GridAreaId>(gridAreas);
             MarketRoles = new List<MarketRole>(marketRoles);
             MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
         }
@@ -71,12 +71,16 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The status of the current actor.
         /// </summary>
-        public ActorStatus Status => _actorStatusTransitioner.Status;
+        public ActorStatus Status
+        {
+            get => _actorStatusTransitioner.Status;
+            set => _actorStatusTransitioner.Status = value;
+        }
 
         /// <summary>
         /// The grid area that the actor has access to.
         /// </summary>
-        public ICollection<GridArea> Areas { get; }
+        public ICollection<GridAreaId> GridAreas { get; }
 
         /// <summary>
         /// The roles (functions and permissions) assigned to the current actor.

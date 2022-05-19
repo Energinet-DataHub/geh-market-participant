@@ -578,7 +578,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             // Act
             var createdActorId = await target.CreateActorAsync(
                     orgId,
-                    new CreateActorDto(new GlobalLocationNumberDto("123456"), Array.Empty<MarketRoleDto>()))
+                    new CreateActorDto(new GlobalLocationNumberDto("123456"), Array.Empty<MarketRoleDto>(), Array.Empty<MarketParticipantMeteringPointType>()))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -629,7 +629,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     actorId,
                     new ChangeActorDto(
                         ActorStatus.Active,
-                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) }))
+                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) },
+                        Array.Empty<MarketParticipantMeteringPointType>()))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -697,6 +698,35 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Assert
             Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), contactId);
+        }
+
+        [Fact]
+        public async Task GetGridAreasAsync_All_ReturnsGridAreas()
+        {
+            // Arrange
+            const string incomingJson = @"
+    [
+        {
+            ""Id"": ""2ac38237-9612-4ea5-8cf5-bac3734c10fd"",
+            ""Code"": ""Code"",
+            ""Name"": ""Name"",
+            ""PriceAreaCode"": ""PriceAreaCode""
+        }
+    ]}";
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
+            httpTest.RespondWith(incomingJson);
+
+            // Act
+            var actual = await target.GetGridAreasAsync().ConfigureAwait(false);
+
+            // Assert
+            var actualContact = actual.Single();
+            Assert.Equal(Guid.Parse("2ac38237-9612-4ea5-8cf5-bac3734c10fd"), actualContact.Id);
+            Assert.Equal("Code", actualContact.Code);
+            Assert.Equal("Name", actualContact.Name);
+            Assert.Equal("PriceAreaCode", actualContact.PriceAreaCode);
         }
     }
 }

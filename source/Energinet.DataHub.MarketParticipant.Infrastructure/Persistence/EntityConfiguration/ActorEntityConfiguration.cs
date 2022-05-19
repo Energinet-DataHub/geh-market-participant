@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -29,13 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.HasKey(actor => actor.Id);
             builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
             builder
-                .HasOne(actor => actor.SingleGridArea!)
-                .WithMany()
-                .HasForeignKey("GridAreaId");
-            builder
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()
                 .HasForeignKey(marketRole => marketRole.ActorInfoId);
+            builder
+                .HasMany(actor => actor.GridAreas)
+                .WithOne()
+                .HasForeignKey(gridArea => gridArea.ActorInfoId);
             builder.OwnsMany(role => role.MeteringPointTypes, ConfigureMeteringTypes);
         }
 

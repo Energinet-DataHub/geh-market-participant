@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
@@ -23,5 +22,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
         GlobalLocationNumberDto Gln,
         string Status,
         IEnumerable<MarketRoleDto> MarketRoles,
-        IEnumerable<MeteringPointType> MeteringPointTypes);
+        IEnumerable<string> MeteringPointTypes);
 }

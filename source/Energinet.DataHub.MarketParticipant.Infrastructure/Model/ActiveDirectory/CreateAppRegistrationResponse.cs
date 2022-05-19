@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Microsoft.Graph;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
-    public interface IServiceBusQueueVerifier
-    {
-        Task<bool> VerifyAsync(string connectionString, string name);
-    }
+    public sealed record CreateAppRegistrationResponse(Application Application, ServicePrincipal ServicePrincipal);
 }

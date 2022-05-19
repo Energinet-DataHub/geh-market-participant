@@ -26,17 +26,21 @@ module "func_entrypoint_marketparticipant" {
   application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value
   log_analytics_workspace_id                = data.azurerm_key_vault_secret.log_shared_id.value
   always_on                                 = true
+  health_check_path                         = "/api/monitor/ready"
+  health_check_alert_action_group_id        = data.azurerm_key_vault_secret.primary_action_group_id.value
+  health_check_alert_enabled                = var.enable_health_check_alerts
   app_settings                              = {
     # Region: Default Values
-    WEBSITE_ENABLE_SYNC_UPDATE_SITE           = true
-    WEBSITE_RUN_FROM_PACKAGE                  = 1
-    WEBSITES_ENABLE_APP_SERVICE_STORAGE       = true
-    FUNCTIONS_WORKER_RUNTIME                  = "dotnet-isolated"
+    WEBSITE_ENABLE_SYNC_UPDATE_SITE                   = true
+    WEBSITE_RUN_FROM_PACKAGE                          = 1
+    WEBSITES_ENABLE_APP_SERVICE_STORAGE               = true
+    FUNCTIONS_WORKER_RUNTIME                          = "dotnet-isolated"
     # Endregion
-    SQL_MP_DB_CONNECTION_STRING        		  = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
-    SERVICE_BUS_CONNECTION_STRING           = data.azurerm_key_vault_secret.sb_domain_relay_send_connection_string.value
-    SBT_MARKET_PARTICIPANT_CHANGED_NAME     = data.azurerm_key_vault_secret.sbt-market-participant-changed-name.value
+    SQL_MP_DB_CONNECTION_STRING        		          = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
+    SERVICE_BUS_CONNECTION_STRING                     = data.azurerm_key_vault_secret.sb_domain_relay_send_connection_string.value
+    SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING        = data.azurerm_key_vault_secret.sb_domain_relay_manage_connection_string.value
+    SBT_MARKET_PARTICIPANT_CHANGED_NAME               = data.azurerm_key_vault_secret.sbt-market-participant-changed-name.value
   }
 
-  tags                                      = azurerm_resource_group.this.tags
+  tags                                                = azurerm_resource_group.this.tags
 }

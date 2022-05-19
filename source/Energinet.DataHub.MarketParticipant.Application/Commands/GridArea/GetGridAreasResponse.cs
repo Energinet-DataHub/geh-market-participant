@@ -13,15 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.HealthCheck
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public interface IFluentHealth
-    {
-        Task<IReadOnlyCollection<(string Key, bool Result)>> RunAsync();
-        Task<IReadOnlyCollection<(string Key, bool Result)>> RunInParallelAsync();
-        IFluentHealth AddSqlDatabase(string verficationKey, string connectionString);
-        IFluentHealth AddMessageBus(string verficationKey, string connectionString, string queueName);
-    }
+    public sealed record GetGridAreasResponse(IEnumerable<GridAreaDto> GridAreas);
 }
