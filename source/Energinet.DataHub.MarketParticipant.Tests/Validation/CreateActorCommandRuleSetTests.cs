@@ -157,7 +157,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.EicFunction)}";
 
             var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validGridAreas, new[] { new MarketRoleDto(value) }, _validMeteringPointTypes);
 
