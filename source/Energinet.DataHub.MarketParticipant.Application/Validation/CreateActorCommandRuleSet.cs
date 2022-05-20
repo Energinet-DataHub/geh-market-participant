@@ -45,6 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(actor => actor.MarketRoles)
                         .NotNull()
+                        .NotEmpty()
                         .ChildRules(rolesValidator =>
                         {
                             rolesValidator
@@ -53,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 .ChildRules(roleValidator =>
                                 {
                                     roleValidator
-                                        .RuleFor(x => x.Function)
+                                        .RuleFor(x => x.EicFunction)
                                         .NotEmpty()
                                         .IsEnumName(typeof(EicFunction), false);
                                 });
