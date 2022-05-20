@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -37,7 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var target = new CreateActorHandler(
                 new Mock<IOrganizationExistsHelperService>().Object,
-                new Mock<IActorFactoryService>().Object);
+                new Mock<IActorFactoryService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             // Act + Assert
             await Assert
@@ -53,7 +55,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string actorGln = "SomeGln";
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
+            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
+            var target = new CreateActorHandler(
+                organizationExistsHelperService.Object,
+                actorFactory.Object,
+                combinationOfBusinessRolesRuleService.Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -107,7 +113,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string actorGln = "SomeGln";
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
+            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
+            var target = new CreateActorHandler(
+                organizationExistsHelperService.Object,
+                actorFactory.Object,
+                combinationOfBusinessRolesRuleService.Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
