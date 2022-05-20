@@ -57,7 +57,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles);
 
-            var meteringPointTypes = request.Actor.MeteringPointTypes.Select(e => MeteringPointType.FromName(e));
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
                 .ConfigureAwait(false);

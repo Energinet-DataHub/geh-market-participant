@@ -46,6 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             var ddx = imbalanceSettlementResponsibleRole.Functions.ToHashSet();
             var dgl = meteredDataAdministratorRole.Functions.ToHashSet();
             var ez = systemOperatorRole.Functions.ToHashSet();
+
             AllSets = new List<HashSet<EicFunction>> { ddkDdqMdr, ddmMdr, ddz, ddx, dgl, ez };
         }
 
