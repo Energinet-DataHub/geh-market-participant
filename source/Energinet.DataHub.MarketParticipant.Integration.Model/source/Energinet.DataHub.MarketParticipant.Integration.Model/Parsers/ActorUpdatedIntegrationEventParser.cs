@@ -29,11 +29,15 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
+                var externalActorId = integrationEvent.ExternalActorId.HasValue
+                    ? integrationEvent.ExternalActorId.Value.ToString()
+                    : string.Empty;
+
                 var contract = new ActorUpdatedIntegrationEventContract
                 {
                     Id = integrationEvent.Id.ToString(),
                     ActorId = integrationEvent.ActorId.ToString(),
-                    ExternalActorId = integrationEvent.ExternalActorId.ToString(),
+                    ExternalActorId = externalActorId,
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Gln = integrationEvent.Gln,
                     Status = (int)integrationEvent.Status,
@@ -65,11 +69,15 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             {
                 var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
+                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                    ? id
+                    : null;
+
                 return new ActorUpdatedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
-                    Guid.Parse(contract.ExternalActorId),
+                    externalActorId,
                     contract.Gln,
                     Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
                     contract.BusinessRoles.Select(
