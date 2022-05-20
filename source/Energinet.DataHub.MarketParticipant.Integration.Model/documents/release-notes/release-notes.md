@@ -32,3 +32,7 @@
 ## Version 2.0.4
 
 - Address fields can no longer be null, but may be empty.
+
+## Version 2.0.5
+
+- External Actor Id is annotated to be null. This will happen if the status is New or Deleted, or the chosen roles do not give permission to the actor.

@@ -25,7 +25,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="id">Unique integration event ID.</param>
         /// <param name="actorId">The internal actor ID.</param>
         /// <param name="organizationId">Organization ID.</param>
-        /// <param name="externalActorId">The external actor ID for integrating Azure AD and domains.</param>
+        /// <param name="externalActorId">
+        /// The external actor id for integrating Azure AD and domains.
+        /// Can be null; this will happen if the status is New or Deleted, or the chosen roles do not give permission to the actor.</param>
         /// <param name="gln">GLN.</param>
         /// <param name="status">The status of the current actor.</param>
         /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
@@ -36,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Guid id,
             Guid actorId,
             Guid organizationId,
-            Guid externalActorId,
+            Guid? externalActorId,
             string gln,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
@@ -59,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
 
-        public Guid ExternalActorId { get; }
+        public Guid? ExternalActorId { get; }
         public string Gln { get; }
         public ActorStatus Status { get; }
 
