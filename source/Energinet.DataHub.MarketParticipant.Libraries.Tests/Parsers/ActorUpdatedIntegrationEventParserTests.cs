@@ -60,6 +60,31 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
+        public void Parse_NoExternalActorId_ParsesCorrectly()
+        {
+            // arrange
+            var target = new ActorUpdatedIntegrationEventParser();
+            var @event = new ActorUpdatedIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                null,
+                "0123456789012",
+                ActorStatus.Active,
+                new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
+                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty },
+                new[] { Guid.NewGuid(), Guid.NewGuid() },
+                new[] { "type1", "type2" });
+
+            // act
+            var actualBytes = target.Parse(@event);
+            var actualEvent = target.Parse(actualBytes);
+
+            // assert
+            Assert.Equal(@event.ExternalActorId, actualEvent.ExternalActorId);
+        }
+
+        [Fact]
         public void Parse_InvalidGuid_ThrowsException()
         {
             // Arrange

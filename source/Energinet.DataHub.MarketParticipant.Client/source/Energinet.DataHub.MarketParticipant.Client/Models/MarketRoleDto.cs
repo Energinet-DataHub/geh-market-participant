@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record MarketRoleDto(EicFunction Function);
+    public sealed record MarketRoleDto(EicFunction EicFunction);
 }

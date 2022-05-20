@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 
         public override bool IsValid(ValidationContext<T> context, string value)
         {
-            return MeteringPointType.TryFromName(value, out _);
+            return MeteringPointType.TryFromName(value, true, out _);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)

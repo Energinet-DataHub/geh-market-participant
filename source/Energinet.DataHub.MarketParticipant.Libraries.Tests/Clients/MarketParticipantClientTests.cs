@@ -18,7 +18,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client;
 using Energinet.DataHub.MarketParticipant.Client.Models;
-using Flurl.Http;
 using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
 using Xunit;
@@ -73,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""Status"": ""Active"",
                     ""MarketRoles"": [
                         {
-                            ""Function"": ""Consumer""
+                            ""EicFunction"": ""Consumer""
                         }
                     ]
                 }
@@ -116,7 +115,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal("Test Comment", actualOrganization.Comment);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(EicFunction.Consumer, actualMarketRole.Function);
+            Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
         }
 
         [Fact]
@@ -138,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""Active"",
                                 ""MarketRoles"": [
                                     {
-                                        ""Function"": ""Consumer""
+                                        ""EicFunction"": ""Consumer""
                                     }
                                 ]
                             }
@@ -166,7 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""New"",
                                 ""MarketRoles"": [
                                     {
-                                        ""Function"": ""Producer""
+                                        ""EicFunction"": ""Producer""
                                     }
                                 ]
                             }
@@ -213,7 +212,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.Active, firstActor.Status);
 
             var firstMarketRole = firstActor.MarketRoles.Single();
-            Assert.Equal(EicFunction.Consumer, firstMarketRole.Function);
+            Assert.Equal(EicFunction.Consumer, firstMarketRole.EicFunction);
 
             var secondOrganization = actual.Skip(1).First();
             Assert.Equal(Guid.Parse("c4d950f7-0acf-439b-9bb6-610255218c6e"), secondOrganization.OrganizationId);
@@ -233,7 +232,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.New, secondActor.Status);
 
             var secondMarketRole = secondActor.MarketRoles.Single();
-            Assert.Equal(EicFunction.Producer, secondMarketRole.Function);
+            Assert.Equal(EicFunction.Producer, secondMarketRole.EicFunction);
         }
 
         [Fact]
@@ -254,7 +253,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ""Status"": ""Active"",
 			                ""MarketRoles"": [
 				                {
-					                ""Function"": ""Consumer""
+					                ""EicFunction"": ""Consumer""
 				                }
 			                ]
 		                }
@@ -297,7 +296,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.Active, actualActor.Status);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(EicFunction.Consumer, actualMarketRole.Function);
+            Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
         }
 
         [Fact]
@@ -318,7 +317,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ""Status"": ""Active"",
 			                ""MarketRoles"": [
 				                {
-					                ""Function"": ""Consumer""
+					                ""EicFunction"": ""Consumer""
 				                }
 			                ]
 		                }
@@ -369,7 +368,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.Active, actualActor.Status);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(EicFunction.Consumer, actualMarketRole.Function);
+            Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
         }
 
         [Fact]
@@ -390,7 +389,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 			                ""Status"": ""Active"",
 			                ""MarketRoles"": [
 				                {
-					                ""Function"": ""Consumer""
+					                ""EicFunction"": ""Consumer""
 				                }
 			                ]
 		                }
@@ -442,7 +441,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(ActorStatus.Active, actualActor.Status);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(EicFunction.Consumer, actualMarketRole.Function);
+            Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
         }
 
         [Fact]
@@ -495,7 +494,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""status"": ""New"",
                         ""marketRoles"": [
                           {
-                            ""function"": ""MarketOperator""
+                            ""EicFunction"": ""MarketOperator""
                           }
                         ]
                       },
@@ -508,7 +507,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""status"": ""Active"",
                         ""marketRoles"": [
                           {
-                            ""function"": ""EnergySupplier""
+                            ""EicFunction"": ""EnergySupplier""
                           }
                         ]
                     }
@@ -536,7 +535,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.True(firstActor.MarketRoles.Count == 1);
 
             var firstMarketRole = firstActor.MarketRoles[0];
-            Assert.Equal(EicFunction.MarketOperator, firstMarketRole.Function);
+            Assert.Equal(EicFunction.MarketOperator, firstMarketRole.EicFunction);
 
             var secondActor = actual.Skip(1).First();
             Assert.Equal(Guid.Parse("02f0d6c9-96f5-4078-a754-fcc589b04937"), secondActor.ActorId);
@@ -546,7 +545,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.True(secondActor.MarketRoles.Count == 1);
 
             var secondMarketRole = secondActor.MarketRoles[0];
-            Assert.Equal(EicFunction.EnergySupplier, secondMarketRole.Function);
+            Assert.Equal(EicFunction.EnergySupplier, secondMarketRole.EicFunction);
         }
 
         [Fact]
@@ -563,7 +562,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""status"": ""New"",
                     ""marketRoles"": [
                         {
-                            ""function"": ""EnergySupplier""
+                            ""EicFunction"": ""EnergySupplier""
                         }
                     ]
                 }";
@@ -578,7 +577,11 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             // Act
             var createdActorId = await target.CreateActorAsync(
                     orgId,
-                    new CreateActorDto(new GlobalLocationNumberDto("123456"), Array.Empty<MarketRoleDto>(), Array.Empty<MarketParticipantMeteringPointType>()))
+                    new CreateActorDto(
+                        new GlobalLocationNumberDto("123456"),
+                        Array.Empty<Guid>(),
+                        Array.Empty<MarketRoleDto>(),
+                        Array.Empty<MarketParticipantMeteringPointType>()))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -594,7 +597,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.True(actual.MarketRoles.Count == 1);
 
             var marketRole = actual.MarketRoles[0];
-            Assert.Equal(EicFunction.EnergySupplier, marketRole.Function);
+            Assert.Equal(EicFunction.EnergySupplier, marketRole.EicFunction);
         }
 
         [Fact]
@@ -611,7 +614,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""status"": ""Active"",
                     ""marketRoles"": [
                         {
-                            ""function"": ""BillingAgent""
+                            ""EicFunction"": ""BillingAgent""
                         }
                     ]
                 }";
@@ -629,6 +632,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     actorId,
                     new ChangeActorDto(
                         ActorStatus.Active,
+                        Array.Empty<Guid>(),
                         new[] { new MarketRoleDto(EicFunction.EnergySupplier) },
                         Array.Empty<MarketParticipantMeteringPointType>()))
                 .ConfigureAwait(false);
@@ -646,7 +650,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.True(actual.MarketRoles.Count == 1);
 
             var marketRole = actual.MarketRoles[0];
-            Assert.Equal(EicFunction.BillingAgent, marketRole.Function);
+            Assert.Equal(EicFunction.BillingAgent, marketRole.EicFunction);
         }
 
         [Fact]

@@ -51,23 +51,35 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .ConfigureAwait(false);
 
             var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
-            var actorRoles = CreateMarketRoles(request.Actor).ToList();
+            var marketRoles = CreateMarketRoles(request.Actor).ToList();
+            var gridAreas = CreateGridAreas(request.Actor).ToList();
+            var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();
 
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(actorRoles);
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles);
 
             var meteringPointTypes = request.Actor.MeteringPointTypes.Select(e => MeteringPointType.FromName(e));
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles, meteringPointTypes.ToList())
+                .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);
+        }
+
+        private static IEnumerable<GridAreaId> CreateGridAreas(CreateActorDto actorDto)
+        {
+            return (actorDto.GridAreas ?? Array.Empty<Guid>()).Select(gridAreaId => new GridAreaId(gridAreaId));
+        }
+
+        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(CreateActorDto actorDto)
+        {
+            return actorDto.MeteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
         }
 
         private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto actorDto)
         {
             foreach (var marketRole in actorDto.MarketRoles)
             {
-                var function = Enum.Parse<EicFunction>(marketRole.Function, true);
+                var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
                 yield return new MarketRole(function);
             }
         }

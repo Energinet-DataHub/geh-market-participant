@@ -178,7 +178,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridArea = new GridArea(
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             var testGridArea = await gridAreaRepository
                 .AddOrUpdateAsync(gridArea)
@@ -229,7 +229,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridArea = new GridArea(
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             var expected = await gridAreaRepository
                 .AddOrUpdateAsync(gridArea)

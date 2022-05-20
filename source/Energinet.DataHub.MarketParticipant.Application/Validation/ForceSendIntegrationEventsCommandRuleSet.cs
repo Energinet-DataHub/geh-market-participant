@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed record MarketRoleDto(string EicFunction);
+    public sealed class ForceSendIntegrationEventsCommandRuleSet : AbstractValidator<ForceSendIntegrationEventsCommand>
+    {
+    }
 }

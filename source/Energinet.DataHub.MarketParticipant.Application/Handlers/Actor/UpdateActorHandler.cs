@@ -36,19 +36,22 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+        private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
             IOrganizationExistsHelperService organizationExistsHelperService,
             IUnitOfWorkProvider unitOfWorkProvider,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-            IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService)
+            IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
+            IAllowedGridAreasRuleService allowedGridAreasRuleService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+            _allowedGridAreasRuleService = allowedGridAreasRuleService;
         }
 
         [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
@@ -71,9 +74,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             }
 
             UpdateActorStatus(actor, request);
-
             UpdateActorMarketRoles(organization, actor, request);
-
+            UpdateActorGridAreas(actor, request);
             UpdateActorMeteringPointTypes(actor, request);
 
             await using var uow = await _unitOfWorkProvider
@@ -102,13 +104,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             actor.MeteringPointTypes.Clear();
 
-            var meteringPointTypes = request.ChangeActor.MeteringPointTypes.Select(t => MeteringPointType.FromName(t));
+            var meteringPointTypes = request.ChangeActor.MeteringPointTypes.Select(t => MeteringPointType.FromName(t, true));
             var meteringPointTypesToAdd = meteringPointTypes.DistinctBy(type => type.Value);
 
-            foreach (var meteringPointTypeDto in meteringPointTypesToAdd)
+            foreach (var meteringPointType in meteringPointTypesToAdd)
             {
-                var meteringPintType = MeteringPointType.FromValue(meteringPointTypeDto.Value);
-                actor.MeteringPointTypes.Add(meteringPintType);
+                actor.MeteringPointTypes.Add(meteringPointType);
             }
         }
 
@@ -118,11 +119,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
-                var function = Enum.Parse<EicFunction>(marketRoleDto.Function, true);
+                var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
                 actor.MarketRoles.Add(new MarketRole(function));
             }
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+        }
+
+        private void UpdateActorGridAreas(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.GridAreas.Clear();
+
+            foreach (var gridAreaId in request.ChangeActor.GridAreas ?? Array.Empty<Guid>())
+            {
+                actor.GridAreas.Add(new GridAreaId(gridAreaId));
+            }
+
+            _allowedGridAreasRuleService.ValidateGridAreas(actor.GridAreas, actor.MarketRoles);
         }
     }
 }

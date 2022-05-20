@@ -40,7 +40,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(gridArea => gridArea.PriceAreaCode)
-                        .Must(priceAreaCode => PriceAreaCode.TryFromName(priceAreaCode, true, out _));
+                        .NotNull()
+                        .IsEnumName(typeof(PriceAreaCode), false);
                 });
         }
     }

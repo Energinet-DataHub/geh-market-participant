@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -50,7 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationExistsHelperService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object);
+                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IAllowedGridAreasRuleService>().Object);
 
             // Act + Assert
             await Assert
@@ -68,7 +70,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object);
+                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IAllowedGridAreasRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -80,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
 
             // Act + Assert
             await Assert
@@ -89,18 +92,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_OverlappingRoles_AreValidated()
+        public async Task Handle_AllowedGridAreas_AreValidated()
         {
             // Arrange
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var overlappingBusinessRolesRuleService = new Mock<IOverlappingBusinessRolesRuleService>();
+            var allowedGridAreasRuleService = new Mock<IAllowedGridAreasRuleService>();
 
             var target = new UpdateActorHandler(
                 new Mock<IOrganizationRepository>().Object,
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                overlappingBusinessRolesRuleService.Object);
+                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                allowedGridAreasRuleService.Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -116,7 +120,47 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+
+            // Act
+            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+
+            // Assert
+            allowedGridAreasRuleService.Verify(
+                x => x.ValidateGridAreas(It.IsAny<IEnumerable<GridAreaId>>(), It.IsAny<IEnumerable<MarketRole>>()),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task Handle_OverlappingRoles_AreValidated()
+        {
+            // Arrange
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var overlappingBusinessRolesRuleService = new Mock<IOverlappingBusinessRolesRuleService>();
+
+            var target = new UpdateActorHandler(
+                new Mock<IOrganizationRepository>().Object,
+                organizationExistsHelperService.Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
+                overlappingBusinessRolesRuleService.Object,
+                new Mock<IAllowedGridAreasRuleService>().Object);
+
+            var organizationId = Guid.NewGuid();
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+
+            organization.Actors.Add(new Actor(
+                new ExternalActorId(organizationId),
+                new GlobalLocationNumber("fake_value")));
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
+                .ReturnsAsync(organization);
+
+            var command = new UpdateActorCommand(
+                organizationId,
+                Guid.Empty,
+                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -139,7 +183,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
                 actorIntegrationEventsQueueService.Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object);
+                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IAllowedGridAreasRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -155,7 +200,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
