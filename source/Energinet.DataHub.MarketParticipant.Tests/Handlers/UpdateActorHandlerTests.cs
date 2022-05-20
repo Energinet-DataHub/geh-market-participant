@@ -52,7 +52,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdGenerationService>().Object);
 
             // Act + Assert
             await Assert
@@ -71,7 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdGenerationService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -104,14 +106,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
-                allowedGridAreasRuleService.Object);
+                allowedGridAreasRuleService.Object,
+                new Mock<IExternalActorIdGenerationService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(
-                new ExternalActorId(organizationId),
-                new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -144,14 +145,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingBusinessRolesRuleService.Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdGenerationService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(
-                new ExternalActorId(organizationId),
-                new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -172,6 +172,45 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
+        public async Task Handle_ExternalActorId_IsGenerated()
+        {
+            // Arrange
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var externalActorIdGenerationService = new Mock<IExternalActorIdGenerationService>();
+
+            var target = new UpdateActorHandler(
+                new Mock<IOrganizationRepository>().Object,
+                organizationExistsHelperService.Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
+                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                externalActorIdGenerationService.Object);
+
+            var organizationId = Guid.NewGuid();
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+
+            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
+                .ReturnsAsync(organization);
+
+            var command = new UpdateActorCommand(
+                organizationId,
+                Guid.Empty,
+                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+
+            // Act
+            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+
+            // Assert
+            externalActorIdGenerationService.Verify(
+                x => x.AssignExternalActorIdAsync(It.IsAny<Actor>()),
+                Times.Once);
+        }
+
+        [Fact]
         public async Task Handle_UpdatedActor_DispatchesEvent()
         {
             // Arrange
@@ -184,14 +223,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 UnitOfWorkProviderMock.Create(),
                 actorIntegrationEventsQueueService.Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdGenerationService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(
-                new ExternalActorId(organizationId),
-                new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))

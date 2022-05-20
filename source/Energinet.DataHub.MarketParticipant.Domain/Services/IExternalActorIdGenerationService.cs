@@ -12,7 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public record AppRegistrationId(string Value);
+    /// <summary>
+    /// slæjsdlfk
+    /// </summary>
+    public interface IExternalActorIdGenerationService
+    {
+        /// <summary>
+        /// alfkadsf
+        /// </summary>
+        /// <param name="actor">safsf</param>
+        public Task AssignExternalActorIdAsync(Actor actor);
+    }
 }

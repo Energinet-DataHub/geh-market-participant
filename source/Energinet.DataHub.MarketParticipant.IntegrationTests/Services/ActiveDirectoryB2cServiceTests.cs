@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
         public async ValueTask DisposeAsync()
         {
-            await _sut.DeleteAppRegistrationAsync(new AppRegistrationId(_b2CAppRegistrationId)).ConfigureAwait(false);
+            await _sut.DeleteAppRegistrationAsync(new ExternalActorId(_b2CAppRegistrationId)).ConfigureAwait(false);
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             // Act
             await _sut
-                .DeleteAppRegistrationAsync(new AppRegistrationId(createAppRegistrationResponse.AppObjectId))
+                .DeleteAppRegistrationAsync(new ExternalActorId(createAppRegistrationResponse.AppObjectId))
                 .ConfigureAwait(false);
 
             // Assert

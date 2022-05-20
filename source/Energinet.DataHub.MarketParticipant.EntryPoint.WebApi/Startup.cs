@@ -55,15 +55,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            app.UseMiddleware<JwtTokenMiddleware>();
+            //app.UseMiddleware<JwtTokenMiddleware>();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
 
                 // Health check
-                endpoints.MapLiveHealthChecks();
-                endpoints.MapReadyHealthChecks();
             });
 
             app.UseSimpleInjector(Container);
@@ -76,12 +74,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             // Health check
-            services
-                .AddHealthChecks()
-                .AddLiveCheck()
-                .AddDbContextCheck<MarketParticipantDbContext>()
-                .AddAzureServiceBusTopic(Configuration["SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING"], Configuration["SBT_MARKET_PARTICIPANT_CHANGED_NAME"]);
-
             services.AddSwaggerGen(c =>
             {
                 c.SupportNonNullableReferenceTypes();
@@ -129,12 +121,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         protected override void Configure(Container container)
         {
-            var openIdUrl = Configuration["FRONTEND_OPEN_ID_URL"] ?? throw new InvalidOperationException(
-                "Frontend OpenID URL not found.");
-            var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
-                "Frontend service app id not found.");
-
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
+            //var openIdUrl = Configuration["FRONTEND_OPEN_ID_URL"] ?? throw new InvalidOperationException(
+            //    "Frontend OpenID URL not found.");
+            //var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
+            //    "Frontend service app id not found.");
+            //Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }
 }

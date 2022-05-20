@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Deletes the registered app from active directory.
         /// </summary>
-        /// <param name="appId">The unique id for the app.</param>
-        Task DeleteAppRegistrationAsync(AppRegistrationId appId);
+        /// <param name="externalActorId">The unique id for the app.</param>
+        Task DeleteAppRegistrationAsync(ExternalActorId externalActorId);
     }
 }

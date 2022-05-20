@@ -21,8 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 
-#pragma warning disable
-
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class ActorUpdatedEventDispatcher : IIntegrationEventDispatcher
@@ -49,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.ActorId,
                 actorUpdatedIntegrationEvent.OrganizationId.Value,
-                actorUpdatedIntegrationEvent.ExternalActorId.Value,
+                actorUpdatedIntegrationEvent.ExternalActorId?.Value,
                 actorUpdatedIntegrationEvent.Gln.Value,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
                 actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
@@ -60,9 +58,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
 
-            await using var sender = _serviceBusClient.CreateSender();
+            var sender = _serviceBusClient.CreateSender();
 
-            await sender.SendMessageAsync(message).ConfigureAwait(false);
+            await using (sender.ConfigureAwait(false))
+            {
+                await sender.SendMessageAsync(message).ConfigureAwait(false);
+            }
+
             return true;
         }
     }

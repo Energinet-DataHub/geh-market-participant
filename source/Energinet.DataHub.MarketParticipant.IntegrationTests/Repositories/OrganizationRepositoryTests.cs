@@ -203,7 +203,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var newActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var newActor = new Actor(new GlobalLocationNumber("fake_value"));
             organization!.Actors.Add(newActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -270,7 +270,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var balancePowerSupplierActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var balancePowerSupplierActor = new Actor(new GlobalLocationNumber("fake_value"));
             balancePowerSupplierActor.MarketRoles.Add(new MarketRole(EicFunction.BalancingServiceProvider));
             organization.Actors.Add(balancePowerSupplierActor);
 
@@ -278,7 +278,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var meteringPointAdministratorActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var meteringPointAdministratorActor = new Actor(new GlobalLocationNumber("fake_value"));
             meteringPointAdministratorActor.MarketRoles.Add(new MarketRole(EicFunction.MeteringPointAdministrator));
             organization!.Actors.Add(meteringPointAdministratorActor);
 
@@ -307,7 +307,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var someActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var someActor = new Actor(new GlobalLocationNumber("fake_value"));
             someActor.MeteringPointTypes.Add(MeteringPointType.D02Analysis);
             organization.Actors.Add(someActor);
 
@@ -315,7 +315,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var meteringPointAdministratorActor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var meteringPointAdministratorActor = new Actor(new GlobalLocationNumber("fake_value"));
             meteringPointAdministratorActor.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
             organization!.Actors.Add(meteringPointAdministratorActor);
 
@@ -349,14 +349,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var actorId = Guid.NewGuid();
 
             // Act
-            organization.Actors.Add(new Actor(new ExternalActorId(actorId), new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository2.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(organization);
             Assert.Single(organization!.Actors);
-            Assert.Contains(organization.Actors, x => x.ExternalActorId.Value == actorId);
+            Assert.Contains(organization.Actors, x => x.ExternalActorId?.Value == actorId);
         }
 
         [Fact]
@@ -372,7 +372,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var actorWithMeteringTypes = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actorWithMeteringTypes = new Actor(new GlobalLocationNumber("fake_value"));
             actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
             organization.Actors.Add(actorWithMeteringTypes);
 
@@ -400,7 +400,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var actorWithMeteringTypes = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actorWithMeteringTypes = new Actor(new GlobalLocationNumber("fake_value"));
             actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
             actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D12TotalConsumption);
             organization.Actors.Add(actorWithMeteringTypes);
@@ -434,7 +434,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var globalLocationNumber = new MockedGln();
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
+            organization.Actors.Add(new Actor(globalLocationNumber));
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
 
             // Act
@@ -461,7 +461,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var globalLocationNumber = new MockedGln();
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), globalLocationNumber));
+            organization.Actors.Add(new Actor(globalLocationNumber));
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
 
             // Act
