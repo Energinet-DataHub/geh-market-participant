@@ -346,17 +346,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository2 = new OrganizationRepository(context2);
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var actorId = Guid.NewGuid();
+            var gln = new MockedGln();
 
             // Act
-            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(gln));
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository2.GetAsync(orgId).ConfigureAwait(false);
 
             // Assert
             Assert.NotNull(organization);
             Assert.Single(organization!.Actors);
-            Assert.Contains(organization.Actors, x => x.ExternalActorId?.Value == actorId);
+            Assert.Contains(organization.Actors, x => x.Gln == gln);
         }
 
         [Fact]
