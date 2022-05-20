@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
-using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
@@ -25,44 +25,30 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
     {
         public CombinationOfBusinessRolesRuleService()
         {
-            BalanceResponsiblePartyRole = new BalanceResponsiblePartyRole();
-            GridAccessProviderRole = new GridAccessProviderRole();
-            BalancePowerSupplierRole = new BalancePowerSupplierRole();
-            ImbalanceSettlementResponsibleRole = new ImbalanceSettlementResponsibleRole();
-            MeteringPointAdministratorRole = new MeteringPointAdministratorRole();
-            MeteredDataAdministratorRole = new MeteredDataAdministratorRole();
-            SystemOperatorRole = new SystemOperatorRole();
-            MeteredDataResponsibleRole = new MeteredDataResponsibleRole();
+            var balanceResponsiblePartyRole = new BalanceResponsiblePartyRole();
+            var gridAccessProviderRole = new GridAccessProviderRole();
+            var balancePowerSupplierRole = new BalancePowerSupplierRole();
+            var imbalanceSettlementResponsibleRole = new ImbalanceSettlementResponsibleRole();
+            var meteringPointAdministratorRole = new MeteringPointAdministratorRole();
+            var meteredDataAdministratorRole = new MeteredDataAdministratorRole();
+            var systemOperatorRole = new SystemOperatorRole();
+            var meteredDataResponsibleRole = new MeteredDataResponsibleRole();
 
-            var ddkDdqMdrHashSets = BalanceResponsiblePartyRole.Functions.ToHashSet();
-            ddkDdqMdrHashSets.UnionWith(BalancePowerSupplierRole.Functions.Concat(MeteredDataResponsibleRole.Functions));
-            DdkDdqMdr = new HashSet<EicFunction>(ddkDdqMdrHashSets);
+            var ddkDdqMdrHashSets = balanceResponsiblePartyRole.Functions.ToHashSet();
+            ddkDdqMdrHashSets.UnionWith(balancePowerSupplierRole.Functions.Concat(meteredDataResponsibleRole.Functions));
+            var ddkDdqMdr = new HashSet<EicFunction>(ddkDdqMdrHashSets);
 
-            var ddmMdrHashSets = BalanceResponsiblePartyRole.Functions.ToHashSet();
-            ddmMdrHashSets.UnionWith(BalancePowerSupplierRole.Functions.Concat(MeteredDataResponsibleRole.Functions));
-            DdmMdr = new HashSet<EicFunction>(ddmMdrHashSets);
+            var ddmMdrHashSets = gridAccessProviderRole.Functions.ToHashSet();
+            ddmMdrHashSets.UnionWith(meteredDataResponsibleRole.Functions);
+            var ddmMdr = new HashSet<EicFunction>(ddmMdrHashSets);
 
-            Ddz = MeteringPointAdministratorRole.Functions.ToHashSet();
-            Ddx = ImbalanceSettlementResponsibleRole.Functions.ToHashSet();
-            Dgl = MeteredDataAdministratorRole.Functions.ToHashSet();
-            Ez = SystemOperatorRole.Functions.ToHashSet();
-            AllSets = new List<HashSet<EicFunction>> { DdkDdqMdr, DdmMdr, Ddz, Ddx, Dgl, Ez };
+            var ddz = meteringPointAdministratorRole.Functions.ToHashSet();
+            var ddx = imbalanceSettlementResponsibleRole.Functions.ToHashSet();
+            var dgl = meteredDataAdministratorRole.Functions.ToHashSet();
+            var ez = systemOperatorRole.Functions.ToHashSet();
+            AllSets = new List<HashSet<EicFunction>> { ddkDdqMdr, ddmMdr, ddz, ddx, dgl, ez };
         }
 
-        private MeteredDataResponsibleRole MeteredDataResponsibleRole { get; }
-        private BalanceResponsiblePartyRole BalanceResponsiblePartyRole { get; }
-        private GridAccessProviderRole GridAccessProviderRole { get; }
-        private BalancePowerSupplierRole BalancePowerSupplierRole { get; }
-        private ImbalanceSettlementResponsibleRole ImbalanceSettlementResponsibleRole { get; }
-        private MeteringPointAdministratorRole MeteringPointAdministratorRole { get; }
-        private MeteredDataAdministratorRole MeteredDataAdministratorRole { get; }
-        private SystemOperatorRole SystemOperatorRole { get; }
-        private HashSet<EicFunction> DdkDdqMdr { get; }
-        private HashSet<EicFunction> DdmMdr { get; }
-        private HashSet<EicFunction> Ddz { get; }
-        private HashSet<EicFunction> Ddx { get; }
-        private HashSet<EicFunction> Dgl { get; }
-        private HashSet<EicFunction> Ez { get; }
         private List<HashSet<EicFunction>> AllSets { get; }
 
         public void ValidateCombinationOfBusinessRoles(IList<MarketRole> marketRoles)
