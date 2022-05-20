@@ -22,17 +22,17 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
     {
         public BaseIntegrationEvent Parse(byte[] protoContract)
         {
-            if (TryParseActorUpdatedIntegrationEvent(protoContract, out ActorUpdatedIntegrationEvent actorUpdatedEvent))
+            if (TryParseActorUpdatedIntegrationEvent(protoContract, out var actorUpdatedEvent))
             {
                 return actorUpdatedEvent;
             }
 
-            if (TryParseOrganizationUpdatedIntegrationEvent(protoContract, out OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent))
+            if (TryParseOrganizationUpdatedIntegrationEvent(protoContract, out var organizationUpdatedIntegrationEvent))
             {
                 return organizationUpdatedIntegrationEvent;
             }
 
-            if (TryParseGridAreaUpdatedIntegrationEvent(protoContract, out GridAreaUpdatedIntegrationEvent gridAreaUpdatedEvent))
+            if (TryParseGridAreaUpdatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
             {
                 return gridAreaUpdatedEvent;
             }
