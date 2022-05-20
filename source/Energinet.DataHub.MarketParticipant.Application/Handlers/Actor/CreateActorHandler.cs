@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -29,13 +30,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
+        private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
-            IActorFactoryService actorFactoryService)
+            IActorFactoryService actorFactoryService,
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
+            _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
         }
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
@@ -50,6 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var marketRoles = CreateMarketRoles(request.Actor).ToList();
             var gridAreas = CreateGridAreas(request.Actor).ToList();
             var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();
+
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles);
 
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
