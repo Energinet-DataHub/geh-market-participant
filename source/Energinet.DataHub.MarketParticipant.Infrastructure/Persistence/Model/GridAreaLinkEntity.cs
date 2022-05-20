@@ -19,6 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     public sealed class GridAreaLinkEntity
     {
         public Guid Id { get; set; }
-        public Guid GridAreaID { get; set; }
+        public Guid GridAreaId { get; set; }
     }
 }

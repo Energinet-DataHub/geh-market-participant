@@ -30,9 +30,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string BusinessRegisterIdentifier { get; set; }
+        public string? Comment { get; set; }
         public AddressEntity Address { get; set; }
 
         public Collection<ActorEntity> Actors { get; }
-        public string? Comment { get; set; }
     }
 }

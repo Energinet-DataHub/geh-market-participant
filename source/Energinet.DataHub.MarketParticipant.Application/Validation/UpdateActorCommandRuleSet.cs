@@ -37,7 +37,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     changeActorValidator
                         .RuleFor(x => x.Status)
                         .NotEmpty()
-                        .IsEnumName(typeof(ActorStatus));
+                        .IsEnumName(typeof(ActorStatus), false);
+
+                    changeActorValidator
+                        .RuleFor(x => x.GridAreas)
+                        .ChildRules(gridAreaValidator =>
+                            gridAreaValidator
+                                .RuleForEach(x => x)
+                                .NotEmpty());
 
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
@@ -54,6 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .IsEnumName(typeof(EicFunction), false);
                                 }));
+
                     changeActorValidator
                         .RuleFor(actor => actor.MeteringPointTypes)
                         .NotNull()

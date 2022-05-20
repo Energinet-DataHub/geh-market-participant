@@ -16,5 +16,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public sealed record GetGridAreasCommand() : IRequest<GetGridAreasResponse>;
+    public sealed record GetGridAreasCommand : IRequest<GetGridAreasResponse>;
 }

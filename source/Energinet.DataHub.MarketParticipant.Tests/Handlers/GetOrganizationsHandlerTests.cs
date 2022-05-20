@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(Guid.NewGuid()),
                 new GlobalLocationNumber("fake_value"),
                 ActorStatus.Active,
-                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<GridAreaId>(),
                 new[] { marketRole },
                 Enumerable.Empty<MeteringPointType>());
 

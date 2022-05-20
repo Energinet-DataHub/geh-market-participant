@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Globalization;
-using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 using FluentValidation.Validators;
@@ -28,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 
         public override bool IsValid(ValidationContext<T> context, string value)
         {
-            return MeteringPointType.TryFromName(value, out _);
+            return MeteringPointType.TryFromName(value, true, out _);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)

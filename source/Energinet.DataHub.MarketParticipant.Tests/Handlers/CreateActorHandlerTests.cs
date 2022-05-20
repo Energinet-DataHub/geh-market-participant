@@ -82,13 +82,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
                     It.IsAny<IReadOnlyCollection<MarketRole>>(),
                     It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
 
             // Act
             var response = await target
@@ -137,13 +138,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
                     It.IsAny<IReadOnlyCollection<MarketRole>>(),
                     It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }, Array.Empty<string>()));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<Guid>(), new[] { marketRole }, Array.Empty<string>()));
 
             // Act
             var response = await target

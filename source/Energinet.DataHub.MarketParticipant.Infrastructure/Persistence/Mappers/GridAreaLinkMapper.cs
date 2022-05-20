@@ -22,14 +22,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         public static void MapToEntity(GridAreaLink from, GridAreaLinkEntity to)
         {
             to.Id = from.Id.Value;
-            to.GridAreaID = from.GridAreaId.Value;
+            to.GridAreaId = from.GridAreaId.Value;
         }
 
         public static GridAreaLink MapFromEntity(GridAreaLinkEntity from)
         {
             return new GridAreaLink(
                 new GridAreaLinkId(from.Id),
-                new GridAreaId(from.GridAreaID));
+                new GridAreaId(from.GridAreaId));
         }
     }
 }

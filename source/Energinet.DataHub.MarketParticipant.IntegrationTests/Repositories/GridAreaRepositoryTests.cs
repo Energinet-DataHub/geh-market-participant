@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
@@ -87,16 +87,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
-            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
-            newGrid = new GridArea(
+            var newGrid = new GridArea(
                 gridId,
                 new GridAreaName("NewName"),
                 new GridAreaCode("234"),
-                PriceAreaCode.DK2);
+                PriceAreaCode.Dk2);
+
             await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
             newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
 
@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(gridId.Value, newGrid?.Id.Value);
             Assert.Equal("234", newGrid?.Code.Value);
             Assert.Equal("NewName", newGrid?.Name.Value);
-            Assert.Equal(PriceAreaCode.DK2, newGrid?.PriceAreaCode);
+            Assert.Equal(PriceAreaCode.Dk2, newGrid?.PriceAreaCode);
         }
 
         [Fact]
@@ -122,16 +122,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
-            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
-            newGrid = new GridArea(
+            var newGrid = new GridArea(
                 gridId,
                 new GridAreaName("NewName"),
                 new GridAreaCode("234"),
-                PriceAreaCode.DK2);
+                PriceAreaCode.Dk2);
             await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
             newGrid = await gridRepository2.GetAsync(gridId).ConfigureAwait(false);
 
@@ -141,7 +140,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(gridId.Value, newGrid?.Id.Value);
             Assert.Equal("234", newGrid?.Code.Value);
             Assert.Equal("NewName", newGrid?.Name.Value);
-            Assert.Equal(PriceAreaCode.DK2, newGrid?.PriceAreaCode);
+            Assert.Equal(PriceAreaCode.Dk2, newGrid?.PriceAreaCode);
         }
 
         [Fact]
@@ -155,7 +154,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridArea = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.DK1);
+                PriceAreaCode.Dk1);
 
             await repository.AddOrUpdateAsync(gridArea).ConfigureAwait(false);
 
