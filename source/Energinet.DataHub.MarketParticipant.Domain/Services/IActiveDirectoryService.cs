@@ -30,7 +30,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="appName">The name of the app to create.</param>
         /// <param name="permissions">Roles to be assigned to the app.</param>
         /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
-        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(GlobalLocationNumber appName, IReadOnlyCollection<MarketRole> permissions);
+        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
+            GlobalLocationNumber appName,
+            IReadOnlyCollection<MarketRole> permissions);
 
         /// <summary>
         /// Creates a new secret for the already registered app.
@@ -52,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Deletes the registered app from active directory.
         /// </summary>
-        /// <param name="appId">The unique id for the app.</param>
-        Task DeleteAppRegistrationAsync(AppRegistrationId appId);
+        /// <param name="externalActorId">The unique id for the app.</param>
+        Task DeleteAppRegistrationAsync(ExternalActorId externalActorId);
     }
 }

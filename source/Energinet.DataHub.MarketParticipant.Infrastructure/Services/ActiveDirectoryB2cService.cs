@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Utilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using CreateAppRegistrationResponse = Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory.CreateAppRegistrationResponse;
@@ -104,13 +103,27 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return new AppRegistrationSecret(secret.SecretText);
         }
 
-        public async Task DeleteAppRegistrationAsync(AppRegistrationId appId)
+        public async Task DeleteAppRegistrationAsync(ExternalActorId externalActorId)
         {
-            ArgumentNullException.ThrowIfNull(appId, nameof(appId));
+            ArgumentNullException.ThrowIfNull(externalActorId);
 
             try
             {
-                await _graphClient.Applications[appId.Value]
+                var appId = externalActorId.Value.ToString();
+                var applicationUsingAppId = await _graphClient
+                    .Applications
+                    .Request()
+                    .Filter($"appId eq '{appId}'")
+                    .GetAsync()
+                    .ConfigureAwait(false);
+
+                var foundApp = applicationUsingAppId.SingleOrDefault();
+                if (foundApp == null)
+                {
+                    throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
+                }
+
+                await _graphClient.Applications[foundApp.Id]
                     .Request()
                     .DeleteAsync()
                     .ConfigureAwait(false);

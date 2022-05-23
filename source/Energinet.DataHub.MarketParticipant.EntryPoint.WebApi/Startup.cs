@@ -89,7 +89,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     "v1",
                     new OpenApiInfo
                     {
-                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi", Version = "v1"
+                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi",
+                        Version = "v1"
                     });
 
                 var securitySchema = new OpenApiSecurityScheme
