@@ -110,8 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         }
 
         [Fact]
-        public async Task
-            DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
+        public async Task DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
         {
             // Arrange
             var roles = new List<MarketRole>
@@ -126,7 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             // Act
             await _sut
-                .DeleteAppRegistrationAsync(new ExternalActorId(createAppRegistrationResponse.AppObjectId))
+                .DeleteAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId)
                 .ConfigureAwait(false);
 
             // Assert

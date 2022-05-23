@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
+        private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
 
         public ActorFactoryService(
             IOrganizationRepository organizationRepository,
@@ -37,7 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-            IAllowedGridAreasRuleService allowedGridAreasRuleService)
+            IAllowedGridAreasRuleService allowedGridAreasRuleService,
+            IExternalActorIdConfigurationService externalActorIdConfigurationService)
         {
             _organizationRepository = organizationRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
@@ -45,6 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
+            _externalActorIdConfigurationService = externalActorIdConfigurationService;
         }
 
         public async Task<Actor> CreateAsync(
@@ -83,6 +86,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var meteringPointType in meteringPointTypes.DistinctBy(e => e.Value))
                 newActor.MeteringPointTypes.Add(meteringPointType);
 
+            await _externalActorIdConfigurationService
+                .AssignExternalActorIdAsync(newActor)
+                .ConfigureAwait(false);
+
             organization.Actors.Add(newActor);
 
             var uow = await _unitOfWorkProvider
@@ -100,6 +107,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             return savedActor;
         }
 
+        private static bool AreActorsEquivalent(Actor a, Actor b)
+        {
+            if (a.Gln != b.Gln)
+                return false;
+
+            if (a.MarketRoles.Count != b.MarketRoles.Count)
+                return false;
+
+            var eicFunctions = b.MarketRoles.Select(roleB => roleB.Function).ToList();
+            return a.MarketRoles.All(roleA => eicFunctions.Contains(roleA.Function));
+        }
+
         private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
         {
             await _organizationRepository
@@ -110,14 +129,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .GetAsync(organization.Id)
                 .ConfigureAwait(false);
 
-            var expectedRoles = newActor
-                .MarketRoles
-                .Select(x => x.Function)
-                .ToHashSet();
-
             return savedOrganization!
                 .Actors
-                .Single(a => a.Gln == newActor.Gln && expectedRoles.SetEquals(a.MarketRoles.Select(x => x.Function)));
+                .Single(actor => AreActorsEquivalent(newActor, actor));
         }
     }
 }

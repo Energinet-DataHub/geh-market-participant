@@ -50,7 +50,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -72,7 +73,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -94,7 +96,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -116,7 +119,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
@@ -152,7 +156,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 actorIntegrationEventsQueueService.Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             var expectedId = Guid.NewGuid();
             var expectedExternalId = Guid.NewGuid();
@@ -226,7 +231,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
@@ -264,7 +270,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
@@ -303,7 +310,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                allowedGridAreasRuleService.Object);
+                allowedGridAreasRuleService.Object,
+                new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new GlobalLocationNumber("fake_value");
@@ -328,6 +336,47 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Assert
             allowedGridAreasRuleService.Verify(
                 x => x.ValidateGridAreas(gridAreas, marketRoles),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateAsync_NewActor_AssignExternalActorId()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var externalActorIdConfigurationService = new Mock<IExternalActorIdConfigurationService>();
+            var target = new ActorFactoryService(
+                organizationRepository.Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IActorIntegrationEventsQueueService>().Object,
+                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                new Mock<IAllowedGridAreasRuleService>().Object,
+                externalActorIdConfigurationService.Object);
+
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var globalLocationNumber = new GlobalLocationNumber("fake_value");
+            var gridAreas = new List<GridAreaId> { new(Guid.NewGuid()) };
+            var marketRoles = new List<MarketRole> { new(EicFunction.BalanceResponsibleParty) };
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
+
+            organizationRepository
+                .Setup(x => x.GetAsync(organization.Id))
+                .ReturnsAsync(organization);
+
+            // Act
+            await target
+                .CreateAsync(
+                    organization,
+                    globalLocationNumber,
+                    gridAreas,
+                    marketRoles,
+                    meteringPointTypes)
+                .ConfigureAwait(false);
+
+            // Assert
+            externalActorIdConfigurationService.Verify(
+                x => x.AssignExternalActorIdAsync(It.IsAny<Actor>()),
                 Times.Once);
         }
     }

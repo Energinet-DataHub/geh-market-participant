@@ -110,7 +110,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             try
             {
                 var appId = externalActorId.Value.ToString();
-                await _graphClient.Applications[appId]
+                var applicationUsingAppId = await _graphClient
+                    .Applications
+                    .Request()
+                    .Filter($"appId eq '{appId}'")
+                    .GetAsync()
+                    .ConfigureAwait(false);
+
+                var foundApp = applicationUsingAppId.SingleOrDefault();
+                if (foundApp == null)
+                {
+                    throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
+                }
+
+                await _graphClient.Applications[foundApp.Id]
                     .Request()
                     .DeleteAsync()
                     .ConfigureAwait(false);

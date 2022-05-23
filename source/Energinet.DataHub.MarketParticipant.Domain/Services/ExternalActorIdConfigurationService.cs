@@ -19,11 +19,11 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed class ExternalActorIdGenerationService : IExternalActorIdGenerationService
+    public sealed class ExternalActorIdConfigurationService : IExternalActorIdConfigurationService
     {
         private readonly IActiveDirectoryService _activeDirectoryService;
 
-        public ExternalActorIdGenerationService(IActiveDirectoryService activeDirectoryService)
+        public ExternalActorIdConfigurationService(IActiveDirectoryService activeDirectoryService)
         {
             _activeDirectoryService = activeDirectoryService;
         }
@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             if (actor.ExternalActorId != null)
             {
-                if (actor.Status is not ActorStatus.Active or ActorStatus.Passive)
+                if (actor.Status is not (ActorStatus.Active or ActorStatus.Passive))
                 {
                     // There is an external id, but it is no longer allowed.
                     await _activeDirectoryService

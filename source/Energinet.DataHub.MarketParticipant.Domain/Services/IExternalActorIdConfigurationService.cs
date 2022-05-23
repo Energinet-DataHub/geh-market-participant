@@ -18,14 +18,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// slæjsdlfk
+    /// Manages actor B2C information in Azure.
     /// </summary>
-    public interface IExternalActorIdGenerationService
+    public interface IExternalActorIdConfigurationService
     {
         /// <summary>
-        /// alfkadsf
+        /// Ensure that the B2C configuration matches the state of the actor.
         /// </summary>
-        /// <param name="actor">safsf</param>
+        /// <param name="actor">The actor to configure B2C for.</param>
         public Task AssignExternalActorIdAsync(Actor actor);
     }
 }

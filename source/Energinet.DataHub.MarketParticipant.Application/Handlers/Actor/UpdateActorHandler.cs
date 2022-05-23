@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
-        private readonly IExternalActorIdGenerationService _externalActorIdGenerationService;
+        private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorIdGenerationService externalActorIdGenerationService)
+            IExternalActorIdConfigurationService externalActorIdConfigurationService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
-            _externalActorIdGenerationService = externalActorIdGenerationService;
+            _externalActorIdConfigurationService = externalActorIdConfigurationService;
         }
 
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             UpdateActorGridAreas(actor, request);
             UpdateActorMeteringPointTypes(actor, request);
 
-            await _externalActorIdGenerationService
+            await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
                 .ConfigureAwait(false);
 
