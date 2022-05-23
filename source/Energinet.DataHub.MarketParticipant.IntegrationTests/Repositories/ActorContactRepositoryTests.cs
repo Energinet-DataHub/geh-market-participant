@@ -80,6 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .ConfigureAwait(false);
 
             organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
             var categories = new[]
@@ -130,6 +131,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .ConfigureAwait(false);
 
             organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
 
@@ -172,6 +174,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .ConfigureAwait(false);
 
             organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
 
@@ -232,6 +235,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .ConfigureAwait(false);
 
             organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            actor = organization!.Actors.First();
 
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
 
