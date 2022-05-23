@@ -7,7 +7,7 @@ CREATE TABLE [dbo].[ActorContact]
     [Email]             [nvarchar](250)    NOT NULL,
     [Phone]             [nvarchar](250)    NOT NULL,
 
-    CONSTRAINT PK_Contact PRIMARY KEY ([Id]),
-    CONSTRAINT FK_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[ActorInfoNew]([Id]),
+    CONSTRAINT PK_ActorContact PRIMARY KEY ([Id]),
+    CONSTRAINT FK_ActorContact_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[ActorInfoNew]([Id]),
 )
 GO
