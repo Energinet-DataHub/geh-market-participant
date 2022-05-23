@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 actor.Status.ToString(),
                 actor.GridAreas.Select(gridAreaId => gridAreaId.Value).ToList(),
                 actor.MarketRoles.Select(Map).ToList(),
-                actor.MeteringPointTypes.Select(e => e.Name));
+                actor.MeteringPointTypes.Select(mp => mp.Name).ToList());
         }
 
         private static AddressDto Map(Address address)

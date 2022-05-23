@@ -112,8 +112,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             actor.MeteringPointTypes.Clear();
 
-            var meteringPointTypes = request.ChangeActor.MeteringPointTypes.Select(t => MeteringPointType.FromName(t, true));
-            var meteringPointTypesToAdd = meteringPointTypes.DistinctBy(type => type.Value);
+            var meteringPointTypesToAdd = request
+                .ChangeActor
+                .MeteringPointTypes
+                .Select(mp => MeteringPointType.FromName(mp, true))
+                .Distinct();
 
             foreach (var meteringPointType in meteringPointTypesToAdd)
             {
