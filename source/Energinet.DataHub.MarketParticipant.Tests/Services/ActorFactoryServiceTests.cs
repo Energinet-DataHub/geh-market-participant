@@ -177,6 +177,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 validAddress,
                 "Test Comment 2");
 
+            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
+
             var organizationAfterUpdate = new Organization(
                 organizationBeforeUpdate.Id,
                 organizationBeforeUpdate.Name,
@@ -188,14 +190,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         new GlobalLocationNumber("fake_value"),
                         ActorStatus.New,
                         Enumerable.Empty<GridAreaId>(),
-                        Enumerable.Empty<MarketRole>(),
+                        marketRoles,
                         Enumerable.Empty<MeteringPointType>())
                 },
                 validBusinessRegisterIdentifier,
                 validAddress,
                 "Test Comment");
-
-            var marketRoles = new List<MarketRole> { new(EicFunction.EnergySupplier) };
 
             organizationRepository
                 .Setup(x => x.GetAsync(organizationAfterUpdate.Id))
