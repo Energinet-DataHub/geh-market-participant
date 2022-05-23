@@ -23,17 +23,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     public interface IGridAreaLinkRepository
     {
         /// <summary>
-        /// Updates a Grid Area Link, or adds it if it's not already present.
+        /// Updates a grid area link, or adds it if it's not already present.
         /// </summary>
         /// <param name="gridAreaLink">The GridAreaLink to add or update</param>
         /// <returns>The id of the added GridAreaLink</returns>
         Task<GridAreaLinkId> AddOrUpdateAsync(GridAreaLink gridAreaLink);
 
         /// <summary>
-        /// Gets an GridAreaLink with the specified Id
+        /// Gets a grid area link with the specified id.
         /// </summary>
-        /// <param name="id">The Id of the GridAreaLink to get.</param>
-        /// <returns>The specified grid area link or null if not found</returns>
+        /// <param name="id">The id of the grid area link to get.</param>
+        /// <returns>The specified grid area link; or null if not found.</returns>
         Task<GridAreaLink?> GetAsync(GridAreaLinkId id);
+
+        /// <summary>
+        /// Gets a grid area link attached to the specified grid area.
+        /// </summary>
+        /// <param name="id">The id of the grid area.</param>
+        /// <returns>The specified grid area link; or null if not found.</returns>
+        Task<GridAreaLink?> GetAsync(GridAreaId id);
     }
 }

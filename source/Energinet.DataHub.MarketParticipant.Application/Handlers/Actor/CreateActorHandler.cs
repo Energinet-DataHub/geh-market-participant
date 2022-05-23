@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -29,13 +30,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
+        private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
-            IActorFactoryService actorFactoryService)
+            IActorFactoryService actorFactoryService,
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
+            _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
         }
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
@@ -47,27 +51,34 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .ConfigureAwait(false);
 
             var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
-            var actorRoles = CreateMarketRoles(request.Actor).ToList();
+            var marketRoles = CreateMarketRoles(request.Actor).ToList();
+            var gridAreas = CreateGridAreas(request.Actor).ToList();
+            var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();
 
-            var meteringPointTypes = request
-                .Actor
-                .MeteringPointTypes
-                .Select(mp => MeteringPointType.FromName(mp, true))
-                .Distinct()
-                .ToList();
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles);
 
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, actorRoles, meteringPointTypes)
+                .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);
+        }
+
+        private static IEnumerable<GridAreaId> CreateGridAreas(CreateActorDto actorDto)
+        {
+            return (actorDto.GridAreas ?? Array.Empty<Guid>()).Select(gridAreaId => new GridAreaId(gridAreaId));
+        }
+
+        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(CreateActorDto actorDto)
+        {
+            return actorDto.MeteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
         }
 
         private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto actorDto)
         {
             foreach (var marketRole in actorDto.MarketRoles)
             {
-                var function = Enum.Parse<EicFunction>(marketRole.Function, true);
+                var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
                 yield return new MarketRole(function);
             }
         }

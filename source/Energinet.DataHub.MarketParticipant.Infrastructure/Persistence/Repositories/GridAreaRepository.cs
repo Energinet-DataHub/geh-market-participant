@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -64,6 +67,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ConfigureAwait(false);
 
             return gridArea is null ? null : GridAreaMapper.MapFromEntity(gridArea);
+        }
+
+        public async Task<IEnumerable<GridArea>> GetAsync()
+        {
+            var query = from gridArea in _marketParticipantDbContext.GridAreas
+                        select gridArea;
+
+            var entites = await query.ToListAsync().ConfigureAwait(false);
+
+            return entites.Select(GridAreaMapper.MapFromEntity);
         }
     }
 }

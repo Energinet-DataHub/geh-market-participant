@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application;
+using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Common.MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
@@ -50,6 +51,9 @@ namespace Energinet.DataHub.MarketParticipant.Common
             Container.AddServiceBus();
             Container.AddServices();
             Container.AddUnitOfWorkProvider();
+            Container.AddAzureAdConfiguration();
+            Container.AddGraphServiceClient();
+            Container.AddActiveDirectoryRoles();
 
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });

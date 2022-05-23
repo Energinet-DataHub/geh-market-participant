@@ -39,9 +39,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             return new ActorDto(
                 actor.Id.ToString(),
-                actor.ExternalActorId.ToString(),
+                actor.ExternalActorId?.ToString(),
                 new GlobalLocationNumberDto(actor.Gln.Value),
                 actor.Status.ToString(),
+                actor.GridAreas.Select(gridAreaId => gridAreaId.Value).ToList(),
                 actor.MarketRoles.Select(Map).ToList(),
                 actor.MeteringPointTypes.Select(mp => mp.Name).ToList());
         }

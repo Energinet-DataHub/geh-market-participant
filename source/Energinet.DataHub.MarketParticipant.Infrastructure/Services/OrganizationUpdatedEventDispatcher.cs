@@ -20,8 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 
-#pragma warning disable
-
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class OrganizationUpdatedEventDispatcher : IIntegrationEventDispatcher
@@ -54,16 +52,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
                     organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
                     organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Country
-                    )
-                );
+                    organizationUpdatedIntegrationEvent.Address.Country));
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
 
-            await using var sender = _serviceBusClient.CreateSender();
+            var sender = _serviceBusClient.CreateSender();
 
-            await sender.SendMessageAsync(message).ConfigureAwait(false);
+            await using (sender.ConfigureAwait(false))
+            {
+                await sender.SendMessageAsync(message).ConfigureAwait(false);
+            }
+
             return true;
         }
     }

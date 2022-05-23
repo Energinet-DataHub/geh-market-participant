@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     {
         private const string ValidId = "6AF7D019-06A7-465B-AF9E-983BF0C7A907";
         private const string ValidGln = "5790000555550";
-
+        private static readonly Guid[] _validGridAreas = { Guid.NewGuid() };
         private static readonly MarketRoleDto[] _validMarketRoles = { new("CapacityTrader") };
         private static readonly string[] _validMeteringPointTypes = { MeteringPointType.D05NetProduction.Name };
 
@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(CreateActorCommand.OrganizationId);
 
-            var actorDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validMarketRoles, _validMeteringPointTypes);
+            var actorDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validGridAreas, _validMarketRoles, _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(value), actorDto);
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.Gln)}";
 
-            var actorDto = new CreateActorDto(new GlobalLocationNumberDto(value), _validMarketRoles, _validMeteringPointTypes);
+            var actorDto = new CreateActorDto(new GlobalLocationNumberDto(value), _validGridAreas, _validMarketRoles, _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), actorDto);
@@ -114,10 +114,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), null!, _validMeteringPointTypes);
+            var createActorDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validGridAreas, null!, _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -133,7 +133,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), Array.Empty<MarketRoleDto>(), _validMeteringPointTypes);
+            var organizationRoleDto = new CreateActorDto(
+                new GlobalLocationNumberDto(ValidGln),
+                _validGridAreas,
+                Array.Empty<MarketRoleDto>(),
+                _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
@@ -152,10 +156,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0]";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), new MarketRoleDto[] { null! }, _validMeteringPointTypes);
+            var createActorDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validGridAreas, new MarketRoleDto[] { null! }, _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -177,9 +181,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.Function)}";
+            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.EicFunction)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), new[] { new MarketRoleDto(value) }, _validMeteringPointTypes);
+            var organizationRoleDto = new CreateActorDto(
+                new GlobalLocationNumberDto(ValidGln),
+                _validGridAreas,
+                new[] { new MarketRoleDto(value) },
+                _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
@@ -206,7 +214,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MeteringPointTypes)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validMarketRoles, null!);
+            var organizationRoleDto = new CreateActorDto(
+                new GlobalLocationNumberDto(ValidGln),
+                _validGridAreas,
+                _validMarketRoles,
+                null!);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
@@ -225,7 +237,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MeteringPointTypes)}";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validMarketRoles, Array.Empty<string>());
+            var organizationRoleDto = new CreateActorDto(
+                new GlobalLocationNumberDto(ValidGln),
+                _validGridAreas,
+                _validMarketRoles,
+                Array.Empty<string>());
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
@@ -244,7 +260,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MeteringPointTypes)}[0]";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validMarketRoles, new string[] { null! });
+            var organizationRoleDto = new CreateActorDto(
+                new GlobalLocationNumberDto(ValidGln),
+                _validGridAreas,
+                _validMarketRoles,
+                new string[] { null! });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
@@ -262,18 +282,23 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData(null, false)]
         [InlineData("  ", false)]
         [InlineData("D06SupplyToGrid", true)]
-        [InlineData("D06SUPPLYTOGRID", true)]
-        [InlineData("D12TotalConsumption", true)]
-        [InlineData("SupplyToGrid", false)]
-        public async Task Validate_MeteringPointTypeEnum_ValidatesProperty(string value, bool isValid)
+        [InlineData("D07ConsumptionFromGrid", true)]
+        [InlineData("D09OwnProduction", true)]
+        [InlineData("D09OWNPRODUCTION", true)]
+        [InlineData("D09OwnProductionXyz", false)]
+        public async Task Validate_MeteringPointType_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MeteringPointTypes)}[0]";
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MeteringPointTypes)}[0]";
 
-            var organizationRoleDto = new CreateActorDto(new GlobalLocationNumberDto(ValidGln), _validMarketRoles, new[] { value });
+            var createActorDto = new CreateActorDto(
+                new GlobalLocationNumberDto(ValidGln),
+                _validGridAreas,
+                _validMarketRoles,
+                new[] { value });
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

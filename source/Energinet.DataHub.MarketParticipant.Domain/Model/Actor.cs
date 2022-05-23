@@ -22,25 +22,23 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     {
         private readonly ActorStatusTransitioner _actorStatusTransitioner;
 
-        public Actor(
-            ExternalActorId externalActorId,
-            GlobalLocationNumber gln)
+        public Actor(GlobalLocationNumber gln)
         {
             Id = Guid.Empty;
-            ExternalActorId = externalActorId;
+            ExternalActorId = null;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner();
-            Areas = new Collection<GridArea>();
+            GridAreas = new Collection<GridAreaId>();
             MarketRoles = new Collection<MarketRole>();
             MeteringPointTypes = new Collection<MeteringPointType>();
         }
 
         public Actor(
             Guid id,
-            ExternalActorId externalActorId,
+            ExternalActorId? externalActorId,
             GlobalLocationNumber gln,
             ActorStatus actorStatus,
-            IEnumerable<GridArea> gridAreas,
+            IEnumerable<GridAreaId> gridAreas,
             IEnumerable<MarketRole> marketRoles,
             IEnumerable<MeteringPointType> meteringPointTypes)
         {
@@ -48,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId = externalActorId;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-            Areas = new List<GridArea>(gridAreas);
+            GridAreas = new List<GridAreaId>(gridAreas);
             MarketRoles = new List<MarketRole>(marketRoles);
             MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
         }
@@ -61,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The external actor id for integrating Azure AD and domains.
         /// </summary>
-        public ExternalActorId ExternalActorId { get; }
+        public ExternalActorId? ExternalActorId { get; set; }
 
         /// <summary>
         /// The global location number of the current actor.
@@ -80,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The grid area that the actor has access to.
         /// </summary>
-        public ICollection<GridArea> Areas { get; }
+        public ICollection<GridAreaId> GridAreas { get; }
 
         /// <summary>
         /// The roles (functions and permissions) assigned to the current actor.

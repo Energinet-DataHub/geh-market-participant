@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.0.3
+
+- Added grid areas to actor.
+
 ## Version 2.0.1
 
 - Added missing metering point types.
@@ -8,9 +12,29 @@
 
 - .NET 6 upgrade
 
-## Version 0.2.1
+## Version 0.5.4
 
-- Preparing package for release.
+- Fixed incorrect null properties.
+
+## Version 0.5.3
+
+- Added error handling.
+
+## Version 0.5.2
+
+- Added Comment to Organization
+
+## Version 0.5.1
+
+- Added contacts
+
+## Version 0.4.1
+
+- Added CVR and Address to organization
+
+## Version 0.4.0
+
+- Global location number cannot be changed on an actor.
 
 ## Version 0.3.1
 
@@ -27,26 +51,6 @@
     - CreateOrganizationAsync
     - UpdateOrganizationAsync
 
-## Version 0.4.0
+## Version 0.2.1
 
-- Global location number cannot be changed on an actor.
-
-## Version 0.4.1
-
-- Added CVR and Address to organization
-
-## Version 0.5.1
-
-- Added contacts
-
-## Version 0.5.2
-
-- Added Comment to Organization
-
-## Version 0.5.3
-
-- Added error handling.
-
-## Version 0.5.4
-
-- Fixed incorrect null properties.
+- Preparing package for release.

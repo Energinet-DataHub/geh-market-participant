@@ -39,7 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var target = new CreateActorHandler(
                 new Mock<IOrganizationExistsHelperService>().Object,
-                new Mock<IActorFactoryService>().Object);
+                new Mock<IActorFactoryService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             // Act + Assert
             await Assert
@@ -55,9 +56,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string actorGln = "SomeGln";
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
+            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
+            var target = new CreateActorHandler(
+                organizationExistsHelperService.Object,
+                actorFactory.Object,
+                combinationOfBusinessRolesRuleService.Object);
             var orgId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -74,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 validAddress,
                 "Test Comment");
 
-            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new GlobalLocationNumber(actorGln));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -84,13 +88,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
                     It.IsAny<IReadOnlyCollection<MarketRole>>(),
                     It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
 
             // Act
             var response = await target
@@ -109,9 +114,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string actorGln = "SomeGln";
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var target = new CreateActorHandler(organizationExistsHelperService.Object, actorFactory.Object);
+            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
+            var target = new CreateActorHandler(
+                organizationExistsHelperService.Object,
+                actorFactory.Object,
+                combinationOfBusinessRolesRuleService.Object);
             var orgId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -128,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 validAddress,
                 "Test Comment");
 
-            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new GlobalLocationNumber(actorGln));
             var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
 
             organizationExistsHelperService
@@ -139,13 +147,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
                     It.IsAny<IReadOnlyCollection<MarketRole>>(),
                     It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new GlobalLocationNumberDto(actorGln), new[] { marketRole }, new[] { MeteringPointType.D06SupplyToGrid.Name }));
+                new CreateActorDto(new GlobalLocationNumberDto(actorGln), Array.Empty<Guid>(), new[] { marketRole }, Array.Empty<string>()));
 
             // Act
             var response = await target

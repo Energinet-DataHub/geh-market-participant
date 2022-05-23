@@ -29,7 +29,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
-        private readonly IActiveDirectoryService _activeDirectoryService;
+        private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
+        private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
 
         public ActorFactoryService(
             IOrganizationRepository organizationRepository,
@@ -37,26 +38,30 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-            IActiveDirectoryService activeDirectoryService)
+            IAllowedGridAreasRuleService allowedGridAreasRuleService,
+            IExternalActorIdConfigurationService externalActorIdConfigurationService)
         {
             _organizationRepository = organizationRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
-            _activeDirectoryService = activeDirectoryService;
+            _allowedGridAreasRuleService = allowedGridAreasRuleService;
+            _externalActorIdConfigurationService = externalActorIdConfigurationService;
         }
 
         public async Task<Actor> CreateAsync(
             Organization organization,
             GlobalLocationNumber gln,
+            IReadOnlyCollection<GridAreaId> gridAreas,
             IReadOnlyCollection<MarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes)
         {
-            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
-            ArgumentNullException.ThrowIfNull(gln, nameof(gln));
-            ArgumentNullException.ThrowIfNull(marketRoles, nameof(marketRoles));
-            ArgumentNullException.ThrowIfNull(meteringPointTypes, nameof(meteringPointTypes));
+            ArgumentNullException.ThrowIfNull(organization);
+            ArgumentNullException.ThrowIfNull(gln);
+            ArgumentNullException.ThrowIfNull(gridAreas);
+            ArgumentNullException.ThrowIfNull(marketRoles);
+            ArgumentNullException.ThrowIfNull(meteringPointTypes);
 
             await _uniqueGlobalLocationNumberRuleService
                 .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
@@ -66,11 +71,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
-            var appRegistrationId = await _activeDirectoryService
-                .EnsureAppRegistrationIdAsync(gln)
-                .ConfigureAwait(false);
+            _allowedGridAreasRuleService.ValidateGridAreas(
+                gridAreas,
+                marketRoles);
 
-            var newActor = new Actor(appRegistrationId, gln);
+            var newActor = new Actor(gln);
+
+            foreach (var gridAreaId in gridAreas)
+                newActor.GridAreas.Add(gridAreaId);
 
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
@@ -78,13 +86,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var meteringPointType in meteringPointTypes.DistinctBy(e => e.Value))
                 newActor.MeteringPointTypes.Add(meteringPointType);
 
+            await _externalActorIdConfigurationService
+                .AssignExternalActorIdAsync(newActor)
+                .ConfigureAwait(false);
+
             organization.Actors.Add(newActor);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
-            var savedActor = await SaveActorAsync(organization, appRegistrationId).ConfigureAwait(false);
+            var savedActor = await SaveActorAsync(organization, newActor).ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
                 .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)
@@ -95,7 +107,19 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             return savedActor;
         }
 
-        private async Task<Actor> SaveActorAsync(Organization organization, ExternalActorId appRegistrationId)
+        private static bool AreActorsEquivalent(Actor a, Actor b)
+        {
+            if (a.Gln != b.Gln)
+                return false;
+
+            if (a.MarketRoles.Count != b.MarketRoles.Count)
+                return false;
+
+            var eicFunctions = b.MarketRoles.Select(roleB => roleB.Function).ToList();
+            return a.MarketRoles.All(roleA => eicFunctions.Contains(roleA.Function));
+        }
+
+        private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
         {
             await _organizationRepository
                 .AddOrUpdateAsync(organization)
@@ -107,7 +131,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             return savedOrganization!
                 .Actors
-                .Single(a => a.ExternalActorId == appRegistrationId);
+                .Single(actor => AreActorsEquivalent(newActor, actor));
         }
     }
 }

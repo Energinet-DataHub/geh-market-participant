@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Ctor_NewRole_HasStatusNew()
         {
             // Arrange + Act
-            var actor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actor = new Actor(new GlobalLocationNumber("fake_value"));
 
             // Assert
             Assert.Equal(ActorStatus.New, actor.Status);
@@ -133,7 +133,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 new ExternalActorId(Guid.Empty),
                 new GlobalLocationNumber("fake_value"),
                 status,
-                Enumerable.Empty<GridArea>(),
+                Enumerable.Empty<GridAreaId>(),
                 Enumerable.Empty<MarketRole>(),
                 Enumerable.Empty<MeteringPointType>());
         }

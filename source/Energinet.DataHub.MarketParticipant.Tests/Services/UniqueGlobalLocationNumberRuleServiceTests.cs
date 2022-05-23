@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var gln = new GlobalLocationNumber("fake_value");
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            organization.Actors.Add(new Actor(new ExternalActorId(Guid.NewGuid()), gln));
+            organization.Actors.Add(new Actor(gln));
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -96,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         new ExternalActorId(Guid.NewGuid()),
                         gln,
                         ActorStatus.Active,
-                        Enumerable.Empty<GridArea>(),
+                        Enumerable.Empty<GridAreaId>(),
                         Enumerable.Empty<MarketRole>(),
                         Enumerable.Empty<MeteringPointType>())
                 },

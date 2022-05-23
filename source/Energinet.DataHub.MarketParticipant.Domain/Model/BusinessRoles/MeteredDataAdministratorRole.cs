@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 {
     public sealed class MeteredDataAdministratorRole : IBusinessRole
     {
-        public BusinessRoleCode Code => BusinessRoleCode.Dlg;
+        public BusinessRoleCode Code => BusinessRoleCode.Dgl;
 
         public IEnumerable<EicFunction> Functions { get; } = new[]
         {

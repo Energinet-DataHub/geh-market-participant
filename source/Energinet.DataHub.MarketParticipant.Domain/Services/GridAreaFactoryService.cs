@@ -19,7 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public class GridAreaFactoryService : IGridAreaFactoryService
+    public sealed class GridAreaFactoryService : IGridAreaFactoryService
     {
         private readonly IGridAreaLinkRepository _gridAreaLinkRepository;
         private readonly IGridAreaRepository _gridAreaRepository;

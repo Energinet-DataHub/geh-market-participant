@@ -35,6 +35,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>());
 
                     validator
+                        .RuleFor(x => x.GridAreas)
+                        .ChildRules(gridAreaValidator =>
+                            gridAreaValidator
+                                .RuleForEach(x => x)
+                                .NotEmpty());
+
+                    validator
                         .RuleFor(actor => actor.MarketRoles)
                         .NotEmpty()
                         .ChildRules(rolesValidator =>
@@ -45,11 +52,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 .ChildRules(roleValidator =>
                                 {
                                     roleValidator
-                                        .RuleFor(x => x.Function)
+                                        .RuleFor(x => x.EicFunction)
                                         .NotEmpty()
                                         .IsEnumName(typeof(EicFunction), false);
                                 });
                         });
+
                     validator
                         .RuleFor(actor => actor.MeteringPointTypes)
                         .NotEmpty()
