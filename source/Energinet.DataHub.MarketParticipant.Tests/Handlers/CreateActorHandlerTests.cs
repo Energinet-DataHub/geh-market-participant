@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
@@ -61,7 +62,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorFactory.Object,
                 combinationOfBusinessRolesRuleService.Object);
             var orgId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 validAddress,
                 "Test Comment");
 
-            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new GlobalLocationNumber(actorGln));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -120,7 +120,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorFactory.Object,
                 combinationOfBusinessRolesRuleService.Object);
             var orgId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -137,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 validAddress,
                 "Test Comment");
 
-            var actor = new Actor(new ExternalActorId(actorId), new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new GlobalLocationNumber(actorGln));
             var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
 
             organizationExistsHelperService

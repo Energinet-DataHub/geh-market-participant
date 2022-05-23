@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,6 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
+        private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
@@ -44,7 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IUnitOfWorkProvider unitOfWorkProvider,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
-            IAllowedGridAreasRuleService allowedGridAreasRuleService)
+            IAllowedGridAreasRuleService allowedGridAreasRuleService,
+            IExternalActorIdConfigurationService externalActorIdConfigurationService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
@@ -52,9 +53,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
+            _externalActorIdConfigurationService = externalActorIdConfigurationService;
         }
 
-        [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
@@ -78,19 +79,26 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             UpdateActorGridAreas(actor, request);
             UpdateActorMeteringPointTypes(actor, request);
 
-            await using var uow = await _unitOfWorkProvider
+            await _externalActorIdConfigurationService
+                .AssignExternalActorIdAsync(actor)
+                .ConfigureAwait(false);
+
+            var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
-            await _organizationRepository
-                .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+            await using (uow.ConfigureAwait(false))
+            {
+                await _organizationRepository
+                    .AddOrUpdateAsync(organization)
+                    .ConfigureAwait(false);
 
-            await _actorIntegrationEventsQueueService
-                .EnqueueActorUpdatedEventAsync(organization.Id, actor)
-                .ConfigureAwait(false);
+                await _actorIntegrationEventsQueueService
+                    .EnqueueActorUpdatedEventAsync(organization.Id, actor)
+                    .ConfigureAwait(false);
 
-            await uow.CommitAsync().ConfigureAwait(false);
+                await uow.CommitAsync().ConfigureAwait(false);
+            }
 
             return Unit.Value;
         }
@@ -104,8 +112,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             actor.MeteringPointTypes.Clear();
 
-            var meteringPointTypes = request.ChangeActor.MeteringPointTypes.Select(t => MeteringPointType.FromName(t, true));
-            var meteringPointTypesToAdd = meteringPointTypes.DistinctBy(type => type.Value);
+            var meteringPointTypesToAdd = request
+                .ChangeActor
+                .MeteringPointTypes
+                .Select(mp => MeteringPointType.FromName(mp, true))
+                .Distinct();
 
             foreach (var meteringPointType in meteringPointTypesToAdd)
             {

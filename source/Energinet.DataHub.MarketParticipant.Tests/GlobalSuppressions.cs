@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
-{
-    public record AppRegistrationId(string Value);
-}
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test project.")]

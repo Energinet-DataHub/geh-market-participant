@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -44,7 +43,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
-                        .NotNull()
                         .NotEmpty()
                         .ChildRules(rolesValidator =>
                         {
@@ -67,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         {
                             rolesValidator
                                 .RuleForEach(x => x)
-                                .SetValidator(new MeteringPointTypeValidationRule<IEnumerable<string>>());
+                                .Must(x => MeteringPointType.TryFromName(x, true, out _));
                         });
                 });
         }

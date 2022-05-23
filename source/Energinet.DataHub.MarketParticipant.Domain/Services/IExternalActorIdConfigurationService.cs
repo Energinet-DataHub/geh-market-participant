@@ -12,24 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using FluentValidation;
-using FluentValidation.Validators;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed class MeteringPointTypeValidationRule<T> : PropertyValidator<T, string>
+    /// <summary>
+    /// Manages actor B2C information in Azure.
+    /// </summary>
+    public interface IExternalActorIdConfigurationService
     {
-        public override string Name => "MeteringPointTypeValidation";
-
-        public override bool IsValid(ValidationContext<T> context, string value)
-        {
-            return MeteringPointType.TryFromName(value, true, out _);
-        }
-
-        protected override string GetDefaultMessageTemplate(string errorCode)
-        {
-            return "'{PropertyName}' must have a valid MeteringPointType.";
-        }
+        /// <summary>
+        /// Ensure that the B2C configuration matches the state of the actor.
+        /// </summary>
+        /// <param name="actor">The actor to configure B2C for.</param>
+        public Task AssignExternalActorIdAsync(Actor actor);
     }
 }
