@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IDomainEventRepository>().Object,
                 new Mock<IBusinessRoleCodeDomainService>().Object);
 
-            var actor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actor = new Actor(new GlobalLocationNumber("fake_value"));
 
             // Act + Assert
             await Assert
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IBusinessRoleCodeDomainService>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
-            var actor = new Actor(new ExternalActorId(Guid.NewGuid()), new GlobalLocationNumber("fake_value"));
+            var actor = new Actor(new GlobalLocationNumber("fake_value"));
             actor.GridAreas.Add(new GridAreaId(Guid.NewGuid()));
 
             actor.MarketRoles.Add(new MarketRole(EicFunction.Agent));

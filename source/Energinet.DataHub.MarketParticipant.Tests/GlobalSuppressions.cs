@@ -12,17 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
-{
-    public sealed record ActorDto(
-        string ActorId,
-        string? ExternalActorId,
-        GlobalLocationNumberDto Gln,
-        string Status,
-        IEnumerable<Guid> GridAreas,
-        IEnumerable<MarketRoleDto> MarketRoles,
-        IEnumerable<string> MeteringPointTypes);
-}
+[assembly: SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "Test project.")]

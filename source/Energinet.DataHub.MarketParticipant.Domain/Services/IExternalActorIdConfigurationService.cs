@@ -12,7 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public record AppRegistrationId(string Value);
+    /// <summary>
+    /// Manages actor B2C information in Azure.
+    /// </summary>
+    public interface IExternalActorIdConfigurationService
+    {
+        /// <summary>
+        /// Ensure that the B2C configuration matches the state of the actor.
+        /// </summary>
+        /// <param name="actor">The actor to configure B2C for.</param>
+        public Task AssignExternalActorIdAsync(Actor actor);
+    }
 }

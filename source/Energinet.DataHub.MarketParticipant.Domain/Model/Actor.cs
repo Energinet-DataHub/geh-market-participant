@@ -22,12 +22,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     {
         private readonly ActorStatusTransitioner _actorStatusTransitioner;
 
-        public Actor(
-            ExternalActorId externalActorId,
-            GlobalLocationNumber gln)
+        public Actor(GlobalLocationNumber gln)
         {
             Id = Guid.Empty;
-            ExternalActorId = externalActorId;
+            ExternalActorId = null;
             Gln = gln;
             _actorStatusTransitioner = new ActorStatusTransitioner();
             GridAreas = new Collection<GridAreaId>();
@@ -37,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public Actor(
             Guid id,
-            ExternalActorId externalActorId,
+            ExternalActorId? externalActorId,
             GlobalLocationNumber gln,
             ActorStatus actorStatus,
             IEnumerable<GridAreaId> gridAreas,
@@ -61,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The external actor id for integrating Azure AD and domains.
         /// </summary>
-        public ExternalActorId ExternalActorId { get; }
+        public ExternalActorId? ExternalActorId { get; set; }
 
         /// <summary>
         /// The global location number of the current actor.
