@@ -48,7 +48,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
-                        .NotNull()
                         .NotEmpty()
                         .ChildRules(rolesValidator =>
                             rolesValidator
@@ -64,13 +63,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     changeActorValidator
                         .RuleFor(actor => actor.MeteringPointTypes)
-                        .NotNull()
                         .NotEmpty()
                         .ChildRules(rolesValidator =>
                         {
                             rolesValidator
                                 .RuleForEach(x => x)
-                                .SetValidator(new MeteringPointTypeValidationRule<IEnumerable<string>>());
+                                .Must(x => MeteringPointType.TryFromName(x, true, out _));
                         });
                 });
         }
