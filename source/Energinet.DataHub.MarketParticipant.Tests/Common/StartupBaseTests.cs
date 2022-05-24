@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             await using var target = new TestOfStartupBase();
 
             // Act
-            target.ConfigureServices(configuration, serviceCollection);
+            target.Initialize(configuration, serviceCollection);
             await using var serviceProvider = serviceCollection.BuildServiceProvider();
             serviceProvider.UseSimpleInjector(target.Container);
 
@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             };
 
             // Act
-            target.ConfigureServices(configuration, serviceCollection);
+            target.Initialize(configuration, serviceCollection);
 
             // Assert
             configureContainerMock.Verify(x => x(), Times.Once);

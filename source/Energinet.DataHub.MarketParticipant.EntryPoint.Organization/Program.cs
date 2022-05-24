@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
                     {
                         options.UseMiddleware<SimpleInjectorScopedRequest>();
                     })
-                    .ConfigureServices((context, services) => startup.ConfigureServices(context.Configuration, services))
+                    .ConfigureServices((context, services) => startup.Initialize(context.Configuration, services))
                     .Build()
                     .UseSimpleInjector(startup.Container);
 

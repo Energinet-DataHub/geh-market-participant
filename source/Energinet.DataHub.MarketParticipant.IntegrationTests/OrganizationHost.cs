@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             var configuration = BuildConfig();
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(configuration);
-            host._startup.ConfigureServices(configuration, serviceCollection);
+            host._startup.Initialize(configuration, serviceCollection);
             serviceCollection
                 .BuildServiceProvider()
                 .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);

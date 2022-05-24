@@ -29,10 +29,5 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             await host.RunAsync().ConfigureAwait(false);
         }
-
-        //.ConfigureAppConfiguration((hostingContext, config) =>
-        //{
-        //    config.AddEnvironmentVariables();
-        //});
     }
 }

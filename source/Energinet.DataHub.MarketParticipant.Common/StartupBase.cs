@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             GC.SuppressFinalize(this);
         }
 
-        public void ConfigureServices(IConfiguration configuration, IServiceCollection services)
+        public void Initialize(IConfiguration configuration, IServiceCollection services)
         {
             services.AddDbContexts(Container);
             services.AddLogging();

@@ -33,6 +33,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 {
     public sealed class Startup : Common.StartupBase
     {
+        private readonly IConfiguration _configuration;
+
+        public Startup(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -61,6 +68,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseSimpleInjector(Container);
             Container.Verify();
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            Initialize(_configuration, services);
         }
 
         protected override void Configure(IConfiguration configuration, IServiceCollection services)
