@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -51,6 +52,52 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             await Assert
                 .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
                 .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Handle_NonExistingActor_Throws()
+        {
+            // Arrange
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var contactRepository = new Mock<IActorContactRepository>();
+            var target = new DeleteActorContactHandler(
+                organizationExistsHelperService.Object,
+                contactRepository.Object);
+
+            var organizationId = new OrganizationId(Guid.NewGuid());
+            var contactId = new ContactId(Guid.NewGuid());
+
+            var actor = new Actor(
+                Guid.NewGuid(),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                Array.Empty<GridAreaId>(),
+                Array.Empty<MarketRole>(),
+                Array.Empty<MeteringPointType>());
+
+            var organization = new Organization(
+                organizationId,
+                "name",
+                new[] { actor },
+                _validCvrBusinessRegisterIdentifier,
+                _validAddress,
+                "Test Comment");
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
+                .ReturnsAsync(organization);
+
+            contactRepository
+                .Setup(x => x.GetAsync(contactId))
+                .ReturnsAsync((ActorContact?)null);
+
+            var wrongId = Guid.NewGuid();
+            var command = new DeleteActorContactCommand(organizationId.Value, wrongId, contactId.Value);
+
+            // act + assert
+            var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+            Assert.Contains(wrongId.ToString(), ex.Message, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]

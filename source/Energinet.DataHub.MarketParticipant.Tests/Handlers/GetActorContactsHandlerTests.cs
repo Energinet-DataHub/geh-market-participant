@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -43,6 +44,65 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             await Assert
                 .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
                 .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Handle_NonExistingActor_Throws()
+        {
+            var organizationRepository = new Mock<IOrganizationExistsHelperService>();
+            var contactRepository = new Mock<IActorContactRepository>();
+            var target = new GetActorContactsHandler(
+                organizationRepository.Object,
+                contactRepository.Object);
+
+            var organizationId = new OrganizationId(Guid.NewGuid());
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var actor = new Actor(
+                Guid.NewGuid(),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                Array.Empty<GridAreaId>(),
+                Array.Empty<MarketRole>(),
+                Array.Empty<MeteringPointType>());
+
+            var organization = new Organization(
+                organizationId,
+                "fake_value",
+                new[] { actor },
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment");
+
+            organizationRepository
+                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
+                .ReturnsAsync(organization);
+
+            var expected = new ActorContact(
+                new ContactId(Guid.NewGuid()),
+                actor.Id,
+                "fake_value",
+                ContactCategory.EndOfSupply,
+                new EmailAddress("fake@value"),
+                new PhoneNumber("1234"));
+
+            contactRepository
+                .Setup(x => x.GetAsync(actor.Id))
+                .ReturnsAsync(new[] { expected });
+
+            var wrongId = Guid.NewGuid();
+            var command = new GetActorContactsCommand(organizationId.Value, wrongId);
+
+            // act + assert
+            var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
+            Assert.Contains(wrongId.ToString(), ex.Message, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]
