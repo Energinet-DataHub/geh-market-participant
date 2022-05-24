@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
@@ -22,12 +21,10 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 {
-    public static class AzureAdConfigurationRegistration
+    internal static class AzureAdConfigurationRegistration
     {
         public static void AddAzureAdConfiguration(this Container container)
         {
-            ArgumentNullException.ThrowIfNull(container);
-
             container.RegisterSingleton(() =>
             {
                 var configuration = container.GetService<IConfiguration>();

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Azure.Identity;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
@@ -23,12 +22,10 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 {
-    public static class GraphServiceClientRegistration
+    internal static class GraphServiceClientRegistration
     {
         public static void AddGraphServiceClient(this Container container)
         {
-            ArgumentNullException.ThrowIfNull(container);
-
             container.Register(
                 () =>
                 {

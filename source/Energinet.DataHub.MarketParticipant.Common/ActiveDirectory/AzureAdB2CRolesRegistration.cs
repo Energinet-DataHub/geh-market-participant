@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -23,12 +22,10 @@ using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 {
-    public static class AzureAdB2CRolesRegistration
+    internal static class AzureAdB2CRolesRegistration
     {
         public static void AddActiveDirectoryRoles(this Container container)
         {
-            ArgumentNullException.ThrowIfNull(container);
-
             container.RegisterSingleton<IActiveDirectoryB2CRolesProvider>(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
