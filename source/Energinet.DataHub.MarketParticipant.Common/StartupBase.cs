@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Common.MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 
@@ -37,12 +38,12 @@ namespace Energinet.DataHub.MarketParticipant.Common
             GC.SuppressFinalize(this);
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IConfiguration configuration, IServiceCollection services)
         {
             services.AddDbContexts(Container);
             services.AddLogging();
 
-            Configure(services);
+            Configure(configuration, services);
             ConfigureSimpleInjector(services);
 
             Container.AddApplicationServices();
@@ -58,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             // Add MediatR
             Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
 
-            Configure(Container);
+            Configure(configuration, Container);
         }
 
 #pragma warning disable VSTHRD200
@@ -68,8 +69,8 @@ namespace Energinet.DataHub.MarketParticipant.Common
             return Container.DisposeAsync();
         }
 
-        protected abstract void Configure(IServiceCollection services);
+        protected abstract void Configure(IConfiguration configuration, IServiceCollection services);
+        protected abstract void Configure(IConfiguration configuration, Container container);
         protected abstract void ConfigureSimpleInjector(IServiceCollection services);
-        protected abstract void Configure(Container container);
     }
 }

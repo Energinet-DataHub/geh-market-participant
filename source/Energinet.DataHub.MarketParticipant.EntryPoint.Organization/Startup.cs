@@ -15,6 +15,8 @@
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Common;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
@@ -29,8 +31,26 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 {
     internal sealed class Startup : StartupBase
     {
-        protected override void Configure(IServiceCollection services)
+        protected override void Configure(IConfiguration configuration, IServiceCollection services)
         {
+            var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
+            var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+
+            // Health check
+            services
+                .AddHealthChecks()
+                .AddLiveCheck()
+                .AddDbContextCheck<MarketParticipantDbContext>()
+                .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
+        }
+
+        protected override void Configure(IConfiguration configuration, Container container)
+        {
+            Container.Register<DispatchEventsTimerTrigger>();
+
+            // Health check
+            container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
+            container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
         }
 
         protected override void ConfigureSimpleInjector(IServiceCollection services)
@@ -41,30 +61,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
                 ServiceLifetime.Singleton);
 
             services.Replace(descriptor);
-
-            var config = new ConfigurationBuilder().AddEnvironmentVariables().Build();
-
-            // Health check
-            services
-                .AddHealthChecks()
-                .AddLiveCheck()
-                .AddDbContextCheck<MarketParticipantDbContext>()
-                .AddAzureServiceBusTopic(config["SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING"], config["SBT_MARKET_PARTICIPANT_CHANGED_NAME"]);
-
             services.AddSimpleInjector(Container, x =>
             {
                 x.DisposeContainerWithServiceProvider = false;
                 x.AddLogging();
             });
-        }
-
-        protected override void Configure(Container container)
-        {
-            Container.Register<DispatchEventsTimerTrigger>();
-
-            // Health check
-            container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
-            container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
         }
     }
 }

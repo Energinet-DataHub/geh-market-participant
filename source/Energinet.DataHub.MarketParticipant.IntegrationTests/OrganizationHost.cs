@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,12 +37,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         {
             var host = new OrganizationHost();
 
+            var configuration = BuildConfig();
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton<IConfiguration>(BuildConfig());
-            host._startup.ConfigureServices(serviceCollection);
-            serviceCollection.BuildServiceProvider().UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
-            host._startup.Container.Options.AllowOverridingRegistrations = true;
+            serviceCollection.AddSingleton(configuration);
+            host._startup.ConfigureServices(configuration, serviceCollection);
+            serviceCollection
+                .BuildServiceProvider()
+                .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
 
+            host._startup.Container.Options.AllowOverridingRegistrations = true;
             return Task.FromResult(host);
         }
 
@@ -54,11 +59,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await _startup.DisposeAsync().ConfigureAwait(false);
         }
 
-        private static IConfigurationRoot BuildConfig()
+        private static IConfiguration BuildConfig()
         {
-            Environment.SetEnvironmentVariable("SQL_MP_DB_CONNECTION_STRING", "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Database=marketparticipant;Connection Timeout=3");
+            KeyValuePair<string, string>[] keyValuePairs =
+            {
+                new(Settings.SqlDbConnectionString.Key, "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Database=marketparticipant;Connection Timeout=3"),
+                new(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value")
+            };
 
-            return new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            return new ConfigurationBuilder()
+                .AddInMemoryCollection(keyValuePairs)
+                .AddEnvironmentVariables()
+                .Build();
         }
     }
 }
