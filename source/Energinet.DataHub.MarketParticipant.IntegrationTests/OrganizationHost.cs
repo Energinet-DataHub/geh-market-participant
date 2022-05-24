@@ -64,7 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             KeyValuePair<string, string>[] keyValuePairs =
             {
                 new(Settings.SqlDbConnectionString.Key, "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Database=marketparticipant;Connection Timeout=3"),
-                new(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value")
+                new(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value"),
+                new(Settings.ServiceBusTopicName.Key, "fake_value")
             };
 
             return new ConfigurationBuilder()
