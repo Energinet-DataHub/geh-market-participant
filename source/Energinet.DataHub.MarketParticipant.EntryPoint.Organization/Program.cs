@@ -30,10 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
             await using (startup.ConfigureAwait(false))
             {
                 var host = new HostBuilder()
-                    .ConfigureFunctionsWorkerDefaults(options =>
-                    {
-                        options.UseMiddleware<SimpleInjectorScopedRequest>();
-                    })
+                    .ConfigureFunctionsWorkerDefaults(options => options.UseMiddleware<SimpleInjectorScopedRequest>())
                     .ConfigureServices((context, services) => startup.Initialize(context.Configuration, services))
                     .Build()
                     .UseSimpleInjector(startup.Container);

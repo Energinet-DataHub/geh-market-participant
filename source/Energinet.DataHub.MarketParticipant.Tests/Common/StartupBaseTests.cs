@@ -18,16 +18,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Domain;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Graph;
 using Moq;
 using SimpleInjector;
@@ -65,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(configuration);
             var configureContainerMock = new Mock<Action>();
-            await using var target = new TestOfStartupBase()
+            await using var target = new TestOfStartupBase
             {
                 ConfigureContainer = configureContainerMock.Object
             };
@@ -81,7 +76,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         {
             KeyValuePair<string, string>[] keyValuePairs =
             {
+                new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
+                new(Settings.ServiceBusTopicName.Key, "fake_value"),
+                new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
                 new(Settings.B2CBackendObjectId.Key, "fake_value"),
+                new(Settings.B2CBackendId.Key, "fake_value"),
             };
 
             return new ConfigurationBuilder()
@@ -103,34 +102,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
                 ConfigureContainer?.Invoke();
             }
 
-            protected override void ConfigureSimpleInjector(IServiceCollection services)
-            {
-                var descriptor = new ServiceDescriptor(
-                    typeof(IFunctionActivator),
-                    typeof(SimpleInjectorActivator),
-                    ServiceLifetime.Singleton);
-
-                services.Replace(descriptor);
-                services.AddSimpleInjector(Container, x =>
-                {
-                    x.DisposeContainerWithServiceProvider = false;
-                    x.AddLogging();
-                });
-            }
-
             private static void AddMockConfiguration(Container container)
             {
                 container.Options.AllowOverridingRegistrations = true;
 
-                container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
                 container.Register(() => new Mock<IUnitOfWorkProvider>().Object);
-                container.RegisterSingleton(() => new ServiceBusConfig("fake_value", "fake_value"));
+                container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
                 container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
-
-                container.RegisterSingleton(() => new AzureAdConfig("fake_value", "fake_value"));
                 container.RegisterSingleton(() => new GraphServiceClient(new HttpClient()));
-                container.Register(() => new Mock<IActiveDirectoryService>().Object, Lifestyle.Scoped);
-                container.RegisterSingleton(() => new Mock<IActiveDirectoryB2CRolesProvider>().Object);
             }
         }
     }

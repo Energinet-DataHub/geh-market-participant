@@ -17,14 +17,11 @@ using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
@@ -51,21 +48,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
             // Health check
             container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
             container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
-        }
-
-        protected override void ConfigureSimpleInjector(IServiceCollection services)
-        {
-            var descriptor = new ServiceDescriptor(
-                typeof(IFunctionActivator),
-                typeof(SimpleInjectorActivator),
-                ServiceLifetime.Singleton);
-
-            services.Replace(descriptor);
-            services.AddSimpleInjector(Container, x =>
-            {
-                x.DisposeContainerWithServiceProvider = false;
-                x.AddLogging();
-            });
         }
     }
 }
