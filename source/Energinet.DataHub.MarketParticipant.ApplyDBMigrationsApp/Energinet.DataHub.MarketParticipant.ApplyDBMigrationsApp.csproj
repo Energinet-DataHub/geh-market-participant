@@ -31,8 +31,4 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\**\*.sql" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Utilities\Energinet.DataHub.MarketParticipant.Utilities.csproj" />
-  </ItemGroup>
-
 </Project>
