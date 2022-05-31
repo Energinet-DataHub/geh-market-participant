@@ -13,16 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Common;
-using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Graph;
 using Moq;
 using SimpleInjector;
 using Xunit;
@@ -34,21 +35,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
     public sealed class StartupBaseTests
     {
         [Fact]
-        public async Task Startup_ConfigureServices_Verifies()
+        public async Task Startup_ConfigureServices_ShouldVerify()
         {
             // Arrange
-            Environment.SetEnvironmentVariable("AZURE_B2C_TENANT", Guid.NewGuid().ToString()); // Must take a Guid as value
-            Environment.SetEnvironmentVariable("AZURE_B2C_SPN_ID", "fake_value");
-            Environment.SetEnvironmentVariable("AZURE_B2C_SPN_SECRET", "fake_value");
-            Environment.SetEnvironmentVariable("AZURE_B2C_BACKEND_OBJECT_ID", "fake_value");
-            Environment.SetEnvironmentVariable("AZURE_B2C_BACKEND_SPN_OBJECT_ID", "fake_value");
-            Environment.SetEnvironmentVariable("AZURE_B2C_BACKEND_ID", "fake_value");
+            var configuration = BuildConfig();
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(BuildConfig());
+            serviceCollection.AddSingleton(configuration);
             await using var target = new TestOfStartupBase();
 
             // Act
-            target.ConfigureServices(serviceCollection);
+            target.Initialize(configuration, serviceCollection);
             await using var serviceProvider = serviceCollection.BuildServiceProvider();
             serviceProvider.UseSimpleInjector(target.Container);
 
@@ -57,16 +53,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         }
 
         [Fact]
-        public async Task Startup_ConfigureServices_CallsConfigureContainer()
+        public async Task Startup_ConfigureServices_ShouldCallConfigureContainer()
         {
             // Arrange
+            var configuration = BuildConfig();
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(BuildConfig());
+            serviceCollection.AddSingleton(configuration);
             var configureContainerMock = new Mock<Action>();
-            await using var target = new TestOfStartupBase { ConfigureContainer = configureContainerMock.Object };
+            await using var target = new TestOfStartupBase
+            {
+                ConfigureContainer = configureContainerMock.Object
+            };
 
             // Act
-            target.ConfigureServices(serviceCollection);
+            target.Initialize(configuration, serviceCollection);
 
             // Assert
             configureContainerMock.Verify(x => x(), Times.Once);
@@ -74,34 +74,29 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
 
         private static IConfiguration BuildConfig()
         {
-            return new ConfigurationBuilder().AddEnvironmentVariables().Build();
+            KeyValuePair<string, string>[] keyValuePairs =
+            {
+                new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
+                new(Settings.ServiceBusTopicName.Key, "fake_value"),
+                new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
+                new(Settings.B2CBackendObjectId.Key, "fake_value"),
+                new(Settings.B2CBackendId.Key, "fake_value"),
+            };
+
+            return new ConfigurationBuilder()
+                .AddInMemoryCollection(keyValuePairs)
+                .Build();
         }
 
         private sealed class TestOfStartupBase : StartupBase
         {
             public Action? ConfigureContainer { get; init; }
 
-            protected override void Configure(IServiceCollection services)
+            protected override void Configure(IConfiguration configuration, IServiceCollection services)
             {
             }
 
-            protected override void ConfigureSimpleInjector(IServiceCollection services)
-            {
-                var descriptor = new ServiceDescriptor(
-                    typeof(IFunctionActivator),
-                    typeof(SimpleInjectorActivator),
-                    ServiceLifetime.Singleton);
-
-                services.Replace(descriptor);
-
-                services.AddSimpleInjector(Container, x =>
-                {
-                    x.DisposeContainerWithServiceProvider = false;
-                    x.AddLogging();
-                });
-            }
-
-            protected override void Configure(Container container)
+            protected override void Configure(IConfiguration configuration, Container container)
             {
                 AddMockConfiguration(container);
                 ConfigureContainer?.Invoke();
@@ -110,9 +105,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             private static void AddMockConfiguration(Container container)
             {
                 container.Options.AllowOverridingRegistrations = true;
-                container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
+
                 container.Register(() => new Mock<IUnitOfWorkProvider>().Object);
+                container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
                 container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
+                container.RegisterSingleton(() => new GraphServiceClient(new HttpClient()));
             }
         }
     }

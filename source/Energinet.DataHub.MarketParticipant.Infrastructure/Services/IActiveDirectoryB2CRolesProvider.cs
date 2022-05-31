@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure
-{
-    public sealed class DatabaseConfig
-    {
-        public DatabaseConfig(string connectionString)
-        {
-            ConnectionString = connectionString;
-        }
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 
-        public string ConnectionString { get; }
-    }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+/// <summary>
+/// Provides access to B2C roles known in Azure.
+/// </summary>
+public interface IActiveDirectoryB2CRolesProvider
+{
+    /// <summary>
+    /// Returns B2C roles known in Azure.
+    /// </summary>
+    /// <returns>B2C roles known in Azure.</returns>
+    Task<ActiveDirectoryB2CRoles> GetB2CRolesAsync();
 }
