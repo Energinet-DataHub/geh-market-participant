@@ -22,3 +22,6 @@ codecov
 CVR
 GridArea
 GridAreaLinkId
+ActorUpdatedIntegrationEvent
+BusinessRoles
+MarketRoles
