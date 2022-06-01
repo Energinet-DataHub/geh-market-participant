@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,14 +33,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 {
     public sealed class Startup : Common.StartupBase
     {
+        private readonly IConfiguration _configuration;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -70,17 +70,26 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             Container.Verify();
         }
 
-        protected override void Configure(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
+            Initialize(_configuration, services);
+        }
+
+        protected override void Configure(IConfiguration configuration, IServiceCollection services)
+        {
+            services
+                .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
+            var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
 
             // Health check
             services
                 .AddHealthChecks()
                 .AddLiveCheck()
                 .AddDbContextCheck<MarketParticipantDbContext>()
-                .AddAzureServiceBusTopic(Configuration["SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING"], Configuration["SBT_MARKET_PARTICIPANT_CHANGED_NAME"]);
+                .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
 
             services.AddSwaggerGen(c =>
             {
@@ -114,6 +123,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services.AddTransient<IMiddlewareFactory>(_ => new SimpleInjectorMiddlewareFactory(Container));
         }
 
+        protected override void Configure(IConfiguration configuration, Container container)
+        {
+            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
+            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
+            Container.AddJwtTokenSecurity(openIdUrl, audience);
+        }
+
         protected override void ConfigureSimpleInjector(IServiceCollection services)
         {
             services.AddSimpleInjector(Container, options =>
@@ -126,16 +142,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             });
 
             services.UseSimpleInjectorAspNetRequestScoping(Container);
-        }
-
-        protected override void Configure(Container container)
-        {
-            var openIdUrl = Configuration["FRONTEND_OPEN_ID_URL"] ?? throw new InvalidOperationException(
-                "Frontend OpenID URL not found.");
-            var audience = Configuration["FRONTEND_SERVICE_APP_ID"] ?? throw new InvalidOperationException(
-                "Frontend service app id not found.");
-
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
     }
 }

@@ -19,7 +19,7 @@ using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public class ActiveDirectoryB2CRolesProvider
+    public class ActiveDirectoryB2CRolesProvider : IActiveDirectoryB2CRolesProvider
     {
         private readonly GraphServiceClient _graphClient;
         private readonly string _appObjectId;

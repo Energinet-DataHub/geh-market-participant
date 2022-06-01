@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,29 +23,14 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 {
     internal static class AzureAdConfigurationRegistration
     {
-        internal static void AddAzureAdConfiguration(this Container container)
+        public static void AddAzureAdConfiguration(this Container container)
         {
             container.RegisterSingleton(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
-                var resourceServicePrincipalObjectId = configuration!["AZURE_B2C_BACKEND_SPN_OBJECT_ID"]; // ResourceServicePrincipalObjectId
-                var backendAppId = configuration["AZURE_B2C_BACKEND_ID"]; // BackendAppId
-
-                if (string.IsNullOrWhiteSpace(resourceServicePrincipalObjectId))
-                {
-                    throw new InvalidOperationException(
-                        "Key 'AZURE_B2C_BACKEND_SPN_OBJECT_ID' is null, empty or whitespace");
-                }
-
-                if (string.IsNullOrWhiteSpace(backendAppId))
-                {
-                    throw new InvalidOperationException(
-                        "Key 'AZURE_B2C_BACKEND_ID' is null, empty or whitespace");
-                }
-
-                return new AzureAdConfig(
-                    resourceServicePrincipalObjectId,
-                    backendAppId);
+                var servicePrincipalObjectId = configuration.GetSetting(Settings.B2CBackendServicePrincipalNameObjectId);
+                var backendAppId = configuration.GetSetting(Settings.B2CBackendId);
+                return new AzureAdConfig(servicePrincipalObjectId, backendAppId);
             });
         }
     }

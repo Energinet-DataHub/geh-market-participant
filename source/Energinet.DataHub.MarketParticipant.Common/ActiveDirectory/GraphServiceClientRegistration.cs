@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Azure.Identity;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
@@ -30,27 +31,9 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                 {
                     var configuration = container.GetService<IConfiguration>();
 
-                    var azureB2CTenant = configuration!["AZURE_B2C_TENANT"]; // Tenant URL
-                    var azureB2CSpnId = configuration["AZURE_B2C_SPN_ID"]; // Resource service principal app id
-                    var azureB2CSpnSecret = configuration["AZURE_B2C_SPN_SECRET"]; // Client secret
-
-                    if (string.IsNullOrWhiteSpace(azureB2CTenant))
-                    {
-                        throw new InvalidOperationException(
-                            "Key 'AZURE_B2C_TENANT' is null, empty or whitespace");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(azureB2CSpnId))
-                    {
-                        throw new InvalidOperationException(
-                            "Key 'AZURE_B2C_SPN_ID' is null, empty or whitespace");
-                    }
-
-                    if (string.IsNullOrWhiteSpace(azureB2CSpnSecret))
-                    {
-                        throw new InvalidOperationException(
-                            "Key 'AZURE_B2C_SPN_SECRET' is null, empty or whitespace");
-                    }
+                    var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
+                    var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalNameId);
+                    var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalNameSecret);
 
                     var clientSecretCredential = new ClientSecretCredential(
                         azureB2CTenant,

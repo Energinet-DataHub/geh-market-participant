@@ -30,14 +30,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
-        private readonly ActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
+        private readonly IActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
         private readonly ILogger<ActiveDirectoryB2cService> _logger;
 
         public ActiveDirectoryB2cService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
             IBusinessRoleCodeDomainService businessRoleCodeDomainService,
-            ActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
+            IActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
             ILogger<ActiveDirectoryB2cService> logger)
         {
             _graphClient = graphClient;

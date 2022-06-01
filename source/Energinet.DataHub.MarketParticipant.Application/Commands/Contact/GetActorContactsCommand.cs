@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure
-{
-    public sealed class DatabaseConfig
-    {
-        public DatabaseConfig(string connectionString)
-        {
-            ConnectionString = connectionString;
-        }
+using System;
+using MediatR;
 
-        public string ConnectionString { get; }
-    }
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
+{
+    public sealed record GetActorContactsCommand(Guid OrganizationId, Guid ActorId) : IRequest<GetActorContactsResponse>;
 }
