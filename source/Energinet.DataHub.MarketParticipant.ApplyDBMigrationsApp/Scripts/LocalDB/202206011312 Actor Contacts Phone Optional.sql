@@ -7,5 +7,5 @@ ALTER COLUMN [Phone] [nvarchar](15) NULL
 GO
 
 ALTER TABLE [dbo].[ActorContact]
-ADD CONSTRAINT UQ_Categories UNIQUE ([ActorId], [Category])
+ADD CONSTRAINT UQ_ActorContact_Categories UNIQUE ([ActorId], [Category])
 GO
