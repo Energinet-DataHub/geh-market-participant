@@ -30,9 +30,8 @@ module "app_webapi" {
   dotnet_framework_version                  = "v6.0"
 
   app_settings                              = {
-    APPINSIGHTS_INSTRUMENTATIONKEY             = "${data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value}"
-    FRONTEND_OPEN_ID_URL                       = "${data.azurerm_key_vault_secret.frontend_open_id_url.value}"
-    FRONTEND_SERVICE_APP_ID                    = "${data.azurerm_key_vault_secret.frontend_service_app_id.value}"
+    FRONTEND_OPEN_ID_URL                       = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=frontend-open-id-url)",
+    FRONTEND_SERVICE_APP_ID                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=frontend-service-app-id)",
     SQL_MP_DB_CONNECTION_STRING                = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
     SERVICE_BUS_CONNECTION_STRING              = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
     SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
