@@ -41,21 +41,6 @@ data "azurerm_key_vault_secret" "mssql_data_name" {
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
-data "azurerm_key_vault_secret" "sb_domain_relay_send_connection_string" {
-  name         = "sb-domain-relay-send-connection-string"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
-data "azurerm_key_vault_secret" "sb_domain_relay_manage_connection_string" {
-  name         = "sb-domain-relay-manage-connection-string"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
-data "azurerm_key_vault_secret" "sbt-market-participant-changed-name" {
-  name         = "sbt-market-participant-changed-name"
-  key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
-}
-
 data "azurerm_key_vault_secret" "plan_shared_id" {
   name         = "plan-shared-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
