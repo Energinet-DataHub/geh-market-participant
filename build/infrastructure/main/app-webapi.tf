@@ -12,35 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 module "app_webapi" {
-  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/app-service?ref=5.8.0"
+  source                                    = "git::https://github.com/Energinet-DataHub/geh-terraform-modules.git//azure/app-service?ref=6.0.0"
 
-  name                                            = "webapi"
-  project_name                                    = var.domain_name_short
-  environment_short                               = var.environment_short
-  environment_instance                            = var.environment_instance
-  resource_group_name                             = azurerm_resource_group.this.name
-  location                                        = azurerm_resource_group.this.location
-  app_service_plan_id                             = data.azurerm_key_vault_secret.plan_shared_id.value
-  application_insights_instrumentation_key        = data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value
-  health_check_path                               = "/monitor/ready"
-  health_check_alert_action_group_id              = data.azurerm_key_vault_secret.primary_action_group_id.value
-  health_check_alert_enabled                      = var.enable_health_check_alerts
-  dotnet_framework_version                        = "v6.0"
+  name                                      = "webapi"
+  project_name                              = var.domain_name_short
+  environment_short                         = var.environment_short
+  environment_instance                      = var.environment_instance
+  resource_group_name                       = azurerm_resource_group.this.name
+  location                                  = azurerm_resource_group.this.location
+  vnet_integration_subnet_id                = data.azurerm_key_vault_secret.snet_vnet_integrations_id.value
+  private_endpoint_subnet_id                = data.azurerm_key_vault_secret.snet_private_endpoints_id.value
+  app_service_plan_id                       = data.azurerm_key_vault_secret.plan_shared_id.value
+  application_insights_instrumentation_key  = data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value
+  health_check_path                         = "/monitor/ready"
+  health_check_alert_action_group_id        = data.azurerm_key_vault_secret.primary_action_group_id.value
+  health_check_alert_enabled                = var.enable_health_check_alerts
+  dotnet_framework_version                  = "v6.0"
 
   app_settings                              = {
-    APPINSIGHTS_INSTRUMENTATIONKEY          		= "${data.azurerm_key_vault_secret.appi_shared_instrumentation_key.value}"
-    FRONTEND_OPEN_ID_URL                    		= "${data.azurerm_key_vault_secret.frontend_open_id_url.value}"
-    FRONTEND_SERVICE_APP_ID                 		= "${data.azurerm_key_vault_secret.frontend_service_app_id.value}"
-	SQL_MP_DB_CONNECTION_STRING             		= local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
-	SERVICE_BUS_CONNECTION_STRING           		= "${data.azurerm_key_vault_secret.sb_domain_relay_send_connection_string.value}"
-    SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING    	= "${data.azurerm_key_vault_secret.sb_domain_relay_manage_connection_string.value}"
-	SBT_MARKET_PARTICIPANT_CHANGED_NAME     		= "${data.azurerm_key_vault_secret.sbt-market-participant-changed-name.value}"
-    AZURE_B2C_TENANT                        		= var.b2c_tenant
-    AZURE_B2C_SPN_ID                        		= var.b2c_spn_id
-    AZURE_B2C_SPN_SECRET                    		= var.b2c_spn_secret
-    AZURE_B2C_BACKEND_OBJECT_ID             		= var.b2c_backend_object_id
-    AZURE_B2C_BACKEND_SPN_OBJECT_ID         		= var.b2c_backend_spn_object_id
-    AZURE_B2C_BACKEND_ID                    		= var.b2c_backend_id
+    FRONTEND_OPEN_ID_URL                       = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=frontend-open-id-url)",
+    FRONTEND_SERVICE_APP_ID                    = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=frontend-service-app-id)",
+    SQL_MP_DB_CONNECTION_STRING                = local.MS_MARKET_PARTICIPANT_CONNECTION_STRING
+    SERVICE_BUS_CONNECTION_STRING              = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-send-connection-string)",
+    SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sb-domain-relay-manage-connection-string)",
+    SBT_MARKET_PARTICIPANT_CHANGED_NAME        = "@Microsoft.KeyVault(VaultName=${var.shared_resources_keyvault_name};SecretName=sbt-market-participant-changed-name)",
+    AZURE_B2C_TENANT                           = var.b2c_tenant
+    AZURE_B2C_SPN_ID                           = var.b2c_spn_id
+    AZURE_B2C_SPN_SECRET                       = var.b2c_spn_secret
+    AZURE_B2C_BACKEND_OBJECT_ID                = var.b2c_backend_object_id
+    AZURE_B2C_BACKEND_SPN_OBJECT_ID            = var.b2c_backend_spn_object_id
+    AZURE_B2C_BACKEND_ID                       = var.b2c_backend_id
   }
 
   tags                                            = azurerm_resource_group.this.tags

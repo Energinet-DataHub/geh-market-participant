@@ -29,9 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions
         }
 
         [Function(nameof(DispatchEventsTimerTrigger))]
-#pragma warning disable CA1801
         public Task RunAsync([TimerTrigger("*/5 * * * * *")] FunctionContext context)
-#pragma warning restore CA1801
         {
             return _mediator.Send(new DispatchEventsCommand());
         }

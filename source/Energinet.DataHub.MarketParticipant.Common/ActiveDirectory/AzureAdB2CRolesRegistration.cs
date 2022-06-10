@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,18 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
     {
         public static void AddActiveDirectoryRoles(this Container container)
         {
-            container.RegisterSingleton(() =>
+            container.RegisterSingleton<IActiveDirectoryB2CRolesProvider>(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
                 var graphClient = container.GetInstance<GraphServiceClient>();
-                var appObjectId = configuration!["AZURE_B2C_BACKEND_OBJECT_ID"];
-
-                if (string.IsNullOrWhiteSpace(appObjectId))
-                {
-                    throw new InvalidOperationException(
-                        "Key 'AZURE_B2C_BACKEND_OBJECT_ID' is null, empty or whitespace");
-                }
-
+                var appObjectId = configuration.GetSetting(Settings.B2CBackendObjectId);
                 return new ActiveDirectoryB2CRolesProvider(graphClient, appObjectId);
             });
         }
