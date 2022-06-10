@@ -32,7 +32,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 {
                     validator
                         .RuleFor(actor => actor.Gln)
-                        .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>());
+                        .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>())
+                        .When(i => string.IsNullOrWhiteSpace(i.Gln.Value) || i.Gln.Value.Length <= 13);
+
+                    validator
+                        .RuleFor(actor => actor.Gln)
+                        .SetValidator(new EnergyIdentificationCodeValidationRule<CreateActorDto>())
+                        .When(i => string.IsNullOrWhiteSpace(i.Gln.Value) || i.Gln.Value.Length >= 14);
 
                     validator
                         .RuleFor(x => x.GridAreas)
