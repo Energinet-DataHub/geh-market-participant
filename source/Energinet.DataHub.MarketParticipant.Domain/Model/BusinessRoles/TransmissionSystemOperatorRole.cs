@@ -12,18 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
-{
-    public sealed class BalancePowerSupplierRole : IBusinessRole
-    {
-        public BusinessRoleCode Code => BusinessRoleCode.Ddq;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 
-        public IEnumerable<EicFunction> Functions { get; } = new[]
-        {
-            EicFunction.EnergySupplier,
-            EicFunction.EnergyTrader
-        };
-    }
+public sealed class TransmissionSystemOperatorRole : IBusinessRole
+{
+    public BusinessRoleCode Code => BusinessRoleCode.Tso;
+
+    // EicFunctions are unknown at this point - waiting for more info...
+    public IEnumerable<EicFunction> Functions { get; } = Array.Empty<EicFunction>();
 }
