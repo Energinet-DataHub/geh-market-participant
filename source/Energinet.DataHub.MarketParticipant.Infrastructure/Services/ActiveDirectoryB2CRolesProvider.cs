@@ -66,14 +66,26 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     case "electricalsupplier":
                         _activeDirectoryB2CRoles.DdqId = appRole.Id!.Value;
                         break;
-                    case "transmissionsystemoperator":
+                    case "imbalancesettlementresponsible":
+                        _activeDirectoryB2CRoles.DdxId = appRole.Id!.Value;
+                        break;
+                    case "meteringpointadministrator":
+                        _activeDirectoryB2CRoles.DdzId = appRole.Id!.Value;
+                        break;
+                    case "metereddataadministrator":
+                        _activeDirectoryB2CRoles.DglId = appRole.Id!.Value;
+                        break;
+                    case "systemoperator":
                         _activeDirectoryB2CRoles.EzId = appRole.Id!.Value;
                         break;
                     case "meterdataresponsible":
                         _activeDirectoryB2CRoles.MdrId = appRole.Id!.Value;
                         break;
-                    case "STS":
+                    case "danishenergyagency":
                         _activeDirectoryB2CRoles.StsId = appRole.Id!.Value;
+                        break;
+                    case "transmissionsystemoperator":
+                        _activeDirectoryB2CRoles.TsoId = appRole.Id!.Value;
                         break;
                     default:
                         throw new InvalidOperationException(

@@ -181,6 +181,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     case BusinessRoleCode.Ddq:
                         b2CIds.Add(roles.DdqId);
                         break;
+                    case BusinessRoleCode.Ddx:
+                        b2CIds.Add(roles.DdxId);
+                        break;
+                    case BusinessRoleCode.Ddz:
+                        b2CIds.Add(roles.DdzId);
+                        break;
+                    case BusinessRoleCode.Dgl:
+                        b2CIds.Add(roles.DglId);
+                        break;
                     case BusinessRoleCode.Ez:
                         b2CIds.Add(roles.EzId);
                         break;
@@ -189,6 +198,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                         break;
                     case BusinessRoleCode.Sts:
                         b2CIds.Add(roles.StsId);
+                        break;
+                    case BusinessRoleCode.Tso:
+                        b2CIds.Add(roles.TsoId);
                         break;
                     default:
                         throw new ArgumentNullException(nameof(businessRoleCodes));
