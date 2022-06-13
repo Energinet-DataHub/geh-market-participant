@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
 
             var organizations = await GetOrganizationQuery()
-                .Where(x => x.Actors.Any(y => y.Gln == actorNumber.Value))
+                .Where(x => x.Actors.Any(y => y.ActorNumber == actorNumber.Value))
                 .ToListAsync()
                 .ConfigureAwait(false);
 
