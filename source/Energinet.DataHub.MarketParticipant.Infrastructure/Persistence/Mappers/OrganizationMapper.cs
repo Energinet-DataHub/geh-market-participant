@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 var meteringPointTypes = actor.MeteringPointTypes
                     .Select(m => MeteringPointType.FromValue(m.MeteringTypeId));
 
-                var actorGln = new GlobalLocationNumber(actor.Gln);
+                var actorGln = new ActorNumber(actor.Gln);
                 var actorStatus = (ActorStatus)actor.Status;
                 var gridAreas = actor
                     .GridAreas

@@ -26,9 +26,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
         private readonly string _gln = CreateRandomGln();
 
 #pragma warning disable CA1062, CA2225, CA5394
-        public static implicit operator GlobalLocationNumber(MockedGln mock)
+        public static implicit operator ActorNumber(MockedGln mock)
         {
-            return new GlobalLocationNumber(mock._gln);
+            return new ActorNumber(mock._gln);
         }
 
         public static implicit operator ActorNumberDto(MockedGln mock)

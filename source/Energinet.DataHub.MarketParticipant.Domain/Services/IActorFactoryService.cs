@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <returns>The created actor.</returns>
         Task<Actor> CreateAsync(
             Organization organization,
-            GlobalLocationNumber gln,
+            ActorNumber gln,
             IReadOnlyCollection<GridAreaId> gridAreas,
             IReadOnlyCollection<MarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes);

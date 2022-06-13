@@ -78,12 +78,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return entities.Select(OrganizationMapper.MapFromEntity);
         }
 
-        public async Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber)
+        public async Task<IEnumerable<Organization>> GetAsync(ActorNumber actorNumber)
         {
-            ArgumentNullException.ThrowIfNull(globalLocationNumber, nameof(globalLocationNumber));
+            ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
 
             var organizations = await GetOrganizationQuery()
-                .Where(x => x.Actors.Any(y => y.Gln == globalLocationNumber.Value))
+                .Where(x => x.Actors.Any(y => y.Gln == actorNumber.Value))
                 .ToListAsync()
                 .ConfigureAwait(false);
 

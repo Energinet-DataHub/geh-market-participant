@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="permissions">Roles to be assigned to the app.</param>
         /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
         Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            GlobalLocationNumber appName,
+            ActorNumber appName,
             IReadOnlyCollection<MarketRole> permissions);
 
         /// <summary>

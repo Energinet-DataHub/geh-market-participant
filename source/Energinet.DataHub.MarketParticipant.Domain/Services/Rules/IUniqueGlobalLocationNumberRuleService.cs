@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// Checks whether GLN is available and throws an exception, if it is not.
         /// </summary>
         /// <param name="organization">The organization that will contain the actor with the specified GLN.</param>
-        /// <param name="globalLocationNumber">The GLN to check for availability.</param>
-        Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, GlobalLocationNumber globalLocationNumber);
+        /// <param name="actorNumber">The GLN to check for availability.</param>
+        Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, ActorNumber actorNumber);
     }
 }

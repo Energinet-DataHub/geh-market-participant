@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         }
 
         public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            GlobalLocationNumber appName,
+            ActorNumber appName,
             IReadOnlyCollection<MarketRole> permissions)
         {
             ArgumentNullException.ThrowIfNull(appName, nameof(appName));

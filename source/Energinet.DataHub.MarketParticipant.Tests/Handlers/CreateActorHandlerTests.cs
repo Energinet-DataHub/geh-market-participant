@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 validAddress,
                 "Test Comment");
 
-            var actor = new Actor(new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new ActorNumber(actorGln));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorFactory
                 .Setup(x => x.CreateAsync(
                     organization,
-                    It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.Is<ActorNumber>(y => y.Value == actorGln),
                     It.IsAny<IReadOnlyCollection<GridAreaId>>(),
                     It.IsAny<IReadOnlyCollection<MarketRole>>(),
                     It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 validAddress,
                 "Test Comment");
 
-            var actor = new Actor(new GlobalLocationNumber(actorGln));
+            var actor = new Actor(new ActorNumber(actorGln));
             var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
 
             organizationExistsHelperService
@@ -146,7 +146,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorFactory
                 .Setup(x => x.CreateAsync(
                     organization,
-                    It.Is<GlobalLocationNumber>(y => y.Value == actorGln),
+                    It.Is<ActorNumber>(y => y.Value == actorGln),
                     It.IsAny<IReadOnlyCollection<GridAreaId>>(),
                     It.IsAny<IReadOnlyCollection<MarketRole>>(),
                     It.IsAny<IReadOnlyCollection<MeteringPointType>>()))

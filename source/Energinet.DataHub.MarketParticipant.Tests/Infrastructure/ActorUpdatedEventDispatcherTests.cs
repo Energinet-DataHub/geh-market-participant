@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 ActorId = Guid.NewGuid(),
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ExternalActorId = new ExternalActorId(Guid.NewGuid()),
-                Gln = new GlobalLocationNumber("gln"),
+                Gln = new ActorNumber("gln"),
                 Status = ActorStatus.Active
             };
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
