@@ -28,18 +28,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
     /// 1 check character to ensure the code validity.
     /// Valid characters of an EIC code are A-Z, 0-9 and “-“.
     /// </summary>
-    public sealed class EnergyIdentificationCodeValidationRule<T> : PropertyValidator<T, GlobalLocationNumberDto?>
+    public sealed class EnergyIdentificationCodeValidationRule<T> : PropertyValidator<T, ActorNumberDto?>
     {
         public override string Name => "EnergyIdentificationCodeValidation";
 
-        public override bool IsValid(ValidationContext<T> context, GlobalLocationNumberDto? value)
+        public override bool IsValid(ValidationContext<T> context, ActorNumberDto? value)
         {
             return !string.IsNullOrEmpty(value?.Value) && IsValidEic(value.Value);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)
         {
-            return "'{PropertyName}' must have a valid EIC.";
+            return "'{PropertyName}' must be a valid GLN or EIC.";
         }
 
         private static bool IsValidEic(string energyIdentificationCode)

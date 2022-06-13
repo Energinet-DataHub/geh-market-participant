@@ -21,18 +21,18 @@ using FluentValidation.Validators;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 {
-    public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, GlobalLocationNumberDto?>
+    public sealed class GlobalLocationNumberValidationRule<T> : PropertyValidator<T, ActorNumberDto?>
     {
         public override string Name => "GlobalLocationNumberValidation";
 
-        public override bool IsValid(ValidationContext<T> context, GlobalLocationNumberDto? value)
+        public override bool IsValid(ValidationContext<T> context, ActorNumberDto? value)
         {
             return !string.IsNullOrEmpty(value?.Value) && IsValidGlnNumber(value.Value);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)
         {
-            return "'{PropertyName}' must have a valid GLN.";
+            return "'{PropertyName}' must be a valid GLN or EIC.";
         }
 
         private static bool IsValidGlnNumber(string glnNumber)

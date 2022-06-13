@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            var actorGln = new GlobalLocationNumber(request.Actor.Gln.Value);
+            var actorGln = new GlobalLocationNumber(request.Actor.ActorNumber.Value);
             var marketRoles = CreateMarketRoles(request.Actor).ToList();
             var gridAreas = CreateGridAreas(request.Actor).ToList();
             var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();

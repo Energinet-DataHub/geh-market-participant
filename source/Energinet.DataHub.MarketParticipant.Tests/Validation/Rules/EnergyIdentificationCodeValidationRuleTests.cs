@@ -140,7 +140,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
 
             public bool Validate(string value)
             {
-                return _rule.IsValid(new ValidationContext<object>(null!), new GlobalLocationNumberDto(value));
+                return _rule.IsValid(new ValidationContext<object>(null!), new ActorNumberDto(value));
             }
         }
     }

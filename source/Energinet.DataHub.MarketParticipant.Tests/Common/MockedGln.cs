@@ -31,9 +31,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             return new GlobalLocationNumber(mock._gln);
         }
 
-        public static implicit operator GlobalLocationNumberDto(MockedGln mock)
+        public static implicit operator ActorNumberDto(MockedGln mock)
         {
-            return new GlobalLocationNumberDto(mock._gln);
+            return new ActorNumberDto(mock._gln);
         }
 
         public static implicit operator string(MockedGln mock)
