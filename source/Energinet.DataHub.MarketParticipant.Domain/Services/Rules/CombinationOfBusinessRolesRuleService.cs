@@ -26,13 +26,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         public CombinationOfBusinessRolesRuleService()
         {
             var balanceResponsiblePartyRole = new BalanceResponsiblePartyRole();
-            var gridAccessProviderRole = new GridAccessProviderRole();
-            var balancePowerSupplierRole = new BalancePowerSupplierRole();
+            var gridAccessProviderRole = new GridOperatorRole();
+            var balancePowerSupplierRole = new ElectricalSupplierRole();
             var imbalanceSettlementResponsibleRole = new ImbalanceSettlementResponsibleRole();
             var meteringPointAdministratorRole = new MeteringPointAdministratorRole();
             var meteredDataAdministratorRole = new MeteredDataAdministratorRole();
             var systemOperatorRole = new SystemOperatorRole();
             var meteredDataResponsibleRole = new MeteredDataResponsibleRole();
+            var danishEnergyAgencyRole = new DanishEnergyAgencyRole();
+            var transmissionSystemOperatorRole = new TransmissionSystemOperatorRole();
 
             var ddkDdqMdrHashSets = balanceResponsiblePartyRole.Functions.ToHashSet();
             ddkDdqMdrHashSets.UnionWith(balancePowerSupplierRole.Functions.Concat(meteredDataResponsibleRole.Functions));
@@ -46,8 +48,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             var ddx = imbalanceSettlementResponsibleRole.Functions.ToHashSet();
             var dgl = meteredDataAdministratorRole.Functions.ToHashSet();
             var ez = systemOperatorRole.Functions.ToHashSet();
+            var sts = danishEnergyAgencyRole.Functions.ToHashSet();
+            var tso = transmissionSystemOperatorRole.Functions.ToHashSet();
 
-            AllSets = new List<HashSet<EicFunction>> { ddkDdqMdr, ddmMdr, ddz, ddx, dgl, ez };
+            AllSets = new List<HashSet<EicFunction>> { ddkDdqMdr, ddmMdr, ddz, ddx, dgl, ez, sts, tso };
         }
 
         private List<HashSet<EicFunction>> AllSets { get; }

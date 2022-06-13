@@ -101,8 +101,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                     .ConfigureAwait(false);
 
                 // Assert
-                Assert.Equal("11b79733-b588-413d-9833-8adedce991aa", app.AppRoles.First().RoleId);
-                Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.ElementAt(1).RoleId);
+                Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.First().RoleId);
+                Assert.Equal("9873b7cb-6b0e-46db-9142-90d0e82c035a", app.AppRoles.ElementAt(1).RoleId);
             }
             finally
             {

@@ -22,8 +22,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirecto
         public Guid DdkId { get; set; }
         public Guid DdmId { get; set; }
         public Guid DdqId { get; set; }
+        public Guid DdxId { get; set; }
+        public Guid DdzId { get; set; }
+        public Guid DglId { get; set; }
         public Guid EzId { get; set; }
         public Guid MdrId { get; set; }
         public Guid StsId { get; set; }
+        public Guid TsoId { get; set; }
     }
 }

@@ -21,10 +21,10 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         Ddq = 3,
         Ddx = 4,
         Ddz = 5,
-        Dea = 6,
-        Dgl = 7,
-        Mdr = 8,
-        Sts = 9,
-        Ez = 10
+        Dgl = 6,
+        Mdr = 7,
+        Sts = 8,
+        Ez = 9,
+        Tso = 10
     }
 }
