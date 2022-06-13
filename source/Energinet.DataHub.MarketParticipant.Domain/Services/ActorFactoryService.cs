@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         private static bool AreActorsEquivalent(Actor a, Actor b)
         {
-            if (a.Gln != b.Gln)
+            if (a.ActorNumber != b.ActorNumber)
                 return false;
 
             if (a.MarketRoles.Count != b.MarketRoles.Count)

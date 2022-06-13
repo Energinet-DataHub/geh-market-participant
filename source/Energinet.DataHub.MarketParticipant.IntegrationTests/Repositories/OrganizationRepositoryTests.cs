@@ -356,7 +356,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(organization);
             Assert.Single(organization!.Actors);
-            Assert.Contains(organization.Actors, x => x.Gln == gln);
+            Assert.Contains(organization.Actors, x => x.ActorNumber == gln);
         }
 
         [Fact]
@@ -472,7 +472,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(organizations);
             var expected = organizations.Single();
-            Assert.Equal(globalLocationNumber, expected.Actors.Single().Gln);
+            Assert.Equal(globalLocationNumber, expected.Actors.Single().ActorNumber);
         }
     }
 }

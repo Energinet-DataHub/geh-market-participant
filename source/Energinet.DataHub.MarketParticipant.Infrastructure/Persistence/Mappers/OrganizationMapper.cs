@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         {
             to.Id = from.Id;
             to.ActorId = from.ExternalActorId?.Value;
-            to.Gln = from.Gln.Value;
+            to.Gln = from.ActorNumber.Value;
             to.Status = (int)from.Status;
 
             // GridArea linking is currently treated as value type, so they are deleted and recreated with each update.

@@ -22,11 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     {
         private readonly ActorStatusTransitioner _actorStatusTransitioner;
 
-        public Actor(ActorNumber gln)
+        public Actor(ActorNumber actorNumber)
         {
             Id = Guid.Empty;
             ExternalActorId = null;
-            Gln = gln;
+            ActorNumber = actorNumber;
             _actorStatusTransitioner = new ActorStatusTransitioner();
             GridAreas = new Collection<GridAreaId>();
             MarketRoles = new Collection<MarketRole>();
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public Actor(
             Guid id,
             ExternalActorId? externalActorId,
-            ActorNumber gln,
+            ActorNumber actorNumber,
             ActorStatus actorStatus,
             IEnumerable<GridAreaId> gridAreas,
             IEnumerable<MarketRole> marketRoles,
@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         {
             Id = id;
             ExternalActorId = externalActorId;
-            Gln = gln;
+            ActorNumber = actorNumber;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
             GridAreas = new List<GridAreaId>(gridAreas);
             MarketRoles = new List<MarketRole>(marketRoles);
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// <summary>
         /// The global location number of the current actor.
         /// </summary>
-        public ActorNumber Gln { get; }
+        public ActorNumber ActorNumber { get; }
 
         /// <summary>
         /// The status of the current actor.

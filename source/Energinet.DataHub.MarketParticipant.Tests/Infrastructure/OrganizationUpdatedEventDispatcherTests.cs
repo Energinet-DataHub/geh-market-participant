@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
-              Gln = new ActorNumber("fake_value"),
+              ActorNumber = new ActorNumber("fake_value"),
               Status = ActorStatus.Active,
               ActorId = Guid.NewGuid(),
               BusinessRoles = { BusinessRoleCode.Ddk },
