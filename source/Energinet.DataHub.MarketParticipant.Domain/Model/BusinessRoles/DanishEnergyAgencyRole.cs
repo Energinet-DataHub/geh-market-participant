@@ -21,6 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
     {
         public BusinessRoleCode Code => BusinessRoleCode.Sts;
 
-        public IEnumerable<EicFunction> Functions { get; } = Array.Empty<EicFunction>();
+        public IEnumerable<EicFunction> Functions { get; } = new[] { EicFunction.DanishEnergyAgency };
     }
 }

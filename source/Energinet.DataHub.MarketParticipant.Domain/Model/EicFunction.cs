@@ -62,6 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         SchedulingAreaResponsible = 44,
         SystemOperator = 45,
         TradeResponsibleParty = 46,
-        TransmissionCapacityAllocator = 47
+        TransmissionCapacityAllocator = 47,
+        DanishEnergyAgency = 48
     }
 }

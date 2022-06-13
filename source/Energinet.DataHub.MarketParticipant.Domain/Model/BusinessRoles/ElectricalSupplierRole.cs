@@ -12,15 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 {
-    public sealed class MeteredDataAggregatorRole : IBusinessRole
+    public sealed class ElectricalSupplierRole : IBusinessRole
     {
-        public BusinessRoleCode Code => BusinessRoleCode.Dea;
+        public BusinessRoleCode Code => BusinessRoleCode.Ddq;
 
-        public IEnumerable<EicFunction> Functions { get; } = Array.Empty<EicFunction>();
+        public IEnumerable<EicFunction> Functions { get; } = new[]
+        {
+            EicFunction.EnergySupplier,
+            EicFunction.EnergyTrader
+        };
     }
 }

@@ -16,7 +16,7 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 {
-    public sealed class GridAccessProviderRole : IBusinessRole
+    public sealed class GridOperatorRole : IBusinessRole
     {
         public BusinessRoleCode Code => BusinessRoleCode.Ddm;
 

@@ -31,8 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var target = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
-                new BalancePowerSupplierRole(),
-                new GridAccessProviderRole(),
+                new ElectricalSupplierRole(),
+                new GridOperatorRole(),
                 new BalanceResponsiblePartyRole()
             });
 
@@ -46,8 +46,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var target = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
-                new BalancePowerSupplierRole(),
-                new GridAccessProviderRole(),
+                new ElectricalSupplierRole(),
+                new GridOperatorRole(),
                 new BalanceResponsiblePartyRole()
             });
 
@@ -71,8 +71,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var target = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
-                new BalancePowerSupplierRole(),
-                new GridAccessProviderRole(),
+                new ElectricalSupplierRole(),
+                new GridOperatorRole(),
                 new BalanceResponsiblePartyRole()
             });
 
