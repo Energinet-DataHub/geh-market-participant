@@ -23,7 +23,7 @@ message ActorUpdatedIntegrationEventContract {
   string ExternalActorId = 3;
 
   string OrganizationId = 4;
-  string Gln = 5;
+  string ActorNumber = 5;
   int32 Status = 6;
 
   repeated int32 BusinessRoles = 7;
