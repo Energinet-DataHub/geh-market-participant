@@ -43,16 +43,16 @@ namespace Energinet.DataHub.MarketParticipant.Common
 
             container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
             container.Collection.Register<IBusinessRole>(
-                new BalancePowerSupplierRole(),
+                new ElectricalSupplierRole(),
                 new BalanceResponsiblePartyRole(),
                 new DanishEnergyAgencyRole(),
-                new GridAccessProviderRole(),
+                new GridOperatorRole(),
                 new ImbalanceSettlementResponsibleRole(),
                 new MeteredDataAdministratorRole(),
-                new MeteredDataAggregatorRole(),
                 new MeteredDataResponsibleRole(),
                 new MeteringPointAdministratorRole(),
-                new SystemOperatorRole());
+                new SystemOperatorRole(),
+                new TransmissionSystemOperatorRole());
         }
     }
 }
