@@ -27,3 +27,5 @@ BusinessRoles
 MarketRoles
 MarketRole
 MeteringPointTypes
+ActorCreated
+GridAreas
