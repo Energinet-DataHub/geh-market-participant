@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actor = new Actor(
                 Guid.NewGuid(),
                 new ExternalActorId(Guid.NewGuid()),
-                new GlobalLocationNumber("fake_value"),
+                new ActorNumber("fake_value"),
                 ActorStatus.Active,
                 Enumerable.Empty<GridAreaId>(),
                 new[] { marketRole },

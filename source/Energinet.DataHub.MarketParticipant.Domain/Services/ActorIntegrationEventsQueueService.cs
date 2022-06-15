@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 OrganizationId = organizationId,
                 ActorId = actor.Id,
                 ExternalActorId = actor.ExternalActorId,
-                Gln = actor.Gln,
+                ActorNumber = actor.ActorNumber,
                 Status = actor.Status
             };
 

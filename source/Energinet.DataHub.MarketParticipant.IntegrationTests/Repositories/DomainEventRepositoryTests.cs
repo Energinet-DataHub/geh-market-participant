@@ -104,7 +104,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             {
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ActorId = Guid.NewGuid(),
-                Gln = new GlobalLocationNumber("fake_value")
+                ActorNumber = new ActorNumber("fake_value")
             };
         }
 

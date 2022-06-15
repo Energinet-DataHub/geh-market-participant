@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record GlobalLocationNumber(string Value);
+    public sealed record ActorNumberDto(string Value);
 }
