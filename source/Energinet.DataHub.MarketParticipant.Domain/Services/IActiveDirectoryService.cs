@@ -27,11 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Creates a consumer app registration.
         /// </summary>
-        /// <param name="appName">The name of the app to create.</param>
+        /// <param name="actorNumber">The actor number of the actor to create.</param>
         /// <param name="permissions">Roles to be assigned to the app.</param>
         /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
         Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            ActorNumber appName,
+            ActorNumber actorNumber,
             IReadOnlyCollection<MarketRole> permissions);
 
         /// <summary>
