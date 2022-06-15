@@ -29,10 +29,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             _organizationRepository = organizationRepository;
         }
 
-        public async Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, GlobalLocationNumber globalLocationNumber)
+        public async Task ValidateGlobalLocationNumberAvailableAsync(Organization organization, ActorNumber actorNumber)
         {
             var organizations = await _organizationRepository
-                .GetAsync(globalLocationNumber)
+                .GetAsync(actorNumber)
                 .ConfigureAwait(false);
 
             if (organizations.Any(o => o.Id != organization.Id))

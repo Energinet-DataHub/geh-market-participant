@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Repositories
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync((GlobalLocationNumber)null!))
+                .ThrowsAsync<ArgumentNullException>(() => target.GetAsync((ActorNumber)null!))
                 .ConfigureAwait(false);
         }
     }

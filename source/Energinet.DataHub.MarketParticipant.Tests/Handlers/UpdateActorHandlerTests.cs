@@ -112,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -151,7 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -190,7 +190,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -229,7 +229,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            organization.Actors.Add(new Actor(new GlobalLocationNumber("fake_value")));
+            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))

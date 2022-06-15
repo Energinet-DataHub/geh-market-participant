@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 actorUpdatedIntegrationEvent.ActorId,
                 actorUpdatedIntegrationEvent.OrganizationId.Value,
                 actorUpdatedIntegrationEvent.ExternalActorId?.Value,
-                actorUpdatedIntegrationEvent.Gln.Value,
+                actorUpdatedIntegrationEvent.ActorNumber.Value,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
                 actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
                 actorUpdatedIntegrationEvent.MarketRoles.Select(x => (EicFunction)x),

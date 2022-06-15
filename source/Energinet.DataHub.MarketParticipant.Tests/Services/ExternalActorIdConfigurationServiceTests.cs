@@ -39,7 +39,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
-        var gln = new GlobalLocationNumber("fake_value");
+        var gln = new ActorNumber("fake_value");
         var externalActorId = new ExternalActorId(Guid.NewGuid());
         var actor = new Actor(gln)
         {
@@ -87,7 +87,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
-        var gln = new GlobalLocationNumber("fake_value");
+        var gln = new ActorNumber("fake_value");
         var externalActorId = new ExternalActorId(Guid.NewGuid());
         var actor = new Actor(gln)
         {

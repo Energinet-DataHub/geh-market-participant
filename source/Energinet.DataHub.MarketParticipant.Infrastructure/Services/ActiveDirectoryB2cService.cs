@@ -48,10 +48,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         }
 
         public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            GlobalLocationNumber appName,
+            ActorNumber actorNumber,
             IReadOnlyCollection<MarketRole> permissions)
         {
-            ArgumentNullException.ThrowIfNull(appName, nameof(appName));
+            ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
             ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
             try
             {
-                var app = await CreateAppInB2CAsync(appName.Value, permissionsToPass).ConfigureAwait(false);
+                var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
 
                 var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId).ConfigureAwait(false);
 

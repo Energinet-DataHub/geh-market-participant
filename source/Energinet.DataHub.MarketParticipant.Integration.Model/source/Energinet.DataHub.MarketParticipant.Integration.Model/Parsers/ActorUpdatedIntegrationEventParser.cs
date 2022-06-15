@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     ActorId = integrationEvent.ActorId.ToString(),
                     ExternalActorId = externalActorId,
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Gln = integrationEvent.Gln,
+                    ActorNumber = integrationEvent.ActorNumber,
                     Status = (int)integrationEvent.Status,
                     GridAreaIds = { integrationEvent.GridAreas.Select(x => x.ToString()) },
                     MeteringPointTypes = { integrationEvent.MeteringPointTypes }
@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
                     externalActorId,
-                    contract.Gln,
+                    contract.ActorNumber,
                     Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
                     contract.BusinessRoles.Select(
                         x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
