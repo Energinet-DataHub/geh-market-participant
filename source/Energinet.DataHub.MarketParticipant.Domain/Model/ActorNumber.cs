@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record GlobalLocationNumber(string Value);
+    public sealed record ActorNumber(string Value);
 }

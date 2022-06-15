@@ -18,7 +18,7 @@ using System.Collections.Generic;
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record CreateActorDto(
-        GlobalLocationNumberDto Gln,
+        ActorNumberDto ActorNumber,
         IEnumerable<Guid> GridAreas,
         IEnumerable<MarketRoleDto> MarketRoles,
         IEnumerable<MarketParticipantMeteringPointType> MeteringPointTypes);

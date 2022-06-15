@@ -101,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actor = new Actor(
                 actorId,
                 new ExternalActorId(actorId),
-                new GlobalLocationNumber(actorGln),
+                new ActorNumber(actorGln),
                 ActorStatus.Active,
                 Enumerable.Empty<GridAreaId>(),
                 Enumerable.Empty<MarketRole>(),
