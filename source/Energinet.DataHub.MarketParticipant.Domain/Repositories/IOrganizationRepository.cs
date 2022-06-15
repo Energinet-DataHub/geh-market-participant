@@ -46,8 +46,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Gets all organizations that contain an actor with the specified GLN.
         /// </summary>
-        /// <param name="globalLocationNumber">The GLN to find organizations for.</param>
+        /// <param name="actorNumber">The GLN to find organizations for.</param>
         /// <returns>The list of organizations with an actor that has the specified GLN.</returns>
-        Task<IEnumerable<Organization>> GetAsync(GlobalLocationNumber globalLocationNumber);
+        Task<IEnumerable<Organization>> GetAsync(ActorNumber actorNumber);
     }
 }

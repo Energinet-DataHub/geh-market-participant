@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             Assert.Equal(@event.ActorId, actualEvent.ActorId);
             Assert.Equal(@event.ExternalActorId, actualEvent.ExternalActorId);
             Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
-            Assert.Equal(@event.Gln, actualEvent.Gln);
+            Assert.Equal(@event.ActorNumber, actualEvent.ActorNumber);
             Assert.Equal(@event.Status, actualEvent.Status);
             Assert.Equal(@event.BusinessRoles, actualEvent.BusinessRoles);
             Assert.Equal(@event.MarketRoles, actualEvent.MarketRoles);
@@ -92,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var contract = new ActorUpdatedIntegrationEventContract
             {
                 Id = "Not_A_Giud",
-                Gln = "fake_value",
+                ActorNumber = "fake_value",
                 Status = 2,
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { 1 },
@@ -114,7 +114,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var contract = new ActorUpdatedIntegrationEventContract
             {
                 Id = "Not_A_Giud",
-                Gln = "fake_value",
+                ActorNumber = "fake_value",
                 Status = -1,
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { 1 },
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var contract = new ActorUpdatedIntegrationEventContract
             {
                 Id = "Not_A_Giud",
-                Gln = "fake_value",
+                ActorNumber = "fake_value",
                 Status = 1,
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { -1 },
@@ -158,7 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var contract = new ActorUpdatedIntegrationEventContract
             {
                 Id = "Not_A_Giud",
-                Gln = "fake_value",
+                ActorNumber = "fake_value",
                 Status = 1,
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { 1 },

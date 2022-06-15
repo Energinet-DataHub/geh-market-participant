@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         {
             to.Id = from.Id;
             to.ActorId = from.ExternalActorId?.Value;
-            to.Gln = from.Gln.Value;
+            to.ActorNumber = from.ActorNumber.Value;
             to.Status = (int)from.Status;
 
             // GridArea linking is currently treated as value type, so they are deleted and recreated with each update.
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 var meteringPointTypes = actor.MeteringPointTypes
                     .Select(m => MeteringPointType.FromValue(m.MeteringTypeId));
 
-                var actorGln = new GlobalLocationNumber(actor.Gln);
+                var actorNumber = new ActorNumber(actor.ActorNumber);
                 var actorStatus = (ActorStatus)actor.Status;
                 var gridAreas = actor
                     .GridAreas
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 return new Actor(
                     actor.Id,
                     actor.ActorId.HasValue ? new ExternalActorId(actor.ActorId.Value) : null,
-                    actorGln,
+                    actorNumber,
                     actorStatus,
                     gridAreas,
                     marketRoles,

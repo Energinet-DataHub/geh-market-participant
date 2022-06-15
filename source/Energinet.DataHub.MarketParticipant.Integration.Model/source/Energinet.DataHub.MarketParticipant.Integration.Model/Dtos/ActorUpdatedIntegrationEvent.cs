@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="externalActorId">
         /// The external actor id for integrating Azure AD and domains.
         /// Can be null; this will happen if the status is New or Deleted, or the chosen roles do not give permission to the actor.</param>
-        /// <param name="gln">GLN.</param>
+        /// <param name="actorNumber">GLN.</param>
         /// <param name="status">The status of the current actor.</param>
         /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
         /// <param name="marketRoles">The roles (functions) assigned to the current actor.</param>
@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Guid actorId,
             Guid organizationId,
             Guid? externalActorId,
-            string gln,
+            string actorNumber,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<EicFunction> marketRoles,
@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             ActorId = actorId;
             OrganizationId = organizationId;
             ExternalActorId = externalActorId;
-            Gln = gln;
+            ActorNumber = actorNumber;
             Status = status;
             BusinessRoles = businessRoles;
             MarketRoles = marketRoles;
@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public Guid OrganizationId { get; }
 
         public Guid? ExternalActorId { get; }
-        public string Gln { get; }
+        public string ActorNumber { get; }
         public ActorStatus Status { get; }
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
