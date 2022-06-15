@@ -25,3 +25,7 @@ GridAreaLinkId
 ActorUpdatedIntegrationEvent
 BusinessRoles
 MarketRoles
+MarketRole
+MeteringPointTypes
+ActorCreated
+GridAreas
