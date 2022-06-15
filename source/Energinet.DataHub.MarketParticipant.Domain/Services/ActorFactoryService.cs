@@ -52,19 +52,19 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         public async Task<Actor> CreateAsync(
             Organization organization,
-            ActorNumber gln,
+            ActorNumber actorNumber,
             IReadOnlyCollection<GridAreaId> gridAreas,
             IReadOnlyCollection<MarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes)
         {
             ArgumentNullException.ThrowIfNull(organization);
-            ArgumentNullException.ThrowIfNull(gln);
+            ArgumentNullException.ThrowIfNull(actorNumber);
             ArgumentNullException.ThrowIfNull(gridAreas);
             ArgumentNullException.ThrowIfNull(marketRoles);
             ArgumentNullException.ThrowIfNull(meteringPointTypes);
 
             await _uniqueGlobalLocationNumberRuleService
-                .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
+                .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
                 .ConfigureAwait(false);
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(
@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 gridAreas,
                 marketRoles);
 
-            var newActor = new Actor(gln);
+            var newActor = new Actor(actorNumber);
 
             foreach (var gridAreaId in gridAreas)
                 newActor.GridAreas.Add(gridAreaId);
