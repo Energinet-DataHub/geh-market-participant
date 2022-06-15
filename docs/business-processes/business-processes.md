@@ -24,9 +24,9 @@ Fig. 3 - Class diagram showing how MarketRoles is associated with GridAreas and 
 ### Organization
 
 ![Integration events regarding organization](../images/Actor_register-OrganizationIntegrationEvents.drawio.png)
-Fig. 4 - All integration events regarding an oganization
+Fig. 4 - All integration events regarding an organization
 
 ### Grid area
 
-![Integration events regaring grid area](../images/Actor_register-GridAreaIntegrationEvents.drawio.png)
+![Integration events regarding grid area](../images/Actor_register-GridAreaIntegrationEvents.drawio.png)
 Fig. 5 - All integration events regarding a grid area
