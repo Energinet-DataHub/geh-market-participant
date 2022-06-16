@@ -24,6 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
     {
         public IEnumerable<IIntegrationEvent> BuildOrganizationCreatedEvents(Organization organization)
         {
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+
             return new List<IIntegrationEvent>()
             {
                 new OrganizationCreatedIntegrationEvent
