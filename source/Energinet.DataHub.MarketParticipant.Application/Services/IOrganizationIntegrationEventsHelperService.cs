@@ -23,15 +23,21 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
     /// <summary>
     /// test
     /// </summary>
-    public interface IOrganizationDetermineChangeEventsHelperService
+    public interface IOrganizationIntegrationEventsHelperService
     {
+        /// <summary>
+        /// Build organization created event
+        /// </summary>
+        /// <param name="organization">organization to build event for</param>
+        /// <returns>Organization created events</returns>
+        IEnumerable<IIntegrationEvent> BuildOrganizationCreatedEvents(Organization organization);
+
         /// <summary>
         /// test
         /// </summary>
         /// <param name="organization"></param>
         /// <param name="organizationDto"></param>
         /// <returns>events</returns>
-        IEnumerable<IIntegrationEvent>
-            DetermineChangeEvents(Organization organization, ChangeOrganizationDto organizationDto);
+        IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto);
     }
 }

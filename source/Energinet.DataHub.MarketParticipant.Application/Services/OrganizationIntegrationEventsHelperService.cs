@@ -20,9 +20,24 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
-    public class OrganizationDetermineChangeEventsHelperService
+    public class OrganizationIntegrationEventsHelperService : IOrganizationIntegrationEventsHelperService
     {
-        public IEnumerable<IIntegrationEvent> DetermineChangeEvents(Organization organization, OrganizationDto organizationDto)
+        public IEnumerable<IIntegrationEvent> BuildOrganizationCreatedEvents(Organization organization)
+        {
+            return new List<IIntegrationEvent>()
+            {
+                new OrganizationCreatedIntegrationEvent
+                {
+                    Address = organization.Address,
+                    Name = organization.Name,
+                    OrganizationId = organization.Id,
+                    BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
+                    Comment = organization.Comment
+                }
+            };
+        }
+
+        public IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
             ArgumentNullException.ThrowIfNull(organizationDto, nameof(organizationDto));

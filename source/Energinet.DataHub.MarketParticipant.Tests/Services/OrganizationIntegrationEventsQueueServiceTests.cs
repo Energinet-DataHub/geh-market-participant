@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -33,6 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new OrganizationIntegrationEventsQueueService(domainEventRepository.Object);
+            var helper = new OrganizationIntegrationEventsHelperService();
 
             var organizationArea = new Organization(
                 new OrganizationId(Guid.NewGuid()),
@@ -47,8 +49,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value"),
                 "Test Comment");
 
+            var changeEvent = helper.BuildOrganizationCreatedEvents(organizationArea);
+
             // Act
-            await target.EnqueueOrganizationCreatedEventAsync(organizationArea).ConfigureAwait(false);
+            await target.EnqueueOrganizationIntegrationEventAsync(changeEvent).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
