@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             {
                 var organizationCreatedEvents = _organizationIntegrationEventsHelperService.BuildOrganizationCreatedEvents(organization);
                 await _organizationIntegrationEventsQueueService
-                    .EnqueueOrganizationIntegrationEventAsync(organizationCreatedEvents)
+                    .EnqueueOrganizationIntegrationEventsAsync(organizationCreatedEvents)
                     .ConfigureAwait(false);
 
                 foreach (var actor in organization.Actors)

@@ -55,15 +55,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            app.UseMiddleware<JwtTokenMiddleware>();
-            app.UseAuthorization();
+            //app.UseMiddleware<JwtTokenMiddleware>();
+            //app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
 
                 // Health check
-                endpoints.MapLiveHealthChecks();
-                endpoints.MapReadyHealthChecks();
+                //endpoints.MapLiveHealthChecks();
+                //endpoints.MapReadyHealthChecks();
             });
 
             app.UseSimpleInjector(Container);

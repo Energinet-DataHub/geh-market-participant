@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             var organizationCreatedIntegrationEvent = BuildOrganizationCreatedIntegrationEvent(savedOrganization);
 
             await _organizationIntegrationEventsQueueService
-                .EnqueueOrganizationIntegrationEventAsync(organizationCreatedIntegrationEvent)
+                .EnqueueOrganizationIntegrationEventsAsync(organizationCreatedIntegrationEvent)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);

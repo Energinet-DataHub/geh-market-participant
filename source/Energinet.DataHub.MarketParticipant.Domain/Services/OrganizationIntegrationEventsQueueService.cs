@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public async Task EnqueueOrganizationIntegrationEventAsync(IEnumerable<IIntegrationEvent> changeEvents)
+        public async Task EnqueueOrganizationIntegrationEventsAsync(IEnumerable<IIntegrationEvent> changeEvents)
         {
             ArgumentNullException.ThrowIfNull(changeEvents, nameof(changeEvents));
 

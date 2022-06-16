@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .ConfigureAwait(false);
 
             await _organizationIntegrationEventsQueueService
-                .EnqueueOrganizationIntegrationEventAsync(changeEvents)
+                .EnqueueOrganizationIntegrationEventsAsync(changeEvents)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
