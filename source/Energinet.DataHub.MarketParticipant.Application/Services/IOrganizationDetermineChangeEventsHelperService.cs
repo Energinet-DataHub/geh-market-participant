@@ -12,28 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     /// <summary>
-    /// Creates and enqueues integration events for Organizations.
+    /// test
     /// </summary>
-    public interface IOrganizationIntegrationEventsQueueService
+    public interface IOrganizationDetermineChangeEventsHelperService
     {
         /// <summary>
-        /// Creates and enqueues an Organization Created integration event for the specified Organization.
+        /// test
         /// </summary>
-        /// <param name="organization">The Organization to publish an integration event for.</param>
-        Task EnqueueOrganizationCreatedEventAsync(Organization organization);
-
-        /// <summary>
-        /// Creates and enqueues an Organization Updated integration event for the specified Organization.
-        /// </summary>
-        /// <param name="changeEvents">The Organization to publish an integration event for.</param>
-        public Task EnqueueOrganizationUpdatedEventAsync(IEnumerable<IIntegrationEvent> changeEvents);
+        /// <param name="organization"></param>
+        /// <param name="organizationDto"></param>
+        /// <returns>events</returns>
+        IEnumerable<IIntegrationEvent>
+            DetermineChangeEvents(Organization organization, ChangeOrganizationDto organizationDto);
     }
 }

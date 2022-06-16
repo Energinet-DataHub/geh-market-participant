@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             foreach (var organization in allOrganizations)
             {
                 await _organizationIntegrationEventsQueueService
-                    .EnqueueOrganizationUpdatedEventAsync(organization)
+                    .EnqueueOrganizationCreatedEventAsync(organization)
                     .ConfigureAwait(false);
 
                 foreach (var actor in organization.Actors)

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -30,20 +31,49 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public Task EnqueueOrganizationUpdatedEventAsync(Organization organization)
+        public Task EnqueueOrganizationCreatedEventAsync(Organization organization)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
 
-            var organizationUpdatedEvent = new OrganizationUpdatedIntegrationEvent
+            var organizationUpdatedEvent = new OrganizationCreatedIntegrationEvent
             {
                 Address = organization.Address,
                 Name = organization.Name,
                 OrganizationId = organization.Id,
-                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier
+                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
+                Comment = organization.Comment
             };
 
             var domainEvent = new DomainEvent(organization.Id.Value, nameof(Organization), organizationUpdatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
+        }
+
+        public async Task EnqueueOrganizationUpdatedEventAsync(IEnumerable<IIntegrationEvent> changeEvents)
+        {
+            ArgumentNullException.ThrowIfNull(changeEvents, nameof(changeEvents));
+
+            foreach (var changeEvent in changeEvents)
+            {
+                DomainEvent? domainEvent;
+                switch (changeEvent)
+                {
+                    case OrganizationAddressChangedIntegrationEvent:
+                        domainEvent = new DomainEvent(changeEvent.Id, nameof(Address), changeEvent);
+                        await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                        break;
+                    case OrganizationBusinessRegisterIdentifierChangedIntegrationEvent:
+                        domainEvent = new DomainEvent(changeEvent.Id, nameof(BusinessRegisterIdentifier), changeEvent);
+                        await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                        break;
+                    case OrganizationCommentChangedIntegrationEvent:
+                    case OrganizationNameChangedIntegrationEvent:
+                        domainEvent = new DomainEvent(changeEvent.Id, nameof(Organization), changeEvent);
+                        await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                        break;
+                    default:
+                        throw new ArgumentException("IntegrationEvent type not handled");
+                }
+            }
         }
     }
 }

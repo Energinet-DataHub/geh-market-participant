@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 "Test Comment");
 
             // Act
-            await target.EnqueueOrganizationUpdatedEventAsync(organizationArea).ConfigureAwait(false);
+            await target.EnqueueOrganizationCreatedEventAsync(organizationArea).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(

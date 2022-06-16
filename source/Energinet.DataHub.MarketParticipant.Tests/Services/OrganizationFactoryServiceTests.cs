@@ -180,7 +180,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             organizationIntegrationEventsQueueService.Verify(
-                x => x.EnqueueOrganizationUpdatedEventAsync(
+                x => x.EnqueueOrganizationCreatedEventAsync(
                     It.Is<Organization>(y => y.Id == organization.Id)),
                 Times.Once);
         }

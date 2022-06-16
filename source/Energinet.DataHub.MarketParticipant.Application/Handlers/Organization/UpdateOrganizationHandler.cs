@@ -14,6 +14,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
@@ -30,6 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IOrganizationDetermineChangeEventsHelperService _organizationDetermineChangeEventsHelperService;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
@@ -37,10 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             IOrganizationRepository organizationRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
             IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
-            IOrganizationExistsHelperService organizationExistsHelperService)
+            IOrganizationExistsHelperService organizationExistsHelperService,
+            IOrganizationDetermineChangeEventsHelperService organizationDetermineChangeEventsHelperService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
+            _organizationDetermineChangeEventsHelperService = organizationDetermineChangeEventsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
         }
@@ -53,6 +57,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             var organization = await _organizationExistsHelperService
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
+
+            var changesEvents = _organizationDetermineChangeEventsHelperService.DetermineChangeEvents(organization, request.Organization);
 
             organization.Name = request.Organization.Name;
             organization.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
@@ -73,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .ConfigureAwait(false);
 
             await _organizationIntegrationEventsQueueService
-                .EnqueueOrganizationUpdatedEventAsync(organization)
+                .EnqueueOrganizationUpdatedEventAsync(changesEvents)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
