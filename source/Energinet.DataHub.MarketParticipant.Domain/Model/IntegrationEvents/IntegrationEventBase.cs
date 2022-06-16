@@ -22,13 +22,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
         protected IntegrationEventBase()
         {
             Id = Guid.NewGuid();
-            FromDate = new TimeSpan(DateTime.UtcNow.Ticks);
+            EventCreated = new TimeSpan(DateTime.UtcNow.Ticks);
         }
 
         [JsonInclude]
         public Guid Id { get; protected set; }
 
         [JsonInclude]
-        public TimeSpan FromDate { get; protected set; }
+        public TimeSpan EventCreated { get; protected set; }
     }
 }
