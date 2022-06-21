@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 {
                                     ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                     ""MeteringPointTypes"": [
-                                        ""MPT""
+                                        ""D01VeProduction""
                                     ]
                                 }
                             ]
@@ -150,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                             {
                                                 ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                                 ""MeteringPointTypes"": [
-                                                    ""MPT""
+                                                    ""D01VeProduction""
                                                 ]
                                             }
                                         ]
@@ -186,7 +186,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                             {
                                                 ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                                 ""MeteringPointTypes"": [
-                                                    ""MPT""
+                                                    ""D01VeProduction""
                                                 ]
                                             }
                                         ]
@@ -282,7 +282,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                         {
                                             ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                             ""MeteringPointTypes"": [
-                                                ""MPT""
+                                                ""D01VeProduction""
                                             ]
                                         }
                                     ]
@@ -354,7 +354,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                         {
                                             ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                             ""MeteringPointTypes"": [
-                                                ""MPT""
+                                                ""D01VeProduction""
                                             ]
                                         }
                                     ]
@@ -434,7 +434,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                         {
                                             ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                             ""MeteringPointTypes"": [
-                                                ""MPT""
+                                                ""D01VeProduction""
                                             ]
                                         }
                                     ]
@@ -547,7 +547,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                     {
                                         ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                         ""MeteringPointTypes"": [
-                                            ""MPT""
+                                            ""D01VeProduction""
                                         ]
                                     }
                                 ]
@@ -568,7 +568,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                     {
                                         ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                         ""MeteringPointTypes"": [
-                                            ""MPT""
+                                            ""D01VeProduction""
                                         ]
                                     }
                                 ]
@@ -631,7 +631,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 {
                                     ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                     ""MeteringPointTypes"": [
-                                        ""MPT""
+                                        ""D01VeProduction""
                                     ]
                                 }
                             ]
@@ -689,7 +689,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 {
                                     ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
                                     ""MeteringPointTypes"": [
-                                        ""MPT""
+                                        ""D01VeProduction""
                                     ]
                                 }
                             ]
