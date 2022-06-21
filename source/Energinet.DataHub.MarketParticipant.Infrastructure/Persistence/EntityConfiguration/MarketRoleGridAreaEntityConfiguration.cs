@@ -19,18 +19,24 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class MarketRoleEntityConfiguration : IEntityTypeConfiguration<MarketRoleEntity>
+    public sealed class MarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<MarketRoleGridAreaEntity>
     {
-        public void Configure(EntityTypeBuilder<MarketRoleEntity> builder)
+        public void Configure(EntityTypeBuilder<MarketRoleGridAreaEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("MarketRole");
-            builder.HasKey(role => role.Id);
-            builder.Property(role => role.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(role => role.GridAreas)
-                .WithOne()
-                .HasForeignKey(g => g.MarketRoleId);
+            builder.ToTable("MarketRoleGridArea");
+            builder.HasKey(rg => rg.Id);
+            builder.Property(rg => rg.Id).ValueGeneratedOnAdd();
+            builder.OwnsMany(role => role.MeteringPointTypes, ConfigureMeteringTypes);
+        }
+
+        private static void ConfigureMeteringTypes(
+            OwnedNavigationBuilder<MarketRoleGridAreaEntity, MeteringPointTypeEntity> meteringPointTypeBuilder)
+        {
+            meteringPointTypeBuilder.WithOwner().HasForeignKey("GridAreaId");
+            meteringPointTypeBuilder.ToTable("GridAreaMeteringPointType");
+            meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
+            meteringPointTypeBuilder.Property(p => p.MeteringTypeId).HasColumnName("MeteringTypeId");
         }
     }
 }

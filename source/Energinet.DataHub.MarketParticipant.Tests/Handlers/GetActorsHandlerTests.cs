@@ -103,18 +103,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(actorId),
                 new ActorNumber(actorGln),
                 ActorStatus.Active,
-                Enumerable.Empty<GridAreaId>(),
-                Enumerable.Empty<MarketRole>(),
-                Enumerable.Empty<MeteringPointType>());
+                Enumerable.Empty<ActorMarketRole>());
 
             var actor2 = new Actor(
                 actorId2,
                 new ExternalActorId(actorId2),
                 new ActorNumber(actorGln),
                 ActorStatus.Active,
-                Enumerable.Empty<GridAreaId>(),
-                Enumerable.Empty<MarketRole>(),
-                Enumerable.Empty<MeteringPointType>());
+                Enumerable.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 new OrganizationId(orgId),

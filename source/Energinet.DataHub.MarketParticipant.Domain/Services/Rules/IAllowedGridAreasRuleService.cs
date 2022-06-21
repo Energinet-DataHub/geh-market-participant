@@ -29,6 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// <param name="marketRoles">The market roles applied to the given grid areas.</param>
         void ValidateGridAreas(
             IEnumerable<GridAreaId> gridAreas,
-            IEnumerable<MarketRole> marketRoles);
+            IEnumerable<ActorMarketRole> marketRoles);
     }
 }

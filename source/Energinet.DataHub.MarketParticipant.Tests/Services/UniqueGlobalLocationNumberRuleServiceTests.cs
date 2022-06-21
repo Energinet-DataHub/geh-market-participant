@@ -96,9 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         new ExternalActorId(Guid.NewGuid()),
                         gln,
                         ActorStatus.Active,
-                        Enumerable.Empty<GridAreaId>(),
-                        Enumerable.Empty<MarketRole>(),
-                        Enumerable.Empty<MeteringPointType>())
+                        Enumerable.Empty<ActorMarketRole>())
                 },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,

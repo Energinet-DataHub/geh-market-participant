@@ -20,6 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
     public sealed record CreateActorDto(
         ActorNumberDto ActorNumber,
         IEnumerable<Guid> GridAreas,
-        IEnumerable<MarketRoleDto> MarketRoles,
+        IEnumerable<ActorMarketRoleDto> MarketRoles,
         IEnumerable<string> MeteringPointTypes);
 }

@@ -17,21 +17,19 @@ using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class ActorEntity
+    public sealed class MarketRoleGridAreaEntity
     {
-        public ActorEntity()
+        public MarketRoleGridAreaEntity()
         {
-            ActorNumber = string.Empty;
-            MarketRoles = new Collection<MarketRoleEntity>();
+            MeteringPointTypes = new Collection<MeteringPointTypeEntity>();
         }
 
         public Guid Id { get; set; }
-        public Guid? ActorId { get; set; }
-        public string ActorNumber { get; set; }
-        public int Status { get; set; }
 
-        public Collection<MarketRoleEntity> MarketRoles { get; }
+        public Guid MarketRoleId { get; set; }
 
-        public Guid OrganizationId { get; set; }
+        public Guid GridAreaId { get; set; }
+
+        public Collection<MeteringPointTypeEntity> MeteringPointTypes { get; }
     }
 }

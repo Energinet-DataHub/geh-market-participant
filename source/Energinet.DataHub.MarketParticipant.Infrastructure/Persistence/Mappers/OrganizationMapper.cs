@@ -83,33 +83,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.ActorNumber = from.ActorNumber.Value;
             to.Status = (int)from.Status;
 
-            // GridArea linking is currently treated as value type, so they are deleted and recreated with each update.
-            to.GridAreas.Clear();
-            foreach (var gridAreaId in from.GridAreas)
-            {
-                to.GridAreas.Add(new GridAreaActorInfoLinkEntity
-                {
-                    GridAreaId = gridAreaId.Value,
-                    ActorInfoId = from.Id
-                });
-            }
-
-            // MeteringPointTypes are currently treated as value types, so they are deleted and recreated with each update.
-            to.MeteringPointTypes.Clear();
-            foreach (var meteringPointType in from.MeteringPointTypes)
-            {
-                to.MeteringPointTypes.Add(new MeteringPointTypeEntity
-                {
-                    MeteringTypeId = meteringPointType.Value,
-                    ActorInfoId = from.Id
-                });
-            }
-
             // Market roles are currently treated as value types, so they are deleted and recreated with each update.
             to.MarketRoles.Clear();
             foreach (var marketRole in from.MarketRoles)
             {
-                to.MarketRoles.Add(new MarketRoleEntity { Function = (int)marketRole.Function });
+                var gridAreasRel = marketRole.GridAreas.Select(e => new MarketRoleGridAreaEntity()
+                {
+                    GridAreaId = e.Id,
+                    MarketRoleId = marketRole.Id
+                }).ToList();
+                to.MarketRoles.Add(new MarketRoleEntity
+                {
+                    Function = (int)marketRole.Function,
+                    GridAreas = gridAreasRel,
+                });
             }
         }
 
@@ -120,27 +107,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 var marketRoles = actor.MarketRoles.Select(marketRole =>
                 {
                     var function = (EicFunction)marketRole.Function;
-                    return new MarketRole(function);
+                    var gridAres = marketRole.GridAreas.Select(e =>
+                        new ActorGridArea(e.Id));
+                    return new ActorMarketRole(marketRole.Id, function, gridAres);
                 });
-
-                var meteringPointTypes = actor.MeteringPointTypes
-                    .Select(m => MeteringPointType.FromValue(m.MeteringTypeId));
 
                 var actorNumber = new ActorNumber(actor.ActorNumber);
                 var actorStatus = (ActorStatus)actor.Status;
-                var gridAreas = actor
-                    .GridAreas
-                    .Select(ga => new GridAreaId(ga.GridAreaId))
-                    .ToList();
 
                 return new Actor(
                     actor.Id,
                     actor.ActorId.HasValue ? new ExternalActorId(actor.ActorId.Value) : null,
                     actorNumber,
                     actorStatus,
-                    gridAreas,
-                    marketRoles,
-                    meteringPointTypes);
+                    marketRoles);
             }).ToList();
         }
     }

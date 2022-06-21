@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             Organization organization,
             ActorNumber actorNumber,
             IReadOnlyCollection<GridAreaId> gridAreas,
-            IReadOnlyCollection<MarketRole> marketRoles,
+            IReadOnlyCollection<ActorMarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes)
         {
             ArgumentNullException.ThrowIfNull(organization);
@@ -77,14 +77,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var newActor = new Actor(actorNumber);
 
-            foreach (var gridAreaId in gridAreas)
-                newActor.GridAreas.Add(gridAreaId);
-
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
-
-            foreach (var meteringPointType in meteringPointTypes.DistinctBy(e => e.Value))
-                newActor.MeteringPointTypes.Add(meteringPointType);
 
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(newActor)

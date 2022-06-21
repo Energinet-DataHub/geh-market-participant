@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private static readonly Guid _validOrganizationId = Guid.NewGuid();
         private static readonly Guid _validActorId = Guid.NewGuid();
         private static readonly Guid[] _validGridAreas = { Guid.NewGuid() };
-        private static readonly MarketRoleDto[] _validMarketRoles = { new("CapacityTrader") };
+        private static readonly ActorMarketRoleDto[] _validMarketRoles = { new("CapacityTrader", Enumerable.Empty<ActorGridAreaDto>()) };
         private static readonly string[] _validMeteringPointTypes = { MeteringPointType.D05NetProduction.Name };
 
         [Fact]
@@ -167,7 +167,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0]";
 
-            var actorDto = new ChangeActorDto(ValidStatus, _validGridAreas, new MarketRoleDto[] { null! }, _validMeteringPointTypes);
+            var actorDto = new ChangeActorDto(ValidStatus, _validGridAreas, new ActorMarketRoleDto[] { null! }, _validMeteringPointTypes);
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
@@ -192,9 +192,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.EicFunction)}";
+            const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].{nameof(ActorMarketRoleDto.EicFunction)}";
 
-            var actorDto = new ChangeActorDto(ValidStatus, _validGridAreas, new[] { new MarketRoleDto(value) }, _validMeteringPointTypes);
+            var actorDto = new ChangeActorDto(
+                ValidStatus,
+                _validGridAreas,
+                new[] { new ActorMarketRoleDto(value, Enumerable.Empty<ActorGridAreaDto>()) },
+                _validMeteringPointTypes);
 
             var target = new UpdateActorCommandRuleSet();
             var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);

@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidId = "6AF7D019-06A7-465B-AF9E-983BF0C7A907";
         private const string ValidGln = "5790000555550";
         private static readonly Guid[] _validGridAreas = { Guid.NewGuid() };
-        private static readonly MarketRoleDto[] _validMarketRoles = { new("CapacityTrader") };
+        private static readonly ActorMarketRoleDto[] _validMarketRoles = { new("CapacityTrader", Enumerable.Empty<ActorGridAreaDto>()) };
         private static readonly string[] _validMeteringPointTypes = { MeteringPointType.D05NetProduction.Name };
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var organizationRoleDto = new CreateActorDto(
                 new ActorNumberDto(ValidGln),
                 _validGridAreas,
-                Array.Empty<MarketRoleDto>(),
+                Array.Empty<ActorMarketRoleDto>(),
                 _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
@@ -156,7 +156,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0]";
 
-            var createActorDto = new CreateActorDto(new ActorNumberDto(ValidGln), _validGridAreas, new MarketRoleDto[] { null! }, _validMeteringPointTypes);
+            var createActorDto = new CreateActorDto(new ActorNumberDto(ValidGln), _validGridAreas, new ActorMarketRoleDto[] { null! }, _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
@@ -181,12 +181,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_MarketRoleFunction_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(MarketRoleDto.EicFunction)}";
+            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(ActorMarketRoleDto.EicFunction)}";
 
             var organizationRoleDto = new CreateActorDto(
                 new ActorNumberDto(ValidGln),
                 _validGridAreas,
-                new[] { new MarketRoleDto(value) },
+                new[] { new ActorMarketRoleDto(value, Enumerable.Empty<ActorGridAreaDto>()) },
                 _validMeteringPointTypes);
 
             var target = new CreateActorCommandRuleSet();

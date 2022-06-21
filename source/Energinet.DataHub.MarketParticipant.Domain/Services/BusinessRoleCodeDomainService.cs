@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _businessRoles = businessRoles;
         }
 
-        public IEnumerable<BusinessRoleCode> GetBusinessRoleCodes(IEnumerable<MarketRole> marketRoles)
+        public IEnumerable<BusinessRoleCode> GetBusinessRoleCodes(IEnumerable<EicFunction> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(marketRoles, nameof(marketRoles));
 
@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             foreach (var marketRole in marketRoles)
             {
-                if (lookup.TryGetValue(marketRole.Function, out var businessRole))
+                if (lookup.TryGetValue(marketRole, out var businessRole))
                 {
                     distinctRoles.Add(businessRole);
                 }

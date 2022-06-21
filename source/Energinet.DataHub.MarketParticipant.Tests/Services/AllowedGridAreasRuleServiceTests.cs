@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Xunit;
@@ -43,7 +44,7 @@ public sealed class AllowedGridAreasRuleServiceTests
 
         // Act + Assert
         Assert.Throws<ValidationException>(() =>
-            target.ValidateGridAreas(gridAreas, new[] { new MarketRole(eicFunction) }));
+            target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value))) }));
     }
 
     [Theory]
@@ -63,7 +64,7 @@ public sealed class AllowedGridAreasRuleServiceTests
         };
 
         // Act + Assert
-        target.ValidateGridAreas(gridAreas, new[] { new MarketRole(eicFunction) });
+        target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value))) });
     }
 
     [Theory]
@@ -80,6 +81,6 @@ public sealed class AllowedGridAreasRuleServiceTests
         };
 
         // Act + Assert
-        target.ValidateGridAreas(gridAreas, new[] { new MarketRole(eicFunction) });
+        target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value))) });
     }
 }

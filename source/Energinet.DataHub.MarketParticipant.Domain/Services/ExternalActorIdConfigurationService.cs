@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 if (actor.Status is ActorStatus.Active or ActorStatus.Passive)
                 {
                     var response = await _activeDirectoryService
-                        .CreateAppRegistrationAsync(actor.ActorNumber, actor.MarketRoles.ToList())
+                        .CreateAppRegistrationAsync(actor.ActorNumber, actor.MarketRoles.Select(m => m.Function).ToList())
                         .ConfigureAwait(false);
 
                     actor.ExternalActorId = response.ExternalActorId;

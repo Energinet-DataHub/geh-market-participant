@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             Organization organization,
             ActorNumber actorNumber,
             IReadOnlyCollection<GridAreaId> gridAreas,
-            IReadOnlyCollection<MarketRole> marketRoles,
+            IReadOnlyCollection<ActorMarketRole> marketRoles,
             IReadOnlyCollection<MeteringPointType> meteringPointTypes);
     }
 }

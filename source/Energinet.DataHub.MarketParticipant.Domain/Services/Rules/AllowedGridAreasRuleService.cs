@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             EicFunction.PartyConnectedToTheGrid
         };
 
-        public void ValidateGridAreas(IEnumerable<GridAreaId> gridAreas, IEnumerable<MarketRole> marketRoles)
+        public void ValidateGridAreas(IEnumerable<GridAreaId> gridAreas, IEnumerable<ActorMarketRole> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(gridAreas);
             ArgumentNullException.ThrowIfNull(marketRoles);

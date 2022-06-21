@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var gridAreas = CreateGridAreas(request.Actor).ToList();
             var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();
 
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles);
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles.Select(m => m.Function).ToList());
 
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
@@ -74,12 +74,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             return actorDto.MeteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
         }
 
-        private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto actorDto)
+        private static IEnumerable<ActorMarketRole> CreateMarketRoles(CreateActorDto actorDto)
         {
             foreach (var marketRole in actorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
-                yield return new MarketRole(function);
+                yield return new ActorMarketRole(function, actorDto.GridAreas.Select(a => new ActorGridArea(a)));
             }
         }
     }

@@ -26,6 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// Validates that the chosen combination of roles is valid.
         /// </summary>
         /// <param name="marketRoles"></param>
-        void ValidateCombinationOfBusinessRoles(IList<MarketRole> marketRoles);
+        void ValidateCombinationOfBusinessRoles(IList<EicFunction> marketRoles);
     }
 }

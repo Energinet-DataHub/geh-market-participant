@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -52,12 +53,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 actorUpdatedEvent.MarketRoles.Add(marketRole.Function);
             }
 
-            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles))
+            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))
             {
                 actorUpdatedEvent.BusinessRoles.Add(businessRole);
             }
 
-            foreach (var gridAreaId in actor.GridAreas)
+            // TODO
+            /*foreach (var gridAreaId in actor.GridAreas)
             {
                 actorUpdatedEvent.GridAreas.Add(gridAreaId);
             }
@@ -65,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var meteringPointTypes in actor.MeteringPointTypes)
             {
                 actorUpdatedEvent.MeteringPointTypes.Add(meteringPointTypes.Name);
-            }
+            }*/
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);

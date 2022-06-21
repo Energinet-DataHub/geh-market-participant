@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OverlappingBusinessRolesRuleService(new Mock<IBusinessRoleCodeDomainService>().Object);
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(null!, Array.Empty<MarketRole>()));
+            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(null!, Array.Empty<ActorMarketRole>()));
         }
 
         [Fact]
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var businessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
             var target = new OverlappingBusinessRolesRuleService(businessRoleCodeDomainService.Object);
 
-            businessRoleCodeDomainService.Setup(x => x.GetBusinessRoleCodes(It.IsAny<IEnumerable<MarketRole>>()))
+            businessRoleCodeDomainService.Setup(x => x.GetBusinessRoleCodes(It.IsAny<IEnumerable<EicFunction>>()))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
             // Act + Assert
@@ -63,8 +63,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 new[]
                 {
-                    new MarketRole(EicFunction.BalanceResponsibleParty),
-                    new MarketRole(EicFunction.BalanceResponsibleParty)
+                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()),
+                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>())
                 }));
         }
 
@@ -77,11 +77,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
-                    It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.BalanceResponsibleParty)))
+                    It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.BalanceResponsibleParty)))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
             var actor = new Actor(new ActorNumber("fake_value"));
-            actor.MarketRoles.Add(new MarketRole(EicFunction.BalanceResponsibleParty));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
             Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 },
                 new[]
                 {
-                    new MarketRole(EicFunction.BalanceResponsibleParty)
+                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>())
                 }));
         }
 
@@ -104,11 +104,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
-                    It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.BalanceResponsibleParty)))
+                    It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.BalanceResponsibleParty)))
                 .Returns(Enumerable.Empty<BusinessRoleCode>());
 
             var actor = new Actor(new ActorNumber("fake_value"));
-            actor.MarketRoles.Add(new MarketRole(EicFunction.BalanceResponsibleParty));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
             Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 },
                 new[]
                 {
-                    new MarketRole(EicFunction.BalanceResponsibleParty)
+                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>())
                 }));
         }
 
@@ -131,16 +131,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
-                    It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.BalanceResponsibleParty)))
+                    It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.BalanceResponsibleParty)))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
-                    It.Is<IEnumerable<MarketRole>>(y => y.Single().Function == EicFunction.EnergySupplier)))
+                    It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.EnergySupplier)))
                 .Returns(new[] { BusinessRoleCode.Ddq });
 
             var actor = new Actor(new ActorNumber("fake_value"));
-            actor.MarketRoles.Add(new MarketRole(EicFunction.BalanceResponsibleParty));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
             target.ValidateRolesAcrossActors(
@@ -150,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 },
                 new[]
                 {
-                    new MarketRole(EicFunction.EnergySupplier)
+                    new ActorMarketRole(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>())
                 });
         }
     }

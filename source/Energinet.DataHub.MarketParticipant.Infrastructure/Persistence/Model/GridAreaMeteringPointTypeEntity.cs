@@ -13,25 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class ActorEntity
+    public sealed class GridAreaMeteringPointTypeEntity
     {
-        public ActorEntity()
-        {
-            ActorNumber = string.Empty;
-            MarketRoles = new Collection<MarketRoleEntity>();
-        }
-
         public Guid Id { get; set; }
-        public Guid? ActorId { get; set; }
-        public string ActorNumber { get; set; }
-        public int Status { get; set; }
-
-        public Collection<MarketRoleEntity> MarketRoles { get; }
-
-        public Guid OrganizationId { get; set; }
+        public Guid GridAreaId { get; set; }
+        public Guid MeteringPointTypeId { get; set; }
     }
 }

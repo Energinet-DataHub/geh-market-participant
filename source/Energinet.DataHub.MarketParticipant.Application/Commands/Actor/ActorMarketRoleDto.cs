@@ -12,23 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed class MarketRoleEntity
-    {
-        public MarketRoleEntity()
-        {
-            GridAreas = new List<MarketRoleGridAreaEntity>();
-        }
-
-        public Guid Id { get; set; }
-        public Guid ActorInfoId { get; set; }
-        public int Function { get; set; }
-#pragma warning disable CA2227
-        public ICollection<MarketRoleGridAreaEntity> GridAreas { get; set; }
-#pragma warning restore CA2227
-    }
+    public sealed record ActorMarketRoleDto(string EicFunction, IEnumerable<ActorGridAreaDto> GridAreas);
 }
