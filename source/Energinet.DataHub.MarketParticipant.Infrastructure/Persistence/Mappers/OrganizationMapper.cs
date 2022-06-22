@@ -124,8 +124,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 var marketRoles = actor.MarketRoles.Select(marketRole =>
                 {
                     var function = (EicFunction)marketRole.Function;
-                    var gridAres = marketRole.GridAreas.Select(grid => new ActorGridArea(grid.GridAreaId, grid.MeteringPointTypes.Select(e => (MeteringPointType)e.MeteringTypeId)));
-                    return new ActorMarketRole(marketRole.Id, function, gridAres);
+                    var gridAres = marketRole
+                        .GridAreas
+                        .Select(grid => new ActorGridArea(grid.GridAreaId, grid.MeteringPointTypes
+                            .Select(e => (MeteringPointType)e.MeteringTypeId)));
+                    return new ActorMarketRole(marketRole.Id, function, gridAres.ToList());
                 });
 
                 var actorNumber = new ActorNumber(actor.ActorNumber);

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -21,7 +22,7 @@ public class ActorGridArea
 {
     public ActorGridArea(IEnumerable<MeteringPointType> meteringPointTypes)
     {
-        MeteringPointTypes = meteringPointTypes;
+        MeteringPointTypes = meteringPointTypes.ToList();
     }
 
     public ActorGridArea(
@@ -29,9 +30,9 @@ public class ActorGridArea
         IEnumerable<MeteringPointType> meteringPointTypes)
     {
         Id = id;
-        MeteringPointTypes = meteringPointTypes;
+        MeteringPointTypes = meteringPointTypes.ToList();
     }
 
     public Guid Id { get; }
-    public IEnumerable<MeteringPointType> MeteringPointTypes { get; }
+    public ICollection<MeteringPointType> MeteringPointTypes { get; }
 }

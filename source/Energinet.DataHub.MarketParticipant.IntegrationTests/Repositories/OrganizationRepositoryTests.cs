@@ -259,7 +259,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var balancePowerSupplierActor = new Actor(new ActorNumber("fake_value"));
-            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalancingServiceProvider, Enumerable.Empty<ActorGridArea>()));
+            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalancingServiceProvider, new List<ActorGridArea>()));
             organization.Actors.Add(balancePowerSupplierActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -267,7 +267,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var meteringPointAdministratorActor = new Actor(new ActorNumber("fake_value"));
-            meteringPointAdministratorActor.MarketRoles.Add(new ActorMarketRole(EicFunction.MeteringPointAdministrator, Enumerable.Empty<ActorGridArea>()));
+            meteringPointAdministratorActor.MarketRoles.Add(new ActorMarketRole(EicFunction.MeteringPointAdministrator, new List<ActorGridArea>()));
             organization!.Actors.Add(meteringPointAdministratorActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -292,33 +292,56 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
+            var gridAreaRepository = new GridAreaRepository(context);
+
+            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+
+            var gridAreaToInsert_Id = await gridAreaRepository
+                .AddOrUpdateAsync(gridAreaToInsert)
+                .ConfigureAwait(false);
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var someActor = new Actor(new ActorNumber("fake_value"));
+            someActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>
+            {
+                new(gridAreaToInsert_Id.Value, new List<MeteringPointType>
+                {
+                    MeteringPointType.D02Analysis
+                })
+            }));
             organization.Actors.Add(someActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var meteringPointAdministratorActor = new Actor(new ActorNumber("fake_value"));
-            organization!.Actors.Add(meteringPointAdministratorActor);
+            foreach (var organizationActor in organization!.Actors)
+            {
+                foreach (var organizationActorMarketRole in organizationActor.MarketRoles)
+                {
+                    foreach (var actorGridArea in organizationActorMarketRole.GridAreas)
+                    {
+                        actorGridArea.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
+                    }
+                }
+            }
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
-            var actorMeteringPointTypes = new List<MeteringPointType>() { MeteringPointType.Unknown };
+            var actorMeteringPointTypes =
+                organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
 
             // Assert
             Assert.NotNull(organization);
-            Assert.Equal(2, organization!.Actors.Count);
-            /*Assert.Contains(
-                organization.Actors,
-                x => x.MeteringPointTypes.Any(y => y.Value == MeteringPointType.D02Analysis.Value));
+            Assert.Equal(2, actorMeteringPointTypes.Count);
             Assert.Contains(
-                organization.Actors,
-                x => x.MeteringPointTypes.Any(y => y.Value == MeteringPointType.D05NetProduction.Value));*/
+                actorMeteringPointTypes,
+                x => x == MeteringPointType.D02Analysis.Value);
+            Assert.Contains(
+                actorMeteringPointTypes,
+                x => x == MeteringPointType.D05NetProduction.Value);
         }
 
         [Fact]

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -22,18 +23,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public ActorMarketRole(Guid id, EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
         {
             Id = id;
-            GridAreas = gridAreas;
+            GridAreas = gridAreas.ToList();
             Function = eic;
         }
 
         public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
         {
-            GridAreas = gridAreas;
+            GridAreas = gridAreas.ToList();
             Function = eic;
         }
 
         public Guid Id { get; }
-        public IEnumerable<ActorGridArea> GridAreas { get; }
+        public ICollection<ActorGridArea> GridAreas { get; }
         public EicFunction Function { get; }
     }
 }
