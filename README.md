@@ -5,7 +5,8 @@ Welcome to the Market Participant domain of the [Green Energy Hub project](https
 
 - [Intro](#intro)
 - [Communicating with Market Participant](#Communicating-with-Market-Participant)
-  - [Integration Events](#Integration-events)
+	 - [API](#API)
+	 - [Integration Events](#Integration-events)
 
 ## Intro
 
@@ -138,7 +139,57 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}/contact/```
 *returns all contacts in the specified organization, if the organization exists.*
 
-### Integration Events
+#### POST:/Organization/Contact
+
+```organization/{organizationId:guid}/contact/```
+*Creates a new contacts in the specified organization, if the organization exists.*
+
+##### Example Body:
+```json
+{
+  "name": "string",
+  "category": "string",
+  "email": "string",
+  "phone": "string"
+}
+```
+
+#### DELETE:/Organization/Contact
+
+```organization/{organizationId:guid}/contact/{contactId:guid}```
+*Deletes a contact from the specified organization, if it exists*
+
+## Actor Contact
+
+#### GET:/Organization/Actor/Contact
+
+```organization/{organizationId:guid}/actor/{actorId:guid}/contact```
+*returns all contacts for the specified actor in the specified organization, if the organization and actor exists.*
+
+#### POST:/Organization/Actor/Contact
+
+```organization/{organizationId:guid}/actor/{actorId:guid}/contact```
+*Creates a contact for the specified actor in the specified organization, if the organization and actor exists.*
+
+##### Example Body:
+```json
+{
+  "name": "string",
+  "category": "string",
+  "email": "string",
+  "phone": "string"
+}
+```
+
+#### DELETE:/Organization/Actor/Contact
+
+```organization/{organizationId:guid}/contact/{contactId:guid}```
+*Deletes a contact from the specified organization, if it exists*
+
+---
+---
+
+## Integration Events
 Integration events are a way for interested parties to know when data changes in the Market Participant domain and be informed of these changes.
 
 Integration events are published to a servicebus topic, where everyone who are interested can listen. What you do with these events are. A description of how to subscribe to these events are [here](#Subscribe-to-integration-events)
