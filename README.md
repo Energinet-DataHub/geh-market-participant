@@ -17,25 +17,26 @@ Interaction with the Market Participant domain is done in two different ways, de
 
 A [Client Nuget Package](https://www.nuget.org/packages/Energinet.DataHub.MarketParticipant.Client/), which is the recommended way to interact with the domain is available, and exposes all the API's currently available
 
-### API
-We have the following exposed endpoints
+## API
+The Following endpoints are available, seperated by concerns.
 
+## Organization
 #### GET:/Organization
 
 ```organization/```
-returns all organizations
+*Returns all organizations*
 
 #### GET:/Organization
 
 ```organization/{organizationId:guid}```
-returns an organization with the specified id if it exists.
+*Returns an organization with the specified id, if it exists.*
 
 #### POST:/Organization
 
 ```organization/```
-returns and organization with the specified id if it exists.
+*Returns and organization with the specified id, if it exists.*
 
-Example BODY:
+##### Example BODY:
 
 ```json
 {
@@ -55,9 +56,9 @@ Example BODY:
 #### PUT:/Organization
 
 ```organization/{organizationId:guid}```
-Updates an organization with the specified id if it exists.
+*Updates an organization with the specified id, if it exists.*
 
-Example BODY:
+##### Example BODY:
 
 ```json
 {
@@ -73,7 +74,69 @@ Example BODY:
   "comment": "string"
 }
 ```
+## Actor
+#### GET:/Organization/Actor
 
+```organization/{organizationId:guid}/actor/```
+*Returns all actors in the specified organization and with the specified id, if it exists.*
+
+#### GET:/Organization/Actor/ID
+
+```organization/{organizationId:guid}/actor/{actorId:guid}```
+*Returns the actor in the specified organization and with the specified id, if it exists.*
+
+#### POST:/Organization/Actor/
+
+```organization/{organizationId:guid}/actor/```
+*Creates an Actor in the specified organization*
+
+##### Example BODY:
+
+```json
+{
+  "actorNumber": {
+    "value": "string"
+  },
+  "gridAreas": [
+    "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  ],
+  "marketRoles": [
+    {
+      "eicFunction": "string"
+    }
+  ],
+  "meteringPointTypes": [
+    "string"
+  ]
+}
+```
+#### PUT:/Organization/Actor/
+
+```organization/{organizationId:guid}/actor/{actorId:guid}```
+*Updates an Actor in the specified organization with the specified id, if it exists*
+
+##### Example Body:
+```json
+{
+  "status": "string",
+  "gridAreas": [
+    "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  ],
+  "marketRoles": [
+    {
+      "eicFunction": "string"
+    }
+  ],
+  "meteringPointTypes": [
+    "string"
+  ]
+}
+```
+## Contact
+#### GET:/Organization/Contact
+
+```organization/{organizationId:guid}/contact/```
+*returns all contacts in the specified organization, if the organization exists.*
 
 ### Integration Events
 Integration events are a way for interested parties to know when data changes in the Market Participant domain and be informed of these changes.
