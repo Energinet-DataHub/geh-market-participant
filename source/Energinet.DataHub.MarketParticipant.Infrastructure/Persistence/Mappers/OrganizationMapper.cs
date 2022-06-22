@@ -87,16 +87,33 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.MarketRoles.Clear();
             foreach (var marketRole in from.MarketRoles)
             {
-                var gridAreasRel = marketRole.GridAreas.Select(e => new MarketRoleGridAreaEntity()
+                var marketRoleEntity = new MarketRoleEntity
                 {
-                    GridAreaId = e.Id,
-                    MarketRoleId = marketRole.Id
-                }).ToList();
-                to.MarketRoles.Add(new MarketRoleEntity
+                    Function = (int)marketRole.Function
+                };
+
+                foreach (var marketRoleGridArea in marketRole.GridAreas)
                 {
-                    Function = (int)marketRole.Function,
-                    GridAreas = gridAreasRel,
-                });
+                    var gridAreaEntity = new MarketRoleGridAreaEntity()
+                    {
+                        GridAreaId = marketRoleGridArea.Id,
+                        MarketRoleId = marketRole.Id
+                    };
+
+                    foreach (var meteringPointType in marketRoleGridArea.MeteringPointTypes)
+                    {
+                        gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity()
+                        {
+                            //GridAreaId = marketRoleGridArea.Id,
+                            MarketRoleGridAreaId = gridAreaEntity.Id,
+                            MeteringTypeId = meteringPointType.Value
+                        });
+                    }
+
+                    marketRoleEntity.GridAreas.Add(gridAreaEntity);
+                }
+
+                to.MarketRoles.Add(marketRoleEntity);
             }
         }
 
@@ -107,8 +124,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 var marketRoles = actor.MarketRoles.Select(marketRole =>
                 {
                     var function = (EicFunction)marketRole.Function;
-                    var gridAres = marketRole.GridAreas.Select(e =>
-                        new ActorGridArea(e.Id));
+                    var gridAres = marketRole.GridAreas.Select(grid => new ActorGridArea(grid.GridAreaId, grid.MeteringPointTypes.Select(e => (MeteringPointType)e.MeteringTypeId)));
                     return new ActorMarketRole(marketRole.Id, function, gridAres);
                 });
 

@@ -44,7 +44,7 @@ public sealed class AllowedGridAreasRuleServiceTests
 
         // Act + Assert
         Assert.Throws<ValidationException>(() =>
-            target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value))) }));
+            target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<MeteringPointType>()))) }));
     }
 
     [Theory]
@@ -64,7 +64,7 @@ public sealed class AllowedGridAreasRuleServiceTests
         };
 
         // Act + Assert
-        target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value))) });
+        target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<MeteringPointType>()))) });
     }
 
     [Theory]
@@ -81,6 +81,6 @@ public sealed class AllowedGridAreasRuleServiceTests
         };
 
         // Act + Assert
-        target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value))) });
+        target.ValidateGridAreas(gridAreas, new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<MeteringPointType>()))) });
     }
 }

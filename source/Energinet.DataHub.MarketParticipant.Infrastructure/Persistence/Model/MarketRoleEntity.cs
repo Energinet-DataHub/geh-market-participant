@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
@@ -21,14 +21,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public MarketRoleEntity()
         {
-            GridAreas = new List<MarketRoleGridAreaEntity>();
+            GridAreas = new Collection<MarketRoleGridAreaEntity>();
         }
 
         public Guid Id { get; set; }
         public Guid ActorInfoId { get; set; }
         public int Function { get; set; }
-#pragma warning disable CA2227
-        public ICollection<MarketRoleGridAreaEntity> GridAreas { get; set; }
-#pragma warning restore CA2227
+        public Collection<MarketRoleGridAreaEntity> GridAreas { get; }
     }
 }

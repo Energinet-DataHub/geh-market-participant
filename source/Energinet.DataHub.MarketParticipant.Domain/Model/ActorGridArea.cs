@@ -13,15 +13,25 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public class ActorGridArea
 {
-    public ActorGridArea(Guid id)
+    public ActorGridArea(IEnumerable<MeteringPointType> meteringPointTypes)
+    {
+        MeteringPointTypes = meteringPointTypes;
+    }
+
+    public ActorGridArea(
+        Guid id,
+        IEnumerable<MeteringPointType> meteringPointTypes)
     {
         Id = id;
+        MeteringPointTypes = meteringPointTypes;
     }
 
     public Guid Id { get; }
+    public IEnumerable<MeteringPointType> MeteringPointTypes { get; }
 }
