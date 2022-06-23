@@ -28,26 +28,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Helpers;
 [UnitTest]
 public class ChangesToActorHelperTests
 {
-    private readonly UpdateActorCommand _incomingActor = new UpdateActorCommand(
-        Guid.NewGuid(),
-        Guid.NewGuid(),
-        new ChangeActorDto(
-            "Active",
-            new List<Guid> { Guid.NewGuid() },
-            new List<ActorMarketRoleDto>
-            {
-                new ActorMarketRoleDto(
-                    EicFunction.Agent.ToString(),
-                    new List<ActorGridAreaDto> { new ActorGridAreaDto(Guid.NewGuid(), new List<string> { "Unknown" }) })
-            },
-            new List<string> { "Unknown" }));
-
-    private readonly Actor _actor = new Actor(
-        Guid.NewGuid(),
-        new ExternalActorId(Guid.NewGuid()),
-        new ActorNumber("1234567890123"),
-        ActorStatus.Active,
-        Enumerable.Empty<ActorMarketRole>());
+    private readonly Actor _actor = CreateValidActorWithChildren();
+    private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
 
     [Fact]
     public void FindChangesMadeToActor_ExistingActorNull_ThrowsException()
@@ -69,5 +51,79 @@ public class ChangesToActorHelperTests
         Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_actor, null!));
     }
 
+    [Fact]
+    public void FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
+    {
+        // Arrange
+        var target = new ChangesToActorHelper();
 
+        // Act
+    }
+
+    private static Actor CreateValidActorWithChildren()
+    {
+        return new Actor(
+            Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
+            new ExternalActorId(Guid.NewGuid()),
+            new ActorNumber("1234567890123"),
+            ActorStatus.Active,
+            new List<ActorMarketRole>
+            {
+                new ActorMarketRole(
+                    Guid.Parse("579010ed-b960-486f-857f-a7c020ffed4d"),
+                    EicFunction.EnergySupplier,
+                    new List<ActorGridArea>
+                    {
+                        new ActorGridArea(
+                            Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d"),
+                            new List<MeteringPointType>
+                            {
+                                MeteringPointType.E17Consumption
+                            })
+                    }),
+                new ActorMarketRole(
+                    Guid.Parse("8bd18c6e-c971-4be8-93cf-e3d4345a2d14"),
+                    EicFunction.Producer,
+                    new List<ActorGridArea>
+                    {
+                        new ActorGridArea(
+                            Guid.Parse("2aca6c52-3282-40e5-a071-c740c9d432b6"),
+                            new List<MeteringPointType>
+                            {
+                                MeteringPointType.D02Analysis,
+                                MeteringPointType.E17Consumption,
+                                MeteringPointType.E18Production
+                            }),
+                        new ActorGridArea(
+                            Guid.Parse("35d007b1-12d0-470f-8186-231b9e51f9e0"),
+                            new List<MeteringPointType>
+                            {
+                                MeteringPointType.E20Exchange,
+                                MeteringPointType.D01VeProduction
+                            })
+                    })
+            });
+    }
+
+    private static UpdateActorCommand CreateValidIncomingActorWithChildren()
+    {
+        return new UpdateActorCommand(
+            Guid.NewGuid(),
+            Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
+            new ChangeActorDto(
+                "Passive",
+                new List<Guid> { Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d") },
+                new List<ActorMarketRoleDto>
+                {
+                    new ActorMarketRoleDto(
+                        EicFunction.EnergySupplier.ToString(),
+                        new List<ActorGridAreaDto>
+                        {
+                            new ActorGridAreaDto(
+                                Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d"),
+                                new List<string> { "Unknown" })
+                        })
+                },
+                new List<string> { "Unknown" }));
+    }
 }
