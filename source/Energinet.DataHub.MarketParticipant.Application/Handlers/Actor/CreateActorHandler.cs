@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             foreach (var marketRole in actorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
-                yield return new ActorMarketRole(function, actorDto.GridAreas.Select(gridId => new ActorGridArea(gridId, actorDto.MeteringPointTypes.Select(e => MeteringPointType.FromName(e)))));
+                yield return new ActorMarketRole(function, marketRole.GridAreas.Select(gridAreaDto => new ActorGridArea(gridAreaDto.Id, gridAreaDto.MeteringPointTypes.Select(e => MeteringPointType.FromName(e)))));
             }
         }
     }

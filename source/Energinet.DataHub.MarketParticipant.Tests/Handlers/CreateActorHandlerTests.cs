@@ -93,7 +93,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<Guid>(), Array.Empty<ActorMarketRoleDto>(), Array.Empty<string>()));
+                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             var response = await target
@@ -150,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<Guid>(), new[] { marketRole }, Array.Empty<string>()));
+                new CreateActorDto(new ActorNumberDto(actorGln), new[] { marketRole }));
 
             // Act
             var response = await target
