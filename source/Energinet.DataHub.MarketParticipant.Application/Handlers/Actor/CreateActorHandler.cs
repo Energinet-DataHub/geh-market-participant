@@ -52,26 +52,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             var actorGln = new ActorNumber(request.Actor.ActorNumber.Value);
             var marketRoles = CreateMarketRoles(request.Actor).ToList();
-            var gridAreas = CreateGridAreas(request.Actor).ToList();
-            var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();
 
             _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles.Select(m => m.Function).ToList());
 
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
+                .CreateAsync(organization, actorGln, marketRoles)
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);
-        }
-
-        private static IEnumerable<GridAreaId> CreateGridAreas(CreateActorDto actorDto)
-        {
-            return (actorDto.GridAreas ?? Array.Empty<Guid>()).Select(gridAreaId => new GridAreaId(gridAreaId));
-        }
-
-        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(CreateActorDto actorDto)
-        {
-            return actorDto.MeteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
         }
 
         private static IEnumerable<ActorMarketRole> CreateMarketRoles(CreateActorDto actorDto)
@@ -79,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             foreach (var marketRole in actorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
-                yield return new ActorMarketRole(function, actorDto.GridAreas.Select(a => new ActorGridArea(a, actorDto.MeteringPointTypes.Select(e => MeteringPointType.FromName(e)))));
+                yield return new ActorMarketRole(function, actorDto.GridAreas.Select(gridId => new ActorGridArea(gridId, actorDto.MeteringPointTypes.Select(e => MeteringPointType.FromName(e)))));
             }
         }
     }

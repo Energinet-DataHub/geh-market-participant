@@ -31,15 +31,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             EicFunction.PartyConnectedToTheGrid
         };
 
-        public void ValidateGridAreas(IEnumerable<GridAreaId> gridAreas, IEnumerable<ActorMarketRole> marketRoles)
+        public void ValidateGridAreas(IEnumerable<ActorMarketRole> marketRoles)
         {
-            ArgumentNullException.ThrowIfNull(gridAreas);
             ArgumentNullException.ThrowIfNull(marketRoles);
-
-            var noOfGridAreas = gridAreas.Count();
 
             foreach (var marketRole in marketRoles)
             {
+                var noOfGridAreas = marketRole.GridAreas.Count;
+
                 var isSingleGridAreaRole = _rolesAllowingSingleGridAreaOnly.Contains(marketRole.Function);
                 if (isSingleGridAreaRole && noOfGridAreas > 1)
                 {
