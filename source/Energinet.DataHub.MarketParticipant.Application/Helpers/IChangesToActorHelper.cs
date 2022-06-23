@@ -14,25 +14,23 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+namespace Energinet.DataHub.MarketParticipant.Application.Helpers;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+/// <summary>
+/// Finds changes made to an actor
+/// </summary>
+public interface IChangesToActorHelper
 {
     /// <summary>
-    /// A factory service ensuring correct construction of an actor.
+    /// Find any possible changes made to an Actor
     /// </summary>
-    public interface IActorFactoryService
-    {
-        /// <summary>
-        /// Creates an actor.
-        /// </summary>
-        /// <param name="organization">The organization that will contain the new actor.</param>
-        /// <param name="actorNumber">The actor number of the new actor.</param>
-        /// <param name="marketRoles">The market roles assigned to the new actor.</param>
-        /// <returns>The created actor.</returns>
-        Task<Actor> CreateAsync(
-            Organization organization,
-            ActorNumber actorNumber,
-            IReadOnlyCollection<ActorMarketRole> marketRoles);
-    }
+    /// <param name="existingActor"></param>
+    /// <param name="incomingActor"></param>
+    /// <returns>A list of integration events to send to a message queue</returns>
+    IEnumerable<IIntegrationEvent> FindChangesMadeToActor(
+        Actor existingActor,
+        UpdateActorCommand incomingActor);
 }

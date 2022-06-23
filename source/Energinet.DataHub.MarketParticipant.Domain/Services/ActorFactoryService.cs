@@ -53,15 +53,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         public async Task<Actor> CreateAsync(
             Organization organization,
             ActorNumber actorNumber,
-            IReadOnlyCollection<GridAreaId> gridAreas,
-            IReadOnlyCollection<ActorMarketRole> marketRoles,
-            IReadOnlyCollection<MeteringPointType> meteringPointTypes)
+            IReadOnlyCollection<ActorMarketRole> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(organization);
             ArgumentNullException.ThrowIfNull(actorNumber);
-            ArgumentNullException.ThrowIfNull(gridAreas);
             ArgumentNullException.ThrowIfNull(marketRoles);
-            ArgumentNullException.ThrowIfNull(meteringPointTypes);
 
             await _uniqueGlobalLocationNumberRuleService
                 .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
@@ -71,9 +67,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
-            _allowedGridAreasRuleService.ValidateGridAreas(
-                gridAreas,
-                marketRoles);
+            foreach (var marketRole in marketRoles)
+            {
+                _allowedGridAreasRuleService.ValidateGridAreas(
+                    marketRole.GridAreas.Select(gridArea => new GridAreaId(gridArea.Id)),
+                    marketRoles);
+            }
 
             var newActor = new Actor(actorNumber);
 

@@ -32,6 +32,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Function = eic;
         }
 
+        public ActorMarketRole(Guid id, EicFunction eic)
+        {
+            Id = id;
+            Function = eic;
+            GridAreas = new List<ActorGridArea>();
+        }
+
         public Guid Id { get; }
         public IEnumerable<ActorGridArea> GridAreas { get; }
         public EicFunction Function { get; }

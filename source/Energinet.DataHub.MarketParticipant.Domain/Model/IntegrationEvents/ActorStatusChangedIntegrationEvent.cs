@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+
+public sealed class ActorStatusChangedIntegrationEvent : IntegrationEventBase
 {
-    public sealed record CreateActorDto(
-        ActorNumberDto ActorNumber,
-        IEnumerable<ActorMarketRoleDto> MarketRoles);
+    public Guid ActorId { get; set; }
+    public ActorStatus Status { get; set; }
 }
