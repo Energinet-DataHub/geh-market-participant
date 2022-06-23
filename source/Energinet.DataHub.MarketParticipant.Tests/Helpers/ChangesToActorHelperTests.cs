@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -27,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Helpers;
 [UnitTest]
 public class ChangesToActorHelperTests
 {
-    private readonly UpdateActorCommand _validIncomingActor = new UpdateActorCommand(
+    private readonly UpdateActorCommand _incomingActor = new UpdateActorCommand(
         Guid.NewGuid(),
         Guid.NewGuid(),
         new ChangeActorDto(
@@ -41,13 +42,32 @@ public class ChangesToActorHelperTests
             },
             new List<string> { "Unknown" }));
 
+    private readonly Actor _actor = new Actor(
+        Guid.NewGuid(),
+        new ExternalActorId(Guid.NewGuid()),
+        new ActorNumber("1234567890123"),
+        ActorStatus.Active,
+        Enumerable.Empty<ActorMarketRole>());
+
     [Fact]
-    public void FindChangesMadeToActor_ActorNull_ThrowsException()
+    public void FindChangesMadeToActor_ExistingActorNull_ThrowsException()
     {
         // Arrange
         var target = new ChangesToActorHelper();
 
         // Act + Assert
-        var s = Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _validIncomingActor));
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _incomingActor));
     }
+
+    [Fact]
+    public void FindChangesMadeToActor_IncomingNull_ThrowsException()
+    {
+        // Arrange
+        var target = new ChangesToActorHelper();
+
+        // Act + Assert
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_actor, null!));
+    }
+
+
 }
