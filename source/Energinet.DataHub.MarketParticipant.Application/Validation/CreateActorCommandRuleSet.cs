@@ -40,12 +40,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .SetValidator(new EnergyIdentificationCodeValidationRule<CreateActorDto>())
                         .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length >= 14);
 
-                    validator
-                        .RuleFor(x => x.GridAreas)
+                    // TODO
+                    /*validator
+                        .RuleFor(x => x.MarketRoles.GridAreas)
                         .ChildRules(gridAreaValidator =>
                             gridAreaValidator
                                 .RuleForEach(x => x)
-                                .NotEmpty());
+                                .NotEmpty());*/
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
@@ -64,7 +65,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 });
                         });
 
-                    validator
+                    // TODO
+                    /*validator
                         .RuleFor(actor => actor.MeteringPointTypes)
                         .NotEmpty()
                         .ChildRules(rolesValidator =>
@@ -72,7 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                             rolesValidator
                                 .RuleForEach(x => x)
                                 .Must(x => MeteringPointType.TryFromName(x, true, out _));
-                        });
+                        });*/
                 });
         }
     }
