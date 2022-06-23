@@ -57,9 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 null!,
                 new ActorNumber("fake_value"),
-                Array.Empty<GridAreaId>(),
-                Array.Empty<ActorMarketRole>(),
-                Array.Empty<MeteringPointType>())).ConfigureAwait(false);
+                Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
         }
 
         [Fact]
@@ -80,9 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 null!,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<ActorMarketRole>(),
-                Array.Empty<MeteringPointType>())).ConfigureAwait(false);
+                Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
         }
 
         [Fact]
@@ -103,9 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 new ActorNumber("fake_value"),
-                Array.Empty<GridAreaId>(),
-                null!,
-                Array.Empty<MeteringPointType>())).ConfigureAwait(false);
+                null!)).ConfigureAwait(false);
         }
 
         [Fact]
@@ -134,9 +128,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     new ActorNumber("fake_value"),
-                    Array.Empty<GridAreaId>(),
-                    marketRoles,
-                    Array.Empty<MeteringPointType>())
+                    marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -204,9 +196,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organizationBeforeUpdate,
                     new ActorNumber("fake_value"),
-                    Array.Empty<GridAreaId>(),
-                    marketRoles,
-                    Array.Empty<MeteringPointType>())
+                    marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -245,9 +235,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
-                    Array.Empty<GridAreaId>(),
-                    marketRoles,
-                    Array.Empty<MeteringPointType>())
+                    marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -273,8 +261,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new ActorNumber("fake_value");
-            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()) };
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
+            var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
+            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -285,9 +274,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
-                    Array.Empty<GridAreaId>(),
-                    marketRoles,
-                    meteringPointTypes)
+                    marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
@@ -313,9 +300,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new ActorNumber("fake_value");
-            var gridAreas = new List<GridAreaId> { new(Guid.NewGuid()) };
-            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()) };
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
+            var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
+            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -326,14 +313,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
-                    gridAreas,
-                    marketRoles,
-                    meteringPointTypes)
+                    marketRoles)
                 .ConfigureAwait(false);
 
             // Assert
             allowedGridAreasRuleService.Verify(
-                x => x.ValidateGridAreas(gridAreas, marketRoles),
+                x => x.ValidateGridAreas(marketRoles),
                 Times.Once);
         }
 
@@ -354,9 +339,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new ActorNumber("fake_value");
-            var gridAreas = new List<GridAreaId> { new(Guid.NewGuid()) };
-            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()) };
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
+            var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
+            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()) };
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -367,9 +352,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
-                    gridAreas,
-                    marketRoles,
-                    meteringPointTypes)
+                    marketRoles)
                 .ConfigureAwait(false);
 
             // Assert

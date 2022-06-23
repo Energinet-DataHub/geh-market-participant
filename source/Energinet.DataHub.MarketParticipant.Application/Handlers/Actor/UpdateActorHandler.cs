@@ -35,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+        private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
 
         public UpdateActorHandler(
@@ -51,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _unitOfWorkProvider = unitOfWorkProvider;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+            _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorIdConfigurationService = externalActorIdConfigurationService;
         }
 
@@ -111,11 +113,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
-                actor.MarketRoles.Add(new ActorMarketRole(function, marketRoleDto.GridAreas
-                    .Select(m => new ActorGridArea(m.Id, m.MeteringPointTypes.Select(e => MeteringPointType.FromName(e))))));
+                actor.MarketRoles
+                    .Add(new ActorMarketRole(
+                        function,
+                        marketRoleDto.GridAreas
+                            .Select(m => new ActorGridArea(
+                                m.Id,
+                                m.MeteringPointTypes
+                                    .Select(e => MeteringPointType.FromName(e, true))
+                                    .Distinct()))));
             }
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+            _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
         }
     }
 }

@@ -67,12 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 organization.Actors,
                 marketRoles);
 
-            foreach (var marketRole in marketRoles)
-            {
-                _allowedGridAreasRuleService.ValidateGridAreas(
-                    marketRole.GridAreas.Select(gridArea => new GridAreaId(gridArea.Id)),
-                    marketRoles);
-            }
+            _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
 
             var newActor = new Actor(actorNumber);
 

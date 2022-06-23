@@ -88,9 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
-                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>(),
-                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
@@ -147,9 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
-                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>(),
-                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(

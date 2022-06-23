@@ -128,7 +128,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             allowedGridAreasRuleService.Verify(
-                x => x.ValidateGridAreas(It.IsAny<IEnumerable<GridAreaId>>(), It.IsAny<IEnumerable<ActorMarketRole>>()),
+                x => x.ValidateGridAreas(It.IsAny<IEnumerable<ActorMarketRole>>()),
                 Times.Once);
         }
 
