@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -211,22 +212,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var gridAreaRepository = new GridAreaRepository(context);
 
-            var gridArea = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1);
+            var gridArea = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
 
             var expected = await gridAreaRepository
                 .AddOrUpdateAsync(gridArea)
                 .ConfigureAwait(false);
 
-            gridArea = await gridAreaRepository.GetAsync(expected).ConfigureAwait(false);
-
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var marketRole = new[]
+            var marketRoles = new[]
             {
-                new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value) })
+                new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) })
             };
 
             organization.Actors.Add(new Actor(
@@ -234,23 +230,24 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new ExternalActorId(Guid.NewGuid()),
                 new ActorNumber("123"),
                 ActorStatus.New,
-                marketRole));
+                marketRoles));
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
 
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
-            var actual = organization!
+            var actualGridArea = organization!
                 .Actors
                 .Single()
                 .MarketRoles
-                .Single();
+                .Single()
+                .GridAreas.Single();
 
             // Assert
-            Assert.Equal(expected.Value, actual.Id);
+            Assert.Equal(expected.Value, actualGridArea.Id);
         }
 
-        /*[Fact]
+        [Fact]
         public async Task AddOrUpdateAsync_MarketRoleAdded_CanReadBack()
         {
             // Arrange
@@ -262,7 +259,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var balancePowerSupplierActor = new Actor(new ActorNumber("fake_value"));
-            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalancingServiceProvider));
+            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalancingServiceProvider, new List<ActorGridArea>()));
             organization.Actors.Add(balancePowerSupplierActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -270,7 +267,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var meteringPointAdministratorActor = new Actor(new ActorNumber("fake_value"));
-            meteringPointAdministratorActor.MarketRoles.Add(new MarketRole(EicFunction.MeteringPointAdministrator));
+            meteringPointAdministratorActor.MarketRoles.Add(new ActorMarketRole(EicFunction.MeteringPointAdministrator, new List<ActorGridArea>()));
             organization!.Actors.Add(meteringPointAdministratorActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -285,9 +282,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Contains(
                 organization.Actors,
                 x => x.MarketRoles.All(y => y.Function == EicFunction.MeteringPointAdministrator));
-        }*/
+        }
 
-        /*[Fact]
+        [Fact]
         public async Task AddOrUpdateAsync_MeteringPointAdded_CanReadBack()
         {
             // Arrange
@@ -295,34 +292,57 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
+            var gridAreaRepository = new GridAreaRepository(context);
+
+            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+
+            var gridAreaToInsert_Id = await gridAreaRepository
+                .AddOrUpdateAsync(gridAreaToInsert)
+                .ConfigureAwait(false);
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var someActor = new Actor(new ActorNumber("fake_value"));
-            someActor.MeteringPointTypes.Add(MeteringPointType.D02Analysis);
+            someActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>
+            {
+                new(gridAreaToInsert_Id.Value, new List<MeteringPointType>
+                {
+                    MeteringPointType.D02Analysis
+                })
+            }));
             organization.Actors.Add(someActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var meteringPointAdministratorActor = new Actor(new ActorNumber("fake_value"));
-            meteringPointAdministratorActor.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
-            organization!.Actors.Add(meteringPointAdministratorActor);
+            foreach (var organizationActor in organization!.Actors)
+            {
+                foreach (var organizationActorMarketRole in organizationActor.MarketRoles)
+                {
+                    foreach (var actorGridArea in organizationActorMarketRole.GridAreas)
+                    {
+                        actorGridArea.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
+                    }
+                }
+            }
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
+            var actorMeteringPointTypes =
+                organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
+
             // Assert
             Assert.NotNull(organization);
-            Assert.Equal(2, organization!.Actors.Count);
+            Assert.Equal(2, actorMeteringPointTypes.Count);
             Assert.Contains(
-                organization.Actors,
-                x => x.MeteringPointTypes.Any(y => y.Value == MeteringPointType.D02Analysis.Value));
+                actorMeteringPointTypes,
+                x => x == MeteringPointType.D02Analysis.Value);
             Assert.Contains(
-                organization.Actors,
-                x => x.MeteringPointTypes.Any(y => y.Value == MeteringPointType.D05NetProduction.Value));
-        }*/
+                actorMeteringPointTypes,
+                x => x == MeteringPointType.D05NetProduction.Value);
+        }
 
         [Fact]
         public async Task GetAsync_DifferentContexts_CanReadBack()
@@ -350,7 +370,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Contains(organization.Actors, x => x.ActorNumber == gln);
         }
 
-        /*[Fact]
+        [Fact]
         public async Task AddOrUpdateAsync_ActorWith1MeteringTypesAdded_CanReadBack()
         {
             // Arrange
@@ -360,22 +380,35 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
             var orgRepositoryRead = new OrganizationRepository(contextRead);
+            var gridAreaRepository = new GridAreaRepository(context);
+
+            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+
+            var gridAreaToInsert_Id = await gridAreaRepository
+                .AddOrUpdateAsync(gridAreaToInsert)
+                .ConfigureAwait(false);
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
+            var meteringPointTypes = new List<MeteringPointType>() { MeteringPointType.D05NetProduction };
+            var gridArea = new ActorGridArea(gridAreaToInsert_Id.Value, meteringPointTypes);
+
             var actorWithMeteringTypes = new Actor(new ActorNumber("fake_value"));
-            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
+            actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>() { gridArea }));
             organization.Actors.Add(actorWithMeteringTypes);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
             organization = await orgRepositoryRead.GetAsync(orgId).ConfigureAwait(false);
 
+            var actorMeteringPointTypes =
+                organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
+
             // Assert
             Assert.NotNull(organization);
             Assert.Contains(
-                organization!.Actors.Single().MeteringPointTypes,
-                x => x.Equals(MeteringPointType.D03NotUsed));
+                actorMeteringPointTypes,
+                x => x.Equals(MeteringPointType.D05NetProduction));
         }
 
         [Fact]
@@ -388,12 +421,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
             var orgRepositoryRead = new OrganizationRepository(contextRead);
+            var gridAreaRepository = new GridAreaRepository(context);
+
+            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+
+            var gridAreaToInsert_Id = await gridAreaRepository
+                .AddOrUpdateAsync(gridAreaToInsert)
+                .ConfigureAwait(false);
+
+            var meteringPointTypesToAdd = new[] { MeteringPointType.D03NotUsed, MeteringPointType.D12TotalConsumption };
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             var actorWithMeteringTypes = new Actor(new ActorNumber("fake_value"));
-            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D03NotUsed);
-            actorWithMeteringTypes.MeteringPointTypes.Add(MeteringPointType.D12TotalConsumption);
+            actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.Producer, new List<ActorGridArea> { new(gridAreaToInsert_Id.Value, meteringPointTypesToAdd) }));
             organization.Actors.Add(actorWithMeteringTypes);
 
             // Act
@@ -403,12 +444,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(organization);
             Assert.Contains(
-                organization!.Actors.Single().MeteringPointTypes,
+                meteringPointTypesToAdd,
                 x => x.Equals(MeteringPointType.D03NotUsed));
             Assert.Contains(
-                organization.Actors.Single().MeteringPointTypes,
+                meteringPointTypesToAdd,
                 x => x.Equals(MeteringPointType.D12TotalConsumption));
-        }*/
+        }
 
         [Fact]
         public async Task GetAsync_All_ReturnsAllOrganizations()

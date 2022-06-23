@@ -111,7 +111,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
-                actor.MarketRoles.Add(new ActorMarketRole(function, marketRoleDto.GridAreas.Select(m => new ActorGridArea(m.Id))));
+                actor.MarketRoles.Add(new ActorMarketRole(function, marketRoleDto.GridAreas
+                    .Select(m => new ActorGridArea(m.Id, m.MeteringPointTypes.Select(e => MeteringPointType.FromName(e))))));
             }
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);

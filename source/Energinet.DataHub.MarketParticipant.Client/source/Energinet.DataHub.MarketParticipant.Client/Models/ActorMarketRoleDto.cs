@@ -12,27 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public class ActorGridArea
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public ActorGridArea(IEnumerable<MeteringPointType> meteringPointTypes)
-    {
-        MeteringPointTypes = meteringPointTypes.ToList();
-    }
-
-    public ActorGridArea(
-        Guid id,
-        IEnumerable<MeteringPointType> meteringPointTypes)
-    {
-        Id = id;
-        MeteringPointTypes = meteringPointTypes.ToList();
-    }
-
-    public Guid Id { get; }
-    public ICollection<MeteringPointType> MeteringPointTypes { get; }
+    public sealed record ActorMarketRoleDto(EicFunction EicFunction, IEnumerable<ActorGridAreaDto> GridAreas);
 }
