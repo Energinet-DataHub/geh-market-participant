@@ -85,7 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<ActorMarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -121,7 +121,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<ActorMarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -160,7 +160,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<ActorMarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -199,7 +199,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<ActorMarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -238,7 +238,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<ActorMarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

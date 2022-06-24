@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -40,13 +41,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .SetValidator(new EnergyIdentificationCodeValidationRule<CreateActorDto>())
                         .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length >= 14);
 
-                    // TODO
-                    /*validator
-                        .RuleFor(x => x.MarketRoles.GridAreas)
+                    validator
+                        .RuleForEach(actor => actor.MarketRoles)
                         .ChildRules(gridAreaValidator =>
                             gridAreaValidator
-                                .RuleForEach(x => x)
-                                .NotEmpty());*/
+                                .RuleFor(x => x.GridAreas)
+                                .NotEmpty());
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
@@ -65,16 +65,22 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 });
                         });
 
-                    // TODO
-                    /*validator
-                        .RuleFor(actor => actor.MeteringPointTypes)
-                        .NotEmpty()
-                        .ChildRules(rolesValidator =>
+                    validator
+                        .RuleForEach(actor => actor.MarketRoles)
+                        .ChildRules(inlineValidator =>
                         {
-                            rolesValidator
-                                .RuleForEach(x => x)
-                                .Must(x => MeteringPointType.TryFromName(x, true, out _));
-                        });*/
+                            inlineValidator
+                                .RuleForEach(m => m.GridAreas)
+                                .ChildRules(validationRules =>
+                                {
+                                    validationRules
+                                        .RuleFor(r => r.MeteringPointTypes)
+                                        .NotEmpty()
+                                        .ChildRules(v =>
+                                            v.RuleForEach(r => r)
+                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                });
+                        });
                 });
         }
     }

@@ -19,7 +19,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
     public sealed record ChangeActorDto(
         string Status,
-        IEnumerable<Guid> GridAreas,
-        IEnumerable<ActorMarketRoleDto> MarketRoles,
-        IEnumerable<string> MeteringPointTypes);
+        IEnumerable<ActorMarketRoleDto> MarketRoles);
 }
