@@ -62,12 +62,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             return new CreateActorResponse(actor.Id);
         }
 
+        private static IEnumerable<ActorGridArea> CreateGridAreas(IEnumerable<ActorGridAreaDto> gridAreaDtos)
+        {
+            return gridAreaDtos.Select(gridArea =>
+                new ActorGridArea(gridArea.Id, CreateMeteringPointTypes(gridArea.MeteringPointTypes)));
+        }
+
+        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(IEnumerable<string> meteringPointTypes)
+        {
+            return meteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
+        }
+
         private static IEnumerable<ActorMarketRole> CreateMarketRoles(CreateActorDto actorDto)
         {
             foreach (var marketRole in actorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
-                yield return new ActorMarketRole(function, marketRole.GridAreas.Select(gridAreaDto => new ActorGridArea(gridAreaDto.Id, gridAreaDto.MeteringPointTypes.Select(e => MeteringPointType.FromName(e)))));
+                var gridAreas = CreateGridAreas(marketRole.GridAreas);
+                yield return new ActorMarketRole(function, gridAreas);
             }
         }
     }
