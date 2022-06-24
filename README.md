@@ -6,7 +6,14 @@ Welcome to the Market Participant domain of the [Green Energy Hub project](https
 - [Intro](#intro)
 - [Communicating with Market Participant](#Communicating-with-Market-Participant)
 	 - [API](#API)
+		 - [Organization](#Organization)
+		 - [Actor](#Actor)
+		 - [Contact](#Contact)
+		 - [Actor Contact](#Actor-Contact)
 	 - [Integration Events](#Integration-events)
+		 - [Actor Events](#Actor-Events)
+		 - [Organization Events](#Organization-Events)
+		 - [Grid Area Events](#Grid-Area-Events)
 
 ## Intro
 
@@ -186,6 +193,26 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}/contact/{contactId:guid}```
 *Deletes a contact from the specified organization, if it exists*
 
+## Grid Area
+#### GET:/GridArea
+
+```gridarea/```
+*returns all grid areas.*
+
+#### POST:/GridArea
+
+```gridarea/```
+*Creates a grid areas.*
+
+##### Example Body:
+```json
+{
+  "name": "string",
+  "code": "string",
+  "priceAreaCode": "string"
+}
+```
+
 ---
 ---
 
@@ -211,7 +238,7 @@ The following integrations events are available:
 	 - [OrganizationAddressChanged](#integration-event-organization-address-changed)
 	 - [OrganizationCommentChanged](#integration-event-organization-comment-changed)
 	 - [OrganizationBusinessRegisterIdentifierChanged](#integration-event-actor-created)
- - **Grid Areas**
+ - **Grid Area Events**
 	 - [GridAreaCreated](#integration-event-actor-created)
 	 - [GridAreaNameChanged](#integration-event-actor-created)
 	
