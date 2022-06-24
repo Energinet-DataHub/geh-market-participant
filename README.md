@@ -11,9 +11,6 @@ Welcome to the Market Participant domain of the [Green Energy Hub project](https
 		 - [Contact](#Contact)
 		 - [Actor Contact](#Actor-Contact)
 	 - [Integration Events](#Integration-events)
-		 - [Actor Events](#Actor-Events)
-		 - [Organization Events](#Organization-Events)
-		 - [Grid Area Events](#Grid-Area-Events)
 
 ## Intro
 
