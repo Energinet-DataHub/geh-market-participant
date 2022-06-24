@@ -193,7 +193,7 @@ The Following endpoints are available, seperated by concerns.
 ## Grid Area
 #### GET:/GridArea
 
-```gridarea/```
+```gridarea/```<br />
 *returns all grid areas.*
 
 #### POST:/GridArea
