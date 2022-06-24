@@ -124,7 +124,6 @@ public class ChangesToActorHelperTests
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ChangeActorDto(
                 "Passive",
-                new List<Guid> { Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d") },
                 new List<ActorMarketRoleDto>
                 {
                     new ActorMarketRoleDto(
@@ -149,7 +148,6 @@ public class ChangesToActorHelperTests
                                     "D05NetProduction"
                                 })
                         })
-                },
-                new List<string> { "Unknown" }));
+                }));
     }
 }
