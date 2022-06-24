@@ -28,17 +28,17 @@ The Following endpoints are available, seperated by concerns.
 ## Organization
 #### GET:/Organization
 
-```organization/```
+```organization/```<br />
 *Returns all organizations*
 
 #### GET:/Organization
 
-```organization/{organizationId:guid}```
+```organization/{organizationId:guid}```<br />
 *Returns an organization with the specified id, if it exists.*
 
 #### POST:/Organization
 
-```organization/```
+```organization/```<br />
 *Returns and organization with the specified id, if it exists.*
 
 ##### Example BODY:
@@ -60,7 +60,7 @@ The Following endpoints are available, seperated by concerns.
 
 #### PUT:/Organization
 
-```organization/{organizationId:guid}```
+```organization/{organizationId:guid}```<br />
 *Updates an organization with the specified id, if it exists.*
 
 ##### Example BODY:
@@ -82,17 +82,17 @@ The Following endpoints are available, seperated by concerns.
 ## Actor
 #### GET:/Organization/Actor
 
-```organization/{organizationId:guid}/actor/```
+```organization/{organizationId:guid}/actor/```<br />
 *Returns all actors in the specified organization and with the specified id, if it exists.*
 
 #### GET:/Organization/Actor/ID
 
-```organization/{organizationId:guid}/actor/{actorId:guid}```
+```organization/{organizationId:guid}/actor/{actorId:guid}```<br />
 *Returns the actor in the specified organization and with the specified id, if it exists.*
 
 #### POST:/Organization/Actor/
 
-```organization/{organizationId:guid}/actor/```
+```organization/{organizationId:guid}/actor/```<br />
 *Creates an Actor in the specified organization*
 
 ##### Example BODY:
@@ -117,7 +117,7 @@ The Following endpoints are available, seperated by concerns.
 ```
 #### PUT:/Organization/Actor/
 
-```organization/{organizationId:guid}/actor/{actorId:guid}```
+```organization/{organizationId:guid}/actor/{actorId:guid}```<br />
 *Updates an Actor in the specified organization with the specified id, if it exists*
 
 ##### Example Body:
@@ -140,12 +140,12 @@ The Following endpoints are available, seperated by concerns.
 ## Contact
 #### GET:/Organization/Contact
 
-```organization/{organizationId:guid}/contact/```
+```organization/{organizationId:guid}/contact/```<br />
 *returns all contacts in the specified organization, if the organization exists.*
 
 #### POST:/Organization/Contact
 
-```organization/{organizationId:guid}/contact/```
+```organization/{organizationId:guid}/contact/```<br />
 *Creates a new contacts in the specified organization, if the organization exists.*
 
 ##### Example Body:
@@ -160,19 +160,19 @@ The Following endpoints are available, seperated by concerns.
 
 #### DELETE:/Organization/Contact
 
-```organization/{organizationId:guid}/contact/{contactId:guid}```
+```organization/{organizationId:guid}/contact/{contactId:guid}```<br />
 *Deletes a contact from the specified organization, if it exists*
 
 ## Actor Contact
 
 #### GET:/Organization/Actor/Contact
 
-```organization/{organizationId:guid}/actor/{actorId:guid}/contact```
+```organization/{organizationId:guid}/actor/{actorId:guid}/contact```<br />
 *returns all contacts for the specified actor in the specified organization, if the organization and actor exists.*
 
 #### POST:/Organization/Actor/Contact
 
-```organization/{organizationId:guid}/actor/{actorId:guid}/contact```
+```organization/{organizationId:guid}/actor/{actorId:guid}/contact```<br />
 *Creates a contact for the specified actor in the specified organization, if the organization and actor exists.*
 
 ##### Example Body:
@@ -187,7 +187,7 @@ The Following endpoints are available, seperated by concerns.
 
 #### DELETE:/Organization/Actor/Contact
 
-```organization/{organizationId:guid}/contact/{contactId:guid}```
+```organization/{organizationId:guid}/contact/{contactId:guid}```<br />
 *Deletes a contact from the specified organization, if it exists*
 
 ## Grid Area
@@ -198,7 +198,7 @@ The Following endpoints are available, seperated by concerns.
 
 #### POST:/GridArea
 
-```gridarea/```
+```gridarea/```<br />
 *Creates a grid areas.*
 
 ##### Example Body:
