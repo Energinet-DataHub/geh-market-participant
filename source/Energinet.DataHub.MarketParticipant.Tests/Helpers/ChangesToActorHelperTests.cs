@@ -62,13 +62,21 @@ public class ChangesToActorHelperTests
         var result = target.FindChangesMadeToActor(_actor, _incomingActor).ToList();
 
         // Assert
-        Assert.Contains(result, x => x is ActorStatusChangedIntegrationEvent);
-        Assert.Contains(result, x => x is AddGridAreaIntegrationEvent);
-        Assert.Contains(result, x => x is RemoveGridAreaIntegrationEvent);
-        Assert.Contains(result, x => x is AddMarketRoleIntegrationEvent);
-        Assert.Contains(result, x => x is RemoveMarketRoleIntegrationEvent);
-        Assert.Contains(result, x => x is AddMeteringPointTypeIntegrationEvent);
-        Assert.Contains(result, x => x is RemoveMeteringPointTypeIntegrationEvent);
+        var numberOfStatusChangedEvents = result.Count(x => x is ActorStatusChangedIntegrationEvent);
+        var numberOfAddMeteringPointEvents = result.Count(x => x is AddMeteringPointTypeIntegrationEvent);
+        var numberOfRemoveMeteringPointEvents = result.Count(x => x is RemoveMeteringPointTypeIntegrationEvent);
+        var numberOfAddGridAreaEvents = result.Count(x => x is AddGridAreaIntegrationEvent);
+        var numberOfRemoveGridAreaEvents = result.Count(x => x is RemoveGridAreaIntegrationEvent);
+        var numberOfAddMarketRoleEvents = result.Count(x => x is AddMarketRoleIntegrationEvent);
+        var numberOfRemoveMarketRoleEvents = result.Count(x => x is RemoveMarketRoleIntegrationEvent);
+
+        Assert.Equal(1, numberOfStatusChangedEvents);
+        Assert.Equal(2, numberOfAddMeteringPointEvents);
+        Assert.Equal(6, numberOfRemoveMeteringPointEvents);
+        Assert.Equal(1, numberOfAddGridAreaEvents);
+        Assert.Equal(2, numberOfRemoveGridAreaEvents);
+        Assert.Equal(1, numberOfAddMarketRoleEvents);
+        Assert.Equal(1, numberOfRemoveMarketRoleEvents);
         Assert.Equal(14, result.Count);
     }
 
