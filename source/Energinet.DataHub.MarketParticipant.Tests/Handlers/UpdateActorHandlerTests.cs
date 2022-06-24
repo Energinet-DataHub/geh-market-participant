@@ -118,10 +118,18 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
                 .ReturnsAsync(organization);
 
+            var meteringPoints = new[]
+            {
+                MeteringPointType.D02Analysis.Name, MeteringPointType.E17Consumption.Name,
+                MeteringPointType.E17Consumption.Name
+            };
+            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), meteringPoints) };
+            var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };
+
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto("Active", marketRoles));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

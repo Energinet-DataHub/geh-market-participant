@@ -135,7 +135,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test Comment");
 
             var actor = new Actor(new ActorNumber(actorGln));
-            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());
+            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), new[] { MeteringPointType.D02Analysis.Name }) };
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), gridAreas);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
