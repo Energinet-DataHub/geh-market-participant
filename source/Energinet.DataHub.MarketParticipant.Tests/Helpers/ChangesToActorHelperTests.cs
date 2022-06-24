@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Xunit;
 using Xunit.Categories;
 
@@ -58,6 +59,17 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper();
 
         // Act
+        var result = target.FindChangesMadeToActor(_actor, _incomingActor).ToList();
+
+        // Assert
+        Assert.Contains(result, x => x is ActorStatusChangedIntegrationEvent);
+        Assert.Contains(result, x => x is AddGridAreaIntegrationEvent);
+        Assert.Contains(result, x => x is RemoveGridAreaIntegrationEvent);
+        Assert.Contains(result, x => x is AddMarketRoleIntegrationEvent);
+        Assert.Contains(result, x => x is RemoveMarketRoleIntegrationEvent);
+        Assert.Contains(result, x => x is AddMeteringPointTypeIntegrationEvent);
+        Assert.Contains(result, x => x is RemoveMeteringPointTypeIntegrationEvent);
+        Assert.Equal(14, result.Count);
     }
 
     private static Actor CreateValidActorWithChildren()
@@ -121,7 +133,21 @@ public class ChangesToActorHelperTests
                         {
                             new ActorGridAreaDto(
                                 Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d"),
-                                new List<string> { "Unknown" })
+                                new List<string>
+                                {
+                                    "Unknown"
+                                })
+                        }),
+                    new ActorMarketRoleDto(
+                        EicFunction.BillingAgent.ToString(),
+                        new List<ActorGridAreaDto>
+                        {
+                            new ActorGridAreaDto(
+                                Guid.NewGuid(),
+                                new List<string>
+                                {
+                                    "D05NetProduction"
+                                })
                         })
                 },
                 new List<string> { "Unknown" }));

@@ -16,8 +16,10 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
-public sealed class MarketRoleToAddToActorIntegrationEvent : IntegrationEventBase
+public class RemoveMeteringPointTypeIntegrationEvent : IntegrationEventBase
 {
     public Guid ActorId { get; set; }
-    public ActorMarketRole MarketRole { get; init; } = null!;
+    public EicFunction Function { get; set; }
+    public Guid GridAreaId { get; set; }
+    public MeteringPointType Type { get; set; } = MeteringPointType.Unknown;
 }

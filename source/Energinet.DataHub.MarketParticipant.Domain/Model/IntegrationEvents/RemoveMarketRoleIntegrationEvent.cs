@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
-public sealed class MarketRoleToRemoveFromActorIntegrationEvent : IntegrationEventBase
+public sealed class RemoveMarketRoleIntegrationEvent : IntegrationEventBase
 {
     public Guid ActorId { get; set; }
     public ActorMarketRole MarketRole { get; init; } = null!;

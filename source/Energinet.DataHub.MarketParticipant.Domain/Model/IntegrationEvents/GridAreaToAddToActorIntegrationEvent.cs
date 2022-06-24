@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
-public sealed class ActorGridAreaToAddIntegrationEvent : IntegrationEventBase
+public sealed class AddGridAreaIntegrationEvent : IntegrationEventBase
 {
     public Guid ActorId { get; set; }
     public EicFunction Function { get; set; }

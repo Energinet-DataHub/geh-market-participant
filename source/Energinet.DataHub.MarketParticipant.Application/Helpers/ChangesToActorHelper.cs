@@ -90,56 +90,64 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             var gridAreas = existingActor.MarketRoles.First(marketRole => marketRole.Function == eicFunction).GridAreas;
             var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas);
 
-            _changeEvents.Add(new MarketRoleToRemoveFromActorIntegrationEvent
+            _changeEvents.Add(new RemoveMarketRoleIntegrationEvent
             {
                 ActorId = existingActor.Id,
                 MarketRole = marketRole
             });
 
-            AddChangeEventsForAddedGridAreas(existingActor.Id, marketRole);
+            AddChangeEventsForRemovedGridAreas(existingActor.Id, eicFunction, gridAreas);
         }
 
         foreach (var eicFunction in eicFunctionsToAddToActor)
         {
-            var gridAreas = existingActor.MarketRoles.First(marketRole => marketRole.Function == eicFunction).GridAreas;
-            var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas);
+            var gridAreas = incomingMarketRoles.First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == eicFunction).GridAreas;
+            var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas.Select(gridArea => new ActorGridArea(gridArea.Id, gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))));
 
-            _changeEvents.Add(new MarketRoleToAddToActorIntegrationEvent
+            _changeEvents.Add(new AddMarketRoleIntegrationEvent
             {
                 ActorId = existingActor.Id,
                 MarketRole = marketRole
             });
 
-            AddChangeEventsForRemovedGridAreas(existingActor.Id, marketRole);
+            AddChangeEventsForAddedGridAreas(existingActor.Id, eicFunction, gridAreas.Select(gridArea => new ActorGridArea(gridArea.Id, gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))));
         }
     }
 
     private void AddChangeEventsIfGridAreasChanged(Guid existingActorId, ActorMarketRole existingMarketRole, IEnumerable<ActorGridAreaDto> incomingGridAreas)
     {
-        var incomingActorGridAreas = incomingGridAreas.Select(gridArea => new ActorGridArea(
-            gridArea.Id,
-            gridArea
-                .MeteringPointTypes
-                .Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))).ToList();
+        var incomingActorGridAreaDtos = incomingGridAreas.ToList();
+        var incomingActorGridAreas = incomingActorGridAreaDtos.Select(gridArea => gridArea.Id).ToList();
 
-        var gridAreasToAddToActor = incomingActorGridAreas.Except(existingMarketRole.GridAreas);
+        var gridAreaIdsToAddToActor = incomingActorGridAreas.Except(existingMarketRole.GridAreas.Select(gridArea => gridArea.Id));
+        var gridAreasToAddToActor = gridAreaIdsToAddToActor
+            .Select(id =>
+                new ActorGridArea(
+                    id,
+                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => MeteringPointType.FromName(x, false))));
 
-        var gridAreasToRemoveFromActor = existingMarketRole
+        var gridAreaIdsToRemoveFromActor = existingMarketRole
             .GridAreas
+            .Select(gridArea => gridArea.Id)
             .Except(incomingActorGridAreas);
+        var gridAreasToRemoveFromActor = gridAreaIdsToRemoveFromActor
+            .Select(id =>
+                new ActorGridArea(
+                    id,
+                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => MeteringPointType.FromName(x, false))));
 
-        AddChangeEventsForAddedGridAreas(existingActorId, new ActorMarketRole(existingMarketRole.Id, existingMarketRole.Function, gridAreasToAddToActor));
-        AddChangeEventsForRemovedGridAreas(existingActorId, new ActorMarketRole(existingMarketRole.Id, existingMarketRole.Function, gridAreasToRemoveFromActor));
+        AddChangeEventsForAddedGridAreas(existingActorId, existingMarketRole.Function, gridAreasToAddToActor);
+        AddChangeEventsForRemovedGridAreas(existingActorId, existingMarketRole.Function, gridAreasToRemoveFromActor);
 
         foreach (var gridArea in existingMarketRole.GridAreas)
         {
-            if (incomingActorGridAreas.Contains(gridArea))
+            if (incomingActorGridAreas.Contains(gridArea.Id))
             {
                 AddChangeEventsIfMeteringPointTypeChanged(
                     existingActorId,
                     existingMarketRole.Function,
                     gridArea,
-                    incomingActorGridAreas.SelectMany(incomingGridArea => incomingGridArea.MeteringPointTypes));
+                    incomingActorGridAreaDtos.SelectMany(incomingGridArea => incomingGridArea.MeteringPointTypes.Select(m => MeteringPointType.FromName(m, false))));
             }
         }
     }
@@ -151,8 +159,8 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         IEnumerable<MeteringPointType> incomingMeteringPointTypes)
     {
         var meteringPointTypes = incomingMeteringPointTypes.ToList();
-        var meteringPointTypesToAddToActor = existingGridArea.MeteringPointTypes.Except(meteringPointTypes);
-        var meteringPointTypesToRemoveFromActor = meteringPointTypes.Except(existingGridArea.MeteringPointTypes);
+        var meteringPointTypesToAddToActor = meteringPointTypes.Except(existingGridArea.MeteringPointTypes);
+        var meteringPointTypesToRemoveFromActor = existingGridArea.MeteringPointTypes.Except(meteringPointTypes);
 
         AddChangeEventsForAddedMeteringPointTypes(
             existingActorId,
@@ -167,20 +175,20 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             meteringPointTypesToRemoveFromActor);
     }
 
-    private void AddChangeEventsForAddedGridAreas(Guid existingActorId, ActorMarketRole marketRole)
+    private void AddChangeEventsForAddedGridAreas(Guid existingActorId, EicFunction function, IEnumerable<ActorGridArea> gridAreas)
     {
-        foreach (var gridArea in marketRole.GridAreas)
+        foreach (var gridArea in gridAreas)
         {
-            _changeEvents.Add(new ActorGridAreaToAddIntegrationEvent
+            _changeEvents.Add(new AddGridAreaIntegrationEvent
                 {
                     ActorId = existingActorId,
-                    Function = marketRole.Function,
+                    Function = function,
                     GridArea = gridArea
                 });
 
             AddChangeEventsForAddedMeteringPointTypes(
                 existingActorId,
-                marketRole.Function,
+                function,
                 gridArea.Id,
                 gridArea.MeteringPointTypes);
         }
@@ -194,7 +202,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
     {
         foreach (var meteringPointType in gridAreaMeteringPointTypes)
         {
-            _changeEvents.Add(new MeteringPointTypeToAddToActorIntegrationEvent
+            _changeEvents.Add(new AddMeteringPointTypeIntegrationEvent
             {
                 ActorId = existingActorId,
                 Function = function,
@@ -204,18 +212,18 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         }
     }
 
-    private void AddChangeEventsForRemovedGridAreas(Guid existingActorId, ActorMarketRole marketRole)
+    private void AddChangeEventsForRemovedGridAreas(Guid existingActorId, EicFunction function, IEnumerable<ActorGridArea> gridAreas)
     {
-        foreach (var gridArea in marketRole.GridAreas)
+        foreach (var gridArea in gridAreas)
         {
-            _changeEvents.Add(new ActorGridAreaToAddIntegrationEvent
+            _changeEvents.Add(new RemoveGridAreaIntegrationEvent
             {
                 ActorId = existingActorId,
-                Function = marketRole.Function,
+                Function = function,
                 GridArea = gridArea
             });
 
-            AddChangeEventsForRemovedMeteringPointTypes(existingActorId, marketRole.Function, gridArea.Id, gridArea.MeteringPointTypes);
+            AddChangeEventsForRemovedMeteringPointTypes(existingActorId, function, gridArea.Id, gridArea.MeteringPointTypes);
         }
     }
 
@@ -227,7 +235,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
     {
         foreach (var meteringPointType in gridAreaMeteringPointTypes)
         {
-            _changeEvents.Add(new MeteringPointTypeToRemoveFromActorIntegrationEvent
+            _changeEvents.Add(new RemoveMeteringPointTypeIntegrationEvent
             {
                 ActorId = existingActorId,
                 Function = function,
