@@ -35,7 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 
         public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
         public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
-        public DbSet<ContactEntity> Contacts { get; private set; } = null!;
         public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
         public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
         public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
@@ -55,7 +54,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaActorInfoLinkEntityConfiguration());
             modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ContactEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
             modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
