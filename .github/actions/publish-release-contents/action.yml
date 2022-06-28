@@ -12,6 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 name: 'Publish release content'
+
+#
+# This action is called from the 'create-prerelease.yml' file.
+#
+# All content in the RELEASE_FOLDER_PATH will be uploaded as a prerelease.
+#
+
 inputs:
   RELEASE_FOLDER_PATH:
     required: true
@@ -26,21 +33,9 @@ runs:
       run: |
         mkdir ${{ inputs.RELEASE_FOLDER_PATH }}
         cp -fR ${{ inputs.REPO_FOLDER_PATH }}/build/infrastructure ${{ inputs.RELEASE_FOLDER_PATH }} 2>/dev/null || :
-
-    - name: Publish Database Migration to release folder
-      uses: actions/download-artifact@v2
+       
+    - name: Publish dotnet artifact to release folder
+      uses: actions/download-artifact@v3
       with:
-        name: databasemigration
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/migration/databasemigration
-        
-    - name: Publish Organization function to release folder
-      uses: actions/download-artifact@v2
-      with:
-        name: organization
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/organization
-        
-    - name: Publish Wep api to release folder
-      uses: actions/download-artifact@v2
-      with:
-        name: webapi
-        path: ${{ inputs.RELEASE_FOLDER_PATH }}/functions/webapi
+        name: dotnet
+        path: ${{ inputs.RELEASE_FOLDER_PATH }}
