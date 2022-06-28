@@ -60,6 +60,8 @@ jobs:
 
   create_prerelease:
     needs: [
+        ci_base,
+        terraform_validate,
         dotnet_solution_ci,
         package_ci
     ]
