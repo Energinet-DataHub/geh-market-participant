@@ -1,16 +1,17 @@
 # Market Participant
+
 [![codecov](https://codecov.io/gh/Energinet-DataHub/geh-market-participant/branch/main/graph/badge.svg?token=1VGVTZG6IT)](https://codecov.io/gh/Energinet-DataHub/geh-market-participant)
 
 Welcome to the Market Participant domain of the [Green Energy Hub project](https://github.com/Energinet-DataHub/green-energy-hub).
 
 - [Intro](#intro)
 - [Communicating with Market Participant](#Communicating-with-Market-Participant)
-	 - [API](#API)
-		 - [Organization](#Organization)
-		 - [Actor](#Actor)
-		 - [Contact](#Contact)
-		 - [Actor Contact](#Actor-Contact)
-	 - [Integration Events](#Integration-events)
+  - [API](#API)
+    - [Organization](#Organization)
+    - [Actor](#Actor)
+    - [Contact](#Contact)
+    - [Actor Contact](#Actor-Contact)
+- [Integration Events](#Integration-events)
 
 ## Intro
 
@@ -23,9 +24,11 @@ Interaction with the Market Participant domain is done in two different ways, de
 A [Client Nuget Package](https://www.nuget.org/packages/Energinet.DataHub.MarketParticipant.Client/), which is the recommended way to interact with the domain is available, and exposes all the API's currently available
 
 ## API
-The Following endpoints are available, seperated by concerns.
+
+The Following endpoints are available, separated by concerns.
 
 ## Organization
+
 #### GET:/Organization
 
 ```organization/```<br />
@@ -41,7 +44,7 @@ The Following endpoints are available, seperated by concerns.
 ```organization/```<br />
 *Returns and organization with the specified id, if it exists.*
 
-##### Example BODY:
+**Example body:**
 
 ```json
 {
@@ -63,7 +66,7 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}```<br />
 *Updates an organization with the specified id, if it exists.*
 
-##### Example BODY:
+**Example body:**
 
 ```json
 {
@@ -79,7 +82,9 @@ The Following endpoints are available, seperated by concerns.
   "comment": "string"
 }
 ```
+
 ## Actor
+
 #### GET:/Organization/Actor
 
 ```organization/{organizationId:guid}/actor/```<br />
@@ -95,7 +100,7 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}/actor/```<br />
 *Creates an Actor in the specified organization*
 
-##### Example BODY:
+**Example body:**
 
 ```json
 {
@@ -120,7 +125,8 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}/actor/{actorId:guid}```<br />
 *Updates an Actor in the specified organization with the specified id, if it exists*
 
-##### Example Body:
+**Example body:**
+
 ```json
 {
   "status": "string",
@@ -137,7 +143,9 @@ The Following endpoints are available, seperated by concerns.
   ]
 }
 ```
+
 ## Contact
+
 #### GET:/Organization/Contact
 
 ```organization/{organizationId:guid}/contact/```<br />
@@ -148,7 +156,8 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}/contact/```<br />
 *Creates a new contacts in the specified organization, if the organization exists.*
 
-##### Example Body:
+**Example body:**
+
 ```json
 {
   "name": "string",
@@ -175,7 +184,8 @@ The Following endpoints are available, seperated by concerns.
 ```organization/{organizationId:guid}/actor/{actorId:guid}/contact```<br />
 *Creates a contact for the specified actor in the specified organization, if the organization and actor exists.*
 
-##### Example Body:
+**Example body:**
+
 ```json
 {
   "name": "string",
@@ -191,6 +201,7 @@ The Following endpoints are available, seperated by concerns.
 *Deletes a contact from the specified organization, if it exists*
 
 ## Grid Area
+
 #### GET:/GridArea
 
 ```gridarea/```<br />
@@ -201,7 +212,8 @@ The Following endpoints are available, seperated by concerns.
 ```gridarea/```<br />
 *Creates a grid areas.*
 
-##### Example Body:
+**Example Body:**
+
 ```json
 {
   "name": "string",
@@ -214,6 +226,7 @@ The Following endpoints are available, seperated by concerns.
 ---
 
 ## Integration Events
+
 Integration events are a way for interested parties to know when data changes in the Market Participant domain and be informed of these changes.
 
 Integration events are published to a servicebus topic, where everyone who are interested can listen. What you do with these events are. A description of how to subscribe to these events are [here](#Subscribe-to-integration-events)
@@ -221,22 +234,21 @@ Integration events are published to a servicebus topic, where everyone who are i
 The following integrations events are available:
 
  - **Actor Events**
-	 - [ActorCreated](#integration-event-actor-created)
-	 - [ActorStatusChanged](#integration-event-actor-status-changed)
-	 - [ActorRoleAdded](#integration-event-actor-role-added)
-	 - [ActorRoleRemoved](#integration-event-actor-role-removed)
-	 - [ActorContactAdded](#integration-event-actor-contact-added)
-	 - [ActorContactRemoved](#integration-event-actor-contact-removed)
-	 - [ActorGridAreaAdded](#integration-event-actor-gridarea-added)
-	 - [ActorGridAreaRemoved](#integration-event-actor-gridarea-removed)
+   - [ActorCreated](#integration-event-actor-created)
+   - [ActorStatusChanged](#integration-event-actor-status-changed)
+   - [ActorRoleAdded](#integration-event-actor-role-added)
+   - [ActorRoleRemoved](#integration-event-actor-role-removed)
+   - [ActorContactAdded](#integration-event-actor-contact-added)
+   - [ActorContactRemoved](#integration-event-actor-contact-removed)
+   - [ActorGridAreaAdded](#integration-event-actor-gridarea-added)
+   - [ActorGridAreaRemoved](#integration-event-actor-gridarea-removed)
  - **Organization Events**
-	 - [OrganizationCreated](#integration-event-organization-created)
-	 - [OrganizationNameChanged](#integration-event-organization-name-changed)
-	 - [OrganizationAddressChanged](#integration-event-organization-address-changed)
-	 - [OrganizationCommentChanged](#integration-event-organization-comment-changed)
-	 - [OrganizationBusinessRegisterIdentifierChanged](#integration-event-actor-created)
+   - [OrganizationCreated](#integration-event-organization-created)
+   - [OrganizationNameChanged](#integration-event-organization-name-changed)
+   - [OrganizationAddressChanged](#integration-event-organization-address-changed)
+   - [OrganizationCommentChanged](#integration-event-organization-comment-changed)
+   - [OrganizationBusinessRegisterIdentifierChanged](#integration-event-actor-created)
  - **Grid Area Events**
-	 - [GridAreaCreated](#integration-event-actor-created)
-	 - [GridAreaNameChanged](#integration-event-actor-created)
+   - [GridAreaCreated](#integration-event-actor-created)
+   - [GridAreaNameChanged](#integration-event-actor-created)
 	
-
