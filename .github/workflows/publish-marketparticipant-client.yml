@@ -32,7 +32,7 @@ on:
   workflow_dispatch: {}
 
 env:
-  DOTNET_VERSION: '6.0.201'
+  DOTNET_VERSION: '6.0.301'
   CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.Client/source/Energinet.DataHub.MarketParticipant.Client/Energinet.DataHub.MarketParticipant.Client.csproj'
   BINARY_PATH: 'source/Energinet.DataHub.MarketParticipant.Client/source/Energinet.DataHub.MarketParticipant.Client/bin/Release/*.nupkg'
 
@@ -45,7 +45,7 @@ jobs:
       packages: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@master
+        uses: actions/checkout@V3
       - name: Pack and publish nuget package
         uses: ./.github/actions/publish-nuget-package
         with:
