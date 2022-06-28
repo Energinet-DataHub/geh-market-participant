@@ -26,10 +26,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     [Route("organization")]
     public sealed class ActorContactController : ControllerBase
     {
-        private readonly ILogger<ContactController> _logger;
+        private readonly ILogger<ActorContactController> _logger;
         private readonly IMediator _mediator;
 
-        public ActorContactController(ILogger<ContactController> logger, IMediator mediator)
+        public ActorContactController(ILogger<ActorContactController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
