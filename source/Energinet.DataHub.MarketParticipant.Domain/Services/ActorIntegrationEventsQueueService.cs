@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -71,6 +72,50 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
+        }
+
+        public async Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Guid actorId, IEnumerable<IIntegrationEvent> integrationEvents)
+        {
+            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
+            ArgumentNullException.ThrowIfNull(integrationEvents, nameof(integrationEvents));
+
+            foreach (var integrationEvent in integrationEvents)
+            {
+                switch (integrationEvent)
+                {
+                    case ActorStatusChangedIntegrationEvent:
+                        {
+                            var domainEvent = new DomainEvent(actorId, nameof(ActorStatus), integrationEvent);
+                            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                            break;
+                        }
+
+                    case AddMarketRoleIntegrationEvent or RemoveMarketRoleIntegrationEvent:
+                        {
+                            var domainEvent = new DomainEvent(actorId, nameof(ActorMarketRole), integrationEvent);
+                            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                            break;
+                        }
+
+                    case AddGridAreaIntegrationEvent or RemoveGridAreaIntegrationEvent:
+                        {
+                            var domainEvent = new DomainEvent(actorId, nameof(ActorGridArea), integrationEvent);
+                            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                            break;
+                        }
+
+                    case AddMeteringPointTypeIntegrationEvent or RemoveMeteringPointTypeIntegrationEvent:
+                        {
+                            var domainEvent = new DomainEvent(actorId, nameof(MeteringPointType), integrationEvent);
+                            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                            break;
+                        }
+
+                    default:
+                        throw new InvalidOperationException(
+                            $"Type of integration event '{integrationEvent.GetType()}' does not match valid event types.");
+                }
+            }
         }
     }
 }

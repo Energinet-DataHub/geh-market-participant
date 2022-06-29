@@ -66,6 +66,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 
         var eicFunctionsToAddToActor = incomingEicFunctions.Except(existingEicFunctions);
 
+        // Loop over each market role that did not change to see if children of the market role have changed
         foreach (var existingEicFunction in existingEicFunctions)
         {
             if (incomingEicFunctions.Contains(existingEicFunction))

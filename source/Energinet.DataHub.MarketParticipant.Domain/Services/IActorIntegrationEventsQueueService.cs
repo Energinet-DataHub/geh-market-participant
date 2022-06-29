@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -28,5 +31,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="organizationId">The organization id the actor belongs to.</param>
         /// <param name="actor">The actor to publish an integration event for.</param>
         Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Actor actor);
+
+        /// <summary>
+        /// Creates and enqueues an ActorUpdated integration event for the specified actor.
+        /// </summary>
+        /// <param name="organizationId">The organization id the actor belongs to.</param>
+        /// <param name="actorId">The actor id.</param>
+        /// <param name="integrationEvents">The events to publish.</param>
+        Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Guid actorId, IEnumerable<IIntegrationEvent> integrationEvents);
     }
 }

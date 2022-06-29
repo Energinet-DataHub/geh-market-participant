@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -33,6 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IChangesToActorHelper _changesToActorHelper;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
@@ -42,6 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IOrganizationRepository organizationRepository,
             IOrganizationExistsHelperService organizationExistsHelperService,
             IUnitOfWorkProvider unitOfWorkProvider,
+            IChangesToActorHelper changesToActorHelper,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
@@ -50,6 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
+            _changesToActorHelper = changesToActorHelper;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
@@ -74,8 +78,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 throw new NotFoundValidationException(actorId);
             }
 
+            var integrationEvents = _changesToActorHelper.FindChangesMadeToActor(actor, request);
             UpdateActorStatus(actor, request);
-            UpdateActorMarketRoles(organization, actor, request);
+            UpdateActorMarketRolesAndChildren(organization, actor, request);
 
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
@@ -95,6 +100,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     .EnqueueActorUpdatedEventAsync(organization.Id, actor)
                     .ConfigureAwait(false);
 
+                await _actorIntegrationEventsQueueService
+                    .EnqueueActorUpdatedEventAsync(organization.Id, actor.Id, integrationEvents)
+                    .ConfigureAwait(false);
+
                 await uow.CommitAsync().ConfigureAwait(false);
             }
 
@@ -106,7 +115,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
         }
 
-        private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
+        private void UpdateActorMarketRolesAndChildren(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MarketRoles.Clear();
 
