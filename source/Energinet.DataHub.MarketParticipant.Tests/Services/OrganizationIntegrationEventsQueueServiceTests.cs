@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var changeEvent = helper.BuildOrganizationCreatedEvents(organizationArea);
 
             // Act
-            await target.EnqueueOrganizationIntegrationEventsAsync(changeEvent).ConfigureAwait(false);
+            await target.EnqueueOrganizationIntegrationEventsAsync(organizationArea.Id, changeEvent).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(

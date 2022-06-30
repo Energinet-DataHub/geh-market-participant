@@ -31,32 +31,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public async Task EnqueueOrganizationIntegrationEventsAsync(IEnumerable<IIntegrationEvent> changeEvents)
+        public async Task EnqueueOrganizationIntegrationEventsAsync(
+            OrganizationId organizationId,
+            IEnumerable<IIntegrationEvent> changeEvents)
         {
+            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
             ArgumentNullException.ThrowIfNull(changeEvents, nameof(changeEvents));
 
             foreach (var changeEvent in changeEvents)
             {
-                var domainObjectId = FindDomainObjectId(changeEvent);
-
-                var domainEvent = new DomainEvent(domainObjectId, nameof(Organization), changeEvent);
+                var domainEvent = new DomainEvent(organizationId.Value, nameof(Organization), changeEvent);
                 await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
             }
-        }
-
-        private static Guid FindDomainObjectId(IIntegrationEvent changeEvent)
-        {
-            var domainId = changeEvent switch
-            {
-                OrganizationCreatedIntegrationEvent orgCreatedEvent => orgCreatedEvent.OrganizationId.Value,
-                OrganizationAddressChangedIntegrationEvent addressChangedIntegrationEvent => addressChangedIntegrationEvent.OrganizationId.Value,
-                OrganizationCommentChangedIntegrationEvent commentChangedIntegrationEvent => commentChangedIntegrationEvent.OrganizationId.Value,
-                OrganizationNameChangedIntegrationEvent nameChangedIntegrationEvent => nameChangedIntegrationEvent.OrganizationId.Value,
-                OrganizationBusinessRegisterIdentifierChangedIntegrationEvent businessRegisterIdentifierChangedEvent => businessRegisterIdentifierChangedEvent.OrganizationId.Value,
-                _ => throw new ArgumentException("Unknown domain event type")
-            };
-
-            return domainId;
         }
     }
 }

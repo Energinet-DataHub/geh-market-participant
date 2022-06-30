@@ -183,6 +183,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Assert
             organizationIntegrationEventsQueueService.Verify(
                 x => x.EnqueueOrganizationIntegrationEventsAsync(
+                    orgId,
                     It.Is<IEnumerable<IIntegrationEvent>>(y => y.Any(e => ((OrganizationCreatedIntegrationEvent)e).OrganizationId == organization.Id))),
                 Times.Once);
         }
