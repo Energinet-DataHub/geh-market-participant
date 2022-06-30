@@ -37,9 +37,26 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             foreach (var changeEvent in changeEvents)
             {
-                var domainEvent = new DomainEvent(changeEvent.Id, nameof(Organization), changeEvent);
+                var domainObjectId = FindDomainObjectId(changeEvent);
+
+                var domainEvent = new DomainEvent(domainObjectId, nameof(Organization), changeEvent);
                 await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
             }
+        }
+
+        private static Guid FindDomainObjectId(IIntegrationEvent changeEvent)
+        {
+            var domainId = changeEvent switch
+            {
+                OrganizationCreatedIntegrationEvent orgCreatedEvent => orgCreatedEvent.OrganizationId.Value,
+                OrganizationAddressChangedIntegrationEvent addressChangedIntegrationEvent => addressChangedIntegrationEvent.OrganizationId.Value,
+                OrganizationCommentChangedIntegrationEvent commentChangedIntegrationEvent => commentChangedIntegrationEvent.OrganizationId.Value,
+                OrganizationNameChangedIntegrationEvent nameChangedIntegrationEvent => nameChangedIntegrationEvent.OrganizationId.Value,
+                OrganizationBusinessRegisterIdentifierChangedIntegrationEvent businessRegisterIdentifierChangedEvent => businessRegisterIdentifierChangedEvent.OrganizationId.Value,
+                _ => throw new ArgumentException("Unknown domain event type")
+            };
+
+            return domainId;
         }
     }
 }

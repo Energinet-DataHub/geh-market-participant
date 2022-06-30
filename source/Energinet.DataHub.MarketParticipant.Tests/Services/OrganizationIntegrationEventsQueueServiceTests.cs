@@ -15,8 +15,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
@@ -58,6 +60,46 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             domainEventRepository.Verify(
                 x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == organizationArea.Id.Value)),
                 Times.Once);
+        }
+
+        [Fact]
+        public Task EnqueueOrganizationNameChangedEventAsync_CreatesEvent()
+        {
+            // Arrange
+            var helper = new OrganizationIntegrationEventsHelperService();
+
+            var organisationDomainModel = new Organization(
+                new OrganizationId(Guid.NewGuid()),
+                "Old Name",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("12345678"),
+                new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                "Test Comment");
+
+            var organisationDto = new ChangeOrganizationDto(
+                "New Name",
+                "12345678",
+                new AddressDto(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                "Test Comment");
+
+            // Act
+            var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);
+
+            // Assert
+            var integrationEvents = changeEvents.ToList();
+            Assert.Single(integrationEvents);
+            Assert.Contains(integrationEvents, e => e is OrganizationNameChangedIntegrationEvent);
+            return Task.CompletedTask;
         }
     }
 }
