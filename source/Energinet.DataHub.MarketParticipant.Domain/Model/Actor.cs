@@ -28,9 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId = null;
             ActorNumber = actorNumber;
             _actorStatusTransitioner = new ActorStatusTransitioner();
-            GridAreas = new Collection<GridAreaId>();
-            MarketRoles = new Collection<MarketRole>();
-            MeteringPointTypes = new Collection<MeteringPointType>();
+            MarketRoles = new Collection<ActorMarketRole>();
         }
 
         public Actor(
@@ -38,17 +36,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId? externalActorId,
             ActorNumber actorNumber,
             ActorStatus actorStatus,
-            IEnumerable<GridAreaId> gridAreas,
-            IEnumerable<MarketRole> marketRoles,
-            IEnumerable<MeteringPointType> meteringPointTypes)
+            IEnumerable<ActorMarketRole> marketRoles)
         {
             Id = id;
             ExternalActorId = externalActorId;
             ActorNumber = actorNumber;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-            GridAreas = new List<GridAreaId>(gridAreas);
-            MarketRoles = new List<MarketRole>(marketRoles);
-            MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
+            MarketRoles = new List<ActorMarketRole>(marketRoles);
         }
 
         /// <summary>
@@ -76,16 +70,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         }
 
         /// <summary>
-        /// The grid area that the actor has access to.
-        /// </summary>
-        public ICollection<GridAreaId> GridAreas { get; }
-
-        /// <summary>
         /// The roles (functions and permissions) assigned to the current actor.
         /// </summary>
-        public ICollection<MarketRole> MarketRoles { get; }
-
-        public ICollection<MeteringPointType> MeteringPointTypes { get; }
+        public ICollection<ActorMarketRole> MarketRoles { get; }
 
         /// <summary>
         /// Activates the current actor, the status changes to Active.

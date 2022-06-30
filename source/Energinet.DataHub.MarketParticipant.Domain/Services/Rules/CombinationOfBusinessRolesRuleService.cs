@@ -56,14 +56,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
         private List<HashSet<EicFunction>> AllSets { get; }
 
-        public void ValidateCombinationOfBusinessRoles(IList<MarketRole> marketRoles)
+        public void ValidateCombinationOfBusinessRoles(IList<EicFunction> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(marketRoles);
             var marketRolesHashSet = new HashSet<EicFunction>();
 
             foreach (var marketRole in marketRoles)
             {
-                marketRolesHashSet.Add(marketRole.Function);
+                marketRolesHashSet.Add(marketRole);
             }
 
             if (AllSets.All(knownSet => !marketRolesHashSet.IsSubsetOf(knownSet)))

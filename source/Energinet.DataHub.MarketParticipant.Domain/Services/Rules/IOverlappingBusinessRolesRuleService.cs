@@ -35,6 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// </summary>
         /// <param name="actors">The list of actors in an organization.</param>
         /// <param name="newActorRoles">The market roles of a new actor.</param>
-        void ValidateRolesAcrossActors(IEnumerable<Actor> actors, IEnumerable<MarketRole> newActorRoles);
+        void ValidateRolesAcrossActors(IEnumerable<Actor> actors, IEnumerable<ActorMarketRole> newActorRoles);
     }
 }

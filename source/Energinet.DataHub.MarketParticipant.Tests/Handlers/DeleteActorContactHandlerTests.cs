@@ -72,9 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 organizationId,
@@ -118,9 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 organizationId,
@@ -162,9 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 organizationId,

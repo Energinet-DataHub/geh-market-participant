@@ -85,7 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -118,17 +118,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
                 .ReturnsAsync(organization);
 
+            var meteringPoints = new[]
+            {
+                MeteringPointType.D02Analysis.Name, MeteringPointType.E17Consumption.Name,
+                MeteringPointType.E17Consumption.Name
+            };
+            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), meteringPoints) };
+            var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };
+
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", marketRoles));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             allowedGridAreasRuleService.Verify(
-                x => x.ValidateGridAreas(It.IsAny<IEnumerable<GridAreaId>>(), It.IsAny<IEnumerable<MarketRole>>()),
+                x => x.ValidateGridAreas(It.IsAny<IEnumerable<ActorMarketRole>>()),
                 Times.Once);
         }
 
@@ -160,7 +168,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -199,7 +207,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -238,7 +246,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
