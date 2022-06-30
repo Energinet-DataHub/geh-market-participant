@@ -42,7 +42,7 @@ data "azurerm_key_vault_secret" "mssql_data_name" {
 }
 
 data "azurerm_key_vault_secret" "plan_shared_id" {
-  name         = "plan-shared-id"
+  name         = "plan-services-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }
 
@@ -62,6 +62,6 @@ data "azurerm_key_vault_secret" "snet_private_endpoints_id" {
 }
 
 data "azurerm_key_vault_secret" "snet_vnet_integrations_id" {
-  name         = "snet-vnet-integrations-id"
+  name         = "snet-vnet-integration-id"
   key_vault_id = data.azurerm_key_vault.kv_shared_resources.id
 }

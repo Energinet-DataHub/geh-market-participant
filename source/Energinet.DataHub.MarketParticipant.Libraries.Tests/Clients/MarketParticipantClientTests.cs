@@ -673,7 +673,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             httpTest.RespondWith(incomingJson);
 
             // Act
-            var actual = await target.GetContactsAsync(Guid.NewGuid()).ConfigureAwait(false);
+            var actual = await target.GetContactsAsync(Guid.NewGuid(), Guid.NewGuid()).ConfigureAwait(false);
 
             // Assert
             var actualContact = actual.Single();
@@ -691,17 +691,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             using var httpTest = new HttpTest();
             using var clientFactory = new PerBaseUrlFlurlClientFactory();
             var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
-            var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
-            httpTest.RespondWith("361fb10a-4204-46b6-bf9e-171ab2e61a59");
+            const string expectedContactId = "361fb10a-4204-46b6-bf9e-171ab2e61a59";
+            httpTest.RespondWith(expectedContactId);
 
             // Act
             var contactId = await target.CreateContactAsync(
-                    orgId,
-                    new CreateContactDto("unit test", ContactCategory.Charges, "email", "phone"))
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new CreateActorContactDto("unit test", ContactCategory.Charges, "email", "phone"))
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), contactId);
+            Assert.Equal(Guid.Parse(expectedContactId), contactId);
         }
 
         [Fact]

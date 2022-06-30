@@ -22,13 +22,13 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
     [UnitTest]
-    public sealed class OverlappingContactCategoriesRuleServiceTests
+    public sealed class OverlappingActorContactCategoriesRuleServiceTests
     {
         [Fact]
         public void ValidateCategoriesAcrossContacts_NullContactsArgument_ThrowsException()
         {
             // Arrange
-            var target = new OverlappingContactCategoriesRuleService();
+            var target = new OverlappingActorContactCategoriesRuleService();
 
             // Act + Assert
             Assert.Throws<ArgumentNullException>(() => target.ValidateCategoriesAcrossContacts(null!));
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public void ValidateCategoriesAcrossContacts_CategoriesAreNotUnique_ThrowsException()
         {
             // Arrange
-            var target = new OverlappingContactCategoriesRuleService();
+            var target = new OverlappingActorContactCategoriesRuleService();
 
             // Act + Assert
             Assert.Throws<ValidationException>(() => target.ValidateCategoriesAcrossContacts(
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public void ValidateRolesAcrossActors_ValidRoles_DoesNothing()
         {
             // Arrange
-            var target = new OverlappingContactCategoriesRuleService();
+            var target = new OverlappingActorContactCategoriesRuleService();
 
             // Act + Assert
             target.ValidateCategoriesAcrossContacts(
@@ -66,10 +66,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 });
         }
 
-        private static Contact CreateTestContact(ContactCategory category)
+        private static ActorContact CreateTestContact(ContactCategory category)
         {
-            return new Contact(
-                new OrganizationId(Guid.NewGuid()),
+            return new ActorContact(
+                Guid.NewGuid(),
                 "fake_value",
                 category,
                 new EmailAddress("fake@value"),

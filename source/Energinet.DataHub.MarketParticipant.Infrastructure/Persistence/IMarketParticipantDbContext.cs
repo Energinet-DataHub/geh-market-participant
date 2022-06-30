@@ -34,11 +34,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         DbSet<GridAreaEntity> GridAreas { get; }
 
         /// <summary>
-        ///     Represent access to the Contacts database table
-        /// </summary>
-        DbSet<ContactEntity> Contacts { get; }
-
-        /// <summary>
         ///     Represent access to the ActorContacts database table
         /// </summary>
         DbSet<ActorContactEntity> ActorContacts { get; }
