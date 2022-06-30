@@ -11,7 +11,7 @@ Integration events currently include addition, removal and modification of organ
 ![Flow diagram for all integration events](../images/Actor_register-Integration%20Events%20Flow%20diagram.drawio.png)
 Fig. 1 - Flow diagram for all integration events
 
-Data transmitted in the events are listed below. Notice that, in the ActorCreated event, the type MarketRole contains all information about correlated grid areas and a grid area contains all information about correlated metering points, as seen on figure 3.
+Data transmitted in the events are listed below. Notice that, in the `ActorCreated` event, the type MarketRole contains all information about correlated grid areas and a grid area contains all information about correlated metering point types, as seen on figure 3.
 
 ### Actor
 
