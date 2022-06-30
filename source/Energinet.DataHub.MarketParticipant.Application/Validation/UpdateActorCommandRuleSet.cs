@@ -38,10 +38,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .IsEnumName(typeof(ActorStatus), false);
 
                     changeActorValidator
-                        .RuleFor(x => x.GridAreas)
-                        .ChildRules(gridAreaValidator =>
-                            gridAreaValidator
-                                .RuleForEach(x => x)
+                        .RuleForEach(actor => actor.MarketRoles)
+                        .ChildRules(gridAreaValidator => gridAreaValidator
+                                .RuleFor(x => x.GridAreas)
                                 .NotEmpty());
 
                     changeActorValidator
@@ -60,13 +59,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 }));
 
                     changeActorValidator
-                        .RuleFor(actor => actor.MeteringPointTypes)
-                        .NotEmpty()
-                        .ChildRules(rolesValidator =>
+                        .RuleForEach(actor => actor.MarketRoles)
+                        .ChildRules(inlineValidator =>
                         {
-                            rolesValidator
-                                .RuleForEach(x => x)
-                                .Must(x => MeteringPointType.TryFromName(x, true, out _));
+                            inlineValidator
+                                .RuleForEach(m => m.GridAreas)
+                                .ChildRules(validationRules =>
+                                {
+                                    validationRules
+                                        .RuleFor(r => r.MeteringPointTypes)
+                                        .NotEmpty()
+                                        .ChildRules(v =>
+                                            v.RuleForEach(r => r)
+                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                });
                         });
                 });
         }

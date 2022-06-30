@@ -76,8 +76,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             UpdateActorStatus(actor, request);
             UpdateActorMarketRoles(organization, actor, request);
-            UpdateActorGridAreas(actor, request);
-            UpdateActorMeteringPointTypes(actor, request);
 
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
@@ -108,22 +106,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
         }
 
-        private static void UpdateActorMeteringPointTypes(Domain.Model.Actor actor, UpdateActorCommand request)
-        {
-            actor.MeteringPointTypes.Clear();
-
-            var meteringPointTypesToAdd = request
-                .ChangeActor
-                .MeteringPointTypes
-                .Select(mp => MeteringPointType.FromName(mp, true))
-                .Distinct();
-
-            foreach (var meteringPointType in meteringPointTypesToAdd)
-            {
-                actor.MeteringPointTypes.Add(meteringPointType);
-            }
-        }
-
         private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MarketRoles.Clear();
@@ -131,22 +113,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
-                actor.MarketRoles.Add(new MarketRole(function));
+                actor.MarketRoles
+                    .Add(new ActorMarketRole(
+                        function,
+                        marketRoleDto.GridAreas
+                            .Select(m => new ActorGridArea(
+                                m.Id,
+                                m.MeteringPointTypes
+                                    .Select(e => MeteringPointType.FromName(e, true))
+                                    .Distinct()))));
             }
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
-        }
-
-        private void UpdateActorGridAreas(Domain.Model.Actor actor, UpdateActorCommand request)
-        {
-            actor.GridAreas.Clear();
-
-            foreach (var gridAreaId in request.ChangeActor.GridAreas ?? Array.Empty<Guid>())
-            {
-                actor.GridAreas.Add(new GridAreaId(gridAreaId));
-            }
-
-            _allowedGridAreasRuleService.ValidateGridAreas(actor.GridAreas, actor.MarketRoles);
+            _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
         }
     }
 }

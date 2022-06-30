@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
-{
-    public sealed record MarketRoleDto(string EicFunction);
-}
+using System;
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+
+public record ActorGridAreaDto(Guid Id, IEnumerable<string> MeteringPointTypes);
