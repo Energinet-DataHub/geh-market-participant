@@ -14,11 +14,9 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public sealed class OrganizationUpdatedIntegrationEvent : IntegrationEventBase
+    public sealed class OrganizationNameChangedIntegrationEvent : IntegrationEventBase
     {
         public OrganizationId OrganizationId { get; set; } = null!;
         public string Name { get; set; } = null!;
-        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; } = null!;
-        public Address Address { get; set; } = null!;
     }
 }

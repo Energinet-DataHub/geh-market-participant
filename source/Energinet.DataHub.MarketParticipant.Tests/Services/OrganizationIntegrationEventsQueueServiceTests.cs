@@ -15,7 +15,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
@@ -33,6 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new OrganizationIntegrationEventsQueueService(domainEventRepository.Object);
+            var helper = new OrganizationIntegrationEventsHelperService();
 
             var organizationArea = new Organization(
                 new OrganizationId(Guid.NewGuid()),
@@ -47,13 +51,55 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value"),
                 "Test Comment");
 
+            var changeEvent = helper.BuildOrganizationCreatedEvents(organizationArea);
+
             // Act
-            await target.EnqueueOrganizationUpdatedEventAsync(organizationArea).ConfigureAwait(false);
+            await target.EnqueueOrganizationIntegrationEventsAsync(organizationArea.Id, changeEvent).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
                 x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == organizationArea.Id.Value)),
                 Times.Once);
+        }
+
+        [Fact]
+        public Task EnqueueOrganizationNameChangedEventAsync_CreatesEvent()
+        {
+            // Arrange
+            var helper = new OrganizationIntegrationEventsHelperService();
+
+            var organisationDomainModel = new Organization(
+                new OrganizationId(Guid.NewGuid()),
+                "Old Name",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("12345678"),
+                new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                "Test Comment");
+
+            var organisationDto = new ChangeOrganizationDto(
+                "New Name",
+                "12345678",
+                new AddressDto(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                "Test Comment");
+
+            // Act
+            var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);
+
+            // Assert
+            var integrationEvents = changeEvents.ToList();
+            Assert.Single(integrationEvents);
+            Assert.Contains(integrationEvents, e => e is OrganizationNameChangedIntegrationEvent);
+            return Task.CompletedTask;
         }
     }
 }

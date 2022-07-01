@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var eventParser = new ActorUpdatedIntegrationEventParser();
             var target = new ActorUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
 
-            var integrationEvent = new OrganizationUpdatedIntegrationEvent
+            var integrationEvent = new OrganizationCreatedIntegrationEvent
             {
                 Address = new Address(
                     "fake_value",

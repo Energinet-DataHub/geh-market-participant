@@ -13,8 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
@@ -53,13 +55,32 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var savedOrganization = await SaveOrganizationAsync(newOrganization).ConfigureAwait(false);
 
+            var organizationCreatedIntegrationEvent = BuildOrganizationCreatedIntegrationEvent(savedOrganization);
+
             await _organizationIntegrationEventsQueueService
-                .EnqueueOrganizationUpdatedEventAsync(savedOrganization)
+                .EnqueueOrganizationIntegrationEventsAsync(savedOrganization.Id, organizationCreatedIntegrationEvent)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
 
             return savedOrganization;
+        }
+
+        private static IEnumerable<IIntegrationEvent> BuildOrganizationCreatedIntegrationEvent(Organization? organization)
+        {
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+
+            return new List<IIntegrationEvent>()
+            {
+                new OrganizationCreatedIntegrationEvent
+                {
+                    Address = organization.Address,
+                    Name = organization.Name,
+                    OrganizationId = organization.Id,
+                    BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
+                    Comment = organization.Comment
+                }
+            };
         }
 
         private async Task<Organization> SaveOrganizationAsync(Organization organization)
