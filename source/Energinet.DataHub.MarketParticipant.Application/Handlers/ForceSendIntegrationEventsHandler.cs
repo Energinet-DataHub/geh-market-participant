@@ -96,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                     .ConfigureAwait(false);
 
                 await _gridAreaIntegrationEventsQueueService
-                    .EnqueueGridAreaUpdatedEventAsync(gridArea, gridAreaLink!)
+                    .EnqueueGridAreaCreatedEventAsync(gridArea, gridAreaLink!)
                     .ConfigureAwait(false);
             }
         }

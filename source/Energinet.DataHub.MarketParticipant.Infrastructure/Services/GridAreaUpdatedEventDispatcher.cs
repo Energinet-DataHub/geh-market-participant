@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaUpdatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaUpdatedIntegrationEvent(

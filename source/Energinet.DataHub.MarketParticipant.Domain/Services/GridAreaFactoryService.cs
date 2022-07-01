@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             var savedGridAreaLink = await SaveGridAreaLinkAsync(newGridAreaLink).ConfigureAwait(false);
 
             await _gridAreaIntegrationEventsQueueService
-                .EnqueueGridAreaUpdatedEventAsync(savedGridArea, savedGridAreaLink)
+                .EnqueueGridAreaCreatedEventAsync(savedGridArea, savedGridAreaLink)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);

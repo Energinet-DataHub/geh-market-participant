@@ -44,6 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<ForceSendIntegrationEventsCommand>, ForceSendIntegrationEventsCommandRuleSet>();
 

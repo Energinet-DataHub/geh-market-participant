@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public sealed class GridAreaUpdatedIntegrationEvent : IntegrationEventBase
+    public sealed class GridAreaCreatedIntegrationEvent : IntegrationEventBase
     {
         public GridAreaId GridAreaId { get; set; } = null!;
         public GridAreaName Name { get; set; } = null!;

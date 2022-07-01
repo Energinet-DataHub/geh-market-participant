@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var eventParser = new SharedIntegrationEventParser();
             var target = new GridAreaUpdatedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
 
-            var integrationEvent = new GridAreaUpdatedIntegrationEvent
+            var integrationEvent = new GridAreaCreatedIntegrationEvent
             {
                 GridAreaId = new GridAreaId(Guid.NewGuid()),
                 Name = new GridAreaName("fake_value"),
