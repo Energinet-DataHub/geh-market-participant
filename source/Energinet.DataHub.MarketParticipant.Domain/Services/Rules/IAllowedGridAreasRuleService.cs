@@ -25,10 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// <summary>
         /// Ensures that grid areas are allowed for the given market roles.
         /// </summary>
-        /// <param name="gridAreas">The grid areas to validate.</param>
         /// <param name="marketRoles">The market roles applied to the given grid areas.</param>
-        void ValidateGridAreas(
-            IEnumerable<GridAreaId> gridAreas,
-            IEnumerable<MarketRole> marketRoles);
+        void ValidateGridAreas(IEnumerable<ActorMarketRole> marketRoles);
     }
 }

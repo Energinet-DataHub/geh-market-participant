@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
             ActorNumber actorNumber,
-            IReadOnlyCollection<MarketRole> permissions)
+            IReadOnlyCollection<EicFunction> permissions)
         {
             ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
             ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));

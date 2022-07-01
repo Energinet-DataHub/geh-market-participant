@@ -27,6 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// </summary>
         /// <param name="marketRoles">The market roles to get business role codes for.</param>
         /// <returns>A list of business role codes derived from the market roles.</returns>
-        IEnumerable<BusinessRoleCode> GetBusinessRoleCodes(IEnumerable<MarketRole> marketRoles);
+        IEnumerable<BusinessRoleCode> GetBusinessRoleCodes(IEnumerable<EicFunction> marketRoles);
     }
 }

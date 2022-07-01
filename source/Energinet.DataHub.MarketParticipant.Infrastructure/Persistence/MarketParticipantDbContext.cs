@@ -50,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
             modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new MarketRoleGridAreaEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaActorInfoLinkEntityConfiguration());

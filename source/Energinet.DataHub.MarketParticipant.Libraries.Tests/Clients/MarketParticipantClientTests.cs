@@ -72,7 +72,15 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""Status"": ""Active"",
                     ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""Consumer""
+                            ""EicFunction"": ""Consumer"",
+                            ""GridAreas"": [
+                                {
+                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                    ""MeteringPointTypes"": [
+                                        ""D01VeProduction""
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }
@@ -137,7 +145,15 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""Active"",
                                 ""MarketRoles"": [
                                     {
-                                        ""EicFunction"": ""Consumer""
+                                        ""EicFunction"": ""Consumer"",
+                                        ""GridAreas"": [
+                                            {
+                                                ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                                ""MeteringPointTypes"": [
+                                                    ""D01VeProduction""
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -165,7 +181,15 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""New"",
                                 ""MarketRoles"": [
                                     {
-                                        ""EicFunction"": ""Producer""
+                                        ""EicFunction"": ""Producer"",
+                                        ""GridAreas"": [
+                                            {
+                                                ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                                ""MeteringPointTypes"": [
+                                                    ""D01VeProduction""
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -251,11 +275,19 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 				                ""Value"": ""9656626091925""
 			                },
 			                ""Status"": ""Active"",
-			                ""MarketRoles"": [
-				                {
-					                ""EicFunction"": ""Consumer""
-				                }
-			                ]
+                            ""MarketRoles"": [
+                                {
+                                    ""EicFunction"": ""Consumer"",
+                                    ""GridAreas"": [
+                                        {
+                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                            ""MeteringPointTypes"": [
+                                                ""D01VeProduction""
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
 		                }
                     ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
@@ -315,11 +347,19 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 				                ""Value"": ""9656626091925""
 			                },
 			                ""Status"": ""Active"",
-			                ""MarketRoles"": [
-				                {
-					                ""EicFunction"": ""Consumer""
-				                }
-			                ]
+                            ""MarketRoles"": [
+                                {
+                                    ""EicFunction"": ""Consumer"",
+                                    ""GridAreas"": [
+                                        {
+                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                            ""MeteringPointTypes"": [
+                                                ""D01VeProduction""
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
 		                }
                     ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
@@ -387,11 +427,19 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 				                ""Value"": ""9656626091925""
 			                },
 			                ""Status"": ""Active"",
-			                ""MarketRoles"": [
-				                {
-					                ""EicFunction"": ""Consumer""
-				                }
-			                ]
+                            ""MarketRoles"": [
+                                {
+                                    ""EicFunction"": ""Consumer"",
+                                    ""GridAreas"": [
+                                        {
+                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                            ""MeteringPointTypes"": [
+                                                ""D01VeProduction""
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
 		                }
                     ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
@@ -492,10 +540,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                           ""value"": ""5790000555550""
                         },
                         ""status"": ""New"",
-                        ""marketRoles"": [
-                          {
-                            ""EicFunction"": ""MarketOperator""
-                          }
+                        ""MarketRoles"": [
+                            {
+                                ""EicFunction"": ""MarketOperator"",
+                                ""GridAreas"": [
+                                    {
+                                        ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                        ""MeteringPointTypes"": [
+                                            ""D01VeProduction""
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
                       },
                     {
@@ -505,10 +561,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                           ""value"": ""5790000701414""
                         },
                         ""status"": ""Active"",
-                        ""marketRoles"": [
-                          {
-                            ""EicFunction"": ""EnergySupplier""
-                          }
+                        ""MarketRoles"": [
+                            {
+                                ""EicFunction"": ""EnergySupplier"",
+                                ""GridAreas"": [
+                                    {
+                                        ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                        ""MeteringPointTypes"": [
+                                            ""D01VeProduction""
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]";
@@ -560,9 +624,17 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""value"": ""123456""
                     },
                     ""status"": ""New"",
-                    ""marketRoles"": [
+                    ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""EnergySupplier""
+                            ""EicFunction"": ""EnergySupplier"",
+                            ""GridAreas"": [
+                                {
+                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                    ""MeteringPointTypes"": [
+                                        ""D01VeProduction""
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }";
@@ -579,9 +651,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     orgId,
                     new CreateActorDto(
                         new ActorNumberDto("123456"),
-                        Array.Empty<Guid>(),
-                        Array.Empty<MarketRoleDto>(),
-                        Array.Empty<MarketParticipantMeteringPointType>()))
+                        Array.Empty<ActorMarketRoleDto>()))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -612,9 +682,17 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""value"": ""1234567""
                     },
                     ""status"": ""Active"",
-                    ""marketRoles"": [
+                    ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""BillingAgent""
+                            ""EicFunction"": ""BillingAgent"",
+                            ""GridAreas"": [
+                                {
+                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                    ""MeteringPointTypes"": [
+                                        ""D01VeProduction""
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }";
@@ -632,9 +710,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     actorId,
                     new ChangeActorDto(
                         ActorStatus.Active,
-                        Array.Empty<Guid>(),
-                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) },
-                        Array.Empty<MarketParticipantMeteringPointType>()))
+                        new[] { new ActorMarketRoleDto(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridAreaDto>()) }))
                 .ConfigureAwait(false);
 
             var actual = await target

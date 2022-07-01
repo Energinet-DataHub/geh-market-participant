@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
-            var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
+            var marketRole = new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>());
 
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -89,9 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(Guid.NewGuid()),
                 new ActorNumber("fake_value"),
                 ActorStatus.Active,
-                Enumerable.Empty<GridAreaId>(),
-                new[] { marketRole },
-                Enumerable.Empty<MeteringPointType>());
+                new[] { marketRole });
 
             var organization = new Organization(
                 new OrganizationId(orgId),

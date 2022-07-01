@@ -88,14 +88,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>(),
-                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             var response = await target
@@ -137,7 +135,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test Comment");
 
             var actor = new Actor(new ActorNumber(actorGln));
-            var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
+            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), new[] { MeteringPointType.D02Analysis.Name }) };
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), gridAreas);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -147,14 +146,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>(),
-                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<Guid>(), new[] { marketRole }, Array.Empty<string>()));
+                new CreateActorDto(new ActorNumberDto(actorGln), new[] { marketRole }));
 
             // Act
             var response = await target
