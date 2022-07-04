@@ -29,6 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
         /// <summary>
         /// Event creation time
         /// </summary>
-        TimeSpan EventCreated { get; }
+        DateTime EventCreated { get; }
     }
 }

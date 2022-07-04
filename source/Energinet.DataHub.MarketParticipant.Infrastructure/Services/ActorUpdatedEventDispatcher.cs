@@ -45,6 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
+                actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,
                 actorUpdatedIntegrationEvent.OrganizationId.Value,
                 actorUpdatedIntegrationEvent.ExternalActorId?.Value,

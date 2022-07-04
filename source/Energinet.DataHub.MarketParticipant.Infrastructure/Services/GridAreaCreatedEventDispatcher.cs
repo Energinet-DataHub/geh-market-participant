@@ -24,11 +24,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class GridAreaCreatedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IGridAreaUpdatedIntegrationEventParser _eventParser;
+        private readonly IGridAreaIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public GridAreaCreatedEventDispatcher(
-            IGridAreaUpdatedIntegrationEventParser eventParser,
+            IGridAreaIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -39,11 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new GridAreaUpdatedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaCreatedIntegrationEvent(
                 gridAreaUpdatedIntegrationEvent.Id,
+                gridAreaUpdatedIntegrationEvent.EventCreated,
                 gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
                 gridAreaUpdatedIntegrationEvent.Name.Value,
                 gridAreaUpdatedIntegrationEvent.Code.Value,
