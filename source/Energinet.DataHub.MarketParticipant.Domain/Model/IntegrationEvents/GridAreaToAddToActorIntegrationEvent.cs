@@ -14,7 +14,11 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+
+public sealed class AddGridAreaIntegrationEvent : IntegrationEventBase
 {
-    public sealed record CreateContactResponse(Guid ContactId);
+    public Guid ActorId { get; set; }
+    public EicFunction Function { get; set; }
+    public ActorGridArea GridArea { get; set; } = null!;
 }

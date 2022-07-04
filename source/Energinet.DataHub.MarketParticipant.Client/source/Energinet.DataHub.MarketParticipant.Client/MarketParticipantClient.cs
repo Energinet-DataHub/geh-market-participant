@@ -24,7 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
     {
         private readonly IMarketParticipantOrganizationClient _marketParticipantOrganizationClient;
         private readonly IMarketParticipantActorClient _marketParticipantActorClient;
-        private readonly IMarketParticipantContactClient _marketParticipantContactClient;
         private readonly IMarketParticipantGridAreaClient _marketParticipantGridAreaClient;
         private readonly IMarketParticipantActorContactClient _marketParticipantActorContactClient;
 
@@ -32,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             _marketParticipantOrganizationClient = new MarketParticipantOrganizationClient(client);
             _marketParticipantActorClient = new MarketParticipantActorClient(client);
-            _marketParticipantContactClient = new MarketParticipantContactClient(client);
             _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
         }
@@ -75,21 +73,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto)
         {
             return _marketParticipantActorClient.UpdateActorAsync(organizationId, actorId, changeActorDto);
-        }
-
-        public Task<IEnumerable<ContactDto>> GetContactsAsync(Guid organizationId)
-        {
-            return _marketParticipantContactClient.GetContactsAsync(organizationId);
-        }
-
-        public Task<Guid> CreateContactAsync(Guid organizationId, CreateContactDto contactDto)
-        {
-            return _marketParticipantContactClient.CreateContactAsync(organizationId, contactDto);
-        }
-
-        public Task DeleteContactAsync(Guid organizationId, Guid contactId)
-        {
-            return _marketParticipantContactClient.DeleteContactAsync(organizationId, contactId);
         }
 
         public Task<IEnumerable<GridAreaDto>> GetGridAreasAsync()

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -59,16 +59,26 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 actorUpdatedEvent.BusinessRoles.Add(businessRole);
             }
 
-            // TODO
-            /*foreach (var gridAreaId in actor.GridAreas)
+            // Temporary flattening the grid areas to use in the existing event
+            var gridAreas = actor.MarketRoles
+                .SelectMany(x => x.GridAreas
+                    .Select(y => y.Id))
+                .Distinct();
+            foreach (var gridAreaId in gridAreas)
             {
-                actorUpdatedEvent.GridAreas.Add(gridAreaId);
+                actorUpdatedEvent.GridAreas.Add(new GridAreaId(gridAreaId));
             }
 
-            foreach (var meteringPointTypes in actor.MeteringPointTypes)
+            // Temporary flattening the metering point types to use in the existing event
+            var meteringPoints = actor.MarketRoles
+                .SelectMany(x => x.GridAreas
+                    .SelectMany(y => y.MeteringPointTypes
+                        .Select(z => z.Name)))
+                .Distinct();
+            foreach (var meteringPoint in meteringPoints)
             {
-                actorUpdatedEvent.MeteringPointTypes.Add(meteringPointTypes.Name);
-            }*/
+                actorUpdatedEvent.MeteringPointTypes.Add(meteringPoint);
+            }
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);

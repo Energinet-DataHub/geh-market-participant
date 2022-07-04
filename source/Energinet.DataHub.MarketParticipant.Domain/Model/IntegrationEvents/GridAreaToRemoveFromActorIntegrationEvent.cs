@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+
+public sealed class RemoveGridAreaIntegrationEvent : IntegrationEventBase
 {
-    public sealed record CreateContactDto(
-        string Name,
-        ContactCategory Category,
-        string Email,
-        string? Phone);
+    public Guid ActorId { get; set; }
+    public EicFunction Function { get; set; }
+    public ActorGridArea GridArea { get; set; } = null!;
 }
