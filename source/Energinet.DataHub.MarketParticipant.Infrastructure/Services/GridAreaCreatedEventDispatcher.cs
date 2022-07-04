@@ -22,12 +22,12 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class GridAreaUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class GridAreaCreatedEventDispatcher : IIntegrationEventDispatcher
     {
         private readonly IGridAreaUpdatedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public GridAreaUpdatedEventDispatcher(
+        public GridAreaCreatedEventDispatcher(
             IGridAreaUpdatedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
@@ -39,10 +39,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaUpdatedIntegrationEvent(
+            var outboundIntegrationEvent = new GridAreaUpdatedIntegrationEvent(
                 gridAreaUpdatedIntegrationEvent.Id,
                 gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
                 gridAreaUpdatedIntegrationEvent.Name.Value,

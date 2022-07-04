@@ -19,13 +19,13 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
     /// <summary>
     /// Parses the protobuf contract.
     /// </summary>
-    public interface IGridAreaUpdatedIntegrationEventParser
+    public interface IGridAreaIntegrationEventParser
     {
         /// <summary>
         /// Parses the event.
         /// </summary>
         /// <param name="integrationEvent">The event</param>
         /// <returns>The protobuf contract.</returns>
-        byte[] Parse(GridAreaUpdatedIntegrationEvent integrationEvent);
+        byte[] Parse(GridAreaCreatedIntegrationEvent integrationEvent);
     }
 }

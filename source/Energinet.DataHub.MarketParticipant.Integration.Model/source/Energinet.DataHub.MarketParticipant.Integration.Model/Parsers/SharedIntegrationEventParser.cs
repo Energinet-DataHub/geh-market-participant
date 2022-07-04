@@ -62,20 +62,20 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 
         private static bool TryParseGridAreaUpdatedIntegrationEvent(
             byte[] protoContract,
-            out GridAreaUpdatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            out GridAreaCreatedIntegrationEvent gridAreaCreatedIntegrationEvent)
         {
             try
             {
-                var gridAreaUpdatedEventParser = new GridAreaUpdatedIntegrationEventParser();
+                var gridAreaUpdatedEventParser = new GridAreaIntegrationEventParser();
                 var gridAreaUpdatedEvent = gridAreaUpdatedEventParser.Parse(protoContract);
-                gridAreaUpdatedIntegrationEvent = gridAreaUpdatedEvent;
+                gridAreaCreatedIntegrationEvent = gridAreaUpdatedEvent;
                 return true;
             }
 #pragma warning disable CA1031
             catch (Exception)
 #pragma warning restore CA1031
             {
-                gridAreaUpdatedIntegrationEvent = null!;
+                gridAreaCreatedIntegrationEvent = null!;
                 return false;
             }
         }

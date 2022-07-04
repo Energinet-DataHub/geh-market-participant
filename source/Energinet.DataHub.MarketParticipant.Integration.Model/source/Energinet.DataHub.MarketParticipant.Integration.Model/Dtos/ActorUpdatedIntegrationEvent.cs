@@ -23,6 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// An event representing an update to a given actor.
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
+        /// <param name="eventCreated">event creation time</param>
         /// <param name="actorId">The internal actor ID.</param>
         /// <param name="organizationId">Organization ID.</param>
         /// <param name="externalActorId">
@@ -36,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="meteringPointTypes"></param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
+            DateTime eventCreated,
             Guid actorId,
             Guid organizationId,
             Guid? externalActorId,
@@ -45,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             IEnumerable<EicFunction> marketRoles,
             IEnumerable<Guid> gridAreas,
             IEnumerable<string> meteringPointTypes)
-        : base(id)
+        : base(id, eventCreated)
         {
             ActorId = actorId;
             OrganizationId = organizationId;

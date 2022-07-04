@@ -35,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             var @event = new ActorUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
@@ -57,11 +58,12 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void ParseCorrectlyWith_GridAreaUpdatedIntegrationEventParser()
         {
             // Arrange
-            var input = new GridAreaUpdatedIntegrationEventParser();
+            var input = new GridAreaIntegrationEventParser();
             var findAndParse = new SharedIntegrationEventParser();
 
-            var @event = new GridAreaUpdatedIntegrationEvent(
+            var @event = new GridAreaCreatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 "TestArea",
                 "123",
@@ -73,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
-            Assert.IsType<GridAreaUpdatedIntegrationEvent>(actualEventObject);
+            Assert.IsType<GridAreaCreatedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]
@@ -85,6 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             var @event = new OrganizationUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 "TestOrg",
                 "12345678",

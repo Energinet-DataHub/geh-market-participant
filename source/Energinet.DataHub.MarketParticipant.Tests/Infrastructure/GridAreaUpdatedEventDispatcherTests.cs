@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
     public sealed class GridAreaUpdatedEventDispatcherTests
     {
         [Fact]
-        public async Task GridAreaUpdated_IntegrationEventDispatcher_CanReadEvent()
+        public async Task GridAreaCreated_IntegrationEventDispatcher_CanReadEvent()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var gridAreaEventParser = new GridAreaUpdatedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new GridAreaUpdatedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
+            var target = new GridAreaCreatedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
 
             var integrationEvent = new GridAreaCreatedIntegrationEvent
             {
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
             var eventParser = new GridAreaUpdatedIntegrationEventParser();
-            var target = new GridAreaUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var target = new GridAreaCreatedEventDispatcher(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {

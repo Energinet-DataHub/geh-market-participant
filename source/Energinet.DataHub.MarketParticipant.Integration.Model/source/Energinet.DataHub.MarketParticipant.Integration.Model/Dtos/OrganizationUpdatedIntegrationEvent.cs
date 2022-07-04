@@ -22,17 +22,19 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// An event representing an update to a given GridArea.
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
+        /// <param name="eventCreated"></param>
         /// <param name="organizationId">Organization ID.</param>
         /// <param name="name">Name of the Grid Area.</param>
         /// <param name="businessRegisterIdentifier">The Business registration code for this organization</param>
         /// <param name="address">The address of this organization</param>
         public OrganizationUpdatedIntegrationEvent(
             Guid id,
+            DateTime eventCreated,
             Guid organizationId,
             string name,
             string businessRegisterIdentifier,
             Address address)
-        : base(id)
+        : base(id, eventCreated)
         {
             OrganizationId = organizationId;
             Name = name;
