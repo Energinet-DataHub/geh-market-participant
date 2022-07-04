@@ -85,17 +85,17 @@ The Following endpoints are available, separated by concerns.
 
 ## Actor
 
-#### GET:/Organization/Actor
+### GET:/Organization/Actor
 
 ```organization/{organizationId:guid}/actor/```<br />
 *Returns all actors in the specified organization and with the specified id, if it exists.*
 
-#### GET:/Organization/Actor/ID
+### GET:/Organization/Actor/ID
 
 ```organization/{organizationId:guid}/actor/{actorId:guid}```<br />
 *Returns the actor in the specified organization and with the specified id, if it exists.*
 
-#### POST:/Organization/Actor/
+### POST:/Organization/Actor/
 
 ```organization/{organizationId:guid}/actor/```<br />
 *Creates an Actor in the specified organization*
@@ -234,22 +234,21 @@ Integration events are published to a servicebus topic, where everyone who are i
 
 The following integrations events are available:
 
- - **Actor Events**
-   - [ActorCreated](#integration-event-actor-created)
-   - [ActorStatusChanged](#integration-event-actor-status-changed)
-   - [ActorRoleAdded](#integration-event-actor-role-added)
-   - [ActorRoleRemoved](#integration-event-actor-role-removed)
-   - [ActorContactAdded](#integration-event-actor-contact-added)
-   - [ActorContactRemoved](#integration-event-actor-contact-removed)
-   - [ActorGridAreaAdded](#integration-event-actor-gridarea-added)
-   - [ActorGridAreaRemoved](#integration-event-actor-gridarea-removed)
- - **Organization Events**
-   - [OrganizationCreated](#integration-event-organization-created)
-   - [OrganizationNameChanged](#integration-event-organization-name-changed)
-   - [OrganizationAddressChanged](#integration-event-organization-address-changed)
-   - [OrganizationCommentChanged](#integration-event-organization-comment-changed)
-   - [OrganizationBusinessRegisterIdentifierChanged](#integration-event-actor-created)
- - **Grid Area Events**
-   - [GridAreaCreated](#integration-event-actor-created)
-   - [GridAreaNameChanged](#integration-event-actor-created)
-	
+- **Actor Events**
+    - [ActorCreated](#integration-event-actor-created)
+    - [ActorStatusChanged](#integration-event-actor-status-changed)
+    - [ActorRoleAdded](#integration-event-actor-role-added)
+    - [ActorRoleRemoved](#integration-event-actor-role-removed)
+    - [ActorContactAdded](#integration-event-actor-contact-added)
+    - [ActorContactRemoved](#integration-event-actor-contact-removed)
+    - [ActorGridAreaAdded](#integration-event-actor-gridarea-added)
+    - [ActorGridAreaRemoved](#integration-event-actor-gridarea-removed)
+- **Organization Events**
+    - [OrganizationCreated](#integration-event-organization-created)
+    - [OrganizationNameChanged](#integration-event-organization-name-changed)
+    - [OrganizationAddressChanged](#integration-event-organization-address-changed)
+    - [OrganizationCommentChanged](#integration-event-organization-comment-changed)
+    - [OrganizationBusinessRegisterIdentifierChanged](#integration-event-actor-created)
+- **Grid Area Events**
+    - [GridAreaCreated](#integration-event-actor-created)
+    - [GridAreaNameChanged](#integration-event-actor-created)
