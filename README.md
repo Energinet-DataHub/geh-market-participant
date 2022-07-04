@@ -6,11 +6,11 @@ Welcome to the Market Participant domain of the [Green Energy Hub project](https
 
 - [Intro](#intro)
 - [Communicating with Market Participant](#Communicating-with-Market-Participant)
-  - [API](#API)
-    - [Organization](#Organization)
-    - [Actor](#Actor)
-    - [Contact](#Contact)
-    - [Actor Contact](#Actor-Contact)
+    - [API](#API)
+        - [Organization](#Organization)
+        - [Actor](#Actor)
+        - [Contact](#Contact)
+        - [Actor Contact](#Actor-Contact)
 - [Integration Events](#Integration-events)
 
 ## Intro
@@ -19,7 +19,7 @@ Market Participant is where everything related to Organization, Actors, GridArea
 
 ## Communicating with Market Participant
 
-Interaction with the Market Participant domain is done in two different ways, depending on whether you are looking to get data updates or want use the API to interact with the domain. 
+Interaction with the Market Participant domain is done in two different ways, depending on whether you are looking to get data updates or want use the API to interact with the domain.
 
 A [Client Nuget Package](https://www.nuget.org/packages/Energinet.DataHub.MarketParticipant.Client/), which is the recommended way to interact with the domain is available, and exposes all the API's currently available
 
@@ -29,17 +29,17 @@ The Following endpoints are available, separated by concerns.
 
 ## Organization
 
-#### GET:/Organization
+### GET:/Organization
 
 ```organization/```<br />
 *Returns all organizations*
 
-#### GET:/Organization
+### GET:/Organization/ID
 
 ```organization/{organizationId:guid}```<br />
 *Returns an organization with the specified id, if it exists.*
 
-#### POST:/Organization
+### POST:/Organization
 
 ```organization/```<br />
 *Returns and organization with the specified id, if it exists.*
@@ -120,7 +120,8 @@ The Following endpoints are available, separated by concerns.
   ]
 }
 ```
-#### PUT:/Organization/Actor/
+
+### PUT:/Organization/Actor/
 
 ```organization/{organizationId:guid}/actor/{actorId:guid}```<br />
 *Updates an Actor in the specified organization with the specified id, if it exists*
@@ -146,12 +147,12 @@ The Following endpoints are available, separated by concerns.
 
 ## Contact
 
-#### GET:/Organization/Contact
+### GET:/Organization/Contact
 
 ```organization/{organizationId:guid}/contact/```<br />
 *returns all contacts in the specified organization, if the organization exists.*
 
-#### POST:/Organization/Contact
+### POST:/Organization/Contact
 
 ```organization/{organizationId:guid}/contact/```<br />
 *Creates a new contacts in the specified organization, if the organization exists.*
@@ -167,19 +168,19 @@ The Following endpoints are available, separated by concerns.
 }
 ```
 
-#### DELETE:/Organization/Contact
+### DELETE:/Organization/Contact
 
 ```organization/{organizationId:guid}/contact/{contactId:guid}```<br />
 *Deletes a contact from the specified organization, if it exists*
 
 ## Actor Contact
 
-#### GET:/Organization/Actor/Contact
+### GET:/Organization/Actor/Contact
 
 ```organization/{organizationId:guid}/actor/{actorId:guid}/contact```<br />
 *returns all contacts for the specified actor in the specified organization, if the organization and actor exists.*
 
-#### POST:/Organization/Actor/Contact
+### POST:/Organization/Actor/Contact
 
 ```organization/{organizationId:guid}/actor/{actorId:guid}/contact```<br />
 *Creates a contact for the specified actor in the specified organization, if the organization and actor exists.*
@@ -195,19 +196,19 @@ The Following endpoints are available, separated by concerns.
 }
 ```
 
-#### DELETE:/Organization/Actor/Contact
+### DELETE:/Organization/Actor/Contact
 
 ```organization/{organizationId:guid}/contact/{contactId:guid}```<br />
 *Deletes a contact from the specified organization, if it exists*
 
 ## Grid Area
 
-#### GET:/GridArea
+### GET:/GridArea
 
 ```gridarea/```<br />
 *returns all grid areas.*
 
-#### POST:/GridArea
+### POST:/GridArea
 
 ```gridarea/```<br />
 *Creates a grid areas.*
