@@ -37,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
+        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
@@ -45,7 +46,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorIdConfigurationService externalActorIdConfigurationService)
+            IExternalActorIdConfigurationService externalActorIdConfigurationService,
+            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
@@ -54,6 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorIdConfigurationService = externalActorIdConfigurationService;
+            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
         }
 
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
@@ -80,6 +83,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
                 .ConfigureAwait(false);
+
+            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
