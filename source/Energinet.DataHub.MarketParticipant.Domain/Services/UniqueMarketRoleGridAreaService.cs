@@ -22,11 +22,11 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed class UniqeMarketRoleGridAreaService : IUniqeMarketRoleGridAreaService
+    public sealed class UniqueMarketRoleGridAreaService : IUniqueMarketRoleGridAreaService
     {
         private readonly IUniqueActorMarketRoleGridAreaRepository _repository;
 
-        public UniqeMarketRoleGridAreaService(IUniqueActorMarketRoleGridAreaRepository repository)
+        public UniqueMarketRoleGridAreaService(IUniqueActorMarketRoleGridAreaRepository repository)
         {
             _repository = repository;
         }
@@ -52,9 +52,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             {
                 foreach (var gridArea in actorMarketRole.GridAreas)
                 {
-                    var uniqeMarketRoleGridArea = new UniqueActorMarketRoleGridArea(actor.Id, actorMarketRole.Function, gridArea.Id);
+                    var uniqueMarketRoleGridArea = new UniqueActorMarketRoleGridArea(actor.Id, actorMarketRole.Function, gridArea.Id);
 
-                    if (!await _repository.TryAddAsync(uniqeMarketRoleGridArea).ConfigureAwait(false))
+                    if (!await _repository.TryAddAsync(uniqueMarketRoleGridArea).ConfigureAwait(false))
                     {
                         throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.");
                     }

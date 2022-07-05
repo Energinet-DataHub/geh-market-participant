@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     /// <summary>
     /// Ensures given market roles only exists once per grid area across all organizations
     /// </summary>
-    public interface IUniqeMarketRoleGridAreaService
+    public interface IUniqueMarketRoleGridAreaService
     {
         /// <summary>
         /// Ensures given market roles only exists once per grid area across all organizations

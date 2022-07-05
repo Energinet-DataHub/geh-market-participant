@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorIdConfigurationService>().Object,
-                new Mock<IUniqeMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             // Act + Assert
             await Assert
@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorIdConfigurationService>().Object,
-                new Mock<IUniqeMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 allowedGridAreasRuleService.Object,
                 new Mock<IExternalActorIdConfigurationService>().Object,
-                new Mock<IUniqeMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -158,7 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 overlappingBusinessRolesRuleService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorIdConfigurationService>().Object,
-                new Mock<IUniqeMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -198,7 +198,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 externalActorIdGenerationService.Object,
-                new Mock<IUniqeMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -238,7 +238,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorIdConfigurationService>().Object,
-                new Mock<IUniqeMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
