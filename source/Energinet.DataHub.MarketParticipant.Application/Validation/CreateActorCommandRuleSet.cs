@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -50,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
-                        .NotEmpty()
+                        .NotNull()
                         .ChildRules(rolesValidator =>
                         {
                             rolesValidator
