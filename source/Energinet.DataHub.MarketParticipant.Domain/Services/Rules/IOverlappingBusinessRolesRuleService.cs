@@ -28,13 +28,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// </summary>
         /// <param name="actors">The list of actors in an organization.</param>
         void ValidateRolesAcrossActors(IEnumerable<Actor> actors);
-
-        /// <summary>
-        /// Ensures that the given actors have unique roles and can exist in the same organization.
-        /// Throws an exception, if the roles are invalid.
-        /// </summary>
-        /// <param name="actors">The list of actors in an organization.</param>
-        /// <param name="newActorRoles">The market roles of a new actor.</param>
-        void ValidateRolesAcrossActors(IEnumerable<Actor> actors, IEnumerable<ActorMarketRole> newActorRoles);
     }
 }
