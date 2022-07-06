@@ -63,10 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
                 .ConfigureAwait(false);
 
-            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(
-                organization.Actors,
-                marketRoles);
-
             _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
 
             var newActor = new Actor(actorNumber);
@@ -74,11 +70,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
 
+            organization.Actors.Add(newActor);
+
+            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(newActor)
                 .ConfigureAwait(false);
-
-            organization.Actors.Add(newActor);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

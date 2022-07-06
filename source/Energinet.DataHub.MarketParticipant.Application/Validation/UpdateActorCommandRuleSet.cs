@@ -47,7 +47,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
                         .NotEmpty()
-                        .When(x => Enum.TryParse(typeof(ActorStatus), x.Status, true, out var result) && result != null && (ActorStatus)result != ActorStatus.New)
+                        .When(x => Enum.TryParse(
+                            typeof(ActorStatus),
+                            x.Status,
+                            true,
+                            out var result) &&
+                                result is ActorStatus actorStatus &&
+                                (actorStatus != ActorStatus.New && actorStatus != ActorStatus.Deleted))
                         .ChildRules(rolesValidator =>
                             rolesValidator
                                 .RuleForEach(x => x)
