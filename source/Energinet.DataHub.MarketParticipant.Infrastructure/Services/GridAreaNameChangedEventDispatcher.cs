@@ -19,16 +19,17 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class GridAreaNameChangedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IGridAreaIntegrationEventParser _eventParser;
+        private readonly IGridAreaNameChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public GridAreaNameChangedEventDispatcher(
-            IGridAreaIntegrationEventParser eventParser,
+            IGridAreaNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -39,17 +40,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaNameChangedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaCreatedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent(
                 gridAreaUpdatedIntegrationEvent.Id,
                 gridAreaUpdatedIntegrationEvent.EventCreated,
                 gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
-                gridAreaUpdatedIntegrationEvent.Name.Value,
-                gridAreaUpdatedIntegrationEvent.Code.Value,
-                (PriceAreaCode)gridAreaUpdatedIntegrationEvent.PriceAreaCode,
-                gridAreaUpdatedIntegrationEvent.GridAreaLinkId.Value);
+                gridAreaUpdatedIntegrationEvent.Name.Value);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
