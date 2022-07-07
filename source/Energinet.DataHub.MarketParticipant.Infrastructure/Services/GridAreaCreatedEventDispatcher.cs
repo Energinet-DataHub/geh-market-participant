@@ -18,17 +18,17 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class GridAreaUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class GridAreaCreatedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IGridAreaUpdatedIntegrationEventParser _eventParser;
+        private readonly IGridAreaIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public GridAreaUpdatedEventDispatcher(
-            IGridAreaUpdatedIntegrationEventParser eventParser,
+        public GridAreaCreatedEventDispatcher(
+            IGridAreaIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -39,11 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaUpdatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaCreatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaUpdatedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaCreatedIntegrationEvent(
                 gridAreaUpdatedIntegrationEvent.Id,
+                gridAreaUpdatedIntegrationEvent.EventCreated,
                 gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
                 gridAreaUpdatedIntegrationEvent.Name.Value,
                 gridAreaUpdatedIntegrationEvent.Code.Value,

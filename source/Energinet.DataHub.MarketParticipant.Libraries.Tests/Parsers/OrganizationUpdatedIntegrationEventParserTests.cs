@@ -33,6 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var target = new OrganizationUpdatedIntegrationEventParser();
             var @event = new OrganizationUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 "TestOrg",
                 "12345678",

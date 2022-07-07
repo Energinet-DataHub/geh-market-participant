@@ -27,6 +27,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// </summary>
         /// <param name="gridArea">The GridArea to publish an integration event for.</param>
         /// <param name="gridAreaLink">The GridAreaLink to include in the integration event</param>
-        Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink);
+        Task EnqueueGridAreaCreatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink);
+
+        /// <summary>
+        /// Created Grid Name changed event
+        /// </summary>
+        /// <param name="gridArea"></param>
+        Task EnqueueGridAreaNameChangedEventAsync(GridArea gridArea);
     }
 }

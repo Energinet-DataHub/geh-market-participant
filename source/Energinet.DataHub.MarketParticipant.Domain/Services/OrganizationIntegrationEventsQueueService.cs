@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -30,20 +31,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public Task EnqueueOrganizationUpdatedEventAsync(Organization organization)
+        public async Task EnqueueOrganizationIntegrationEventsAsync(
+            OrganizationId organizationId,
+            IEnumerable<IIntegrationEvent> changeEvents)
         {
-            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
+            ArgumentNullException.ThrowIfNull(changeEvents, nameof(changeEvents));
 
-            var organizationUpdatedEvent = new OrganizationUpdatedIntegrationEvent
+            foreach (var changeEvent in changeEvents)
             {
-                Address = organization.Address,
-                Name = organization.Name,
-                OrganizationId = organization.Id,
-                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier
-            };
-
-            var domainEvent = new DomainEvent(organization.Id.Value, nameof(Organization), organizationUpdatedEvent);
-            return _domainEventRepository.InsertAsync(domainEvent);
+                var domainEvent = new DomainEvent(organizationId.Value, nameof(Organization), changeEvent);
+                await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+            }
         }
     }
 }

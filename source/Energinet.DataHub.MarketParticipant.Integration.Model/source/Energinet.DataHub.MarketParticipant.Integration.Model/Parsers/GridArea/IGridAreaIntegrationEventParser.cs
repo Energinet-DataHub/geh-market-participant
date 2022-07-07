@@ -12,23 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
-    public abstract class IntegrationEventBase : IIntegrationEvent
+    /// <summary>
+    /// Parses the protobuf contract.
+    /// </summary>
+    public interface IGridAreaIntegrationEventParser
     {
-        protected IntegrationEventBase()
-        {
-            Id = Guid.NewGuid();
-            EventCreated = DateTime.UtcNow;
-        }
-
-        [JsonInclude]
-        public Guid Id { get; protected set; }
-
-        [JsonInclude]
-        public DateTime EventCreated { get; protected set; }
+        /// <summary>
+        /// Parses the event.
+        /// </summary>
+        /// <param name="integrationEvent">The event</param>
+        /// <returns>The protobuf contract.</returns>
+        byte[] Parse(GridAreaCreatedIntegrationEvent integrationEvent);
     }
 }

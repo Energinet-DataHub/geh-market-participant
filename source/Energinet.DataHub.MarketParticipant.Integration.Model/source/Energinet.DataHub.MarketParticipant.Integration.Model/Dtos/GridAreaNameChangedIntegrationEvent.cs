@@ -16,37 +16,27 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record GridAreaUpdatedIntegrationEvent : BaseIntegrationEvent
+    public sealed record GridAreaNameChangedIntegrationEvent : BaseIntegrationEvent
     {
         /// <summary>
         /// An event representing an update to a given GridArea.
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
+        /// <param name="eventCreated">event creation time</param>
         /// <param name="gridAreaId">Grid Area ID.</param>
         /// <param name="name">Name of the Grid Area.</param>
-        /// <param name="code">The code for the Grid Area</param>
-        /// <param name="priceAreaCode">The price area code for this Grid Area</param>
-        /// <param name="gridAreaLinkId">The gridAreaLinkId for this GridArea</param>
-        public GridAreaUpdatedIntegrationEvent(
+        public GridAreaNameChangedIntegrationEvent(
             Guid id,
+            DateTime eventCreated,
             Guid gridAreaId,
-            string name,
-            string code,
-            PriceAreaCode priceAreaCode,
-            Guid gridAreaLinkId)
-        : base(id)
+            string name)
+        : base(id, eventCreated)
         {
             GridAreaId = gridAreaId;
             Name = name;
-            Code = code;
-            PriceAreaCode = priceAreaCode;
-            GridAreaLinkId = gridAreaLinkId;
         }
 
         public Guid GridAreaId { get; }
         public string Name { get; }
-        public string Code { get; }
-        public PriceAreaCode PriceAreaCode { get; }
-        public Guid GridAreaLinkId { get; }
     }
 }

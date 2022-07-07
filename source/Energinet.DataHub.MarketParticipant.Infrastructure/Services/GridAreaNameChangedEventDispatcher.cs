@@ -13,23 +13,23 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActorUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class GridAreaNameChangedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IActorUpdatedIntegrationEventParser _eventParser;
+        private readonly IGridAreaNameChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public ActorUpdatedEventDispatcher(
-            IActorUpdatedIntegrationEventParser eventParser,
+        public GridAreaNameChangedEventDispatcher(
+            IGridAreaNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -40,21 +40,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaNameChangedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
-                actorUpdatedIntegrationEvent.Id,
-                actorUpdatedIntegrationEvent.EventCreated,
-                actorUpdatedIntegrationEvent.ActorId,
-                actorUpdatedIntegrationEvent.OrganizationId.Value,
-                actorUpdatedIntegrationEvent.ExternalActorId?.Value,
-                actorUpdatedIntegrationEvent.ActorNumber.Value,
-                (ActorStatus)actorUpdatedIntegrationEvent.Status,
-                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
-                actorUpdatedIntegrationEvent.MarketRoles.Select(x => (EicFunction)x),
-                actorUpdatedIntegrationEvent.GridAreas.Select(x => x.Value),
-                actorUpdatedIntegrationEvent.MeteringPointTypes);
+            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent(
+                gridAreaUpdatedIntegrationEvent.Id,
+                gridAreaUpdatedIntegrationEvent.EventCreated,
+                gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
+                gridAreaUpdatedIntegrationEvent.Name.Value);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);

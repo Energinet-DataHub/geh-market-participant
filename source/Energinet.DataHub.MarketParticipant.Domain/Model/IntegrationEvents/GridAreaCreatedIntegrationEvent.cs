@@ -12,23 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public abstract class IntegrationEventBase : IIntegrationEvent
+    public sealed class GridAreaCreatedIntegrationEvent : IntegrationEventBase
     {
-        protected IntegrationEventBase()
-        {
-            Id = Guid.NewGuid();
-            EventCreated = DateTime.UtcNow;
-        }
-
-        [JsonInclude]
-        public Guid Id { get; protected set; }
-
-        [JsonInclude]
-        public DateTime EventCreated { get; protected set; }
+        public GridAreaId GridAreaId { get; set; } = null!;
+        public GridAreaName Name { get; set; } = null!;
+        public GridAreaCode Code { get; set; } = null!;
+        public PriceAreaCode PriceAreaCode { get; set; } = PriceAreaCode.Dk1;
+        public GridAreaLinkId GridAreaLinkId { get; set; } = null!;
     }
 }

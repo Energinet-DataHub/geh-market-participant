@@ -13,22 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public abstract class IntegrationEventBase : IIntegrationEvent
-    {
-        protected IntegrationEventBase()
-        {
-            Id = Guid.NewGuid();
-            EventCreated = DateTime.UtcNow;
-        }
-
-        [JsonInclude]
-        public Guid Id { get; protected set; }
-
-        [JsonInclude]
-        public DateTime EventCreated { get; protected set; }
-    }
+    public sealed record ChangeGridAreaDto(Guid Id, string Name);
 }

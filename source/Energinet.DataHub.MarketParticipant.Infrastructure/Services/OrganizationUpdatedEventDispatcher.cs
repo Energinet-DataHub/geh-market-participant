@@ -39,11 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not OrganizationCreatedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent(
+            var outboundIntegrationEvent = new OrganizationUpdatedIntegrationEvent(
                 organizationUpdatedIntegrationEvent.Id,
+                organizationUpdatedIntegrationEvent.EventCreated,
                 organizationUpdatedIntegrationEvent.OrganizationId.Value,
                 organizationUpdatedIntegrationEvent.Name,
                 organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,

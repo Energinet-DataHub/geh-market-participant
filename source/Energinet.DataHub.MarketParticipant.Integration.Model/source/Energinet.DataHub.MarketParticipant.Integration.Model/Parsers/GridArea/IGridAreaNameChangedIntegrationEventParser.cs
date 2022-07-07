@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
-    public sealed class OrganizationUpdatedIntegrationEvent : IntegrationEventBase
+    /// <summary>
+    /// Parses the protobuf contract.
+    /// </summary>
+    public interface IGridAreaNameChangedIntegrationEventParser
     {
-        public OrganizationId OrganizationId { get; set; } = null!;
-        public string Name { get; set; } = null!;
-        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; } = null!;
-        public Address Address { get; set; } = null!;
+        /// <summary>
+        /// Parses the event.
+        /// </summary>
+        /// <param name="integrationEvent">The event</param>
+        /// <returns>The protobuf contract.</returns>
+        byte[] Parse(GridAreaNameChangedIntegrationEvent integrationEvent);
     }
 }

@@ -16,6 +16,7 @@ using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Xunit;
 using Xunit.Categories;
 using ActorStatus = Energinet.DataHub.MarketParticipant.Integration.Model.Dtos.ActorStatus;
@@ -35,6 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             var @event = new ActorUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
@@ -57,11 +59,12 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void ParseCorrectlyWith_GridAreaUpdatedIntegrationEventParser()
         {
             // Arrange
-            var input = new GridAreaUpdatedIntegrationEventParser();
+            var input = new GridAreaIntegrationEventParser();
             var findAndParse = new SharedIntegrationEventParser();
 
-            var @event = new GridAreaUpdatedIntegrationEvent(
+            var @event = new GridAreaCreatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 "TestArea",
                 "123",
@@ -73,7 +76,28 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
-            Assert.IsType<GridAreaUpdatedIntegrationEvent>(actualEventObject);
+            Assert.IsType<GridAreaCreatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaNameChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaNameChangedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaNameChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "TestArea");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaNameChangedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]
@@ -85,6 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             var @event = new OrganizationUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 "TestOrg",
                 "12345678",

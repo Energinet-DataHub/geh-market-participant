@@ -14,12 +14,12 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public sealed class GridAreaUpdatedIntegrationEvent : IntegrationEventBase
+    public sealed class OrganizationCreatedIntegrationEvent : IntegrationEventBase
     {
-        public GridAreaId GridAreaId { get; set; } = null!;
-        public GridAreaName Name { get; set; } = null!;
-        public GridAreaCode Code { get; set; } = null!;
-        public PriceAreaCode PriceAreaCode { get; set; } = PriceAreaCode.Dk1;
-        public GridAreaLinkId GridAreaLinkId { get; set; } = null!;
+        public OrganizationId OrganizationId { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; } = null!;
+        public Address Address { get; set; } = null!;
+        public string? Comment { get; set; }
     }
 }

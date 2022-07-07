@@ -12,23 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public abstract class IntegrationEventBase : IIntegrationEvent
+    public sealed class UpdateGridAreaCommandRuleSet : AbstractValidator<UpdateGridAreaCommand>
     {
-        protected IntegrationEventBase()
+        public UpdateGridAreaCommandRuleSet()
         {
-            Id = Guid.NewGuid();
-            EventCreated = DateTime.UtcNow;
+            RuleFor(command => command.GridAreaDto.Name)
+                .NotEmpty();
         }
-
-        [JsonInclude]
-        public Guid Id { get; protected set; }
-
-        [JsonInclude]
-        public DateTime EventCreated { get; protected set; }
     }
 }
