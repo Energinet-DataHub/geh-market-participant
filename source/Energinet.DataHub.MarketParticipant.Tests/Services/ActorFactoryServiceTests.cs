@@ -279,7 +279,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             overlappingBusinessRolesService.Verify(
-                x => x.ValidateRolesAcrossActors(organization.Actors, marketRoles),
+                x => x.ValidateRolesAcrossActors(organization.Actors),
                 Times.Once);
         }
 

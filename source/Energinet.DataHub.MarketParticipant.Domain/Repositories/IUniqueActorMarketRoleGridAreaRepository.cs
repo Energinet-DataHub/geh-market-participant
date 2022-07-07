@@ -12,20 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    /// Service to validate that the chosen combination of roles is valid.
+    /// Provides access to UniqueActorMarketRoleGridAreas.
     /// </summary>
-    public interface ICombinationOfBusinessRolesRuleService
+    public interface IUniqueActorMarketRoleGridAreaRepository
     {
         /// <summary>
-        /// Validates that the chosen combination of roles is valid.
+        /// Tries to add the UniqueActorMarketRoleGridArea />
         /// </summary>
-        /// <param name="marketRoles"></param>
-        void ValidateCombinationOfBusinessRoles(IEnumerable<EicFunction> marketRoles);
+        /// <param name="domain"></param>
+        /// <returns>true if operation succeeded, otherwise false.</returns>
+        Task<bool> TryAddAsync(UniqueActorMarketRoleGridArea domain);
+
+        /// <summary>
+        /// Removes all UniqueActorMarketRoleGridAreas for the given actor ID
+        /// </summary>
+        /// <param name="actorId"></param>
+        Task RemoveAsync(Guid actorId);
     }
 }

@@ -94,18 +94,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 foreach (var marketRoleGridArea in marketRole.GridAreas)
                 {
-                    var gridAreaEntity = new MarketRoleGridAreaEntity()
+                    var gridAreaEntity = new MarketRoleGridAreaEntity
                     {
                         GridAreaId = marketRoleGridArea.Id,
-                        MarketRoleId = marketRole.Id
                     };
 
                     foreach (var meteringPointType in marketRoleGridArea.MeteringPointTypes)
                     {
-                        gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity()
+                        gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity
                         {
-                            //GridAreaId = marketRoleGridArea.Id,
-                            MarketRoleGridAreaId = gridAreaEntity.Id,
                             MeteringTypeId = meteringPointType.Value
                         });
                     }

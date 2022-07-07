@@ -35,17 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OverlappingBusinessRolesRuleService(new Mock<IBusinessRoleCodeDomainService>().Object);
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(null!, Array.Empty<ActorMarketRole>()));
-        }
-
-        [Fact]
-        public void ValidateRolesAcrossActors_NullRolesArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new OverlappingBusinessRolesRuleService(new Mock<IBusinessRoleCodeDomainService>().Object);
-
-            // Act
-            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(Array.Empty<Actor>(), null!));
+            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(null!));
         }
 
         [Fact]
@@ -58,13 +48,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             businessRoleCodeDomainService.Setup(x => x.GetBusinessRoleCodes(It.IsAny<IEnumerable<EicFunction>>()))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
+            var actor = new Actor(new ActorNumber("fake_value"));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
+
             // Act + Assert
             Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
-                Enumerable.Empty<Actor>(),
                 new[]
                 {
-                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()),
-                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>())
+                    actor
                 }));
         }
 
@@ -83,15 +75,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var actor = new Actor(new ActorNumber("fake_value"));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
+            var newActorWithSameGln = new Actor(new ActorNumber("fake_value"));
+            newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
+
             // Act + Assert
             Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
                 new[]
                 {
-                    actor
-                },
-                new[]
-                {
-                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>())
+                    actor,
+                    newActorWithSameGln
                 }));
         }
 
@@ -110,15 +102,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var actor = new Actor(new ActorNumber("fake_value"));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
+            var newActorWithSameGln = new Actor(new ActorNumber("fake_value"));
+            newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
+
             // Act + Assert
             Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
                 new[]
                 {
-                    actor
-                },
-                new[]
-                {
-                    new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>())
+                    actor,
+                    newActorWithSameGln
                 }));
         }
 
@@ -142,15 +134,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var actor = new Actor(new ActorNumber("fake_value"));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
+            var newActorWithSameGln = new Actor(new ActorNumber("fake_value"));
+            newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()));
+
             // Act + Assert
             target.ValidateRolesAcrossActors(
                 new[]
                 {
-                    actor
-                },
-                new[]
-                {
-                    new ActorMarketRole(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>())
+                    actor,
+                    newActorWithSameGln
                 });
         }
     }
