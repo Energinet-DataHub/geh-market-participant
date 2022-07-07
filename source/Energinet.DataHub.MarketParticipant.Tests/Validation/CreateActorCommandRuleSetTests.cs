@@ -133,27 +133,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Fact]
-        public async Task Validate_NoMarketRoles_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}";
-
-            var organizationRoleDto = new CreateActorDto(
-                new ActorNumberDto(ValidGln),
-                Array.Empty<ActorMarketRoleDto>());
-
-            var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-
-        [Fact]
         public async Task Validate_NullMarketRole_ValidatesProperty()
         {
             // Arrange
