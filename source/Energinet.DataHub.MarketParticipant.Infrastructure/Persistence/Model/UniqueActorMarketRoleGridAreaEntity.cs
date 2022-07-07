@@ -12,20 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    /// <summary>
-    /// Service to validate that the chosen combination of roles is valid.
-    /// </summary>
-    public interface ICombinationOfBusinessRolesRuleService
+    public sealed class UniqueActorMarketRoleGridAreaEntity
     {
-        /// <summary>
-        /// Validates that the chosen combination of roles is valid.
-        /// </summary>
-        /// <param name="marketRoles"></param>
-        void ValidateCombinationOfBusinessRoles(IEnumerable<EicFunction> marketRoles);
+        public Guid Id { get; set; }
+        public Guid ActorId { get; set; }
+        public int MarketRoleFunction { get; set; }
+        public Guid GridAreaId { get; set; }
     }
 }

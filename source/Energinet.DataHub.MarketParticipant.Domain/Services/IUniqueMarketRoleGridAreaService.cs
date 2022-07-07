@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Service to validate that the chosen combination of roles is valid.
+    /// Ensures given market roles only exists once per grid area across all organizations
     /// </summary>
-    public interface ICombinationOfBusinessRolesRuleService
+    public interface IUniqueMarketRoleGridAreaService
     {
         /// <summary>
-        /// Validates that the chosen combination of roles is valid.
+        /// Ensures given market roles only exists once per grid area across all organizations
         /// </summary>
-        /// <param name="marketRoles"></param>
-        void ValidateCombinationOfBusinessRoles(IEnumerable<EicFunction> marketRoles);
+        /// <param name="actor">Actor for which to ensure unique market roles</param>
+        Task EnsureUniqueMarketRolesPerGridAreaAsync(Actor actor);
     }
 }

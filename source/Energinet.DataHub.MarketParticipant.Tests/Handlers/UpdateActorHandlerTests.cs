@@ -53,7 +53,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             // Act + Assert
             await Assert
@@ -73,7 +75,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -107,7 +111,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 allowedGridAreasRuleService.Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -154,7 +160,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingBusinessRolesRuleService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -193,7 +201,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                externalActorIdGenerationService.Object);
+                externalActorIdGenerationService.Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -232,7 +242,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorIntegrationEventsQueueService.Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);

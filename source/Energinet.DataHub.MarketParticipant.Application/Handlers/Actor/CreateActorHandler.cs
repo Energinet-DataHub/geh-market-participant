@@ -53,7 +53,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actorGln = new ActorNumber(request.Actor.ActorNumber.Value);
             var marketRoles = CreateMarketRoles(request.Actor).ToList();
 
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles.Select(m => m.Function).ToList());
+            var allMarketRolesForActorGln = organization.Actors
+                .Where(x => x.ActorNumber == actorGln)
+                .SelectMany(x => x.MarketRoles)
+                .Select(x => x.Function)
+                .Concat(marketRoles.Select(x => x.Function));
+
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorGln, marketRoles)
