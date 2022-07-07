@@ -26,21 +26,18 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 {
     [UnitTest]
-    public class GridAreaUpdatedIntegrationEventParserTests
+    public class GridAreaNameChangedIntegrationEventParserTests
     {
         [Fact]
         public void Parse_InputValid_ParsesCorrectly()
         {
             // arrange
-            var target = new GridAreaIntegrationEventParser();
-            var @event = new GridAreaCreatedIntegrationEvent(
+            var target = new GridAreaNameChangedIntegrationEventParser();
+            var @event = new GridAreaNameChangedIntegrationEvent(
                 Guid.NewGuid(),
                 DateTime.UtcNow,
                 Guid.NewGuid(),
-                "TestArea",
-                "123",
-                PriceAreaCode.DK1,
-                Guid.NewGuid());
+                "TestArea");
 
             // act
             var actualBytes = target.Parse(@event);
@@ -48,26 +45,21 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
-            Assert.Equal(@event.Code, actualEvent.Code);
             Assert.Equal(@event.Name, actualEvent.Name);
             Assert.Equal(@event.GridAreaId, actualEvent.GridAreaId);
-            Assert.Equal(@event.PriceAreaCode, actualEvent.PriceAreaCode);
-            Assert.Equal(@event.GridAreaLinkId, actualEvent.GridAreaLinkId);
         }
 
         [Fact]
         public void Parse_InvalidGuid_ThrowsException()
         {
             // Arrange
-            var target = new GridAreaIntegrationEventParser();
-            var contract = new GridAreaCreatedIntegrationEventContract
+            var target = new GridAreaNameChangedIntegrationEventParser();
+            var contract = new GridAreaNameChangedIntegrationEventContract
             {
                 Id = "Not_A_Guid",
                 Name = "fake_value",
-                Code = "123",
                 GridAreaId = Guid.NewGuid().ToString(),
-                PriceAreaCode = (int)PriceAreaCode.DK1,
-                GridAreaLinkId = Guid.NewGuid().ToString()
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
             // Act + Assert
@@ -78,55 +70,13 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void Parse_InvaliGridAreaGuid_ThrowsException()
         {
             // Arrange
-            var target = new GridAreaIntegrationEventParser();
-            var contract = new GridAreaCreatedIntegrationEventContract
+            var target = new GridAreaNameChangedIntegrationEventParser();
+            var contract = new GridAreaNameChangedIntegrationEventContract
             {
                 Id = Guid.NewGuid().ToString(),
                 EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
                 Name = "fake_value",
-                Code = "123",
-                GridAreaId = "Not_A_Guid",
-                PriceAreaCode = (int)PriceAreaCode.DK1,
-                GridAreaLinkId = Guid.NewGuid().ToString()
-            };
-
-            // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
-        }
-
-        [Fact]
-        public void Parse_InvaliGridAreaLinkGuid_ThrowsException()
-        {
-            // Arrange
-            var target = new GridAreaIntegrationEventParser();
-            var contract = new GridAreaCreatedIntegrationEventContract
-            {
-                Id = Guid.NewGuid().ToString(),
-                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
-                Name = "fake_value",
-                Code = "123",
-                GridAreaId = Guid.NewGuid().ToString(),
-                PriceAreaCode = (int)PriceAreaCode.DK1,
-                GridAreaLinkId = "Not_A_Giud"
-            };
-
-            // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
-        }
-
-        [Fact]
-        public void Parse_InvalidEnum_ThrowsException()
-        {
-            // Arrange
-            var target = new GridAreaIntegrationEventParser();
-            var contract = new GridAreaCreatedIntegrationEventContract
-            {
-                Id = Guid.NewGuid().ToString(),
-                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
-                Name = "fake_value",
-                Code = "123",
-                GridAreaId = Guid.NewGuid().ToString(),
-                PriceAreaCode = 34
+                GridAreaId = "Not_A_Guid"
             };
 
             // Act + Assert
@@ -137,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void Parse_InvalidInput_ThrowsException()
         {
             // Arrange
-            var target = new GridAreaIntegrationEventParser();
+            var target = new GridAreaNameChangedIntegrationEventParser();
 
             // Act + Assert
             Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));

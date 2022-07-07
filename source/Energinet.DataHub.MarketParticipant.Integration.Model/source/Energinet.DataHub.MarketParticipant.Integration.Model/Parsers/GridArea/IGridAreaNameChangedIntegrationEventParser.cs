@@ -14,20 +14,13 @@
 
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
     /// <summary>
     /// Parses the protobuf contract.
     /// </summary>
-    public interface IGridAreaIntegrationEventParser
+    public interface IGridAreaNameChangedIntegrationEventParser
     {
-        /// <summary>
-        /// Parses the event.
-        /// </summary>
-        /// <param name="integrationEvent">The event</param>
-        /// <returns>The protobuf contract.</returns>
-        byte[] Parse(GridAreaCreatedIntegrationEvent integrationEvent);
-
         /// <summary>
         /// Parses the event.
         /// </summary>

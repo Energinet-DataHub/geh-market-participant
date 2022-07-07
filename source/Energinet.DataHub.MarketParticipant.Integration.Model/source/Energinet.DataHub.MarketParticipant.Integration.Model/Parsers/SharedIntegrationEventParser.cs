@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
@@ -35,6 +36,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             if (TryParseGridAreaCreatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
             {
                 return gridAreaUpdatedEvent;
+            }
+
+            if (TryParseGridAreaNameChangedIntegrationEvent(protoContract, out var gridAreaNameChangedEvent))
+            {
+                return gridAreaNameChangedEvent;
             }
 
             throw new MarketParticipantException("IntegrationEventParser not found");
@@ -76,6 +82,26 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 gridAreaCreatedIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseGridAreaNameChangedIntegrationEvent(
+            byte[] protoContract,
+            out GridAreaNameChangedIntegrationEvent gridAreaNameChangedIntegrationEvent)
+        {
+            try
+            {
+                var gridAreaNameChangedEventParser = new GridAreaNameChangedIntegrationEventParser();
+                var gridAreaNameChangedEvent = gridAreaNameChangedEventParser.Parse(protoContract);
+                gridAreaNameChangedIntegrationEvent = gridAreaNameChangedEvent;
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                gridAreaNameChangedIntegrationEvent = null!;
                 return false;
             }
         }

@@ -20,7 +20,7 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Enum = System.Enum;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
     public sealed class GridAreaIntegrationEventParser : IGridAreaIntegrationEventParser
     {
@@ -49,28 +49,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             }
         }
 
-        public byte[] Parse(GridAreaNameChangedIntegrationEvent integrationEvent)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new GridAreaCreatedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    Name = integrationEvent.Name
-                };
-
-                return contract.ToByteArray();
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
-            {
-                throw new MarketParticipantException($"Error parsing {nameof(GridAreaCreatedIntegrationEvent)}", ex);
-            }
-        }
-
         internal GridAreaCreatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
@@ -85,25 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     contract.Code,
                     Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
                     Guid.Parse(contract.GridAreaLinkId));
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaCreatedIntegrationEvent)}", ex);
-            }
-        }
-
-        internal GridAreaNameChangedIntegrationEvent ParseGridAreaNameChanged(byte[] protoContract)
-        {
-            try
-            {
-                // TODO
-                var contract = GridAreaNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return new GridAreaNameChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.Name);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
