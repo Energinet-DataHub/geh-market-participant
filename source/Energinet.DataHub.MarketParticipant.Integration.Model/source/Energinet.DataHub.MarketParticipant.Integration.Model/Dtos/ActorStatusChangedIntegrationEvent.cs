@@ -14,11 +14,24 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-
-public sealed class RemoveMarketRoleIntegrationEvent : IntegrationEventBase
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public Guid ActorId { get; set; }
-    public BusinessRoleCode BusinessRole { get; init; }
-    public EicFunction MarketRole { get; init; }
+    public sealed class ActorStatusChangedIntegrationEvent
+    {
+        public ActorStatusChangedIntegrationEvent(
+            Guid eventId,
+            Guid actorId,
+            ActorStatus status)
+        {
+            EventId = eventId;
+            ActorId = actorId;
+            Status = status;
+            EventCreated = DateTime.Now;
+        }
+
+        public Guid EventId { get; }
+        public Guid ActorId { get; }
+        public ActorStatus Status { get; }
+        public DateTime EventCreated { get; }
+    }
 }

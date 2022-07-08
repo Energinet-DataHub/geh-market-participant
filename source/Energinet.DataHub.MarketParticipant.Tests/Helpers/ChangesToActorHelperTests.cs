@@ -21,6 +21,8 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -31,12 +33,13 @@ public class ChangesToActorHelperTests
 {
     private readonly Actor _actor = CreateValidActorWithChildren();
     private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
+    private readonly Mock<IBusinessRoleCodeDomainService> _businessRoleCodeDomainServiceMock = new();
 
     [Fact]
     public void FindChangesMadeToActor_ExistingActorNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper();
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
         Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _incomingActor));
@@ -46,7 +49,7 @@ public class ChangesToActorHelperTests
     public void FindChangesMadeToActor_IncomingNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper();
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
         Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_actor, null!));
@@ -56,7 +59,7 @@ public class ChangesToActorHelperTests
     public void FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
     {
         // Arrange
-        var target = new ChangesToActorHelper();
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act
         var result = target.FindChangesMadeToActor(_actor, _incomingActor).ToList();

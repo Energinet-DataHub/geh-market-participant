@@ -18,12 +18,19 @@ using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Helpers;
 
 public sealed class ChangesToActorHelper : IChangesToActorHelper
 {
     private readonly List<IIntegrationEvent> _changeEvents = new();
+    private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
+
+    public ChangesToActorHelper(IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+    {
+        _businessRoleCodeDomainService = businessRoleCodeDomainService;
+    }
 
     public IEnumerable<IIntegrationEvent> FindChangesMadeToActor(Actor existingActor, UpdateActorCommand incomingActor)
     {
@@ -94,7 +101,8 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             _changeEvents.Add(new RemoveMarketRoleIntegrationEvent
             {
                 ActorId = existingActor.Id,
-                MarketRole = marketRole
+                BusinessRole = _businessRoleCodeDomainService.GetBusinessRoleCodes(new List<EicFunction> { marketRole.Function }).FirstOrDefault(),
+                MarketRole = marketRole.Function
             });
 
             AddChangeEventsForRemovedGridAreas(existingActor.Id, eicFunction, gridAreas);
@@ -108,7 +116,8 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             _changeEvents.Add(new AddMarketRoleIntegrationEvent
             {
                 ActorId = existingActor.Id,
-                MarketRole = marketRole
+                BusinessRole = _businessRoleCodeDomainService.GetBusinessRoleCodes(new List<EicFunction> { marketRole.Function }).FirstOrDefault(),
+                MarketRole = marketRole.Function
             });
 
             AddChangeEventsForAddedGridAreas(existingActor.Id, eicFunction, gridAreas.Select(gridArea => new ActorGridArea(gridArea.Id, gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))));
@@ -184,7 +193,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 {
                     ActorId = existingActorId,
                     Function = function,
-                    GridArea = gridArea
+                    GridAreaId = gridArea.Id
                 });
 
             AddChangeEventsForAddedMeteringPointTypes(
@@ -221,7 +230,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             {
                 ActorId = existingActorId,
                 Function = function,
-                GridArea = gridArea
+                GridAreaId = gridArea.Id
             });
 
             AddChangeEventsForRemovedMeteringPointTypes(existingActorId, function, gridArea.Id, gridArea.MeteringPointTypes);

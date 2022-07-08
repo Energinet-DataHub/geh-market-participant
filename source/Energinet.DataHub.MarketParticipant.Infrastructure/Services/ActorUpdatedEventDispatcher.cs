@@ -67,5 +67,31 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             return true;
         }
+
+        // public async Task<bool> TryDispatchStatusEventAsync(IIntegrationEvent integrationEvent)
+        // {
+        //     ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+        //
+        //     if (integrationEvent is not ActorStatusChangedIntegrationEvent actorStatusChangedIntegrationEvent)
+        //         return false;
+        //
+        //     var outboundIntegrationEvent = new Integration.Model.Dtos.ActorStatusChangedIntegrationEvent(
+        //         actorStatusChangedIntegrationEvent.Id,
+        //         actorStatusChangedIntegrationEvent.ActorId,
+        //         actorStatusChangedIntegrationEvent.Status);
+        //
+        //     var bytes = _actorStatusEventParser.Parse(outboundIntegrationEvent);
+        //
+        //     var message = new ServiceBusMessage(bytes);
+        //
+        //     var sender = _serviceBusClient.CreateSender();
+        //
+        //     await using (sender.ConfigureAwait(false))
+        //     {
+        //         await sender.SendMessageAsync(message).ConfigureAwait(false);
+        //     }
+        //
+        //     return true;
+        // }
     }
 }

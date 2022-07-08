@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
-public class RemoveMeteringPointTypeIntegrationEvent : IntegrationEventBase
+public sealed class RemoveMeteringPointTypeIntegrationEvent : IntegrationEventBase
 {
     public Guid ActorId { get; set; }
     public EicFunction Function { get; set; }

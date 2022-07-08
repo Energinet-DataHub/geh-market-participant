@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
 public sealed class AddMarketRoleIntegrationEvent : IntegrationEventBase
 {
-    public Guid ActorId { get; set; }
-    public ActorMarketRole MarketRole { get; init; } = null!;
+    public Guid ActorId { get; init; }
+    public BusinessRoleCode BusinessRole { get; init; }
+    public EicFunction MarketRole { get; init; }
 }
