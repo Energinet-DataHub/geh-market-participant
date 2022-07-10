@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public Actor(ActorNumber actorNumber)
         {
-            Id = Guid.Empty;
+            Id = Guid.NewGuid();
             ExternalActorId = null;
             ActorNumber = actorNumber;
             _actorStatusTransitioner = new ActorStatusTransitioner();
