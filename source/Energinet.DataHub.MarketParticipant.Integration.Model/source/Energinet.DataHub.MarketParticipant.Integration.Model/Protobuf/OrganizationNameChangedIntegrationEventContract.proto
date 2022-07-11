@@ -18,20 +18,9 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 import "google/protobuf/timestamp.proto";
 
-message OrganizationCreatedIntegrationEventContract {
+message OrganizationNameChangedIntegrationEventContract {
     string Id = 1;
     string OrganizationId = 2;
-    string Name = 4;
-    string BusinessRegisterIdentifier = 5;
-    OrganizationAddress Address = 6;
-    google.protobuf.Timestamp EventCreated = 7;
-    optional string Comment = 8;
-}
-
-message OrganizationAddress {
-  string StreetName = 1;
-  string Number = 2;
-  string ZipCode = 3;
-  string City = 4;
-  string Country = 5;
+    string Name = 3;
+    google.protobuf.Timestamp EventCreated = 4;
 }

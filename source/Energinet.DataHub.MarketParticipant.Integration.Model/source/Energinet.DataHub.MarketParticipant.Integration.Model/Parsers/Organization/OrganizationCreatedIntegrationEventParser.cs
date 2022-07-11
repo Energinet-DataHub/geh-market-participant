@@ -19,9 +19,9 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 {
-    public sealed class OrganizationCreatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
+    public sealed class OrganizationCreatedIntegrationEventParser : IOrganizationCreatedIntegrationEventParser
     {
         public byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent)
         {
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Name = integrationEvent.Name,
                     BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
-                    Address = new OrganizationAddress()
+                    Address = new OrganizationAddress
                     {
                         City = integrationEvent.Address.City,
                         Country = integrationEvent.Address.Country,
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEventContract)}", ex);
             }
         }
 
