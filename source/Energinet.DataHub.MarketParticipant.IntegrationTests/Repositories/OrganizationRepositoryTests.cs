@@ -175,12 +175,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var initialActor = new Actor(
-                Guid.Empty,
-                new ExternalActorId(Guid.NewGuid()),
-                new ActorNumber(Guid.NewGuid().ToString()),
-                ActorStatus.New,
-                Enumerable.Empty<ActorMarketRole>());
+            var initialActor = new Actor(new ActorNumber(Guid.NewGuid().ToString()));
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
             organization.Actors.Add(initialActor);
@@ -220,17 +215,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", _validCvrBusinessRegisterIdentifier, _validAddress);
 
-            var marketRoles = new[]
-            {
-                new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) })
-            };
-
-            organization.Actors.Add(new Actor(
-                Guid.Empty,
-                new ExternalActorId(Guid.NewGuid()),
-                new ActorNumber("123"),
-                ActorStatus.New,
-                marketRoles));
+            var initalActor = new Actor(new ActorNumber("123"));
+            initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) }));
+            organization.Actors.Add(initalActor);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);

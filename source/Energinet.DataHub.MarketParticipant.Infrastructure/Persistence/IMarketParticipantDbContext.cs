@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
@@ -57,5 +58,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         ///     Saves changes to the database.
         /// </summary>
         Task<int> SaveChangesAsync();
+
+        /// <summary>
+        ///     Gets the EntityEntry for the given Entry
+        /// </summary>
+        EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
+            where TEntity : class;
     }
 }

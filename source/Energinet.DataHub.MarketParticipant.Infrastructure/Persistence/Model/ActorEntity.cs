@@ -33,5 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public Collection<MarketRoleEntity> MarketRoles { get; }
 
         public Guid OrganizationId { get; set; }
+        public bool New { get; set; }
     }
 }
