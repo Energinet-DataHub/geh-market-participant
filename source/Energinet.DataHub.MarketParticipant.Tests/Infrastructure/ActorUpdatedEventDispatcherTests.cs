@@ -48,14 +48,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 Status = ActorStatus.Active
             };
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
-            integrationEvent.MarketRoles.Add(EicFunction.BalancingServiceProvider);
-            integrationEvent.GridAreas.Add(new GridAreaId(Guid.NewGuid()));
-            integrationEvent.MeteringPointTypes.Add(MeteringPointType.E17Consumption.Name);
+
+            var meteringPointType = MeteringPointType.D03NotUsed;
+            var actorGridArea = new ActorGridArea(new[] { meteringPointType });
+            var marketRole = new ActorMarketRole(EicFunction.Consumer, new[] { actorGridArea });
+            integrationEvent.ActorMarketRoles.Add(marketRole);
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.ActorUpdatedIntegrationEvent;
+            var actualEvent = (MarketParticipant.Integration.Model.Dtos.ActorUpdatedIntegrationEvent)eventParser.Parse(actualMessage.Body.ToArray());
+            var actualMarketRole = actualEvent.ActorMarketRoles.Single();
+            var actualGridArea = actualMarketRole.GridAreas.Single();
+            var actualMeteringPoint = actualGridArea.MeteringPointTypes.Single();
 
             // assert
             Assert.True(actual);
@@ -63,12 +68,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.ExternalActorId.Value, actualEvent.ExternalActorId);
-            Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.Gln);
+            Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber);
             Assert.Equal((int)integrationEvent.Status, (int)actualEvent.Status);
             Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
-            Assert.Equal((int)integrationEvent.MarketRoles.Single(), (int)actualEvent.MarketRoles.Single());
-            Assert.Equal(integrationEvent.GridAreas.Single().Value.ToString(), actualEvent.GridAreas.Single().ToString());
-            Assert.Equal(integrationEvent.MeteringPointTypes.Single(), actualEvent.MeteringPointTypes.Single());
+            Assert.Equal((int)marketRole.Function, (int)actualMarketRole.Function);
+            Assert.Equal(actorGridArea.Id, actualGridArea.Id);
+            Assert.Equal(meteringPointType.ToString(), actualMeteringPoint);
         }
 
         [Fact]
