@@ -28,9 +28,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return actorUpdatedEvent;
             }
 
-            if (TryParseOrganizationUpdatedIntegrationEvent(protoContract, out var organizationUpdatedIntegrationEvent))
+            if (TryParseOrganizationCreatedIntegrationEvent(protoContract, out var organizationCreatedIntegrationEvent))
             {
-                return organizationUpdatedIntegrationEvent;
+                return organizationCreatedIntegrationEvent;
             }
 
             if (TryParseGridAreaCreatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
@@ -106,21 +106,21 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             }
         }
 
-        private static bool TryParseOrganizationUpdatedIntegrationEvent(
+        private static bool TryParseOrganizationCreatedIntegrationEvent(
             byte[] protoContract,
-            out OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
+            out OrganizationCreatedIntegrationEvent organizationCreatedIntegrationEvent)
         {
             try
             {
-                var organizationUpdatedIntegrationEventParser = new OrganizationUpdatedIntegrationEventParser();
-                organizationUpdatedIntegrationEvent = organizationUpdatedIntegrationEventParser.Parse(protoContract);
+                var organizationCreatedIntegrationEventParser = new OrganizationCreatedIntegrationEventParser();
+                organizationCreatedIntegrationEvent = organizationCreatedIntegrationEventParser.Parse(protoContract);
                 return true;
             }
 #pragma warning disable CA1031
             catch (Exception)
 #pragma warning restore CA1031
             {
-                organizationUpdatedIntegrationEvent = null!;
+                organizationCreatedIntegrationEvent = null!;
                 return false;
             }
         }

@@ -104,10 +104,10 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void ParseCorrectlyWith_OrganizationUpdatedIntegrationEventParser()
         {
             // Arrange
-            var input = new OrganizationUpdatedIntegrationEventParser();
+            var input = new OrganizationCreatedIntegrationEventParser();
             var findAndParse = new SharedIntegrationEventParser();
 
-            var @event = new OrganizationUpdatedIntegrationEvent(
+            var @event = new OrganizationCreatedIntegrationEvent(
                 Guid.NewGuid(),
                 DateTime.UtcNow,
                 Guid.NewGuid(),
@@ -120,12 +120,14 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     "fake_value",
                     "fake_value"));
 
+            @event.Comment = "fake_comment";
+
             // Act
             var actualBytes = input.Parse(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
-            Assert.IsType<OrganizationUpdatedIntegrationEvent>(actualEventObject);
+            Assert.IsType<OrganizationCreatedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]

@@ -26,6 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
         /// </summary>
         /// <param name="integrationEvent">The event</param>
         /// <returns>The protobuf contract.</returns>
-        byte[] Parse(OrganizationUpdatedIntegrationEvent integrationEvent);
+        byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent);
     }
 }

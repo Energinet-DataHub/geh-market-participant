@@ -21,15 +21,15 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
-    public sealed class OrganizationUpdatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
+    public sealed class OrganizationCreatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationUpdatedIntegrationEvent integrationEvent)
+        public byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationUpdatedIntegrationEventContract()
+                var contract = new OrganizationCreatedIntegrationEventContract()
                 {
                     Id = integrationEvent.Id.ToString(),
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
@@ -46,21 +46,26 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     }
                 };
 
+                if (integrationEvent.Comment != null)
+                {
+                    contract.Comment = integrationEvent.Comment;
+                }
+
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal OrganizationCreatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = OrganizationUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = OrganizationCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                return new OrganizationUpdatedIntegrationEvent(
+                var createdEvent = new OrganizationCreatedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.OrganizationId),
@@ -72,10 +77,17 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                         contract.Address.ZipCode,
                         contract.Address.City,
                         contract.Address.Country));
+
+                if (contract.HasComment)
+                {
+                    createdEvent.Comment = contract.Comment;
+                }
+
+                return createdEvent;
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCreatedIntegrationEvent)}", ex);
             }
         }
     }

@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record OrganizationUpdatedIntegrationEvent : BaseIntegrationEvent
+    public sealed record OrganizationCreatedIntegrationEvent : BaseIntegrationEvent
     {
         /// <summary>
         /// An event representing an update to a given GridArea.
@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="name">Name of the Grid Area.</param>
         /// <param name="businessRegisterIdentifier">The Business registration code for this organization</param>
         /// <param name="address">The address of this organization</param>
-        public OrganizationUpdatedIntegrationEvent(
+        public OrganizationCreatedIntegrationEvent(
             Guid id,
             DateTime eventCreated,
             Guid organizationId,
@@ -46,5 +46,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public string Name { get; }
         public string BusinessRegisterIdentifier { get; }
         public Address Address { get; }
+        public string? Comment { get; set; }
     }
 }
