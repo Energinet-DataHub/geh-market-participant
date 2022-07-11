@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     {
                         integrationEvent.ActorMarketRoles.Select(x => new Protobuf.ActorMarketRole
                         {
-                            Function = (int)x.Funtion, GridAreas =
+                            Function = (int)x.Function, GridAreas =
                             {
                                 x.GridAreas.Select(g => new Protobuf.ActorGridArea
                                 {

@@ -16,5 +16,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public record ActorMarketRole(EicFunction Funtion, IEnumerable<ActorGridArea> GridAreas);
+    public record ActorMarketRole(EicFunction Function, IEnumerable<ActorGridArea> GridAreas);
 }

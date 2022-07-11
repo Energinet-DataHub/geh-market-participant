@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     Assert.Equal(expGrids[j].Id, actGrids[j].Id);
                 }
 
-                Assert.Equal(expRoles[i].Funtion, actRoles[i].Funtion);
+                Assert.Equal(expRoles[i].Function, actRoles[i].Function);
             }
         }
 
