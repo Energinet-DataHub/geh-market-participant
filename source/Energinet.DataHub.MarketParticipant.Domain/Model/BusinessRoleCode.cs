@@ -14,6 +14,9 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
+    /// <summary>
+    /// Important: Don't change assigned values e.g. Mdr = 8 may never change.
+    /// </summary>
     public enum BusinessRoleCode
     {
         Ddk = 1,
@@ -21,10 +24,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         Ddq = 3,
         Ddx = 4,
         Ddz = 5,
-        Dgl = 6,
-        Mdr = 7,
-        Sts = 8,
-        Ez = 9,
-        Tso = 10
+        Dgl = 7,
+        Mdr = 8,
+        Sts = 9,
+        Ez = 10,
+        Tso = 11,
     }
 }
