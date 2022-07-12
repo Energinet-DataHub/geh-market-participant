@@ -100,12 +100,22 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
         private static ActorUpdatedIntegrationEvent CreateIntegrationEvent()
         {
-            return new ActorUpdatedIntegrationEvent
+            var actorUpdatedIntegrationEvent = new ActorUpdatedIntegrationEvent
             {
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ActorId = Guid.NewGuid(),
-                ActorNumber = new ActorNumber("fake_value")
+                ActorNumber = new ActorNumber("fake_value"),
             };
+
+            actorUpdatedIntegrationEvent.ActorMarketRoles.Add(
+                new ActorMarketRoleEventData(
+                    EicFunction.BalanceResponsibleParty,
+                    new List<ActorGridAreaEventData>
+                    {
+                        new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { "mp1", "mp2" })
+                    }));
+
+            return actorUpdatedIntegrationEvent;
         }
 
         private sealed class DomainEventRepositoryDecorator : IDomainEventRepository
