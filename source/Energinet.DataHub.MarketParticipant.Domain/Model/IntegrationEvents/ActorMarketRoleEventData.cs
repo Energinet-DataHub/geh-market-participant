@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    public sealed class ActorUpdatedIntegrationEvent : IntegrationEventBase
+    public class ActorMarketRoleEventData
     {
-        public Guid ActorId { get; set; }
-        public OrganizationId OrganizationId { get; set; } = null!;
-        public ExternalActorId? ExternalActorId { get; set; }
-        public ActorNumber ActorNumber { get; set; } = null!;
-        public ActorStatus Status { get; set; }
+        public ActorMarketRoleEventData(EicFunction function, ICollection<ActorGridAreaEventData> gridAreas)
+        {
+            GridAreas = gridAreas;
+            Function = function;
+        }
 
-        [JsonInclude]
-        public ICollection<BusinessRoleCode> BusinessRoles { get; private set; } = new List<BusinessRoleCode>();
-
-        [JsonInclude]
-        public ICollection<ActorMarketRoleEventData> ActorMarketRoles { get; private set; } = new List<ActorMarketRoleEventData>();
+        public ICollection<ActorGridAreaEventData> GridAreas { get; }
+        public EicFunction Function { get; }
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -50,8 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
 
             var meteringPointType = MeteringPointType.D03NotUsed;
-            var actorGridArea = new ActorGridArea(new[] { meteringPointType });
-            var marketRole = new ActorMarketRole(EicFunction.Consumer, new[] { actorGridArea });
+            var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.Name });
+            var marketRole = new ActorMarketRoleEventData(EicFunction.Consumer, new List<ActorGridAreaEventData> { actorGridArea });
             integrationEvent.ActorMarketRoles.Add(marketRole);
 
             // act
