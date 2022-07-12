@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using FluentValidation;
 using SimpleInjector;
 
@@ -55,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IGridAreaIntegrationEventParser, GridAreaIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IGridAreaNameChangedIntegrationEventParser, GridAreaNameChangedIntegrationEventParser>(Lifestyle.Scoped);
-            container.Register<IOrganizationUpdatedIntegrationEventParser, OrganizationUpdatedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationCreatedIntegrationEventParser, OrganizationCreatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
         }
     }

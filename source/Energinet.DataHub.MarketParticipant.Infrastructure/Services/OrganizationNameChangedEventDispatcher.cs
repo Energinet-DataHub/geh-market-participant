@@ -18,17 +18,17 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class OrganizationNameChangedEventDispatcher : IIntegrationEventDispatcher
     {
-        private readonly IOrganizationUpdatedIntegrationEventParser _eventParser;
+        private readonly IOrganizationNameChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public OrganizationUpdatedEventDispatcher(
-            IOrganizationUpdatedIntegrationEventParser eventParser,
+        public OrganizationNameChangedEventDispatcher(
+            IOrganizationNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -39,24 +39,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not OrganizationCreatedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationNameChangedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new OrganizationUpdatedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationNameChangedIntegrationEvent(
                 organizationUpdatedIntegrationEvent.Id,
                 organizationUpdatedIntegrationEvent.EventCreated,
                 organizationUpdatedIntegrationEvent.OrganizationId.Value,
-                organizationUpdatedIntegrationEvent.Name,
-                organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
-                new Address(
-                    organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Country));
+                organizationUpdatedIntegrationEvent.Name);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
+            message.ApplicationProperties.Add("IntegrationEventType", nameof(Domain.Model.IntegrationEvents.OrganizationNameChangedIntegrationEvent));
 
             var sender = _serviceBusClient.CreateSender();
 

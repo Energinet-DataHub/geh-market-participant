@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -26,43 +27,40 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 {
     [UnitTest]
-    public sealed class OrganizationUpdatedEventDispatcherTests
+    public sealed class OrganizationAddressChangedEventDispatcherTests
     {
         [Fact]
-        public async Task OrganizationUpdated_IntegrationEventDispatcher_CanReadEvent()
+        public async Task OrganizationAddressChanged_IntegrationEventDispatcher_CanReadEvent()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var organizationEventParser = new OrganizationUpdatedIntegrationEventParser();
+            var organizationAddressChangedEventParser = new OrganizationAddressChangedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new OrganizationUpdatedEventDispatcher(organizationEventParser, serviceBusClient.Object);
+            var target = new OrganizationAddressChangedEventDispatcher(organizationAddressChangedEventParser, serviceBusClient.Object);
 
-            var integrationEvent = new OrganizationCreatedIntegrationEvent
+            var integrationEvent = new OrganizationAddressChangedIntegrationEvent
             {
-               Address = new Address(
-                   "fake_value",
-                   "fake_value",
-                   "fake_value",
-                   "fake_value",
-                   "fake_value"),
-               Name = "fake_value",
-               OrganizationId = new OrganizationId(Guid.NewGuid()),
-               BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678")
+                Address = new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                OrganizationId = new OrganizationId(Guid.NewGuid())
             };
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent;
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationAddressChangedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
-            Assert.Equal(integrationEvent.Name, actualEvent.Name);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.Address.City, actualEvent.Address.City);
             Assert.Equal(integrationEvent.Address.Country, actualEvent.Address.Country);
@@ -72,15 +70,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
         }
 
         [Fact]
-        public async Task OrganizationUpdatedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
+        public async Task OrganizationAddressChangedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var eventParser = new OrganizationUpdatedIntegrationEventParser();
-            var target = new OrganizationUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var eventParser = new OrganizationAddressChangedIntegrationEventParser();
+            var target = new OrganizationAddressChangedEventDispatcher(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
