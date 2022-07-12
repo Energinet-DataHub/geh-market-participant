@@ -34,9 +34,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         {
             OrganizationId = organizationId;
             Name = name;
+            Type = nameof(OrganizationNameChangedIntegrationEvent);
         }
 
         public Guid OrganizationId { get; }
         public string Name { get; }
+        public string Type { get; }
     }
 }

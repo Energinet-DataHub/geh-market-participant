@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
@@ -32,6 +33,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
         {
             // arrange
             var target = new OrganizationNameChangedIntegrationEventParser();
+            var targetGrid = new OrganizationNameChangedIntegrationEventParser();
+
             var @event = new OrganizationNameChangedIntegrationEvent(
                 Guid.NewGuid(),
                 DateTime.UtcNow,
@@ -39,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
                 "TestOrg");
 
             // act
-            var actualBytes = target.Parse(@event);
+            var actualBytes = targetGrid.Parse(@event);
             var actualEvent = target.Parse(actualBytes);
 
             // assert

@@ -34,9 +34,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         {
             GridAreaId = gridAreaId;
             Name = name;
+            Type = nameof(GridAreaNameChangedIntegrationEvent);
         }
 
         public Guid GridAreaId { get; }
         public string Name { get; }
+        public string Type { get; }
     }
 }

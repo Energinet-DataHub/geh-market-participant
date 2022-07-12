@@ -23,4 +23,5 @@ message OrganizationCommentChangedIntegrationEventContract {
     string OrganizationId = 2;
     string Comment = 3;
     google.protobuf.Timestamp EventCreated = 4;
+    string Type = 5;
 }

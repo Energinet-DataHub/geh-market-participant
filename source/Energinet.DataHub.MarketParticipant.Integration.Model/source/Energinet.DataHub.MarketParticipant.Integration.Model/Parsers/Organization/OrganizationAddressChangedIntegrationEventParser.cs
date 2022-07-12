@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
                     Id = integrationEvent.Id.ToString(),
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Address = new OrganizationAddressUpdate
+                    OrganizationAddress = new OrganizationAddressUpdate
                     {
                         City = integrationEvent.Address.City,
                         Country = integrationEvent.Address.Country,
@@ -63,11 +63,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
                     contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.OrganizationId),
                     new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country));
+                        contract.OrganizationAddress.StreetName,
+                        contract.OrganizationAddress.Number,
+                        contract.OrganizationAddress.ZipCode,
+                        contract.OrganizationAddress.City,
+                        contract.OrganizationAddress.Country));
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {

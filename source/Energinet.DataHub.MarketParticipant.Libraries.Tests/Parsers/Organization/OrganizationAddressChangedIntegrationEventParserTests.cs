@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
             var target = new OrganizationAddressChangedIntegrationEventParser();
             var contract = new OrganizationAddressChangedIntegrationEventContract
             {
-                Address = new OrganizationAddressUpdate()
+                OrganizationAddress = new OrganizationAddressUpdate()
                 {
                     City = "fake_city_value",
                     Country = "fake_country_value",

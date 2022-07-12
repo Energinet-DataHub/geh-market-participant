@@ -35,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     GridAreaId = integrationEvent.GridAreaId.ToString(),
                     Name = integrationEvent.Name,
+                    Type = integrationEvent.Type
                 };
 
                 return contract.ToByteArray();
@@ -51,11 +52,18 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             {
                 var contract = GridAreaNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                return new GridAreaNameChangedIntegrationEvent(
+                var integrationEvent = new GridAreaNameChangedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.GridAreaId),
                     contract.Name);
+
+                if (integrationEvent.Type != contract.Type)
+                {
+                    throw new FormatException("Invalid Type");
+                }
+
+                return integrationEvent;
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {

@@ -21,7 +21,7 @@ import "google/protobuf/timestamp.proto";
 message OrganizationAddressChangedIntegrationEventContract {
     string Id = 1;
     string OrganizationId = 2;
-    OrganizationAddressUpdate Address = 3;
+    OrganizationAddressUpdate OrganizationAddress = 3;
     google.protobuf.Timestamp EventCreated = 4;
 }
 

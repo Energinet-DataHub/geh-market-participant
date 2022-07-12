@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
-        public void Parse_InvaliGridAreaGuid_ThrowsException()
+        public void Parse_InvalidGridAreaGuid_ThrowsException()
         {
             // Arrange
             var target = new GridAreaNameChangedIntegrationEventParser();
