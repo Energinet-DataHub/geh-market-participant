@@ -17,7 +17,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
     /// <summary>
     /// Important: Don't change assigned values e.g. Mdr = 8 may never change.
     /// </summary>
+#pragma warning disable CA1027
     public enum BusinessRoleCode
+#pragma warning restore CA1027
     {
         Ddk = 1,
         Ddm = 2,
