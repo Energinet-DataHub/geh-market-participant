@@ -13,16 +13,15 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
     public class ActorMarketRoleEventData
     {
-        public ActorMarketRoleEventData(EicFunction eic, IEnumerable<ActorGridAreaEventData> gridAreas)
+        public ActorMarketRoleEventData(EicFunction function, ICollection<ActorGridAreaEventData> gridAreas)
         {
-            GridAreas = gridAreas.ToList();
-            Function = eic;
+            GridAreas = gridAreas;
+            Function = function;
         }
 
         public ICollection<ActorGridAreaEventData> GridAreas { get; }

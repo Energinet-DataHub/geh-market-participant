@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
@@ -22,10 +21,10 @@ public class ActorGridAreaEventData
 {
     public ActorGridAreaEventData(
         Guid id,
-        IEnumerable<string> meteringPointTypes)
+        ICollection<string> meteringPointTypes)
     {
         Id = id;
-        MeteringPointTypes = meteringPointTypes.ToList();
+        MeteringPointTypes = meteringPointTypes;
     }
 
     public Guid Id { get; }
