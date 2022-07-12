@@ -55,7 +55,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             foreach (var actorMarketRole in actor.MarketRoles)
             {
-                actorUpdatedEvent.ActorMarketRoles.Add(actorMarketRole);
+                actorUpdatedEvent.ActorMarketRoles.Add(
+                    new ActorMarketRoleEventData(
+                        actorMarketRole.Function,
+                        actorMarketRole.GridAreas.Select(
+                            x => new ActorGridAreaEventData(
+                                x.Id,
+                                x.MeteringPointTypes.Select(y => y.Name).ToList()))
+                            .ToList()));
             }
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);
