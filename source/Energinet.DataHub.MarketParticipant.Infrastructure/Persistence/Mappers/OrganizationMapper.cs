@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 }
                 else
                 {
-                    var newActor = new ActorEntity();
+                    var newActor = new ActorEntity() { New = true };
                     MapActorEntity(actor, newActor);
                     to.Actors.Add(newActor);
                 }
