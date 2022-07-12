@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<ActorMarketRole> actorMarketRoles)
-        : base(id)
+        : base(id, eventCreated)
         {
             ActorId = actorId;
             OrganizationId = organizationId;
