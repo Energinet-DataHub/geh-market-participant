@@ -27,63 +27,56 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 {
     [UnitTest]
-    public sealed class GridAreaUpdatedEventDispatcherTests
+    public sealed class GridAreaNameChangedEventDispatcherTests
     {
         [Fact]
-        public async Task GridAreaCreated_IntegrationEventDispatcher_CanReadEvent()
+        public async Task GridAreaNameChanged_IntegrationEventDispatcher_CanReadEvent()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var gridAreaEventParser = new GridAreaIntegrationEventParser();
+            var gridAreaEventParser = new GridAreaNameChangedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new GridAreaCreatedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
+            var target = new GridAreaNameChangedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
 
-            var integrationEvent = new GridAreaCreatedIntegrationEvent
+            var integrationEvent = new GridAreaNameChangedIntegrationEvent
             {
                 GridAreaId = new GridAreaId(Guid.NewGuid()),
-                Name = new GridAreaName("fake_value"),
-                Code = new GridAreaCode("123"),
-                PriceAreaCode = PriceAreaCode.Dk1,
-                GridAreaLinkId = new GridAreaLinkId(Guid.NewGuid())
+                Name = new GridAreaName("new_fake_value")
             };
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.GridAreaCreatedIntegrationEvent;
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);
-            Assert.Equal(integrationEvent.Code.Value, actualEvent.Code);
-            Assert.Equal(integrationEvent.PriceAreaCode, (PriceAreaCode)actualEvent.PriceAreaCode);
-            Assert.Equal(integrationEvent.GridAreaLinkId.Value, actualEvent.GridAreaLinkId);
         }
 
         [Fact]
-        public async Task GridAreaUpdatedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
+        public async Task GridAreaNameChangedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var eventParser = new GridAreaIntegrationEventParser();
-            var target = new GridAreaCreatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var eventParser = new GridAreaNameChangedIntegrationEventParser();
+            var target = new GridAreaNameChangedEventDispatcher(eventParser, serviceBusClient.Object);
 
-            var integrationEvent = new ActorUpdatedIntegrationEvent
+            var integrationEvent = new GridAreaCreatedIntegrationEvent()
             {
-                ActorNumber = new ActorNumber("fake_value"),
-                Status = ActorStatus.Active,
-                ActorId = Guid.NewGuid(),
-                BusinessRoles = { BusinessRoleCode.Ddk },
-                OrganizationId = new OrganizationId(Guid.NewGuid()),
-                ExternalActorId = new ExternalActorId(Guid.NewGuid())
+                GridAreaId = new GridAreaId(Guid.NewGuid()),
+                Name = new GridAreaName("fake_value"),
+                Code = new GridAreaCode("123"),
+                PriceAreaCode = PriceAreaCode.Dk1,
+                GridAreaLinkId = new GridAreaLinkId(Guid.NewGuid())
             };
 
             // act
