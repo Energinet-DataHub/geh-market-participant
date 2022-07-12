@@ -171,12 +171,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
-            organizationRepository.Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>())).Callback<Organization>(org =>
-            {
-                organizationRepository
-                    .Setup(x => x.GetAsync(organization.Id))
-                    .ReturnsAsync(org);
-            });
+            organizationRepository
+                .Setup(x => x.GetAsync(organization.Id))
+                .ReturnsAsync(organization);
+
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(organization)).ReturnsAsync(organization.Id);
 
             // Act
             await target
