@@ -32,9 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="actorNumber">GLN.</param>
         /// <param name="status">The status of the current actor.</param>
         /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
-        /// <param name="marketRoles">The roles (functions) assigned to the current actor.</param>
-        /// <param name="gridAreas">The roles (grid areas) assigned to the current actor.</param>
-        /// <param name="meteringPointTypes"></param>
+        /// <param name="actorMarketRoles">Actors market roles.</param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
             DateTime eventCreated,
@@ -44,10 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             string actorNumber,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
-            IEnumerable<EicFunction> marketRoles,
-            IEnumerable<Guid> gridAreas,
-            IEnumerable<string> meteringPointTypes)
-        : base(id, eventCreated)
+            IEnumerable<ActorMarketRole> actorMarketRoles)
+        : base(id)
         {
             ActorId = actorId;
             OrganizationId = organizationId;
@@ -55,9 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             ActorNumber = actorNumber;
             Status = status;
             BusinessRoles = businessRoles;
-            MarketRoles = marketRoles;
-            GridAreas = gridAreas;
-            MeteringPointTypes = meteringPointTypes;
+            ActorMarketRoles = actorMarketRoles;
         }
 
         public Guid ActorId { get; }
@@ -68,8 +62,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public ActorStatus Status { get; }
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
-        public IEnumerable<EicFunction> MarketRoles { get; }
-        public IEnumerable<Guid> GridAreas { get; }
-        public IEnumerable<string> MeteringPointTypes { get; }
+        public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
     }
 }

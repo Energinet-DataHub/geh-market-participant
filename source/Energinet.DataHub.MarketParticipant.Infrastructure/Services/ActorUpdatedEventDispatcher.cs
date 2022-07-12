@@ -52,9 +52,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 actorUpdatedIntegrationEvent.ActorNumber.Value,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
                 actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
-                actorUpdatedIntegrationEvent.MarketRoles.Select(x => (EicFunction)x),
-                actorUpdatedIntegrationEvent.GridAreas.Select(x => x.Value),
-                actorUpdatedIntegrationEvent.MeteringPointTypes);
+                actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
+                    new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
+                        new ActorGridArea(y.Id, y.MeteringPointTypes.Select(z => z.Name))))));
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);

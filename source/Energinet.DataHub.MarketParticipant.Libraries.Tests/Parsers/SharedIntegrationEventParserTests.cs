@@ -44,9 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "0123456789012",
                 ActorStatus.Active,
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty },
-                new[] { Guid.NewGuid(), Guid.NewGuid() },
-                new[] { "type1", "type2" });
+                new[] { new ActorMarketRole(EicFunction.Agent, new[] { new ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) });
 
             // act
             var actualBytes = input.Parse(@event);
