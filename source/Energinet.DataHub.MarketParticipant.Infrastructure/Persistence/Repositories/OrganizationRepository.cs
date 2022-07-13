@@ -56,6 +56,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             foreach (var actor in destination.Actors.Where(x => x.New))
             {
                 _marketParticipantDbContext.Entry(actor).State = EntityState.Added;
+                foreach (var mr in actor.MarketRoles)
+                {
+                    _marketParticipantDbContext.Entry(mr).State = EntityState.Added;
+                    foreach (var ga in mr.GridAreas)
+                    {
+                        _marketParticipantDbContext.Entry(ga).State = EntityState.Added;
+                        foreach (var mp in ga.MeteringPointTypes)
+                        {
+                            _marketParticipantDbContext.Entry(mp).State = EntityState.Added;
+                        }
+                    }
+                }
+
                 actor.New = false;
             }
 
