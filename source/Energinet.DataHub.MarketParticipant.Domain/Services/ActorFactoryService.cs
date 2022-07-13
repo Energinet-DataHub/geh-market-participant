@@ -63,10 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
                 .ConfigureAwait(false);
 
-            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(
-                organization.Actors,
-                marketRoles);
-
             _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
 
             var newActor = new Actor(actorNumber);
@@ -74,11 +70,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);
 
+            organization.Actors.Add(newActor);
+
+            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(newActor)
                 .ConfigureAwait(false);
-
-            organization.Actors.Add(newActor);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -95,18 +93,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             return savedActor;
         }
 
-        private static bool AreActorsEquivalent(Actor a, Actor b)
-        {
-            if (a.ActorNumber != b.ActorNumber)
-                return false;
-
-            if (a.MarketRoles.Count != b.MarketRoles.Count)
-                return false;
-
-            var eicFunctions = b.MarketRoles.Select(roleB => roleB.Function).ToList();
-            return a.MarketRoles.All(roleA => eicFunctions.Contains(roleA.Function));
-        }
-
         private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
         {
             await _organizationRepository
@@ -119,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             return savedOrganization!
                 .Actors
-                .Single(actor => AreActorsEquivalent(newActor, actor));
+                .Single(actor => actor.Id == newActor.Id);
         }
     }
 }

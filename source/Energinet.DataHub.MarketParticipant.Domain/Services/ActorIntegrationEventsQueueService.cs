@@ -46,38 +46,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorId = actor.Id,
                 ExternalActorId = actor.ExternalActorId,
                 ActorNumber = actor.ActorNumber,
-                Status = actor.Status
+                Status = actor.Status,
             };
-
-            foreach (var marketRole in actor.MarketRoles)
-            {
-                actorUpdatedEvent.MarketRoles.Add(marketRole.Function);
-            }
 
             foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))
             {
                 actorUpdatedEvent.BusinessRoles.Add(businessRole);
             }
 
-            // Temporary flattening the grid areas to use in the existing event
-            var gridAreas = actor.MarketRoles
-                .SelectMany(x => x.GridAreas
-                    .Select(y => y.Id))
-                .Distinct();
-            foreach (var gridAreaId in gridAreas)
+            foreach (var actorMarketRole in actor.MarketRoles)
             {
-                actorUpdatedEvent.GridAreas.Add(new GridAreaId(gridAreaId));
-            }
-
-            // Temporary flattening the metering point types to use in the existing event
-            var meteringPoints = actor.MarketRoles
-                .SelectMany(x => x.GridAreas
-                    .SelectMany(y => y.MeteringPointTypes
-                        .Select(z => z.Name)))
-                .Distinct();
-            foreach (var meteringPoint in meteringPoints)
-            {
-                actorUpdatedEvent.MeteringPointTypes.Add(meteringPoint);
+                actorUpdatedEvent.ActorMarketRoles.Add(
+                    new ActorMarketRoleEventData(
+                        actorMarketRole.Function,
+                        actorMarketRole.GridAreas.Select(
+                            x => new ActorGridAreaEventData(
+                                x.Id,
+                                x.MeteringPointTypes.Select(y => y.Name).ToList()))
+                            .ToList()));
             }
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);

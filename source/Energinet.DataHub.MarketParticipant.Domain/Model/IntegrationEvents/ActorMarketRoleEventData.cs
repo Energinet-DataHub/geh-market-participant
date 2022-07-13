@@ -13,19 +13,18 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
 {
-    /// <summary>
-    /// Service to validate that the chosen combination of roles is valid.
-    /// </summary>
-    public interface ICombinationOfBusinessRolesRuleService
+    public class ActorMarketRoleEventData
     {
-        /// <summary>
-        /// Validates that the chosen combination of roles is valid.
-        /// </summary>
-        /// <param name="marketRoles"></param>
-        void ValidateCombinationOfBusinessRoles(IEnumerable<EicFunction> marketRoles);
+        public ActorMarketRoleEventData(EicFunction function, ICollection<ActorGridAreaEventData> gridAreas)
+        {
+            GridAreas = gridAreas;
+            Function = function;
+        }
+
+        public ICollection<ActorGridAreaEventData> GridAreas { get; }
+        public EicFunction Function { get; }
     }
 }

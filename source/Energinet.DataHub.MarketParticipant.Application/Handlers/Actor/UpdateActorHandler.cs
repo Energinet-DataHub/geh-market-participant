@@ -39,6 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
+        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
+        private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
@@ -48,7 +50,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorIdConfigurationService externalActorIdConfigurationService)
+            IExternalActorIdConfigurationService externalActorIdConfigurationService,
+            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
@@ -58,6 +62,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorIdConfigurationService = externalActorIdConfigurationService;
+            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
+            _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
         }
 
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
@@ -85,6 +91,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
                 .ConfigureAwait(false);
+
+            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+
+            var allMarketRolesForActorGln = organization.Actors
+                .Where(x => x.ActorNumber == actor.ActorNumber)
+                .SelectMany(x => x.MarketRoles)
+                .Select(x => x.Function);
+
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

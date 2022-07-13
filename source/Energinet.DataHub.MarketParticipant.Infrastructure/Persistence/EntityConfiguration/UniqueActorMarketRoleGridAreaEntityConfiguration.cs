@@ -13,26 +13,22 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class ActorEntity
+    public sealed class UniqueActorMarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<UniqueActorMarketRoleGridAreaEntity>
     {
-        public ActorEntity()
+        public void Configure(EntityTypeBuilder<UniqueActorMarketRoleGridAreaEntity> builder)
         {
-            ActorNumber = string.Empty;
-            MarketRoles = new Collection<MarketRoleEntity>();
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            builder.ToTable("UniqueActorMarketRoleGridArea");
+            builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
+            builder.Property(e => e.ActorId);
+            builder.Property(e => e.MarketRoleFunction);
+            builder.Property(e => e.GridAreaId);
         }
-
-        public Guid Id { get; set; }
-        public Guid? ActorId { get; set; }
-        public string ActorNumber { get; set; }
-        public int Status { get; set; }
-
-        public Collection<MarketRoleEntity> MarketRoles { get; }
-
-        public Guid OrganizationId { get; set; }
-        public bool New { get; set; }
     }
 }

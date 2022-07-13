@@ -161,7 +161,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 "Test City",
                 "Test Country");
 
-            var organizationBeforeUpdate = new Organization(
+            var organization = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "fake_value",
                 Array.Empty<Actor>(),
@@ -171,30 +171,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
-            var organizationAfterUpdate = new Organization(
-                organizationBeforeUpdate.Id,
-                organizationBeforeUpdate.Name,
-                new[]
-                {
-                    new Actor(
-                        expectedId,
-                        new ExternalActorId(expectedExternalId),
-                        new ActorNumber("fake_value"),
-                        ActorStatus.New,
-                        marketRoles)
-                },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                "Test Comment");
-
             organizationRepository
-                .Setup(x => x.GetAsync(organizationAfterUpdate.Id))
-                .ReturnsAsync(organizationAfterUpdate);
+                .Setup(x => x.GetAsync(organization.Id))
+                .ReturnsAsync(organization);
+
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(organization)).ReturnsAsync(organization.Id);
 
             // Act
             await target
                 .CreateAsync(
-                    organizationBeforeUpdate,
+                    organization,
                     new ActorNumber("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
@@ -202,7 +188,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Assert
             actorIntegrationEventsQueueService.Verify(
                 x => x.EnqueueActorUpdatedEventAsync(
-                    It.Is<OrganizationId>(y => y == organizationAfterUpdate.Id),
+                    It.Is<OrganizationId>(y => y == organization.Id),
                     It.IsAny<Actor>()),
                 Times.Once);
         }
@@ -279,7 +265,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             overlappingBusinessRolesService.Verify(
-                x => x.ValidateRolesAcrossActors(organization.Actors, marketRoles),
+                x => x.ValidateRolesAcrossActors(organization.Actors),
                 Times.Once);
         }
 

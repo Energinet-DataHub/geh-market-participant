@@ -12,20 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    /// <summary>
-    /// Service to validate that the chosen combination of roles is valid.
-    /// </summary>
-    public interface ICombinationOfBusinessRolesRuleService
-    {
-        /// <summary>
-        /// Validates that the chosen combination of roles is valid.
-        /// </summary>
-        /// <param name="marketRoles"></param>
-        void ValidateCombinationOfBusinessRoles(IEnumerable<EicFunction> marketRoles);
-    }
+    public record ActorGridArea(Guid Id, IEnumerable<string> MeteringPointTypes);
 }
