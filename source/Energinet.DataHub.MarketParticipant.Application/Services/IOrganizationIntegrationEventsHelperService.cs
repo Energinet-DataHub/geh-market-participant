@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     /// <summary>
-    /// test
+    /// Organization helper service for integration events
     /// </summary>
     public interface IOrganizationIntegrationEventsHelperService
     {

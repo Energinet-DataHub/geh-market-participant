@@ -70,16 +70,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
 
-            return new List<IIntegrationEvent>()
+            yield return new OrganizationCreatedIntegrationEvent
             {
-                new OrganizationCreatedIntegrationEvent
-                {
-                    Address = organization.Address,
-                    Name = organization.Name,
-                    OrganizationId = organization.Id,
-                    BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
-                    Comment = organization.Comment
-                }
+                Address = organization.Address,
+                Name = organization.Name,
+                OrganizationId = organization.Id,
+                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
+                Comment = organization.Comment
             };
         }
 

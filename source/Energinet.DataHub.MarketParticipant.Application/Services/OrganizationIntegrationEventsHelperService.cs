@@ -26,16 +26,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
 
-            return new List<IIntegrationEvent>()
+            yield return new OrganizationCreatedIntegrationEvent
             {
-                new OrganizationCreatedIntegrationEvent
-                {
-                    Address = organization.Address,
-                    Name = organization.Name,
-                    OrganizationId = organization.Id,
-                    BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
-                    Comment = organization.Comment
-                }
+                Address = organization.Address,
+                Name = organization.Name,
+                OrganizationId = organization.Id,
+                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
+                Comment = organization.Comment
             };
         }
 
@@ -44,33 +41,30 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
             ArgumentNullException.ThrowIfNull(organizationDto, nameof(organizationDto));
 
-            var changeEvents = new List<IIntegrationEvent>();
-
             if (organization.Name != organizationDto.Name)
             {
-                changeEvents.Add(new OrganizationNameChangedIntegrationEvent()
+                yield return new OrganizationNameChangedIntegrationEvent
                 {
                     Name = organizationDto.Name,
                     OrganizationId = organization.Id
-                });
+                };
             }
 
             if (organization.BusinessRegisterIdentifier.Identifier != organizationDto.BusinessRegisterIdentifier)
             {
-                changeEvents.Add(new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent()
+                yield return new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent
                 {
                     BusinessRegisterIdentifier = new BusinessRegisterIdentifier(organizationDto.BusinessRegisterIdentifier),
                     OrganizationId = organization.Id
-                });
+                };
             }
 
             if (organization.Comment != organizationDto.Comment)
             {
-                changeEvents.Add(new OrganizationCommentChangedIntegrationEvent()
+                yield return new OrganizationCommentChangedIntegrationEvent
                 {
-                    Comment = organizationDto.Comment,
-                    OrganizationId = organization.Id
-                });
+                    Comment = organizationDto.Comment, OrganizationId = organization.Id
+                };
             }
 
             if (organizationDto.Address.StreetName != organization.Address.StreetName ||
@@ -79,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 organizationDto.Address.Number != organization.Address.Number ||
                 organizationDto.Address.ZipCode != organization.Address.ZipCode)
             {
-                changeEvents.Add(new OrganizationAddressChangedIntegrationEvent()
+                yield return new OrganizationAddressChangedIntegrationEvent
                 {
                     Address = new Address(
                         organizationDto.Address.StreetName,
@@ -88,10 +82,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                         organizationDto.Address.City,
                         organizationDto.Address.Country),
                     OrganizationId = organization.Id
-                });
+                };
             }
-
-            return changeEvents;
         }
     }
 }
