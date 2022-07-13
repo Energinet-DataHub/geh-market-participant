@@ -93,18 +93,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             return savedActor;
         }
 
-        private static bool AreActorsEquivalent(Actor a, Actor b)
-        {
-            if (a.ActorNumber != b.ActorNumber)
-                return false;
-
-            if (a.MarketRoles.Count != b.MarketRoles.Count)
-                return false;
-
-            var eicFunctions = b.MarketRoles.Select(roleB => roleB.Function).ToList();
-            return a.MarketRoles.All(roleA => eicFunctions.Contains(roleA.Function));
-        }
-
         private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
         {
             await _organizationRepository
@@ -117,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             return savedOrganization!
                 .Actors
-                .Single(actor => AreActorsEquivalent(newActor, actor));
+                .Single(actor => actor.Id == newActor.Id);
         }
     }
 }

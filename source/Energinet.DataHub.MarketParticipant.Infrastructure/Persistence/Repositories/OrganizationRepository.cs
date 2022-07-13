@@ -53,6 +53,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             OrganizationMapper.MapToEntity(organization, destination);
             _marketParticipantDbContext.Organizations.Update(destination);
 
+            foreach (var actor in destination.Actors.Where(x => x.New))
+            {
+                _marketParticipantDbContext.Entry(actor).State = EntityState.Added;
+                actor.New = false;
+            }
+
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
             return new OrganizationId(destination.Id);
         }
