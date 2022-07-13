@@ -15,26 +15,31 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
-    public sealed class ActorStatusChangedIntegrationEventParser
+    public sealed class ActorStatusChangedIntegrationEventParser : IActorStatusChangedIntegrationEventParser
     {
-        // public byte[] Parse(ActorStatusChangedIntegrationEvent integrationEvent)
-        // {
-        //     try
-        //     {
-        //         ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-        //
-        //        // var contract = new ActorStatusChangedIntegrationEventContract { };
-        //
-        //        return integrationEvent.ToByteArray();
-        //     }
-        //     catch (Exception e) when (e is InvalidProtocolBufferException)
-        //     {
-        //         throw new MarketParticipantException($"Error parsing {nameof(ActorStatusChangedIntegrationEvent)}", e);
-        //     }
-        // }
+        public byte[] Parse(ActorStatusChangedIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+
+                var contract = new ActorStatusChangedIntegrationEventContract
+                {
+                    // todo
+                    Id = integrationEvent.EventId.ToString(),
+                };
+
+                return contract.ToByteArray();
+            }
+            catch (Exception e) when (e is InvalidProtocolBufferException)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorStatusChangedIntegrationEvent)}", e);
+            }
+        }
     }
 }

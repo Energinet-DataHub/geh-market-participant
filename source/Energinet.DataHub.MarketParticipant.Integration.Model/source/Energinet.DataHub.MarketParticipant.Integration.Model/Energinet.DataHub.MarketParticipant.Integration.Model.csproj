@@ -91,6 +91,12 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
     </Protobuf>
+    <Protobuf Include="Protobuf\ActorStatusChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+    </Protobuf>
   </ItemGroup>
 
 </Project>
