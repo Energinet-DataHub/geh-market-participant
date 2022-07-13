@@ -94,8 +94,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var firstAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value)).ConfigureAwait(false);
             await target.RemoveAsync(actor.Id).ConfigureAwait(false);
-            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var thirdAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var fourthAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value)).ConfigureAwait(false);
 
             // Assert
             Assert.True(firstAddResult);
