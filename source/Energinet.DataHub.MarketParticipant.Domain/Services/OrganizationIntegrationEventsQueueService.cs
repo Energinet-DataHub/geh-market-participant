@@ -44,5 +44,22 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
             }
         }
+
+        [Obsolete("Deprecated, will be removed.")]
+        public Task EnqueueLegacyOrganizationUpdatedEventAsync(Organization organization)
+        {
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+
+            var organizationUpdatedEvent = new OrganizationUpdatedIntegrationEvent
+            {
+                Address = organization.Address,
+                Name = organization.Name,
+                OrganizationId = organization.Id,
+                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier
+            };
+
+            var domainEvent = new DomainEvent(organization.Id.Value, nameof(Organization), organizationUpdatedEvent);
+            return _domainEventRepository.InsertAsync(domainEvent);
+        }
     }
 }

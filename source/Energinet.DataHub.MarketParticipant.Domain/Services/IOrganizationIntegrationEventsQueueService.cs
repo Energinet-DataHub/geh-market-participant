@@ -30,5 +30,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="organizationId">The Organization Id for domainObjectId.</param>
         /// <param name="changeEvents">The Organization to publish an integration event for.</param>
         public Task EnqueueOrganizationIntegrationEventsAsync(OrganizationId organizationId, IEnumerable<IIntegrationEvent> changeEvents);
+
+        /// <summary>
+        /// Creates an organization updated event. For legacy use.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns>Enqueue task</returns>
+        public Task EnqueueLegacyOrganizationUpdatedEventAsync(Organization organization);
     }
 }
