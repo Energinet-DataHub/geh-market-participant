@@ -17,26 +17,24 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 {
-    public sealed class OrganizationCreatedIntegrationEventParser : IOrganizationCreatedIntegrationEventParser
+    public sealed class OrganizationUpdatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent)
+        public byte[] Parse(OrganizationUpdatedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationCreatedIntegrationEventContract()
+                var contract = new OrganizationUpdatedIntegrationEventContract()
                 {
                     Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Name = integrationEvent.Name,
                     BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
-                    Address = new OrganizationAddressCreate
+                    Address = new OrganizationAddressUpdate
                     {
                         City = integrationEvent.Address.City,
                         Country = integrationEvent.Address.Country,
@@ -46,28 +44,22 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
                     }
                 };
 
-                if (integrationEvent.Comment != null)
-                {
-                    contract.Comment = integrationEvent.Comment;
-                }
-
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationUpdatedIntegrationEventContract)}", ex);
             }
         }
 
-        internal OrganizationCreatedIntegrationEvent Parse(byte[] protoContract)
+        internal OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = OrganizationCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = OrganizationUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var createdEvent = new OrganizationCreatedIntegrationEvent(
+                return new OrganizationUpdatedIntegrationEvent(
                     Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.OrganizationId),
                     contract.Name,
                     contract.BusinessRegisterIdentifier,
@@ -77,17 +69,10 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
                         contract.Address.ZipCode,
                         contract.Address.City,
                         contract.Address.Country));
-
-                if (contract.HasComment)
-                {
-                    createdEvent.Comment = contract.Comment;
-                }
-
-                return createdEvent;
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCreatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
             }
         }
     }

@@ -58,6 +58,56 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void ParseCorrectlyWith_GridAreaUpdatedIntegrationEventParser()
         {
             // Arrange
+            var input = new GridAreaUpdatedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaUpdatedIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                "TestArea",
+                "123",
+                PriceAreaCode.DK1,
+                Guid.NewGuid());
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaUpdatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationUpdatedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationUpdatedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationUpdatedIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                "TestOrg",
+                "12345678",
+                new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"));
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationUpdatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaCreatedIntegrationEventParser()
+        {
+            // Arrange
             var input = new GridAreaIntegrationEventParser();
             var findAndParse = new SharedIntegrationEventParser();
 

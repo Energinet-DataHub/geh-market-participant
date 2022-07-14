@@ -17,23 +17,20 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
-using Google.Protobuf.WellKnownTypes;
-using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
-    public sealed class GridAreaIntegrationEventParser : IGridAreaIntegrationEventParser
+    public sealed class GridAreaUpdatedIntegrationEventParser : IGridAreaUpdatedIntegrationEventParser
     {
-        public byte[] Parse(GridAreaCreatedIntegrationEvent integrationEvent)
+        public byte[] Parse(GridAreaUpdatedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new GridAreaCreatedIntegrationEventContract
+                var contract = new GridAreaUpdatedIntegrationEventContract
                 {
                     Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
                     GridAreaId = integrationEvent.GridAreaId.ToString(),
                     Name = integrationEvent.Name,
                     Code = integrationEvent.Code,
@@ -46,19 +43,18 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(GridAreaCreatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
             }
         }
 
-        internal GridAreaCreatedIntegrationEvent Parse(byte[] protoContract)
+        internal GridAreaUpdatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = GridAreaCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = GridAreaUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new GridAreaCreatedIntegrationEvent(
+                var integrationEvent = new GridAreaUpdatedIntegrationEvent(
                     Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.GridAreaId),
                     contract.Name,
                     contract.Code,
@@ -74,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaCreatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
             }
         }
     }

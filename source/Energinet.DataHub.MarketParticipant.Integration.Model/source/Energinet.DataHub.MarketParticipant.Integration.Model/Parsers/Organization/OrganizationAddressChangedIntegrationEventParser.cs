@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
                     Id = integrationEvent.Id.ToString(),
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    OrganizationAddress = new OrganizationAddressUpdate
+                    OrganizationAddress = new OrganizationAddressChanged
                     {
                         City = integrationEvent.Address.City,
                         Country = integrationEvent.Address.Country,

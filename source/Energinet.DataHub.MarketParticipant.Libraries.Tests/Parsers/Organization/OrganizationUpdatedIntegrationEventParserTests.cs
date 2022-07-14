@@ -24,16 +24,15 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organization
 {
     [UnitTest]
-    public class OrganizationCreatedIntegrationEventParserTests
+    public class OrganizationUpdatedIntegrationEventParserTests
     {
         [Fact]
         public void Parse_InputValid_ParsesCorrectly()
         {
             // arrange
-            var target = new OrganizationCreatedIntegrationEventParser();
-            var @event = new OrganizationCreatedIntegrationEvent(
+            var target = new OrganizationUpdatedIntegrationEventParser();
+            var @event = new OrganizationUpdatedIntegrationEvent(
                 Guid.NewGuid(),
-                DateTime.UtcNow,
                 Guid.NewGuid(),
                 "TestOrg",
                 "12345678",
@@ -43,8 +42,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
                     "fake_value",
                     "fake_value",
                     "fake_value"));
-
-            @event.Comment = "fake_comment";
 
             // act
             var actualBytes = target.Parse(@event);
@@ -60,17 +57,16 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
             Assert.Equal(@event.Address.Number, actualEvent.Address.Number);
             Assert.Equal(@event.Address.StreetName, actualEvent.Address.StreetName);
             Assert.Equal(@event.Address.ZipCode, actualEvent.Address.ZipCode);
-            Assert.Equal(@event.Comment, actualEvent.Comment);
         }
 
         [Fact]
         public void Parse_InvalidGuid_ThrowsException()
         {
             // Arrange
-            var target = new OrganizationCreatedIntegrationEventParser();
-            var contract = new OrganizationCreatedIntegrationEventContract
+            var target = new OrganizationUpdatedIntegrationEventParser();
+            var contract = new OrganizationUpdatedIntegrationEventContract
             {
-                Address = new OrganizationAddressCreate()
+                Address = new OrganizationAddressUpdate()
                 {
                     City = "fake_value",
                     Country = "fake_value",
@@ -81,8 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
                 Id = "Not_A_Giud",
                 BusinessRegisterIdentifier = "12345678",
                 Name = "fake_value",
-                OrganizationId = Guid.NewGuid().ToString(),
-                Comment = "fake_comment"
+                OrganizationId = Guid.NewGuid().ToString()
             };
 
             // Act + Assert
@@ -93,37 +88,10 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
         public void Parse_InvalidInput_ThrowsException()
         {
             // Arrange
-            var target = new OrganizationCreatedIntegrationEventParser();
+            var target = new OrganizationUpdatedIntegrationEventParser();
 
             // Act + Assert
             Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
-        }
-
-        [Fact]
-        public void Parse_OptionalCommentNotPresent_OK()
-        {
-            // Arrange
-            var target = new OrganizationCreatedIntegrationEventParser();
-            var @event = new OrganizationCreatedIntegrationEvent(
-                Guid.NewGuid(),
-                DateTime.UtcNow,
-                Guid.NewGuid(),
-                "TestOrg",
-                "12345678",
-                new Address(
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value"));
-
-            // act
-            var actualBytes = target.Parse(@event);
-            var actualEvent = target.Parse(actualBytes);
-
-            // assert
-            Assert.Equal(@event.Id, actualEvent.Id);
-            Assert.Equal(@event.Comment, actualEvent.Comment);
         }
     }
 }

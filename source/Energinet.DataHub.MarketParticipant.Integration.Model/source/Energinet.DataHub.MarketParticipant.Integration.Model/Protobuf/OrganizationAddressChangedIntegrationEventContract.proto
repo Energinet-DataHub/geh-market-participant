@@ -21,11 +21,11 @@ import "google/protobuf/timestamp.proto";
 message OrganizationAddressChangedIntegrationEventContract {
     string Id = 1;
     string OrganizationId = 2;
-    OrganizationAddressUpdate OrganizationAddress = 3;
+    OrganizationAddressChanged OrganizationAddress = 3;
     google.protobuf.Timestamp EventCreated = 4;
 }
 
-message OrganizationAddressUpdate {
+message OrganizationAddressChanged {
   string StreetName = 1;
   string Number = 2;
   string ZipCode = 3;

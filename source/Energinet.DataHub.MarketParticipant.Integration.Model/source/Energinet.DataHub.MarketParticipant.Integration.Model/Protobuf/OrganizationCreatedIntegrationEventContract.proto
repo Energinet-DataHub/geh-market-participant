@@ -23,12 +23,12 @@ message OrganizationCreatedIntegrationEventContract {
     string OrganizationId = 2;
     string Name = 4;
     string BusinessRegisterIdentifier = 5;
-    OrganizationAddress Address = 6;
+    OrganizationAddressCreate Address = 6;
     google.protobuf.Timestamp EventCreated = 7;
     optional string Comment = 8;
 }
 
-message OrganizationAddress {
+message OrganizationAddressCreate {
   string StreetName = 1;
   string Number = 2;
   string ZipCode = 3;

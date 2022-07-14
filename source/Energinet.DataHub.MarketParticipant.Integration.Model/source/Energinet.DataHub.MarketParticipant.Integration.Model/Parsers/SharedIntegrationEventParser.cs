@@ -29,19 +29,29 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return actorUpdatedEvent;
             }
 
-            if (TryParseOrganizationCreatedIntegrationEvent(protoContract, out var organizationCreatedIntegrationEvent))
-            {
-                return organizationCreatedIntegrationEvent;
-            }
-
-            if (TryParseGridAreaCreatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
+            if (TryParseGridAreaUpdatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
             {
                 return gridAreaUpdatedEvent;
+            }
+
+            if (TryParseGridAreaCreatedIntegrationEvent(protoContract, out var gridAreaCreatedEvent))
+            {
+                return gridAreaCreatedEvent;
             }
 
             if (TryParseGridAreaNameChangedIntegrationEvent(protoContract, out var gridAreaNameChangedEvent))
             {
                 return gridAreaNameChangedEvent;
+            }
+
+            if (TryParseOrganizationCreatedIntegrationEvent(protoContract, out var organizationCreatedIntegrationEvent))
+            {
+                return organizationCreatedIntegrationEvent;
+            }
+
+            if (TryParseOrganizationUpdatedIntegrationEvent(protoContract, out var organizationUpdatedIntegrationEvent))
+            {
+                return organizationUpdatedIntegrationEvent;
             }
 
             if (TryParseOrganizationNameChangedIntegrationEvent(protoContract, out var organizationNameChangedIntegrationEvent))
@@ -83,6 +93,45 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 actorUpdatedEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseGridAreaUpdatedIntegrationEvent(
+            byte[] protoContract,
+            out GridAreaUpdatedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+        {
+            try
+            {
+                var gridAreaUpdatedEventParser = new GridAreaUpdatedIntegrationEventParser();
+                var gridAreaUpdatedEvent = gridAreaUpdatedEventParser.Parse(protoContract);
+                gridAreaUpdatedIntegrationEvent = gridAreaUpdatedEvent;
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                gridAreaUpdatedIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseOrganizationUpdatedIntegrationEvent(
+            byte[] protoContract,
+            out OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
+        {
+            try
+            {
+                var organizationUpdatedIntegrationEventParser = new OrganizationUpdatedIntegrationEventParser();
+                organizationUpdatedIntegrationEvent = organizationUpdatedIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                organizationUpdatedIntegrationEvent = null!;
                 return false;
             }
         }
