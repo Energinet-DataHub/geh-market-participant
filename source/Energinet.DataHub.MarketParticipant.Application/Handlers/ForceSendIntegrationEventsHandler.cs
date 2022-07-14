@@ -74,6 +74,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                     .EnqueueOrganizationIntegrationEventsAsync(organization.Id, organizationCreatedEvents)
                     .ConfigureAwait(false);
 
+                await _organizationIntegrationEventsQueueService
+                    .EnqueueLegacyOrganizationUpdatedEventAsync(organization)
+                    .ConfigureAwait(false);
+
                 foreach (var actor in organization.Actors)
                 {
                     await _actorIntegrationEventsQueueService
@@ -97,6 +101,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
                 await _gridAreaIntegrationEventsQueueService
                     .EnqueueGridAreaCreatedEventAsync(gridArea, gridAreaLink!)
+                    .ConfigureAwait(false);
+
+                await _gridAreaIntegrationEventsQueueService
+                    .EnqueueLegacyGridAreaUpdatedEventAsync(gridArea, gridAreaLink!)
                     .ConfigureAwait(false);
             }
         }
