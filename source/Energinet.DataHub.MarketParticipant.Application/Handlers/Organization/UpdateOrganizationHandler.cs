@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
@@ -37,10 +38,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             IOrganizationRepository organizationRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
             IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
-            IOrganizationExistsHelperService organizationExistsHelperService)
+            IOrganizationExistsHelperService organizationExistsHelperService,
+            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
+            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
         }
@@ -63,6 +66,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
             organization.Comment = request.Organization.Comment;
+
+            await _uniqueOrganizationBusinessRegisterIdentifierService
+                .EnsureUniqueMarketRolesPerGridAreaAsync(organization)
+                .ConfigureAwait(false);
 
             await using var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
