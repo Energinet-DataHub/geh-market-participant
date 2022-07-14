@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var gridAreaEventParser = new GridAreaNameChangedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new GridAreaNameChangedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
+            var target = new GridAreaNameChanged(gridAreaEventParser, serviceBusClient.Object);
 
             var integrationEvent = new GridAreaNameChangedIntegrationEvent
             {
@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
             var eventParser = new GridAreaNameChangedIntegrationEventParser();
-            var target = new GridAreaNameChangedEventDispatcher(eventParser, serviceBusClient.Object);
+            var target = new GridAreaNameChanged(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new GridAreaCreatedIntegrationEvent()
             {

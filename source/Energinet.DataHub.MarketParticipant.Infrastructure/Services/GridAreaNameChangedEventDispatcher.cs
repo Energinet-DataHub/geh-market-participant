@@ -20,12 +20,12 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class GridAreaNameChangedEventDispatcher : BaseEventDispatcher
+    public sealed class GridAreaNameChanged : EventDispatcherBase
     {
         private readonly IGridAreaNameChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public GridAreaNameChangedEventDispatcher(
+        public GridAreaNameChanged(
             IGridAreaNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {

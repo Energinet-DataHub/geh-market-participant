@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public abstract class BaseEventDispatcher : IIntegrationEventDispatcher
+    public abstract class EventDispatcherBase : IIntegrationEventDispatcher
     {
         public abstract Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent);
 

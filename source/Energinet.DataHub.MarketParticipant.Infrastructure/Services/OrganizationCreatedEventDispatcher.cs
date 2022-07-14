@@ -22,12 +22,12 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationCreatedEventDispatcher : BaseEventDispatcher
+    public sealed class OrganizationCreated : EventDispatcherBase
     {
         private readonly IOrganizationCreatedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public OrganizationCreatedEventDispatcher(
+        public OrganizationCreated(
             IOrganizationCreatedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {

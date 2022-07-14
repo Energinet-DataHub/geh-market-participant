@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var organizationNameChangedEventParser = new OrganizationNameChangedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new OrganizationNameChangedEventDispatcher(organizationNameChangedEventParser, serviceBusClient.Object);
+            var target = new OrganizationNameChanged(organizationNameChangedEventParser, serviceBusClient.Object);
 
             var integrationEvent = new OrganizationNameChangedIntegrationEvent
             {
@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
             var eventParser = new OrganizationNameChangedIntegrationEventParser();
-            var target = new OrganizationNameChangedEventDispatcher(eventParser, serviceBusClient.Object);
+            var target = new OrganizationNameChanged(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
