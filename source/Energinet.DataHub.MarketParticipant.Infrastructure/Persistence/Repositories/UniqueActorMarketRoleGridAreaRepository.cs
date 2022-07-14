@@ -60,12 +60,14 @@ public sealed class UniqueActorMarketRoleGridAreaRepository : IUniqueActorMarket
                         u.ActorId == actorId
                     select u;
 
-        var entity = await query.FirstOrDefaultAsync().ConfigureAwait(false);
+        var entities = await query.ToListAsync().ConfigureAwait(false);
 
-        if (entity != null)
+        foreach (var entity in entities)
         {
             _marketParticipantDbContext.UniqueActorMarketRoleGridAreas.Remove(entity);
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
+
+        if (entities.Count > 0)
+            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 }
