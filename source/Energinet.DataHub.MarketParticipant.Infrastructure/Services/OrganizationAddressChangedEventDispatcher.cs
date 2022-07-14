@@ -22,7 +22,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationAddressChangedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class OrganizationAddressChangedEventDispatcher : BaseEventDispatcher
     {
         private readonly IOrganizationAddressChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _serviceBusClient = serviceBusClient;
         }
 
-        public async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
-            message.ApplicationProperties.Add("IntegrationEventType", nameof(Domain.Model.IntegrationEvents.OrganizationAddressChangedIntegrationEvent));
+            SetMessageMetaData(message, outboundIntegrationEvent);
 
             var sender = _serviceBusClient.CreateSender();
 

@@ -17,13 +17,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActorUpdatedEventDispatcher : IIntegrationEventDispatcher
+    public sealed class ActorUpdatedEventDispatcher : BaseEventDispatcher
     {
         private readonly IActorUpdatedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
@@ -36,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _serviceBusClient = serviceBusClient;
         }
 
-        public async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
@@ -58,6 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
+            SetMessageMetaData(message, outboundIntegrationEvent);
 
             var sender = _serviceBusClient.CreateSender();
 
