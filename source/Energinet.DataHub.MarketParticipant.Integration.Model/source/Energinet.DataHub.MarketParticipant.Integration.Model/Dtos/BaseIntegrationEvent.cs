@@ -29,9 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         {
             Id = id;
             EventCreated = eventCreated;
+            Type = GetType().Name;
         }
 
         public Guid Id { get; }
         public DateTime EventCreated { get; }
+        public string Type { get; }
     }
 }
