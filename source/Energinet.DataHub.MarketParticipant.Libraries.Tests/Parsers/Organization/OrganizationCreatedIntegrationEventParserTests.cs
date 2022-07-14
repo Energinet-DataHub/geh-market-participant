@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
             var target = new OrganizationCreatedIntegrationEventParser();
             var contract = new OrganizationCreatedIntegrationEventContract
             {
-                Address = new OrganizationAddressCreate()
+                Address = new OrganizationAddressEventData()
                 {
                     City = "fake_value",
                     Country = "fake_value",

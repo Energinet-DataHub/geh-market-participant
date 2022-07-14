@@ -16,12 +16,11 @@
 syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
-import "Protobuf/OrganisationAddressEventData.proto";
 
-message OrganizationUpdatedIntegrationEventContract {
-  string Id = 1;
-  string OrganizationId = 2;
-  string Name = 4;
-  string BusinessRegisterIdentifier = 5;
-  OrganizationAddressEventData Address = 6;
+message OrganizationAddressEventData {
+  string StreetName = 1;
+  string Number = 2;
+  string ZipCode = 3;
+  string City = 4;
+  string Country = 5;
 }
