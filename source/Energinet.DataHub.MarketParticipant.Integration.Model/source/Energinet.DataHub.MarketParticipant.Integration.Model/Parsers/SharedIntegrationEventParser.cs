@@ -29,6 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return actorUpdatedEvent;
             }
 
+            if (TryParseActorStatusChangedIntegrationEvent(protoContract, out var actorStatusChangedEvent))
+            {
+                return actorStatusChangedEvent;
+            }
+
             if (TryParseGridAreaUpdatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
             {
                 return gridAreaUpdatedEvent;
@@ -93,6 +98,26 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 actorUpdatedEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseActorStatusChangedIntegrationEvent(
+            byte[] protoContract,
+            out ActorStatusChangedIntegrationEvent actorStatusChangedEvent)
+        {
+            try
+            {
+                var actorStatusChangedEventParser = new ActorStatusChangedIntegrationEventParser();
+                var actorEvent = actorStatusChangedEventParser.Parse(protoContract);
+                actorStatusChangedEvent = actorEvent;
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                actorStatusChangedEvent = null!;
                 return false;
             }
         }

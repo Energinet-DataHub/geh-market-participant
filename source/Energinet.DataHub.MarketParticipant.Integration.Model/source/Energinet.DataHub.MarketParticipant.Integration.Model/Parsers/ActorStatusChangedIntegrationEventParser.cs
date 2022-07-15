@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
@@ -30,15 +31,45 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 
                 var contract = new ActorStatusChangedIntegrationEventContract
                 {
-                    // todo
                     Id = integrationEvent.EventId.ToString(),
+                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                    ActorId = integrationEvent.ActorId.ToString(),
+                    OrganizationId = integrationEvent.OrganizationId.ToString(),
+                    Status = integrationEvent.Status.ToString(),
+                    Type = integrationEvent.Type
                 };
 
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(ActorStatusChangedIntegrationEvent)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(ActorStatusChangedIntegrationEventContract)}", e);
+            }
+        }
+
+        internal ActorStatusChangedIntegrationEvent Parse(byte[] protoContract)
+        {
+            try
+            {
+                var contract = ActorStatusChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
+
+                var integrationEvent = new ActorStatusChangedIntegrationEvent(
+                    Guid.Parse(contract.Id),
+                    contract.EventCreated.ToDateTime(),
+                    Guid.Parse(contract.ActorId),
+                    Guid.Parse(contract.OrganizationId),
+                    System.Enum.Parse<ActorStatus>(contract.Status));
+
+                if (integrationEvent.Type != contract.Type)
+                {
+                    throw new FormatException("Invalid Type");
+                }
+
+                return integrationEvent;
+            }
+            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+            {
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorStatusChangedIntegrationEvent)}", ex);
             }
         }
     }

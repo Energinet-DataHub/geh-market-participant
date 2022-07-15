@@ -16,22 +16,25 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed class ActorStatusChangedIntegrationEvent
+    public sealed record ActorStatusChangedIntegrationEvent : BaseIntegrationEvent
     {
         public ActorStatusChangedIntegrationEvent(
             Guid eventId,
+            DateTime eventCreated,
             Guid actorId,
+            Guid organizationId,
             ActorStatus status)
+            : base(eventId, eventCreated)
         {
             EventId = eventId;
             ActorId = actorId;
+            OrganizationId = organizationId;
             Status = status;
-            EventCreated = DateTime.Now;
         }
 
         public Guid EventId { get; }
         public Guid ActorId { get; }
+        public Guid OrganizationId { get; }
         public ActorStatus Status { get; }
-        public DateTime EventCreated { get; }
     }
 }

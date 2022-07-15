@@ -55,6 +55,28 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
+        public void ParseCorrectlyWith_ActorStatusChangedIntegrationEventParser()
+        {
+            // arrange
+            var input = new ActorStatusChangedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ActorStatusChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                ActorStatus.Active);
+
+            // act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // assert
+            Assert.IsType<ActorStatusChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
         public void ParseCorrectlyWith_GridAreaUpdatedIntegrationEventParser()
         {
             // Arrange
