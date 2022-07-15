@@ -17,62 +17,57 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 {
-    public sealed class OrganizationUpdatedIntegrationEventParser : IOrganizationUpdatedIntegrationEventParser
+    public class OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser : IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationUpdatedIntegrationEvent integrationEvent)
+        public byte[] Parse(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationUpdatedIntegrationEventContract()
+                var contract = new OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract()
                 {
                     Id = integrationEvent.Id.ToString(),
+                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Name = integrationEvent.Name,
                     BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
-                    Address = new OrganizationAddress()
-                    {
-                        City = integrationEvent.Address.City,
-                        Country = integrationEvent.Address.Country,
-                        Number = integrationEvent.Address.Number,
-                        StreetName = integrationEvent.Address.StreetName,
-                        ZipCode = integrationEvent.Address.ZipCode
-                    }
+                    Type = integrationEvent.Type
                 };
 
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract)}", ex);
             }
         }
 
-        internal OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal OrganizationBusinessRegisterIdentifierChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = OrganizationUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                return new OrganizationUpdatedIntegrationEvent(
+                var integrationEvent = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
                     Guid.Parse(contract.Id),
+                    contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.OrganizationId),
-                    contract.Name,
-                    contract.BusinessRegisterIdentifier,
-                    new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country));
+                    contract.BusinessRegisterIdentifier);
+
+                if (integrationEvent.Type != contract.Type)
+                {
+                    throw new FormatException("Invalid Type");
+                }
+
+                return integrationEvent;
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent)}", ex);
             }
         }
     }

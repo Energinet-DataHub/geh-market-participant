@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -38,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var gridAreaEventParser = new GridAreaUpdatedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new GridAreaUpdatedEventDispatcher(gridAreaEventParser, serviceBusClient.Object);
+            var target = new GridAreaUpdated(gridAreaEventParser, serviceBusClient.Object);
 
             var integrationEvent = new GridAreaUpdatedIntegrationEvent
             {
@@ -73,7 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
             var eventParser = new GridAreaUpdatedIntegrationEventParser();
-            var target = new GridAreaUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
+            var target = new GridAreaUpdated(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {

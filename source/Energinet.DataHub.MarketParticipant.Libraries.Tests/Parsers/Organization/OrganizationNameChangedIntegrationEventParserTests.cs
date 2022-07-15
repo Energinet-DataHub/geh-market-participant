@@ -15,69 +15,53 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
+namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organization
 {
     [UnitTest]
-    public class OrganizationUpdatedIntegrationEventParserTests
+    public class OrganizationNameChangedIntegrationEventParserTests
     {
         [Fact]
         public void Parse_InputValid_ParsesCorrectly()
         {
             // arrange
-            var target = new OrganizationUpdatedIntegrationEventParser();
-            var @event = new OrganizationUpdatedIntegrationEvent(
+            var target = new OrganizationNameChangedIntegrationEventParser();
+            var targetGrid = new OrganizationNameChangedIntegrationEventParser();
+
+            var @event = new OrganizationNameChangedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
-                "TestOrg",
-                "12345678",
-                new Address(
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value"));
+                "TestOrg");
 
             // act
-            var actualBytes = target.Parse(@event);
+            var actualBytes = targetGrid.Parse(@event);
             var actualEvent = target.Parse(actualBytes);
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
             Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
             Assert.Equal(@event.Name, actualEvent.Name);
-            Assert.Equal(@event.BusinessRegisterIdentifier, actualEvent.BusinessRegisterIdentifier);
-            Assert.Equal(@event.Address.City, actualEvent.Address.City);
-            Assert.Equal(@event.Address.Country, actualEvent.Address.Country);
-            Assert.Equal(@event.Address.Number, actualEvent.Address.Number);
-            Assert.Equal(@event.Address.StreetName, actualEvent.Address.StreetName);
-            Assert.Equal(@event.Address.ZipCode, actualEvent.Address.ZipCode);
         }
 
         [Fact]
         public void Parse_InvalidGuid_ThrowsException()
         {
             // Arrange
-            var target = new OrganizationUpdatedIntegrationEventParser();
-            var contract = new OrganizationUpdatedIntegrationEventContract
+            var target = new OrganizationNameChangedIntegrationEventParser();
+            var contract = new OrganizationNameChangedIntegrationEventContract
             {
-                Address = new OrganizationAddress()
-                {
-                    City = "fake_value",
-                    Country = "fake_value",
-                    Number = "fake_value",
-                    StreetName = "fake_value",
-                    ZipCode = "fake_value"
-                },
                 Id = "Not_A_Giud",
-                BusinessRegisterIdentifier = "12345678",
                 Name = "fake_value",
-                OrganizationId = Guid.NewGuid().ToString()
+                OrganizationId = Guid.NewGuid().ToString(),
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
             };
 
             // Act + Assert
@@ -88,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         public void Parse_InvalidInput_ThrowsException()
         {
             // Arrange
-            var target = new OrganizationUpdatedIntegrationEventParser();
+            var target = new OrganizationNameChangedIntegrationEventParser();
 
             // Act + Assert
             Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));

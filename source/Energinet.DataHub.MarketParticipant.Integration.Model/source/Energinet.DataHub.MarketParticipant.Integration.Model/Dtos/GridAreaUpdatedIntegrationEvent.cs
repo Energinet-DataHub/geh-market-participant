@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             string code,
             PriceAreaCode priceAreaCode,
             Guid gridAreaLinkId)
-        : base(id)
+            : base(id, DateTime.UtcNow)
         {
             GridAreaId = gridAreaId;
             Name = name;
