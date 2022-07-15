@@ -40,7 +40,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOrganizationIntegrationEventsQueueService>().Object,
-                new Mock<IOrganizationExistsHelperService>().Object);
+                new Mock<IOrganizationExistsHelperService>().Object,
+                new Mock<OrganizationIntegrationEventsHelperService>().Object);
 
             // Act + Assert
             await Assert
@@ -55,11 +56,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationRepository = new Mock<IOrganizationRepository>();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var organizationIntegrationEventsQueueService = new Mock<IOrganizationIntegrationEventsQueueService>();
+            var organizationIntegrationEventsHelperService = new Mock<OrganizationIntegrationEventsHelperService>();
+
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 organizationIntegrationEventsQueueService.Object,
-                organizationExistsHelperService.Object);
+                organizationExistsHelperService.Object,
+                organizationIntegrationEventsHelperService.Object);
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 

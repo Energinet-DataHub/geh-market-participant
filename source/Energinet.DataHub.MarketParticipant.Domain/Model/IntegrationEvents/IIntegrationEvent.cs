@@ -25,5 +25,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
         /// ID of the integration event
         /// </summary>
         Guid Id { get; }
+
+        /// <summary>
+        /// Event creation time
+        /// </summary>
+        DateTime EventCreated { get; }
     }
 }
