@@ -94,8 +94,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var firstAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value)).ConfigureAwait(false);
             await target.RemoveAsync(actor.Id).ConfigureAwait(false);
-            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var thirdAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var fourthAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value)).ConfigureAwait(false);
 
             // Assert
             Assert.True(firstAddResult);
@@ -104,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
         private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDbContext context)
         {
-            var organization = new Organization(Guid.NewGuid().ToString(), new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+            var organization = new Organization(Guid.NewGuid().ToString(), MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"));
             organization.Actors.Add(new Actor(new MockedGln()));
 
             var repository = new OrganizationRepository(context);

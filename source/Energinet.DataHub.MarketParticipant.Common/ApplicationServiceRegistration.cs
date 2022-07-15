@@ -23,6 +23,8 @@ using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using FluentValidation;
 using SimpleInjector;
 
@@ -45,16 +47,25 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<ForceSendIntegrationEventsCommand>, ForceSendIntegrationEventsCommandRuleSet>();
 
             container.Register<IActiveDirectoryService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
+            container.Register<IOrganizationIntegrationEventsHelperService, OrganizationIntegrationEventsHelperService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
-            container.Register<IGridAreaUpdatedIntegrationEventParser, GridAreaUpdatedIntegrationEventParser>(Lifestyle.Scoped);
-            container.Register<IOrganizationUpdatedIntegrationEventParser, OrganizationUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IChangesToActorHelper, ChangesToActorHelper>(Lifestyle.Scoped);
-            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
+            container.Register<IGridAreaIntegrationEventParser, GridAreaIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IGridAreaUpdatedIntegrationEventParser, GridAreaUpdatedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IGridAreaNameChangedIntegrationEventParser, GridAreaNameChangedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationCreatedIntegrationEventParser, OrganizationCreatedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationNameChangedIntegrationEventParser, OrganizationNameChangedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationCommentChangedIntegrationEventParser, OrganizationCommentChangedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser, OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationAddressChangedIntegrationEventParser, OrganizationAddressChangedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IOrganizationUpdatedIntegrationEventParser, OrganizationUpdatedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdated).Assembly);
         }
     }
 }

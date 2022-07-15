@@ -18,6 +18,8 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
@@ -36,6 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 var contract = new ActorUpdatedIntegrationEventContract
                 {
                     Id = integrationEvent.Id.ToString(),
+                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     ActorId = integrationEvent.ActorId.ToString(),
                     ExternalActorId = externalActorId,
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
@@ -82,6 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 
                 return new ActorUpdatedIntegrationEvent(
                     Guid.Parse(contract.Id),
+                    contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
                     externalActorId,
