@@ -15,6 +15,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -23,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
     public static class MockedBusinessRegisterIdentifier
     {
         private static readonly object _key = new object();
-        private static int _no = 0;
+        private static int _no;
 
         public static BusinessRegisterIdentifier New()
         {
@@ -50,10 +51,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
                         {
                             var record = (IDataRecord)reader;
 
-                            int.TryParse(record.GetString(0), out _no);
+                            if (int.TryParse(record.GetString(0), out var no))
+                            {
+                                _no = no;
+                            }
                         }
                     }
+#pragma warning disable CA1031
                     catch (Exception)
+#pragma warning restore CA1031
                     {
                         // ignored
                     }
@@ -65,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
                 }
 
                 ++_no;
-                return new(_no.ToString());
+                return new(_no.ToString(CultureInfo.InvariantCulture));
             }
         }
     }
