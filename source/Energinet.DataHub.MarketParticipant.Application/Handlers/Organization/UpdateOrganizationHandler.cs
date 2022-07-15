@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
         private readonly IOrganizationIntegrationEventsHelperService _organizationIntegrationEventsHelperService;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
@@ -39,10 +40,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             IUnitOfWorkProvider unitOfWorkProvider,
             IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
             IOrganizationExistsHelperService organizationExistsHelperService,
+            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService,
             IOrganizationIntegrationEventsHelperService organizationIntegrationEventsHelperService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
+            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
             _organizationIntegrationEventsHelperService = organizationIntegrationEventsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
@@ -69,6 +72,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
             organization.Comment = request.Organization.Comment;
+
+            await _uniqueOrganizationBusinessRegisterIdentifierService
+                .EnsureUniqueMarketRolesPerGridAreaAsync(organization)
+                .ConfigureAwait(false);
 
             await using var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

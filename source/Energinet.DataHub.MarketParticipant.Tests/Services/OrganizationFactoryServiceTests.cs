@@ -47,7 +47,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object);
+                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -66,7 +67,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object);
+                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -85,7 +87,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object);
+                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -104,7 +107,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object);
+                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             var orgId = new OrganizationId(Guid.NewGuid());
             var organization = new Organization(
@@ -152,7 +156,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                organizationIntegrationEventsQueueService.Object);
+                organizationIntegrationEventsQueueService.Object,
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             var orgId = new OrganizationId(Guid.NewGuid());
             var organization = new Organization(
