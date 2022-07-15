@@ -29,12 +29,12 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationNameChangedIntegrationEventContract()
+                var contract = new OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract()
                 {
                     Id = integrationEvent.Id.ToString(),
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Name = integrationEvent.BusinessRegisterIdentifier,
+                    BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
                     Type = integrationEvent.Type
                 };
 
@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationNameChangedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract)}", ex);
             }
         }
 
