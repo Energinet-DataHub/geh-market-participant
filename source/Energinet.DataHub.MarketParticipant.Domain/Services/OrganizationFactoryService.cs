@@ -26,15 +26,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
+        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
 
         public OrganizationFactoryService(
             IOrganizationRepository organizationRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
-            IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService)
+            IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
+            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
         {
             _organizationRepository = organizationRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
+            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
         }
 
         public async Task<Organization> CreateAsync(
@@ -48,6 +51,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             ArgumentNullException.ThrowIfNull(address, nameof(address));
 
             var newOrganization = new Organization(name, businessRegisterIdentifier, address, comment);
+
+            await _uniqueOrganizationBusinessRegisterIdentifierService
+                .EnsureUniqueMarketRolesPerGridAreaAsync(newOrganization).ConfigureAwait(false);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

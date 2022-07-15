@@ -36,6 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
 
             container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
             container.Register<IUniqueMarketRoleGridAreaService, UniqueMarketRoleGridAreaService>(Lifestyle.Scoped);
+            container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
 
             container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);

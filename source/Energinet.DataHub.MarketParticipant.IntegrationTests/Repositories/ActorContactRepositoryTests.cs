@@ -36,8 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             "Test City",
             "Test Country");
 
-        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
-
         public ActorContactRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
             _fixture = fixture;
@@ -71,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationRepository = new OrganizationRepository(context);
 
-            var organization = new Organization("Test Organization", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -122,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -165,7 +163,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -226,7 +224,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
