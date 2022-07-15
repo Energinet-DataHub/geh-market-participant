@@ -16,6 +16,7 @@ using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using Xunit;
