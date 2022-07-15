@@ -17,52 +17,57 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 {
-    public sealed class GridAreaUpdatedIntegrationEventParser : IGridAreaUpdatedIntegrationEventParser
+    public class OrganizationNameChangedIntegrationEventParser : IOrganizationNameChangedIntegrationEventParser
     {
-        public byte[] Parse(GridAreaUpdatedIntegrationEvent integrationEvent)
+        public byte[] Parse(OrganizationNameChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new GridAreaUpdatedIntegrationEventContract
+                var contract = new OrganizationNameChangedIntegrationEventContract()
                 {
                     Id = integrationEvent.Id.ToString(),
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
+                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                    OrganizationId = integrationEvent.OrganizationId.ToString(),
                     Name = integrationEvent.Name,
-                    Code = integrationEvent.Code,
-                    PriceAreaCode = (int)integrationEvent.PriceAreaCode,
-                    GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString()
+                    Type = integrationEvent.Type
                 };
 
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationNameChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal GridAreaUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal OrganizationNameChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = GridAreaUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = OrganizationNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                return new GridAreaUpdatedIntegrationEvent(
+                var integrationEvent = new OrganizationNameChangedIntegrationEvent(
                     Guid.Parse(contract.Id),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.Name,
-                    contract.Code,
-                    Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
-                    Guid.Parse(contract.GridAreaLinkId));
+                    contract.EventCreated.ToDateTime(),
+                    Guid.Parse(contract.OrganizationId),
+                    contract.Name);
+
+                if (integrationEvent.Type != contract.Type)
+                {
+                    throw new FormatException("Invalid Type");
+                }
+
+                return integrationEvent;
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationNameChangedIntegrationEvent)}", ex);
             }
         }
     }

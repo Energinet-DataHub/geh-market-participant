@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             string name,
             string businessRegisterIdentifier,
             Address address)
-        : base(id)
+            : base(id, DateTime.UtcNow)
         {
             OrganizationId = organizationId;
             Name = name;

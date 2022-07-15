@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Integration.Model</PackageId>
-    <PackageVersion>2.2.1$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.3.0$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Integration.Model library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -79,17 +79,81 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
     </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaCreatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+    </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaNameChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
     <Protobuf Include="Protobuf\GridAreaUpdatedIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Internal</Access>
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganisationAddressEventData.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationAddressChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationCommentChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationCreatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+    </Protobuf>
+    <Protobuf Include="Protobuf\OrganizationNameChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
     </Protobuf>
     <Protobuf Include="Protobuf\OrganizationUpdatedIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Internal</Access>
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
     </Protobuf>
   </ItemGroup>
 

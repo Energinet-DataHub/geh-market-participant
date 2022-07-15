@@ -34,6 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var target = new ActorUpdatedIntegrationEventParser();
             var @event = new ActorUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
@@ -88,6 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             var target = new ActorUpdatedIntegrationEventParser();
             var @event = new ActorUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 null,
