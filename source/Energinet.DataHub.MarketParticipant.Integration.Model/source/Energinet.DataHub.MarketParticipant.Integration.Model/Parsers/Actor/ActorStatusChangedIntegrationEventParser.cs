@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
@@ -58,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
-                    System.Enum.Parse<ActorStatus>(contract.Status));
+                    Enum.IsDefined(typeof(ActorStatus), contract.Status) ? Enum.Parse<ActorStatus>(contract.Status) : throw new FormatException(nameof(contract.Status)));
 
                 if (integrationEvent.Type != contract.Type)
                 {

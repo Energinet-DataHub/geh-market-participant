@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Xunit;
 using Xunit.Categories;
 
@@ -48,6 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             Assert.Equal(@event.ActorId, actualEvent.ActorId);
             Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
             Assert.Equal(@event.Status, actualEvent.Status);
+            Assert.Equal(@event.Type, actualEvent.Type);
         }
 
         [Fact]
@@ -61,6 +63,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 Status = "Active",
                 ActorId = Guid.NewGuid().ToString(),
                 OrganizationId = Guid.NewGuid().ToString(),
+                Type = nameof(ActorStatusChangedIntegrationEvent),
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
             // Act + Assert
@@ -74,10 +78,31 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             var target = new ActorStatusChangedIntegrationEventParser();
             var contract = new ActorStatusChangedIntegrationEventContract
             {
-                Id = "Not_A_Giud",
+                Id = Guid.NewGuid().ToString(),
                 Status = "FAIL",
                 ActorId = Guid.NewGuid().ToString(),
-                OrganizationId = Guid.NewGuid().ToString()
+                OrganizationId = Guid.NewGuid().ToString(),
+                Type = nameof(ActorStatusChangedIntegrationEvent),
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
+        public void Parse_InvalidActorStatusEnumNumber_ThrowsException()
+        {
+            // Arrange
+            var target = new ActorStatusChangedIntegrationEventParser();
+            var contract = new ActorStatusChangedIntegrationEventContract
+            {
+                Id = Guid.NewGuid().ToString(),
+                Status = "123",
+                ActorId = Guid.NewGuid().ToString(),
+                OrganizationId = Guid.NewGuid().ToString(),
+                Type = nameof(ActorStatusChangedIntegrationEvent),
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
             };
 
             // Act + Assert

@@ -74,6 +74,26 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
         }
 
         [Fact]
+        public void Parse_InvalidMarketRole_ThrowsException()
+        {
+            // Arrange
+            var target = new MarketRoleRemovedFromActorIntegrationEventParser();
+            var contract = new MarketRoleRemovedFromActorIntegrationEventContract
+            {
+                Id = Guid.NewGuid().ToString(),
+                ActorId = Guid.NewGuid().ToString(),
+                OrganizationId = Guid.NewGuid().ToString(),
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
+                MarketRoleFunction = (int)EicFunction.Agent,
+                BusinessRole = -1,
+                Type = nameof(MarketRoleRemovedFromActorIntegrationEvent)
+            };
+
+            // Act + Assert
+            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+        }
+
+        [Fact]
         public void Parse_InvalidType_ThrowsException()
         {
             // Arrange

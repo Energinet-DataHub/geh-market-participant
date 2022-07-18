@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
@@ -35,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     ActorId = integrationEvent.ActorId.ToString(),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    //businessRoleCode = integrationEvent.BusinessRoleCode.ToString(),
+                    BusinessRole = (int)integrationEvent.BusinessRoleCode,
                     MarketRoleFunction = (int)integrationEvent.MarketRole,
                     Type = integrationEvent.Type
                 };
@@ -58,8 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     Guid.Parse(contract.Id),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
-                    BusinessRoleCode.Ddk,
-                    (EicFunction)contract.MarketRoleFunction,
+                    Enum.IsDefined(typeof(BusinessRoleCode), contract.BusinessRole) ? (BusinessRoleCode)contract.BusinessRole : throw new FormatException(nameof(contract.BusinessRole)),
+                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
                     contract.EventCreated.ToDateTime());
 
                 if (integrationEvent.Type != contract.Type)

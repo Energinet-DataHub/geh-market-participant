@@ -86,9 +86,10 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     contract.BusinessRoles
                         .Select(c => Enum.IsDefined(typeof(BusinessRoleCode), c) ? (BusinessRoleCode)c : throw new FormatException(nameof(contract.BusinessRoles)))
                         .ToList(),
-                    contract.ActorMarketRoles.Select(
-                        x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
-                            g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))),
+                    contract.ActorMarketRoles
+                        .Select(x => new Dtos.ActorMarketRole(ParseOrThrowOnMarketRole().Invoke(x.Function), x.GridAreas.Select(
+                            g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes))))
+                        .ToList(),
                     contract.EventCreated.ToDateTime());
 
                 if (integrationEvent.Type != contract.Type)
@@ -103,5 +104,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorCreatedIntegrationEvent)}", ex);
             }
         }
+
+        private Func<int, EicFunction> ParseOrThrowOnMarketRole() => i =>
+            Enum.IsDefined(typeof(EicFunction), i) ? (EicFunction)i : throw new FormatException(nameof(EicFunction));
     }
 }
