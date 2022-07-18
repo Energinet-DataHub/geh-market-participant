@@ -16,18 +16,20 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed class AddGridAreaIntegrationEvent
+    public sealed class MeteringPointTypeRemovedFromIntegrationEvent
     {
-        public AddGridAreaIntegrationEvent(
+        public MeteringPointTypeRemovedFromIntegrationEvent(
             Guid eventId,
             Guid actorId,
             EicFunction function,
-            Guid gridAreaId)
+            Guid gridAreaId,
+            string type)
         {
             EventId = eventId;
             ActorId = actorId;
             Function = function;
             GridAreaId = gridAreaId;
+            Type = type;
             EventCreated = DateTime.Now;
         }
 
@@ -35,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public Guid ActorId { get; }
         public EicFunction Function { get; }
         public Guid GridAreaId { get; }
+        public string Type { get; }
         public DateTime EventCreated { get; }
     }
 }

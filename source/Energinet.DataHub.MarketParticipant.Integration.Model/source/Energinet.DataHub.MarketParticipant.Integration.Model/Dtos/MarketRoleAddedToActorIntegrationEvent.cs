@@ -16,25 +16,26 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed class AddMarketRoleIntegrationEvent
+    public sealed record MarketRoleAddedToActorIntegrationEvent : BaseIntegrationEvent
     {
-        public AddMarketRoleIntegrationEvent(
+        public MarketRoleAddedToActorIntegrationEvent(
             Guid eventId,
             Guid actorId,
+            Guid organizationId,
             BusinessRoleCode businessRole,
-            EicFunction marketRole)
+            EicFunction marketRole,
+            DateTime eventCreated)
+            : base(eventId, eventCreated)
         {
-            EventId = eventId;
             ActorId = actorId;
+            OrganizationId = organizationId;
             BusinessRole = businessRole;
             MarketRole = marketRole;
-            EventCreated = DateTime.Now;
         }
 
-        public Guid EventId { get; }
+        public Guid OrganizationId { get; }
         public Guid ActorId { get; }
         public BusinessRoleCode BusinessRole { get; }
         public EicFunction MarketRole { get; }
-        public DateTime EventCreated { get; }
     }
 }

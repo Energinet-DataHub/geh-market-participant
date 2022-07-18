@@ -23,22 +23,22 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class MeteringPointTypeAddedToActorIntegrationEventParser : IMeteringPointTypeAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(AddMeteringPointTypeIntegrationEvent integrationEvent)
+        public byte[] Parse(MeteringPointTypeAddedToActorIntegrationEvent addedToActorIntegrationEvent)
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                ArgumentNullException.ThrowIfNull(addedToActorIntegrationEvent, nameof(addedToActorIntegrationEvent));
 
                 var contract = new MeteringPointTypeAddedToActorIntegrationEventContract
                 {
-                    Id = integrationEvent.EventId.ToString(),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    MarketRoleFunction = (int)integrationEvent.Function,
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    MeteringPointType = integrationEvent.Type,
-                    Type = integrationEvent.Type
+                    Id = addedToActorIntegrationEvent.EventId.ToString(),
+                    ActorId = addedToActorIntegrationEvent.ActorId.ToString(),
+                    OrganizationId = addedToActorIntegrationEvent.OrganizationId.ToString(),
+                    EventCreated = Timestamp.FromDateTime(addedToActorIntegrationEvent.EventCreated),
+                    MarketRoleFunction = (int)addedToActorIntegrationEvent.Function,
+                    GridAreaId = addedToActorIntegrationEvent.GridAreaId.ToString(),
+                    MeteringPointType = addedToActorIntegrationEvent.MeteringPointType,
+                    Type = addedToActorIntegrationEvent.Type
                 };
 
                 return contract.ToByteArray();
@@ -49,13 +49,13 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        internal AddMeteringPointTypeIntegrationEvent Parse(byte[] protoContract)
+        internal MeteringPointTypeAddedToActorIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = MeteringPointTypeAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new AddMeteringPointTypeIntegrationEvent(
+                var integrationEvent = new MeteringPointTypeAddedToActorIntegrationEvent(
                     Guid.Parse(contract.Id),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
