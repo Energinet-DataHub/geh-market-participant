@@ -119,12 +119,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var integrationEvents = new List<IIntegrationEvent>();
             integrationEvents.Add(new ActorStatusChangedIntegrationEvent());
-            integrationEvents.Add(new AddMarketRoleIntegrationEvent());
-            integrationEvents.Add(new RemoveMarketRoleIntegrationEvent());
-            integrationEvents.Add(new AddGridAreaIntegrationEvent());
-            integrationEvents.Add(new RemoveGridAreaIntegrationEvent());
-            integrationEvents.Add(new AddMeteringPointTypeIntegrationEvent());
-            integrationEvents.Add(new RemoveMeteringPointTypeIntegrationEvent());
+            integrationEvents.Add(new MarketRoleAddedToActorIntegrationEvent());
+            integrationEvents.Add(new MarketRoleRemovedFromActorIntegrationEvent());
+            integrationEvents.Add(new GridAreaAddedToActorIntegrationEvent());
+            integrationEvents.Add(new GridAreaRemovedFromActorIntegrationEvent());
+            integrationEvents.Add(new MeteringPointTypeAddedToActorIntegrationEvent());
+            integrationEvents.Add(new MeteringPointTypeRemovedFromActorIntegrationEvent());
 
             // Act
             await target.EnqueueActorUpdatedEventAsync(

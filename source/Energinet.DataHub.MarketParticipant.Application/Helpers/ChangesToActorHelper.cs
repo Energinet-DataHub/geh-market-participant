@@ -102,7 +102,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             var gridAreas = existingActor.MarketRoles.First(marketRole => marketRole.Function == eicFunction).GridAreas;
             var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas);
 
-            _changeEvents.Add(new RemoveMarketRoleIntegrationEvent
+            _changeEvents.Add(new MarketRoleRemovedFromActorIntegrationEvent
             {
                 OrganizationId = organizationId,
                 ActorId = existingActor.Id,
@@ -118,7 +118,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             var gridAreas = incomingMarketRoles.First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == eicFunction).GridAreas;
             var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas.Select(gridArea => new ActorGridArea(gridArea.Id, gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))));
 
-            _changeEvents.Add(new AddMarketRoleIntegrationEvent
+            _changeEvents.Add(new MarketRoleAddedToActorIntegrationEvent
             {
                 OrganizationId = organizationId,
                 ActorId = existingActor.Id,
@@ -206,7 +206,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
     {
         foreach (var gridArea in gridAreas)
         {
-            _changeEvents.Add(new AddGridAreaIntegrationEvent
+            _changeEvents.Add(new GridAreaAddedToActorIntegrationEvent
                 {
                     OrganizationId = organizationId,
                     ActorId = existingActorId,
@@ -232,7 +232,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
     {
         foreach (var meteringPointType in gridAreaMeteringPointTypes)
         {
-            _changeEvents.Add(new AddMeteringPointTypeIntegrationEvent
+            _changeEvents.Add(new MeteringPointTypeAddedToActorIntegrationEvent
             {
                 OrganizationId = organizationId,
                 ActorId = existingActorId,
@@ -247,7 +247,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
     {
         foreach (var gridArea in gridAreas)
         {
-            _changeEvents.Add(new RemoveGridAreaIntegrationEvent
+            _changeEvents.Add(new GridAreaRemovedFromActorIntegrationEvent
             {
                 OrganizationId = organizationId,
                 ActorId = existingActorId,
@@ -273,7 +273,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
     {
         foreach (var meteringPointType in gridAreaMeteringPointTypes)
         {
-            _changeEvents.Add(new RemoveMeteringPointTypeIntegrationEvent
+            _changeEvents.Add(new MeteringPointTypeRemovedFromActorIntegrationEvent
             {
                 OrganizationId = organizationId,
                 ActorId = existingActorId,

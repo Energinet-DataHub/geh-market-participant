@@ -87,21 +87,21 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                             break;
                         }
 
-                    case AddMarketRoleIntegrationEvent or RemoveMarketRoleIntegrationEvent:
+                    case MarketRoleAddedToActorIntegrationEvent or MarketRoleRemovedFromActorIntegrationEvent:
                         {
                             var domainEvent = new DomainEvent(actorId, nameof(ActorMarketRole), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
-                    case AddGridAreaIntegrationEvent or RemoveGridAreaIntegrationEvent:
+                    case GridAreaAddedToActorIntegrationEvent or GridAreaRemovedFromActorIntegrationEvent:
                         {
                             var domainEvent = new DomainEvent(actorId, nameof(ActorGridArea), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
-                    case AddMeteringPointTypeIntegrationEvent or RemoveMeteringPointTypeIntegrationEvent:
+                    case MeteringPointTypeAddedToActorIntegrationEvent or MeteringPointTypeRemovedFromActorIntegrationEvent:
                         {
                             var domainEvent = new DomainEvent(actorId, nameof(MeteringPointType), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);

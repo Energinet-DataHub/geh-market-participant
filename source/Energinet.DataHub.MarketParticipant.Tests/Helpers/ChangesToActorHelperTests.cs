@@ -75,12 +75,12 @@ public class ChangesToActorHelperTests
 
         // Assert
         var numberOfStatusChangedEvents = result.Count(x => x is ActorStatusChangedIntegrationEvent);
-        var numberOfAddMeteringPointEvents = result.Count(x => x is AddMeteringPointTypeIntegrationEvent);
-        var numberOfRemoveMeteringPointEvents = result.Count(x => x is RemoveMeteringPointTypeIntegrationEvent);
-        var numberOfAddGridAreaEvents = result.Count(x => x is AddGridAreaIntegrationEvent);
-        var numberOfRemoveGridAreaEvents = result.Count(x => x is RemoveGridAreaIntegrationEvent);
-        var numberOfAddMarketRoleEvents = result.Count(x => x is AddMarketRoleIntegrationEvent);
-        var numberOfRemoveMarketRoleEvents = result.Count(x => x is RemoveMarketRoleIntegrationEvent);
+        var numberOfAddMeteringPointEvents = result.Count(x => x is MeteringPointTypeAddedToActorIntegrationEvent);
+        var numberOfRemoveMeteringPointEvents = result.Count(x => x is MeteringPointTypeRemovedFromActorIntegrationEvent);
+        var numberOfAddGridAreaEvents = result.Count(x => x is GridAreaAddedToActorIntegrationEvent);
+        var numberOfRemoveGridAreaEvents = result.Count(x => x is GridAreaRemovedFromActorIntegrationEvent);
+        var numberOfAddMarketRoleEvents = result.Count(x => x is MarketRoleAddedToActorIntegrationEvent);
+        var numberOfRemoveMarketRoleEvents = result.Count(x => x is MarketRoleRemovedFromActorIntegrationEvent);
 
         Assert.Equal(1, numberOfStatusChangedEvents);
         Assert.Equal(2, numberOfAddMeteringPointEvents);

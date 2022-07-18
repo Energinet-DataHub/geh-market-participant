@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
-public sealed class RemoveMeteringPointTypeIntegrationEvent : IntegrationEventBase
+public sealed class MeteringPointTypeRemovedFromActorIntegrationEvent : IntegrationEventBase
 {
     public OrganizationId OrganizationId { get; set; } = null!;
     public Guid ActorId { get; set; }
