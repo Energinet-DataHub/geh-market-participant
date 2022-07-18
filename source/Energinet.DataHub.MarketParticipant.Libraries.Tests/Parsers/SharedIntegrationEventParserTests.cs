@@ -388,6 +388,52 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
+        public void ParseCorrectlyWith_MarketRoleRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MarketRoleRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MarketRoleRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                BusinessRoleCode.Ddk,
+                EicFunction.Agent,
+                DateTime.UtcNow);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MarketRoleRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_MarketRoleAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MarketRoleAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MarketRoleAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                BusinessRoleCode.Ddk,
+                EicFunction.Agent,
+                DateTime.UtcNow);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MarketRoleAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
         public void ParseException_FallThrough()
         {
             // Arrange

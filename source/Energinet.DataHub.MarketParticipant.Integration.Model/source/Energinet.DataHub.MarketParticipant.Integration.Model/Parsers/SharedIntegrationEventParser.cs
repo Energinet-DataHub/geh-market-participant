@@ -100,6 +100,16 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return gridAreaRemovedFromActorIntegrationEvent;
             }
 
+            if (TryParseMarketRoleAddedToActorIntegrationEvent(protoContract, out var marketRoleAddedToActorIntegrationEvent))
+            {
+                return marketRoleAddedToActorIntegrationEvent;
+            }
+
+            if (TryParseMarketRoleRemovedFromActorIntegrationEvent(protoContract, out var marketRoleRemovedFromActorIntegrationEvent))
+            {
+                return marketRoleRemovedFromActorIntegrationEvent;
+            }
+
             throw new MarketParticipantException("IntegrationEventParser not found");
         }
 
@@ -389,6 +399,44 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 gridAreaRemovedFromActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseMarketRoleAddedToActorIntegrationEvent(
+            byte[] protoContract,
+            out MarketRoleAddedToActorIntegrationEvent marketRoleAddedToActorIntegrationEvent)
+        {
+            try
+            {
+                var marketRoleAddedToActorIntegrationEventParser = new MarketRoleAddedToActorIntegrationEventParser();
+                marketRoleAddedToActorIntegrationEvent = marketRoleAddedToActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                marketRoleAddedToActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseMarketRoleRemovedFromActorIntegrationEvent(
+            byte[] protoContract,
+            out MarketRoleRemovedFromActorIntegrationEvent marketRoleRemovedFromActorIntegrationEvent)
+        {
+            try
+            {
+                var marketRoleRemovedFromActorIntegrationEventParser = new MarketRoleRemovedFromActorIntegrationEventParser();
+                marketRoleRemovedFromActorIntegrationEvent = marketRoleRemovedFromActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                marketRoleRemovedFromActorIntegrationEvent = null!;
                 return false;
             }
         }

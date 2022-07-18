@@ -22,7 +22,7 @@ using Google.Protobuf;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
+namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
 {
     [UnitTest]
     public class ActorUpdatedIntegrationEventParserTests
