@@ -19,16 +19,17 @@ using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActorUpdated : EventDispatcherBase
+    public sealed class ActorStatusChangedEventDispatcher : EventDispatcherBase
     {
-        private readonly IActorUpdatedIntegrationEventParser _eventParser;
+        private readonly IActorStatusChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public ActorUpdated(
-            IActorUpdatedIntegrationEventParser eventParser,
+        public ActorStatusChangedEventDispatcher(
+            IActorStatusChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -39,21 +40,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorStatusChangedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorStatusChangedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,
-                actorUpdatedIntegrationEvent.OrganizationId.Value,
-                actorUpdatedIntegrationEvent.ExternalActorId?.Value,
-                actorUpdatedIntegrationEvent.ActorNumber.Value,
-                (ActorStatus)actorUpdatedIntegrationEvent.Status,
-                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
-                actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
-                    new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
-                        new ActorGridArea(y.Id, y.MeteringPointTypes)))));
+                actorUpdatedIntegrationEvent.OrganizationId,
+                (ActorStatus)actorUpdatedIntegrationEvent.Status);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);
