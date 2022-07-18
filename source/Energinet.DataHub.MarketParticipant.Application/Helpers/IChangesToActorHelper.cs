@@ -27,10 +27,12 @@ public interface IChangesToActorHelper
     /// <summary>
     /// Find any possible changes made to an Actor
     /// </summary>
+    /// <param name="organizationId"></param>
     /// <param name="existingActor"></param>
     /// <param name="incomingActor"></param>
     /// <returns>A list of integration events to send to a message queue</returns>
     IEnumerable<IIntegrationEvent> FindChangesMadeToActor(
+        OrganizationId organizationId,
         Actor existingActor,
         UpdateActorCommand incomingActor);
 }

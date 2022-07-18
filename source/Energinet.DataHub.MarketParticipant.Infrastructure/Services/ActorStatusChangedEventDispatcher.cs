@@ -40,14 +40,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorStatusChangedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorStatusChangedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.ActorStatusChangedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,
-                actorUpdatedIntegrationEvent.OrganizationId,
+                actorUpdatedIntegrationEvent.OrganizationId.Value,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);

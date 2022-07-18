@@ -12,14 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-
-public sealed class AddMeteringPointTypeIntegrationEvent : IntegrationEventBase
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents
 {
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Guid GridAreaId { get; set; }
-    public MeteringPointType Type { get; set; } = MeteringPointType.Unknown;
+    public sealed class OrganizationNameChangedIntegrationEvent : IntegrationEventBase
+    {
+        public OrganizationId OrganizationId { get; set; } = null!;
+        public string Name { get; set; } = null!;
+    }
 }

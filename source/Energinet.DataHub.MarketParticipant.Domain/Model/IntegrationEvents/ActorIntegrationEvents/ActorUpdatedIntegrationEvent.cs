@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
     public sealed class ActorUpdatedIntegrationEvent : IntegrationEventBase
     {

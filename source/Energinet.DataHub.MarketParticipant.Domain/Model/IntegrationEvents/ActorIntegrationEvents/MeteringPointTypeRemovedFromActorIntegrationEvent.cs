@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
-public sealed class AddMarketRoleIntegrationEvent : IntegrationEventBase
+public sealed class RemoveMeteringPointTypeIntegrationEvent : IntegrationEventBase
 {
-    public Guid ActorId { get; init; }
-    public BusinessRoleCode BusinessRole { get; init; }
-    public EicFunction MarketRole { get; init; }
+    public OrganizationId OrganizationId { get; set; } = null!;
+    public Guid ActorId { get; set; }
+    public EicFunction Function { get; set; }
+    public Guid GridAreaId { get; set; }
+    public MeteringPointType Type { get; set; } = MeteringPointType.Unknown;
 }

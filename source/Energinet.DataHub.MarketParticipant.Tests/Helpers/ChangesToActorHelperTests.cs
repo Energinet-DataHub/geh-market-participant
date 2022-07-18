@@ -15,12 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
@@ -31,9 +29,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Helpers;
 [UnitTest]
 public class ChangesToActorHelperTests
 {
+    private readonly OrganizationId _organizationId = CreateOrganizationId();
     private readonly Actor _actor = CreateValidActorWithChildren();
     private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
     private readonly Mock<IBusinessRoleCodeDomainService> _businessRoleCodeDomainServiceMock = new();
+
+    [Fact]
+    public void FindChangesMadeToActor_OrganizationIdNull_ThrowsException()
+    {
+        // Arrange
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
+
+        // Act + Assert
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _actor, _incomingActor));
+    }
 
     [Fact]
     public void FindChangesMadeToActor_ExistingActorNull_ThrowsException()
@@ -42,7 +51,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _incomingActor));
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_organizationId, null!, _incomingActor));
     }
 
     [Fact]
@@ -52,7 +61,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_actor, null!));
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_organizationId, _actor, null!));
     }
 
     [Fact]
@@ -62,7 +71,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act
-        var result = target.FindChangesMadeToActor(_actor, _incomingActor).ToList();
+        var result = target.FindChangesMadeToActor(_organizationId, _actor, _incomingActor).ToList();
 
         // Assert
         var numberOfStatusChangedEvents = result.Count(x => x is ActorStatusChangedIntegrationEvent);
@@ -81,6 +90,11 @@ public class ChangesToActorHelperTests
         Assert.Equal(1, numberOfAddMarketRoleEvents);
         Assert.Equal(1, numberOfRemoveMarketRoleEvents);
         Assert.Equal(14, result.Count);
+    }
+
+    private static OrganizationId CreateOrganizationId()
+    {
+        return new OrganizationId(Guid.NewGuid());
     }
 
     private static Actor CreateValidActorWithChildren()

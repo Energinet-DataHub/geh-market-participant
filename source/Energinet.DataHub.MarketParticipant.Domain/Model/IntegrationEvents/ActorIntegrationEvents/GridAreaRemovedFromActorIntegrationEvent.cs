@@ -14,12 +14,12 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
-public sealed class RemoveMeteringPointTypeIntegrationEvent : IntegrationEventBase
+public sealed class RemoveGridAreaIntegrationEvent : IntegrationEventBase
 {
+    public OrganizationId OrganizationId { get; set; } = null!;
     public Guid ActorId { get; set; }
     public EicFunction Function { get; set; }
     public Guid GridAreaId { get; set; }
-    public MeteringPointType Type { get; set; } = MeteringPointType.Unknown;
 }

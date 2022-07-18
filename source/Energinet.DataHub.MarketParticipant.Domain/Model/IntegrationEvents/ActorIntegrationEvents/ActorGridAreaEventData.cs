@@ -12,14 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+using System;
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+
+public class ActorGridAreaEventData
 {
-    public sealed class GridAreaUpdatedIntegrationEvent : IntegrationEventBase
+    public ActorGridAreaEventData(
+        Guid id,
+        ICollection<string> meteringPointTypes)
     {
-        public GridAreaId GridAreaId { get; set; } = null!;
-        public GridAreaName Name { get; set; } = null!;
-        public GridAreaCode Code { get; set; } = null!;
-        public PriceAreaCode PriceAreaCode { get; set; } = PriceAreaCode.Dk1;
-        public GridAreaLinkId GridAreaLinkId { get; set; } = null!;
+        Id = id;
+        MeteringPointTypes = meteringPointTypes;
     }
+
+    public Guid Id { get; }
+    public ICollection<string> MeteringPointTypes { get; }
 }

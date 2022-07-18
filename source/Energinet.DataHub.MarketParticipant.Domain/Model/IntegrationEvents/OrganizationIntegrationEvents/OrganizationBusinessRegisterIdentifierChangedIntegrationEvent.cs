@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents
 {
-    public sealed class OrganizationCommentChangedIntegrationEvent : IntegrationEventBase
+    public sealed class OrganizationBusinessRegisterIdentifierChangedIntegrationEvent : IntegrationEventBase
     {
         public OrganizationId OrganizationId { get; set; } = null!;
-        public string? Comment { get; set; }
+        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; } = null!;
     }
 }

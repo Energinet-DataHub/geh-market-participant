@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 throw new NotFoundValidationException(actorId);
             }
 
-            var integrationEvents = _changesToActorHelper.FindChangesMadeToActor(actor, request);
+            var integrationEvents = _changesToActorHelper.FindChangesMadeToActor(organization.Id, actor, request);
             UpdateActorStatus(actor, request);
             UpdateActorMarketRolesAndChildren(organization, actor, request);
 
