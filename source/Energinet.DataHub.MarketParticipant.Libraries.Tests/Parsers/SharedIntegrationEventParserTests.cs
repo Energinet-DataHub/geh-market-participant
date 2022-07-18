@@ -292,6 +292,102 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
+        public void ParseCorrectlyWith_MeteringPointTypeAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MeteringPointTypeAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MeteringPointTypeAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                "123");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MeteringPointTypeAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_MeteringPointTypeRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MeteringPointTypeRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MeteringPointTypeRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                "123",
+                DateTime.UtcNow);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MeteringPointTypeRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                Guid.NewGuid());
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                Guid.NewGuid());
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
         public void ParseException_FallThrough()
         {
             // Arrange
