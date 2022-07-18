@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
+using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
@@ -71,13 +72,20 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 var contract = ActorCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
+                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                    ? id
+                    : null;
+
                 var integrationEvent = new ActorCreatedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.ExternalActorId),
+                    externalActorId,
                     Guid.Parse(contract.OrganizationId),
-                    (ActorStatus)contract.Status,
+                    Enum.IsDefined(typeof(ActorStatus), contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
                     contract.ActorNumber,
+                    contract.BusinessRoles
+                        .Select(c => Enum.IsDefined(typeof(BusinessRoleCode), c) ? (BusinessRoleCode)c : throw new FormatException(nameof(contract.BusinessRoles)))
+                        .ToList(),
                     contract.ActorMarketRoles.Select(
                         x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
                             g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))),

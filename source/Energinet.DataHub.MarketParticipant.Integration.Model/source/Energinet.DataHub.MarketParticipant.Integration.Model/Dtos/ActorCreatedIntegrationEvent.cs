@@ -22,10 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public ActorCreatedIntegrationEvent(
             Guid eventId,
             Guid actorId,
-            Guid externalActorId,
+            Guid? externalActorId,
             Guid organizationId,
             ActorStatus status,
             string actorNumber,
+            IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<ActorMarketRole> actorMarketRoles,
             DateTime eventCreated)
             : base(eventId, eventCreated)
@@ -35,14 +36,16 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             OrganizationId = organizationId;
             Status = status;
             ActorNumber = actorNumber;
+            BusinessRoles = businessRoles;
             ActorMarketRoles = actorMarketRoles;
         }
 
         public Guid ActorId { get; }
-        public Guid ExternalActorId { get; }
+        public Guid? ExternalActorId { get; }
         public Guid OrganizationId { get; }
         public ActorStatus Status { get; }
         public string ActorNumber { get; }
+        public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
         public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
     }
 }

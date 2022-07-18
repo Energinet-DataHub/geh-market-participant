@@ -56,6 +56,32 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
+        public void ParseCorrectlyWith_ActorCreatedIntegrationEventParser()
+        {
+            // arrange
+            var input = new ActorCreatedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ActorCreatedIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                ActorStatus.Active,
+                "0123456789012",
+                new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
+                new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
+                DateTime.UtcNow);
+
+            // act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // assert
+            Assert.IsType<ActorCreatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
         public void ParseCorrectlyWith_ActorStatusChangedIntegrationEventParser()
         {
             // arrange
