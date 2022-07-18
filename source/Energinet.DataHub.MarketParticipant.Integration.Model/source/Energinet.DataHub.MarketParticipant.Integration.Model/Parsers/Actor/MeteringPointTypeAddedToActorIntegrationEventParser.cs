@@ -21,21 +21,23 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
-    public sealed class ActorStatusChangedIntegrationEventParser : IActorStatusChangedIntegrationEventParser
+    public sealed class MeteringPointTypeAddedToActorIntegrationEventParser : IMeteringPointTypeAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(ActorStatusChangedIntegrationEvent integrationEvent)
+        public byte[] Parse(AddMeteringPointTypeIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new ActorStatusChangedIntegrationEventContract
+                var contract = new MeteringPointTypeAddedToActorIntegrationEventContract
                 {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                    Id = integrationEvent.EventId.ToString(),
                     ActorId = integrationEvent.ActorId.ToString(),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Status = integrationEvent.Status.ToString(),
+                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                    MarketRoleFunction = (int)integrationEvent.Function,
+                    GridAreaId = integrationEvent.GridAreaId.ToString(),
+                    MeteringPointType = integrationEvent.Type,
                     Type = integrationEvent.Type
                 };
 
@@ -43,22 +45,24 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(ActorStatusChangedIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeAddedToActorIntegrationEventContract)}", e);
             }
         }
 
-        internal ActorStatusChangedIntegrationEvent Parse(byte[] protoContract)
+        internal AddMeteringPointTypeIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = ActorStatusChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = MeteringPointTypeAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new ActorStatusChangedIntegrationEvent(
+                var integrationEvent = new AddMeteringPointTypeIntegrationEvent(
                     Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
-                    System.Enum.Parse<ActorStatus>(contract.Status));
+                    (EicFunction)contract.MarketRoleFunction,
+                    Guid.Parse(contract.GridAreaId),
+                    contract.EventCreated.ToDateTime(),
+                    contract.MeteringPointType);
 
                 if (integrationEvent.Type != contract.Type)
                 {

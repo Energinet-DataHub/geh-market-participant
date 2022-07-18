@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,13 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record ActorStatusChangedIntegrationEvent : BaseIntegrationEvent
+    public record ActorCreatedIntegrationEvent : BaseIntegrationEvent
     {
-        public ActorStatusChangedIntegrationEvent(
+        public ActorCreatedIntegrationEvent(
             Guid eventId,
-            DateTime eventCreated,
-            Guid actorId,
-            Guid organizationId,
-            ActorStatus status)
+            DateTime eventCreated)
             : base(eventId, eventCreated)
         {
-            ActorId = actorId;
-            OrganizationId = organizationId;
-            Status = status;
         }
-
-        public Guid ActorId { get; }
-        public Guid OrganizationId { get; }
-        public ActorStatus Status { get; }
     }
 }
