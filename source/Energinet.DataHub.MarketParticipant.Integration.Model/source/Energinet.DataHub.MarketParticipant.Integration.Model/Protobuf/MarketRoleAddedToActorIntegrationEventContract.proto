@@ -24,5 +24,6 @@ message MarketRoleAddedToActorIntegrationEventContract {
     string OrganizationId = 3;
     google.protobuf.Timestamp EventCreated = 4;
     int32 MarketRoleFunction = 5;
-    string Type = 6;
+    int32 BusinessRole = 6;
+    string Type = 7;
 }

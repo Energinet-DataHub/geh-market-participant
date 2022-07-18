@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
@@ -20,9 +21,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
     {
         public ActorCreatedIntegrationEvent(
             Guid eventId,
+            Guid actorId,
+            Guid externalActorId,
+            Guid organizationId,
+            ActorStatus status,
+            string actorNumber,
+            IEnumerable<ActorMarketRole> actorMarketRoles,
             DateTime eventCreated)
             : base(eventId, eventCreated)
         {
+            ActorId = actorId;
+            ExternalActorId = externalActorId;
+            OrganizationId = organizationId;
+            Status = status;
+            ActorNumber = actorNumber;
+            ActorMarketRoles = actorMarketRoles;
         }
+
+        public Guid ActorId { get; }
+        public Guid ExternalActorId { get; }
+        public Guid OrganizationId { get; }
+        public ActorStatus Status { get; }
+        public string ActorNumber { get; }
+        public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
     }
 }

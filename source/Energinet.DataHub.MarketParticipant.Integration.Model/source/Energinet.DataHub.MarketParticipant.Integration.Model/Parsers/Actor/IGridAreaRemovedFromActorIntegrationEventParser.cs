@@ -29,8 +29,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
         /// <summary>
         /// Parses the event.
         /// </summary>
-        /// <param name="removedFromActorIntegrationEvent">The event</param>
+        /// <param name="integrationEvent">The event</param>
         /// <returns>The protobuf contract.</returns>
-        byte[] Parse(GridAreaRemovedFromActorIntegrationEvent removedFromActorIntegrationEvent);
+        byte[] Parse(GridAreaRemovedFromActorIntegrationEvent integrationEvent);
     }
 }

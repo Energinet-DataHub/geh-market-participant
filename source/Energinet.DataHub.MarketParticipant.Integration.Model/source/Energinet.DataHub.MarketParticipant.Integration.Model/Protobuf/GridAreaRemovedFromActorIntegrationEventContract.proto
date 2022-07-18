@@ -23,7 +23,8 @@ message GridAreaRemovedFromActorIntegrationEventContract {
     string ActorId = 2;
     string OrganizationId = 3;
     google.protobuf.Timestamp EventCreated = 4;
-    string GridAreaId = 5;
-    string GridAreaLinkId = 6;
-    string Type = 7;
+    int32 MarketRoleFunction = 5;
+    string GridAreaId = 6;
+    string GridAreaLinkId = 7;
+    string Type = 8;
 }

@@ -24,18 +24,21 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Guid organizationId,
             DateTime eventCreated,
             EicFunction function,
-            Guid gridAreaId)
+            Guid gridAreaId,
+            Guid gridAreaLinkId)
         : base(eventId, eventCreated)
         {
             ActorId = actorId;
             OrganizationId = organizationId;
             Function = function;
             GridAreaId = gridAreaId;
+            GridAreaLinkId = gridAreaLinkId;
         }
 
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
         public EicFunction Function { get; }
         public Guid GridAreaId { get; }
+        public Guid GridAreaLinkId { get; }
     }
 }

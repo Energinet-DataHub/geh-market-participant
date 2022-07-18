@@ -22,20 +22,20 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Guid eventId,
             Guid actorId,
             Guid organizationId,
-            BusinessRoleCode businessRole,
+            BusinessRoleCode businessRoleCode,
             EicFunction marketRole,
             DateTime eventCreated)
             : base(eventId, eventCreated)
         {
             ActorId = actorId;
             OrganizationId = organizationId;
-            BusinessRole = businessRole;
+            BusinessRoleCode = businessRoleCode;
             MarketRole = marketRole;
         }
 
         public Guid OrganizationId { get; }
         public Guid ActorId { get; }
-        public BusinessRoleCode BusinessRole { get; }
+        public BusinessRoleCode BusinessRoleCode { get; }
         public EicFunction MarketRole { get; }
     }
 }
