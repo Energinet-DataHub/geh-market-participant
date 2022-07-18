@@ -30,6 +30,23 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 public sealed class MeteringPointTypeAddedToActorEventDispatcherTests
 {
     [Fact]
+    public async Task TryDispatchAsync_integrationEventNull_ThrowsException()
+    {
+        // Arrange
+        await using var serviceBusSenderMock = new MockedServiceBusSender();
+        var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
+        serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
+
+        var meteringPointTypeEventParser = new MeteringPointTypeAddedToActorIntegrationEventParser();
+        var sut = new MeteringPointTypeAddedToActorEventDispatcher(
+            meteringPointTypeEventParser,
+            serviceBusClient.Object);
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.TryDispatchAsync(null!));
+    }
+
+    [Fact]
     public async Task TryDispatchAsync_SendingCorrectEvent_ReturnsTrue()
     {
         // Arrange
@@ -70,9 +87,32 @@ public sealed class MeteringPointTypeAddedToActorEventDispatcherTests
         Assert.Equal(integrationEvent.Type.Name, actualEvent.MeteringPointType);
     }
 
-    // [Fact]
-    // public async Task TryDispatchAsync_SendingWrongEvent_ReturnsFalse()
-    // {
-    //
-    // }
+    [Fact]
+    public async Task TryDispatchAsync_SendingWrongEvent_ReturnsFalse()
+    {
+        // Arrange
+        await using var serviceBusSenderMock = new MockedServiceBusSender();
+        var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
+        serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
+
+        var meteringPointTypeEventParser = new MeteringPointTypeAddedToActorIntegrationEventParser();
+        var sut = new MeteringPointTypeAddedToActorEventDispatcher(
+            meteringPointTypeEventParser,
+            serviceBusClient.Object);
+
+        var integrationEvent = new MeteringPointTypeRemovedFromActorIntegrationEvent
+        {
+            OrganizationId = new OrganizationId(Guid.NewGuid()),
+            ActorId = Guid.NewGuid(),
+            Function = EicFunction.EnergySupplier,
+            GridAreaId = Guid.NewGuid(),
+            Type = MeteringPointType.E18Production
+        };
+
+        // Act
+        var result = await sut.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
+
+        // Assert
+        Assert.False(result);
+    }
 }
