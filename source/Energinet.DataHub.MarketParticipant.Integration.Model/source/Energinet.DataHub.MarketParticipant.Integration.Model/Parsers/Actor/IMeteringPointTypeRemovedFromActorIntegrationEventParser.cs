@@ -29,8 +29,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
         /// <summary>
         /// Parses the event.
         /// </summary>
-        /// <param name="removedFromIntegrationEvent">The event</param>
+        /// <param name="meteringPointTypeRemovedFromActorIntegrationEvent">The event</param>
         /// <returns>The protobuf contract.</returns>
-        byte[] Parse(MeteringPointTypeRemovedFromIntegrationEvent removedFromIntegrationEvent);
+        byte[] Parse(MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent);
     }
 }
