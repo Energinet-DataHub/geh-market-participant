@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
@@ -23,21 +22,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     public sealed class OrganizationNameChanged : EventDispatcherBase
     {
         private readonly IOrganizationNameChangedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public OrganizationNameChanged(
             IOrganizationNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
+            : base(serviceBusClient)
         {
             _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
         }
 
         public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
-            ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+            ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationNameChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not OrganizationNameChangedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationNameChangedIntegrationEvent(
@@ -47,15 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 organizationUpdatedIntegrationEvent.Name);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
-            var message = new ServiceBusMessage(bytes);
-            SetMessageMetaData(message, outboundIntegrationEvent);
-
-            var sender = _serviceBusClient.CreateSender();
-
-            await using (sender.ConfigureAwait(false))
-            {
-                await sender.SendMessageAsync(message).ConfigureAwait(false);
-            }
+            await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
             return true;
         }
