@@ -19,43 +19,44 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-
-public sealed class ActorUpdated : EventDispatcherBase
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    private readonly IActorUpdatedIntegrationEventParser _eventParser;
-
-    public ActorUpdated(
-        IActorUpdatedIntegrationEventParser eventParser,
-        IMarketParticipantServiceBusClient serviceBusClient)
-        : base(serviceBusClient)
+    public sealed class ActorUpdated : EventDispatcherBase
     {
-        _eventParser = eventParser;
-    }
+        private readonly IActorUpdatedIntegrationEventParser _eventParser;
 
-    public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
-    {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
+        public ActorUpdated(
+            IActorUpdatedIntegrationEventParser eventParser,
+            IMarketParticipantServiceBusClient serviceBusClient)
+            : base(serviceBusClient)
+        {
+            _eventParser = eventParser;
+        }
 
-        if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
-            return false;
+        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+        {
+            ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
-            actorUpdatedIntegrationEvent.Id,
-            actorUpdatedIntegrationEvent.EventCreated,
-            actorUpdatedIntegrationEvent.ActorId,
-            actorUpdatedIntegrationEvent.OrganizationId.Value,
-            actorUpdatedIntegrationEvent.ExternalActorId?.Value,
-            actorUpdatedIntegrationEvent.ActorNumber.Value,
-            (ActorStatus)actorUpdatedIntegrationEvent.Status,
-            actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
-            actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
-                new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
-                    new ActorGridArea(y.Id, y.MeteringPointTypes)))));
+            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorUpdatedIntegrationEvent actorUpdatedIntegrationEvent)
+                return false;
 
-        var bytes = _eventParser.Parse(outboundIntegrationEvent);
-        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
+            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorUpdatedIntegrationEvent(
+                actorUpdatedIntegrationEvent.Id,
+                actorUpdatedIntegrationEvent.EventCreated,
+                actorUpdatedIntegrationEvent.ActorId,
+                actorUpdatedIntegrationEvent.OrganizationId.Value,
+                actorUpdatedIntegrationEvent.ExternalActorId?.Value,
+                actorUpdatedIntegrationEvent.ActorNumber.Value,
+                (ActorStatus)actorUpdatedIntegrationEvent.Status,
+                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
+                actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
+                    new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
+                        new ActorGridArea(y.Id, y.MeteringPointTypes)))));
 
-        return true;
+            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
+
+            return true;
+        }
     }
 }

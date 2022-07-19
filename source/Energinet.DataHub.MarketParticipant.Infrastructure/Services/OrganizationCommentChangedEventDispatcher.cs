@@ -17,36 +17,37 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-
-public sealed class OrganizationCommentChanged : EventDispatcherBase
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    private readonly IOrganizationCommentChangedIntegrationEventParser _eventParser;
-
-    public OrganizationCommentChanged(
-        IOrganizationCommentChangedIntegrationEventParser eventParser,
-        IMarketParticipantServiceBusClient serviceBusClient)
-        : base(serviceBusClient)
+    public sealed class OrganizationCommentChanged : EventDispatcherBase
     {
-        _eventParser = eventParser;
-    }
+        private readonly IOrganizationCommentChangedIntegrationEventParser _eventParser;
 
-    public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
-    {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
+        public OrganizationCommentChanged(
+            IOrganizationCommentChangedIntegrationEventParser eventParser,
+            IMarketParticipantServiceBusClient serviceBusClient)
+            : base(serviceBusClient)
+        {
+            _eventParser = eventParser;
+        }
 
-        if (integrationEvent is not OrganizationCommentChangedIntegrationEvent organizationUpdatedIntegrationEvent)
-            return false;
+        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+        {
+            ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationCommentChangedIntegrationEvent(
-            organizationUpdatedIntegrationEvent.Id,
-            organizationUpdatedIntegrationEvent.EventCreated,
-            organizationUpdatedIntegrationEvent.OrganizationId.Value,
-            organizationUpdatedIntegrationEvent.Comment ?? string.Empty);
+            if (integrationEvent is not OrganizationCommentChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+                return false;
 
-        var bytes = _eventParser.Parse(outboundIntegrationEvent);
-        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
+            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationCommentChangedIntegrationEvent(
+                organizationUpdatedIntegrationEvent.Id,
+                organizationUpdatedIntegrationEvent.EventCreated,
+                organizationUpdatedIntegrationEvent.OrganizationId.Value,
+                organizationUpdatedIntegrationEvent.Comment ?? string.Empty);
 
-        return true;
+            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
+
+            return true;
+        }
     }
 }

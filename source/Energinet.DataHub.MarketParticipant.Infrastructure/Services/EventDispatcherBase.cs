@@ -21,54 +21,55 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-
-public abstract class EventDispatcherBase : IIntegrationEventDispatcher
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    private readonly IMarketParticipantServiceBusClient _serviceBusClient;
-
-    protected EventDispatcherBase(IMarketParticipantServiceBusClient serviceBusClient)
+    public abstract class EventDispatcherBase : IIntegrationEventDispatcher
     {
-        _serviceBusClient = serviceBusClient;
-    }
+        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-    public abstract Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent);
-
-    protected async Task DispatchAsync(BaseIntegrationEvent integrationEvent, byte[] payload)
-    {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
-        ArgumentNullException.ThrowIfNull(payload);
-
-        var message = new ServiceBusMessage(payload);
-
-        SetEventTypeMetadata(message, integrationEvent);
-        SetIntegrationEventMetadata(message, integrationEvent);
-
-        var sender = _serviceBusClient.CreateSender();
-
-        await using (sender.ConfigureAwait(false))
+        protected EventDispatcherBase(IMarketParticipantServiceBusClient serviceBusClient)
         {
-            await sender.SendMessageAsync(message).ConfigureAwait(false);
+            _serviceBusClient = serviceBusClient;
         }
-    }
 
-    private static void SetEventTypeMetadata(ServiceBusMessage message, BaseIntegrationEvent baseIntegrationEvent)
-    {
-        message.ApplicationProperties.Add("IntegrationEventType", baseIntegrationEvent.Type);
-    }
+        public abstract Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent);
 
-    private static void SetIntegrationEventMetadata(ServiceBusMessage message, BaseIntegrationEvent baseIntegrationEvent)
-    {
-        var correlationId = Guid.NewGuid();
-        var timestamp = SystemClock
-            .Instance
-            .GetCurrentInstant()
-            .ToString(null, CultureInfo.InvariantCulture);
+        protected async Task DispatchAsync(BaseIntegrationEvent integrationEvent, byte[] payload)
+        {
+            ArgumentNullException.ThrowIfNull(integrationEvent);
+            ArgumentNullException.ThrowIfNull(payload);
 
-        message.ApplicationProperties.Add("OperationTimestamp", timestamp);
-        message.ApplicationProperties.Add("OperationCorrelationId", correlationId.ToString());
-        message.ApplicationProperties.Add("MessageVersion", 1);
-        message.ApplicationProperties.Add("MessageType", baseIntegrationEvent.Type);
-        message.ApplicationProperties.Add("EventIdentification", baseIntegrationEvent.Id.ToString());
+            var message = new ServiceBusMessage(payload);
+
+            SetEventTypeMetadata(message, integrationEvent);
+            SetIntegrationEventMetadata(message, integrationEvent);
+
+            var sender = _serviceBusClient.CreateSender();
+
+            await using (sender.ConfigureAwait(false))
+            {
+                await sender.SendMessageAsync(message).ConfigureAwait(false);
+            }
+        }
+
+        private static void SetEventTypeMetadata(ServiceBusMessage message, BaseIntegrationEvent baseIntegrationEvent)
+        {
+            message.ApplicationProperties.Add("IntegrationEventType", baseIntegrationEvent.Type);
+        }
+
+        private static void SetIntegrationEventMetadata(ServiceBusMessage message, BaseIntegrationEvent baseIntegrationEvent)
+        {
+            var correlationId = Guid.NewGuid();
+            var timestamp = SystemClock
+                .Instance
+                .GetCurrentInstant()
+                .ToString(null, CultureInfo.InvariantCulture);
+
+            message.ApplicationProperties.Add("OperationTimestamp", timestamp);
+            message.ApplicationProperties.Add("OperationCorrelationId", correlationId.ToString());
+            message.ApplicationProperties.Add("MessageVersion", 1);
+            message.ApplicationProperties.Add("MessageType", baseIntegrationEvent.Type);
+            message.ApplicationProperties.Add("EventIdentification", baseIntegrationEvent.Id.ToString());
+        }
     }
 }

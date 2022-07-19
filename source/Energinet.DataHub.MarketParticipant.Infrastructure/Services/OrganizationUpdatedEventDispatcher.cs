@@ -18,42 +18,43 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
-
-public sealed class OrganizationUpdated : EventDispatcherBase
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    private readonly IOrganizationUpdatedIntegrationEventParser _eventParser;
-
-    public OrganizationUpdated(
-        IOrganizationUpdatedIntegrationEventParser eventParser,
-        IMarketParticipantServiceBusClient serviceBusClient)
-        : base(serviceBusClient)
+    public sealed class OrganizationUpdated : EventDispatcherBase
     {
-        _eventParser = eventParser;
-    }
+        private readonly IOrganizationUpdatedIntegrationEventParser _eventParser;
 
-    public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
-    {
-        ArgumentNullException.ThrowIfNull(integrationEvent);
+        public OrganizationUpdated(
+            IOrganizationUpdatedIntegrationEventParser eventParser,
+            IMarketParticipantServiceBusClient serviceBusClient)
+            : base(serviceBusClient)
+        {
+            _eventParser = eventParser;
+        }
 
-        if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
-            return false;
+        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+        {
+            ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent(
-            organizationUpdatedIntegrationEvent.Id,
-            organizationUpdatedIntegrationEvent.OrganizationId.Value,
-            organizationUpdatedIntegrationEvent.Name,
-            organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
-            new Address(
-                organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
-                organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
-                organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
-                organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
-                organizationUpdatedIntegrationEvent.Address.Country));
+            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationUpdatedIntegrationEvent organizationUpdatedIntegrationEvent)
+                return false;
 
-        var bytes = _eventParser.Parse(outboundIntegrationEvent);
-        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
+            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent(
+                organizationUpdatedIntegrationEvent.Id,
+                organizationUpdatedIntegrationEvent.OrganizationId.Value,
+                organizationUpdatedIntegrationEvent.Name,
+                organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
+                new Address(
+                    organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
+                    organizationUpdatedIntegrationEvent.Address.Country));
 
-        return true;
+            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
+
+            return true;
+        }
     }
 }
