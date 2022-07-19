@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             DateTime eventCreated,
             Guid actorId,
             Guid organizationId,
-            Guid externalActorId)
+            Guid? externalActorId)
             : base(eventId, eventCreated)
         {
             ActorId = actorId;
@@ -33,6 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
-        public Guid ExternalActorId { get; }
+        public Guid? ExternalActorId { get; }
     }
 }

@@ -36,9 +36,13 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     ActorId = integrationEvent.ActorId.ToString(),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    ExternalActorId = integrationEvent.ExternalActorId.ToString(),
                     Type = integrationEvent.Type
                 };
+
+                if (integrationEvent.ExternalActorId.HasValue)
+                {
+                    contract.ExternalActorId = integrationEvent.ExternalActorId.ToString();
+                }
 
                 return contract.ToByteArray();
             }
@@ -54,12 +58,16 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 var contract = ActorExternalIdChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
+                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                    ? id
+                    : null;
+
                 var integrationEvent = new ActorExternalIdChangedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
-                    Guid.Parse(contract.ExternalActorId));
+                    externalActorId);
 
                 if (integrationEvent.Type != contract.Type)
                 {

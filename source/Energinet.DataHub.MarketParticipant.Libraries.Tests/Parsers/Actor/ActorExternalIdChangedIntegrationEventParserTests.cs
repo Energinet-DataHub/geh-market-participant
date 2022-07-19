@@ -53,6 +53,31 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
         }
 
         [Fact]
+        public void Parse_InputValidExternalIdNull_ParsesCorrectly()
+        {
+            // arrange
+            var target = new ActorExternalIdChangedIntegrationEventParser();
+            var @event = new ActorExternalIdChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                null);
+
+            // act
+            var actualBytes = target.Parse(@event);
+            var actualEvent = target.Parse(actualBytes);
+
+            // assert
+            Assert.Equal(@event.Id, actualEvent.Id);
+            Assert.Equal(@event.EventCreated, actualEvent.EventCreated);
+            Assert.Equal(@event.ActorId, actualEvent.ActorId);
+            Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
+            Assert.Equal(@event.ExternalActorId, actualEvent.ExternalActorId);
+            Assert.Equal(@event.Type, actualEvent.Type);
+        }
+
+        [Fact]
         public void Parse_InvalidGuid_ThrowsException()
         {
             // Arrange

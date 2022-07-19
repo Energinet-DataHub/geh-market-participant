@@ -22,7 +22,7 @@ message ActorExternalIdChangedIntegrationEventContract{
     string Id = 1;
     string ActorId = 2;
     string OrganizationId = 3;
-    google.protobuf.Timestamp EventCreated = 5;
-    string ExternalActorId = 4;
-    string Type = 6;
+    google.protobuf.Timestamp EventCreated = 4;
+    string Type = 5;
+    optional string ExternalActorId = 6;
 }
