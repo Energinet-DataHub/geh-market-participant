@@ -14,57 +14,45 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+public sealed class OrganizationAddressChanged : EventDispatcherBase
 {
-    public sealed class OrganizationAddressChanged : EventDispatcherBase
+    private readonly IOrganizationAddressChangedIntegrationEventParser _eventParser;
+
+    public OrganizationAddressChanged(
+        IOrganizationAddressChangedIntegrationEventParser eventParser,
+        IMarketParticipantServiceBusClient serviceBusClient)
+        : base(serviceBusClient)
     {
-        private readonly IOrganizationAddressChangedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
+        _eventParser = eventParser;
+    }
 
-        public OrganizationAddressChanged(
-            IOrganizationAddressChangedIntegrationEventParser eventParser,
-            IMarketParticipantServiceBusClient serviceBusClient)
-        {
-            _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
-        }
+    public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
-        {
-            ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+        if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationAddressChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+            return false;
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationAddressChangedIntegrationEvent organizationUpdatedIntegrationEvent)
-                return false;
+        var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationAddressChangedIntegrationEvent(
+            organizationUpdatedIntegrationEvent.Id,
+            organizationUpdatedIntegrationEvent.EventCreated,
+            organizationUpdatedIntegrationEvent.OrganizationId.Value,
+            new Address(
+                organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
+                organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
+                organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
+                organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
+                organizationUpdatedIntegrationEvent.Address.Country));
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationAddressChangedIntegrationEvent(
-                organizationUpdatedIntegrationEvent.Id,
-                organizationUpdatedIntegrationEvent.EventCreated,
-                organizationUpdatedIntegrationEvent.OrganizationId.Value,
-                new Address(
-                    organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Country));
+        var bytes = _eventParser.Parse(outboundIntegrationEvent);
+        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
-            var message = new ServiceBusMessage(bytes);
-            SetMessageMetaData(message, outboundIntegrationEvent);
-
-            var sender = _serviceBusClient.CreateSender();
-
-            await using (sender.ConfigureAwait(false))
-            {
-                await sender.SendMessageAsync(message).ConfigureAwait(false);
-            }
-
-            return true;
-        }
+        return true;
     }
 }

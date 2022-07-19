@@ -14,50 +14,39 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+public sealed class GridAreaNameChanged : EventDispatcherBase
 {
-    public sealed class GridAreaNameChanged : EventDispatcherBase
+    private readonly IGridAreaNameChangedIntegrationEventParser _eventParser;
+
+    public GridAreaNameChanged(
+        IGridAreaNameChangedIntegrationEventParser eventParser,
+        IMarketParticipantServiceBusClient serviceBusClient)
+        : base(serviceBusClient)
     {
-        private readonly IGridAreaNameChangedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
+        _eventParser = eventParser;
+    }
 
-        public GridAreaNameChanged(
-            IGridAreaNameChangedIntegrationEventParser eventParser,
-            IMarketParticipantServiceBusClient serviceBusClient)
-        {
-            _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
-        }
+    public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
-        {
-            ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+        if (integrationEvent is not GridAreaNameChangedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            return false;
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaNameChangedIntegrationEvent gridAreaUpdatedIntegrationEvent)
-                return false;
+        var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent(
+            gridAreaUpdatedIntegrationEvent.Id,
+            gridAreaUpdatedIntegrationEvent.EventCreated,
+            gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
+            gridAreaUpdatedIntegrationEvent.Name.Value);
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent(
-                gridAreaUpdatedIntegrationEvent.Id,
-                gridAreaUpdatedIntegrationEvent.EventCreated,
-                gridAreaUpdatedIntegrationEvent.GridAreaId.Value,
-                gridAreaUpdatedIntegrationEvent.Name.Value);
+        var bytes = _eventParser.Parse(outboundIntegrationEvent);
+        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
-            var message = new ServiceBusMessage(bytes);
-            SetMessageMetaData(message, outboundIntegrationEvent);
-
-            var sender = _serviceBusClient.CreateSender();
-
-            await using (sender.ConfigureAwait(false))
-            {
-                await sender.SendMessageAsync(message).ConfigureAwait(false);
-            }
-
-            return true;
-        }
+        return true;
     }
 }

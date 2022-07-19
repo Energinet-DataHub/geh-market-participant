@@ -14,50 +14,39 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+public sealed class OrganizationBusinessRegisterIdentifierChanged : EventDispatcherBase
 {
-    public sealed class OrganizationBusinessRegisterIdentifierChanged : EventDispatcherBase
+    private readonly IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser _eventParser;
+
+    public OrganizationBusinessRegisterIdentifierChanged(
+        IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser eventParser,
+        IMarketParticipantServiceBusClient serviceBusClient)
+        : base(serviceBusClient)
     {
-        private readonly IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
+        _eventParser = eventParser;
+    }
 
-        public OrganizationBusinessRegisterIdentifierChanged(
-            IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser eventParser,
-            IMarketParticipantServiceBusClient serviceBusClient)
-        {
-            _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
-        }
+    public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
+    {
+        ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
-        {
-            ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+        if (integrationEvent is not OrganizationBusinessRegisterIdentifierChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+            return false;
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent organizationUpdatedIntegrationEvent)
-                return false;
+        var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
+            organizationUpdatedIntegrationEvent.Id,
+            organizationUpdatedIntegrationEvent.EventCreated,
+            organizationUpdatedIntegrationEvent.OrganizationId.Value,
+            organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier);
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
-                organizationUpdatedIntegrationEvent.Id,
-                organizationUpdatedIntegrationEvent.EventCreated,
-                organizationUpdatedIntegrationEvent.OrganizationId.Value,
-                organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier);
+        var bytes = _eventParser.Parse(outboundIntegrationEvent);
+        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
-            var message = new ServiceBusMessage(bytes);
-            SetMessageMetaData(message, outboundIntegrationEvent);
-
-            var sender = _serviceBusClient.CreateSender();
-
-            await using (sender.ConfigureAwait(false))
-            {
-                await sender.SendMessageAsync(message).ConfigureAwait(false);
-            }
-
-            return true;
-        }
+        return true;
     }
 }
