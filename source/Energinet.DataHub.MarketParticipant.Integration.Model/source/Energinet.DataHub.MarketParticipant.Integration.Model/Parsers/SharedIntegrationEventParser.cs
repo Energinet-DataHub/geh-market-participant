@@ -120,6 +120,16 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return marketRoleRemovedFromActorIntegrationEvent;
             }
 
+            if (TryParseContactAddedToActorIntegrationEvent(protoContract, out var contactAddedToActorIntegrationEvent))
+            {
+                return contactAddedToActorIntegrationEvent;
+            }
+
+            if (TryParseContactRemovedFromActorIntegrationEvent(protoContract, out var contactRemovedFromActorIntegrationEvent))
+            {
+                return contactRemovedFromActorIntegrationEvent;
+            }
+
             throw new MarketParticipantException("IntegrationEventParser not found");
         }
 
@@ -487,6 +497,44 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 marketRoleRemovedFromActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseContactAddedToActorIntegrationEvent(
+            byte[] protoContract,
+            out ContactAddedToActorIntegrationEvent contactAddedToActorIntegrationEvent)
+        {
+            try
+            {
+                var contactAddedToActorIntegrationEventParser = new ContactAddedToActorIntegrationEventParser();
+                contactAddedToActorIntegrationEvent = contactAddedToActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                contactAddedToActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseContactRemovedFromActorIntegrationEvent(
+            byte[] protoContract,
+            out ContactRemovedFromActorIntegrationEvent contactRemovedFromActorIntegrationEvent)
+        {
+            try
+            {
+                var contactRemovedFromActorIntegrationEventParser = new ContactRemovedFromActorIntegrationEventParser();
+                contactRemovedFromActorIntegrationEvent = contactRemovedFromActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                contactRemovedFromActorIntegrationEvent = null!;
                 return false;
             }
         }

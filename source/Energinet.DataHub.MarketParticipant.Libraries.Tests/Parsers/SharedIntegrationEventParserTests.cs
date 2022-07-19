@@ -481,6 +481,58 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
         }
 
         [Fact]
+        public void ParseCorrectlyWith_ContactAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new ContactAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ContactAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                new ActorContact(
+                    "fake_name",
+                    "fake_email@me.dk",
+                    ContactCategory.Default,
+                    "34343434"));
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<ContactAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ContactRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new ContactRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ContactRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                new ActorContact(
+                    "fake_name",
+                    "fake_email@me.dk",
+                    ContactCategory.Default,
+                    "34343434"));
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<ContactRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
         public void ParseException_FallThrough()
         {
             // Arrange

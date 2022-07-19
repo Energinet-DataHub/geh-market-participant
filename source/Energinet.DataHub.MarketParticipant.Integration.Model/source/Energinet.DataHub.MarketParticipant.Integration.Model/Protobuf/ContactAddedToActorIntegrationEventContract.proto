@@ -24,6 +24,6 @@ message ContactAddedToActorIntegrationEventContract {
     string ActorId = 2;
     string OrganizationId = 3;
     google.protobuf.Timestamp EventCreated = 4;
-    ActorContact Contact = 5;
+    ActorContactEventData Contact = 5;
     string Type = 6;
 }
