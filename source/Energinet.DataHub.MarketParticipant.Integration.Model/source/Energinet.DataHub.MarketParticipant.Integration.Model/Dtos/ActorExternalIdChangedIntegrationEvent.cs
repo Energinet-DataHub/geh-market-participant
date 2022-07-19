@@ -13,36 +13,26 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public record ActorCreatedIntegrationEvent : BaseIntegrationEvent
+    public sealed record ActorExternalIdChangedIntegrationEvent : BaseIntegrationEvent
     {
-        public ActorCreatedIntegrationEvent(
+        public ActorExternalIdChangedIntegrationEvent(
             Guid eventId,
+            DateTime eventCreated,
             Guid actorId,
             Guid organizationId,
-            ActorStatus status,
-            string actorNumber,
-            IEnumerable<BusinessRoleCode> businessRoles,
-            IEnumerable<ActorMarketRole> actorMarketRoles,
-            DateTime eventCreated)
+            Guid externalActorId)
             : base(eventId, eventCreated)
         {
             ActorId = actorId;
             OrganizationId = organizationId;
-            Status = status;
-            ActorNumber = actorNumber;
-            BusinessRoles = businessRoles;
-            ActorMarketRoles = actorMarketRoles;
+            ExternalActorId = externalActorId;
         }
 
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
-        public ActorStatus Status { get; }
-        public string ActorNumber { get; }
-        public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
-        public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
+        public Guid ExternalActorId { get; }
     }
 }

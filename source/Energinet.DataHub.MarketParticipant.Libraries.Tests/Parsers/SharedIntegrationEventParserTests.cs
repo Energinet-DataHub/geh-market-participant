@@ -66,7 +66,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
                 ActorStatus.Active,
                 "0123456789012",
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
@@ -79,6 +78,28 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // assert
             Assert.IsType<ActorCreatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ActorExternalIdChangedIntegrationEventParser()
+        {
+            // arrange
+            var input = new ActorExternalIdChangedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ActorExternalIdChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid());
+
+            // act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // assert
+            Assert.IsType<ActorExternalIdChangedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]
