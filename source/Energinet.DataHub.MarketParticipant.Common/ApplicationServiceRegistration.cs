@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using FluentValidation;
@@ -65,6 +66,13 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser, OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationAddressChangedIntegrationEventParser, OrganizationAddressChangedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationUpdatedIntegrationEventParser, OrganizationUpdatedIntegrationEventParser>(Lifestyle.Scoped);
+            container.Register<IActorStatusChangedIntegrationEventParser, ActorStatusChangedIntegrationEventParser>();
+            container.Register<IMeteringPointTypeAddedToActorIntegrationEventParser, MeteringPointTypeAddedToActorIntegrationEventParser>();
+            container.Register<IMeteringPointTypeRemovedFromActorIntegrationEventParser, MeteringPointTypeRemovedFromActorIntegrationEventParser>();
+            container.Register<IGridAreaAddedToActorIntegrationEventParser, GridAreaAddedToActorIntegrationEventParser>();
+            container.Register<IGridAreaRemovedFromActorIntegrationEventParser, GridAreaRemovedFromActorIntegrationEventParser>();
+            container.Register<IMarketRoleAddedToActorIntegrationEventParser, MarketRoleAddedToActorIntegrationEventParser>();
+            container.Register<IMarketRoleRemovedFromActorIntegrationEventParser, MarketRoleRemovedFromActorIntegrationEventParser>();
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdated).Assembly);
         }
     }

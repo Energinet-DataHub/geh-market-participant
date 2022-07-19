@@ -28,16 +28,13 @@ public sealed class GridAreaRemovedFromActorEventDispatcher : EventDispatcherBas
 {
     private readonly IGridAreaRemovedFromActorIntegrationEventParser _eventParser;
     private readonly IMarketParticipantServiceBusClient _serviceBusClient;
-    private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
 
     public GridAreaRemovedFromActorEventDispatcher(
         IGridAreaRemovedFromActorIntegrationEventParser eventParser,
-        IMarketParticipantServiceBusClient serviceBusClient,
-        IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+        IMarketParticipantServiceBusClient serviceBusClient)
     {
         _eventParser = eventParser;
         _serviceBusClient = serviceBusClient;
-        _businessRoleCodeDomainService = businessRoleCodeDomainService;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
