@@ -50,7 +50,7 @@ public sealed class MeteringPointTypeAddedToActorEventDispatcher : EventDispatch
             meteringPointTypeAddedToActorIntegrationEvent.OrganizationId.Value,
             (EicFunction)meteringPointTypeAddedToActorIntegrationEvent.Function,
             meteringPointTypeAddedToActorIntegrationEvent.GridAreaId,
-            DateTime.UtcNow,
+            meteringPointTypeAddedToActorIntegrationEvent.EventCreated,
             meteringPointTypeAddedToActorIntegrationEvent.Type.ToString());
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);

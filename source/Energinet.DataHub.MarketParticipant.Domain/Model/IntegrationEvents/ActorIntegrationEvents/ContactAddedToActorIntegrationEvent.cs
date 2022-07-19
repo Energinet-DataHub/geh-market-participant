@@ -14,13 +14,12 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
-
-public sealed class GridAreaRemovedFromActorIntegrationEvent : IntegrationEventBase
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
-    public OrganizationId OrganizationId { get; set; } = null!;
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Guid GridAreaId { get; set; }
-    public Guid GridAreaLinkId { get; set; }
+    public sealed class ContactAddedToActorIntegrationEvent : IntegrationEventBase
+    {
+        public Guid ActorId { get; set; }
+        public OrganizationId OrganizationId { get; set; } = null!;
+        public ActorContactEventData Contact { get; set; } = null!;
+    }
 }

@@ -73,6 +73,9 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IGridAreaRemovedFromActorIntegrationEventParser, GridAreaRemovedFromActorIntegrationEventParser>();
             container.Register<IMarketRoleAddedToActorIntegrationEventParser, MarketRoleAddedToActorIntegrationEventParser>();
             container.Register<IMarketRoleRemovedFromActorIntegrationEventParser, MarketRoleRemovedFromActorIntegrationEventParser>();
+            container.Register<IContactRemovedFromActorIntegrationEventParser, ContactRemovedFromActorIntegrationEventParser>();
+            container.Register<IContactAddedToActorIntegrationEventParser, ContactAddedToActorIntegrationEventParser>();
+
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdated).Assembly);
         }
     }

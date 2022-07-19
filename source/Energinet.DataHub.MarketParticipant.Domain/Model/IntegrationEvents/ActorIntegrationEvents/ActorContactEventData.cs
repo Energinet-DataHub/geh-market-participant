@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
-
-public sealed class GridAreaRemovedFromActorIntegrationEvent : IntegrationEventBase
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
-    public OrganizationId OrganizationId { get; set; } = null!;
-    public Guid ActorId { get; set; }
-    public EicFunction Function { get; set; }
-    public Guid GridAreaId { get; set; }
-    public Guid GridAreaLinkId { get; set; }
+    public class ActorContactEventData
+    {
+        public ActorContactEventData(string name, string email, ContactCategory category, string? phone)
+        {
+            Name = name;
+            Email = email;
+            Category = category;
+            Phone = phone;
+        }
+
+        public string Name { get; }
+        public string Email { get; }
+        public ContactCategory Category { get; }
+        public string? Phone { get; }
+    }
 }

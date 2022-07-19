@@ -13,22 +13,25 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using MeteringPointTypeRemovedFromActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.MeteringPointTypeRemovedFromActorIntegrationEvent;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
+using GridAreaAddedToActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.GridAreaAddedToActorIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public sealed class MeteringPointTypeRemovedFromActorEventDispatcher : EventDispatcherBase
+public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
 {
-    private readonly IMeteringPointTypeRemovedFromActorIntegrationEventParser _eventParser;
+    private readonly IContactRemovedFromActorIntegrationEventParser _eventParser;
     private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-    public MeteringPointTypeRemovedFromActorEventDispatcher(
-        IMeteringPointTypeRemovedFromActorIntegrationEventParser eventParser,
+    public ContactRemovedFromActorEventDispatcher(
+        IContactRemovedFromActorIntegrationEventParser eventParser,
         IMarketParticipantServiceBusClient serviceBusClient)
     {
         _eventParser = eventParser;
@@ -39,19 +42,21 @@ public sealed class MeteringPointTypeRemovedFromActorEventDispatcher : EventDisp
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (integrationEvent is not MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent)
+        if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ContactRemovedFromActorIntegrationEvent contactAddedToActorIntegrationEvent)
         {
             return false;
         }
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.MeteringPointTypeRemovedFromActorIntegrationEvent(
-            meteringPointTypeRemovedFromActorIntegrationEvent.Id,
-            meteringPointTypeRemovedFromActorIntegrationEvent.ActorId,
-            meteringPointTypeRemovedFromActorIntegrationEvent.OrganizationId.Value,
-            (EicFunction)meteringPointTypeRemovedFromActorIntegrationEvent.Function,
-            meteringPointTypeRemovedFromActorIntegrationEvent.GridAreaId,
-            meteringPointTypeRemovedFromActorIntegrationEvent.Type.ToString(),
-            meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated);
+        var outboundIntegrationEvent = new Integration.Model.Dtos.ContactRemovedFromActorIntegrationEvent(
+            contactAddedToActorIntegrationEvent.Id,
+            contactAddedToActorIntegrationEvent.ActorId,
+            contactAddedToActorIntegrationEvent.OrganizationId.Value,
+            contactAddedToActorIntegrationEvent.EventCreated,
+            new Integration.Model.Dtos.ActorContact(
+                contactAddedToActorIntegrationEvent.Contact.Name,
+                contactAddedToActorIntegrationEvent.Contact.Email,
+                (Integration.Model.Dtos.ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category.Value,
+                contactAddedToActorIntegrationEvent.Contact.Phone));
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
         var message = new ServiceBusMessage(bytes);

@@ -52,7 +52,7 @@ public sealed class MarketRoleAddedToActorEventDispatcher : EventDispatcherBase
             marketRoleAddedToActorIntegrationEvent.OrganizationId.Value,
             (BusinessRoleCode)marketRoleAddedToActorIntegrationEvent.BusinessRole,
             (EicFunction)marketRoleAddedToActorIntegrationEvent.MarketRole,
-            DateTime.UtcNow);
+            marketRoleAddedToActorIntegrationEvent.EventCreated);
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
         var message = new ServiceBusMessage(bytes);

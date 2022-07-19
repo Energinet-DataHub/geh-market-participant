@@ -50,7 +50,7 @@ public sealed class MarketRoleRemovedFromActorEventDispatcher : EventDispatcherB
             marketRoleAddedToActorIntegrationEvent.OrganizationId.Value,
             (BusinessRoleCode)marketRoleAddedToActorIntegrationEvent.BusinessRole,
             (EicFunction)marketRoleAddedToActorIntegrationEvent.MarketRole,
-            DateTime.UtcNow);
+            marketRoleAddedToActorIntegrationEvent.EventCreated);
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
         var message = new ServiceBusMessage(bytes);

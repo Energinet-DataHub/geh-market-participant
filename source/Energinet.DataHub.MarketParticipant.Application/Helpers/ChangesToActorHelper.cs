@@ -225,7 +225,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                     ActorId = existingActorId,
                     Function = function,
                     GridAreaId = gridArea.Id,
-                    GridAreaLinkId = gridAreaLink.Id
+                    GridAreaLinkId = gridAreaLink.Id.Value
                 });
 
             AddChangeEventsForAddedMeteringPointTypes(
@@ -274,7 +274,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 ActorId = existingActorId,
                 Function = function,
                 GridAreaId = gridArea.Id,
-                GridAreaLinkId = gridAreaLink.Id
+                GridAreaLinkId = gridAreaLink.Id.Value
             });
 
             AddChangeEventsForRemovedMeteringPointTypes(

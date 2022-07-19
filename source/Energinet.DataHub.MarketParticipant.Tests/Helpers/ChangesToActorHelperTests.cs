@@ -15,10 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
@@ -33,54 +35,60 @@ public class ChangesToActorHelperTests
     private readonly Actor _actor = CreateValidActorWithChildren();
     private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
     private readonly Mock<IBusinessRoleCodeDomainService> _businessRoleCodeDomainServiceMock = new();
+    private readonly Mock<IGridAreaLinkRepository> _gridAreaLinkRepositoryMock = new();
 
     [Fact]
-    public void FindChangesMadeToActor_OrganizationIdNull_ThrowsException()
+    public async Task FindChangesMadeToActor_OrganizationIdNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(null!, _actor, _incomingActor));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(null!, _actor, _incomingActor));
     }
 
     [Fact]
-    public void FindChangesMadeToActor_ExistingActorNull_ThrowsException()
+    public async Task FindChangesMadeToActor_ExistingActorNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, null!, _incomingActor));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, null!, _incomingActor));
     }
 
     [Fact]
-    public void FindChangesMadeToActor_IncomingNull_ThrowsException()
+    public async Task FindChangesMadeToActor_IncomingNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, _actor, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, _actor, null!));
     }
 
     [Fact]
-    public void FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
+    public async Task FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
+        _gridAreaLinkRepositoryMock
+            .Setup(e => e.GetAsync(It.IsAny<GridAreaId>()))
+            .ReturnsAsync(new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), It.IsAny<GridAreaId>()));
+
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act
-        var result = target.FindChangesMadeToActorAsync(_organizationId, _actor, _incomingActor).ToList();
+        var result = await target.FindChangesMadeToActorAsync(_organizationId, _actor, _incomingActor).ConfigureAwait(false);
+        var integrationEvents = result.ToList();
 
         // Assert
-        var numberOfStatusChangedEvents = result.Count(x => x is ActorStatusChangedIntegrationEvent);
-        var numberOfAddMeteringPointEvents = result.Count(x => x is MeteringPointTypeAddedToActorIntegrationEvent);
-        var numberOfRemoveMeteringPointEvents = result.Count(x => x is MeteringPointTypeRemovedFromActorIntegrationEvent);
-        var numberOfAddGridAreaEvents = result.Count(x => x is GridAreaAddedToActorIntegrationEvent);
-        var numberOfRemoveGridAreaEvents = result.Count(x => x is GridAreaRemovedFromActorIntegrationEvent);
-        var numberOfAddMarketRoleEvents = result.Count(x => x is MarketRoleAddedToActorIntegrationEvent);
-        var numberOfRemoveMarketRoleEvents = result.Count(x => x is MarketRoleRemovedFromActorIntegrationEvent);
+        var numberOfStatusChangedEvents = integrationEvents.Count(x => x is ActorStatusChangedIntegrationEvent);
+        var numberOfAddMeteringPointEvents = integrationEvents.Count(x => x is MeteringPointTypeAddedToActorIntegrationEvent);
+        var numberOfRemoveMeteringPointEvents = integrationEvents.Count(x => x is MeteringPointTypeRemovedFromActorIntegrationEvent);
+        var numberOfAddGridAreaEvents = integrationEvents.Count(x => x is GridAreaAddedToActorIntegrationEvent);
+        var numberOfRemoveGridAreaEvents = integrationEvents.Count(x => x is GridAreaRemovedFromActorIntegrationEvent);
+        var numberOfAddMarketRoleEvents = integrationEvents.Count(x => x is MarketRoleAddedToActorIntegrationEvent);
+        var numberOfRemoveMarketRoleEvents = integrationEvents.Count(x => x is MarketRoleRemovedFromActorIntegrationEvent);
 
         Assert.Equal(1, numberOfStatusChangedEvents);
         Assert.Equal(2, numberOfAddMeteringPointEvents);
@@ -89,7 +97,7 @@ public class ChangesToActorHelperTests
         Assert.Equal(2, numberOfRemoveGridAreaEvents);
         Assert.Equal(1, numberOfAddMarketRoleEvents);
         Assert.Equal(1, numberOfRemoveMarketRoleEvents);
-        Assert.Equal(14, result.Count);
+        Assert.Equal(14, integrationEvents.Count);
     }
 
     private static OrganizationId CreateOrganizationId()

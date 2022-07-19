@@ -27,7 +27,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 
 [UnitTest]
-public sealed class GridAreaAddedToActorEventDispatcherTests
+public sealed class ContactRemovedFromActorEventDispatcherTests
 {
     [Fact]
     public async Task TryDispatchAsync_integrationEventNull_ThrowsException()
@@ -37,8 +37,8 @@ public sealed class GridAreaAddedToActorEventDispatcherTests
         var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
         serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-        var eventParser = new GridAreaAddedToActorIntegrationEventParser();
-        var sut = new GridAreaAddedToActorEventDispatcher(
+        var eventParser = new ContactRemovedFromActorIntegrationEventParser();
+        var sut = new ContactRemovedFromActorEventDispatcher(
             eventParser,
             serviceBusClient.Object);
 
@@ -54,19 +54,17 @@ public sealed class GridAreaAddedToActorEventDispatcherTests
         var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
         serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-        var gridAreaEventParser = new GridAreaAddedToActorIntegrationEventParser();
+        var gridAreaEventParser = new ContactRemovedFromActorIntegrationEventParser();
         var eventParser = new SharedIntegrationEventParser();
-        var sut = new GridAreaAddedToActorEventDispatcher(
+        var sut = new ContactRemovedFromActorEventDispatcher(
             gridAreaEventParser,
             serviceBusClient.Object);
 
-        var integrationEvent = new GridAreaAddedToActorIntegrationEvent()
+        var integrationEvent = new ContactRemovedFromActorIntegrationEvent()
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Function = EicFunction.EnergySupplier,
-            GridAreaId = Guid.NewGuid(),
-            GridAreaLinkId = Guid.NewGuid()
+            Contact = new ActorContactEventData("fake_name", "fake_email", ContactCategory.Notification, "fake_phone")
         };
 
         // Act
@@ -74,7 +72,7 @@ public sealed class GridAreaAddedToActorEventDispatcherTests
         var message = serviceBusSenderMock.SentMessages.Single();
         var actualEvent =
             eventParser.Parse(message.Body.ToArray()) as
-                Integration.Model.Dtos.GridAreaAddedToActorIntegrationEvent;
+                Integration.Model.Dtos.ContactRemovedFromActorIntegrationEvent;
 
         // Assert
         Assert.True(result);
@@ -82,8 +80,10 @@ public sealed class GridAreaAddedToActorEventDispatcherTests
         Assert.Equal(integrationEvent.Id, actualEvent!.Id);
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
-        Assert.Equal(integrationEvent.Function.ToString(), actualEvent.Function.ToString());
-        Assert.Equal(integrationEvent.GridAreaId, actualEvent.GridAreaId);
+        Assert.Equal(integrationEvent.Contact.Name, actualEvent.Contact.Name);
+        Assert.Equal(integrationEvent.Contact.Email, actualEvent.Contact.Email);
+        Assert.Equal((int)integrationEvent.Contact.Category, (int)actualEvent.Contact.Category);
+        Assert.Equal(integrationEvent.Contact.Phone, actualEvent.Contact.Phone);
     }
 
     [Fact]
@@ -94,17 +94,16 @@ public sealed class GridAreaAddedToActorEventDispatcherTests
         var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
         serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-        var eventParser = new GridAreaAddedToActorIntegrationEventParser();
-        var sut = new GridAreaAddedToActorEventDispatcher(
+        var eventParser = new ContactRemovedFromActorIntegrationEventParser();
+        var sut = new ContactRemovedFromActorEventDispatcher(
             eventParser,
             serviceBusClient.Object);
 
-        var integrationEvent = new GridAreaRemovedFromActorIntegrationEvent
+        var integrationEvent = new ContactAddedToActorIntegrationEvent
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Function = EicFunction.EnergySupplier,
-            GridAreaId = Guid.NewGuid()
+            Contact = new ActorContactEventData("fake_name", "fake_email", ContactCategory.Notification, "fake_phone")
         };
 
         // Act

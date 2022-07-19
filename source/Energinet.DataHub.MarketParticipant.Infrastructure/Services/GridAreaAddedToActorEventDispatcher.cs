@@ -51,10 +51,10 @@ public sealed class GridAreaAddedToActorEventDispatcher : EventDispatcherBase
             gridAreaAddedToActorIntegrationEvent.Id,
             gridAreaAddedToActorIntegrationEvent.ActorId,
             gridAreaAddedToActorIntegrationEvent.OrganizationId.Value,
-            DateTime.UtcNow,
+            gridAreaAddedToActorIntegrationEvent.EventCreated,
             (EicFunction)gridAreaAddedToActorIntegrationEvent.Function,
             gridAreaAddedToActorIntegrationEvent.GridAreaId,
-            Guid.NewGuid());
+            gridAreaAddedToActorIntegrationEvent.GridAreaLinkId);
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
         var message = new ServiceBusMessage(bytes);
