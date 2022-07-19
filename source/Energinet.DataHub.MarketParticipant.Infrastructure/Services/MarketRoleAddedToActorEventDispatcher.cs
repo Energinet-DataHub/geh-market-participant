@@ -28,16 +28,13 @@ public sealed class MarketRoleAddedToActorEventDispatcher : EventDispatcherBase
 {
     private readonly IMarketRoleAddedToActorIntegrationEventParser _eventParser;
     private readonly IMarketParticipantServiceBusClient _serviceBusClient;
-    private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
 
     public MarketRoleAddedToActorEventDispatcher(
         IMarketRoleAddedToActorIntegrationEventParser eventParser,
-        IMarketParticipantServiceBusClient serviceBusClient,
-        IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+        IMarketParticipantServiceBusClient serviceBusClient)
     {
         _eventParser = eventParser;
         _serviceBusClient = serviceBusClient;
-        _businessRoleCodeDomainService = businessRoleCodeDomainService;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
