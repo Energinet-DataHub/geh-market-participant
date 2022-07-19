@@ -31,7 +31,7 @@ public interface IChangesToActorHelper
     /// <param name="existingActor"></param>
     /// <param name="incomingActor"></param>
     /// <returns>A list of integration events to send to a message queue</returns>
-    IEnumerable<IIntegrationEvent> FindChangesMadeToActor(
+    Task<IEnumerable<IIntegrationEvent>> FindChangesMadeToActorAsync(
         OrganizationId organizationId,
         Actor existingActor,
         UpdateActorCommand incomingActor);

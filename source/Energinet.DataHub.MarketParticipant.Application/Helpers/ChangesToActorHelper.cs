@@ -15,10 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Helpers;
@@ -27,20 +29,24 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 {
     private readonly List<IIntegrationEvent> _changeEvents = new();
     private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
+    private readonly IGridAreaLinkRepository _gridAreaLinkRepository;
 
-    public ChangesToActorHelper(IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+    public ChangesToActorHelper(
+        IBusinessRoleCodeDomainService businessRoleCodeDomainService,
+        IGridAreaLinkRepository gridAreaLinkRepository)
     {
         _businessRoleCodeDomainService = businessRoleCodeDomainService;
+        _gridAreaLinkRepository = gridAreaLinkRepository;
     }
 
-    public IEnumerable<IIntegrationEvent> FindChangesMadeToActor(OrganizationId organizationId, Actor existingActor, UpdateActorCommand incomingActor)
+    public async Task<IEnumerable<IIntegrationEvent>> FindChangesMadeToActorAsync(OrganizationId organizationId, Actor existingActor, UpdateActorCommand incomingActor)
     {
         ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
         ArgumentNullException.ThrowIfNull(existingActor, nameof(existingActor));
         ArgumentNullException.ThrowIfNull(incomingActor, nameof(incomingActor));
 
         AddChangeEventIfActorStatusChanged(organizationId, existingActor, incomingActor.ChangeActor.Status);
-        AddChangeEventsIfMarketRolesOrChildrenChanged(organizationId, existingActor, incomingActor.ChangeActor.MarketRoles);
+        await AddChangeEventsIfMarketRolesOrChildrenChangedAsync(organizationId, existingActor, incomingActor.ChangeActor.MarketRoles).ConfigureAwait(false);
 
         return _changeEvents;
     }
@@ -59,7 +65,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         }
     }
 
-    private void AddChangeEventsIfMarketRolesOrChildrenChanged(
+    private async Task AddChangeEventsIfMarketRolesOrChildrenChangedAsync(
         OrganizationId organizationId,
         Actor existingActor,
         IEnumerable<ActorMarketRoleDto> incomingMarketRoles)
@@ -93,7 +99,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 
                 var marketRole = new ActorMarketRole(existingActor.Id, existingEicFunction, existingGridAreas);
 
-                AddChangeEventsIfGridAreasChanged(organizationId, existingActor.Id, marketRole, incomingGridAreas);
+                await AddChangeEventsIfGridAreasChangedAsync(organizationId, existingActor.Id, marketRole, incomingGridAreas).ConfigureAwait(false);
             }
         }
 
@@ -110,7 +116,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 MarketRole = marketRole.Function
             });
 
-            AddChangeEventsForRemovedGridAreas(organizationId, existingActor.Id, eicFunction, gridAreas);
+            await AddChangeEventsForRemovedGridAreasAsync(organizationId, existingActor.Id, eicFunction, gridAreas).ConfigureAwait(false);
         }
 
         foreach (var eicFunction in eicFunctionsToAddToActor)
@@ -126,17 +132,17 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 MarketRole = marketRole.Function
             });
 
-            AddChangeEventsForAddedGridAreas(
+            await AddChangeEventsForAddedGridAreasAsync(
                 organizationId,
                 existingActor.Id,
                 eicFunction,
                 gridAreas.Select(gridArea => new ActorGridArea(
                     gridArea.Id,
-                    gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))));
+                    gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType))))).ConfigureAwait(false);
         }
     }
 
-    private void AddChangeEventsIfGridAreasChanged(OrganizationId organizationId, Guid existingActorId, ActorMarketRole existingMarketRole, IEnumerable<ActorGridAreaDto> incomingGridAreas)
+    private async Task AddChangeEventsIfGridAreasChangedAsync(OrganizationId organizationId, Guid existingActorId, ActorMarketRole existingMarketRole, IEnumerable<ActorGridAreaDto> incomingGridAreas)
     {
         var incomingActorGridAreaDtos = incomingGridAreas.ToList();
         var incomingActorGridAreas = incomingActorGridAreaDtos.Select(gridArea => gridArea.Id).ToList();
@@ -159,8 +165,8 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                     id,
                     incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => MeteringPointType.FromName(x, false))));
 
-        AddChangeEventsForAddedGridAreas(organizationId, existingActorId, existingMarketRole.Function, gridAreasToAddToActor);
-        AddChangeEventsForRemovedGridAreas(organizationId, existingActorId, existingMarketRole.Function, gridAreasToRemoveFromActor);
+        await AddChangeEventsForAddedGridAreasAsync(organizationId, existingActorId, existingMarketRole.Function, gridAreasToAddToActor).ConfigureAwait(false);
+        await AddChangeEventsForRemovedGridAreasAsync(organizationId, existingActorId, existingMarketRole.Function, gridAreasToRemoveFromActor).ConfigureAwait(false);
 
         foreach (var gridArea in existingMarketRole.GridAreas)
         {
@@ -202,16 +208,24 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             meteringPointTypesToRemoveFromActor);
     }
 
-    private void AddChangeEventsForAddedGridAreas(OrganizationId organizationId, Guid existingActorId, EicFunction function, IEnumerable<ActorGridArea> gridAreas)
+    private async Task AddChangeEventsForAddedGridAreasAsync(OrganizationId organizationId, Guid existingActorId, EicFunction function, IEnumerable<ActorGridArea> gridAreas)
     {
         foreach (var gridArea in gridAreas)
         {
+            var gridAreaLink = await _gridAreaLinkRepository.GetAsync(new GridAreaId(gridArea.Id)).ConfigureAwait(false);
+            if (gridAreaLink is null)
+            {
+                throw new InvalidOperationException(
+                    $"Could not find an associated link id with the specified grid area id: {gridArea.Id}");
+            }
+
             _changeEvents.Add(new GridAreaAddedToActorIntegrationEvent
                 {
                     OrganizationId = organizationId,
                     ActorId = existingActorId,
                     Function = function,
-                    GridAreaId = gridArea.Id
+                    GridAreaId = gridArea.Id,
+                    GridAreaLinkId = gridAreaLink.Id
                 });
 
             AddChangeEventsForAddedMeteringPointTypes(
@@ -243,16 +257,24 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         }
     }
 
-    private void AddChangeEventsForRemovedGridAreas(OrganizationId organizationId, Guid existingActorId, EicFunction function, IEnumerable<ActorGridArea> gridAreas)
+    private async Task AddChangeEventsForRemovedGridAreasAsync(OrganizationId organizationId, Guid existingActorId, EicFunction function, IEnumerable<ActorGridArea> gridAreas)
     {
         foreach (var gridArea in gridAreas)
         {
+            var gridAreaLink = await _gridAreaLinkRepository.GetAsync(new GridAreaId(gridArea.Id)).ConfigureAwait(false);
+            if (gridAreaLink is null)
+            {
+                throw new InvalidOperationException(
+                    $"Could not find an associated link id with the specified grid area id: {gridArea.Id}");
+            }
+
             _changeEvents.Add(new GridAreaRemovedFromActorIntegrationEvent
             {
                 OrganizationId = organizationId,
                 ActorId = existingActorId,
                 Function = function,
-                GridAreaId = gridArea.Id
+                GridAreaId = gridArea.Id,
+                GridAreaLinkId = gridAreaLink.Id
             });
 
             AddChangeEventsForRemovedMeteringPointTypes(

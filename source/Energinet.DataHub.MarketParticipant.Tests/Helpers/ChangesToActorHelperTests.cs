@@ -41,7 +41,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _actor, _incomingActor));
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(null!, _actor, _incomingActor));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_organizationId, null!, _incomingActor));
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, null!, _incomingActor));
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_organizationId, _actor, null!));
+        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, _actor, null!));
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class ChangesToActorHelperTests
         var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object);
 
         // Act
-        var result = target.FindChangesMadeToActor(_organizationId, _actor, _incomingActor).ToList();
+        var result = target.FindChangesMadeToActorAsync(_organizationId, _actor, _incomingActor).ToList();
 
         // Assert
         var numberOfStatusChangedEvents = result.Count(x => x is ActorStatusChangedIntegrationEvent);

@@ -22,4 +22,5 @@ public sealed class GridAreaRemovedFromActorIntegrationEvent : IntegrationEventB
     public Guid ActorId { get; set; }
     public EicFunction Function { get; set; }
     public Guid GridAreaId { get; set; }
+    public GridAreaLinkId GridAreaLinkId { get; set; } = null!;
 }
