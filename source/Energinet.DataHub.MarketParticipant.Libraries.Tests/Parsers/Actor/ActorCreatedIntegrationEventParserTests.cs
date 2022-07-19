@@ -38,7 +38,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                Guid.NewGuid(),
                 ActorStatus.Active,
                 "0123456789012",
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
@@ -52,7 +51,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
             Assert.Equal(@event.ActorId, actualEvent.ActorId);
-            Assert.Equal(@event.ExternalActorId, actualEvent.ExternalActorId);
             Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
             Assert.Equal(@event.ActorNumber, actualEvent.ActorNumber);
             Assert.Equal(@event.Status, actualEvent.Status);
@@ -84,30 +82,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
         }
 
         [Fact]
-        public void Parse_NoExternalActorId_ParsesCorrectly()
-        {
-            // arrange
-            var target = new ActorCreatedIntegrationEventParser();
-            var @event = new ActorCreatedIntegrationEvent(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                null,
-                Guid.NewGuid(),
-                ActorStatus.Active,
-                "0123456789012",
-                new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
-                DateTime.UtcNow);
-
-            // act
-            var actualBytes = target.Parse(@event);
-            var actualEvent = target.Parse(actualBytes);
-
-            // assert
-            Assert.Equal(@event.ExternalActorId, actualEvent.ExternalActorId);
-        }
-
-        [Fact]
         public void Parse_InvalidGuid_ThrowsException()
         {
             // Arrange
@@ -120,7 +94,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString(),
                 Type = nameof(ActorCreatedIntegrationEvent),
                 EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
             };
@@ -142,7 +115,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString(),
                 Type = nameof(ActorCreatedIntegrationEvent),
                 EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
             };
@@ -164,7 +136,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { -1, -2 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString(),
                 Type = nameof(ActorCreatedIntegrationEvent),
                 EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
             };
@@ -186,7 +157,6 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 ActorId = Guid.NewGuid().ToString(),
                 BusinessRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
-                ExternalActorId = Guid.NewGuid().ToString(),
                 Type = nameof(ActorCreatedIntegrationEvent),
                 EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
                 ActorMarketRoles = { new List<ActorMarketRoleEventData>() { new() { Function = -1 } } }
