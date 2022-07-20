@@ -13,21 +13,23 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActorStatusChangedEventDispatcher : EventDispatcherBase
+    public sealed class ActorExternalIdChangedEventDispatcher : EventDispatcherBase
     {
-        private readonly IActorStatusChangedIntegrationEventParser _eventParser;
+        private readonly IActorExternalIdChangedIntegrationEventParser _eventParser;
         private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
-        public ActorStatusChangedEventDispatcher(
-            IActorStatusChangedIntegrationEventParser eventParser,
+        public ActorExternalIdChangedEventDispatcher(
+            IActorExternalIdChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
         {
             _eventParser = eventParser;
@@ -38,15 +40,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorStatusChangedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorExternalIdChangedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorStatusChangedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorExternalIdChangedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,
-                actorUpdatedIntegrationEvent.OrganizationId.Value,
-                (ActorStatus)actorUpdatedIntegrationEvent.Status);
+                actorUpdatedIntegrationEvent.OrganizationId,
+                actorUpdatedIntegrationEvent.ExternalActorId);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             var message = new ServiceBusMessage(bytes);

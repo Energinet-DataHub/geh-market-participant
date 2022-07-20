@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -39,7 +40,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         _gridAreaLinkRepository = gridAreaLinkRepository;
     }
 
-    public async Task<IEnumerable<IIntegrationEvent>> FindChangesMadeToActorAsync(OrganizationId organizationId, Actor existingActor, UpdateActorCommand incomingActor)
+    public async Task<List<IIntegrationEvent>> FindChangesMadeToActorAsync(OrganizationId organizationId, Actor existingActor, UpdateActorCommand incomingActor)
     {
         ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
         ArgumentNullException.ThrowIfNull(existingActor, nameof(existingActor));
@@ -49,6 +50,30 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         await AddChangeEventsIfMarketRolesOrChildrenChangedAsync(organizationId, existingActor, incomingActor.ChangeActor.MarketRoles).ConfigureAwait(false);
 
         return _changeEvents;
+    }
+
+    public void SetIntegrationEventForExternalActorId(
+        Actor newActorState,
+        OrganizationId organizationId,
+        Guid? previousExternalId,
+        List<IIntegrationEvent> integrationEvents)
+    {
+        ArgumentNullException.ThrowIfNull(newActorState, nameof(newActorState));
+        ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
+        ArgumentNullException.ThrowIfNull(integrationEvents, nameof(integrationEvents));
+
+        var currentExternalActorId = newActorState.ExternalActorId?.Value;
+
+        if (previousExternalId != currentExternalActorId)
+        {
+            integrationEvents.Add(
+                new ActorExternalIdChangedIntegrationEvent
+                {
+                    ActorId = newActorState.Id,
+                    OrganizationId = organizationId.Value,
+                    ExternalActorId = newActorState.ExternalActorId?.Value
+                });
+        }
     }
 
     private void AddChangeEventIfActorStatusChanged(OrganizationId organizationId, Actor existingActor, string incomingStatus)

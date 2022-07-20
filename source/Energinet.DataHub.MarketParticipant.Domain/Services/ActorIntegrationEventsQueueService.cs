@@ -87,6 +87,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                             break;
                         }
 
+                    case ActorExternalIdChangedIntegrationEvent:
+                        {
+                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
+                            await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
+                            break;
+                        }
+
                     case MarketRoleAddedToActorIntegrationEvent or MarketRoleRemovedFromActorIntegrationEvent:
                         {
                             var domainEvent = new DomainEvent(actorId, nameof(ActorMarketRole), integrationEvent);

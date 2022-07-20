@@ -75,22 +75,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .ConfigureAwait(false);
 
             var actorId = request.ActorId;
-            var actor = organization
-                .Actors
-                .SingleOrDefault(actor => actor.Id == actorId);
+            var actor = organization.Actors.SingleOrDefault(actor => actor.Id == actorId) ?? throw new NotFoundValidationException(actorId);
 
-            if (actor == null)
-            {
-                throw new NotFoundValidationException(actorId);
-            }
-
-            var integrationEvents = await _changesToActorHelper.FindChangesMadeToActorAsync(organization.Id, actor, request).ConfigureAwait(false);
+            var actorChangedIntegrationEvents = await _changesToActorHelper.FindChangesMadeToActorAsync(organization.Id, actor, request).ConfigureAwait(false);
             UpdateActorStatus(actor, request);
             UpdateActorMarketRolesAndChildren(organization, actor, request);
+
+            var externalActorIdBeforeAssign = actor.ExternalActorId?.Value;
 
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
                 .ConfigureAwait(false);
+
+            _changesToActorHelper.SetIntegrationEventForExternalActorId(actor, organization.Id, externalActorIdBeforeAssign, actorChangedIntegrationEvents);
 
             await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
 
@@ -116,7 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     .ConfigureAwait(false);
 
                 await _actorIntegrationEventsQueueService
-                    .EnqueueActorUpdatedEventAsync(organization.Id, actor.Id, integrationEvents)
+                    .EnqueueActorUpdatedEventAsync(organization.Id, actor.Id, actorChangedIntegrationEvents)
                     .ConfigureAwait(false);
 
                 await uow.CommitAsync().ConfigureAwait(false);
