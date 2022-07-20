@@ -57,6 +57,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     Type = integrationEvent.Type
                 };
 
+                foreach (var x in integrationEvent.BusinessRoles)
+                {
+                    contract.BusinessRoles.Add((int)x);
+                }
+
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)

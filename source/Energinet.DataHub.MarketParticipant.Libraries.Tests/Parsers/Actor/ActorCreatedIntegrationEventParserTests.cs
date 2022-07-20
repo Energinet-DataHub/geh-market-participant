@@ -54,6 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
             Assert.Equal(@event.ActorNumber, actualEvent.ActorNumber);
             Assert.Equal(@event.Status, actualEvent.Status);
+            Assert.Equal(@event.BusinessRoles.Count(), actualEvent.BusinessRoles.Count());
             Assert.Equal(@event.ActorMarketRoles.Count(), actualEvent.ActorMarketRoles.Count());
 
             var expRoles = @event.ActorMarketRoles.ToList();
