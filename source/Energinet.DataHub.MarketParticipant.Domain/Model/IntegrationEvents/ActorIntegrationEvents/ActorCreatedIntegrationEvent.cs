@@ -12,21 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
-    public class ActorContactEventData
+    public sealed class ActorCreatedIntegrationEvent : IntegrationEventBase
     {
-        public ActorContactEventData(string name, EmailAddress email, ContactCategory category, PhoneNumber? phone)
-        {
-            Name = name;
-            Email = email;
-            Category = category;
-            Phone = phone;
-        }
+        public Guid ActorId { get; set; }
+        public OrganizationId OrganizationId { get; set; } = null!;
+        public ActorNumber ActorNumber { get; set; } = null!;
+        public ActorStatus Status { get; set; }
 
-        public string Name { get; }
-        public EmailAddress Email { get; }
-        public ContactCategory Category { get; }
-        public PhoneNumber? Phone { get; }
+        [JsonInclude]
+        public ICollection<BusinessRoleCode> BusinessRoles { get; private set; } = new List<BusinessRoleCode>();
+
+        [JsonInclude]
+        public ICollection<ActorMarketRoleEventData> ActorMarketRoles { get; private set; } = new List<ActorMarketRoleEventData>();
     }
 }

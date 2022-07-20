@@ -64,7 +64,7 @@ public sealed class ContactAddedToActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Contact = new ActorContactEventData("fake_name", "fake_email", ContactCategory.Notification, "fake_phone")
+            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ContactCategory.Notification, new PhoneNumber("32323232"))
         };
 
         // Act
@@ -81,9 +81,9 @@ public sealed class ContactAddedToActorEventDispatcherTests
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.Contact.Name, actualEvent.Contact.Name);
-        Assert.Equal(integrationEvent.Contact.Email, actualEvent.Contact.Email);
+        Assert.Equal(integrationEvent.Contact.Email.Address, actualEvent.Contact.Email);
         Assert.Equal((int)integrationEvent.Contact.Category, (int)actualEvent.Contact.Category);
-        Assert.Equal(integrationEvent.Contact.Phone, actualEvent.Contact.Phone);
+        Assert.Equal(integrationEvent.Contact.Phone?.Number, actualEvent.Contact.Phone);
     }
 
     [Fact]
@@ -103,7 +103,7 @@ public sealed class ContactAddedToActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Contact = new ActorContactEventData("fake_name", "fake_email", ContactCategory.Notification, "fake_phone")
+            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ContactCategory.Notification, new PhoneNumber("32323232"))
         };
 
         // Act

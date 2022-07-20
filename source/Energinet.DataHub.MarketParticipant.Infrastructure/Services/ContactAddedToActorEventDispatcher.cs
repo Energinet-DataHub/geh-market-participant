@@ -54,9 +54,9 @@ public sealed class ContactAddedToActorEventDispatcher : EventDispatcherBase
             contactAddedToActorIntegrationEvent.EventCreated,
             new Integration.Model.Dtos.ActorContact(
                 contactAddedToActorIntegrationEvent.Contact.Name,
-                contactAddedToActorIntegrationEvent.Contact.Email,
+                contactAddedToActorIntegrationEvent.Contact.Email.Address,
                 (Integration.Model.Dtos.ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category.Value,
-                contactAddedToActorIntegrationEvent.Contact.Phone));
+                contactAddedToActorIntegrationEvent.Contact.Phone?.Number));
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
         var message = new ServiceBusMessage(bytes);
