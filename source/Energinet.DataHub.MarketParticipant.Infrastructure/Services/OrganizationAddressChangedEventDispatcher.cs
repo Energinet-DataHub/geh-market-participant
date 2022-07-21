@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
+using OrganizationAddressChangedIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents.OrganizationAddressChangedIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -36,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationAddressChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not OrganizationAddressChangedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationAddressChangedIntegrationEvent(

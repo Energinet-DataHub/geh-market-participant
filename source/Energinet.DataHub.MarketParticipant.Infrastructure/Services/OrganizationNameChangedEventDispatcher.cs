@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services

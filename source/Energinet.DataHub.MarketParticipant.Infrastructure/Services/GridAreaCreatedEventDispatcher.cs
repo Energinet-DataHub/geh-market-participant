@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
+using GridAreaCreatedIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents.GridAreaCreatedIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -36,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaCreatedIntegrationEvent gridAreaCreatedIntegrationEvent)
+            if (integrationEvent is not GridAreaCreatedIntegrationEvent gridAreaCreatedIntegrationEvent)
                 return false;
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaCreatedIntegrationEvent(
