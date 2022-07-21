@@ -30,6 +30,7 @@ public sealed class MeteringPointTypeRemovedFromActorEventDispatcher : EventDisp
     public MeteringPointTypeRemovedFromActorEventDispatcher(
         IMeteringPointTypeRemovedFromActorIntegrationEventParser eventParser,
         IMarketParticipantServiceBusClient serviceBusClient)
+        : base(serviceBusClient)
     {
         _eventParser = eventParser;
         _serviceBusClient = serviceBusClient;
@@ -54,15 +55,7 @@ public sealed class MeteringPointTypeRemovedFromActorEventDispatcher : EventDisp
             meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated);
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
-        var message = new ServiceBusMessage(bytes);
-        SetMessageMetaData(message, outboundIntegrationEvent);
-
-        var sender = _serviceBusClient.CreateSender();
-
-        await using (sender.ConfigureAwait(false))
-        {
-            await sender.SendMessageAsync(message).ConfigureAwait(false);
-        }
+        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
         return true;
     }

@@ -33,6 +33,7 @@ public sealed class GridAreaAddedToActorEventDispatcher : EventDispatcherBase
     public GridAreaAddedToActorEventDispatcher(
         IGridAreaAddedToActorIntegrationEventParser eventParser,
         IMarketParticipantServiceBusClient serviceBusClient)
+        : base(serviceBusClient)
     {
         _eventParser = eventParser;
         _serviceBusClient = serviceBusClient;
@@ -57,15 +58,7 @@ public sealed class GridAreaAddedToActorEventDispatcher : EventDispatcherBase
             gridAreaAddedToActorIntegrationEvent.GridAreaLinkId);
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
-        var message = new ServiceBusMessage(bytes);
-        SetMessageMetaData(message, outboundIntegrationEvent);
-
-        var sender = _serviceBusClient.CreateSender();
-
-        await using (sender.ConfigureAwait(false))
-        {
-            await sender.SendMessageAsync(message).ConfigureAwait(false);
-        }
+        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
         return true;
     }

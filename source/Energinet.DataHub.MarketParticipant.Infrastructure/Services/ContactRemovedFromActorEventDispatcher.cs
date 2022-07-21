@@ -33,6 +33,7 @@ public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
     public ContactRemovedFromActorEventDispatcher(
         IContactRemovedFromActorIntegrationEventParser eventParser,
         IMarketParticipantServiceBusClient serviceBusClient)
+        : base(serviceBusClient)
     {
         _eventParser = eventParser;
         _serviceBusClient = serviceBusClient;
@@ -59,15 +60,7 @@ public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
                 contactAddedToActorIntegrationEvent.Contact.Phone?.Number));
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);
-        var message = new ServiceBusMessage(bytes);
-        SetMessageMetaData(message, outboundIntegrationEvent);
-
-        var sender = _serviceBusClient.CreateSender();
-
-        await using (sender.ConfigureAwait(false))
-        {
-            await sender.SendMessageAsync(message).ConfigureAwait(false);
-        }
+        await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
         return true;
     }
