@@ -50,6 +50,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 };
             }
 
+            var newStatus = Enum.Parse<OrganizationStatus>(organizationDto.Status);
+            if (organization.Status != newStatus)
+            {
+                yield return new OrganizationStatusChangedIntegrationEvent
+                {
+                    Status = newStatus,
+                    OrganizationId = organization.Id
+                };
+            }
+
             if (organization.BusinessRegisterIdentifier.Identifier != organizationDto.BusinessRegisterIdentifier)
             {
                 yield return new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent
