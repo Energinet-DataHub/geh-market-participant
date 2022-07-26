@@ -381,7 +381,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             var orgId = await target
-                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "Test Comment"))
+                .CreateOrganizationAsync(new CreateOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "Test Comment"))
                 .ConfigureAwait(false);
 
             var createdOrg = await target
@@ -463,7 +463,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             await target
-                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2"))
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2", OrganizationStatus.Active))
                 .ConfigureAwait(false);
 
             var changedOrg = await target

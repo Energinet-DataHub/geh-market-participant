@@ -14,10 +14,11 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment,
-        OrganizationStatus Status);
+    public enum OrganizationStatus
+    {
+        New = 1,
+        Active = 2,
+        Blocked = 3,
+        Deleted = 4
+    }
 }

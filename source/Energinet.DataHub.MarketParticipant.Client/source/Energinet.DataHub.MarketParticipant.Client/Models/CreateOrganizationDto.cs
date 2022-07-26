@@ -14,10 +14,9 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record ChangeOrganizationDto(
+    public sealed record CreateOrganizationDto(
         string Name,
         string BusinessRegisterIdentifier,
         AddressDto Address,
-        string? Comment,
-        OrganizationStatus Status);
+        string? Comment);
 }
