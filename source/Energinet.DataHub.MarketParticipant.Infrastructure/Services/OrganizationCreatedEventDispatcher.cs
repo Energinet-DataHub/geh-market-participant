@@ -50,10 +50,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     organizationCreatedIntegrationEvent.Address.Number ?? string.Empty,
                     organizationCreatedIntegrationEvent.Address.ZipCode ?? string.Empty,
                     organizationCreatedIntegrationEvent.Address.City ?? string.Empty,
-                    organizationCreatedIntegrationEvent.Address.Country));
+                    organizationCreatedIntegrationEvent.Address.Country),
+                (OrganizationStatus)organizationCreatedIntegrationEvent.Status);
 
             outboundIntegrationEvent.Comment = organizationCreatedIntegrationEvent.Comment;
-            // outboundIntegrationEvent.Status = organizationCreatedIntegrationEvent.Status.ToString();
+
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
