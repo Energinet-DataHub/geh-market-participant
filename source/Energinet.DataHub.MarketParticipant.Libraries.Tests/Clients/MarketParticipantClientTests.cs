@@ -450,7 +450,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
                     },
-                    ""comment"": ""Test Comment 2""
+                    ""comment"": ""Test Comment 2"",
+                    ""status"": ""Active""
                 }";
             var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
             using var httpTest = new HttpTest();
@@ -481,6 +482,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.StreetName, changedOrg.Address.StreetName);
             Assert.Equal(changedAddress.ZipCode, changedOrg.Address.ZipCode);
             Assert.Equal("Test Comment 2", changedOrg.Comment);
+            Assert.Equal(OrganizationStatus.Active.ToString(), changedOrg.Status);
 
             var actualActor = changedOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);

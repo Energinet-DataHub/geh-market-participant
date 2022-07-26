@@ -22,6 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         string Name,
         string BusinessRegisterIdentifier,
         string Comment,
+        string Status,
         AddressDto Address,
         IReadOnlyList<ActorDto> Actors);
 }
