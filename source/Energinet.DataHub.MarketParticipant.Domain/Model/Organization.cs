@@ -21,16 +21,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class Organization
     {
-        public Organization(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address)
+        public Organization(
+            string name,
+            BusinessRegisterIdentifier businessRegisterIdentifier,
+            Address address)
         {
             Id = new OrganizationId(Guid.Empty);
             Name = name;
             Actors = new Collection<Actor>();
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
+            Status = OrganizationStatus.New;
         }
 
-        public Organization(string name, BusinessRegisterIdentifier businessRegisterIdentifier, Address address, string? comment)
+        public Organization(
+            string name,
+            BusinessRegisterIdentifier businessRegisterIdentifier,
+            Address address,
+            string? comment)
         {
             Id = new OrganizationId(Guid.Empty);
             Name = name;
@@ -38,6 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
             Comment = comment;
+            Status = OrganizationStatus.New;
         }
 
         public Organization(
@@ -46,7 +55,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             IEnumerable<Actor> actors,
             BusinessRegisterIdentifier businessRegisterIdentifier,
             Address address,
-            string? comment)
+            string? comment,
+            OrganizationStatus status)
         {
             Id = id;
             Name = name;
@@ -54,6 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
             Comment = comment;
+            Status = status;
         }
 
         public OrganizationId Id { get; }
@@ -67,5 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public ICollection<Actor> Actors { get; }
 
         public string? Comment { get; set; }
+
+        public OrganizationStatus Status { get; set; }
     }
 }

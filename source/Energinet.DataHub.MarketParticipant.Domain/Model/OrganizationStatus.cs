@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record CreateOrganizationCommand(CreateOrganizationDto Organization) : IRequest<CreateOrganizationResponse>;
+    public enum OrganizationStatus
+    {
+        New = 1,
+        Active = 2,
+        Blocked = 3,
+        Deleted = 4
+    }
 }

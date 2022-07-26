@@ -49,7 +49,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var changeEvent = helper.BuildOrganizationCreatedEvents(organizationArea);
 
@@ -79,7 +80,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var organisationDto = new ChangeOrganizationDto(
                 "New Name",
@@ -90,7 +92,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                "Test Comment");
+                "Test Comment",
+                "Active");
 
             // Act
             var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);

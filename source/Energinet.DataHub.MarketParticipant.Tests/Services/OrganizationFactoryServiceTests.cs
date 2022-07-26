@@ -117,7 +117,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
@@ -166,7 +167,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
