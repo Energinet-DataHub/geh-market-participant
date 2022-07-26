@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed class OrganizationCreatedIntegrationEvent : IntegrationEventBase
+    public enum OrganizationStatus
     {
-        public OrganizationId OrganizationId { get; set; } = null!;
-        public string Name { get; set; } = null!;
-        public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; } = null!;
-        public Address Address { get; set; } = null!;
-        public string? Comment { get; set; }
-        public OrganizationStatus Status { get; set; }
+        New = 1,
+        Active = 2,
+        Blocked = 3,
+        Deleted = 4
     }
 }

@@ -16,40 +16,27 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record OrganizationCreatedIntegrationEvent : BaseIntegrationEvent
+    public sealed record OrganizationStatusChangedIntegrationEvent : BaseIntegrationEvent
     {
         /// <summary>
-        /// An event representing an update to a given GridArea.
+        /// An event representing an update to a given OrganizationStatusChanged.
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
         /// <param name="eventCreated"></param>
         /// <param name="organizationId">Organization ID.</param>
-        /// <param name="name">Name of the Grid Area.</param>
-        /// <param name="businessRegisterIdentifier">The Business registration code for this organization</param>
-        /// <param name="address">The address of this organization</param>
         /// <param name="status">Organization status</param>
-        public OrganizationCreatedIntegrationEvent(
+        public OrganizationStatusChangedIntegrationEvent(
             Guid id,
             DateTime eventCreated,
             Guid organizationId,
-            string name,
-            string businessRegisterIdentifier,
-            Address address,
             OrganizationStatus status)
         : base(id, eventCreated)
         {
             OrganizationId = organizationId;
-            Name = name;
-            BusinessRegisterIdentifier = businessRegisterIdentifier;
-            Address = address;
             Status = status;
         }
 
         public Guid OrganizationId { get; }
-        public string Name { get; }
-        public string BusinessRegisterIdentifier { get; }
-        public Address Address { get; }
-        public string? Comment { get; set; }
-        public OrganizationStatus Status { get; set; }
+        public OrganizationStatus Status { get; }
     }
 }
