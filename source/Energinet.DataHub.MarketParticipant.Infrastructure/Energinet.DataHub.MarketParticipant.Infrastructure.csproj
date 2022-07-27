@@ -34,7 +34,7 @@ limitations under the License.
     <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="2.1.0" />
     <PackageReference Include="Azure.Identity" Version="1.6.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.7.0" />
-    <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.4.0-alpha-20220720T114847" />
+    <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.4.0-alpha-20220727T130412" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4" />
     <PackageReference Include="NodaTime" Version="3.1.0" />
