@@ -27,71 +27,54 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 {
     [UnitTest]
-    public sealed class OrganizationCreatedEventDispatcherTests
+    public sealed class OrganizationStatusChangedEventDispatcherTests
     {
         [Fact]
-        public async Task OrganizationCreated_IntegrationEventDispatcher_CanReadEvent()
+        public async Task OrganizationStatusChanged_IntegrationEventDispatcher_CanReadEvent()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var organizationEventParser = new OrganizationCreatedIntegrationEventParser();
+            var organizationStatusChangedEventParser = new OrganizationStatusChangedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new OrganizationCreated(organizationEventParser, serviceBusClient.Object);
+            var target = new OrganizationStatusChanged(organizationStatusChangedEventParser, serviceBusClient.Object);
 
-            var integrationEvent = new OrganizationCreatedIntegrationEvent
+            var integrationEvent = new OrganizationStatusChangedIntegrationEvent
             {
-               Address = new Address(
-                   "fake_value",
-                   "fake_value",
-                   "fake_value",
-                   "fake_value",
-                   "fake_value"),
-               Name = "fake_value",
-               OrganizationId = new OrganizationId(Guid.NewGuid()),
-               BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678"),
-               Status = OrganizationStatus.Active
+                Status = OrganizationStatus.Active,
+                OrganizationId = new OrganizationId(Guid.NewGuid())
             };
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationCreatedIntegrationEvent;
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationStatusChangedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
-            Assert.Equal(integrationEvent.Name, actualEvent.Name);
+            Assert.Equal(integrationEvent.Status.ToString(), actualEvent.Status.ToString());
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
-            Assert.Equal(integrationEvent.Address.City, actualEvent.Address.City);
-            Assert.Equal(integrationEvent.Address.Country, actualEvent.Address.Country);
-            Assert.Equal(integrationEvent.Address.Number, actualEvent.Address.Number);
-            Assert.Equal(integrationEvent.Address.StreetName, actualEvent.Address.StreetName);
-            Assert.Equal(integrationEvent.Address.ZipCode, actualEvent.Address.ZipCode);
         }
 
         [Fact]
-        public async Task OrganizationCreatedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
+        public async Task OrganizationStatusChangedIntegrationEventDispatcher_WrongEventType_ReturnsFalse()
         {
             // arrange
             await using var serviceBusSenderMock = new MockedServiceBusSender();
             var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
-            var eventParser = new OrganizationCreatedIntegrationEventParser();
-            var target = new OrganizationCreated(eventParser, serviceBusClient.Object);
+            var eventParser = new OrganizationStatusChangedIntegrationEventParser();
+            var target = new OrganizationStatusChanged(eventParser, serviceBusClient.Object);
 
-            var integrationEvent = new ActorUpdatedIntegrationEvent
+            var integrationEvent = new OrganizationNameChangedIntegrationEvent
             {
-              ActorNumber = new ActorNumber("fake_value"),
-              Status = ActorStatus.Active,
-              ActorId = Guid.NewGuid(),
-              BusinessRoles = { BusinessRoleCode.Ddk },
-              OrganizationId = new OrganizationId(Guid.NewGuid()),
-              ExternalActorId = new ExternalActorId(Guid.NewGuid())
+                Name = "NewName",
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
             };
 
             // act

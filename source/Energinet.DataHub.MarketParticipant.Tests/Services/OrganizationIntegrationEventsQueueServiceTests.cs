@@ -49,7 +49,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var changeEvent = helper.BuildOrganizationCreatedEvents(organizationArea);
 
@@ -79,7 +80,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var organisationDto = new ChangeOrganizationDto(
                 "New Name",
@@ -90,7 +92,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                "Test Comment");
+                "Test Comment",
+                "Active");
 
             // Act
             var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);
@@ -99,6 +102,48 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var integrationEvents = changeEvents.ToList();
             Assert.Single(integrationEvents);
             Assert.Contains(integrationEvents, e => e is OrganizationNameChangedIntegrationEvent);
+            return Task.CompletedTask;
+        }
+
+        [Fact]
+        public Task EnqueueOrganizationStatusChangedEventAsync_CreatesEvent()
+        {
+            // Arrange
+            var helper = new OrganizationIntegrationEventsHelperService();
+
+            var organisationDomainModel = new Organization(
+                new OrganizationId(Guid.NewGuid()),
+                "Name",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("12345678"),
+                new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                "Test Comment",
+                OrganizationStatus.Active);
+
+            var organisationDto = new ChangeOrganizationDto(
+                "Name",
+                "12345678",
+                new AddressDto(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                "Test Comment",
+                "Blocked");
+
+            // Act
+            var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);
+
+            // Assert
+            var integrationEvents = changeEvents.ToList();
+            Assert.Single(integrationEvents);
+            Assert.Contains(integrationEvents, e => e is OrganizationStatusChangedIntegrationEvent);
             return Task.CompletedTask;
         }
     }

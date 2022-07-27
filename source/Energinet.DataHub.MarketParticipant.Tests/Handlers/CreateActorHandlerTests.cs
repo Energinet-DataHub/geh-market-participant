@@ -76,7 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
 
@@ -132,7 +133,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
             var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), new[] { MeteringPointType.D02Analysis.Name }) };

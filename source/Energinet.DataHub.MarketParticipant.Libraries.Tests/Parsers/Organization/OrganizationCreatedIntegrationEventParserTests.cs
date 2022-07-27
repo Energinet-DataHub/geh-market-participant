@@ -42,7 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
                     "fake_value",
                     "fake_value",
                     "fake_value",
-                    "fake_value"));
+                    "fake_value"),
+                OrganizationStatus.New);
 
             @event.Comment = "fake_comment";
 
@@ -61,6 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
             Assert.Equal(@event.Address.StreetName, actualEvent.Address.StreetName);
             Assert.Equal(@event.Address.ZipCode, actualEvent.Address.ZipCode);
             Assert.Equal(@event.Comment, actualEvent.Comment);
+            Assert.Equal(@event.Status, actualEvent.Status);
         }
 
         [Fact]
@@ -82,7 +84,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
                 BusinessRegisterIdentifier = "12345678",
                 Name = "fake_value",
                 OrganizationId = Guid.NewGuid().ToString(),
-                Comment = "fake_comment"
+                Comment = "fake_comment",
+                Status = 1
             };
 
             // Act + Assert
@@ -115,7 +118,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Organizati
                     "fake_value",
                     "fake_value",
                     "fake_value",
-                    "fake_value"));
+                    "fake_value"),
+                OrganizationStatus.New);
 
             // act
             var actualBytes = target.Parse(@event);

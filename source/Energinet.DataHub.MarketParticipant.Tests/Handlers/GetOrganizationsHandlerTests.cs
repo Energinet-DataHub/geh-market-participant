@@ -59,7 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationRepository
                 .Setup(x => x.GetAsync())

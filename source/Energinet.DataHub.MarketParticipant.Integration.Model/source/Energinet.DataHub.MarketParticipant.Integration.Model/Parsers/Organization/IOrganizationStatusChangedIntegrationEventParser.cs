@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 {
-    public sealed record OrganizationDto(
-        Guid OrganizationId,
-        string Name,
-        string BusinessRegisterIdentifier,
-        string Comment,
-        OrganizationStatus Status,
-        AddressDto Address,
-        IReadOnlyList<ActorDto> Actors);
+    /// <summary>
+    /// Parses the protobuf contract.
+    /// </summary>
+    public interface IOrganizationStatusChangedIntegrationEventParser
+    {
+        /// <summary>
+        /// Parses the event.
+        /// </summary>
+        /// <param name="integrationEvent">The event</param>
+        /// <returns>The protobuf contract.</returns>
+        byte[] Parse(OrganizationStatusChangedIntegrationEvent integrationEvent);
+    }
 }

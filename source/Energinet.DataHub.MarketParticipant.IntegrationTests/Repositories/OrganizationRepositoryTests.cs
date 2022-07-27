@@ -63,6 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
             Assert.Equal(testOrg.Name, newOrg?.Name);
             Assert.Equal(testOrg.Comment, newOrg?.Comment);
+            Assert.Equal(testOrg.Status, newOrg?.Status);
         }
 
         [Fact]
@@ -152,7 +153,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 newOrg.Actors,
                 newOrg.BusinessRegisterIdentifier,
                 newOrg.Address,
-                "Test Comment 2");
+                "Test Comment 2",
+                OrganizationStatus.New);
 
             await orgRepository.AddOrUpdateAsync(newOrg).ConfigureAwait(false);
             newOrg = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
@@ -162,6 +164,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotEqual(Guid.Empty, newOrg?.Id.Value);
             Assert.Equal("NewName", newOrg?.Name);
             Assert.Equal("Test Comment 2", newOrg?.Comment);
+            Assert.Equal(OrganizationStatus.New, newOrg?.Status);
         }
 
         [Fact]
