@@ -57,7 +57,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(Guid.NewGuid()),
                 new ActorNumber("fake_value"),
                 ActorStatus.Active,
-                new[] { marketRole });
+                new[] { marketRole },
+                new ActorName(string.Empty));
 
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(

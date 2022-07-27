@@ -88,12 +88,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
+                    It.Is<ActorName>(y => y.Value == string.Empty),
                     It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<ActorMarketRoleDto>()));
+                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(actorGln), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             var response = await target
@@ -146,12 +147,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
+                    It.Is<ActorName>(y => y.Value == string.Empty),
                     It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), new[] { marketRole }));
+                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(actorGln), new[] { marketRole }));
 
             // Act
             var response = await target

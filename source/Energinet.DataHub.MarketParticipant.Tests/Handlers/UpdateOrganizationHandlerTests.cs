@@ -92,7 +92,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(Guid.NewGuid()),
                 new ActorNumber("fake_value"),
                 ActorStatus.Active,
-                new[] { marketRole });
+                new[] { marketRole },
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 new OrganizationId(orgId),
@@ -165,7 +166,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(Guid.NewGuid()),
                 new ActorNumber("fake_value"),
                 ActorStatus.Active,
-                new[] { marketRole });
+                new[] { marketRole },
+                new ActorName(string.Empty));
 
             var dbOrganization = new Organization(
                 new OrganizationId(orgId),

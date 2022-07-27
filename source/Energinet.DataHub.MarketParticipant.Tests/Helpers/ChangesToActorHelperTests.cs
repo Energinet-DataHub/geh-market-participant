@@ -147,7 +147,8 @@ public class ChangesToActorHelperTests
                                 MeteringPointType.D01VeProduction
                             })
                     })
-            });
+            },
+            new ActorName(string.Empty));
     }
 
     private static UpdateActorCommand CreateValidIncomingActorWithChildren()
@@ -157,6 +158,7 @@ public class ChangesToActorHelperTests
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ChangeActorDto(
                 "Passive",
+                new ActorNameDto(string.Empty),
                 new List<ActorMarketRoleDto>
                 {
                     new ActorMarketRoleDto(
