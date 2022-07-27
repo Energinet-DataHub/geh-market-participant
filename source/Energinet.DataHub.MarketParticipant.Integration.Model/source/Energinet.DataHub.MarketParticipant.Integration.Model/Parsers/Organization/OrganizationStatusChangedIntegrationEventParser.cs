@@ -22,75 +22,53 @@ using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 {
-    public sealed class OrganizationCreatedIntegrationEventParser : IOrganizationCreatedIntegrationEventParser
+    public class OrganizationStatusChangedIntegrationEventParser : IOrganizationStatusChangedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent)
+        public byte[] Parse(OrganizationStatusChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationCreatedIntegrationEventContract()
+                var contract = new OrganizationStatusChangedIntegrationEventContract()
                 {
                     Id = integrationEvent.Id.ToString(),
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Name = integrationEvent.Name,
-                    BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
-                    Address = new OrganizationAddressEventData
-                    {
-                        City = integrationEvent.Address.City,
-                        Country = integrationEvent.Address.Country,
-                        Number = integrationEvent.Address.Number,
-                        StreetName = integrationEvent.Address.StreetName,
-                        ZipCode = integrationEvent.Address.ZipCode
-                    },
-                    Status = (int)integrationEvent.Status
+                    Status = (int)integrationEvent.Status,
+                    Type = integrationEvent.Type
                 };
-
-                if (integrationEvent.Comment != null)
-                {
-                    contract.Comment = integrationEvent.Comment;
-                }
 
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationStatusChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationCreatedIntegrationEvent Parse(byte[] protoContract)
+        internal OrganizationStatusChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
-                var contract = OrganizationCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                var contract = OrganizationStatusChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var createdEvent = new OrganizationCreatedIntegrationEvent(
+                var integrationEvent = new OrganizationStatusChangedIntegrationEvent(
                     Guid.Parse(contract.Id),
                     contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.OrganizationId),
-                    contract.Name,
-                    contract.BusinessRegisterIdentifier,
-                    new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country),
                     Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
 
-                if (contract.HasComment)
+                if (integrationEvent.Type != contract.Type)
                 {
-                    createdEvent.Comment = contract.Comment;
+                    throw new FormatException("Invalid Type");
                 }
 
-                return createdEvent;
+                return integrationEvent;
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCreatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationStatusChangedIntegrationEvent)}", ex);
             }
         }
     }

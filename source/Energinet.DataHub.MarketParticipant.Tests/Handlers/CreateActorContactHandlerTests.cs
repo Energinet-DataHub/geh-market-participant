@@ -87,7 +87,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -156,7 +157,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -227,7 +229,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),

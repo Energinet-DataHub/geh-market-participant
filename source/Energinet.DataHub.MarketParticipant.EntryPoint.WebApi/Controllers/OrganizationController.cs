@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrganizationAsync(ChangeOrganizationDto organization)
+        public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             return await this.ProcessAsync(
                 async () =>

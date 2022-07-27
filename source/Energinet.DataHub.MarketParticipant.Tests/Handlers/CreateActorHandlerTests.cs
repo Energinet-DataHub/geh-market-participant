@@ -75,7 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
 
@@ -131,7 +132,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
             var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());

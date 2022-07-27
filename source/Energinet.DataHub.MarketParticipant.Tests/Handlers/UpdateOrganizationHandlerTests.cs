@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -99,7 +100,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -109,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
-            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2");
+            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
@@ -120,6 +122,76 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.Equal(Unit.Value, response);
+        }
+
+        [Fact]
+        public async Task Handle_UpdateOrganizationDeleted_ThrowsException()
+        {
+            // Arrange
+            var organizationRepository = new Mock<IOrganizationRepository>();
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var organizationIntegrationEventsQueueService = new Mock<IOrganizationIntegrationEventsQueueService>();
+            var organizationIntegrationEventsHelperService = new Mock<IOrganizationIntegrationEventsHelperService>();
+
+            var target = new UpdateOrganizationHandler(
+                organizationRepository.Object,
+                UnitOfWorkProviderMock.Create(),
+                organizationIntegrationEventsQueueService.Object,
+                organizationExistsHelperService.Object,
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object,
+                organizationIntegrationEventsHelperService.Object);
+
+            var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
+
+            var marketRole = new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>());
+
+            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
+            var validAddress = new Address(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var validAddressDto = new AddressDto(
+                "test Street",
+                "1",
+                "1111",
+                "Test City",
+                "Test Country");
+
+            var actor = new Actor(
+                Guid.NewGuid(),
+                new ExternalActorId(Guid.NewGuid()),
+                new ActorNumber("fake_value"),
+                ActorStatus.Active,
+                new[] { marketRole });
+
+            var dbOrganization = new Organization(
+                new OrganizationId(orgId),
+                "fake_value",
+                new[] { actor },
+                validBusinessRegisterIdentifier,
+                validAddress,
+                "Test Comment",
+                OrganizationStatus.Deleted);
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+                .ReturnsAsync(dbOrganization);
+
+            organizationRepository
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(new OrganizationId(orgId));
+
+            var changeOrganizationDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
+
+            var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None))
+                .ConfigureAwait(false);
         }
     }
 }

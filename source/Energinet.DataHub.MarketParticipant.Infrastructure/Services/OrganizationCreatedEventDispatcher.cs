@@ -37,23 +37,24 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not OrganizationCreatedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationCreatedIntegrationEvent organizationCreatedIntegrationEvent)
                 return false;
 
             var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationCreatedIntegrationEvent(
-                organizationUpdatedIntegrationEvent.Id,
-                organizationUpdatedIntegrationEvent.EventCreated,
-                organizationUpdatedIntegrationEvent.OrganizationId.Value,
-                organizationUpdatedIntegrationEvent.Name,
-                organizationUpdatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
+                organizationCreatedIntegrationEvent.Id,
+                organizationCreatedIntegrationEvent.EventCreated,
+                organizationCreatedIntegrationEvent.OrganizationId.Value,
+                organizationCreatedIntegrationEvent.Name,
+                organizationCreatedIntegrationEvent.BusinessRegisterIdentifier.Identifier,
                 new Address(
-                    organizationUpdatedIntegrationEvent.Address.StreetName ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Number ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.ZipCode ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
-                    organizationUpdatedIntegrationEvent.Address.Country));
+                    organizationCreatedIntegrationEvent.Address.StreetName ?? string.Empty,
+                    organizationCreatedIntegrationEvent.Address.Number ?? string.Empty,
+                    organizationCreatedIntegrationEvent.Address.ZipCode ?? string.Empty,
+                    organizationCreatedIntegrationEvent.Address.City ?? string.Empty,
+                    organizationCreatedIntegrationEvent.Address.Country),
+                (OrganizationStatus)organizationCreatedIntegrationEvent.Status);
 
-            outboundIntegrationEvent.Comment = organizationUpdatedIntegrationEvent.Comment;
+            outboundIntegrationEvent.Comment = organizationCreatedIntegrationEvent.Comment;
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);

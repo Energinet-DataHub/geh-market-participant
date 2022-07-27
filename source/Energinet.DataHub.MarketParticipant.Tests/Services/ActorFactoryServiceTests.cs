@@ -167,7 +167,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Array.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment 2");
+                "Test Comment 2",
+                OrganizationStatus.Active);
 
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 

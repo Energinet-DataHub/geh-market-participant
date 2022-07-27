@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return singleOrganizationsResult;
         }
 
-        public async Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
+        public async Task<Guid> CreateOrganizationAsync(CreateOrganizationDto organizationDto)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(

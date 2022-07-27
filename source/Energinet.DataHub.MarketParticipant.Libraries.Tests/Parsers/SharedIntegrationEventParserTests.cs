@@ -237,7 +237,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     "fake_value",
                     "fake_value",
                     "fake_value",
-                    "fake_value"));
+                    "fake_value"),
+                OrganizationStatus.New);
 
             @event.Comment = "fake_comment";
 
@@ -268,6 +269,27 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // Assert
             Assert.IsType<OrganizationNameChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationStatusChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationStatusChangedIntegrationEventParser();
+            var sharedIntegrationParser = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationStatusChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                OrganizationStatus.Active);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationStatusChangedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]

@@ -75,6 +75,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return organizationNameChangedIntegrationEvent;
             }
 
+            if (TryParseOrganizationStatusChangedIntegrationEvent(protoContract, out var organizationStatusChangedIntegrationEvent))
+            {
+                return organizationStatusChangedIntegrationEvent;
+            }
+
             if (TryParseOrganizationBusinessRegisterIdentifierIntegrationEvent(protoContract, out var organizationBusinessRegisterIdentifierIntegrationEvent))
             {
                 return organizationBusinessRegisterIdentifierIntegrationEvent;
@@ -326,6 +331,25 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 organizationNameChangedIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseOrganizationStatusChangedIntegrationEvent(
+            byte[] protoContract,
+            out OrganizationStatusChangedIntegrationEvent organizationStatusChangedIntegrationEvent)
+        {
+            try
+            {
+                var organizationStatusChangedIntegrationEventParser = new OrganizationStatusChangedIntegrationEventParser();
+                organizationStatusChangedIntegrationEvent = organizationStatusChangedIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                organizationStatusChangedIntegrationEvent = null!;
                 return false;
             }
         }
