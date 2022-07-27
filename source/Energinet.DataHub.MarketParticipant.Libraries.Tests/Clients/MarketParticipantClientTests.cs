@@ -482,7 +482,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.StreetName, changedOrg.Address.StreetName);
             Assert.Equal(changedAddress.ZipCode, changedOrg.Address.ZipCode);
             Assert.Equal("Test Comment 2", changedOrg.Comment);
-            Assert.Equal(OrganizationStatus.Active.ToString(), changedOrg.Status);
+            Assert.Equal(OrganizationStatus.Active, changedOrg.Status);
 
             var actualActor = changedOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
