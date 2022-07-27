@@ -128,13 +128,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Active", true)]
         [InlineData("Blocked", true)]
         [InlineData("Deleted", true)]
-        public async Task Validate_OrganizationStatus_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationStatus_ValidatesProperty(string status, bool isValid)
         {
             // Arrange
             const string propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Status)}";
 
             var organizationDto = new ChangeOrganizationDto(
-                value,
+                "fake_value",
                 ValidCvr,
                 new AddressDto(
                     string.Empty,
@@ -143,7 +143,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                value);
+                status);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
