@@ -21,6 +21,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class Organization
     {
+        private readonly OrganizationStatusTransitioner _organizationStatusTransitioner;
+
         public Organization(
             string name,
             BusinessRegisterIdentifier businessRegisterIdentifier,
@@ -31,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Actors = new Collection<Actor>();
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
-            Status = OrganizationStatus.New;
+            _organizationStatusTransitioner = new OrganizationStatusTransitioner();
         }
 
         public Organization(
@@ -46,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
             Comment = comment;
-            Status = OrganizationStatus.New;
+            _organizationStatusTransitioner = new OrganizationStatusTransitioner();
         }
 
         public Organization(
@@ -64,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             BusinessRegisterIdentifier = businessRegisterIdentifier;
             Address = address;
             Comment = comment;
-            Status = status;
+            _organizationStatusTransitioner = new OrganizationStatusTransitioner(status);
         }
 
         public OrganizationId Id { get; }
@@ -79,6 +81,26 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public string? Comment { get; set; }
 
-        public OrganizationStatus Status { get; set; }
+        public OrganizationStatus Status
+        {
+            get => _organizationStatusTransitioner.Status;
+            set => _organizationStatusTransitioner.Status = value;
+        }
+
+        /// <summary>
+        /// Activates the current organization, the status changes to Active.
+        /// Only New and Blocked  organizations can be activated.
+        /// </summary>
+        public void Activate() => _organizationStatusTransitioner.Activate();
+
+        /// <summary>
+        /// Blocks the current organization, the status changes to Blocked.
+        /// </summary>
+        public void Blocked() => _organizationStatusTransitioner.Blocked();
+
+        /// <summary>
+        /// Soft-deletes the current organization, the status changes to Deleted.
+        /// </summary>
+        public void Delete() => _organizationStatusTransitioner.Delete();
     }
 }

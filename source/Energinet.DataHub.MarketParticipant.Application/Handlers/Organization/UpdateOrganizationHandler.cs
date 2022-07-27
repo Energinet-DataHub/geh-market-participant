@@ -61,8 +61,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            EnsureNoStatusChangeWhenOrganizationMarkedAsDeleted(organization, request);
-
             var changeEvents = _organizationIntegrationEventsHelperService
                 .DetermineOrganizationUpdatedChangeEvents(organization, request.Organization);
 
@@ -100,15 +98,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             await uow.CommitAsync().ConfigureAwait(false);
 
             return Unit.Value;
-        }
-
-        private static void EnsureNoStatusChangeWhenOrganizationMarkedAsDeleted(Domain.Model.Organization organization, UpdateOrganizationCommand request)
-        {
-            var incomingStatus = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
-            if (organization.Status == OrganizationStatus.Deleted && incomingStatus != OrganizationStatus.Deleted)
-            {
-                throw new ValidationException("Status can't change when organization is marked as deleted");
-            }
         }
     }
 }
