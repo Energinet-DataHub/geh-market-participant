@@ -12,17 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public sealed record OrganizationDto(
-        Guid OrganizationId,
-        string Name,
-        string BusinessRegisterIdentifier,
-        string Comment,
-        OrganizationStatus Status,
-        AddressDto Address,
-        IReadOnlyList<ActorDto> Actors);
+    public enum OrganizationStatus
+    {
+        New = 1,
+        Active = 2,
+        Blocked = 3,
+        Deleted = 4
+    }
 }

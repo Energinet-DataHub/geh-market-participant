@@ -21,5 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents
         public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; } = null!;
         public Address Address { get; set; } = null!;
         public string? Comment { get; set; }
+        public OrganizationStatus Status { get; set; }
     }
 }

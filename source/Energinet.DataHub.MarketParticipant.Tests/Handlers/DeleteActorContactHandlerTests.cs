@@ -80,7 +80,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
@@ -124,7 +125,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
@@ -166,7 +168,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))

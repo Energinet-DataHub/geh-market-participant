@@ -100,7 +100,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
