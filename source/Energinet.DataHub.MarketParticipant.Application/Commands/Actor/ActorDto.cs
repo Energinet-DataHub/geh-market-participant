@@ -21,5 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
         string? ExternalActorId,
         ActorNumberDto ActorNumber,
         string Status,
+        ActorNameDto Name,
         IEnumerable<ActorMarketRoleDto> MarketRoles);
 }

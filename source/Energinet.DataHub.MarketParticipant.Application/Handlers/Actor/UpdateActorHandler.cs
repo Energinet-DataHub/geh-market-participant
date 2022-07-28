@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -79,6 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             var actorChangedIntegrationEvents = await _changesToActorHelper.FindChangesMadeToActorAsync(organization.Id, actor, request).ConfigureAwait(false);
             UpdateActorStatus(actor, request);
+            UpdateActorName(actor, request);
             UpdateActorMarketRolesAndChildren(organization, actor, request);
 
             var externalActorIdBeforeAssign = actor.ExternalActorId?.Value;
@@ -120,6 +122,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             }
 
             return Unit.Value;
+        }
+
+        private static void UpdateActorName(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.Name = new ActorName(request.ChangeActor.Name.Value);
         }
 
         private static void UpdateActorStatus(Domain.Model.Actor actor, UpdateActorCommand request)

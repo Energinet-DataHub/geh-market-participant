@@ -50,11 +50,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            var actorGln = new ActorNumber(request.Actor.ActorNumber.Value);
+            var actorNumber = new ActorNumber(request.Actor.ActorNumber.Value);
+            var actorName = new ActorName(request.Actor.ActorName.Value);
             var marketRoles = CreateMarketRoles(request.Actor).ToList();
 
             var allMarketRolesForActorGln = organization.Actors
-                .Where(x => x.ActorNumber == actorGln)
+                .Where(x => x.ActorNumber == actorNumber)
                 .SelectMany(x => x.MarketRoles)
                 .Select(x => x.Function)
                 .Concat(marketRoles.Select(x => x.Function));
@@ -62,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, marketRoles)
+                .CreateAsync(organization, actorNumber, actorName, marketRoles)
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);

@@ -132,13 +132,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 var actorNumber = new ActorNumber(actor.ActorNumber);
                 var actorStatus = (ActorStatus)actor.Status;
+                var actorName = new ActorName(actor.Name);
 
                 return new Actor(
                     actor.Id,
                     actor.ActorId.HasValue ? new ExternalActorId(actor.ActorId.Value) : null,
                     actorNumber,
                     actorStatus,
-                    marketRoles);
+                    marketRoles,
+                    actorName);
             }).ToList();
         }
     }
