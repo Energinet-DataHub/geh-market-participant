@@ -119,6 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var integrationEvents = new List<IIntegrationEvent>();
             integrationEvents.Add(new ActorStatusChangedIntegrationEvent());
+            integrationEvents.Add(new ActorNameChangedIntegrationEvent());
             integrationEvents.Add(new MarketRoleAddedToActorIntegrationEvent());
             integrationEvents.Add(new MarketRoleRemovedFromActorIntegrationEvent());
             integrationEvents.Add(new GridAreaAddedToActorIntegrationEvent());
@@ -136,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Assert
             domainEventRepository.Verify(
                 x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id)),
-                Times.Exactly(7));
+                Times.Exactly(8));
         }
     }
 }

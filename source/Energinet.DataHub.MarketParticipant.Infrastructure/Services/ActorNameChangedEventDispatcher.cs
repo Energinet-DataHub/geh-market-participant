@@ -13,49 +13,37 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using ActorUpdatedIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorUpdatedIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActorCreatedEventDispatcher : EventDispatcherBase
+    public sealed class ActorNameChangedEventDispatcher : EventDispatcherBase
     {
-        private readonly IActorCreatedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
+        private readonly IActorNameChangedIntegrationEventParser _eventParser;
 
-        public ActorCreatedEventDispatcher(
-            IActorCreatedIntegrationEventParser eventParser,
+        public ActorNameChangedEventDispatcher(
+            IActorNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
             : base(serviceBusClient)
         {
             _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
         }
 
         public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
         {
             ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorCreatedIntegrationEvent actorUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorNameChangedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new ActorCreatedIntegrationEvent(
+            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorNameChangedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
+                actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,
                 actorUpdatedIntegrationEvent.OrganizationId.Value,
-                (ActorStatus)actorUpdatedIntegrationEvent.Status,
-                actorUpdatedIntegrationEvent.ActorNumber.Value,
-                actorUpdatedIntegrationEvent.Name.Value,
-                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (Integration.Model.Dtos.BusinessRoleCode)(int)x),
-                actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
-                    new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
-                        new ActorGridArea(y.Id, y.MeteringPointTypes)))),
-                actorUpdatedIntegrationEvent.EventCreated);
+                actorUpdatedIntegrationEvent.Name.Value);
 
             var bytes = _eventParser.Parse(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
