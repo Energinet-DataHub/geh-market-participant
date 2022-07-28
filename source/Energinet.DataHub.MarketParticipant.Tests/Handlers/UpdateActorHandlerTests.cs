@@ -117,8 +117,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -129,12 +129,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 MeteringPointType.D02Analysis.Name, MeteringPointType.E17Consumption.Name,
                 MeteringPointType.E17Consumption.Name
             };
-            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), meteringPoints) };
+            var gridAreas = new[] { new ActorGridAreaDto(actor.Id, meteringPoints) };
             var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
+                actor.Id,
                 new ChangeActorDto("Active", marketRoles));
 
             // Act
@@ -166,8 +166,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -175,7 +175,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
+                actor.Id,
                 new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
@@ -207,8 +207,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -216,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
+                actor.Id,
                 new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act
@@ -248,8 +248,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -257,7 +257,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
+                actor.Id,
                 new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
 
             // Act

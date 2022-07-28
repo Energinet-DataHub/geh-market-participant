@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -37,6 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(organization => organization.BusinessRegisterIdentifier)
                         .NotEmpty()
                         .Length(1, 8);
+
+                    validator
+                        .RuleFor(organization => organization.Status)
+                        .NotEmpty()
+                        .IsEnumName(typeof(OrganizationStatus));
 
                     validator
                         .RuleFor(organization => organization.Address)

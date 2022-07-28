@@ -14,7 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
     /// <summary>
     /// Parses the protobuf contract.

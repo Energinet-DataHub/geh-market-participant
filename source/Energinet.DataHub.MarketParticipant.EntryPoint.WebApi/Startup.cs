@@ -84,6 +84,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
             var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
 
+            services.AddApplicationInsightsTelemetry();
+
             // Health check
             services
                 .AddHealthChecks()

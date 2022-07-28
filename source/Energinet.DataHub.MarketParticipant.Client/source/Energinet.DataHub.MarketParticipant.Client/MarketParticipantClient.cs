@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantOrganizationClient.GetOrganizationAsync(organizationId);
         }
 
-        public Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto)
+        public Task<Guid> CreateOrganizationAsync(CreateOrganizationDto organizationDto)
         {
             return _marketParticipantOrganizationClient.CreateOrganizationAsync(organizationDto);
         }

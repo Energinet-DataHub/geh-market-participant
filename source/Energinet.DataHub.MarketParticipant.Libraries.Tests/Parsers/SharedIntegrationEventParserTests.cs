@@ -16,6 +16,8 @@ using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using Xunit;
 using Xunit.Categories;
 using ActorStatus = Energinet.DataHub.MarketParticipant.Integration.Model.Dtos.ActorStatus;
@@ -35,15 +37,14 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             var @event = new ActorUpdatedIntegrationEvent(
                 Guid.NewGuid(),
+                DateTime.UtcNow,
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 "0123456789012",
                 ActorStatus.Active,
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { EicFunction.Agent, EicFunction.BalanceResponsibleParty },
-                new[] { Guid.NewGuid(), Guid.NewGuid() },
-                new[] { "type1", "type2" });
+                new[] { new ActorMarketRole(EicFunction.Agent, new[] { new ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) });
 
             // act
             var actualBytes = input.Parse(@event);
@@ -101,6 +102,192 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // Assert
             Assert.IsType<OrganizationUpdatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaCreatedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaCreatedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "TestArea",
+                "123",
+                PriceAreaCode.DK1,
+                Guid.NewGuid());
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaCreatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaNameChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaNameChangedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaNameChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "TestArea");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaNameChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationCreatedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationCreatedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationCreatedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "TestOrg",
+                "12345678",
+                new Address(
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value",
+                    "fake_value"),
+                OrganizationStatus.New);
+
+            @event.Comment = "fake_comment";
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationCreatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationNameChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationNameChangedIntegrationEventParser();
+            var sharedIntegrationParser = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationNameChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "TestOrg");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationNameChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationStatusChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationStatusChangedIntegrationEventParser();
+            var sharedIntegrationParser = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationStatusChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                OrganizationStatus.Active);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationStatusChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationCommentChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationCommentChangedIntegrationEventParser();
+            var sharedIntegrationParser = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationCommentChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "TestComment");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationCommentChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser();
+            var sharedIntegrationParser = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                "BusinessIdentifier");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationBusinessRegisterIdentifierChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_OrganizationAddressChangedIntegrationEventParser()
+        {
+            // Arrange
+            var input = new OrganizationAddressChangedIntegrationEventParser();
+            var sharedIntegrationParser = new SharedIntegrationEventParser();
+
+            var @event = new OrganizationAddressChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                new Address(
+                    "fake_street",
+                    "fake_number",
+                    "fake_zip",
+                    "fake_city",
+                    "fake_country"));
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<OrganizationAddressChangedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]

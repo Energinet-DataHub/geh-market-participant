@@ -23,6 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// An event representing an update to a given actor.
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
+        /// <param name="eventCreated">event creation time</param>
         /// <param name="actorId">The internal actor ID.</param>
         /// <param name="organizationId">Organization ID.</param>
         /// <param name="externalActorId">
@@ -31,21 +32,18 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// <param name="actorNumber">GLN.</param>
         /// <param name="status">The status of the current actor.</param>
         /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
-        /// <param name="marketRoles">The roles (functions) assigned to the current actor.</param>
-        /// <param name="gridAreas">The roles (grid areas) assigned to the current actor.</param>
-        /// <param name="meteringPointTypes"></param>
+        /// <param name="actorMarketRoles">Actors market roles.</param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
+            DateTime eventCreated,
             Guid actorId,
             Guid organizationId,
             Guid? externalActorId,
             string actorNumber,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
-            IEnumerable<EicFunction> marketRoles,
-            IEnumerable<Guid> gridAreas,
-            IEnumerable<string> meteringPointTypes)
-        : base(id)
+            IEnumerable<ActorMarketRole> actorMarketRoles)
+        : base(id, eventCreated)
         {
             ActorId = actorId;
             OrganizationId = organizationId;
@@ -53,9 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             ActorNumber = actorNumber;
             Status = status;
             BusinessRoles = businessRoles;
-            MarketRoles = marketRoles;
-            GridAreas = gridAreas;
-            MeteringPointTypes = meteringPointTypes;
+            ActorMarketRoles = actorMarketRoles;
         }
 
         public Guid ActorId { get; }
@@ -66,8 +62,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public ActorStatus Status { get; }
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
-        public IEnumerable<EicFunction> MarketRoles { get; }
-        public IEnumerable<Guid> GridAreas { get; }
-        public IEnumerable<string> MeteringPointTypes { get; }
+        public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
     }
 }

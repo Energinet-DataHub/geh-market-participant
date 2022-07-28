@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="organizationDto">The organization to create.</param>
         /// <returns>The id <see cref="Guid"/> of the created organization.</returns>
-        Task<Guid> CreateOrganizationAsync(ChangeOrganizationDto organizationDto);
+        Task<Guid> CreateOrganizationAsync(CreateOrganizationDto organizationDto);
 
         /// <summary>
         /// Updates an organization.

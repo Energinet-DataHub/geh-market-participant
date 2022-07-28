@@ -12,20 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    /// <summary>
-    /// Parses the protobuf contract.
-    /// </summary>
-    public interface IOrganizationUpdatedIntegrationEventParser
-    {
-        /// <summary>
-        /// Parses the event.
-        /// </summary>
-        /// <param name="integrationEvent">The event</param>
-        /// <returns>The protobuf contract.</returns>
-        byte[] Parse(OrganizationUpdatedIntegrationEvent integrationEvent);
-    }
+    public record ActorMarketRole(EicFunction Function, IEnumerable<ActorGridArea> GridAreas);
 }
