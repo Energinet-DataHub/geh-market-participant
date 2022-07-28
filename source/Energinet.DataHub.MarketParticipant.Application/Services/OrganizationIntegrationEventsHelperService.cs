@@ -32,7 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 Name = organization.Name,
                 OrganizationId = organization.Id,
                 BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
-                Comment = organization.Comment
+                Comment = organization.Comment,
+                Status = organization.Status
             };
         }
 
