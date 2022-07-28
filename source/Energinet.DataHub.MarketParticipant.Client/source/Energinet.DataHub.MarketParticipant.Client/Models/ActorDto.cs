@@ -22,5 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Guid? ExternalActorId,
         ActorNumberDto ActorNumber,
         ActorStatus Status,
+        ActorNameDto Name,
         IReadOnlyList<ActorMarketRoleDto> MarketRoles);
 }
