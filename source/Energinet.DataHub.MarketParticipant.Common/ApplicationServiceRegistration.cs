@@ -69,6 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IOrganizationAddressChangedIntegrationEventParser, OrganizationAddressChangedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IOrganizationUpdatedIntegrationEventParser, OrganizationUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IActorStatusChangedIntegrationEventParser, ActorStatusChangedIntegrationEventParser>();
+            container.Register<IActorNameChangedIntegrationEventParser, ActorNameChangedIntegrationEventParser>();
             container.Register<IActorExternalIdChangedIntegrationEventParser, ActorExternalIdChangedIntegrationEventParser>();
             container.Register<IMeteringPointTypeAddedToActorIntegrationEventParser, MeteringPointTypeAddedToActorIntegrationEventParser>();
             container.Register<IMeteringPointTypeRemovedFromActorIntegrationEventParser, MeteringPointTypeRemovedFromActorIntegrationEventParser>();
