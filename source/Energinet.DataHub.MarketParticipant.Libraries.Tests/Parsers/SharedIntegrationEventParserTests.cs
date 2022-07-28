@@ -68,6 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 ActorStatus.Active,
                 "0123456789012",
+                "ActorName",
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
                 new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
                 DateTime.UtcNow);

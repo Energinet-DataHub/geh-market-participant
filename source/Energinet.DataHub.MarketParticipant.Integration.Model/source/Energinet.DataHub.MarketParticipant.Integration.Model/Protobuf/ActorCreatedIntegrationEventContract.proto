@@ -30,6 +30,7 @@ message ActorCreatedIntegrationEventContract{
   repeated ActorMarketRoleEventData ActorMarketRoles = 7;
   google.protobuf.Timestamp EventCreated = 8;
   string Type = 9;
+  string Name = 10;
 }
 
 message ActorMarketRoleEventData {
