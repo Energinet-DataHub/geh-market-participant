@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // act + assert
             await Assert.ThrowsAsync<ValidationException>(
-                () => target.EnsureUniqueMarketRolesPerGridAreaAsync(organization));
+                () => target.EnsureUniqueBusinessRegisterIdentifierAsync(organization));
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
 
             // act + assert
-            await target.EnsureUniqueMarketRolesPerGridAreaAsync(organization);
+            await target.EnsureUniqueBusinessRegisterIdentifierAsync(organization);
         }
     }
 }
