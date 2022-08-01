@@ -52,34 +52,40 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             var actorGln = new ActorNumber(request.Actor.ActorNumber.Value);
             var marketRoles = CreateMarketRoles(request.Actor).ToList();
-            var gridAreas = CreateGridAreas(request.Actor).ToList();
-            var meteringPointTypes = CreateMeteringPointTypes(request.Actor).ToList();
 
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(marketRoles);
+            var allMarketRolesForActorGln = organization.Actors
+                .Where(x => x.ActorNumber == actorGln)
+                .SelectMany(x => x.MarketRoles)
+                .Select(x => x.Function)
+                .Concat(marketRoles.Select(x => x.Function));
+
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             var actor = await _actorFactoryService
-                .CreateAsync(organization, actorGln, gridAreas, marketRoles, meteringPointTypes)
+                .CreateAsync(organization, actorGln, marketRoles)
                 .ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);
         }
 
-        private static IEnumerable<GridAreaId> CreateGridAreas(CreateActorDto actorDto)
+        private static IEnumerable<ActorGridArea> CreateGridAreas(IEnumerable<ActorGridAreaDto> gridAreaDtos)
         {
-            return (actorDto.GridAreas ?? Array.Empty<Guid>()).Select(gridAreaId => new GridAreaId(gridAreaId));
+            return gridAreaDtos.Select(gridArea =>
+                new ActorGridArea(gridArea.Id, CreateMeteringPointTypes(gridArea.MeteringPointTypes)));
         }
 
-        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(CreateActorDto actorDto)
+        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(IEnumerable<string> meteringPointTypes)
         {
-            return actorDto.MeteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
+            return meteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
         }
 
-        private static IEnumerable<MarketRole> CreateMarketRoles(CreateActorDto actorDto)
+        private static IEnumerable<ActorMarketRole> CreateMarketRoles(CreateActorDto actorDto)
         {
             foreach (var marketRole in actorDto.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
-                yield return new MarketRole(function);
+                var gridAreas = CreateGridAreas(marketRole.GridAreas);
+                yield return new ActorMarketRole(function, gridAreas);
             }
         }
     }

@@ -48,9 +48,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             try
             {
                 // Arrange
-                var roles = new List<MarketRole>
+                var roles = new List<EicFunction>
                 {
-                    new(EicFunction.SystemOperator) // transmission system operator
+                    EicFunction.SystemOperator // transmission system operator
                 };
 
                 // Act
@@ -82,10 +82,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             try
             {
                 // Arrange
-                var roles = new List<MarketRole>
+                var roles = new List<EicFunction>
                 {
-                    new(EicFunction.SystemOperator), // transmission system operator
-                    new(EicFunction.MeteredDataResponsible)
+                    EicFunction.SystemOperator, // transmission system operator
+                    EicFunction.MeteredDataResponsible
                 };
 
                 var createAppRegistrationResponse = await _sut
@@ -118,9 +118,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             try
             {
                 // Arrange
-                var roles = new List<MarketRole>
+                var roles = new List<EicFunction>
                 {
-                    new(EicFunction.SystemOperator), // transmission system operator
+                    EicFunction.SystemOperator, // transmission system operator
                 };
 
                 var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(

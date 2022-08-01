@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -44,27 +45,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorId = actor.Id,
                 ExternalActorId = actor.ExternalActorId,
                 ActorNumber = actor.ActorNumber,
-                Status = actor.Status
+                Status = actor.Status,
             };
 
-            foreach (var marketRole in actor.MarketRoles)
-            {
-                actorUpdatedEvent.MarketRoles.Add(marketRole.Function);
-            }
-
-            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles))
+            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))
             {
                 actorUpdatedEvent.BusinessRoles.Add(businessRole);
             }
 
-            foreach (var gridAreaId in actor.GridAreas)
+            foreach (var actorMarketRole in actor.MarketRoles)
             {
-                actorUpdatedEvent.GridAreas.Add(gridAreaId);
-            }
-
-            foreach (var meteringPointTypes in actor.MeteringPointTypes)
-            {
-                actorUpdatedEvent.MeteringPointTypes.Add(meteringPointTypes.Name);
+                actorUpdatedEvent.ActorMarketRoles.Add(
+                    new ActorMarketRoleEventData(
+                        actorMarketRole.Function,
+                        actorMarketRole.GridAreas.Select(
+                            x => new ActorGridAreaEventData(
+                                x.Id,
+                                x.MeteringPointTypes.Select(y => y.Name).ToList()))
+                            .ToList()));
             }
 
             var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);

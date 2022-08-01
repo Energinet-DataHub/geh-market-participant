@@ -21,72 +21,50 @@ on:
       - main
 
 jobs:
+  # Markdown, links and spell checks
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@6.3.0
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@7.6.0
 
   terraform_validate:
-    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@6.0.0
+    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@7.6.0
     with:
       TERRAFORM_WORKING_DIR_PATH: './build/infrastructure/main'
-      TERRAFORM_VERSION: '1.1.5'
+      TERRAFORM_VERSION: '1.2.2'
 
-  database_migration_ci:
-    needs: [ci_base, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-webapi-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp/Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: databasemigration
-
+     # Build and test solution, and publish coverage report
   dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@6.1.0
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@temporarily_disable_integration_test # TODO: Revert to next version when integration test issue is solved
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
-      DOTNET_VERSION: '6.0.201'
+      DOTNET_VERSION: '6.0.301'
       USE_SQLLOCALDB_2019: true
+      PREPARE_OUTPUTS: true
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID }}
-      AZURE_SPN_SECRET: ${{ secrets.AZURE_SPN_SECRET }}
+      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
       AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
       AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
 
-  organization_func_ci:
-    needs: [ci_base, dotnet_solution_ci, terraform_validate]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-function-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.EntryPoint.Organization/Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: organization
-
-  webapi_ci:
-    needs: [ci_base, terraform_validate, dotnet_solution_ci]
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-create-webapi-artifact.yml@6.1.0
-    with:
-      CSPROJ_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.EntryPoint.WebApi/Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.csproj'
-      DOTNET_VERSION: '6.0.201'
-      ARTIFACT_NAME: webapi
-
   package_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@6.1.0
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@temporarily_disable_integration_test # TODO: Revert to next version when integration test issue is solved
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.Libraries.sln'
-      DOTNET_VERSION: '6.0.201'
+      DOTNET_VERSION: '6.0.301'
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID }}
-      AZURE_SPN_SECRET: ${{ secrets.AZURE_SPN_SECRET }}
+      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
       AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
 
   create_prerelease:
     needs: [
-      database_migration_ci,
-      organization_func_ci,
-      webapi_ci
+        ci_base,
+        terraform_validate,
+        dotnet_solution_ci,
+        package_ci
     ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@6.0.0
+    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@7.6.0
     with:
       CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
     secrets:

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
     {
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
+        private readonly IOrganizationIntegrationEventsHelperService _organizationIntegrationEventsHelperService;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
@@ -37,10 +40,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             IOrganizationRepository organizationRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
             IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
-            IOrganizationExistsHelperService organizationExistsHelperService)
+            IOrganizationExistsHelperService organizationExistsHelperService,
+            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService,
+            IOrganizationIntegrationEventsHelperService organizationIntegrationEventsHelperService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
+            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
+            _organizationIntegrationEventsHelperService = organizationIntegrationEventsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
         }
@@ -54,6 +61,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
+            var changeEvents = _organizationIntegrationEventsHelperService
+                .DetermineOrganizationUpdatedChangeEvents(organization, request.Organization);
+
             organization.Name = request.Organization.Name;
             organization.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
             organization.Address = new Address(
@@ -63,6 +73,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
             organization.Comment = request.Organization.Comment;
+            organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
+
+            await _uniqueOrganizationBusinessRegisterIdentifierService
+                .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
+                .ConfigureAwait(false);
 
             await using var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -73,7 +88,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .ConfigureAwait(false);
 
             await _organizationIntegrationEventsQueueService
-                .EnqueueOrganizationUpdatedEventAsync(organization)
+                .EnqueueOrganizationIntegrationEventsAsync(organization.Id, changeEvents)
+                .ConfigureAwait(false);
+
+            await _organizationIntegrationEventsQueueService
+                .EnqueueLegacyOrganizationUpdatedEventAsync(organization)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);

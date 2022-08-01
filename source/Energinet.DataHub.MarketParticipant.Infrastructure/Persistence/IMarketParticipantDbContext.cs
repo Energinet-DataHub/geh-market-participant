@@ -15,6 +15,7 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
@@ -34,11 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         DbSet<GridAreaEntity> GridAreas { get; }
 
         /// <summary>
-        ///     Represent access to the Contacts database table
-        /// </summary>
-        DbSet<ContactEntity> Contacts { get; }
-
-        /// <summary>
         ///     Represent access to the ActorContacts database table
         /// </summary>
         DbSet<ActorContactEntity> ActorContacts { get; }
@@ -54,8 +50,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         DbSet<GridAreaLinkEntity> GridAreaLinks { get; }
 
         /// <summary>
+        ///     Represent access to the UniqueActorMarketRoleGridArea database table
+        /// </summary>
+        DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
+
+        /// <summary>
         ///     Saves changes to the database.
         /// </summary>
         Task<int> SaveChangesAsync();
+
+        /// <summary>
+        ///     Gets the EntityEntry for the given Entry
+        /// </summary>
+        EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
+            where TEntity : class;
     }
 }

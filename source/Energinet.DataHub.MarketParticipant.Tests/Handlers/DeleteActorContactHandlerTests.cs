@@ -72,9 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 organizationId,
@@ -82,7 +80,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
@@ -118,9 +117,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 organizationId,
@@ -128,7 +125,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
@@ -162,9 +160,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 organizationId,
@@ -172,7 +168,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))

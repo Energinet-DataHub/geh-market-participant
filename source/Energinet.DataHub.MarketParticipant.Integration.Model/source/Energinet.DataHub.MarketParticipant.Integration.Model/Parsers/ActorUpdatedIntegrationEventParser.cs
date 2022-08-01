@@ -18,6 +18,8 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
@@ -36,23 +38,31 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 var contract = new ActorUpdatedIntegrationEventContract
                 {
                     Id = integrationEvent.Id.ToString(),
+                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     ActorId = integrationEvent.ActorId.ToString(),
                     ExternalActorId = externalActorId,
                     OrganizationId = integrationEvent.OrganizationId.ToString(),
                     ActorNumber = integrationEvent.ActorNumber,
                     Status = (int)integrationEvent.Status,
-                    GridAreaIds = { integrationEvent.GridAreas.Select(x => x.ToString()) },
-                    MeteringPointTypes = { integrationEvent.MeteringPointTypes }
+                    ActorMarketRoles =
+                    {
+                        integrationEvent.ActorMarketRoles.Select(x => new Protobuf.ActorMarketRole
+                        {
+                            Function = (int)x.Function, GridAreas =
+                            {
+                                x.GridAreas.Select(g => new Protobuf.ActorGridArea
+                                {
+                                    Id = g.Id.ToString(),
+                                    MeteringPointTypes = { g.MeteringPointTypes }
+                                })
+                            }
+                        })
+                    }
                 };
 
                 foreach (var x in integrationEvent.BusinessRoles)
                 {
                     contract.BusinessRoles.Add((int)x);
-                }
-
-                foreach (var x in integrationEvent.MarketRoles)
-                {
-                    contract.MarketRoles.Add((int)x);
                 }
 
                 return contract.ToByteArray();
@@ -75,6 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 
                 return new ActorUpdatedIntegrationEvent(
                     Guid.Parse(contract.Id),
+                    contract.EventCreated.ToDateTime(),
                     Guid.Parse(contract.ActorId),
                     Guid.Parse(contract.OrganizationId),
                     externalActorId,
@@ -82,10 +93,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
                     contract.BusinessRoles.Select(
                         x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
-                    contract.MarketRoles.Select(
-                        x => Enum.IsDefined((EicFunction)x) ? (EicFunction)x : throw new FormatException(nameof(contract.MarketRoles))).ToList(),
-                    contract.GridAreaIds.Select(x => Guid.Parse(x)),
-                    contract.MeteringPointTypes);
+                    contract.ActorMarketRoles.Select(
+                        x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
+                            g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))));
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {

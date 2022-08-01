@@ -53,6 +53,25 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             OrganizationMapper.MapToEntity(organization, destination);
             _marketParticipantDbContext.Organizations.Update(destination);
 
+            foreach (var actor in destination.Actors.Where(x => x.New))
+            {
+                _marketParticipantDbContext.Entry(actor).State = EntityState.Added;
+                foreach (var mr in actor.MarketRoles)
+                {
+                    _marketParticipantDbContext.Entry(mr).State = EntityState.Added;
+                    foreach (var ga in mr.GridAreas)
+                    {
+                        _marketParticipantDbContext.Entry(ga).State = EntityState.Added;
+                        foreach (var mp in ga.MeteringPointTypes)
+                        {
+                            _marketParticipantDbContext.Entry(mp).State = EntityState.Added;
+                        }
+                    }
+                }
+
+                actor.New = false;
+            }
+
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
             return new OrganizationId(destination.Id);
         }
@@ -95,11 +114,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return _marketParticipantDbContext
                 .Organizations
                 .Include(x => x.Actors)
-                .ThenInclude(x => x.MeteringPointTypes)
-                .Include(x => x.Actors)
-                .ThenInclude(x => x.GridAreas)
-                .Include(x => x.Actors)
                 .ThenInclude(x => x.MarketRoles)
+                .ThenInclude(x => x.GridAreas)
+                .ThenInclude(m => m.MeteringPointTypes)
                 .Include(x => x.Address)
                 .AsSingleQuery();
         }

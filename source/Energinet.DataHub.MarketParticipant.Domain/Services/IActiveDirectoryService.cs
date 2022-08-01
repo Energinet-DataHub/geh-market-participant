@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
         Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
             ActorNumber actorNumber,
-            IReadOnlyCollection<MarketRole> permissions);
+            IReadOnlyCollection<EicFunction> permissions);
 
         /// <summary>
         /// Creates a new secret for the already registered app.

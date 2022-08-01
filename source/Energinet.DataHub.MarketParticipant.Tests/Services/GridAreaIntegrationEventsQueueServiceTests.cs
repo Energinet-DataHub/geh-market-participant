@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var gridAreaLink = new GridAreaLink(gridAreaId);
 
             // Act
-            await target.EnqueueGridAreaUpdatedEventAsync(gridArea, gridAreaLink).ConfigureAwait(false);
+            await target.EnqueueGridAreaCreatedEventAsync(gridArea, gridAreaLink).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueGridAreaUpdatedEventAsync(null!, gridAreaLink))
+                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueGridAreaCreatedEventAsync(null!, gridAreaLink))
                 .ConfigureAwait(false);
         }
 
@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueGridAreaUpdatedEventAsync(gridArea, null!))
+                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueGridAreaCreatedEventAsync(gridArea, null!))
                 .ConfigureAwait(false);
         }
     }

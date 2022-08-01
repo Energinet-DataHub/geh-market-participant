@@ -31,47 +31,43 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
         public void ValidateRolesAcrossActors(IEnumerable<Actor> actors)
         {
-            ValidateRolesAcrossActors(actors, Enumerable.Empty<MarketRole>());
-        }
-
-        public void ValidateRolesAcrossActors(IEnumerable<Actor> actors, IEnumerable<MarketRole> newActorRoles)
-        {
             ArgumentNullException.ThrowIfNull(actors, nameof(actors));
-            ArgumentNullException.ThrowIfNull(newActorRoles, nameof(newActorRoles));
 
-            var setOfSets = actors
-                .Select(x => AreRolesUnique(x.MarketRoles))
-                .Append(AreRolesUnique(newActorRoles))
-                .ToList();
-
-            var usedBusinessRoles = new HashSet<BusinessRoleCode>();
-
-            foreach (var businessRole in setOfSets.SelectMany(CreateSet))
+            foreach (var actorsWithSameActorNumber in actors.GroupBy(x => x.ActorNumber))
             {
-                if (!usedBusinessRoles.Add(businessRole))
+                var setOfSets = actorsWithSameActorNumber
+                    .Select(x => AreRolesUnique(x.MarketRoles.Select(m => m.Function)))
+                    .ToList();
+
+                var usedBusinessRoles = new HashSet<BusinessRoleCode>();
+
+                foreach (var businessRole in setOfSets.SelectMany(CreateSet))
                 {
-                    throw new ValidationException($"Cannot add '{businessRole}' as this business role is already assigned to another actor within the organization.");
+                    if (!usedBusinessRoles.Add(businessRole))
+                    {
+                        throw new ValidationException($"Cannot add '{businessRole}' as this business role is already assigned to another actor within the organization.");
+                    }
                 }
-            }
 
-            var usedMarketRoles = new HashSet<EicFunction>();
+                var usedMarketRoles = new HashSet<EicFunction>();
 
-            foreach (var marketRole in setOfSets.SelectMany(x => x))
-            {
-                if (!usedMarketRoles.Add(marketRole.Function))
+                foreach (var marketRole in setOfSets.SelectMany(x => x))
                 {
-                    throw new ValidationException($"Cannot add '{marketRole.Function}' as this market role is already assigned to another actor within the organization.");
+                    if (!usedMarketRoles.Add(marketRole))
+                    {
+                        throw new ValidationException($"Cannot add '{marketRole}' as this market role is already assigned to another actor within the organization.");
+                    }
                 }
             }
         }
 
-        private static IEnumerable<MarketRole> AreRolesUnique(IEnumerable<MarketRole> marketRoles)
+        private static IEnumerable<EicFunction> AreRolesUnique(IEnumerable<EicFunction> marketRoles)
         {
             var usedFunctions = new HashSet<EicFunction>();
 
             foreach (var marketRole in marketRoles)
             {
-                if (!usedFunctions.Add(marketRole.Function))
+                if (!usedFunctions.Add(marketRole))
                 {
                     throw new ValidationException("The market roles cannot contain duplicates.");
                 }
@@ -80,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             }
         }
 
-        private IEnumerable<BusinessRoleCode> CreateSet(IEnumerable<MarketRole> marketRoles)
+        private IEnumerable<BusinessRoleCode> CreateSet(IEnumerable<EicFunction> marketRoles)
         {
             return _businessRoleCodeDomainService.GetBusinessRoleCodes(AreRolesUnique(marketRoles));
         }

@@ -76,9 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 orgId,
@@ -86,7 +84,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -146,9 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 orgId,
@@ -156,7 +153,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -218,9 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<GridAreaId>(),
-                Array.Empty<MarketRole>(),
-                Array.Empty<MeteringPointType>());
+                Array.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 orgId,
@@ -228,7 +224,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),

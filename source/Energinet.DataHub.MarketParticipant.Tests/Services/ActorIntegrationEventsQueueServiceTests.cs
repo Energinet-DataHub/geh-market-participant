@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -69,10 +70,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var actor = new Actor(new ActorNumber("fake_value"));
-            actor.GridAreas.Add(new GridAreaId(Guid.NewGuid()));
 
-            actor.MarketRoles.Add(new MarketRole(EicFunction.Agent));
-            actor.MarketRoles.Add(new MarketRole(EicFunction.Consumer));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.Agent, Enumerable.Empty<ActorGridArea>()));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.Consumer, Enumerable.Empty<ActorGridArea>()));
 
             // Act
             await target.EnqueueActorUpdatedEventAsync(organizationId, actor).ConfigureAwait(false);

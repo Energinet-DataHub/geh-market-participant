@@ -53,8 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var markedRoles = new[]
             {
-                new MarketRole(EicFunction.BalanceResponsibleParty),
-                new MarketRole(EicFunction.EnergySupplier)
+                EicFunction.BalanceResponsibleParty,
+                EicFunction.EnergySupplier,
             };
 
             // Act
@@ -78,8 +78,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var markedRoles = new[]
             {
-                new MarketRole(EicFunction.EnergyTrader),
-                new MarketRole(EicFunction.EnergySupplier)
+                EicFunction.EnergyTrader,
+                EicFunction.EnergySupplier
             };
 
             // Act

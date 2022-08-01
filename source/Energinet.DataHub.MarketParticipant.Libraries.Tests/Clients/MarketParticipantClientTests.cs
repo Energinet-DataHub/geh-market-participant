@@ -72,7 +72,15 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""Status"": ""Active"",
                     ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""Consumer""
+                            ""EicFunction"": ""Consumer"",
+                            ""GridAreas"": [
+                                {
+                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                    ""MeteringPointTypes"": [
+                                        ""D01VeProduction""
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }
@@ -137,7 +145,15 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""Active"",
                                 ""MarketRoles"": [
                                     {
-                                        ""EicFunction"": ""Consumer""
+                                        ""EicFunction"": ""Consumer"",
+                                        ""GridAreas"": [
+                                            {
+                                                ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                                ""MeteringPointTypes"": [
+                                                    ""D01VeProduction""
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -165,7 +181,15 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                                 ""Status"": ""New"",
                                 ""MarketRoles"": [
                                     {
-                                        ""EicFunction"": ""Producer""
+                                        ""EicFunction"": ""Producer"",
+                                        ""GridAreas"": [
+                                            {
+                                                ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                                ""MeteringPointTypes"": [
+                                                    ""D01VeProduction""
+                                                ]
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -251,11 +275,19 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 				                ""Value"": ""9656626091925""
 			                },
 			                ""Status"": ""Active"",
-			                ""MarketRoles"": [
-				                {
-					                ""EicFunction"": ""Consumer""
-				                }
-			                ]
+                            ""MarketRoles"": [
+                                {
+                                    ""EicFunction"": ""Consumer"",
+                                    ""GridAreas"": [
+                                        {
+                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                            ""MeteringPointTypes"": [
+                                                ""D01VeProduction""
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
 		                }
                     ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
@@ -315,11 +347,19 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 				                ""Value"": ""9656626091925""
 			                },
 			                ""Status"": ""Active"",
-			                ""MarketRoles"": [
-				                {
-					                ""EicFunction"": ""Consumer""
-				                }
-			                ]
+                            ""MarketRoles"": [
+                                {
+                                    ""EicFunction"": ""Consumer"",
+                                    ""GridAreas"": [
+                                        {
+                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                            ""MeteringPointTypes"": [
+                                                ""D01VeProduction""
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
 		                }
                     ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
@@ -341,7 +381,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             var orgId = await target
-                .CreateOrganizationAsync(new ChangeOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "Test Comment"))
+                .CreateOrganizationAsync(new CreateOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "Test Comment"))
                 .ConfigureAwait(false);
 
             var createdOrg = await target
@@ -387,11 +427,19 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 				                ""Value"": ""9656626091925""
 			                },
 			                ""Status"": ""Active"",
-			                ""MarketRoles"": [
-				                {
-					                ""EicFunction"": ""Consumer""
-				                }
-			                ]
+                            ""MarketRoles"": [
+                                {
+                                    ""EicFunction"": ""Consumer"",
+                                    ""GridAreas"": [
+                                        {
+                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                            ""MeteringPointTypes"": [
+                                                ""D01VeProduction""
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
 		                }
                     ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
@@ -402,7 +450,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""city"": ""Testby"",
                         ""country"": ""Testland""
                     },
-                    ""comment"": ""Test Comment 2""
+                    ""comment"": ""Test Comment 2"",
+                    ""status"": ""Active""
                 }";
             var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
             using var httpTest = new HttpTest();
@@ -415,7 +464,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act
             await target
-                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2"))
+                .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2", OrganizationStatus.Active))
                 .ConfigureAwait(false);
 
             var changedOrg = await target
@@ -433,6 +482,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(_validAddress.StreetName, changedOrg.Address.StreetName);
             Assert.Equal(changedAddress.ZipCode, changedOrg.Address.ZipCode);
             Assert.Equal("Test Comment 2", changedOrg.Comment);
+            Assert.Equal(OrganizationStatus.Active, changedOrg.Status);
 
             var actualActor = changedOrg.Actors.Single();
             Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
@@ -492,10 +542,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                           ""value"": ""5790000555550""
                         },
                         ""status"": ""New"",
-                        ""marketRoles"": [
-                          {
-                            ""EicFunction"": ""MarketOperator""
-                          }
+                        ""MarketRoles"": [
+                            {
+                                ""EicFunction"": ""MarketOperator"",
+                                ""GridAreas"": [
+                                    {
+                                        ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                        ""MeteringPointTypes"": [
+                                            ""D01VeProduction""
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
                       },
                     {
@@ -505,10 +563,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                           ""value"": ""5790000701414""
                         },
                         ""status"": ""Active"",
-                        ""marketRoles"": [
-                          {
-                            ""EicFunction"": ""EnergySupplier""
-                          }
+                        ""MarketRoles"": [
+                            {
+                                ""EicFunction"": ""EnergySupplier"",
+                                ""GridAreas"": [
+                                    {
+                                        ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                        ""MeteringPointTypes"": [
+                                            ""D01VeProduction""
+                                        ]
+                                    }
+                                ]
+                            }
                         ]
                     }
                 ]";
@@ -560,9 +626,17 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""value"": ""123456""
                     },
                     ""status"": ""New"",
-                    ""marketRoles"": [
+                    ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""EnergySupplier""
+                            ""EicFunction"": ""EnergySupplier"",
+                            ""GridAreas"": [
+                                {
+                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                    ""MeteringPointTypes"": [
+                                        ""D01VeProduction""
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }";
@@ -579,9 +653,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     orgId,
                     new CreateActorDto(
                         new ActorNumberDto("123456"),
-                        Array.Empty<Guid>(),
-                        Array.Empty<MarketRoleDto>(),
-                        Array.Empty<MarketParticipantMeteringPointType>()))
+                        Array.Empty<ActorMarketRoleDto>()))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -612,9 +684,17 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""value"": ""1234567""
                     },
                     ""status"": ""Active"",
-                    ""marketRoles"": [
+                    ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""BillingAgent""
+                            ""EicFunction"": ""BillingAgent"",
+                            ""GridAreas"": [
+                                {
+                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
+                                    ""MeteringPointTypes"": [
+                                        ""D01VeProduction""
+                                    ]
+                                }
+                            ]
                         }
                     ]
                 }";
@@ -632,9 +712,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     actorId,
                     new ChangeActorDto(
                         ActorStatus.Active,
-                        Array.Empty<Guid>(),
-                        new[] { new MarketRoleDto(EicFunction.EnergySupplier) },
-                        Array.Empty<MarketParticipantMeteringPointType>()))
+                        new[] { new ActorMarketRoleDto(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridAreaDto>()) }))
                 .ConfigureAwait(false);
 
             var actual = await target
@@ -673,7 +751,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             httpTest.RespondWith(incomingJson);
 
             // Act
-            var actual = await target.GetContactsAsync(Guid.NewGuid()).ConfigureAwait(false);
+            var actual = await target.GetContactsAsync(Guid.NewGuid(), Guid.NewGuid()).ConfigureAwait(false);
 
             // Assert
             var actualContact = actual.Single();
@@ -691,17 +769,18 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             using var httpTest = new HttpTest();
             using var clientFactory = new PerBaseUrlFlurlClientFactory();
             var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
-            var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
-            httpTest.RespondWith("361fb10a-4204-46b6-bf9e-171ab2e61a59");
+            const string expectedContactId = "361fb10a-4204-46b6-bf9e-171ab2e61a59";
+            httpTest.RespondWith(expectedContactId);
 
             // Act
             var contactId = await target.CreateContactAsync(
-                    orgId,
-                    new CreateContactDto("unit test", ContactCategory.Charges, "email", "phone"))
+                    Guid.NewGuid(),
+                    Guid.NewGuid(),
+                    new CreateActorContactDto("unit test", ContactCategory.Charges, "email", "phone"))
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"), contactId);
+            Assert.Equal(Guid.Parse(expectedContactId), contactId);
         }
 
         [Fact]

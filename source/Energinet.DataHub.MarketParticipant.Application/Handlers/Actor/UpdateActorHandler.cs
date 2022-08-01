@@ -37,6 +37,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
+        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
+        private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
@@ -45,7 +47,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorIdConfigurationService externalActorIdConfigurationService)
+            IExternalActorIdConfigurationService externalActorIdConfigurationService,
+            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
@@ -54,6 +58,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorIdConfigurationService = externalActorIdConfigurationService;
+            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
+            _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
         }
 
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
@@ -76,12 +82,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             UpdateActorStatus(actor, request);
             UpdateActorMarketRoles(organization, actor, request);
-            UpdateActorGridAreas(actor, request);
-            UpdateActorMeteringPointTypes(actor, request);
 
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
                 .ConfigureAwait(false);
+
+            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+
+            var allMarketRolesForActorGln = organization.Actors
+                .Where(x => x.ActorNumber == actor.ActorNumber)
+                .SelectMany(x => x.MarketRoles)
+                .Select(x => x.Function);
+
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -108,22 +121,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
         }
 
-        private static void UpdateActorMeteringPointTypes(Domain.Model.Actor actor, UpdateActorCommand request)
-        {
-            actor.MeteringPointTypes.Clear();
-
-            var meteringPointTypesToAdd = request
-                .ChangeActor
-                .MeteringPointTypes
-                .Select(mp => MeteringPointType.FromName(mp, true))
-                .Distinct();
-
-            foreach (var meteringPointType in meteringPointTypesToAdd)
-            {
-                actor.MeteringPointTypes.Add(meteringPointType);
-            }
-        }
-
         private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MarketRoles.Clear();
@@ -131,22 +128,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
             {
                 var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
-                actor.MarketRoles.Add(new MarketRole(function));
+                actor.MarketRoles
+                    .Add(new ActorMarketRole(
+                        function,
+                        marketRoleDto.GridAreas
+                            .Select(m => new ActorGridArea(
+                                m.Id,
+                                m.MeteringPointTypes
+                                    .Select(e => MeteringPointType.FromName(e, true))
+                                    .Distinct()))));
             }
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
-        }
-
-        private void UpdateActorGridAreas(Domain.Model.Actor actor, UpdateActorCommand request)
-        {
-            actor.GridAreas.Clear();
-
-            foreach (var gridAreaId in request.ChangeActor.GridAreas ?? Array.Empty<Guid>())
-            {
-                actor.GridAreas.Add(new GridAreaId(gridAreaId));
-            }
-
-            _allowedGridAreasRuleService.ValidateGridAreas(actor.GridAreas, actor.MarketRoles);
+            _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
         }
     }
 }

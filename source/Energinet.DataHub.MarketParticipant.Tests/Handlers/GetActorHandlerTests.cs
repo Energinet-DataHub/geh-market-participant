@@ -65,7 +65,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -103,9 +104,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(actorId),
                 new ActorNumber(actorGln),
                 ActorStatus.Active,
-                Enumerable.Empty<GridAreaId>(),
-                Enumerable.Empty<MarketRole>(),
-                Enumerable.Empty<MeteringPointType>());
+                Enumerable.Empty<ActorMarketRole>());
 
             var organization = new Organization(
                 new OrganizationId(orgId),
@@ -113,7 +112,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))

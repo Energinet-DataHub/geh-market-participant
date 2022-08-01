@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -23,9 +25,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public interface IOrganizationIntegrationEventsQueueService
     {
         /// <summary>
-        /// Creates and enqueues an Organization Updated integration event for the specified Organization.
+        /// Creates and enqueues an Organization integration event for the specified Organization.
         /// </summary>
-        /// <param name="organization">The Organization to publish an integration event for.</param>
-        Task EnqueueOrganizationUpdatedEventAsync(Organization organization);
+        /// <param name="organizationId">The Organization Id for domainObjectId.</param>
+        /// <param name="changeEvents">The Organization to publish an integration event for.</param>
+        public Task EnqueueOrganizationIntegrationEventsAsync(OrganizationId organizationId, IEnumerable<IIntegrationEvent> changeEvents);
+
+        /// <summary>
+        /// Creates an organization updated event. For legacy use.
+        /// </summary>
+        /// <param name="organization"></param>
+        /// <returns>Enqueue task</returns>
+        public Task EnqueueLegacyOrganizationUpdatedEventAsync(Organization organization);
     }
 }

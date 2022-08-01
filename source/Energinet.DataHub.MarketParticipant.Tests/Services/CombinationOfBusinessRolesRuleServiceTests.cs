@@ -46,7 +46,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
         var ez = new SystemOperatorRole();
         var dgl = new MeteredDataAdministratorRole();
 
-        var invalidCombinationOfBusinessRoles = new List<MarketRole>() { new(ez.Functions.First()), new(dgl.Functions.First()) };
+        var invalidCombinationOfBusinessRoles = new List<EicFunction>() { ez.Functions.First(), dgl.Functions.First() };
 
         // Act + Assert
         Assert.Throws<ValidationException>(() => target.ValidateCombinationOfBusinessRoles(invalidCombinationOfBusinessRoles));
@@ -60,7 +60,7 @@ public class CombinationOfBusinessRolesRuleServiceTests
 
         var ddk = new BalanceResponsiblePartyRole();
 
-        var combinationofBusinessRoles = ddk.Functions.Select(eicFunction => new MarketRole(eicFunction)).ToList();
+        var combinationofBusinessRoles = ddk.Functions.ToList();
 
         // Act + Assert
         target.ValidateCombinationOfBusinessRoles(combinationofBusinessRoles);
