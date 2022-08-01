@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,19 +30,32 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public async Task Ensure_BusinessRegisterIdentifierNotUnique_Throws()
         {
             // arrange
-            var organization = new Organization(
-                "org",
-                new BusinessRegisterIdentifier("fake_value"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"));
+            var currentOrganizationToUpdate = new Organization(
+                new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+                "org1Name",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("same_value"),
+                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                string.Empty,
+                OrganizationStatus.Active);
+
+            var anotherOrganizationToUpdateWithSameIdentifier = new Organization(
+                new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+                "org2Name",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("same_value"),
+                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                string.Empty,
+                OrganizationStatus.Active);
 
             var repository = new Mock<IOrganizationRepository>();
-            repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { organization });
+            repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { currentOrganizationToUpdate, anotherOrganizationToUpdateWithSameIdentifier });
 
             var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
 
             // act + assert
             await Assert.ThrowsAsync<ValidationException>(
-                () => target.EnsureUniqueMarketRolesPerGridAreaAsync(organization));
+                () => target.EnsureUniqueBusinessRegisterIdentifierAsync(currentOrganizationToUpdate));
         }
 
         [Fact]
@@ -48,22 +63,30 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // arrange
             var existingOrganisation = new Organization(
-                "org",
+                new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+                "org1Name",
+                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("fake_value"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"));
+                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                string.Empty,
+                OrganizationStatus.Active);
 
             var repository = new Mock<IOrganizationRepository>();
             repository.Setup(x => x.GetAsync()).ReturnsAsync(new[] { existingOrganisation });
 
             var organization = new Organization(
-                "org",
+                new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
+                "org1Name",
+                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("unique"),
-                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"));
+                new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                string.Empty,
+                OrganizationStatus.Active);
 
             var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);
 
             // act + assert
-            await target.EnsureUniqueMarketRolesPerGridAreaAsync(organization);
+            await target.EnsureUniqueBusinessRegisterIdentifierAsync(organization);
         }
     }
 }
