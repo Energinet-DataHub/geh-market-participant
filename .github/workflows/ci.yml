@@ -23,10 +23,10 @@ on:
 jobs:
   # Markdown, links and spell checks
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@7.7.0
 
   terraform_validate:
-    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@7.7.0
     with:
       TERRAFORM_WORKING_DIR_PATH: './build/infrastructure/main'
       TERRAFORM_VERSION: '1.2.2'
@@ -64,7 +64,7 @@ jobs:
         dotnet_solution_ci,
         package_ci
     ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@7.7.0
     with:
       CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
     secrets:
