@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Id = Guid.NewGuid();
             ExternalActorId = null;
             ActorNumber = actorNumber;
+            Name = new ActorName(string.Empty);
             _actorStatusTransitioner = new ActorStatusTransitioner();
             MarketRoles = new Collection<ActorMarketRole>();
         }
@@ -36,11 +37,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId? externalActorId,
             ActorNumber actorNumber,
             ActorStatus actorStatus,
-            IEnumerable<ActorMarketRole> marketRoles)
+            IEnumerable<ActorMarketRole> marketRoles,
+            ActorName name)
         {
             Id = id;
             ExternalActorId = externalActorId;
             ActorNumber = actorNumber;
+            Name = name;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
             MarketRoles = new List<ActorMarketRole>(marketRoles);
         }
@@ -68,6 +71,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             get => _actorStatusTransitioner.Status;
             set => _actorStatusTransitioner.Status = value;
         }
+
+        /// <summary>
+        /// The Name of the current actor.
+        /// </summary>
+        public ActorName Name { get; set; }
 
         /// <summary>
         /// The roles (functions and permissions) assigned to the current actor.

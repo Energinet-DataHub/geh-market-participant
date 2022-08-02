@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Integration.Model</PackageId>
-    <PackageVersion>2.3.1$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.4.1$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Integration.Model library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -73,11 +73,67 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="Protobuf\ActorContactEventData.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\ActorCreatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\ActorExternalIdChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\ActorNameChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
     <Protobuf Include="Protobuf\ActorUpdatedIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Internal</Access>
       <ProtoCompile>True</ProtoCompile>
       <CompileOutputs>True</CompileOutputs>
+    </Protobuf>
+    <Protobuf Include="Protobuf\ContactAddedToActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\ContactRemovedFromActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaAddedToActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
     </Protobuf>
     <Protobuf Include="Protobuf\GridAreaCreatedIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
@@ -93,7 +149,47 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <OutputDir>obj\Debug\net6.0\</OutputDir>
       <Generator>MSBuild:Compile</Generator>
     </Protobuf>
+    <Protobuf Include="Protobuf\GridAreaRemovedFromActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
     <Protobuf Include="Protobuf\GridAreaUpdatedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\MarketRoleAddedToActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\MarketRoleRemovedFromActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\MeteringPointTypeAddedToActorIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
+      <OutputDir>obj\Debug\net6.0\</OutputDir>
+      <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\MeteringPointTypeRemovedFromActorIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Internal</Access>
       <ProtoCompile>True</ProtoCompile>
@@ -162,6 +258,12 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <CompileOutputs>True</CompileOutputs>
       <OutputDir>obj\Debug\net6.0\</OutputDir>
       <Generator>MSBuild:Compile</Generator>
+    </Protobuf>
+    <Protobuf Include="Protobuf\ActorStatusChangedIntegrationEventContract.proto">
+      <GrpcServices>None</GrpcServices>
+      <Access>Internal</Access>
+      <ProtoCompile>True</ProtoCompile>
+      <CompileOutputs>True</CompileOutputs>
     </Protobuf>
   </ItemGroup>
 

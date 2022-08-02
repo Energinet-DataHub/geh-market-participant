@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -46,7 +47,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var target = new DeleteActorContactHandler(
                 new Mock<IOrganizationExistsHelperService>().Object,
-                new Mock<IActorContactRepository>().Object);
+                new Mock<IActorContactRepository>().Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             // Act + Assert
             await Assert
@@ -62,7 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
                 organizationExistsHelperService.Object,
-                contactRepository.Object);
+                contactRepository.Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
@@ -72,7 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 organizationId,
@@ -107,7 +111,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
                 organizationExistsHelperService.Object,
-                contactRepository.Object);
+                contactRepository.Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
@@ -117,7 +122,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 organizationId,
@@ -150,7 +156,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
                 organizationExistsHelperService.Object,
-                contactRepository.Object);
+                contactRepository.Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
@@ -160,7 +167,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 organizationId,

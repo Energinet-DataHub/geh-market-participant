@@ -57,6 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 null!,
                 new ActorNumber("fake_value"),
+                new ActorName("fake_value"),
                 Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
         }
 
@@ -78,6 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 null!,
+                new ActorName("fake_value"),
                 Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
         }
 
@@ -99,6 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
                 new ActorNumber("fake_value"),
+                new ActorName("fake_value"),
                 null!)).ConfigureAwait(false);
         }
 
@@ -128,6 +131,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     new ActorNumber("fake_value"),
+                    new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
 
@@ -183,6 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     new ActorNumber("fake_value"),
+                    new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
 
@@ -222,6 +227,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
+                    new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
 
@@ -261,6 +267,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
+                    new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
 
@@ -300,6 +307,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
+                    new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
 
@@ -339,6 +347,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .CreateAsync(
                     organization,
                     globalLocationNumber,
+                    new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
 

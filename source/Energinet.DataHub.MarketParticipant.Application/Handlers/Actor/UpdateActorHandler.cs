@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -33,6 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+        private readonly IChangesToActorHelper _changesToActorHelper;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
@@ -44,6 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IOrganizationRepository organizationRepository,
             IOrganizationExistsHelperService organizationExistsHelperService,
             IUnitOfWorkProvider unitOfWorkProvider,
+            IChangesToActorHelper changesToActorHelper,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
@@ -54,6 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
             _unitOfWorkProvider = unitOfWorkProvider;
+            _changesToActorHelper = changesToActorHelper;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
@@ -71,21 +75,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .ConfigureAwait(false);
 
             var actorId = request.ActorId;
-            var actor = organization
-                .Actors
-                .SingleOrDefault(actor => actor.Id == actorId);
+            var actor = organization.Actors.SingleOrDefault(actor => actor.Id == actorId) ?? throw new NotFoundValidationException(actorId);
 
-            if (actor == null)
-            {
-                throw new NotFoundValidationException(actorId);
-            }
-
+            var actorChangedIntegrationEvents = await _changesToActorHelper.FindChangesMadeToActorAsync(organization.Id, actor, request).ConfigureAwait(false);
             UpdateActorStatus(actor, request);
-            UpdateActorMarketRoles(organization, actor, request);
+            UpdateActorName(actor, request);
+            UpdateActorMarketRolesAndChildren(organization, actor, request);
+
+            var externalActorIdBeforeAssign = actor.ExternalActorId?.Value;
 
             await _externalActorIdConfigurationService
                 .AssignExternalActorIdAsync(actor)
                 .ConfigureAwait(false);
+
+            _changesToActorHelper.SetIntegrationEventForExternalActorId(actor, organization.Id, externalActorIdBeforeAssign, actorChangedIntegrationEvents);
 
             await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
 
@@ -110,10 +113,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     .EnqueueActorUpdatedEventAsync(organization.Id, actor)
                     .ConfigureAwait(false);
 
+                await _actorIntegrationEventsQueueService
+                    .EnqueueActorUpdatedEventAsync(organization.Id, actor.Id, actorChangedIntegrationEvents)
+                    .ConfigureAwait(false);
+
                 await uow.CommitAsync().ConfigureAwait(false);
             }
 
             return Unit.Value;
+        }
+
+        private static void UpdateActorName(Domain.Model.Actor actor, UpdateActorCommand request)
+        {
+            actor.Name = new ActorName(request.ChangeActor.Name.Value);
         }
 
         private static void UpdateActorStatus(Domain.Model.Actor actor, UpdateActorCommand request)
@@ -121,7 +133,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
         }
 
-        private void UpdateActorMarketRoles(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
+        private void UpdateActorMarketRolesAndChildren(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MarketRoles.Clear();
 

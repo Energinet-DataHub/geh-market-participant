@@ -21,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public ActorEntity()
         {
+            Name = string.Empty;
             ActorNumber = string.Empty;
             MarketRoles = new Collection<MarketRoleEntity>();
         }
@@ -29,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public Guid? ActorId { get; set; }
         public string ActorNumber { get; set; }
         public int Status { get; set; }
+        public string Name { get; set; }
 
         public Collection<MarketRoleEntity> MarketRoles { get; }
 

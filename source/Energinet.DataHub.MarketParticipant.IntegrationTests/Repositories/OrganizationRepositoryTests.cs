@@ -494,5 +494,36 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var expected = organizations.Single();
             Assert.Equal(globalLocationNumber, expected.Actors.Single().ActorNumber);
         }
+
+        [Fact]
+        public async Task AddOrUpdateAsync_ActorName_CanReadBack()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var orgRepository = new OrganizationRepository(context);
+
+            var initialActor = new Actor(new ActorNumber(Guid.NewGuid().ToString())) { Name = new ActorName("ActorName") };
+
+            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
+            organization.Actors.Add(initialActor);
+
+            var orgId = await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Act
+            var newActor = new Actor(new ActorNumber("fake_value")) { Name = new ActorName("fake_value") };
+            organization!.Actors.Add(newActor);
+
+            await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
+            organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(organization);
+            Assert.Equal(2, organization!.Actors.Count);
+            Assert.Contains(organization.Actors, x => x.Name == initialActor.Name);
+            Assert.Contains(organization.Actors, x => x.Name == newActor.Name);
+        }
     }
 }

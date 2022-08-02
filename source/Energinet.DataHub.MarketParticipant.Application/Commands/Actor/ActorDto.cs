@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
@@ -22,5 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
         string? ExternalActorId,
         ActorNumberDto ActorNumber,
         string Status,
+        ActorNameDto Name,
         IEnumerable<ActorMarketRoleDto> MarketRoles);
 }

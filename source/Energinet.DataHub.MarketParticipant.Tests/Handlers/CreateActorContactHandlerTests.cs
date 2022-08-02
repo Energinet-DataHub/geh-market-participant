@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -41,7 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IActorContactRepository>().Object,
-                new Mock<IOverlappingActorContactCategoriesRuleService>().Object);
+                new Mock<IOverlappingActorContactCategoriesRuleService>().Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             // Act + Assert
             await Assert
@@ -59,7 +61,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 organizationExistsHelperService.Object,
                 contactRepository.Object,
-                overlappingContactCategoriesRuleService.Object);
+                overlappingContactCategoriesRuleService.Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             var orgId = new OrganizationId(Guid.NewGuid());
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
@@ -76,7 +79,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 orgId,
@@ -128,7 +132,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 organizationExistsHelperService.Object,
                 contactRepository.Object,
-                overlappingContactCategoriesRuleService.Object);
+                overlappingContactCategoriesRuleService.Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             var orgId = new OrganizationId(Guid.NewGuid());
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
@@ -145,7 +150,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 orgId,
@@ -199,7 +205,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 organizationExistsHelperService.Object,
                 contactRepository.Object,
-                new Mock<IOverlappingActorContactCategoriesRuleService>().Object);
+                new Mock<IOverlappingActorContactCategoriesRuleService>().Object,
+                new Mock<IActorIntegrationEventsQueueService>().Object);
 
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -216,7 +223,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 orgId,
