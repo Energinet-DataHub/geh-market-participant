@@ -53,6 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         public async Task<Actor> CreateAsync(
             Organization organization,
             ActorNumber actorNumber,
+            ActorName actorName,
             IReadOnlyCollection<ActorMarketRole> marketRoles)
         {
             ArgumentNullException.ThrowIfNull(organization);
@@ -65,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
 
-            var newActor = new Actor(actorNumber);
+            var newActor = new Actor(actorNumber) { Name = actorName };
 
             foreach (var marketRole in marketRoles)
                 newActor.MarketRoles.Add(marketRole);

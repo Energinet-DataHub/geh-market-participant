@@ -505,6 +505,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""actorNumber"": {
                         ""value"": ""123456""
                     },
+                    ""name"": {
+                        ""value"": ""ActorName""
+                    },
                     ""status"": ""New"",
                     ""marketRoles"": []
                 }";
@@ -526,6 +529,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"), actual.ExternalActorId);
             Assert.Equal("123456", actual.ActorNumber.Value);
             Assert.Equal(ActorStatus.New, actual.Status);
+            Assert.Equal("ActorName", actual.Name.Value);
             Assert.True(actual.MarketRoles.Count == 0);
         }
 
@@ -540,6 +544,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""externalActorId"": ""41df62f6-67dc-42de-9ab3-dfeb7d7a7aab"",
                         ""actorNumber"": {
                           ""value"": ""5790000555550""
+                        },
+                        ""name"": {
+                          ""value"": ""name1""
                         },
                         ""status"": ""New"",
                         ""MarketRoles"": [
@@ -561,6 +568,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                         ""externalActorId"": ""5a20e113-4d17-44ec-8014-4d032b700a73"",
                         ""actorNumber"": {
                           ""value"": ""5790000701414""
+                        },
+                        ""name"": {
+                          ""value"": ""name2""
                         },
                         ""status"": ""Active"",
                         ""MarketRoles"": [
@@ -598,6 +608,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("41df62f6-67dc-42de-9ab3-dfeb7d7a7aab"), firstActor.ExternalActorId);
             Assert.Equal("5790000555550", firstActor.ActorNumber.Value);
             Assert.Equal(ActorStatus.New, firstActor.Status);
+            Assert.Equal("name1", firstActor.Name.Value);
             Assert.True(firstActor.MarketRoles.Count == 1);
 
             var firstMarketRole = firstActor.MarketRoles[0];
@@ -608,6 +619,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("5a20e113-4d17-44ec-8014-4d032b700a73"), secondActor.ExternalActorId);
             Assert.Equal("5790000701414", secondActor.ActorNumber.Value);
             Assert.Equal(ActorStatus.Active, secondActor.Status);
+            Assert.Equal("name2", secondActor.Name.Value);
             Assert.True(secondActor.MarketRoles.Count == 1);
 
             var secondMarketRole = secondActor.MarketRoles[0];
@@ -624,6 +636,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""externalActorId"": ""c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"",
                     ""actorNumber"": {
                         ""value"": ""123456""
+                    },
+                    ""name"": {
+                        ""value"": ""ActorName""
                     },
                     ""status"": ""New"",
                     ""MarketRoles"": [
@@ -653,6 +668,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     orgId,
                     new CreateActorDto(
                         new ActorNumberDto("123456"),
+                        new ActorNameDto("ActorName"),
                         Array.Empty<ActorMarketRoleDto>()))
                 .ConfigureAwait(false);
 
@@ -666,6 +682,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"), actual.ExternalActorId);
             Assert.Equal("123456", actual.ActorNumber.Value);
             Assert.Equal(ActorStatus.New, actual.Status);
+            Assert.Equal("ActorName", actual.Name.Value);
             Assert.True(actual.MarketRoles.Count == 1);
 
             var marketRole = actual.MarketRoles[0];
@@ -682,6 +699,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     ""externalActorId"": ""c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"",
                     ""actorNumber"": {
                         ""value"": ""1234567""
+                    },
+                    ""name"": {
+                        ""value"": """"
                     },
                     ""status"": ""Active"",
                     ""MarketRoles"": [
@@ -712,6 +732,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     actorId,
                     new ChangeActorDto(
                         ActorStatus.Active,
+                        new ActorNameDto("ActorName"),
                         new[] { new ActorMarketRoleDto(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridAreaDto>()) }))
                 .ConfigureAwait(false);
 
@@ -725,6 +746,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("c7e6c6d1-a23a-464b-bebd-c1a9c5ceebe1"), actual.ExternalActorId);
             Assert.Equal("1234567", actual.ActorNumber.Value);
             Assert.Equal(ActorStatus.Active, actual.Status);
+            Assert.Equal(string.Empty, actual.Name.Value);
             Assert.True(actual.MarketRoles.Count == 1);
 
             var marketRole = actual.MarketRoles[0];

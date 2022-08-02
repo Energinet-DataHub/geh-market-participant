@@ -47,6 +47,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         ArgumentNullException.ThrowIfNull(incomingActor, nameof(incomingActor));
 
         AddChangeEventIfActorStatusChanged(organizationId, existingActor, incomingActor.ChangeActor.Status);
+        AddChangeEventIfActorNameChanged(organizationId, existingActor, incomingActor.ChangeActor.Name);
         await AddChangeEventsIfMarketRolesOrChildrenChangedAsync(organizationId, existingActor, incomingActor.ChangeActor.MarketRoles).ConfigureAwait(false);
 
         return _changeEvents;
@@ -86,6 +87,20 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 OrganizationId = organizationId,
                 ActorId = existingActor.Id,
                 Status = newStatus
+            });
+        }
+    }
+
+    private void AddChangeEventIfActorNameChanged(OrganizationId organizationId, Actor existingActor, ActorNameDto incomingName)
+    {
+        var newName = incomingName.Value.Trim();
+        if (existingActor.Name.Value.Trim() != newName)
+        {
+            _changeEvents.Add(new ActorNameChangedIntegrationEvent
+            {
+                OrganizationId = organizationId,
+                ActorId = existingActor.Id,
+                Name = new ActorName(newName)
             });
         }
     }

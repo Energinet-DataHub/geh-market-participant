@@ -28,11 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// </summary>
         /// <param name="organization">The organization that will contain the new actor.</param>
         /// <param name="actorNumber">The actor number of the new actor.</param>
+        /// <param name="actorName">The actor name for the new actor.</param>
         /// <param name="marketRoles">The market roles assigned to the new actor.</param>
         /// <returns>The created actor.</returns>
         Task<Actor> CreateAsync(
             Organization organization,
             ActorNumber actorNumber,
+            ActorName actorName,
             IReadOnlyCollection<ActorMarketRole> marketRoles);
     }
 }

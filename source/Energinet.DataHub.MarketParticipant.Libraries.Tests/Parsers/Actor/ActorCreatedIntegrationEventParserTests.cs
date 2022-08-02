@@ -40,6 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 Guid.NewGuid(),
                 ActorStatus.Active,
                 "0123456789012",
+                "ActorName",
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
                 new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
                 DateTime.UtcNow);
@@ -53,6 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             Assert.Equal(@event.ActorId, actualEvent.ActorId);
             Assert.Equal(@event.OrganizationId, actualEvent.OrganizationId);
             Assert.Equal(@event.ActorNumber, actualEvent.ActorNumber);
+            Assert.Equal(@event.Name, actualEvent.Name);
             Assert.Equal(@event.Status, actualEvent.Status);
             Assert.Equal(@event.BusinessRoles.Count(), actualEvent.BusinessRoles.Count());
             Assert.Equal(@event.ActorMarketRoles.Count(), actualEvent.ActorMarketRoles.Count());
@@ -96,7 +98,8 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
                 BusinessRoles = { 1 },
                 OrganizationId = Guid.NewGuid().ToString(),
                 Type = nameof(ActorCreatedIntegrationEvent),
-                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow)
+                EventCreated = Timestamp.FromDateTime(DateTime.UtcNow),
+                Name = "ActorName"
             };
 
             // Act + Assert

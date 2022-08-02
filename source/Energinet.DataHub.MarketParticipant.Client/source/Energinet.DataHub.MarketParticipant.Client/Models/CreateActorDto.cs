@@ -18,5 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record CreateActorDto(
         ActorNumberDto ActorNumber,
+        ActorNameDto Name,
         IReadOnlyList<ActorMarketRoleDto> MarketRoles);
 }
