@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
@@ -137,8 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
-            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), new[] { MeteringPointType.D02Analysis.Name }) };
-            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), gridAreas);
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))

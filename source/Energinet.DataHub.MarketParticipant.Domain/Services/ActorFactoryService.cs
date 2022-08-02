@@ -88,6 +88,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)
                 .ConfigureAwait(false);
 
+            await _actorIntegrationEventsQueueService
+                .EnqueueActorCreatedEventsAsync(organization.Id, savedActor)
+                .ConfigureAwait(false);
+
             await uow.CommitAsync().ConfigureAwait(false);
 
             return savedActor;

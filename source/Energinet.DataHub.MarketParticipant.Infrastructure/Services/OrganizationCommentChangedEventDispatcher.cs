@@ -15,15 +15,16 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationCommentChanged : EventDispatcherBase
+    public sealed class OrganizationCommentChangedEventDispatcher : EventDispatcherBase
     {
         private readonly IOrganizationCommentChangedIntegrationEventParser _eventParser;
 
-        public OrganizationCommentChanged(
+        public OrganizationCommentChangedEventDispatcher(
             IOrganizationCommentChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
             : base(serviceBusClient)
@@ -35,10 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not OrganizationCommentChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationIntegrationEvents.OrganizationCommentChangedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationCommentChangedIntegrationEvent(
+            var outboundIntegrationEvent = new OrganizationCommentChangedIntegrationEvent(
                 organizationUpdatedIntegrationEvent.Id,
                 organizationUpdatedIntegrationEvent.EventCreated,
                 organizationUpdatedIntegrationEvent.OrganizationId.Value,

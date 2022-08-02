@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
@@ -81,6 +85,59 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             domainEventRepository.Verify(
                 x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id)),
                 Times.Once);
+        }
+
+        [Fact]
+        public async Task EnqueueActorUpdatedEventAsync_integrationEventsNull_ThrowsException()
+        {
+            // Arrange
+            var target = new ActorIntegrationEventsQueueService(
+                new Mock<IDomainEventRepository>().Object,
+                new Mock<IBusinessRoleCodeDomainService>().Object);
+
+            var organizationId = new OrganizationId(Guid.NewGuid());
+
+            // Act + Assert
+            await Assert
+                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueActorUpdatedEventAsync(
+                    organizationId,
+                    Guid.NewGuid(),
+                    null!))
+                .ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task EnqueueActorUpdatedEventAsync_WithIntegrationEvents_CreatesEvents()
+        {
+            // Arrange
+            var domainEventRepository = new Mock<IDomainEventRepository>();
+            var target = new ActorIntegrationEventsQueueService(
+                domainEventRepository.Object,
+                new Mock<IBusinessRoleCodeDomainService>().Object);
+
+            var actor = new Actor(new ActorNumber("fake_value"));
+            var organizationId = new OrganizationId(Guid.NewGuid());
+
+            var integrationEvents = new List<IIntegrationEvent>();
+            integrationEvents.Add(new ActorStatusChangedIntegrationEvent());
+            integrationEvents.Add(new MarketRoleAddedToActorIntegrationEvent());
+            integrationEvents.Add(new MarketRoleRemovedFromActorIntegrationEvent());
+            integrationEvents.Add(new GridAreaAddedToActorIntegrationEvent());
+            integrationEvents.Add(new GridAreaRemovedFromActorIntegrationEvent());
+            integrationEvents.Add(new MeteringPointTypeAddedToActorIntegrationEvent());
+            integrationEvents.Add(new MeteringPointTypeRemovedFromActorIntegrationEvent());
+
+            // Act
+            await target.EnqueueActorUpdatedEventAsync(
+                    organizationId,
+                    actor.Id,
+                    integrationEvents)
+                .ConfigureAwait(false);
+
+            // Assert
+            domainEventRepository.Verify(
+                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id)),
+                Times.Exactly(7));
         }
     }
 }

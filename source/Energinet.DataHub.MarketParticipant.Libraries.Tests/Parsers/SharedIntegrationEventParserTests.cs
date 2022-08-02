@@ -16,6 +16,7 @@ using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 using Xunit;
@@ -52,6 +53,75 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // assert
             Assert.IsType<ActorUpdatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ActorCreatedIntegrationEventParser()
+        {
+            // arrange
+            var input = new ActorCreatedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ActorCreatedIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                ActorStatus.Active,
+                "0123456789012",
+                new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
+                new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
+                DateTime.UtcNow);
+
+            // act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // assert
+            Assert.IsType<ActorCreatedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ActorExternalIdChangedIntegrationEventParser()
+        {
+            // arrange
+            var input = new ActorExternalIdChangedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ActorExternalIdChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid());
+
+            // act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // assert
+            Assert.IsType<ActorExternalIdChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ActorStatusChangedIntegrationEventParser()
+        {
+            // arrange
+            var input = new ActorStatusChangedIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ActorStatusChangedIntegrationEvent(
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                ActorStatus.Active);
+
+            // act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // assert
+            Assert.IsType<ActorStatusChangedIntegrationEvent>(actualEventObject);
         }
 
         [Fact]
@@ -288,6 +358,200 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
 
             // Assert
             Assert.IsType<OrganizationAddressChangedIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_MeteringPointTypeAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MeteringPointTypeAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MeteringPointTypeAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                "123");
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MeteringPointTypeAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_MeteringPointTypeRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MeteringPointTypeRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MeteringPointTypeRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                "123",
+                DateTime.UtcNow);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MeteringPointTypeRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                Guid.NewGuid());
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_GridAreaRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new GridAreaRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new GridAreaRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                EicFunction.Agent,
+                Guid.NewGuid(),
+                Guid.NewGuid());
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<GridAreaRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_MarketRoleRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MarketRoleRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MarketRoleRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                BusinessRoleCode.Ddk,
+                EicFunction.Agent,
+                DateTime.UtcNow);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MarketRoleRemovedFromActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_MarketRoleAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new MarketRoleAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new MarketRoleAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                BusinessRoleCode.Ddk,
+                EicFunction.Agent,
+                DateTime.UtcNow);
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<MarketRoleAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ContactAddedToActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new ContactAddedToActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ContactAddedToActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                new ActorContact(
+                    "fake_name",
+                    "fake_email@me.dk",
+                    ContactCategory.Default,
+                    "34343434"));
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<ContactAddedToActorIntegrationEvent>(actualEventObject);
+        }
+
+        [Fact]
+        public void ParseCorrectlyWith_ContactRemovedFromActorIntegrationEventParser()
+        {
+            // Arrange
+            var input = new ContactRemovedFromActorIntegrationEventParser();
+            var findAndParse = new SharedIntegrationEventParser();
+
+            var @event = new ContactRemovedFromActorIntegrationEvent(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTime.UtcNow,
+                new ActorContact(
+                    "fake_name",
+                    "fake_email@me.dk",
+                    ContactCategory.Default,
+                    "34343434"));
+
+            // Act
+            var actualBytes = input.Parse(@event);
+            var actualEventObject = findAndParse.Parse(actualBytes);
+
+            // Assert
+            Assert.IsType<ContactRemovedFromActorIntegrationEvent>(actualEventObject);
         }
 
         [Fact]

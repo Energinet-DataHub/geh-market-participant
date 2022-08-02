@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
@@ -27,6 +28,21 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             if (TryParseActorUpdatedIntegrationEvent(protoContract, out var actorUpdatedEvent))
             {
                 return actorUpdatedEvent;
+            }
+
+            if (TryParseActorCreatedIntegrationEvent(protoContract, out var actorCreatedEvent))
+            {
+                return actorCreatedEvent;
+            }
+
+            if (TryParseActorStatusChangedIntegrationEvent(protoContract, out var actorStatusChangedEvent))
+            {
+                return actorStatusChangedEvent;
+            }
+
+            if (TryParseActorExternalIdChangedIntegrationEvent(protoContract, out var actorExternalIdChangedEvent))
+            {
+                return actorExternalIdChangedEvent;
             }
 
             if (TryParseGridAreaUpdatedIntegrationEvent(protoContract, out var gridAreaUpdatedEvent))
@@ -79,6 +95,46 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 return organizationAddressChangedIntegrationEvent;
             }
 
+            if (TryParseMeteringPointTypeAddedToActorIntegrationEvent(protoContract, out var meteringPointTypeAddedToActorIntegrationEvent))
+            {
+                return meteringPointTypeAddedToActorIntegrationEvent;
+            }
+
+            if (TryParseMeteringPointTypeRemovedFromActorIntegrationEvent(protoContract, out var meteringPointTypeRemovedFromActorIntegrationEvent))
+            {
+                return meteringPointTypeRemovedFromActorIntegrationEvent;
+            }
+
+            if (TryParseGridAreaAddedToActorIntegrationEvent(protoContract, out var gridAreaAddedToActorIntegrationEvent))
+            {
+                return gridAreaAddedToActorIntegrationEvent;
+            }
+
+            if (TryParseGridAreaRemovedFromActorIntegrationEvent(protoContract, out var gridAreaRemovedFromActorIntegrationEvent))
+            {
+                return gridAreaRemovedFromActorIntegrationEvent;
+            }
+
+            if (TryParseMarketRoleAddedToActorIntegrationEvent(protoContract, out var marketRoleAddedToActorIntegrationEvent))
+            {
+                return marketRoleAddedToActorIntegrationEvent;
+            }
+
+            if (TryParseMarketRoleRemovedFromActorIntegrationEvent(protoContract, out var marketRoleRemovedFromActorIntegrationEvent))
+            {
+                return marketRoleRemovedFromActorIntegrationEvent;
+            }
+
+            if (TryParseContactAddedToActorIntegrationEvent(protoContract, out var contactAddedToActorIntegrationEvent))
+            {
+                return contactAddedToActorIntegrationEvent;
+            }
+
+            if (TryParseContactRemovedFromActorIntegrationEvent(protoContract, out var contactRemovedFromActorIntegrationEvent))
+            {
+                return contactRemovedFromActorIntegrationEvent;
+            }
+
             throw new MarketParticipantException("IntegrationEventParser not found");
         }
 
@@ -98,6 +154,66 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 actorUpdatedEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseActorCreatedIntegrationEvent(
+            byte[] protoContract,
+            out ActorCreatedIntegrationEvent actorCreatedEvent)
+        {
+            try
+            {
+                var actorCreatedEventParser = new ActorCreatedIntegrationEventParser();
+                var actorEvent = actorCreatedEventParser.Parse(protoContract);
+                actorCreatedEvent = actorEvent;
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                actorCreatedEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseActorExternalIdChangedIntegrationEvent(
+            byte[] protoContract,
+            out ActorExternalIdChangedIntegrationEvent actorExternalIdChangedEvent)
+        {
+            try
+            {
+                var actorExternalIdChangedEventParser = new ActorExternalIdChangedIntegrationEventParser();
+                var actorExternalIdEvent = actorExternalIdChangedEventParser.Parse(protoContract);
+                actorExternalIdChangedEvent = actorExternalIdEvent;
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                actorExternalIdChangedEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseActorStatusChangedIntegrationEvent(
+            byte[] protoContract,
+            out ActorStatusChangedIntegrationEvent actorStatusChangedEvent)
+        {
+            try
+            {
+                var actorStatusChangedEventParser = new ActorStatusChangedIntegrationEventParser();
+                var actorEvent = actorStatusChangedEventParser.Parse(protoContract);
+                actorStatusChangedEvent = actorEvent;
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                actorStatusChangedEvent = null!;
                 return false;
             }
         }
@@ -291,6 +407,158 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 #pragma warning restore CA1031
             {
                 organizationBusinessRegisterIdentifierIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseMeteringPointTypeAddedToActorIntegrationEvent(
+            byte[] protoContract,
+            out MeteringPointTypeAddedToActorIntegrationEvent meteringPointTypeAddedToActorIntegrationEvent)
+        {
+            try
+            {
+                var meteringPointTypeAddedToActorIntegrationEventParser = new MeteringPointTypeAddedToActorIntegrationEventParser();
+                meteringPointTypeAddedToActorIntegrationEvent = meteringPointTypeAddedToActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                meteringPointTypeAddedToActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseMeteringPointTypeRemovedFromActorIntegrationEvent(
+            byte[] protoContract,
+            out MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent)
+        {
+            try
+            {
+                var meteringPointTypeRemovedFromActorIntegrationEventParser = new MeteringPointTypeRemovedFromActorIntegrationEventParser();
+                meteringPointTypeRemovedFromActorIntegrationEvent = meteringPointTypeRemovedFromActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                meteringPointTypeRemovedFromActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseGridAreaAddedToActorIntegrationEvent(
+            byte[] protoContract,
+            out GridAreaAddedToActorIntegrationEvent gridAreaAddedToActorIntegrationEvent)
+        {
+            try
+            {
+                var gridAreaAddedToActorIntegrationEventParser = new GridAreaAddedToActorIntegrationEventParser();
+                gridAreaAddedToActorIntegrationEvent = gridAreaAddedToActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                gridAreaAddedToActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseGridAreaRemovedFromActorIntegrationEvent(
+            byte[] protoContract,
+            out GridAreaRemovedFromActorIntegrationEvent gridAreaRemovedFromActorIntegrationEvent)
+        {
+            try
+            {
+                var gridAreaRemovedFromActorIntegrationEventParser = new GridAreaRemovedFromActorIntegrationEventParser();
+                gridAreaRemovedFromActorIntegrationEvent = gridAreaRemovedFromActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                gridAreaRemovedFromActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseMarketRoleAddedToActorIntegrationEvent(
+            byte[] protoContract,
+            out MarketRoleAddedToActorIntegrationEvent marketRoleAddedToActorIntegrationEvent)
+        {
+            try
+            {
+                var marketRoleAddedToActorIntegrationEventParser = new MarketRoleAddedToActorIntegrationEventParser();
+                marketRoleAddedToActorIntegrationEvent = marketRoleAddedToActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                marketRoleAddedToActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseMarketRoleRemovedFromActorIntegrationEvent(
+            byte[] protoContract,
+            out MarketRoleRemovedFromActorIntegrationEvent marketRoleRemovedFromActorIntegrationEvent)
+        {
+            try
+            {
+                var marketRoleRemovedFromActorIntegrationEventParser = new MarketRoleRemovedFromActorIntegrationEventParser();
+                marketRoleRemovedFromActorIntegrationEvent = marketRoleRemovedFromActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                marketRoleRemovedFromActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseContactAddedToActorIntegrationEvent(
+            byte[] protoContract,
+            out ContactAddedToActorIntegrationEvent contactAddedToActorIntegrationEvent)
+        {
+            try
+            {
+                var contactAddedToActorIntegrationEventParser = new ContactAddedToActorIntegrationEventParser();
+                contactAddedToActorIntegrationEvent = contactAddedToActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                contactAddedToActorIntegrationEvent = null!;
+                return false;
+            }
+        }
+
+        private static bool TryParseContactRemovedFromActorIntegrationEvent(
+            byte[] protoContract,
+            out ContactRemovedFromActorIntegrationEvent contactRemovedFromActorIntegrationEvent)
+        {
+            try
+            {
+                var contactRemovedFromActorIntegrationEventParser = new ContactRemovedFromActorIntegrationEventParser();
+                contactRemovedFromActorIntegrationEvent = contactRemovedFromActorIntegrationEventParser.Parse(protoContract);
+                return true;
+            }
+#pragma warning disable CA1031
+            catch (Exception)
+#pragma warning restore CA1031
+            {
+                contactRemovedFromActorIntegrationEvent = null!;
                 return false;
             }
         }
