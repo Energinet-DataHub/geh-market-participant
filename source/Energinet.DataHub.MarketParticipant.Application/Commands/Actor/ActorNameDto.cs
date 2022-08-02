@@ -12,15 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record ActorDto(
-        string ActorId,
-        string? ExternalActorId,
-        ActorNumberDto ActorNumber,
-        string Status,
-        ActorNameDto Name,
-        IEnumerable<ActorMarketRoleDto> MarketRoles);
+    public sealed record ActorNameDto(string Value);
 }
