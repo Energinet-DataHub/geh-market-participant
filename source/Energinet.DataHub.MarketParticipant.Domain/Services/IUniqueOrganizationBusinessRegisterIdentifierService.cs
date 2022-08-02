@@ -26,6 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// Ensures business register identifier for an organization is unique; throws ValidationException if it is not unique
         /// </summary>
         /// <param name="organization">Organization</param>
-        Task EnsureUniqueMarketRolesPerGridAreaAsync(Organization organization);
+        Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization);
     }
 }

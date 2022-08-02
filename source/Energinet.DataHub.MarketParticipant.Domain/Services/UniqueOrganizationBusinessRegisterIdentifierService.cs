@@ -30,14 +30,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _organizationRepository = organizationRepository;
         }
 
-        public async Task EnsureUniqueMarketRolesPerGridAreaAsync(Organization organization)
+        public async Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization)
         {
             var organizations = await _organizationRepository.GetAsync().ConfigureAwait(false);
             if (organizations.Any(
                 x => string.Equals(
                     x.BusinessRegisterIdentifier.Identifier,
                     organization.BusinessRegisterIdentifier.Identifier,
-                    StringComparison.OrdinalIgnoreCase)))
+                    StringComparison.OrdinalIgnoreCase)
+                     && x.Id.Value != organization.Id.Value))
             {
                 throw new ValidationException("The business register identifier is already in use");
             }

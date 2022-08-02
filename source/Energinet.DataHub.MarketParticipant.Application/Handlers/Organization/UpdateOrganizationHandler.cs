@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
 
             await _uniqueOrganizationBusinessRegisterIdentifierService
-                .EnsureUniqueMarketRolesPerGridAreaAsync(organization)
+                .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
                 .ConfigureAwait(false);
 
             await using var uow = await _unitOfWorkProvider
