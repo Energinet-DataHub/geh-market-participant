@@ -15,16 +15,16 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationBusinessRegisterIdentifierChanged : EventDispatcherBase
+    public sealed class OrganizationIdentifierChangedEventDispatcher : EventDispatcherBase
     {
         private readonly IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser _eventParser;
 
-        public OrganizationBusinessRegisterIdentifierChanged(
+        public OrganizationIdentifierChangedEventDispatcher(
             IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
             : base(serviceBusClient)
@@ -36,10 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not OrganizationBusinessRegisterIdentifierChangedIntegrationEvent organizationUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.OrganizationIntegrationEvents.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent organizationUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
+            var outboundIntegrationEvent = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
                 organizationUpdatedIntegrationEvent.Id,
                 organizationUpdatedIntegrationEvent.EventCreated,
                 organizationUpdatedIntegrationEvent.OrganizationId.Value,

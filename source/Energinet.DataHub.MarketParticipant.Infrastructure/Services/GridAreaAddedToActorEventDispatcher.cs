@@ -13,22 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
-using GridAreaAddedToActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.GridAreaAddedToActorIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class GridAreaAddedToActorEventDispatcher : EventDispatcherBase
 {
     private readonly IGridAreaAddedToActorIntegrationEventParser _eventParser;
-    private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
     public GridAreaAddedToActorEventDispatcher(
         IGridAreaAddedToActorIntegrationEventParser eventParser,
@@ -36,19 +30,18 @@ public sealed class GridAreaAddedToActorEventDispatcher : EventDispatcherBase
         : base(serviceBusClient)
     {
         _eventParser = eventParser;
-        _serviceBusClient = serviceBusClient;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (integrationEvent is not GridAreaAddedToActorIntegrationEvent gridAreaAddedToActorIntegrationEvent)
+        if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaIntegrationEvents.GridAreaAddedToActorIntegrationEvent gridAreaAddedToActorIntegrationEvent)
         {
             return false;
         }
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaAddedToActorIntegrationEvent(
+        var outboundIntegrationEvent = new GridAreaAddedToActorIntegrationEvent(
             gridAreaAddedToActorIntegrationEvent.Id,
             gridAreaAddedToActorIntegrationEvent.ActorId,
             gridAreaAddedToActorIntegrationEvent.OrganizationId.Value,

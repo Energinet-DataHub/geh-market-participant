@@ -14,18 +14,15 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using MeteringPointTypeAddedToActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.MeteringPointTypeAddedToActorIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class MeteringPointTypeAddedToActorEventDispatcher : EventDispatcherBase
 {
     private readonly IMeteringPointTypeAddedToActorIntegrationEventParser _eventParser;
-    private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
     public MeteringPointTypeAddedToActorEventDispatcher(
         IMeteringPointTypeAddedToActorIntegrationEventParser eventParser,
@@ -33,19 +30,18 @@ public sealed class MeteringPointTypeAddedToActorEventDispatcher : EventDispatch
         : base(serviceBusClient)
     {
         _eventParser = eventParser;
-        _serviceBusClient = serviceBusClient;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (integrationEvent is not MeteringPointTypeAddedToActorIntegrationEvent meteringPointTypeAddedToActorIntegrationEvent)
+        if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.MeteringPointTypeAddedToActorIntegrationEvent meteringPointTypeAddedToActorIntegrationEvent)
         {
             return false;
         }
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.MeteringPointTypeAddedToActorIntegrationEvent(
+        var outboundIntegrationEvent = new MeteringPointTypeAddedToActorIntegrationEvent(
             meteringPointTypeAddedToActorIntegrationEvent.Id,
             meteringPointTypeAddedToActorIntegrationEvent.ActorId,
             meteringPointTypeAddedToActorIntegrationEvent.OrganizationId.Value,

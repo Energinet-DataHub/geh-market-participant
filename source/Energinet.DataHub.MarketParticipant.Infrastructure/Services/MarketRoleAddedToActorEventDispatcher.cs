@@ -13,21 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using MarketRoleAddedToActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.MarketRoleAddedToActorIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class MarketRoleAddedToActorEventDispatcher : EventDispatcherBase
 {
     private readonly IMarketRoleAddedToActorIntegrationEventParser _eventParser;
-    private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
     public MarketRoleAddedToActorEventDispatcher(
         IMarketRoleAddedToActorIntegrationEventParser eventParser,
@@ -35,19 +30,18 @@ public sealed class MarketRoleAddedToActorEventDispatcher : EventDispatcherBase
         : base(serviceBusClient)
     {
         _eventParser = eventParser;
-        _serviceBusClient = serviceBusClient;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (integrationEvent is not MarketRoleAddedToActorIntegrationEvent marketRoleAddedToActorIntegrationEvent)
+        if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.MarketRoleAddedToActorIntegrationEvent marketRoleAddedToActorIntegrationEvent)
         {
             return false;
         }
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.MarketRoleAddedToActorIntegrationEvent(
+        var outboundIntegrationEvent = new MarketRoleAddedToActorIntegrationEvent(
             marketRoleAddedToActorIntegrationEvent.Id,
             marketRoleAddedToActorIntegrationEvent.ActorId,
             marketRoleAddedToActorIntegrationEvent.OrganizationId.Value,

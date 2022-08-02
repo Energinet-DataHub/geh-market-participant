@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var organizationEventParser = new OrganizationCreatedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new OrganizationCreated(organizationEventParser, serviceBusClient.Object);
+            var target = new OrganizationCreatedEventDispatcher(organizationEventParser, serviceBusClient.Object);
 
             var integrationEvent = new OrganizationCreatedIntegrationEvent
             {
@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
             var eventParser = new OrganizationCreatedIntegrationEventParser();
-            var target = new OrganizationCreated(eventParser, serviceBusClient.Object);
+            var target = new OrganizationCreatedEventDispatcher(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {

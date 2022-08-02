@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IContactRemovedFromActorIntegrationEventParser, ContactRemovedFromActorIntegrationEventParser>();
             container.Register<IContactAddedToActorIntegrationEventParser, ContactAddedToActorIntegrationEventParser>();
 
-            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdated).Assembly);
+            container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
         }
     }
 }
