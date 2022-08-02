@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
@@ -26,7 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     public sealed class ActorExternalIdChangedEventDispatcher : EventDispatcherBase
     {
         private readonly IActorExternalIdChangedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public ActorExternalIdChangedEventDispatcher(
             IActorExternalIdChangedIntegrationEventParser eventParser,
@@ -34,7 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             : base(serviceBusClient)
         {
             _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
         }
 
         public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
@@ -44,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorExternalIdChangedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorExternalIdChangedIntegrationEvent(
+            var outboundIntegrationEvent = new ActorExternalIdChangedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,

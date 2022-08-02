@@ -13,22 +13,16 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
-using GridAreaAddedToActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.GridAreaAddedToActorIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
 {
     private readonly IContactRemovedFromActorIntegrationEventParser _eventParser;
-    private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
     public ContactRemovedFromActorEventDispatcher(
         IContactRemovedFromActorIntegrationEventParser eventParser,
@@ -36,7 +30,6 @@ public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
         : base(serviceBusClient)
     {
         _eventParser = eventParser;
-        _serviceBusClient = serviceBusClient;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
@@ -48,15 +41,15 @@ public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
             return false;
         }
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.ContactRemovedFromActorIntegrationEvent(
+        var outboundIntegrationEvent = new ContactRemovedFromActorIntegrationEvent(
             contactAddedToActorIntegrationEvent.Id,
             contactAddedToActorIntegrationEvent.ActorId,
             contactAddedToActorIntegrationEvent.OrganizationId.Value,
             contactAddedToActorIntegrationEvent.EventCreated,
-            new Integration.Model.Dtos.ActorContact(
+            new ActorContact(
                 contactAddedToActorIntegrationEvent.Contact.Name,
                 contactAddedToActorIntegrationEvent.Contact.Email.Address,
-                (Integration.Model.Dtos.ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category.Value,
+                (ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category.Value,
                 contactAddedToActorIntegrationEvent.Contact.Phone?.Number));
 
         var bytes = _eventParser.Parse(outboundIntegrationEvent);

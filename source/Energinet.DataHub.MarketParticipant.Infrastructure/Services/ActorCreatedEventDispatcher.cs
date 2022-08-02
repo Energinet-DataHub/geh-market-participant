@@ -15,18 +15,15 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using ActorUpdatedIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorUpdatedIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class ActorCreatedEventDispatcher : EventDispatcherBase
     {
         private readonly IActorCreatedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public ActorCreatedEventDispatcher(
             IActorCreatedIntegrationEventParser eventParser,
@@ -34,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             : base(serviceBusClient)
         {
             _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
         }
 
         public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
@@ -51,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
                 actorUpdatedIntegrationEvent.ActorNumber.Value,
                 actorUpdatedIntegrationEvent.Name.Value,
-                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (Integration.Model.Dtos.BusinessRoleCode)(int)x),
+                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)(int)x),
                 actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
                     new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
                         new ActorGridArea(y.Id, y.MeteringPointTypes)))),

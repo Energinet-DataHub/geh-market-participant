@@ -15,16 +15,16 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class GridAreaNameChanged : EventDispatcherBase
+    public sealed class GridAreaNameChangedEventDispatcher : EventDispatcherBase
     {
         private readonly IGridAreaNameChangedIntegrationEventParser _eventParser;
 
-        public GridAreaNameChanged(
+        public GridAreaNameChangedEventDispatcher(
             IGridAreaNameChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
             : base(serviceBusClient)
@@ -36,10 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(integrationEvent);
 
-            if (integrationEvent is not GridAreaNameChangedIntegrationEvent gridAreaUpdatedIntegrationEvent)
+            if (integrationEvent is not Domain.Model.IntegrationEvents.GridAreaIntegrationEvents.GridAreaNameChangedIntegrationEvent gridAreaUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent(
+            var outboundIntegrationEvent = new GridAreaNameChangedIntegrationEvent(
                 gridAreaUpdatedIntegrationEvent.Id,
                 gridAreaUpdatedIntegrationEvent.EventCreated,
                 gridAreaUpdatedIntegrationEvent.GridAreaId.Value,

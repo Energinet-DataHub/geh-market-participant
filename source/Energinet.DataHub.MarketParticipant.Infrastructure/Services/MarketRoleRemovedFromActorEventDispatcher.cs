@@ -14,18 +14,15 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
-using MarketRoleRemovedFromActorIntegrationEvent = Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents.MarketRoleRemovedFromActorIntegrationEvent;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class MarketRoleRemovedFromActorEventDispatcher : EventDispatcherBase
 {
     private readonly IMarketRoleRemovedFromActorIntegrationEventParser _eventParser;
-    private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
     public MarketRoleRemovedFromActorEventDispatcher(
         IMarketRoleRemovedFromActorIntegrationEventParser eventParser,
@@ -33,19 +30,18 @@ public sealed class MarketRoleRemovedFromActorEventDispatcher : EventDispatcherB
         : base(serviceBusClient)
     {
         _eventParser = eventParser;
-        _serviceBusClient = serviceBusClient;
     }
 
     public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
 
-        if (integrationEvent is not MarketRoleRemovedFromActorIntegrationEvent marketRoleAddedToActorIntegrationEvent)
+        if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.MarketRoleRemovedFromActorIntegrationEvent marketRoleAddedToActorIntegrationEvent)
         {
             return false;
         }
 
-        var outboundIntegrationEvent = new Integration.Model.Dtos.MarketRoleRemovedFromActorIntegrationEvent(
+        var outboundIntegrationEvent = new MarketRoleRemovedFromActorIntegrationEvent(
             marketRoleAddedToActorIntegrationEvent.Id,
             marketRoleAddedToActorIntegrationEvent.ActorId,
             marketRoleAddedToActorIntegrationEvent.OrganizationId.Value,

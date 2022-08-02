@@ -19,11 +19,11 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class OrganizationStatusChanged : EventDispatcherBase
+    public sealed class OrganizationStatusChangedEventDispatcher : EventDispatcherBase
     {
         private readonly IOrganizationStatusChangedIntegrationEventParser _eventParser;
 
-        public OrganizationStatusChanged(
+        public OrganizationStatusChangedEventDispatcher(
             IOrganizationStatusChangedIntegrationEventParser eventParser,
             IMarketParticipantServiceBusClient serviceBusClient)
             : base(serviceBusClient)

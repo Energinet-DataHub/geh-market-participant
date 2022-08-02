@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
@@ -24,7 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     public sealed class ActorStatusChangedEventDispatcher : EventDispatcherBase
     {
         private readonly IActorStatusChangedIntegrationEventParser _eventParser;
-        private readonly IMarketParticipantServiceBusClient _serviceBusClient;
 
         public ActorStatusChangedEventDispatcher(
             IActorStatusChangedIntegrationEventParser eventParser,
@@ -32,7 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             : base(serviceBusClient)
         {
             _eventParser = eventParser;
-            _serviceBusClient = serviceBusClient;
         }
 
         public override async Task<bool> TryDispatchAsync(IIntegrationEvent integrationEvent)
@@ -42,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorStatusChangedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
-            var outboundIntegrationEvent = new Integration.Model.Dtos.ActorStatusChangedIntegrationEvent(
+            var outboundIntegrationEvent = new ActorStatusChangedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,

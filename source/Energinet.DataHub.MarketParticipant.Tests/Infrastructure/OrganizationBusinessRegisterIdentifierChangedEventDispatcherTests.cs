@@ -39,7 +39,7 @@ public sealed class OrganizationBusinessRegisterIdentifierChangedEventDispatcher
         serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
         var eventParser = new SharedIntegrationEventParser();
-        var target = new OrganizationBusinessRegisterIdentifierChanged(
+        var target = new OrganizationIdentifierChangedEventDispatcher(
             new OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser(),
             serviceBusClient.Object);
 
@@ -71,7 +71,7 @@ public sealed class OrganizationBusinessRegisterIdentifierChangedEventDispatcher
         serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
         var eventParser = new OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser();
-        var target = new OrganizationBusinessRegisterIdentifierChanged(eventParser, serviceBusClient.Object);
+        var target = new OrganizationIdentifierChangedEventDispatcher(eventParser, serviceBusClient.Object);
 
         var integrationEvent = new ActorUpdatedIntegrationEvent
         {
