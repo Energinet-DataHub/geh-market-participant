@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Dtos;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
-    public sealed record ActorDto(
-        string ActorId,
-        string? ExternalActorId,
-        ActorNumberDto ActorNumber,
-        string Status,
-        ActorNameDto Name,
-        IEnumerable<ActorMarketRoleDto> MarketRoles);
+    /// <summary>
+    /// Shared parser for Integration events. Try parses through known parsers.
+    /// </summary>
+    public interface IActorNameChangedIntegrationEventParser
+    {
+        /// <summary>
+        /// Parses the event.
+        /// </summary>
+        /// <param name="integrationEvent">The event</param>
+        /// <returns>The protobuf contract.</returns>
+        byte[] Parse(ActorNameChangedIntegrationEvent integrationEvent);
+    }
 }

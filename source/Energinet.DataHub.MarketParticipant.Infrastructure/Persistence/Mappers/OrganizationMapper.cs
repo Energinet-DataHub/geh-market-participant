@@ -84,6 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.ActorId = from.ExternalActorId?.Value;
             to.ActorNumber = from.ActorNumber.Value;
             to.Status = (int)from.Status;
+            to.Name = from.Name.Value;
 
             // Market roles are currently treated as value types, so they are deleted and recreated with each update.
             to.MarketRoles.Clear();
@@ -132,13 +133,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
                 var actorNumber = new ActorNumber(actor.ActorNumber);
                 var actorStatus = (ActorStatus)actor.Status;
+                var actorName = new ActorName(actor.Name);
 
                 return new Actor(
                     actor.Id,
                     actor.ActorId.HasValue ? new ExternalActorId(actor.ActorId.Value) : null,
                     actorNumber,
                     actorStatus,
-                    marketRoles);
+                    marketRoles,
+                    actorName);
             }).ToList();
         }
     }

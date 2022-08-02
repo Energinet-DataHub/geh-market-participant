@@ -92,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -139,7 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", marketRoles));
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), marketRoles));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -181,7 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -223,7 +223,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -265,7 +265,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

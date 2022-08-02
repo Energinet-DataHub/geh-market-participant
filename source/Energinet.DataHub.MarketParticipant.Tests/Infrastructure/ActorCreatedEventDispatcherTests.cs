@@ -48,6 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ActorNumber = new ActorNumber("gln"),
                 Status = ActorStatus.Active,
+                Name = new ActorName("ActorName")
             };
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
 
@@ -70,6 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber);
+            Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);
             Assert.Equal((int)integrationEvent.Status, (int)actualEvent.Status);
             Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
             Assert.Equal((int)marketRole.Function, (int)actualMarketRole.Function);

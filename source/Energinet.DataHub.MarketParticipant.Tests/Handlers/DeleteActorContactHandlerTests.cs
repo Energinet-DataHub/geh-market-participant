@@ -75,7 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 organizationId,
@@ -121,7 +122,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 organizationId,
@@ -165,7 +167,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                Array.Empty<ActorMarketRole>());
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 organizationId,

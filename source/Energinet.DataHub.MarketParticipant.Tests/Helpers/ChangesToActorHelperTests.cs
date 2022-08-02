@@ -84,6 +84,7 @@ public class ChangesToActorHelperTests
 
         // Assert
         var numberOfStatusChangedEvents = integrationEvents.Count(x => x is ActorStatusChangedIntegrationEvent);
+        var numberOfNameChangedEvents = integrationEvents.Count(x => x is ActorNameChangedIntegrationEvent);
         var numberOfAddMeteringPointEvents = integrationEvents.Count(x => x is MeteringPointTypeAddedToActorIntegrationEvent);
         var numberOfRemoveMeteringPointEvents = integrationEvents.Count(x => x is MeteringPointTypeRemovedFromActorIntegrationEvent);
         var numberOfAddGridAreaEvents = integrationEvents.Count(x => x is GridAreaAddedToActorIntegrationEvent);
@@ -92,13 +93,14 @@ public class ChangesToActorHelperTests
         var numberOfRemoveMarketRoleEvents = integrationEvents.Count(x => x is MarketRoleRemovedFromActorIntegrationEvent);
 
         Assert.Equal(1, numberOfStatusChangedEvents);
+        Assert.Equal(1, numberOfNameChangedEvents);
         Assert.Equal(2, numberOfAddMeteringPointEvents);
         Assert.Equal(6, numberOfRemoveMeteringPointEvents);
         Assert.Equal(1, numberOfAddGridAreaEvents);
         Assert.Equal(2, numberOfRemoveGridAreaEvents);
         Assert.Equal(1, numberOfAddMarketRoleEvents);
         Assert.Equal(1, numberOfRemoveMarketRoleEvents);
-        Assert.Equal(14, integrationEvents.Count);
+        Assert.Equal(15, integrationEvents.Count);
     }
 
     private static OrganizationId CreateOrganizationId()
@@ -148,7 +150,8 @@ public class ChangesToActorHelperTests
                                 MeteringPointType.D01VeProduction
                             })
                     })
-            });
+            },
+            new ActorName("CurrentActorName"));
     }
 
     private static UpdateActorCommand CreateValidIncomingActorWithChildren()
@@ -158,6 +161,7 @@ public class ChangesToActorHelperTests
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ChangeActorDto(
                 "Passive",
+                new ActorNameDto("NewActorName"),
                 new List<ActorMarketRoleDto>
                 {
                     new ActorMarketRoleDto(

@@ -83,6 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorId = actor.Id,
                 ActorNumber = actor.ActorNumber,
                 Status = actor.Status,
+                Name = actor.Name
             };
 
             foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))
@@ -122,6 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                             break;
                         }
 
+                    case ActorNameChangedIntegrationEvent:
                     case ActorExternalIdChangedIntegrationEvent:
                         {
                             var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);

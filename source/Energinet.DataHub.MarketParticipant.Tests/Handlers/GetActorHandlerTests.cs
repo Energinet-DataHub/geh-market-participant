@@ -104,7 +104,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ExternalActorId(actorId),
                 new ActorNumber(actorGln),
                 ActorStatus.Active,
-                Enumerable.Empty<ActorMarketRole>());
+                Enumerable.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty));
 
             var organization = new Organization(
                 new OrganizationId(orgId),
