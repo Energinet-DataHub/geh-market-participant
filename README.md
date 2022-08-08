@@ -42,7 +42,7 @@ The Following endpoints are available, separated by concerns.
 ### POST:/Organization
 
 ```organization/```<br />
-*Returns and organization with the specified id, if it exists.*
+*Creates a new organization with the specified data*
 
 **Example body:**
 
@@ -145,34 +145,6 @@ The Following endpoints are available, separated by concerns.
 }
 ```
 
-## Contact
-
-### GET:/Organization/Contact
-
-```organization/{organizationId:guid}/contact/```<br />
-*returns all contacts in the specified organization, if the organization exists.*
-
-### POST:/Organization/Contact
-
-```organization/{organizationId:guid}/contact/```<br />
-*Creates a new contacts in the specified organization, if the organization exists.*
-
-**Example body:**
-
-```json
-{
-  "name": "string",
-  "category": "string",
-  "email": "string",
-  "phone": "string"
-}
-```
-
-### DELETE:/Organization/Contact
-
-```organization/{organizationId:guid}/contact/{contactId:guid}```<br />
-*Deletes a contact from the specified organization, if it exists*
-
 ## Actor Contact
 
 ### GET:/Organization/Actor/Contact
@@ -199,7 +171,7 @@ The Following endpoints are available, separated by concerns.
 ### DELETE:/Organization/Actor/Contact
 
 ```organization/{organizationId:guid}/contact/{contactId:guid}```<br />
-*Deletes a contact from the specified organization, if it exists*
+*Deletes a contact from the specified actor in the specified organisation, if it exists*
 
 ## Grid Area
 
@@ -230,7 +202,7 @@ The Following endpoints are available, separated by concerns.
 
 Integration events are a way for interested parties to know when data changes in the Market Participant domain and be informed of these changes.
 
-Integration events are published to a servicebus topic, where everyone who are interested can listen. What you do with these events are. A description of how to subscribe to these events are [here](#Subscribe-to-integration-events)
+Integration events are published to a servicebus topic, where everyone who are interested can listen. What events you are listening for are up to the domain to decide, not all events are relevant for all domains. A description of how to subscribe to these events is found [here](#Subscribe-to-integration-events)
 
 The following integrations events are available:
 
