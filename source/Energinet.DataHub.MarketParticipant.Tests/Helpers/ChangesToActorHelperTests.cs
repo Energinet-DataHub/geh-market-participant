@@ -15,12 +15,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -29,55 +32,80 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Helpers;
 [UnitTest]
 public class ChangesToActorHelperTests
 {
+    private readonly OrganizationId _organizationId = CreateOrganizationId();
     private readonly Actor _actor = CreateValidActorWithChildren();
     private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
+    private readonly Mock<IBusinessRoleCodeDomainService> _businessRoleCodeDomainServiceMock = new();
+    private readonly Mock<IGridAreaLinkRepository> _gridAreaLinkRepositoryMock = new();
 
     [Fact]
-    public void FindChangesMadeToActor_ExistingActorNull_ThrowsException()
+    public async Task FindChangesMadeToActor_OrganizationIdNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper();
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(null!, _incomingActor));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(null!, _actor, _incomingActor));
     }
 
     [Fact]
-    public void FindChangesMadeToActor_IncomingNull_ThrowsException()
+    public async Task FindChangesMadeToActor_ExistingActorNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper();
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.FindChangesMadeToActor(_actor, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, null!, _incomingActor));
     }
 
     [Fact]
-    public void FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
+    public async Task FindChangesMadeToActor_IncomingNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper();
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, _actor, null!));
+    }
+
+    [Fact]
+    public async Task FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
+    {
+        // Arrange
+        _gridAreaLinkRepositoryMock
+            .Setup(e => e.GetAsync(It.IsAny<GridAreaId>()))
+            .ReturnsAsync(new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), It.IsAny<GridAreaId>()));
+
+        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
 
         // Act
-        var result = target.FindChangesMadeToActor(_actor, _incomingActor).ToList();
+        var result = await target.FindChangesMadeToActorAsync(_organizationId, _actor, _incomingActor).ConfigureAwait(false);
+        var integrationEvents = result.ToList();
 
         // Assert
-        var numberOfStatusChangedEvents = result.Count(x => x is ActorStatusChangedIntegrationEvent);
-        var numberOfAddMeteringPointEvents = result.Count(x => x is AddMeteringPointTypeIntegrationEvent);
-        var numberOfRemoveMeteringPointEvents = result.Count(x => x is RemoveMeteringPointTypeIntegrationEvent);
-        var numberOfAddGridAreaEvents = result.Count(x => x is AddGridAreaIntegrationEvent);
-        var numberOfRemoveGridAreaEvents = result.Count(x => x is RemoveGridAreaIntegrationEvent);
-        var numberOfAddMarketRoleEvents = result.Count(x => x is AddMarketRoleIntegrationEvent);
-        var numberOfRemoveMarketRoleEvents = result.Count(x => x is RemoveMarketRoleIntegrationEvent);
+        var numberOfStatusChangedEvents = integrationEvents.Count(x => x is ActorStatusChangedIntegrationEvent);
+        var numberOfNameChangedEvents = integrationEvents.Count(x => x is ActorNameChangedIntegrationEvent);
+        var numberOfAddMeteringPointEvents = integrationEvents.Count(x => x is MeteringPointTypeAddedToActorIntegrationEvent);
+        var numberOfRemoveMeteringPointEvents = integrationEvents.Count(x => x is MeteringPointTypeRemovedFromActorIntegrationEvent);
+        var numberOfAddGridAreaEvents = integrationEvents.Count(x => x is GridAreaAddedToActorIntegrationEvent);
+        var numberOfRemoveGridAreaEvents = integrationEvents.Count(x => x is GridAreaRemovedFromActorIntegrationEvent);
+        var numberOfAddMarketRoleEvents = integrationEvents.Count(x => x is MarketRoleAddedToActorIntegrationEvent);
+        var numberOfRemoveMarketRoleEvents = integrationEvents.Count(x => x is MarketRoleRemovedFromActorIntegrationEvent);
 
         Assert.Equal(1, numberOfStatusChangedEvents);
+        Assert.Equal(1, numberOfNameChangedEvents);
         Assert.Equal(2, numberOfAddMeteringPointEvents);
         Assert.Equal(6, numberOfRemoveMeteringPointEvents);
         Assert.Equal(1, numberOfAddGridAreaEvents);
         Assert.Equal(2, numberOfRemoveGridAreaEvents);
         Assert.Equal(1, numberOfAddMarketRoleEvents);
         Assert.Equal(1, numberOfRemoveMarketRoleEvents);
-        Assert.Equal(14, result.Count);
+        Assert.Equal(15, integrationEvents.Count);
+    }
+
+    private static OrganizationId CreateOrganizationId()
+    {
+        return new OrganizationId(Guid.NewGuid());
     }
 
     private static Actor CreateValidActorWithChildren()
@@ -122,7 +150,8 @@ public class ChangesToActorHelperTests
                                 MeteringPointType.D01VeProduction
                             })
                     })
-            });
+            },
+            new ActorName("CurrentActorName"));
     }
 
     private static UpdateActorCommand CreateValidIncomingActorWithChildren()
@@ -132,6 +161,7 @@ public class ChangesToActorHelperTests
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ChangeActorDto(
                 "Passive",
+                new ActorNameDto("NewActorName"),
                 new List<ActorMarketRoleDto>
                 {
                     new ActorMarketRoleDto(

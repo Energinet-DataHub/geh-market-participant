@@ -18,5 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record ChangeActorDto(
         ActorStatus Status,
+        ActorNameDto Name,
         IReadOnlyList<ActorMarketRoleDto> MarketRoles);
 }

@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organization;
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var organizationCommentChangedEventParser = new OrganizationCommentChangedIntegrationEventParser();
             var eventParser = new SharedIntegrationEventParser();
-            var target = new OrganizationCommentChanged(organizationCommentChangedEventParser, serviceBusClient.Object);
+            var target = new OrganizationCommentChangedEventDispatcher(organizationCommentChangedEventParser, serviceBusClient.Object);
 
             var integrationEvent = new OrganizationCommentChangedIntegrationEvent
             {
@@ -69,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
 
             var eventParser = new OrganizationCommentChangedIntegrationEventParser();
-            var target = new OrganizationCommentChanged(eventParser, serviceBusClient.Object);
+            var target = new OrganizationCommentChangedEventDispatcher(eventParser, serviceBusClient.Object);
 
             var integrationEvent = new OrganizationNameChangedIntegrationEvent
             {
