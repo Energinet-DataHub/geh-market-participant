@@ -133,9 +133,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 new ExternalActorId(Guid.Empty),
                 new ActorNumber("fake_value"),
                 status,
-                Enumerable.Empty<GridAreaId>(),
-                Enumerable.Empty<MarketRole>(),
-                Enumerable.Empty<MeteringPointType>());
+                Enumerable.Empty<ActorMarketRole>(),
+                new ActorName("test_actor_name"));
         }
     }
 }

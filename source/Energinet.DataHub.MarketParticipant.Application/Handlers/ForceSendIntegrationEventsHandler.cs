@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
@@ -30,6 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         private readonly IGridAreaIntegrationEventsQueueService _gridAreaIntegrationEventsQueueService;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
+        private readonly IOrganizationIntegrationEventsHelperService _organizationIntegrationEventsHelperService;
 
         public ForceSendIntegrationEventsHandler(
             IGridAreaRepository gridAreaRepository,
@@ -37,7 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             IOrganizationRepository organizationRepository,
             IGridAreaIntegrationEventsQueueService gridAreaIntegrationEventsQueueService,
             IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
-            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService)
+            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
+            IOrganizationIntegrationEventsHelperService organizationIntegrationEventsHelperService)
         {
             _gridAreaRepository = gridAreaRepository;
             _gridAreaLinkRepository = gridAreaLinkRepository;
@@ -45,6 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             _gridAreaIntegrationEventsQueueService = gridAreaIntegrationEventsQueueService;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
+            _organizationIntegrationEventsHelperService = organizationIntegrationEventsHelperService;
         }
 
         public async Task<Unit> Handle(ForceSendIntegrationEventsCommand request, CancellationToken cancellationToken)
@@ -65,8 +69,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             foreach (var organization in allOrganizations)
             {
+                var organizationCreatedEvents = _organizationIntegrationEventsHelperService.BuildOrganizationCreatedEvents(organization);
                 await _organizationIntegrationEventsQueueService
-                    .EnqueueOrganizationUpdatedEventAsync(organization)
+                    .EnqueueOrganizationIntegrationEventsAsync(organization.Id, organizationCreatedEvents)
+                    .ConfigureAwait(false);
+
+                await _organizationIntegrationEventsQueueService
+                    .EnqueueLegacyOrganizationUpdatedEventAsync(organization)
                     .ConfigureAwait(false);
 
                 foreach (var actor in organization.Actors)
@@ -91,7 +100,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                     .ConfigureAwait(false);
 
                 await _gridAreaIntegrationEventsQueueService
-                    .EnqueueGridAreaUpdatedEventAsync(gridArea, gridAreaLink!)
+                    .EnqueueGridAreaCreatedEventAsync(gridArea, gridAreaLink!)
+                    .ConfigureAwait(false);
+
+                await _gridAreaIntegrationEventsQueueService
+                    .EnqueueLegacyGridAreaUpdatedEventAsync(gridArea, gridAreaLink!)
                     .ConfigureAwait(false);
             }
         }

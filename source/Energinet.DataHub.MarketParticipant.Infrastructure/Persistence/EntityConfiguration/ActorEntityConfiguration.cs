@@ -26,25 +26,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("ActorInfoNew");
             builder.HasKey(actor => actor.Id);
-            builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
+            builder.Property(actor => actor.Id).ValueGeneratedNever();
+            builder.Ignore(actor => actor.New);
             builder
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()
                 .HasForeignKey(marketRole => marketRole.ActorInfoId);
-            builder
-                .HasMany(actor => actor.GridAreas)
-                .WithOne()
-                .HasForeignKey(gridArea => gridArea.ActorInfoId);
-            builder.OwnsMany(role => role.MeteringPointTypes, ConfigureMeteringTypes);
-        }
-
-        private static void ConfigureMeteringTypes(
-            OwnedNavigationBuilder<ActorEntity, MeteringPointTypeEntity> meteringPointTypeBuilder)
-        {
-            meteringPointTypeBuilder.WithOwner().HasForeignKey("ActorInfoId");
-            meteringPointTypeBuilder.ToTable("ActorInfoMeteringType");
-            meteringPointTypeBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
-            meteringPointTypeBuilder.Property(p => p.MeteringTypeId).HasColumnName("MeteringTypeId");
         }
     }
 }

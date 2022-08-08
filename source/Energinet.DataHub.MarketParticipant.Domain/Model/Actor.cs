@@ -24,13 +24,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public Actor(ActorNumber actorNumber)
         {
-            Id = Guid.Empty;
+            Id = Guid.NewGuid();
             ExternalActorId = null;
             ActorNumber = actorNumber;
+            Name = new ActorName(string.Empty);
             _actorStatusTransitioner = new ActorStatusTransitioner();
-            GridAreas = new Collection<GridAreaId>();
-            MarketRoles = new Collection<MarketRole>();
-            MeteringPointTypes = new Collection<MeteringPointType>();
+            MarketRoles = new Collection<ActorMarketRole>();
         }
 
         public Actor(
@@ -38,17 +37,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             ExternalActorId? externalActorId,
             ActorNumber actorNumber,
             ActorStatus actorStatus,
-            IEnumerable<GridAreaId> gridAreas,
-            IEnumerable<MarketRole> marketRoles,
-            IEnumerable<MeteringPointType> meteringPointTypes)
+            IEnumerable<ActorMarketRole> marketRoles,
+            ActorName name)
         {
             Id = id;
             ExternalActorId = externalActorId;
             ActorNumber = actorNumber;
+            Name = name;
             _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-            GridAreas = new List<GridAreaId>(gridAreas);
-            MarketRoles = new List<MarketRole>(marketRoles);
-            MeteringPointTypes = new List<MeteringPointType>(meteringPointTypes);
+            MarketRoles = new List<ActorMarketRole>(marketRoles);
         }
 
         /// <summary>
@@ -76,16 +73,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         }
 
         /// <summary>
-        /// The grid area that the actor has access to.
+        /// The Name of the current actor.
         /// </summary>
-        public ICollection<GridAreaId> GridAreas { get; }
+        public ActorName Name { get; set; }
 
         /// <summary>
         /// The roles (functions and permissions) assigned to the current actor.
         /// </summary>
-        public ICollection<MarketRole> MarketRoles { get; }
-
-        public ICollection<MeteringPointType> MeteringPointTypes { get; }
+        public ICollection<ActorMarketRole> MarketRoles { get; }
 
         /// <summary>
         /// Activates the current actor, the status changes to Active.

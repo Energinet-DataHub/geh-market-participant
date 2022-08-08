@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
@@ -24,15 +27,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IOrganizationIntegrationEventsQueueService _organizationIntegrationEventsQueueService;
+        private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
 
         public OrganizationFactoryService(
             IOrganizationRepository organizationRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
-            IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService)
+            IOrganizationIntegrationEventsQueueService organizationIntegrationEventsQueueService,
+            IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
         {
             _organizationRepository = organizationRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _organizationIntegrationEventsQueueService = organizationIntegrationEventsQueueService;
+            _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
         }
 
         public async Task<Organization> CreateAsync(
@@ -47,19 +53,43 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var newOrganization = new Organization(name, businessRegisterIdentifier, address, comment);
 
+            await _uniqueOrganizationBusinessRegisterIdentifierService
+                .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization).ConfigureAwait(false);
+
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
 
             var savedOrganization = await SaveOrganizationAsync(newOrganization).ConfigureAwait(false);
 
+            var organizationCreatedIntegrationEvent = BuildOrganizationCreatedIntegrationEvent(savedOrganization);
+
             await _organizationIntegrationEventsQueueService
-                .EnqueueOrganizationUpdatedEventAsync(savedOrganization)
+                .EnqueueOrganizationIntegrationEventsAsync(savedOrganization.Id, organizationCreatedIntegrationEvent)
+                .ConfigureAwait(false);
+
+            await _organizationIntegrationEventsQueueService
+                .EnqueueLegacyOrganizationUpdatedEventAsync(savedOrganization)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
 
             return savedOrganization;
+        }
+
+        private static IEnumerable<IIntegrationEvent> BuildOrganizationCreatedIntegrationEvent(Organization? organization)
+        {
+            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
+
+            yield return new OrganizationCreatedIntegrationEvent
+            {
+                Address = organization.Address,
+                Name = organization.Name,
+                OrganizationId = organization.Id,
+                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
+                Comment = organization.Comment,
+                Status = organization.Status
+            };
         }
 
         private async Task<Organization> SaveOrganizationAsync(Organization organization)

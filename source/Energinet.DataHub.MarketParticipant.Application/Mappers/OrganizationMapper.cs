@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
@@ -30,6 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
                 organization.Comment,
+                organization.Status.ToString(),
                 organization.Actors.Select(Map).ToList(),
                 Map(organization.Address));
         }
@@ -42,9 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 actor.ExternalActorId?.ToString(),
                 new ActorNumberDto(actor.ActorNumber.Value),
                 actor.Status.ToString(),
-                actor.GridAreas.Select(gridAreaId => gridAreaId.Value).ToList(),
-                actor.MarketRoles.Select(Map).ToList(),
-                actor.MeteringPointTypes.Select(mp => mp.Name).ToList());
+                new ActorNameDto(actor.Name.Value),
+                actor.MarketRoles.Select(Map).ToList());
         }
 
         private static AddressDto Map(Address address)
@@ -57,9 +58,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 address.Country);
         }
 
-        private static MarketRoleDto Map(MarketRole marketRole)
+        private static ActorMarketRoleDto Map(ActorMarketRole marketRole)
         {
-            return new MarketRoleDto(marketRole.Function.ToString());
+            return new ActorMarketRoleDto(
+                marketRole.Function.ToString(),
+                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => m.Name))));
         }
     }
 }

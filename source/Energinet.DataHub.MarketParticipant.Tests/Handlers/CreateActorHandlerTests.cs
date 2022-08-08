@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Moq;
@@ -76,7 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
 
@@ -88,14 +88,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>(),
-                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
+                    It.Is<ActorName>(y => y.Value == string.Empty),
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(actorGln), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             var response = await target
@@ -134,10 +133,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             var actor = new Actor(new ActorNumber(actorGln));
-            var marketRole = new MarketRoleDto(EicFunction.BillingAgent.ToString());
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -147,14 +147,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.CreateAsync(
                     organization,
                     It.Is<ActorNumber>(y => y.Value == actorGln),
-                    It.IsAny<IReadOnlyCollection<GridAreaId>>(),
-                    It.IsAny<IReadOnlyCollection<MarketRole>>(),
-                    It.IsAny<IReadOnlyCollection<MeteringPointType>>()))
+                    It.Is<ActorName>(y => y.Value == string.Empty),
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
                 .ReturnsAsync(actor);
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNumberDto(actorGln), Array.Empty<Guid>(), new[] { marketRole }, Array.Empty<string>()));
+                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(actorGln), new[] { marketRole }));
 
             // Act
             var response = await target

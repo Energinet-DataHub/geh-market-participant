@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 "Test City",
                 "Test Country");
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 value,
                 validCvr,
                 validAddress,
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.BusinessRegisterIdentifier)}";
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 ValidName,
                 value,
                 new AddressDto(
@@ -140,7 +140,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.StreetName)}";
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
                 new AddressDto(
@@ -181,7 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.City)}";
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
                 new AddressDto(
@@ -222,7 +222,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Country)}";
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
                 new AddressDto(
@@ -263,7 +263,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Number)}";
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
                 new AddressDto(
@@ -304,7 +304,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.ZipCode)}";
 
-            var organizationDto = new ChangeOrganizationDto(
+            var organizationDto = new CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
                 new AddressDto(

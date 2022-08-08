@@ -17,8 +17,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -81,8 +84,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 Status = ActorStatus.Active,
                 ActorId = Guid.NewGuid(),
                 BusinessRoles = { BusinessRoleCode.Ddk },
-                GridAreas = { new GridAreaId(Guid.NewGuid()) },
-                MarketRoles = { EicFunction.Agent },
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };

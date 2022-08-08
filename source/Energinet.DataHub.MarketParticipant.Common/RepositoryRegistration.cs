@@ -22,12 +22,12 @@ namespace Energinet.DataHub.MarketParticipant.Common
     {
         public static void AddRepositories(this Container container)
         {
-            container.Register<IContactRepository, ContactRepository>(Lifestyle.Scoped);
             container.Register<IActorContactRepository, ActorContactRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaRepository, GridAreaRepository>(Lifestyle.Scoped);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
             container.Register<IDomainEventRepository, DomainEventRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaLinkRepository, GridAreaLinkRepository>(Lifestyle.Scoped);
+            container.Register<IUniqueActorMarketRoleGridAreaRepository, UniqueActorMarketRoleGridAreaRepository>(Lifestyle.Scoped);
         }
     }
 }

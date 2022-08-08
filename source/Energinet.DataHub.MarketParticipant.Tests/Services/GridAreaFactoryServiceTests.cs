@@ -169,7 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             gridAreaIntegrationEventsQueueService.Verify(
-                x => x.EnqueueGridAreaUpdatedEventAsync(
+                x => x.EnqueueGridAreaCreatedEventAsync(
                     It.Is<GridArea>(y => y.Id == gridAreaId),
                     It.Is<GridAreaLink>(y => y.Id == gridAreaLinkId && y.GridAreaId == gridAreaId)),
                 Times.Once);

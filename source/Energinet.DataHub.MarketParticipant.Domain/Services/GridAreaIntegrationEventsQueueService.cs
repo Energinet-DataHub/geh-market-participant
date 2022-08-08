@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
@@ -30,7 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public Task EnqueueGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink)
+        [Obsolete("Deprecated, will be removed.")]
+        public Task EnqueueLegacyGridAreaUpdatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink)
         {
             ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
             ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
@@ -42,6 +44,38 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 Name = gridArea.Name,
                 PriceAreaCode = gridArea.PriceAreaCode,
                 GridAreaLinkId = gridAreaLink.Id
+            };
+
+            var domainEvent = new DomainEvent(gridArea.Id.Value, nameof(GridArea), gridAreaUpdatedEvent);
+            return _domainEventRepository.InsertAsync(domainEvent);
+        }
+
+        public Task EnqueueGridAreaCreatedEventAsync(GridArea gridArea, GridAreaLink gridAreaLink)
+        {
+            ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
+            ArgumentNullException.ThrowIfNull(gridAreaLink, nameof(gridAreaLink));
+
+            var gridAreaCreatedIntegrationEvent = new GridAreaCreatedIntegrationEvent
+            {
+                GridAreaId = gridArea.Id,
+                Code = gridArea.Code,
+                Name = gridArea.Name,
+                PriceAreaCode = gridArea.PriceAreaCode,
+                GridAreaLinkId = gridAreaLink.Id
+            };
+
+            var domainEvent = new DomainEvent(gridArea.Id.Value, nameof(GridArea), gridAreaCreatedIntegrationEvent);
+            return _domainEventRepository.InsertAsync(domainEvent);
+        }
+
+        public Task EnqueueGridAreaNameChangedEventAsync(GridArea gridArea)
+        {
+            ArgumentNullException.ThrowIfNull(gridArea, nameof(gridArea));
+
+            var gridAreaUpdatedEvent = new GridAreaNameChangedIntegrationEvent
+            {
+                GridAreaId = gridArea.Id,
+                Name = gridArea.Name
             };
 
             var domainEvent = new DomainEvent(gridArea.Id.Value, nameof(GridArea), gridAreaUpdatedEvent);
