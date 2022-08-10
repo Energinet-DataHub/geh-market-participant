@@ -41,6 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
         private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
         private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
+        private readonly IActorStatusMarketRolesRuleService _actorStatusMarketRolesRuleService;
 
         public UpdateActorHandler(
             IOrganizationRepository organizationRepository,
@@ -52,7 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IExternalActorIdConfigurationService externalActorIdConfigurationService,
             IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
-            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
+            IActorStatusMarketRolesRuleService actorStatusMarketRolesRuleService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
@@ -64,6 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _externalActorIdConfigurationService = externalActorIdConfigurationService;
             _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
             _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
+            _actorStatusMarketRolesRuleService = actorStatusMarketRolesRuleService;
         }
 
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
@@ -98,6 +101,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .Select(x => x.Function);
 
             _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
+
+            await _actorStatusMarketRolesRuleService.ValidateAsync(organization.Id, actor).ConfigureAwait(false);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
