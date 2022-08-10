@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -28,6 +29,41 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 [UnitTest]
 public sealed class ActorStatusMarketRolesRuleServiceTests
 {
+    [Fact]
+    public async Task Validate_OrganizationIsNotFound_Throws()
+    {
+        var repository = new Mock<IOrganizationRepository>();
+
+        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+
+        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.Agent, MeteringPointType.D01VeProduction);
+
+        // act + assert
+        var exc = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
+            target.ValidateAsync(new OrganizationId(Guid.NewGuid().ToString()), updatedActor));
+
+        Assert.Equal("Organization not found", exc.Message);
+    }
+
+    [Fact]
+    public async Task Validate_ActorIsNotFound_Throws()
+    {
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+
+        var repository = new Mock<IOrganizationRepository>();
+        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
+
+        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+
+        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.Agent, MeteringPointType.D01VeProduction);
+
+        // act + assert
+        var exc = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
+            target.ValidateAsync(organization.Id, updatedActor));
+
+        Assert.Equal("Actor not found", exc.Message);
+    }
+
     [Theory]
     [InlineData(ActorStatus.New)]
     [InlineData(ActorStatus.Active)]
