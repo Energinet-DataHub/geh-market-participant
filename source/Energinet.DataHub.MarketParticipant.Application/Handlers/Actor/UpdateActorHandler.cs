@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
+using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -142,18 +143,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             actor.MarketRoles.Clear();
 
-            foreach (var marketRoleDto in request.ChangeActor.MarketRoles)
+            foreach (var marketRole in MarketRoleMapper.Map(request.ChangeActor.MarketRoles))
             {
-                var function = Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true);
-                actor.MarketRoles
-                    .Add(new ActorMarketRole(
-                        function,
-                        marketRoleDto.GridAreas
-                            .Select(m => new ActorGridArea(
-                                m.Id,
-                                m.MeteringPointTypes
-                                    .Select(e => MeteringPointType.FromName(e, true))
-                                    .Distinct()))));
+                actor.MarketRoles.Add(marketRole);
             }
 
             _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);

@@ -121,7 +121,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [InlineData(ActorStatus.Inactive, true)]
     [InlineData(ActorStatus.Deleted, true)]
     [InlineData(ActorStatus.Passive, true)]
-    public async Task Validate_UpdatedActorHasUpdatedGridAreasForMarketRole_ThrowsIfStatusIsNotNew(ActorStatus status, bool throws)
+    public async Task Validate_GridAreaForMarketRoleIsRemoved_ThrowsIfStatusIsNotNew(ActorStatus status, bool throws)
     {
         // arrange
         var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
@@ -130,7 +130,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         organization.Actors.Add(existingActor);
 
         var updatedActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
-        updatedActor.MarketRoles.Single().GridAreas.Add(new ActorGridArea(Guid.NewGuid(), new[] { MeteringPointType.D02Analysis }));
+        updatedActor.MarketRoles.Single().GridAreas.Clear();
 
         var repository = new Mock<IOrganizationRepository>();
         repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);

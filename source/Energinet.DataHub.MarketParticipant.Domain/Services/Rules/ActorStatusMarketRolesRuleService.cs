@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,17 +50,20 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             if (actor.Status == ActorStatus.New)
                 return;
 
-            foreach (var marketRole in actor.MarketRoles)
+            if (!CreateEqualityKeys(actor.MarketRoles).All(x => CreateEqualityKeys(updatedActor.MarketRoles).Contains(x)))
             {
-                var matchingMarketRole = updatedActor.MarketRoles.FirstOrDefault(
-                        x => x.Function == marketRole.Function &&
-                        marketRole.GridAreas.Count == x.GridAreas.Count &&
-                        marketRole.GridAreas.Select(
-                            ga => new { ga.Id, mps = string.Join(string.Empty, ga.MeteringPointTypes.Select(mp => mp.Name).OrderBy(mp => mp)).ToUpperInvariant() }).ToHashSet().SetEquals(x.GridAreas.Select(
-                            ga => new { ga.Id, mps = string.Join(string.Empty, ga.MeteringPointTypes.Select(mp => mp.Name).OrderBy(mp => mp)).ToUpperInvariant() })));
+                throw new ValidationException("It is only allowed to remove and edit market roles for actors marked as 'New'.");
+            }
+        }
 
-                if (matchingMarketRole == null)
-                    throw new ValidationException("It is only allowed to remove and edit market roles for actors marked as 'New'.");
+        private static IEnumerable<string> CreateEqualityKeys(IEnumerable<ActorMarketRole> marketRoles)
+        {
+            foreach (var marketRole in marketRoles)
+            {
+                foreach (var grid in marketRole.GridAreas)
+                {
+                    yield return (marketRole.Function.ToString() + grid.Id + string.Join(string.Empty, grid.MeteringPointTypes.Select(mp => mp.Name).OrderBy(mp => mp))).ToUpperInvariant();
+                }
             }
         }
     }
