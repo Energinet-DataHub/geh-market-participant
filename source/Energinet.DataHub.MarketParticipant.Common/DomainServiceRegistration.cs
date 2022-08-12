@@ -54,6 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Common
                 new MeteringPointAdministratorRole(),
                 new SystemOperatorRole(),
                 new TransmissionSystemOperatorRole());
+
+            container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
         }
     }
 }
