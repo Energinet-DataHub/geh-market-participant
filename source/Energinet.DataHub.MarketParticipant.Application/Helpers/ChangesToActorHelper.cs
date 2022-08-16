@@ -210,14 +210,14 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 
         foreach (var gridArea in existingMarketRole.GridAreas)
         {
-            if (incomingActorGridAreas.Contains(gridArea.Id))
+            if (incomingActorGridAreaDtos.FirstOrDefault(x => x.Id == gridArea.Id) is ActorGridAreaDto incomingDto)
             {
                 AddChangeEventsIfMeteringPointTypeChanged(
                     organizationId,
                     existingActorId,
                     existingMarketRole.Function,
                     gridArea,
-                    incomingActorGridAreaDtos.SelectMany(incomingGridArea => incomingGridArea.MeteringPointTypes.Select(m => MeteringPointType.FromName(m, false))));
+                    incomingDto.MeteringPointTypes.Select(m => MeteringPointType.FromName(m, false)));
             }
         }
     }

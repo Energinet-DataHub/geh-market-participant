@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
-                .EnqueueContactAddedToActorEventAsync(organization.Id, actor, contact)
+                .EnqueueContactRemovedFromActorEventAsync(organization.Id, actor, contact)
                 .ConfigureAwait(false);
 
             return Unit.Value;
