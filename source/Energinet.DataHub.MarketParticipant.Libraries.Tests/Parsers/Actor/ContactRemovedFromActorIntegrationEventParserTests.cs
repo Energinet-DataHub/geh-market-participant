@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
 
             // act
             var actualBytes = target.Parse(@event);
-            var actualEvent = target.Parse(actualBytes);
+            var actualEvent = ContactRemovedFromActorIntegrationEventParser.Parse(actualBytes);
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => ContactRemovedFromActorIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => ContactRemovedFromActorIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             };
 
             // Act + Assert
-            Assert.Throws<NullReferenceException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<NullReferenceException>(() => ContactRemovedFromActorIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             var target = new ContactRemovedFromActorIntegrationEventParser();
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
+            Assert.Throws<MarketParticipantException>(() => ContactRemovedFromActorIntegrationEventParser.Parse(new byte[] { 1, 2, 3 }));
         }
     }
 }

@@ -46,29 +46,39 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             }
         }
 
-        internal GridAreaNameChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static GridAreaNameChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = GridAreaNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new GridAreaNameChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.Name);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaNameChangedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static GridAreaNameChangedIntegrationEvent Parse(GridAreaNameChangedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static GridAreaNameChangedIntegrationEvent MapContract(GridAreaNameChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new GridAreaNameChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.GridAreaId),
+                contract.Name);
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

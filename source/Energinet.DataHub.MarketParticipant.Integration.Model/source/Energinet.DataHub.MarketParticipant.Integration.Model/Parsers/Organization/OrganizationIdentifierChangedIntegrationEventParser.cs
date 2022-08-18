@@ -46,29 +46,39 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
         }
 
-        internal OrganizationBusinessRegisterIdentifierChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationBusinessRegisterIdentifierChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.BusinessRegisterIdentifier);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static OrganizationBusinessRegisterIdentifierChangedIntegrationEvent Parse(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationBusinessRegisterIdentifierChangedIntegrationEvent MapContract(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.BusinessRegisterIdentifier);
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

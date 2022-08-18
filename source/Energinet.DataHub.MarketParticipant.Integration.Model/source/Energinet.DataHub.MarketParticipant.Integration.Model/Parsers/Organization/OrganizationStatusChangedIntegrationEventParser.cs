@@ -47,29 +47,39 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
         }
 
-        internal OrganizationStatusChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationStatusChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = OrganizationStatusChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new OrganizationStatusChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationStatusChangedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static OrganizationStatusChangedIntegrationEvent Parse(OrganizationStatusChangedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationStatusChangedIntegrationEvent MapContract(OrganizationStatusChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationStatusChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
 
             // act
             var actualBytes = target.Parse(@event);
-            var actualEvent = target.Parse(actualBytes);
+            var actualEvent = GridAreaAddedToActorIntegrationEventParser.Parse(actualBytes);
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => GridAreaAddedToActorIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             var target = new GridAreaAddedToActorIntegrationEventParser();
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
+            Assert.Throws<MarketParticipantException>(() => GridAreaAddedToActorIntegrationEventParser.Parse(new byte[] { 1, 2, 3 }));
         }
     }
 }

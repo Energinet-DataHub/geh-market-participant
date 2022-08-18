@@ -23,7 +23,7 @@ using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
-    public sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
+    internal sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
     {
         public byte[] Parse(ActorUpdatedIntegrationEvent integrationEvent)
         {
@@ -34,7 +34,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 var externalActorId = integrationEvent.ExternalActorId.HasValue
                     ? integrationEvent.ExternalActorId.Value.ToString()
                     : string.Empty;
-
                 var contract = new ActorUpdatedIntegrationEventContract
                 {
                     Id = integrationEvent.Id.ToString(),
@@ -73,34 +72,44 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             }
         }
 
-        internal ActorUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal static ActorUpdatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
-                    ? id
-                    : null;
-
-                return new ActorUpdatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    externalActorId,
-                    contract.ActorNumber,
-                    Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
-                    contract.BusinessRoles.Select(
-                        x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
-                    contract.ActorMarketRoles.Select(
-                        x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
-                            g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))));
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array  {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static ActorUpdatedIntegrationEvent Parse(ActorUpdatedIntegrationEventContract contract)
+        {
+            return MapContract(contract);
+        }
+
+        private static ActorUpdatedIntegrationEvent MapContract(ActorUpdatedIntegrationEventContract contract)
+        {
+            Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                ? id
+                : null;
+
+            return new ActorUpdatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                externalActorId,
+                contract.ActorNumber,
+                Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
+                contract.BusinessRoles.Select(
+                    x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
+                contract.ActorMarketRoles.Select(
+                    x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
+                        g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))));
         }
     }
 }

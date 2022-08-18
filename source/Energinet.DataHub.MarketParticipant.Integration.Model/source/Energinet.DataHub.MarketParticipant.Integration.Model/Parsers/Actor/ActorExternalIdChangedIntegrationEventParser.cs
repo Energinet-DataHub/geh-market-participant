@@ -52,34 +52,44 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        internal ActorExternalIdChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static ActorExternalIdChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = ActorExternalIdChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
-                    ? id
-                    : null;
-
-                var integrationEvent = new ActorExternalIdChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    externalActorId);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorExternalIdChangedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static ActorExternalIdChangedIntegrationEvent Parse(ActorExternalIdChangedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static ActorExternalIdChangedIntegrationEvent MapContract(ActorExternalIdChangedIntegrationEventContract contract)
+        {
+            Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                ? id
+                : null;
+
+            var integrationEvent = new ActorExternalIdChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                externalActorId);
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

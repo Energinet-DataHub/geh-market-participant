@@ -46,29 +46,39 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
         }
 
-        internal OrganizationNameChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationNameChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = OrganizationNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new OrganizationNameChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Name);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationNameChangedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static OrganizationNameChangedIntegrationEvent Parse(OrganizationNameChangedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationNameChangedIntegrationEvent MapContract(OrganizationNameChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationNameChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.Name);
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

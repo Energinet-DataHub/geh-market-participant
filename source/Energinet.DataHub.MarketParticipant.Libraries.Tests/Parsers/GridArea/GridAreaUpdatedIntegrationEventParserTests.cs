@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.GridArea
 
             // act
             var actualBytes = target.Parse(@event);
-            var actualEvent = target.Parse(actualBytes);
+            var actualEvent = GridAreaUpdatedIntegrationEventParser.Parse(actualBytes);
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.GridArea
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => GridAreaUpdatedIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.GridArea
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => GridAreaUpdatedIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.GridArea
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => GridAreaUpdatedIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.GridArea
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => GridAreaUpdatedIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.GridArea
             var target = new GridAreaUpdatedIntegrationEventParser();
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
+            Assert.Throws<MarketParticipantException>(() => GridAreaUpdatedIntegrationEventParser.Parse(new byte[] { 1, 2, 3 }));
         }
     }
 }

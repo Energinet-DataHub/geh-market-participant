@@ -49,31 +49,41 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        internal MarketRoleRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
+        internal static MarketRoleRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = MarketRoleRemovedFromActorIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new MarketRoleRemovedFromActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined(typeof(BusinessRoleCode), contract.BusinessRole) ? (BusinessRoleCode)contract.BusinessRole : throw new FormatException(nameof(contract.BusinessRole)),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    contract.EventCreated.ToDateTime());
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(MarketRoleRemovedFromActorIntegrationEvent)}", ex);
             }
+        }
+
+        internal static MarketRoleRemovedFromActorIntegrationEvent Parse(MarketRoleRemovedFromActorIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static MarketRoleRemovedFromActorIntegrationEvent MapContract(MarketRoleRemovedFromActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new MarketRoleRemovedFromActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined(typeof(BusinessRoleCode), contract.BusinessRole) ? (BusinessRoleCode)contract.BusinessRole : throw new FormatException(nameof(contract.BusinessRole)),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                contract.EventCreated.ToDateTime());
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

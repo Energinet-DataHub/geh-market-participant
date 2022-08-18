@@ -50,32 +50,42 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        internal GridAreaRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
+        internal static GridAreaRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = GridAreaRemovedFromActorIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new GridAreaRemovedFromActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.EventCreated.ToDateTime(),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    Guid.Parse(contract.GridAreaId),
-                    Guid.Parse(contract.GridAreaLinkId));
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaRemovedFromActorIntegrationEvent)}", ex);
             }
+        }
+
+        internal static GridAreaRemovedFromActorIntegrationEvent Parse(GridAreaRemovedFromActorIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static GridAreaRemovedFromActorIntegrationEvent MapContract(GridAreaRemovedFromActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new GridAreaRemovedFromActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                contract.EventCreated.ToDateTime(),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                Guid.Parse(contract.GridAreaId),
+                Guid.Parse(contract.GridAreaLinkId));
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

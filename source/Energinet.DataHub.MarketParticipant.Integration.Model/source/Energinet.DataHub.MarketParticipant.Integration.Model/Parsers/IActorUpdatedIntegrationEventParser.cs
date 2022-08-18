@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
     /// <summary>
     /// Parses the protobuf contract.
     /// </summary>
-    public interface IActorUpdatedIntegrationEventParser
+    internal interface IActorUpdatedIntegrationEventParser
     {
         /// <summary>
         /// Parses the event.

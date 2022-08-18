@@ -31,7 +31,8 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new ActorCreatedIntegrationEventContract
+                var contract = new SharedIntegrationEventContract();
+                contract.ActorCreatedIntegrationEvent = new ActorCreatedIntegrationEventContract
                 {
                     Id = integrationEvent.Id.ToString(),
                     ActorId = integrationEvent.ActorId.ToString(),
@@ -49,7 +50,10 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                                 x.GridAreas.Select(g => new ActorGridAreaEventData
                                 {
                                     Id = g.Id.ToString(),
-                                    MeteringPointTypes = { g.MeteringPointTypes }
+                                    MeteringPointTypes =
+                                    {
+                                        g.MeteringPointTypes
+                                    }
                                 })
                             }
                         })
@@ -57,10 +61,9 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                     EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                     Type = integrationEvent.Type
                 };
-
                 foreach (var x in integrationEvent.BusinessRoles)
                 {
-                    contract.BusinessRoles.Add((int)x);
+                    contract.ActorCreatedIntegrationEvent.BusinessRoles.Add((int)x);
                 }
 
                 return contract.ToByteArray();
@@ -71,34 +74,13 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        internal ActorCreatedIntegrationEvent Parse(byte[] protoContract)
+        internal static ActorCreatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = ActorCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new ActorCreatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined(typeof(ActorStatus), contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
-                    contract.ActorNumber,
-                    contract.Name,
-                    contract.BusinessRoles
-                        .Select(c => Enum.IsDefined(typeof(BusinessRoleCode), c) ? (BusinessRoleCode)c : throw new FormatException(nameof(contract.BusinessRoles)))
-                        .ToList(),
-                    contract.ActorMarketRoles
-                        .Select(x => new Dtos.ActorMarketRole(ParseOrThrowOnMarketRole().Invoke(x.Function), x.GridAreas.Select(
-                            g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes))))
-                        .ToList(),
-                    contract.EventCreated.ToDateTime());
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
@@ -106,7 +88,38 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        private Func<int, EicFunction> ParseOrThrowOnMarketRole() => i =>
+        internal static ActorCreatedIntegrationEvent Parse(ActorCreatedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static ActorCreatedIntegrationEvent MapContract(ActorCreatedIntegrationEventContract contract)
+        {
+            var integrationEvent = new ActorCreatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined(typeof(ActorStatus), contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
+                contract.ActorNumber,
+                contract.Name,
+                contract.BusinessRoles
+                    .Select(c => Enum.IsDefined(typeof(BusinessRoleCode), c) ? (BusinessRoleCode)c : throw new FormatException(nameof(contract.BusinessRoles)))
+                    .ToList(),
+                contract.ActorMarketRoles
+                    .Select(x => new Dtos.ActorMarketRole(ParseOrThrowOnMarketRole().Invoke(x.Function), x.GridAreas.Select(
+                        g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes))))
+                    .ToList(),
+                contract.EventCreated.ToDateTime());
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
+        }
+
+        private static Func<int, EicFunction> ParseOrThrowOnMarketRole() => i =>
             Enum.IsDefined(typeof(EicFunction), i) ? (EicFunction)i : throw new FormatException(nameof(EicFunction));
     }
 }

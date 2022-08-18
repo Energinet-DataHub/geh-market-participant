@@ -61,37 +61,47 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
         }
 
-        internal OrganizationCreatedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationCreatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = OrganizationCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var createdEvent = new OrganizationCreatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Name,
-                    contract.BusinessRegisterIdentifier,
-                    new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country),
-                    Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
-
-                if (contract.HasComment)
-                {
-                    createdEvent.Comment = contract.Comment;
-                }
-
-                return createdEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCreatedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static OrganizationCreatedIntegrationEvent Parse(OrganizationCreatedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationCreatedIntegrationEvent MapContract(OrganizationCreatedIntegrationEventContract contract)
+        {
+            var createdEvent = new OrganizationCreatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.Name,
+                contract.BusinessRegisterIdentifier,
+                new Address(
+                    contract.Address.StreetName,
+                    contract.Address.Number,
+                    contract.Address.ZipCode,
+                    contract.Address.City,
+                    contract.Address.Country),
+                Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
+
+            if (contract.HasComment)
+            {
+                createdEvent.Comment = contract.Comment;
+            }
+
+            return createdEvent;
         }
     }
 }

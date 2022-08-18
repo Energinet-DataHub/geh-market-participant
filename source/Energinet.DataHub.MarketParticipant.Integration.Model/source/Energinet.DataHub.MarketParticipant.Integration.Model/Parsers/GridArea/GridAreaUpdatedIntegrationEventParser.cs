@@ -47,31 +47,41 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             }
         }
 
-        internal GridAreaUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal static GridAreaUpdatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = GridAreaUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new GridAreaUpdatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.Name,
-                    contract.Code,
-                    Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
-                    Guid.Parse(contract.GridAreaLinkId));
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static GridAreaUpdatedIntegrationEvent Parse(GridAreaUpdatedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static GridAreaUpdatedIntegrationEvent MapContract(GridAreaUpdatedIntegrationEventContract contract)
+        {
+            var integrationEvent = new GridAreaUpdatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.GridAreaId),
+                contract.Name,
+                contract.Code,
+                Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
+                Guid.Parse(contract.GridAreaLinkId));
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

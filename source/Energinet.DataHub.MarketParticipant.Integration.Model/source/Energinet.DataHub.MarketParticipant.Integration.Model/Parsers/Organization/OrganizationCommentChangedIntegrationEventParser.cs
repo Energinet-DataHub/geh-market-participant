@@ -46,29 +46,39 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
         }
 
-        internal OrganizationCommentChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationCommentChangedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = OrganizationCommentChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new OrganizationCommentChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Comment);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCommentChangedIntegrationEventContract)}", ex);
             }
+        }
+
+        internal static OrganizationCommentChangedIntegrationEvent Parse(OrganizationCommentChangedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationCommentChangedIntegrationEvent MapContract(OrganizationCommentChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationCommentChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.Comment);
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

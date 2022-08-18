@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
 
             // act
             var actualBytes = target.Parse(@event);
-            var actualEvent = target.Parse(actualBytes);
+            var actualEvent = MeteringPointTypeRemovedFromActorIntegrationEventParser.Parse(actualBytes);
 
             // assert
             Assert.Equal(@event.Id, actualEvent.Id);
@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             };
 
             // Act
-            var parsedObject = target.Parse(contract.ToByteArray());
+            var parsedObject = MeteringPointTypeRemovedFromActorIntegrationEventParser.Parse(contract.ToByteArray());
 
             // Assert
             Assert.IsType<MeteringPointTypeRemovedFromActorIntegrationEvent>(parsedObject);
@@ -95,7 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             };
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(contract.ToByteArray()));
+            Assert.Throws<MarketParticipantException>(() => MeteringPointTypeRemovedFromActorIntegrationEventParser.Parse(contract.ToByteArray()));
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers.Actor
             var target = new MeteringPointTypeRemovedFromActorIntegrationEventParser();
 
             // Act + Assert
-            Assert.Throws<MarketParticipantException>(() => target.Parse(new byte[] { 1, 2, 3 }));
+            Assert.Throws<MarketParticipantException>(() => MeteringPointTypeRemovedFromActorIntegrationEventParser.Parse(new byte[] { 1, 2, 3 }));
         }
     }
 }

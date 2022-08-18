@@ -50,32 +50,42 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
         }
 
-        internal MeteringPointTypeRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
+        internal static MeteringPointTypeRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = MeteringPointTypeRemovedFromActorIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                var integrationEvent = new MeteringPointTypeRemovedFromActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.MeteringPointType,
-                    contract.EventCreated.ToDateTime());
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(MeteringPointTypeRemovedFromActorIntegrationEvent)}", ex);
             }
+        }
+
+        internal static MeteringPointTypeRemovedFromActorIntegrationEvent Parse(MeteringPointTypeRemovedFromActorIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static MeteringPointTypeRemovedFromActorIntegrationEvent MapContract(MeteringPointTypeRemovedFromActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new MeteringPointTypeRemovedFromActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                Guid.Parse(contract.GridAreaId),
+                contract.MeteringPointType,
+                contract.EventCreated.ToDateTime());
+
+            if (integrationEvent.Type != contract.Type)
+            {
+                throw new FormatException("Invalid Type");
+            }
+
+            return integrationEvent;
         }
     }
 }

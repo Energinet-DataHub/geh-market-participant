@@ -52,28 +52,38 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
         }
 
-        internal OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationUpdatedIntegrationEvent Parse(byte[] protoContract)
         {
             try
             {
                 var contract = OrganizationUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
 
-                return new OrganizationUpdatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Name,
-                    contract.BusinessRegisterIdentifier,
-                    new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country));
+                return MapContract(contract);
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
             {
                 throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationUpdatedIntegrationEvent)}", ex);
             }
+        }
+
+        internal static OrganizationUpdatedIntegrationEvent Parse(OrganizationUpdatedIntegrationEventContract protoContract)
+        {
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationUpdatedIntegrationEvent MapContract(OrganizationUpdatedIntegrationEventContract contract)
+        {
+            return new OrganizationUpdatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.OrganizationId),
+                contract.Name,
+                contract.BusinessRegisterIdentifier,
+                new Address(
+                    contract.Address.StreetName,
+                    contract.Address.Number,
+                    contract.Address.ZipCode,
+                    contract.Address.City,
+                    contract.Address.Country));
         }
     }
 }
