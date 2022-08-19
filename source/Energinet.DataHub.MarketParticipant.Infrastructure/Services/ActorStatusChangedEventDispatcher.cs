@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 actorUpdatedIntegrationEvent.OrganizationId.Value,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status);
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
             return true;

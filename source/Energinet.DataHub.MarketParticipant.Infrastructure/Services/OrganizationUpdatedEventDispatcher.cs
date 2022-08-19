@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     organizationUpdatedIntegrationEvent.Address.City ?? string.Empty,
                     organizationUpdatedIntegrationEvent.Address.Country));
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
             return true;

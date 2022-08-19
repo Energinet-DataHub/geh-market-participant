@@ -50,7 +50,7 @@ public sealed class MeteringPointTypeRemovedFromActorEventDispatcher : EventDisp
             meteringPointTypeRemovedFromActorIntegrationEvent.Type.ToString(),
             meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated);
 
-        var bytes = _eventParser.Parse(outboundIntegrationEvent);
+        var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
         await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
         return true;

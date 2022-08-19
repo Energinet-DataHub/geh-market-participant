@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 (PriceAreaCode)gridAreaUpdatedIntegrationEvent.PriceAreaCode,
                 gridAreaUpdatedIntegrationEvent.GridAreaLinkId.Value);
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
             return true;
