@@ -23,7 +23,7 @@ using Enum = System.Enum;
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
-    internal sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
+    public sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
     {
         public byte[] Parse(ActorUpdatedIntegrationEvent integrationEvent)
         {
@@ -42,6 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
         {
             try
             {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
                 var eventContract = MapEvent(integrationEvent);
                 var contract = new SharedIntegrationEventContract { ActorUpdatedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
