@@ -30,23 +30,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 ArgumentNullException.ThrowIfNull(meteringPointTypeRemovedFromActorIntegrationEvent, nameof(meteringPointTypeRemovedFromActorIntegrationEvent));
 
-                var contract = new MeteringPointTypeRemovedFromActorIntegrationEventContract
-                {
-                    Id = meteringPointTypeRemovedFromActorIntegrationEvent.Id.ToString(),
-                    ActorId = meteringPointTypeRemovedFromActorIntegrationEvent.ActorId.ToString(),
-                    OrganizationId = meteringPointTypeRemovedFromActorIntegrationEvent.OrganizationId.ToString(),
-                    EventCreated = Timestamp.FromDateTime(meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated),
-                    MarketRoleFunction = (int)meteringPointTypeRemovedFromActorIntegrationEvent.Function,
-                    GridAreaId = meteringPointTypeRemovedFromActorIntegrationEvent.GridAreaId.ToString(),
-                    MeteringPointType = meteringPointTypeRemovedFromActorIntegrationEvent.MeteringPointType,
-                    Type = meteringPointTypeRemovedFromActorIntegrationEvent.Type
-                };
+                var contract = MapEvent(meteringPointTypeRemovedFromActorIntegrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeRemovedFromActorIntegrationEventContract)}", e);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(MeteringPointTypeRemovedFromActorIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { MeteringPointTypeRemovedFromActorIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -86,6 +91,23 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
 
             return integrationEvent;
+        }
+
+        private static MeteringPointTypeRemovedFromActorIntegrationEventContract MapEvent(
+            MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent)
+        {
+            var contract = new MeteringPointTypeRemovedFromActorIntegrationEventContract
+            {
+                Id = meteringPointTypeRemovedFromActorIntegrationEvent.Id.ToString(),
+                ActorId = meteringPointTypeRemovedFromActorIntegrationEvent.ActorId.ToString(),
+                OrganizationId = meteringPointTypeRemovedFromActorIntegrationEvent.OrganizationId.ToString(),
+                EventCreated = Timestamp.FromDateTime(meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated),
+                MarketRoleFunction = (int)meteringPointTypeRemovedFromActorIntegrationEvent.Function,
+                GridAreaId = meteringPointTypeRemovedFromActorIntegrationEvent.GridAreaId.ToString(),
+                MeteringPointType = meteringPointTypeRemovedFromActorIntegrationEvent.MeteringPointType,
+                Type = meteringPointTypeRemovedFromActorIntegrationEvent.Type
+            };
+            return contract;
         }
     }
 }

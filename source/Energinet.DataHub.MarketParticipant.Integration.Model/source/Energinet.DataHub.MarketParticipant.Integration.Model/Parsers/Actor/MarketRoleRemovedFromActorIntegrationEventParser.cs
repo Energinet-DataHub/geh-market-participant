@@ -30,22 +30,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new MarketRoleRemovedFromActorIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    BusinessRole = (int)integrationEvent.BusinessRoleCode,
-                    MarketRoleFunction = (int)integrationEvent.MarketRole,
-                    Type = integrationEvent.Type
-                };
+                var contract = MapEvent(integrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(MarketRoleRemovedFromActorIntegrationEventContract)}", e);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(MarketRoleRemovedFromActorIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { MarketRoleRemovedFromActorIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -84,6 +90,22 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
 
             return integrationEvent;
+        }
+
+        private static MarketRoleRemovedFromActorIntegrationEventContract MapEvent(
+            MarketRoleRemovedFromActorIntegrationEvent integrationEvent)
+        {
+            var contract = new MarketRoleRemovedFromActorIntegrationEventContract
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                BusinessRole = (int)integrationEvent.BusinessRoleCode,
+                MarketRoleFunction = (int)integrationEvent.MarketRole,
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

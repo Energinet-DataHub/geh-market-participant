@@ -29,26 +29,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationAddressChangedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    OrganizationAddress = new OrganizationAddressEventData
-                    {
-                        City = integrationEvent.Address.City,
-                        Country = integrationEvent.Address.Country,
-                        Number = integrationEvent.Address.Number,
-                        StreetName = integrationEvent.Address.StreetName,
-                        ZipCode = integrationEvent.Address.ZipCode
-                    }
-                };
+                var contract = MapEvent(integrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(OrganizationAddressChangedIntegrationEventContract)}", ex);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(OrganizationAddressChangedIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationAddressChangedIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -83,6 +85,26 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
                     contract.OrganizationAddress.ZipCode,
                     contract.OrganizationAddress.City,
                     contract.OrganizationAddress.Country));
+        }
+
+        private static OrganizationAddressChangedIntegrationEventContract MapEvent(
+            OrganizationAddressChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationAddressChangedIntegrationEventContract()
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                OrganizationAddress = new OrganizationAddressEventData
+                {
+                    City = integrationEvent.Address.City,
+                    Country = integrationEvent.Address.Country,
+                    Number = integrationEvent.Address.Number,
+                    StreetName = integrationEvent.Address.StreetName,
+                    ZipCode = integrationEvent.Address.ZipCode
+                }
+            };
+            return contract;
         }
     }
 }

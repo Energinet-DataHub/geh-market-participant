@@ -30,20 +30,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new OrganizationStatusChangedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Status = (int)integrationEvent.Status,
-                    Type = integrationEvent.Type
-                };
+                var contract = MapEvent(integrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(OrganizationStatusChangedIntegrationEvent)}", ex);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(OrganizationStatusChangedIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationStatusChangedIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -80,6 +88,20 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
             }
 
             return integrationEvent;
+        }
+
+        private static OrganizationStatusChangedIntegrationEventContract MapEvent(
+            OrganizationStatusChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationStatusChangedIntegrationEventContract()
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Status = (int)integrationEvent.Status,
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

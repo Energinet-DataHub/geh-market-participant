@@ -30,23 +30,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new GridAreaAddedToActorIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    MarketRoleFunction = (int)integrationEvent.Function,
-                    GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
-                    Type = integrationEvent.Type
-                };
+                var contract = MapEvent(integrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(GridAreaAddedToActorIntegrationEventContract)}", e);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(GridAreaAddedToActorIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { GridAreaAddedToActorIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -86,6 +91,23 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
 
             return integrationEvent;
+        }
+
+        private static GridAreaAddedToActorIntegrationEventContract MapEvent(
+            GridAreaAddedToActorIntegrationEvent integrationEvent)
+        {
+            var contract = new GridAreaAddedToActorIntegrationEventContract
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                GridAreaId = integrationEvent.GridAreaId.ToString(),
+                MarketRoleFunction = (int)integrationEvent.Function,
+                GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

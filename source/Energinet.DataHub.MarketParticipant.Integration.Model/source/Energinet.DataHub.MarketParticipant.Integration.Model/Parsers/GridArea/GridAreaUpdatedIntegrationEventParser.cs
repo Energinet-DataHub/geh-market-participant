@@ -28,22 +28,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new GridAreaUpdatedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    Name = integrationEvent.Name,
-                    Code = integrationEvent.Code,
-                    PriceAreaCode = (int)integrationEvent.PriceAreaCode,
-                    GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
-                    Type = integrationEvent.Type
-                };
+                var contract = MapEvent(integrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception ex) when (ex is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(GridAreaUpdatedIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { GridAreaUpdatedIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -82,6 +88,21 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             }
 
             return integrationEvent;
+        }
+
+        private static GridAreaUpdatedIntegrationEventContract MapEvent(GridAreaUpdatedIntegrationEvent integrationEvent)
+        {
+            var contract = new GridAreaUpdatedIntegrationEventContract
+            {
+                Id = integrationEvent.Id.ToString(),
+                GridAreaId = integrationEvent.GridAreaId.ToString(),
+                Name = integrationEvent.Name,
+                Code = integrationEvent.Code,
+                PriceAreaCode = (int)integrationEvent.PriceAreaCode,
+                GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

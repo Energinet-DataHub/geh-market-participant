@@ -31,46 +31,28 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new SharedIntegrationEventContract();
-                contract.ActorCreatedIntegrationEvent = new ActorCreatedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Status = (int)integrationEvent.Status,
-                    ActorNumber = integrationEvent.ActorNumber,
-                    Name = integrationEvent.Name,
-                    ActorMarketRoles =
-                    {
-                        integrationEvent.ActorMarketRoles.Select(x => new ActorMarketRoleEventData
-                        {
-                            Function = (int)x.Function,
-                            GridAreas =
-                            {
-                                x.GridAreas.Select(g => new ActorGridAreaEventData
-                                {
-                                    Id = g.Id.ToString(),
-                                    MeteringPointTypes =
-                                    {
-                                        g.MeteringPointTypes
-                                    }
-                                })
-                            }
-                        })
-                    },
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    Type = integrationEvent.Type
-                };
-                foreach (var x in integrationEvent.BusinessRoles)
-                {
-                    contract.ActorCreatedIntegrationEvent.BusinessRoles.Add((int)x);
-                }
+                var contract = MapEvent(integrationEvent);
 
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorCreatedIntegrationEventContract)}", e);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(ActorCreatedIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { ActorCreatedIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -117,6 +99,45 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
 
             return integrationEvent;
+        }
+
+        private static ActorCreatedIntegrationEventContract MapEvent(ActorCreatedIntegrationEvent integrationEvent)
+        {
+            var contract = new ActorCreatedIntegrationEventContract
+            {
+                Id = integrationEvent.Id.ToString(),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Status = (int)integrationEvent.Status,
+                ActorNumber = integrationEvent.ActorNumber,
+                Name = integrationEvent.Name,
+                ActorMarketRoles =
+                {
+                    integrationEvent.ActorMarketRoles.Select(x => new ActorMarketRoleEventData
+                    {
+                        Function = (int)x.Function,
+                        GridAreas =
+                        {
+                            x.GridAreas.Select(g => new ActorGridAreaEventData
+                            {
+                                Id = g.Id.ToString(),
+                                MeteringPointTypes =
+                                {
+                                    g.MeteringPointTypes
+                                }
+                            })
+                        }
+                    })
+                },
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                Type = integrationEvent.Type
+            };
+            foreach (var x in integrationEvent.BusinessRoles)
+            {
+                contract.BusinessRoles.Add((int)x);
+            }
+
+            return contract;
         }
 
         private static Func<int, EicFunction> ParseOrThrowOnMarketRole() => i =>

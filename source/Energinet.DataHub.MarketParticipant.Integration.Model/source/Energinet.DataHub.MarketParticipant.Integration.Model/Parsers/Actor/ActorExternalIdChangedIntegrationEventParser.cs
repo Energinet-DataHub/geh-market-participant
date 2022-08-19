@@ -30,25 +30,27 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
 
-                var contract = new ActorExternalIdChangedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Type = integrationEvent.Type
-                };
-
-                if (integrationEvent.ExternalActorId.HasValue)
-                {
-                    contract.ExternalActorId = integrationEvent.ExternalActorId.ToString();
-                }
-
+                var contract = MapEvent(integrationEvent);
                 return contract.ToByteArray();
             }
             catch (Exception e) when (e is InvalidProtocolBufferException)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorExternalIdChangedIntegrationEventContract)}", e);
+            }
+        }
+
+        public byte[] ParseToSharedIntegrationEvent(ActorExternalIdChangedIntegrationEvent integrationEvent)
+        {
+            try
+            {
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { ActorExternalIdChangedIntegrationEvent = eventContract };
+                return contract.ToByteArray();
+            }
+            catch (Exception ex)
+            {
+                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
@@ -90,6 +92,26 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
 
             return integrationEvent;
+        }
+
+        private static ActorExternalIdChangedIntegrationEventContract MapEvent(
+            ActorExternalIdChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new ActorExternalIdChangedIntegrationEventContract
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Type = integrationEvent.Type
+            };
+
+            if (integrationEvent.ExternalActorId.HasValue)
+            {
+                contract.ExternalActorId = integrationEvent.ExternalActorId.ToString();
+            }
+
+            return contract;
         }
     }
 }
