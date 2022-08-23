@@ -13,14 +13,9 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public sealed record GridAreaDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo);
+    public sealed record GetGridAreaCommand(Guid Id) : IRequest<GetGridAreaResponse>;
 }
