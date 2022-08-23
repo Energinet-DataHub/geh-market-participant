@@ -21,6 +21,6 @@ terraform {
 }
 
 provider "azurerm" {
-  # It is recommended to pin to a given version of the Provider  
+  use_oidc = true
   features {}
 }

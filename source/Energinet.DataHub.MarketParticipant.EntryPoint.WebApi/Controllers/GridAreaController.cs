@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
@@ -51,6 +52,23 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
+        [HttpPut]
+        public async Task<IActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
+
+                    var response = await _mediator
+                        .Send(updateGridAreaCommand)
+                        .ConfigureAwait(false);
+
+                    return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetGridAreasAsync()
         {
@@ -60,6 +78,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     var command = new GetGridAreasCommand();
                     var response = await _mediator.Send(command).ConfigureAwait(false);
                     return Ok(response.GridAreas);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
+        [HttpGet("{gridAreaId:guid}")]
+        public async Task<IActionResult> GetGridAreaAsync(Guid gridAreaId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var command = new GetGridAreaCommand(gridAreaId);
+                    var response = await _mediator.Send(command).ConfigureAwait(false);
+                    return Ok(response.GridArea);
                 },
                 _logger).ConfigureAwait(false);
         }

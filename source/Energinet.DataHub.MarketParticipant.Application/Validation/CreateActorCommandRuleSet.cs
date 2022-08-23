@@ -41,15 +41,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length >= 14);
 
                     validator
-                        .RuleFor(x => x.GridAreas)
+                        .RuleForEach(actor => actor.MarketRoles)
                         .ChildRules(gridAreaValidator =>
                             gridAreaValidator
-                                .RuleForEach(x => x)
+                                .RuleFor(x => x.GridAreas)
                                 .NotEmpty());
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
-                        .NotEmpty()
+                        .NotNull()
                         .ChildRules(rolesValidator =>
                         {
                             rolesValidator
@@ -65,13 +65,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         });
 
                     validator
-                        .RuleFor(actor => actor.MeteringPointTypes)
-                        .NotEmpty()
-                        .ChildRules(rolesValidator =>
+                        .RuleForEach(actor => actor.MarketRoles)
+                        .ChildRules(inlineValidator =>
                         {
-                            rolesValidator
-                                .RuleForEach(x => x)
-                                .Must(x => MeteringPointType.TryFromName(x, true, out _));
+                            inlineValidator
+                                .RuleForEach(m => m.GridAreas)
+                                .ChildRules(validationRules =>
+                                {
+                                    validationRules
+                                        .RuleFor(r => r.MeteringPointTypes)
+                                        .NotEmpty()
+                                        .ChildRules(v =>
+                                            v.RuleForEach(r => r)
+                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                });
                         });
                 });
         }

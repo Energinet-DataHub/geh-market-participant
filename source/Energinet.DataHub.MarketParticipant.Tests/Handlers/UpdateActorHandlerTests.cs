@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -50,10 +51,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 new Mock<IOrganizationExistsHelperService>().Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             // Act + Assert
             await Assert
@@ -70,10 +75,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
@@ -85,7 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -104,31 +113,43 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 allowedGridAreasRuleService.Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
                 .ReturnsAsync(organization);
 
+            var meteringPoints = new[]
+            {
+                MeteringPointType.D02Analysis.Name, MeteringPointType.E17Consumption.Name,
+                MeteringPointType.E17Consumption.Name
+            };
+            var gridAreas = new[] { new ActorGridAreaDto(actor.Id, meteringPoints) };
+            var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };
+
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                actor.Id,
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), marketRoles));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
             allowedGridAreasRuleService.Verify(
-                x => x.ValidateGridAreas(It.IsAny<IEnumerable<GridAreaId>>(), It.IsAny<IEnumerable<MarketRole>>()),
+                x => x.ValidateGridAreas(It.IsAny<IEnumerable<ActorMarketRole>>()),
                 Times.Once);
         }
 
@@ -143,15 +164,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingBusinessRolesRuleService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -159,8 +184,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                actor.Id,
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -182,15 +207,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                externalActorIdGenerationService.Object);
+                externalActorIdGenerationService.Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -198,8 +227,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                actor.Id,
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -221,15 +250,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationRepository>().Object,
                 organizationExistsHelperService.Object,
                 UnitOfWorkProviderMock.Create(),
+                new Mock<IChangesToActorHelper>().Object,
                 actorIntegrationEventsQueueService.Object,
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorIdConfigurationService>().Object);
+                new Mock<IExternalActorIdConfigurationService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-
-            organization.Actors.Add(new Actor(new ActorNumber("fake_value")));
+            var actor = new Actor(new ActorNumber("fake_value"));
+            organization.Actors.Add(actor);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -237,8 +270,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateActorCommand(
                 organizationId,
-                Guid.Empty,
-                new ChangeActorDto("Active", Array.Empty<Guid>(), Array.Empty<MarketRoleDto>(), Array.Empty<string>()));
+                actor.Id,
+                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

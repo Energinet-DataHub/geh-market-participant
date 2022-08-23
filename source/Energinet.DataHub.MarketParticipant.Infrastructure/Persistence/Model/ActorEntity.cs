@@ -21,21 +21,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public ActorEntity()
         {
+            Name = string.Empty;
             ActorNumber = string.Empty;
-            MeteringPointTypes = new Collection<MeteringPointTypeEntity>();
             MarketRoles = new Collection<MarketRoleEntity>();
-            GridAreas = new Collection<GridAreaActorInfoLinkEntity>();
         }
 
         public Guid Id { get; set; }
         public Guid? ActorId { get; set; }
         public string ActorNumber { get; set; }
         public int Status { get; set; }
+        public string Name { get; set; }
 
-        public Collection<MeteringPointTypeEntity> MeteringPointTypes { get; }
         public Collection<MarketRoleEntity> MarketRoles { get; }
-        public Collection<GridAreaActorInfoLinkEntity> GridAreas { get; }
 
         public Guid OrganizationId { get; set; }
+        public bool New { get; set; }
     }
 }

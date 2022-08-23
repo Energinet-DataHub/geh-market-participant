@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     public class MeteringPointTypeEntity
     {
         public Guid Id { get; set; }
-        public Guid ActorInfoId { get; set; }
+        public Guid MarketRoleGridAreaId { get; set; }
         public int MeteringTypeId { get; set; }
     }
 }

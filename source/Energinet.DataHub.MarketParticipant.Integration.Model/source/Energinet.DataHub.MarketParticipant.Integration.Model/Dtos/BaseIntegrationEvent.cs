@@ -22,11 +22,18 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// A base event representing a change.
         /// </summary>
         /// <param name="id">Unique integration event ID.</param>
-        protected BaseIntegrationEvent(Guid id)
+        /// <param name="eventCreated">event creation time</param>
+        protected BaseIntegrationEvent(
+            Guid id,
+            DateTime eventCreated)
         {
             Id = id;
+            EventCreated = eventCreated;
+            Type = GetType().Name;
         }
 
         public Guid Id { get; }
+        public DateTime EventCreated { get; }
+        public string Type { get; }
     }
 }

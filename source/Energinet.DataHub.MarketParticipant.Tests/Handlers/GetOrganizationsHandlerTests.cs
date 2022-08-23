@@ -36,16 +36,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new GetOrganizationsHandler(organizationRepository.Object);
 
-            var marketRole = new MarketRole(EicFunction.BalanceResponsibleParty);
+            var marketRole = new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>());
 
             var actor = new Actor(
                 Guid.NewGuid(),
                 new ExternalActorId(Guid.NewGuid()),
                 new ActorNumber("fake_value"),
                 ActorStatus.Active,
-                Enumerable.Empty<GridAreaId>(),
                 new[] { marketRole },
-                Enumerable.Empty<MeteringPointType>());
+                new ActorName(string.Empty));
 
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -61,7 +60,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
-                "Test Comment");
+                "Test Comment",
+                OrganizationStatus.Active);
 
             organizationRepository
                 .Setup(x => x.GetAsync())

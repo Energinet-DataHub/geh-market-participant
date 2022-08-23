@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Moq;
@@ -48,14 +51,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 Status = ActorStatus.Active
             };
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
-            integrationEvent.MarketRoles.Add(EicFunction.BalancingServiceProvider);
-            integrationEvent.GridAreas.Add(new GridAreaId(Guid.NewGuid()));
-            integrationEvent.MeteringPointTypes.Add(MeteringPointType.E17Consumption.Name);
+
+            var meteringPointType = MeteringPointType.D03NotUsed;
+            var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.Name });
+            var marketRole = new ActorMarketRoleEventData(EicFunction.Consumer, new List<ActorGridAreaEventData> { actorGridArea });
+            integrationEvent.ActorMarketRoles.Add(marketRole);
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.ActorUpdatedIntegrationEvent;
+            var actualEvent = (MarketParticipant.Integration.Model.Dtos.ActorUpdatedIntegrationEvent)eventParser.Parse(actualMessage.Body.ToArray());
+            var actualMarketRole = actualEvent.ActorMarketRoles.Single();
+            var actualGridArea = actualMarketRole.GridAreas.Single();
+            var actualMeteringPoint = actualGridArea.MeteringPointTypes.Single();
 
             // assert
             Assert.True(actual);
@@ -63,12 +71,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal(integrationEvent.Id, actualEvent!.Id);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.ExternalActorId.Value, actualEvent.ExternalActorId);
-            Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.Gln);
+            Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber);
             Assert.Equal((int)integrationEvent.Status, (int)actualEvent.Status);
             Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
-            Assert.Equal((int)integrationEvent.MarketRoles.Single(), (int)actualEvent.MarketRoles.Single());
-            Assert.Equal(integrationEvent.GridAreas.Single().Value.ToString(), actualEvent.GridAreas.Single().ToString());
-            Assert.Equal(integrationEvent.MeteringPointTypes.Single(), actualEvent.MeteringPointTypes.Single());
+            Assert.Equal((int)marketRole.Function, (int)actualMarketRole.Function);
+            Assert.Equal(actorGridArea.Id, actualGridArea.Id);
+            Assert.Equal(meteringPointType.ToString(), actualMeteringPoint);
         }
 
         [Fact]
@@ -82,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var eventParser = new ActorUpdatedIntegrationEventParser();
             var target = new ActorUpdatedEventDispatcher(eventParser, serviceBusClient.Object);
 
-            var integrationEvent = new OrganizationUpdatedIntegrationEvent
+            var integrationEvent = new OrganizationCreatedIntegrationEvent
             {
                 Address = new Address(
                     "fake_value",

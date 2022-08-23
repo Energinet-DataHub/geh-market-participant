@@ -71,7 +71,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         activeDirectoryService.Verify(
-            x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<MarketRole>>()),
+            x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<EicFunction>>()),
             Times.Never);
     }
 
@@ -100,7 +100,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         activeDirectoryService
-            .Setup(x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<MarketRole>>()))
+            .Setup(x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<EicFunction>>()))
             .ReturnsAsync(new CreateAppRegistrationResponse(externalActorId, "fake_value", "fake_value"));
 
         // Act

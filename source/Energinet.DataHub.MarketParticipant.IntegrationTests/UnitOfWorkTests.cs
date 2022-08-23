@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -87,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 "Test City",
                 "Test Country");
 
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
+            var validBusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New();
             return new Organization("Test", validBusinessRegisterIdentifier, validAddress);
         }
     }

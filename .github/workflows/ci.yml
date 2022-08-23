@@ -23,20 +23,19 @@ on:
 jobs:
   # Markdown, links and spell checks
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@7.7.0
 
   terraform_validate:
-    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/terraform-validate.yml@7.7.0
     with:
       TERRAFORM_WORKING_DIR_PATH: './build/infrastructure/main'
       TERRAFORM_VERSION: '1.2.2'
 
      # Build and test solution, and publish coverage report
   dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@7.7.0
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
-      DOTNET_VERSION: '6.0.301'
       USE_SQLLOCALDB_2019: true
       PREPARE_OUTPUTS: true
     secrets:
@@ -47,10 +46,9 @@ jobs:
       AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
 
   package_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@7.7.0
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.Libraries.sln'
-      DOTNET_VERSION: '6.0.301'
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -64,7 +62,7 @@ jobs:
         dotnet_solution_ci,
         package_ci
     ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@7.6.0
+    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@7.7.0
     with:
       CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
     secrets:

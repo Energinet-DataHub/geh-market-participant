@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
@@ -38,15 +39,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .IsEnumName(typeof(ActorStatus), false);
 
                     changeActorValidator
-                        .RuleFor(x => x.GridAreas)
-                        .ChildRules(gridAreaValidator =>
-                            gridAreaValidator
-                                .RuleForEach(x => x)
+                        .RuleForEach(actor => actor.MarketRoles)
+                        .ChildRules(gridAreaValidator => gridAreaValidator
+                                .RuleFor(x => x.GridAreas)
                                 .NotEmpty());
 
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
                         .NotEmpty()
+                        .When(x => Enum.TryParse(
+                                       typeof(ActorStatus),
+                                       x.Status,
+                                       true,
+                                       out var result) &&
+                                   result is ActorStatus actorStatus && actorStatus != ActorStatus.New && actorStatus != ActorStatus.Deleted)
                         .ChildRules(rolesValidator =>
                             rolesValidator
                                 .RuleForEach(x => x)
@@ -60,13 +66,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 }));
 
                     changeActorValidator
-                        .RuleFor(actor => actor.MeteringPointTypes)
-                        .NotEmpty()
-                        .ChildRules(rolesValidator =>
+                        .RuleForEach(actor => actor.MarketRoles)
+                        .ChildRules(inlineValidator =>
                         {
-                            rolesValidator
-                                .RuleForEach(x => x)
-                                .Must(x => MeteringPointType.TryFromName(x, true, out _));
+                            inlineValidator
+                                .RuleForEach(m => m.GridAreas)
+                                .ChildRules(validationRules =>
+                                {
+                                    validationRules
+                                        .RuleFor(r => r.MeteringPointTypes)
+                                        .NotEmpty()
+                                        .ChildRules(v =>
+                                            v.RuleForEach(r => r)
+                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                });
                         });
                 });
         }
