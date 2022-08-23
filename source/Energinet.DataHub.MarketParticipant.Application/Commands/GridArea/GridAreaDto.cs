@@ -20,5 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
         Guid Id,
         string Code,
         string Name,
-        string PriceAreaCode);
+        string PriceAreaCode,
+        DateTimeOffset ValidFrom,
+        DateTimeOffset? ValidTo);
 }
