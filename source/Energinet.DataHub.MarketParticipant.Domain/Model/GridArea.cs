@@ -24,6 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Name = name;
             Code = code;
             PriceAreaCode = priceAreaCode;
+            ValidFrom = DateTimeOffset.MinValue;
         }
 
         public GridArea(GridAreaId id, GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode)
@@ -32,11 +33,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Name = name;
             Code = code;
             PriceAreaCode = priceAreaCode;
+            ValidFrom = DateTimeOffset.MinValue;
         }
 
         public GridAreaId Id { get; init; }
         public GridAreaName Name { get; init; }
         public GridAreaCode Code { get; init; }
         public PriceAreaCode PriceAreaCode { get; init; }
+        public DateTimeOffset ValidFrom { get; set; }
+        public DateTimeOffset? ValidTo { get; set; }
     }
 }
