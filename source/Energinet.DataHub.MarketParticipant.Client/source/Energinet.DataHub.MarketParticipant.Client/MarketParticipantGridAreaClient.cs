@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
@@ -42,6 +43,20 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return gridAreas;
+        }
+
+        public async Task<GridAreaDto> GetGridAreaAsync(Guid gridAreaId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(GridAreasBaseUrl, gridAreaId).GetAsync())
+                .ConfigureAwait(false);
+
+            var gridArea = await response
+                .GetJsonAsync<GridAreaDto>()
+                .ConfigureAwait(false);
+
+            return gridArea;
         }
     }
 }

@@ -50,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<ForceSendIntegrationEventsCommand>, ForceSendIntegrationEventsCommandRuleSet>();
 
             container.Register<IActiveDirectoryService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
