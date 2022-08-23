@@ -203,21 +203,21 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             .Select(id =>
                 new ActorGridArea(
                     id,
-                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => MeteringPointType.FromName(x, false))));
+                    existingMarketRole.GridAreas.First(x => x.Id == id).MeteringPointTypes.Select(x => x)));
 
         await AddChangeEventsForAddedGridAreasAsync(organizationId, existingActorId, existingMarketRole.Function, gridAreasToAddToActor).ConfigureAwait(false);
         await AddChangeEventsForRemovedGridAreasAsync(organizationId, existingActorId, existingMarketRole.Function, gridAreasToRemoveFromActor).ConfigureAwait(false);
 
         foreach (var gridArea in existingMarketRole.GridAreas)
         {
-            if (incomingActorGridAreas.Contains(gridArea.Id))
+            if (incomingActorGridAreaDtos.FirstOrDefault(x => x.Id == gridArea.Id) is ActorGridAreaDto incomingDto)
             {
                 AddChangeEventsIfMeteringPointTypeChanged(
                     organizationId,
                     existingActorId,
                     existingMarketRole.Function,
                     gridArea,
-                    incomingActorGridAreaDtos.SelectMany(incomingGridArea => incomingGridArea.MeteringPointTypes.Select(m => MeteringPointType.FromName(m, false))));
+                    incomingDto.MeteringPointTypes.Select(m => MeteringPointType.FromName(m, false)));
             }
         }
     }
