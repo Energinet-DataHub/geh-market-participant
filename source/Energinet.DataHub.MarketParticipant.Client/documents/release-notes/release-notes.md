@@ -1,5 +1,13 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.2.1
+
+- Pipeline updated
+
+## Version 2.0.3 -> 2.2.0
+
+- Unknown
+
 ## Version 2.0.3
 
 - Added grid areas to actor.
