@@ -50,7 +50,7 @@ public sealed class GridAreaAddedToActorEventDispatcher : EventDispatcherBase
             gridAreaAddedToActorIntegrationEvent.GridAreaId,
             gridAreaAddedToActorIntegrationEvent.GridAreaLinkId);
 
-        var bytes = _eventParser.Parse(outboundIntegrationEvent);
+        var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
         await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
         return true;

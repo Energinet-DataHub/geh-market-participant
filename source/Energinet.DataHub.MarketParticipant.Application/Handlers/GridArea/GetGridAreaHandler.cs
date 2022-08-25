@@ -13,36 +13,42 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 {
-    public sealed class GetGridAreasHandler : IRequestHandler<GetGridAreasCommand, GetGridAreasResponse>
+    public sealed class GetGridAreaHandler : IRequestHandler<GetGridAreaCommand, GetGridAreaResponse>
     {
         private readonly IGridAreaRepository _repository;
 
-        public GetGridAreasHandler(IGridAreaRepository repository)
+        public GetGridAreaHandler(IGridAreaRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<GetGridAreasResponse> Handle(GetGridAreasCommand request, CancellationToken cancellationToken)
+        public async Task<GetGridAreaResponse> Handle(GetGridAreaCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var gridAreas = await _repository.GetAsync().ConfigureAwait(false);
-            return new GetGridAreasResponse(gridAreas.Select(gridArea => new GridAreaDto(
-                gridArea.Id.Value,
-                gridArea.Code.Value,
-                gridArea.Name.Value,
-                gridArea.PriceAreaCode.ToString(),
-                gridArea.ValidFrom,
-                gridArea.ValidTo)));
+            var gridArea = await _repository.GetAsync(new GridAreaId(request.Id)).ConfigureAwait(false);
+
+            return gridArea switch
+            {
+                null => throw new NotFoundValidationException(request.Id),
+                _ => new GetGridAreaResponse(new GridAreaDto(
+                    gridArea.Id.Value,
+                    gridArea.Code.Value,
+                    gridArea.Name.Value,
+                    gridArea.PriceAreaCode.ToString(),
+                    gridArea.ValidFrom,
+                    gridArea.ValidTo))
+            };
         }
     }
 }

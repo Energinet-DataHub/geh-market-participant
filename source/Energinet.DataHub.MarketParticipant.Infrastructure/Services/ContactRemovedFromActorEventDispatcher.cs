@@ -52,7 +52,7 @@ public sealed class ContactRemovedFromActorEventDispatcher : EventDispatcherBase
                 (ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category.Value,
                 contactAddedToActorIntegrationEvent.Contact.Phone?.Number));
 
-        var bytes = _eventParser.Parse(outboundIntegrationEvent);
+        var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
         await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
         return true;

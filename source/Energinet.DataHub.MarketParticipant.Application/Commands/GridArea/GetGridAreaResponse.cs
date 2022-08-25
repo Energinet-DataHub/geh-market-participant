@@ -12,15 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public sealed record GridAreaDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo);
+    public sealed record GetGridAreaResponse(GridAreaDto GridArea);
 }
