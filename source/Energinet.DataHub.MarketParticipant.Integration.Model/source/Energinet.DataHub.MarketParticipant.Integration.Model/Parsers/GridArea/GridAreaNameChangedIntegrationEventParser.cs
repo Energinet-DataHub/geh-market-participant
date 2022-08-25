@@ -23,22 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
     public sealed class GridAreaNameChangedIntegrationEventParser : IGridAreaNameChangedIntegrationEventParser
     {
-        public byte[] Parse(GridAreaNameChangedIntegrationEvent integrationEvent)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = MapEvent(integrationEvent);
-
-                return contract.ToByteArray();
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
-            {
-                throw new MarketParticipantException($"Error parsing {nameof(GridAreaNameChangedIntegrationEvent)}", ex);
-            }
-        }
-
         public byte[] ParseToSharedIntegrationEvent(GridAreaNameChangedIntegrationEvent integrationEvent)
         {
             try
@@ -51,20 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
-        internal static GridAreaNameChangedIntegrationEvent Parse(byte[] protoContract)
-        {
-            try
-            {
-                var contract = GridAreaNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return MapContract(contract);
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaNameChangedIntegrationEvent)}", ex);
             }
         }
 

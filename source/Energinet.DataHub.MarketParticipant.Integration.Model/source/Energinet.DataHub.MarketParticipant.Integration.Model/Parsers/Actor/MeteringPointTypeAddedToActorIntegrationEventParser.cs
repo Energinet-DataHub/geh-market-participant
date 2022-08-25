@@ -24,22 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class MeteringPointTypeAddedToActorIntegrationEventParser : IMeteringPointTypeAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(MeteringPointTypeAddedToActorIntegrationEvent addedToActorIntegrationEvent)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(addedToActorIntegrationEvent, nameof(addedToActorIntegrationEvent));
-
-                var contract = MapEvent(addedToActorIntegrationEvent);
-
-                return contract.ToByteArray();
-            }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
-            {
-                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeAddedToActorIntegrationEventContract)}", e);
-            }
-        }
-
         public byte[] ParseToSharedIntegrationEvent(MeteringPointTypeAddedToActorIntegrationEvent integrationEvent)
         {
             try
@@ -52,20 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
-        internal static MeteringPointTypeAddedToActorIntegrationEvent Parse(byte[] protoContract)
-        {
-            try
-            {
-                var contract = MeteringPointTypeAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return MapContract(contract);
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorStatusChangedIntegrationEvent)}", ex);
             }
         }
 

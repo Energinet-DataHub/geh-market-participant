@@ -24,22 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class MeteringPointTypeRemovedFromActorIntegrationEventParser : IMeteringPointTypeRemovedFromActorIntegrationEventParser
     {
-        public byte[] Parse(MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(meteringPointTypeRemovedFromActorIntegrationEvent, nameof(meteringPointTypeRemovedFromActorIntegrationEvent));
-
-                var contract = MapEvent(meteringPointTypeRemovedFromActorIntegrationEvent);
-
-                return contract.ToByteArray();
-            }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
-            {
-                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeRemovedFromActorIntegrationEventContract)}", e);
-            }
-        }
-
         public byte[] ParseToSharedIntegrationEvent(MeteringPointTypeRemovedFromActorIntegrationEvent integrationEvent)
         {
             try
@@ -52,20 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
-        internal static MeteringPointTypeRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
-        {
-            try
-            {
-                var contract = MeteringPointTypeRemovedFromActorIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return MapContract(contract);
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(MeteringPointTypeRemovedFromActorIntegrationEvent)}", ex);
             }
         }
 

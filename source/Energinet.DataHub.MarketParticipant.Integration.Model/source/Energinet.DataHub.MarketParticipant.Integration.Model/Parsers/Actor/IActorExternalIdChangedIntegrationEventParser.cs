@@ -22,13 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
     public interface IActorExternalIdChangedIntegrationEventParser
     {
         /// <summary>
-        /// Parses the event.
-        /// </summary>
-        /// <param name="integrationEvent">The event</param>
-        /// <returns>The protobuf contract.</returns>
-        byte[] Parse(ActorExternalIdChangedIntegrationEvent integrationEvent);
-
-        /// <summary>
         /// Parses the event and wraps it into the shared event message
         /// </summary>
         /// <param name="integrationEvent">The event to parse</param>

@@ -27,13 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
     public interface IMeteringPointTypeAddedToActorIntegrationEventParser
     {
         /// <summary>
-        /// Parses the event.
-        /// </summary>
-        /// <param name="addedToActorIntegrationEvent">The event</param>
-        /// <returns>The protobuf contract.</returns>
-        byte[] Parse(MeteringPointTypeAddedToActorIntegrationEvent addedToActorIntegrationEvent);
-
-        /// <summary>
         /// Parses the event and wraps it into the shared event message
         /// </summary>
         /// <param name="integrationEvent">The event to parse</param>

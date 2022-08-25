@@ -25,19 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
     public sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
     {
-        public byte[] Parse(ActorUpdatedIntegrationEvent integrationEvent)
-        {
-            try
-            {
-                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-                return MapEvent(integrationEvent).ToByteArray();
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
-            {
-                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
         public byte[] ParseToSharedIntegrationEvent(ActorUpdatedIntegrationEvent integrationEvent)
         {
             try
@@ -50,20 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
             catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
-            }
-        }
-
-        internal static ActorUpdatedIntegrationEvent Parse(byte[] protoContract)
-        {
-            try
-            {
-                var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                return MapContract(contract);
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
-            {
-                throw new MarketParticipantException($"Error parsing byte array  {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 

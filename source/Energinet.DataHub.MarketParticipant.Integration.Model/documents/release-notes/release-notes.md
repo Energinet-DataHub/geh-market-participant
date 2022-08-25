@@ -36,3 +36,7 @@
 ## Version 2.0.5
 
 - External Actor Id is annotated to be null. This will happen if the status is New or Deleted, or the chosen roles do not give permission to the actor.
+
+# Version 2.5.0
+
+- Merged eventparsers to a single shared parser, this is an internal change so no actions is required from consumers
