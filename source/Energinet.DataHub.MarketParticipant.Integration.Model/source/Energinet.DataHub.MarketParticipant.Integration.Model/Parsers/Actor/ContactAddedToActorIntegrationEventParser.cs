@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
             }
             catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(ContactAddedToActorIntegrationEvent)}", ex);
             }
         }
 

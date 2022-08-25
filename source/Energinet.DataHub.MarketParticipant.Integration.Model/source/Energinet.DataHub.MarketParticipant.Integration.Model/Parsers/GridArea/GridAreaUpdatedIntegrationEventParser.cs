@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
             }
             catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
             }
         }
 
