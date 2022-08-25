@@ -23,52 +23,54 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
 {
     public class OrganizationCommentChangedIntegrationEventParser : IOrganizationCommentChangedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationCommentChangedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(OrganizationCommentChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new OrganizationCommentChangedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Comment = integrationEvent.Comment,
-                    Type = integrationEvent.Type
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationCommentChangedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCommentChangedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCommentChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationCommentChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationCommentChangedIntegrationEvent Parse(OrganizationCommentChangedIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationCommentChangedIntegrationEvent MapContract(OrganizationCommentChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationCommentChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.Comment);
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = OrganizationCommentChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new OrganizationCommentChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Comment);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static OrganizationCommentChangedIntegrationEventContract MapEvent(
+            OrganizationCommentChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationCommentChangedIntegrationEventContract()
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCommentChangedIntegrationEventContract)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Comment = integrationEvent.Comment,
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

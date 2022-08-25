@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
                         new ActorGridArea(y.Id, y.MeteringPointTypes)))));
 
-            var bytes = _eventParser.Parse(outboundIntegrationEvent);
+            var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
             await DispatchAsync(outboundIntegrationEvent, bytes).ConfigureAwait(false);
 
             return true;

@@ -23,52 +23,54 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
 {
     public class OrganizationBusinessRegisterIdentifierChangedIntegrationEventParser : IOrganizationBusinessRegisterIdentifierChangedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
-                    Type = integrationEvent.Type
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationBusinessRegisterIdentifierChangedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationBusinessRegisterIdentifierChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationBusinessRegisterIdentifierChangedIntegrationEvent Parse(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationBusinessRegisterIdentifierChangedIntegrationEvent MapContract(OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.BusinessRegisterIdentifier);
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new OrganizationBusinessRegisterIdentifierChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.BusinessRegisterIdentifier);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract MapEvent(
+            OrganizationBusinessRegisterIdentifierChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationBusinessRegisterIdentifierChangedIntegrationEventContract()
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationBusinessRegisterIdentifierChangedIntegrationEvent)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

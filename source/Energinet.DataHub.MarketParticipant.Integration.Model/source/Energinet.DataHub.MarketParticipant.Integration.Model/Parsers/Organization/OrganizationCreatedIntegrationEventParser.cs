@@ -24,74 +24,77 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
 {
     public sealed class OrganizationCreatedIntegrationEventParser : IOrganizationCreatedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(OrganizationCreatedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new OrganizationCreatedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Name = integrationEvent.Name,
-                    BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
-                    Address = new OrganizationAddressEventData
-                    {
-                        City = integrationEvent.Address.City,
-                        Country = integrationEvent.Address.Country,
-                        Number = integrationEvent.Address.Number,
-                        StreetName = integrationEvent.Address.StreetName,
-                        ZipCode = integrationEvent.Address.ZipCode
-                    },
-                    Status = (int)integrationEvent.Status
-                };
-
-                if (integrationEvent.Comment != null)
-                {
-                    contract.Comment = integrationEvent.Comment;
-                }
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationCreatedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationCreatedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationCreatedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationCreatedIntegrationEvent Parse(OrganizationCreatedIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationCreatedIntegrationEvent MapContract(OrganizationCreatedIntegrationEventContract contract)
+        {
+            var createdEvent = new OrganizationCreatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.Name,
+                contract.BusinessRegisterIdentifier,
+                new Address(
+                    contract.Address.StreetName,
+                    contract.Address.Number,
+                    contract.Address.ZipCode,
+                    contract.Address.City,
+                    contract.Address.Country),
+                Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
+
+            if (contract.HasComment)
             {
-                var contract = OrganizationCreatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+                createdEvent.Comment = contract.Comment;
+            }
 
-                var createdEvent = new OrganizationCreatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Name,
-                    contract.BusinessRegisterIdentifier,
-                    new Address(
-                        contract.Address.StreetName,
-                        contract.Address.Number,
-                        contract.Address.ZipCode,
-                        contract.Address.City,
-                        contract.Address.Country),
-                    Enum.IsDefined((OrganizationStatus)contract.Status) ? (OrganizationStatus)contract.Status : throw new FormatException(nameof(contract.Status)));
+            return createdEvent;
+        }
 
-                if (contract.HasComment)
+        private static OrganizationCreatedIntegrationEventContract MapEvent(
+            OrganizationCreatedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationCreatedIntegrationEventContract()
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Name = integrationEvent.Name,
+                BusinessRegisterIdentifier = integrationEvent.BusinessRegisterIdentifier,
+                Address = new OrganizationAddressEventData
                 {
-                    createdEvent.Comment = contract.Comment;
-                }
+                    City = integrationEvent.Address.City,
+                    Country = integrationEvent.Address.Country,
+                    Number = integrationEvent.Address.Number,
+                    StreetName = integrationEvent.Address.StreetName,
+                    ZipCode = integrationEvent.Address.ZipCode
+                },
+                Status = (int)integrationEvent.Status
+            };
 
-                return createdEvent;
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+            if (integrationEvent.Comment != null)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationCreatedIntegrationEvent)}", ex);
+                contract.Comment = integrationEvent.Comment;
             }
+
+            return contract;
         }
     }
 }
