@@ -24,56 +24,58 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class MarketRoleAddedToActorIntegrationEventParser : IMarketRoleAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(MarketRoleAddedToActorIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(MarketRoleAddedToActorIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new MarketRoleAddedToActorIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    BusinessRole = (int)integrationEvent.BusinessRoleCode,
-                    MarketRoleFunction = (int)integrationEvent.MarketRole,
-                    Type = integrationEvent.Type
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { MarketRoleAddedToActorIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(MarketRoleAddedToActorIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(MarketRoleAddedToActorIntegrationEvent)}", ex);
             }
         }
 
-        internal MarketRoleAddedToActorIntegrationEvent Parse(byte[] protoContract)
+        internal static MarketRoleAddedToActorIntegrationEvent Parse(MarketRoleAddedToActorIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static MarketRoleAddedToActorIntegrationEvent MapContract(MarketRoleAddedToActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new MarketRoleAddedToActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined(typeof(BusinessRoleCode), contract.BusinessRole) ? (BusinessRoleCode)contract.BusinessRole : throw new FormatException(nameof(contract.BusinessRole)),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                contract.EventCreated.ToDateTime());
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = MarketRoleAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new MarketRoleAddedToActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined(typeof(BusinessRoleCode), contract.BusinessRole) ? (BusinessRoleCode)contract.BusinessRole : throw new FormatException(nameof(contract.BusinessRole)),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    contract.EventCreated.ToDateTime());
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static MarketRoleAddedToActorIntegrationEventContract MapEvent(
+            MarketRoleAddedToActorIntegrationEvent integrationEvent)
+        {
+            var contract = new MarketRoleAddedToActorIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(MarketRoleAddedToActorIntegrationEvent)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                BusinessRole = (int)integrationEvent.BusinessRoleCode,
+                MarketRoleFunction = (int)integrationEvent.MarketRole,
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

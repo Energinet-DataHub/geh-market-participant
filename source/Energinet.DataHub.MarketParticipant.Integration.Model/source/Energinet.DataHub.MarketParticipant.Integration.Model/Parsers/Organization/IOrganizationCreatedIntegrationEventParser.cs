@@ -21,11 +21,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
     /// </summary>
     public interface IOrganizationCreatedIntegrationEventParser
     {
-        /// <summary>
-        /// Parses the event.
+         /// <summary>
+        /// Parses the event and wraps it into the shared event message
         /// </summary>
-        /// <param name="integrationEvent">The event</param>
-        /// <returns>The protobuf contract.</returns>
-        byte[] Parse(OrganizationCreatedIntegrationEvent integrationEvent);
+        /// <param name="integrationEvent">The event to parse</param>
+        /// <returns>A Byte array corresponding to the protobuf contract</returns>
+        byte[] ParseToSharedIntegrationEvent(OrganizationCreatedIntegrationEvent integrationEvent);
     }
 }

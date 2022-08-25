@@ -24,62 +24,65 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class ActorExternalIdChangedIntegrationEventParser : IActorExternalIdChangedIntegrationEventParser
     {
-        public byte[] Parse(ActorExternalIdChangedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(ActorExternalIdChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new ActorExternalIdChangedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Type = integrationEvent.Type
-                };
-
-                if (integrationEvent.ExternalActorId.HasValue)
-                {
-                    contract.ExternalActorId = integrationEvent.ExternalActorId.ToString();
-                }
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { ActorExternalIdChangedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(ActorExternalIdChangedIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(ActorExternalIdChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal ActorExternalIdChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static ActorExternalIdChangedIntegrationEvent Parse(ActorExternalIdChangedIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static ActorExternalIdChangedIntegrationEvent MapContract(ActorExternalIdChangedIntegrationEventContract contract)
+        {
+            Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                ? id
+                : null;
+
+            var integrationEvent = new ActorExternalIdChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                externalActorId);
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = ActorExternalIdChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
-                    ? id
-                    : null;
-
-                var integrationEvent = new ActorExternalIdChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    externalActorId);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static ActorExternalIdChangedIntegrationEventContract MapEvent(
+            ActorExternalIdChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new ActorExternalIdChangedIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorExternalIdChangedIntegrationEvent)}", ex);
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Type = integrationEvent.Type
+            };
+
+            if (integrationEvent.ExternalActorId.HasValue)
+            {
+                contract.ExternalActorId = integrationEvent.ExternalActorId.ToString();
             }
+
+            return contract;
         }
     }
 }
