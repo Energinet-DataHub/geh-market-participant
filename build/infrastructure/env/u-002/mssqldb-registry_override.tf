@@ -11,6 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-module "mssqldb_wholesale" {
+module "mssqldb_market_participant" {
   developer_ad_group_name     = var.developer_ad_group_name
 }
