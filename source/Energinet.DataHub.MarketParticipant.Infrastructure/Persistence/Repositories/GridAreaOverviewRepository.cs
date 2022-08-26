@@ -32,32 +32,38 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<GridAreaOverviewItem>> GetAsync()
         {
-            var q = from g in _marketParticipantDbContext.GridAreas
-                    join l in _marketParticipantDbContext.MarketRoleGridAreas on g.Id equals l.GridAreaId into lgroup
-                    from l in lgroup.DefaultIfEmpty()
-                    join r in _marketParticipantDbContext.MarketRoles on l.MarketRoleId equals r.Id into rgroup
-                    from r in rgroup.DefaultIfEmpty()
-                    join a in _marketParticipantDbContext.Actors on r.ActorInfoId equals a.Id into agroup
-                    from a in agroup.DefaultIfEmpty()
-                    where a == null || r.Function == (int)EicFunction.GridAccessProvider
-                    select new { g, a, r };
+            var actorsWithMarketRoleGridArea =
+                from actor in _marketParticipantDbContext.Actors
+                join marketRole in _marketParticipantDbContext.MarketRoles
+                    on actor.Id equals marketRole.ActorInfoId
+                join marketRoleGridArea in _marketParticipantDbContext.MarketRoleGridAreas
+                    on marketRole.Id equals marketRoleGridArea.MarketRoleId
+                select new { actor, marketRole, marketRoleGridArea };
 
-            var result = await q.ToListAsync().ConfigureAwait(false);
+            var gridAreas =
+                from gridArea in _marketParticipantDbContext.GridAreas
+                join actorWithMarketRoleGridArea in actorsWithMarketRoleGridArea
+                    on gridArea.Id equals actorWithMarketRoleGridArea.marketRoleGridArea.GridAreaId into gr
+                from actorWithMarketRoleGridArea in gr.DefaultIfEmpty()
+                where actorWithMarketRoleGridArea.actor == null || actorWithMarketRoleGridArea.marketRole.Function == (int)EicFunction.GridAccessProvider
+                select new { actorWithMarketRoleGridArea.actor, gridArea };
 
-            return result.GroupBy(x => x.g.Id).Select(x =>
+            var result = await gridAreas.ToListAsync().ConfigureAwait(false);
+
+            return result.Select(x =>
             {
-                var ga = x.FirstOrDefault(x => x.r?.Function == (int)EicFunction.GridAccessProvider) ?? x.First();
-                var grid = ga.g;
-                var actor = ga.a;
+                var gridArea = x.gridArea;
+                var actor = x.actor;
+
                 return new GridAreaOverviewItem(
-                    new GridAreaId(grid.Id),
-                    new GridAreaName(grid.Name),
-                    new GridAreaCode(grid.Code),
-                    grid.PriceAreaCode,
-                    grid.ValidFrom,
-                    grid.ValidTo,
-                    actor != null ? new ActorNumber(ga.a.ActorNumber) : null,
-                    actor != null ? new ActorName(ga.a.Name) : null);
+                    new GridAreaId(gridArea.Id),
+                    new GridAreaName(gridArea.Name),
+                    new GridAreaCode(gridArea.Code),
+                    gridArea.PriceAreaCode,
+                    gridArea.ValidFrom,
+                    gridArea.ValidTo,
+                    actor != null ? new ActorNumber(actor.ActorNumber) : null,
+                    actor != null ? new ActorName(actor.Name) : null);
             });
         }
     }
