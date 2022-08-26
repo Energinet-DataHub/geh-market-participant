@@ -24,58 +24,60 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class MeteringPointTypeRemovedFromActorIntegrationEventParser : IMeteringPointTypeRemovedFromActorIntegrationEventParser
     {
-        public byte[] Parse(MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(MeteringPointTypeRemovedFromActorIntegrationEvent integrationEvent)
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(meteringPointTypeRemovedFromActorIntegrationEvent, nameof(meteringPointTypeRemovedFromActorIntegrationEvent));
-
-                var contract = new MeteringPointTypeRemovedFromActorIntegrationEventContract
-                {
-                    Id = meteringPointTypeRemovedFromActorIntegrationEvent.Id.ToString(),
-                    ActorId = meteringPointTypeRemovedFromActorIntegrationEvent.ActorId.ToString(),
-                    OrganizationId = meteringPointTypeRemovedFromActorIntegrationEvent.OrganizationId.ToString(),
-                    EventCreated = Timestamp.FromDateTime(meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated),
-                    MarketRoleFunction = (int)meteringPointTypeRemovedFromActorIntegrationEvent.Function,
-                    GridAreaId = meteringPointTypeRemovedFromActorIntegrationEvent.GridAreaId.ToString(),
-                    MeteringPointType = meteringPointTypeRemovedFromActorIntegrationEvent.MeteringPointType,
-                    Type = meteringPointTypeRemovedFromActorIntegrationEvent.Type
-                };
-
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { MeteringPointTypeRemovedFromActorIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeRemovedFromActorIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeRemovedFromActorIntegrationEvent)}", ex);
             }
         }
 
-        internal MeteringPointTypeRemovedFromActorIntegrationEvent Parse(byte[] protoContract)
+        internal static MeteringPointTypeRemovedFromActorIntegrationEvent Parse(MeteringPointTypeRemovedFromActorIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static MeteringPointTypeRemovedFromActorIntegrationEvent MapContract(MeteringPointTypeRemovedFromActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new MeteringPointTypeRemovedFromActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                Guid.Parse(contract.GridAreaId),
+                contract.MeteringPointType,
+                contract.EventCreated.ToDateTime());
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = MeteringPointTypeRemovedFromActorIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new MeteringPointTypeRemovedFromActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.MeteringPointType,
-                    contract.EventCreated.ToDateTime());
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static MeteringPointTypeRemovedFromActorIntegrationEventContract MapEvent(
+            MeteringPointTypeRemovedFromActorIntegrationEvent meteringPointTypeRemovedFromActorIntegrationEvent)
+        {
+            var contract = new MeteringPointTypeRemovedFromActorIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(MeteringPointTypeRemovedFromActorIntegrationEvent)}", ex);
-            }
+                Id = meteringPointTypeRemovedFromActorIntegrationEvent.Id.ToString(),
+                ActorId = meteringPointTypeRemovedFromActorIntegrationEvent.ActorId.ToString(),
+                OrganizationId = meteringPointTypeRemovedFromActorIntegrationEvent.OrganizationId.ToString(),
+                EventCreated = Timestamp.FromDateTime(meteringPointTypeRemovedFromActorIntegrationEvent.EventCreated),
+                MarketRoleFunction = (int)meteringPointTypeRemovedFromActorIntegrationEvent.Function,
+                GridAreaId = meteringPointTypeRemovedFromActorIntegrationEvent.GridAreaId.ToString(),
+                MeteringPointType = meteringPointTypeRemovedFromActorIntegrationEvent.MeteringPointType,
+                Type = meteringPointTypeRemovedFromActorIntegrationEvent.Type
+            };
+            return contract;
         }
     }
 }

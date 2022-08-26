@@ -24,58 +24,60 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class MeteringPointTypeAddedToActorIntegrationEventParser : IMeteringPointTypeAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(MeteringPointTypeAddedToActorIntegrationEvent addedToActorIntegrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(MeteringPointTypeAddedToActorIntegrationEvent integrationEvent)
         {
             try
             {
-                ArgumentNullException.ThrowIfNull(addedToActorIntegrationEvent, nameof(addedToActorIntegrationEvent));
-
-                var contract = new MeteringPointTypeAddedToActorIntegrationEventContract
-                {
-                    Id = addedToActorIntegrationEvent.EventId.ToString(),
-                    ActorId = addedToActorIntegrationEvent.ActorId.ToString(),
-                    OrganizationId = addedToActorIntegrationEvent.OrganizationId.ToString(),
-                    EventCreated = Timestamp.FromDateTime(addedToActorIntegrationEvent.EventCreated),
-                    MarketRoleFunction = (int)addedToActorIntegrationEvent.Function,
-                    GridAreaId = addedToActorIntegrationEvent.GridAreaId.ToString(),
-                    MeteringPointType = addedToActorIntegrationEvent.MeteringPointType,
-                    Type = addedToActorIntegrationEvent.Type
-                };
-
+                ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { MeteringPointTypeAddedToActorIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeAddedToActorIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(MeteringPointTypeAddedToActorIntegrationEvent)}", ex);
             }
         }
 
-        internal MeteringPointTypeAddedToActorIntegrationEvent Parse(byte[] protoContract)
+        internal static MeteringPointTypeAddedToActorIntegrationEvent Parse(MeteringPointTypeAddedToActorIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static MeteringPointTypeAddedToActorIntegrationEvent MapContract(MeteringPointTypeAddedToActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new MeteringPointTypeAddedToActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                Guid.Parse(contract.GridAreaId),
+                contract.EventCreated.ToDateTime(),
+                contract.MeteringPointType);
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = MeteringPointTypeAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new MeteringPointTypeAddedToActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.EventCreated.ToDateTime(),
-                    contract.MeteringPointType);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static MeteringPointTypeAddedToActorIntegrationEventContract MapEvent(
+            MeteringPointTypeAddedToActorIntegrationEvent addedToActorIntegrationEvent)
+        {
+            var contract = new MeteringPointTypeAddedToActorIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(ActorStatusChangedIntegrationEvent)}", ex);
-            }
+                Id = addedToActorIntegrationEvent.EventId.ToString(),
+                ActorId = addedToActorIntegrationEvent.ActorId.ToString(),
+                OrganizationId = addedToActorIntegrationEvent.OrganizationId.ToString(),
+                EventCreated = Timestamp.FromDateTime(addedToActorIntegrationEvent.EventCreated),
+                MarketRoleFunction = (int)addedToActorIntegrationEvent.Function,
+                GridAreaId = addedToActorIntegrationEvent.GridAreaId.ToString(),
+                MeteringPointType = addedToActorIntegrationEvent.MeteringPointType,
+                Type = addedToActorIntegrationEvent.Type
+            };
+            return contract;
         }
     }
 }

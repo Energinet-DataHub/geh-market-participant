@@ -23,56 +23,58 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
 {
     public class OrganizationAddressChangedIntegrationEventParser : IOrganizationAddressChangedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationAddressChangedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(OrganizationAddressChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new OrganizationAddressChangedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    OrganizationAddress = new OrganizationAddressEventData
-                    {
-                        City = integrationEvent.Address.City,
-                        Country = integrationEvent.Address.Country,
-                        Number = integrationEvent.Address.Number,
-                        StreetName = integrationEvent.Address.StreetName,
-                        ZipCode = integrationEvent.Address.ZipCode
-                    }
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationAddressChangedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(OrganizationAddressChangedIntegrationEventContract)}", ex);
+                throw new MarketParticipantException($"Error parsing {nameof(OrganizationAddressChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationAddressChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationAddressChangedIntegrationEvent Parse(OrganizationAddressChangedIntegrationEventContract protoContract)
         {
-            try
-            {
-                var contract = OrganizationAddressChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
+            return MapContract(protoContract);
+        }
 
-                return new OrganizationAddressChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    new Address(
-                        contract.OrganizationAddress.StreetName,
-                        contract.OrganizationAddress.Number,
-                        contract.OrganizationAddress.ZipCode,
-                        contract.OrganizationAddress.City,
-                        contract.OrganizationAddress.Country));
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+        private static OrganizationAddressChangedIntegrationEvent MapContract(OrganizationAddressChangedIntegrationEventContract contract)
+        {
+            return new OrganizationAddressChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                new Address(
+                    contract.OrganizationAddress.StreetName,
+                    contract.OrganizationAddress.Number,
+                    contract.OrganizationAddress.ZipCode,
+                    contract.OrganizationAddress.City,
+                    contract.OrganizationAddress.Country));
+        }
+
+        private static OrganizationAddressChangedIntegrationEventContract MapEvent(
+            OrganizationAddressChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationAddressChangedIntegrationEventContract()
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationAddressChangedIntegrationEvent)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                OrganizationAddress = new OrganizationAddressEventData
+                {
+                    City = integrationEvent.Address.City,
+                    Country = integrationEvent.Address.Country,
+                    Number = integrationEvent.Address.Number,
+                    StreetName = integrationEvent.Address.StreetName,
+                    ZipCode = integrationEvent.Address.ZipCode
+                }
+            };
+            return contract;
         }
     }
 }

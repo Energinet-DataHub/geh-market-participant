@@ -24,68 +24,71 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class ContactAddedToActorIntegrationEventParser : IContactAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(ContactAddedToActorIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(ContactAddedToActorIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new ContactAddedToActorIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Contact = new ActorContactEventData
-                    {
-                        Name = integrationEvent.Contact.Name,
-                        Email = integrationEvent.Contact.Email,
-                        Category = (int)integrationEvent.Contact.Category
-                    },
-                    Type = integrationEvent.Type
-                };
-
-                if (integrationEvent.Contact.Phone != null)
-                {
-                    contract.Contact.Phone = integrationEvent.Contact.Phone;
-                }
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { ContactAddedToActorIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(ContactAddedToActorIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(ContactAddedToActorIntegrationEvent)}", ex);
             }
         }
 
-        internal ContactAddedToActorIntegrationEvent Parse(byte[] protoContract)
+        internal static ContactAddedToActorIntegrationEvent Parse(ContactAddedToActorIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static ContactAddedToActorIntegrationEvent MapContract(ContactAddedToActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new ContactAddedToActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                contract.EventCreated.ToDateTime(),
+                new ActorContact(
+                    contract.Contact.Name,
+                    contract.Contact.Email,
+                    Enum.IsDefined(typeof(ContactCategory), contract.Contact.Category) ? (ContactCategory)contract.Contact.Category : throw new FormatException(nameof(contract.Contact.Category)),
+                    contract.Contact.HasPhone ? contract.Contact.Phone : null));
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = ContactAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
+                throw new FormatException("Invalid Type");
+            }
 
-                var integrationEvent = new ContactAddedToActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.EventCreated.ToDateTime(),
-                    new ActorContact(
-                        contract.Contact.Name,
-                        contract.Contact.Email,
-                        Enum.IsDefined(typeof(ContactCategory), contract.Contact.Category) ? (ContactCategory)contract.Contact.Category : throw new FormatException(nameof(contract.Contact.Category)),
-                        contract.Contact.HasPhone ? contract.Contact.Phone : null));
+            return integrationEvent;
+        }
 
-                if (integrationEvent.Type != contract.Type)
+        private static ContactAddedToActorIntegrationEventContract MapEvent(
+            ContactAddedToActorIntegrationEvent integrationEvent)
+        {
+            var contract = new ContactAddedToActorIntegrationEventContract
+            {
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Contact = new ActorContactEventData
                 {
-                    throw new FormatException("Invalid Type");
-                }
+                    Name = integrationEvent.Contact.Name,
+                    Email = integrationEvent.Contact.Email,
+                    Category = (int)integrationEvent.Contact.Category
+                },
+                Type = integrationEvent.Type
+            };
 
-                return integrationEvent;
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+            if (integrationEvent.Contact.Phone != null)
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(ContactAddedToActorIntegrationEvent)}", ex);
+                contract.Contact.Phone = integrationEvent.Contact.Phone;
             }
+
+            return contract;
         }
     }
 }

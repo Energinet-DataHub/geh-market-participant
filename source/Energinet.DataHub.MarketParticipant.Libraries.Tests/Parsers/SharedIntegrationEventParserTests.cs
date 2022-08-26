@@ -48,11 +48,13 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 new[] { new ActorMarketRole(EicFunction.Agent, new[] { new ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) });
 
             // act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // assert
             Assert.IsType<ActorUpdatedIntegrationEvent>(actualEventObject);
+            var actualTyped = actualEventObject as ActorUpdatedIntegrationEvent;
+            Assert.Equal(@event.ActorId, actualTyped!.ActorId);
         }
 
         [Fact]
@@ -74,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 DateTime.UtcNow);
 
             // act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // assert
@@ -96,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid());
 
             // act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // assert
@@ -118,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 ActorStatus.Active);
 
             // act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // assert
@@ -140,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "ActorName");
 
             // act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // assert
@@ -163,7 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid());
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -190,7 +192,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     "fake_value"));
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -214,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid());
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -235,7 +237,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "TestArea");
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -266,7 +268,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
             @event.Comment = "fake_comment";
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -287,7 +289,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "TestOrg");
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
 
             // Assert
@@ -308,7 +310,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 OrganizationStatus.Active);
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
 
             // Assert
@@ -329,7 +331,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "TestComment");
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
 
             // Assert
@@ -350,7 +352,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "BusinessIdentifier");
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
 
             // Assert
@@ -376,7 +378,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     "fake_country"));
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = sharedIntegrationParser.Parse(actualBytes);
 
             // Assert
@@ -400,7 +402,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 "123");
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -424,7 +426,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 DateTime.UtcNow);
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -448,7 +450,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid());
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -472,7 +474,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid());
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -495,7 +497,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 DateTime.UtcNow);
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -518,7 +520,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 DateTime.UtcNow);
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -544,7 +546,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     "34343434"));
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert
@@ -570,7 +572,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                     "34343434"));
 
             // Act
-            var actualBytes = input.Parse(@event);
+            var actualBytes = input.ParseToSharedIntegrationEvent(@event);
             var actualEventObject = findAndParse.Parse(actualBytes);
 
             // Assert

@@ -23,52 +23,54 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Organiza
 {
     public class OrganizationNameChangedIntegrationEventParser : IOrganizationNameChangedIntegrationEventParser
     {
-        public byte[] Parse(OrganizationNameChangedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(OrganizationNameChangedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new OrganizationNameChangedIntegrationEventContract()
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    Name = integrationEvent.Name,
-                    Type = integrationEvent.Type
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { OrganizationNameChangedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(OrganizationNameChangedIntegrationEvent)}", ex);
             }
         }
 
-        internal OrganizationNameChangedIntegrationEvent Parse(byte[] protoContract)
+        internal static OrganizationNameChangedIntegrationEvent Parse(OrganizationNameChangedIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static OrganizationNameChangedIntegrationEvent MapContract(OrganizationNameChangedIntegrationEventContract contract)
+        {
+            var integrationEvent = new OrganizationNameChangedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.OrganizationId),
+                contract.Name);
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = OrganizationNameChangedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new OrganizationNameChangedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.Name);
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static OrganizationNameChangedIntegrationEventContract MapEvent(
+            OrganizationNameChangedIntegrationEvent integrationEvent)
+        {
+            var contract = new OrganizationNameChangedIntegrationEventContract()
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(OrganizationNameChangedIntegrationEvent)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                Name = integrationEvent.Name,
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }
