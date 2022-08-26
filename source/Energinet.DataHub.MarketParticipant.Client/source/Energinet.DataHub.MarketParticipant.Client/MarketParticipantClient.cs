@@ -97,5 +97,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             return _marketParticipantActorContactClient.DeleteContactAsync(organizationId, actorId, contactId);
         }
+
+        public Task<IEnumerable<GridAreaOverviewItemDto>> GetGridAreaOverviewAsync()
+        {
+            return _marketParticipantGridAreaOverviewClient.GetGridAreaOverviewAsync();
+        }
     }
 }
