@@ -34,7 +34,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         }
 
         public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
+        public DbSet<ActorEntity> Actors { get; private set; } = null!;
         public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
+        public DbSet<MarketRoleEntity> MarketRoles { get; private set; } = null!;
+        public DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; private set; } = null!;
         public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
         public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
         public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
