@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private readonly IMarketParticipantActorClient _marketParticipantActorClient;
         private readonly IMarketParticipantGridAreaClient _marketParticipantGridAreaClient;
         private readonly IMarketParticipantActorContactClient _marketParticipantActorContactClient;
+        private readonly IMarketParticipantGridAreaOverviewClient _marketParticipantGridAreaOverviewClient;
 
         public MarketParticipantClient(IFlurlClient client)
         {
@@ -33,6 +34,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _marketParticipantActorClient = new MarketParticipantActorClient(client);
             _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
+            _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
+            _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(client);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
