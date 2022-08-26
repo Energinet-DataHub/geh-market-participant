@@ -34,7 +34,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _marketParticipantActorClient = new MarketParticipantActorClient(client);
             _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
-            _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
             _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(client);
         }
 
