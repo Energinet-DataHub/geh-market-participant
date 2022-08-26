@@ -39,7 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(
                 new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IActorFactoryService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object);
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             // Act + Assert
             await Assert
@@ -59,7 +60,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
-                combinationOfBusinessRolesRuleService.Object);
+                combinationOfBusinessRolesRuleService.Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -117,7 +119,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
-                combinationOfBusinessRolesRuleService.Object);
+                combinationOfBusinessRolesRuleService.Object,
+                new Mock<IUniqueMarketRoleGridAreaService>().Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -162,6 +165,58 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.Equal(actor.Id, response.ActorId);
+        }
+
+        [Fact]
+        public async Task Handle_NewActorWithMarketRoles_CallsUniqueMarketRoleGridAreaService()
+        {
+            // Arrange
+            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorFactory = new Mock<IActorFactoryService>();
+            var uniqueService = new Mock<IUniqueMarketRoleGridAreaService>();
+
+            var target = new CreateActorHandler(
+                organizationExistsHelperService.Object,
+                actorFactory.Object,
+                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
+                uniqueService.Object);
+
+            var orgId = Guid.NewGuid();
+
+            var organization = new Organization(
+                new OrganizationId(orgId),
+                "SomeName",
+                Enumerable.Empty<Actor>(),
+                new BusinessRegisterIdentifier("123"),
+                new Address(null, null, null, null, "DK"),
+                null,
+                OrganizationStatus.Active);
+
+            var actor = new Actor(new ActorNumber(string.Empty));
+
+            organizationExistsHelperService
+                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
+                .ReturnsAsync(organization);
+
+            actorFactory
+                .Setup(x => x.CreateAsync(
+                    organization,
+                    It.IsAny<ActorNumber>(),
+                    It.IsAny<ActorName>(),
+                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
+                .ReturnsAsync(actor);
+
+            var command = new CreateActorCommand(
+                orgId,
+                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(string.Empty), Enumerable.Empty<ActorMarketRoleDto>()));
+
+            // Act
+            await target
+                .Handle(command, CancellationToken.None)
+                .ConfigureAwait(false);
+
+            // Assert
+            uniqueService.Verify(x => x.EnsureUniqueMarketRolesPerGridAreaAsync(actor), Times.Once);
         }
     }
 }

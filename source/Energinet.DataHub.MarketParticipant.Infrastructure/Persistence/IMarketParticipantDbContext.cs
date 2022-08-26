@@ -30,9 +30,24 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         DbSet<OrganizationEntity> Organizations { get; }
 
         /// <summary>
+        ///     Represent access to the actor database table
+        /// </summary>
+        DbSet<ActorEntity> Actors { get; }
+
+        /// <summary>
         ///     Represent access to the GridAreas database table
         /// </summary>
         DbSet<GridAreaEntity> GridAreas { get; }
+
+        /// <summary>
+        ///     Represent access to the MarketRole database table
+        /// </summary>
+        DbSet<MarketRoleEntity> MarketRoles { get; }
+
+        /// <summary>
+        ///     Represent access to the MarketRoleGridArea database table
+        /// </summary>
+        DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; }
 
         /// <summary>
         ///     Represent access to the ActorContacts database table
