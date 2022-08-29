@@ -4,23 +4,20 @@ about: Use this template for adding bug reports.
 labels: bug
 ---
 
-### Current Behavior
-<!--- A clear and concise description of the behavior. --->
+**Observation**
+<!--
+A clear and concise description of what the bug is.
+Include the way to reproduce the error, if known.
+-->
 
-### Expected behavior
-<!--- A clear and concise description of what you expected to happen. --->
+**Environment**
 
-### How to reproduce
-<!--- Please insert the steps required to reproduce the issue --->
+**Expected result**
 
-### Logs
-<!--- Please insert code example, stacktrace or other. If too long, please put in a gist and link it here. --->
+**Actual result**
 
-### Environment
-<!--- Please describe the current environment this error happened in. --->
+### Optional Task List
 
-### Possible Solution
-<!--- Only if you have suggestions on a fix for the bug. -->
+#### Tasks in Development
 
-### Additional context/screenshots
-<!--- Add any other context about the problem here. If applicable, add screenshots to help explain. -->
+#### Tasks Completed
