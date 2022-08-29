@@ -12,12 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
+
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
+    /// BFF client for grid areas in Energinet.DataHub.MarketParticipant.
     /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantGridAreaClient, IMarketParticipantActorContactClient, IMarketParticipantGridAreaOverviewClient
+    public interface IMarketParticipantGridAreaOverviewClient
     {
+        /// <summary>
+        /// List all grid areas.
+        /// </summary>
+        /// <returns>A list of grid areas <see cref="GridAreaDto"/>.</returns>
+        Task<IEnumerable<GridAreaOverviewItemDto>> GetGridAreaOverviewAsync();
     }
 }

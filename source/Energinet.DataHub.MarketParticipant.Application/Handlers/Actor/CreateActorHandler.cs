@@ -31,15 +31,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
         private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
+        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
             IActorFactoryService actorFactoryService,
-            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
+            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
             _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
+            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
         }
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
@@ -65,6 +68,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorNumber, actorName, marketRoles)
                 .ConfigureAwait(false);
+
+            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id);
         }

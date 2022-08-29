@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+using System;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
-    /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantGridAreaClient, IMarketParticipantActorContactClient, IMarketParticipantGridAreaOverviewClient
-    {
-    }
+    public sealed record GridAreaOverviewItem(
+        GridAreaId Id,
+        GridAreaName Name,
+        GridAreaCode Code,
+        PriceAreaCode PriceAreaCode,
+        DateTimeOffset ValidFrom,
+        DateTimeOffset? ValidTo,
+        ActorNumber? ActorNumber,
+        ActorName? ActorName);
 }
