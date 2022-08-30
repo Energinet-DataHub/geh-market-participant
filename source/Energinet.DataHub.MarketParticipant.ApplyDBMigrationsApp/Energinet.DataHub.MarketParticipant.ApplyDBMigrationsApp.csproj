@@ -24,7 +24,7 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dbup-sqlserver" Version="4.5.0" />
+    <PackageReference Include="dbup-sqlserver" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
