@@ -10,8 +10,9 @@ labels:
 - [ ] A subset of feature's acceptance criteria.
 - [ ] ...
 
-- [ ] Can be demoed?
+#### Testability
 - [ ] Can be tested?
+- [ ] Can be demoed?
 
 ### Optional Business Notes
 - None
