@@ -2,7 +2,7 @@
 
 ## Version 2.5.1
 
-- Updagted packages
+- Updated packages
 
 ## Version 2.4.2
 
