@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
+## Version 2.5.1
+
+- Updated packages
+
 ## Version 2.4.2
 
 - Pipeline updated
