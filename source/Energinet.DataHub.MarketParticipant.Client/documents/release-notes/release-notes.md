@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.4.0
+
+- Added Grid name update
+
+
 ## Version 2.3.0
 
 - Added FullFlexDate
