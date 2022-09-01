@@ -28,5 +28,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <returns>A list of grid areas <see cref="GridAreaDto"/>.</returns>
         Task<IEnumerable<GridAreaDto>> GetGridAreasAsync();
+
+        /// <summary>
+        /// Updates gridarea name
+        /// </summary>
+        /// <param name="changes">gridarea changes</param>
+        /// <returns>update task</returns>
+        Task UpdateGridAreaNameAsync(ChangeGridAreaDto changes);
     }
 }
