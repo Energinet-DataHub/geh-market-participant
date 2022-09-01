@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.2.6
+
+- Added FullFlexDate
+
 ## Version 2.2.5
 
 - Updated packages
