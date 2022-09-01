@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             return ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(GridAreasBaseUrl, changes).PutJsonAsync(changes));
+                    () => _httpClient.Request(GridAreasBaseUrl).PutJsonAsync(changes));
         }
     }
 }

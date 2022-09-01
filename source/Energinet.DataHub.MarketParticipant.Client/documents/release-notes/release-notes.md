@@ -4,7 +4,6 @@
 
 - Added Grid name update
 
-
 ## Version 2.3.0
 
 - Added FullFlexDate
