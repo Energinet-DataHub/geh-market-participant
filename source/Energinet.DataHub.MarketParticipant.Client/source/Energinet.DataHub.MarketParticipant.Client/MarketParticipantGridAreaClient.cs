@@ -58,5 +58,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
             return gridArea;
         }
+
+        public Task UpdateGridAreaNameAsync(ChangeGridAreaDto changes)
+        {
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(GridAreasBaseUrl, changes).PutJsonAsync(changes));
+        }
     }
 }
