@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
@@ -26,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 
         public Guid Id { get; set; }
         public Guid ActorInfoId { get; set; }
-        public int Function { get; set; }
+        public EicFunction Function { get; set; }
         public Collection<MarketRoleGridAreaEntity> GridAreas { get; }
     }
 }
