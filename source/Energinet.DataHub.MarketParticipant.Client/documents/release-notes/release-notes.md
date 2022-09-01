@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.3.0
+## Version 2.4.0
 
 - PriceAreaCode is now an enum.
+
+## Version 2.3.0
+
+- Added FullFlexDate
 
 ## Version 2.2.5
 

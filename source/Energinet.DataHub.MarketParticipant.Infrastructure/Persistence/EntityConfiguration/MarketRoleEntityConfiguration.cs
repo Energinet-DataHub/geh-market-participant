@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -27,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("MarketRole");
             builder.HasKey(role => role.Id);
             builder.Property(role => role.Id).ValueGeneratedOnAdd();
+            builder.Property(role => role.Function).HasConversion(x => (int)x, x => (EicFunction)x);
             builder
                 .HasMany(role => role.GridAreas)
                 .WithOne()
