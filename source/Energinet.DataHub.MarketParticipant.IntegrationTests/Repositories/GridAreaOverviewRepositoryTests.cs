@@ -54,29 +54,72 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task GetAsync_ActorMarketRoleAssigne_ReturnsWithActorNameAndNumber()
+        public async Task GetAsync_GridAccessProviderAssigned_ReturnsWithActorNameAndNumber()
         {
             // arrange
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var (gridAreaId, actorNumber, actorName) = await CreateGridAreaAssignedToGridAccessProvider();
-            var gridAreaIdNotAssignedToActor = await CreateGridArea();
+            var gridAreaId = await CreateGridArea(EicFunction.GridAccessProvider);
 
             var target = new GridAreaOverviewRepository(context);
 
             // act
             var actual = (await target
                 .GetAsync()
-                .ConfigureAwait(false)).ToList();
+                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
 
             // assert
-            Assert.NotNull(actual.Single(x => x.Id == gridAreaId && x.ActorName == actorName && x.ActorNumber == actorNumber));
-            Assert.NotNull(actual.Single(x => x.Id == gridAreaIdNotAssignedToActor));
+            Assert.NotNull(actual.ActorName);
+            Assert.NotNull(actual.ActorNumber);
         }
 
-        private async Task<(GridAreaId GridAreaId, ActorNumber ActorNumber, ActorName ActorName)> CreateGridAreaAssignedToGridAccessProvider()
+        [Fact]
+        public async Task GetAsync_OtherMarketRoleAssigned_DoesNotReturnWithActorNameAndNumber()
+        {
+            // arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+            var gridAreaId = await CreateGridArea(EicFunction.BalanceResponsibleParty);
+
+            var target = new GridAreaOverviewRepository(context);
+
+            // act
+            var actual = (await target
+                .GetAsync()
+                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+
+            // assert
+            Assert.Null(actual.ActorName);
+            Assert.Null(actual.ActorNumber);
+        }
+
+        [Fact]
+        public async Task GetAsync_NoMarketRoleAssigned_DoesNotReturnWithActorNameAndNumber()
+        {
+            // arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+            var gridAreaId = await CreateGridArea();
+
+            var target = new GridAreaOverviewRepository(context);
+
+            // act
+            var actual = (await target
+                .GetAsync()
+                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+
+            // assert
+            Assert.Null(actual.ActorName);
+            Assert.Null(actual.ActorNumber);
+        }
+
+        private async Task<GridAreaId> CreateGridArea(EicFunction? marketRole = null)
         {
             await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
             await using var scope = host.BeginScope();
@@ -88,29 +131,22 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var marketRoleGridAreaId = Guid.NewGuid();
 
             var gridAreaRepo = new GridAreaRepository(context);
-            var gridAreaId = await CreateGridArea();
+            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
 
-            var orgRepo = new OrganizationRepository(context);
-            var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"));
+            if (marketRole.HasValue)
+            {
+                var orgRepo = new OrganizationRepository(context);
+                var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"));
 
-            var actor = new Actor(new MockedGln());
-            actor.MarketRoles.Add(new ActorMarketRole(marketRoleId, EicFunction.GridAccessProvider, new[] { new ActorGridArea(gridAreaId.Value, new[] { MeteringPointType.D01VeProduction }) }));
+                var actor = new Actor(new MockedGln());
+                actor.MarketRoles.Add(new ActorMarketRole(marketRoleId, marketRole.Value, new[] { new ActorGridArea(gridAreaId.Value, new[] { MeteringPointType.D01VeProduction }) }));
 
-            org.Actors.Add(actor);
+                org.Actors.Add(actor);
 
-            await orgRepo.AddOrUpdateAsync(org);
+                await orgRepo.AddOrUpdateAsync(org);
+            }
 
-            return (gridAreaId, actor.ActorNumber, actor.Name);
-        }
-
-        private async Task<GridAreaId> CreateGridArea()
-        {
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-
-            var gridAreaRepo = new GridAreaRepository(context);
-            return await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
+            return gridAreaId;
         }
     }
 }

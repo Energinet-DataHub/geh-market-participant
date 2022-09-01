@@ -45,8 +45,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 join actorWithMarketRoleGridArea in actorsWithMarketRoleGridArea
                     on gridArea.Id equals actorWithMarketRoleGridArea.marketRoleGridArea.GridAreaId into gr
                 from actorWithMarketRoleGridArea in gr.DefaultIfEmpty()
-                where actorWithMarketRoleGridArea.actor == null || actorWithMarketRoleGridArea.marketRole.Function == (int)EicFunction.GridAccessProvider
-                select new { actorWithMarketRoleGridArea.actor, gridArea };
+                select new
+                {
+                    actor = actorWithMarketRoleGridArea.marketRole.Function == EicFunction.GridAccessProvider
+                        ? actorWithMarketRoleGridArea.actor
+                        : null,
+                    gridArea
+                };
 
             var result = await gridAreas.ToListAsync().ConfigureAwait(false);
 
