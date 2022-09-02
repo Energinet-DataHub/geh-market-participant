@@ -27,19 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
             {
                 return await func().ConfigureAwait(false);
             }
-            catch (FlurlHttpException e)
+            catch (FlurlHttpException ex) when (ex.StatusCode == 400)
             {
-                if (e.StatusCode is int statusCode)
-                {
-                    if (statusCode == 400)
-                    {
-                        throw new MarketParticipantException(statusCode, message: await e.GetResponseStringAsync().ConfigureAwait(false));
-                    }
-
-                    throw new MarketParticipantException(statusCode, string.Empty);
-                }
-
-                throw new MarketParticipantException(408, string.Empty);
+                var responseJson = await ex.GetResponseStringAsync().ConfigureAwait(false);
+                throw new MarketParticipantException(400, message: responseJson);
             }
         }
     }
