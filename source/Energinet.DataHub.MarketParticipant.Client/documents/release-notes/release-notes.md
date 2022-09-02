@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.5.0
+
+- Added Grid name update
+
 ## Version 2.4.0
 
 - Price area code is now an enumeration.
