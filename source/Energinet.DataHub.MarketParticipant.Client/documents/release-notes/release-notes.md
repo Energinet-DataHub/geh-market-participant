@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.5.1
+
+- Do not handle unexpected exceptions.
+
 ## Version 2.5.0
 
 - Added Grid name update
