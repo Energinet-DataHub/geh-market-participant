@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return gridArea;
         }
 
-        public Task UpdateGridAreaNameAsync(ChangeGridAreaDto changes)
+        public Task UpdateGridAreaAsync(ChangeGridAreaDto changes)
         {
             return ValidationExceptionHandler
                 .HandleAsync(

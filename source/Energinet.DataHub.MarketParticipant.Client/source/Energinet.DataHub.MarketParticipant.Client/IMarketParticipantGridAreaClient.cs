@@ -34,6 +34,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="changes">gridarea changes</param>
         /// <returns>update task</returns>
-        Task UpdateGridAreaNameAsync(ChangeGridAreaDto changes);
+        Task UpdateGridAreaAsync(ChangeGridAreaDto changes);
     }
 }
