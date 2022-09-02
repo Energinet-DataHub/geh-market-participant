@@ -4,6 +4,10 @@
 
 - Added Grid name update
 
+## Version 2.4.0
+
+- Price area code is now an enumeration.
+
 ## Version 2.3.0
 
 - Added FullFlexDate

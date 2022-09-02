@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Guid Id,
         string Code,
         string Name,
-        string PriceAreaCode,
+        PriceAreaCode PriceAreaCode,
         DateTimeOffset ValidFrom,
         DateTimeOffset? ValidTo);
 }
