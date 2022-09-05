@@ -5,10 +5,10 @@ labels:
 ---
 
 ### Acceptance Criteria
-<!-- The list has to be completable and testable by the business. -->
+<!-- The items have to be completable and testable by the business. -->
 
-- [ ] A subset of feature's acceptance criteria.
-- [ ] ...
+- A subset of feature's acceptance criteria.
+- ...
 
 #### Testability
 - [ ] Can be tested?
