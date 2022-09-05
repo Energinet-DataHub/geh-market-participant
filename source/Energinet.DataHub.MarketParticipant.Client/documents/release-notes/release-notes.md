@@ -1,5 +1,33 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.5.1
+
+- Do not handle unexpected exceptions.
+
+## Version 2.5.0
+
+- Added Grid name update
+
+## Version 2.4.0
+
+- Price area code is now an enumeration.
+
+## Version 2.3.0
+
+- Added FullFlexDate
+
+## Version 2.2.5
+
+- Updated packages
+
+## Version 2.2.1
+
+- Pipeline updated
+
+## Version 2.0.3 -> 2.2.0
+
+- Unknown
+
 ## Version 2.0.3
 
 - Added grid areas to actor.

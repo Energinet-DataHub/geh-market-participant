@@ -18,6 +18,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client;
 using Energinet.DataHub.MarketParticipant.Client.Models;
+using Flurl.Http;
 using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
 using Xunit;
@@ -48,9 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
             // Act + Assert
             var exception = await Assert
-                .ThrowsAsync<MarketParticipantException>(() => target.GetOrganizationsAsync())
+                .ThrowsAsync<FlurlHttpException>(() => target.GetOrganizationsAsync())
                 .ConfigureAwait(false);
-            Assert.Equal(exception.StatusCode, (int)HttpStatusCode.Unauthorized);
+            Assert.Equal((int)HttpStatusCode.Unauthorized, exception.StatusCode);
         }
 
         [Fact]
@@ -815,7 +816,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             ""Id"": ""2ac38237-9612-4ea5-8cf5-bac3734c10fd"",
             ""Code"": ""Code"",
             ""Name"": ""Name"",
-            ""PriceAreaCode"": ""PriceAreaCode""
+            ""PriceAreaCode"": ""Dk2""
         }
     ]}";
             using var httpTest = new HttpTest();
@@ -831,7 +832,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal(Guid.Parse("2ac38237-9612-4ea5-8cf5-bac3734c10fd"), actualContact.Id);
             Assert.Equal("Code", actualContact.Code);
             Assert.Equal("Name", actualContact.Name);
-            Assert.Equal("PriceAreaCode", actualContact.PriceAreaCode);
+            Assert.Equal(PriceAreaCode.Dk2, actualContact.PriceAreaCode);
         }
     }
 }

@@ -24,58 +24,60 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
 {
     public sealed class GridAreaAddedToActorIntegrationEventParser : IGridAreaAddedToActorIntegrationEventParser
     {
-        public byte[] Parse(GridAreaAddedToActorIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(GridAreaAddedToActorIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new GridAreaAddedToActorIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    MarketRoleFunction = (int)integrationEvent.Function,
-                    GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
-                    Type = integrationEvent.Type
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { GridAreaAddedToActorIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception e) when (e is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
-                throw new MarketParticipantException($"Error parsing {nameof(GridAreaAddedToActorIntegrationEventContract)}", e);
+                throw new MarketParticipantException($"Error parsing {nameof(GridAreaAddedToActorIntegrationEvent)}", ex);
             }
         }
 
-        internal GridAreaAddedToActorIntegrationEvent Parse(byte[] protoContract)
+        internal static GridAreaAddedToActorIntegrationEvent Parse(GridAreaAddedToActorIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static GridAreaAddedToActorIntegrationEvent MapContract(GridAreaAddedToActorIntegrationEventContract contract)
+        {
+            var integrationEvent = new GridAreaAddedToActorIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                contract.EventCreated.ToDateTime(),
+                Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
+                Guid.Parse(contract.GridAreaId),
+                Guid.Parse(contract.GridAreaLinkId));
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = GridAreaAddedToActorIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new GridAreaAddedToActorIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    contract.EventCreated.ToDateTime(),
-                    Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
-                    Guid.Parse(contract.GridAreaId),
-                    Guid.Parse(contract.GridAreaLinkId));
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static GridAreaAddedToActorIntegrationEventContract MapEvent(
+            GridAreaAddedToActorIntegrationEvent integrationEvent)
+        {
+            var contract = new GridAreaAddedToActorIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaAddedToActorIntegrationEvent)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                GridAreaId = integrationEvent.GridAreaId.ToString(),
+                MarketRoleFunction = (int)integrationEvent.Function,
+                GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

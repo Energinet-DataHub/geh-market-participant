@@ -22,56 +22,57 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.GridArea
 {
     public sealed class GridAreaUpdatedIntegrationEventParser : IGridAreaUpdatedIntegrationEventParser
     {
-        public byte[] Parse(GridAreaUpdatedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(GridAreaUpdatedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var contract = new GridAreaUpdatedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    GridAreaId = integrationEvent.GridAreaId.ToString(),
-                    Name = integrationEvent.Name,
-                    Code = integrationEvent.Code,
-                    PriceAreaCode = (int)integrationEvent.PriceAreaCode,
-                    GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
-                    Type = integrationEvent.Type
-                };
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { GridAreaUpdatedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
             }
         }
 
-        internal GridAreaUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal static GridAreaUpdatedIntegrationEvent Parse(GridAreaUpdatedIntegrationEventContract protoContract)
         {
-            try
+            return MapContract(protoContract);
+        }
+
+        private static GridAreaUpdatedIntegrationEvent MapContract(GridAreaUpdatedIntegrationEventContract contract)
+        {
+            var integrationEvent = new GridAreaUpdatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                Guid.Parse(contract.GridAreaId),
+                contract.Name,
+                contract.Code,
+                Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
+                Guid.Parse(contract.GridAreaLinkId));
+
+            if (integrationEvent.Type != contract.Type)
             {
-                var contract = GridAreaUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
-
-                var integrationEvent = new GridAreaUpdatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    Guid.Parse(contract.GridAreaId),
-                    contract.Name,
-                    contract.Code,
-                    Enum.IsDefined((PriceAreaCode)contract.PriceAreaCode) ? (PriceAreaCode)contract.PriceAreaCode : throw new FormatException(nameof(contract.PriceAreaCode)),
-                    Guid.Parse(contract.GridAreaLinkId));
-
-                if (integrationEvent.Type != contract.Type)
-                {
-                    throw new FormatException("Invalid Type");
-                }
-
-                return integrationEvent;
+                throw new FormatException("Invalid Type");
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+
+            return integrationEvent;
+        }
+
+        private static GridAreaUpdatedIntegrationEventContract MapEvent(GridAreaUpdatedIntegrationEvent integrationEvent)
+        {
+            var contract = new GridAreaUpdatedIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array for {nameof(GridAreaUpdatedIntegrationEvent)}", ex);
-            }
+                Id = integrationEvent.Id.ToString(),
+                GridAreaId = integrationEvent.GridAreaId.ToString(),
+                Name = integrationEvent.Name,
+                Code = integrationEvent.Code,
+                PriceAreaCode = (int)integrationEvent.PriceAreaCode,
+                GridAreaLinkId = integrationEvent.GridAreaLinkId.ToString(),
+                Type = integrationEvent.Type
+            };
+            return contract;
         }
     }
 }

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Text.Json.Serialization;
+using Ardalis.SmartEnum.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
@@ -22,5 +24,6 @@ public sealed class MeteringPointTypeAddedToActorIntegrationEvent : IntegrationE
     public Guid ActorId { get; set; }
     public EicFunction Function { get; set; }
     public Guid GridAreaId { get; set; }
+    [JsonConverter(typeof(SmartEnumNameConverter<MeteringPointType, int>))]
     public MeteringPointType Type { get; set; } = MeteringPointType.Unknown;
 }

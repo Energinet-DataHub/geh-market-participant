@@ -13,11 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -31,15 +31,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
         private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
+        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
             IActorFactoryService actorFactoryService,
-            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService)
+            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
+            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
             _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
+            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
         }
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
@@ -52,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             var actorNumber = new ActorNumber(request.Actor.ActorNumber.Value);
             var actorName = new ActorName(request.Actor.Name.Value);
-            var marketRoles = CreateMarketRoles(request.Actor).ToList();
+            var marketRoles = MarketRoleMapper.Map(request.Actor.MarketRoles).ToList();
 
             var allMarketRolesForActorGln = organization.Actors
                 .Where(x => x.ActorNumber == actorNumber)
@@ -66,28 +69,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .CreateAsync(organization, actorNumber, actorName, marketRoles)
                 .ConfigureAwait(false);
 
+            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+
             return new CreateActorResponse(actor.Id);
-        }
-
-        private static IEnumerable<ActorGridArea> CreateGridAreas(IEnumerable<ActorGridAreaDto> gridAreaDtos)
-        {
-            return gridAreaDtos.Select(gridArea =>
-                new ActorGridArea(gridArea.Id, CreateMeteringPointTypes(gridArea.MeteringPointTypes)));
-        }
-
-        private static IEnumerable<MeteringPointType> CreateMeteringPointTypes(IEnumerable<string> meteringPointTypes)
-        {
-            return meteringPointTypes.Select(type => MeteringPointType.FromName(type, true));
-        }
-
-        private static IEnumerable<ActorMarketRole> CreateMarketRoles(CreateActorDto actorDto)
-        {
-            foreach (var marketRole in actorDto.MarketRoles)
-            {
-                var function = Enum.Parse<EicFunction>(marketRole.EicFunction, true);
-                var gridAreas = CreateGridAreas(marketRole.GridAreas);
-                yield return new ActorMarketRole(function, gridAreas);
-            }
         }
     }
 }

@@ -40,7 +40,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                 gridArea.Id.Value,
                 gridArea.Code.Value,
                 gridArea.Name.Value,
-                gridArea.PriceAreaCode.ToString())));
+                gridArea.PriceAreaCode.ToString(),
+                gridArea.ValidFrom,
+                gridArea.ValidTo)));
         }
     }
 }

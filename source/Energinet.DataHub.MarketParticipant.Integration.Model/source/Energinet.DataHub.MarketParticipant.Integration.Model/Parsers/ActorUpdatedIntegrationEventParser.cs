@@ -25,82 +25,84 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
 {
     public sealed class ActorUpdatedIntegrationEventParser : IActorUpdatedIntegrationEventParser
     {
-        public byte[] Parse(ActorUpdatedIntegrationEvent integrationEvent)
+        public byte[] ParseToSharedIntegrationEvent(ActorUpdatedIntegrationEvent integrationEvent)
         {
             try
             {
                 ArgumentNullException.ThrowIfNull(integrationEvent, nameof(integrationEvent));
-
-                var externalActorId = integrationEvent.ExternalActorId.HasValue
-                    ? integrationEvent.ExternalActorId.Value.ToString()
-                    : string.Empty;
-
-                var contract = new ActorUpdatedIntegrationEventContract
-                {
-                    Id = integrationEvent.Id.ToString(),
-                    EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
-                    ActorId = integrationEvent.ActorId.ToString(),
-                    ExternalActorId = externalActorId,
-                    OrganizationId = integrationEvent.OrganizationId.ToString(),
-                    ActorNumber = integrationEvent.ActorNumber,
-                    Status = (int)integrationEvent.Status,
-                    ActorMarketRoles =
-                    {
-                        integrationEvent.ActorMarketRoles.Select(x => new Protobuf.ActorMarketRole
-                        {
-                            Function = (int)x.Function, GridAreas =
-                            {
-                                x.GridAreas.Select(g => new Protobuf.ActorGridArea
-                                {
-                                    Id = g.Id.ToString(),
-                                    MeteringPointTypes = { g.MeteringPointTypes }
-                                })
-                            }
-                        })
-                    }
-                };
-
-                foreach (var x in integrationEvent.BusinessRoles)
-                {
-                    contract.BusinessRoles.Add((int)x);
-                }
-
+                var eventContract = MapEvent(integrationEvent);
+                var contract = new SharedIntegrationEventContract { ActorUpdatedIntegrationEvent = eventContract };
                 return contract.ToByteArray();
             }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException)
+            catch (Exception ex)
             {
                 throw new MarketParticipantException($"Error parsing {nameof(ActorUpdatedIntegrationEvent)}", ex);
             }
         }
 
-        internal ActorUpdatedIntegrationEvent Parse(byte[] protoContract)
+        internal static ActorUpdatedIntegrationEvent Parse(ActorUpdatedIntegrationEventContract contract)
         {
-            try
-            {
-                var contract = ActorUpdatedIntegrationEventContract.Parser.ParseFrom(protoContract);
+            return MapContract(contract);
+        }
 
-                Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
-                    ? id
-                    : null;
+        private static ActorUpdatedIntegrationEvent MapContract(ActorUpdatedIntegrationEventContract contract)
+        {
+            Guid? externalActorId = Guid.TryParse(contract.ExternalActorId, out var id)
+                ? id
+                : null;
 
-                return new ActorUpdatedIntegrationEvent(
-                    Guid.Parse(contract.Id),
-                    contract.EventCreated.ToDateTime(),
-                    Guid.Parse(contract.ActorId),
-                    Guid.Parse(contract.OrganizationId),
-                    externalActorId,
-                    contract.ActorNumber,
-                    Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
-                    contract.BusinessRoles.Select(
-                        x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
-                    contract.ActorMarketRoles.Select(
-                        x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
-                            g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))));
-            }
-            catch (Exception ex) when (ex is InvalidProtocolBufferException or FormatException)
+            return new ActorUpdatedIntegrationEvent(
+                Guid.Parse(contract.Id),
+                contract.EventCreated.ToDateTime(),
+                Guid.Parse(contract.ActorId),
+                Guid.Parse(contract.OrganizationId),
+                externalActorId,
+                contract.ActorNumber,
+                Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
+                contract.BusinessRoles.Select(
+                    x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
+                contract.ActorMarketRoles.Select(
+                    x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
+                        g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))));
+        }
+
+        private static ActorUpdatedIntegrationEventContract MapEvent(ActorUpdatedIntegrationEvent integrationEvent)
+        {
+            var externalActorId = integrationEvent.ExternalActorId.HasValue
+                ? integrationEvent.ExternalActorId.Value.ToString()
+                : string.Empty;
+
+            var contract = new ActorUpdatedIntegrationEventContract
             {
-                throw new MarketParticipantException($"Error parsing byte array  {nameof(ActorUpdatedIntegrationEvent)}", ex);
+                Id = integrationEvent.Id.ToString(),
+                EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
+                ActorId = integrationEvent.ActorId.ToString(),
+                ExternalActorId = externalActorId,
+                OrganizationId = integrationEvent.OrganizationId.ToString(),
+                ActorNumber = integrationEvent.ActorNumber,
+                Status = (int)integrationEvent.Status,
+                ActorMarketRoles =
+                {
+                    integrationEvent.ActorMarketRoles.Select(x => new Protobuf.ActorMarketRole
+                    {
+                        Function = (int)x.Function, GridAreas =
+                        {
+                            x.GridAreas.Select(g => new Protobuf.ActorGridArea
+                            {
+                                Id = g.Id.ToString(),
+                                MeteringPointTypes = { g.MeteringPointTypes }
+                            })
+                        }
+                    })
+                }
+            };
+
+            foreach (var x in integrationEvent.BusinessRoles)
+            {
+                contract.BusinessRoles.Add((int)x);
             }
+
+            return contract;
         }
     }
 }

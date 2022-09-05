@@ -30,5 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public string Name { get; set; }
         public string Code { get; set; }
         public PriceAreaCode PriceAreaCode { get; set; }
+        public DateTimeOffset ValidFrom { get; set; }
+        public DateTimeOffset? ValidTo { get; set; }
+        public DateTimeOffset? FullFlexDate { get; set; }
     }
 }
