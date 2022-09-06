@@ -44,7 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                 gridArea.ValidFrom,
                 gridArea.ValidTo,
                 gridArea.ActorNumber?.Value,
-                gridArea.ActorName?.Value)));
+                gridArea.ActorName?.Value,
+                gridArea.FullFlexDate)));
         }
     }
 }
