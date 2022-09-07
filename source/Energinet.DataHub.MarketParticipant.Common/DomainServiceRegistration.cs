@@ -44,12 +44,14 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
             container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
-            container.Register<IUserIdProvider>(() =>
-            {
-                var user = container.GetInstance<IHttpContextAccessor>().HttpContext.User;
-                var subject = user.Claims.First(x => x.Type == "sub").Value;
-                return new UserIdProvider(Guid.Parse(subject));
-            }, Lifestyle.Scoped);
+            container.Register<IUserIdProvider>(
+                () =>
+                {
+                    var user = container.GetInstance<IHttpContextAccessor>().HttpContext.User;
+                    var subject = user.Claims.First(x => x.Type == "sub").Value;
+                    return new UserIdProvider(Guid.Parse(subject));
+                },
+                Lifestyle.Scoped);
             container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
             container.Collection.Register<IBusinessRole>(
                 new ElectricalSupplierRole(),
