@@ -14,6 +14,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     {
         private readonly ILogger<OrganizationController> _logger;
         private readonly IUserIdProvider _userIdProvider;
+        private readonly ClaimsPrincipalContext _context;
 
-        public JwtController(ILogger<OrganizationController> logger, IUserIdProvider userIdProvider)
+        public JwtController(ILogger<OrganizationController> logger, IUserIdProvider userIdProvider, ClaimsPrincipalContext context)
         {
             _logger = logger;
             _userIdProvider = userIdProvider;
+            _context = context;
         }
 
         [HttpGet]
@@ -41,7 +44,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 async () =>
                     {
                         await Task.CompletedTask.ConfigureAwait(false);
-                        return Ok($"ClaimsCount: {User.Claims.Count()}, User.Identity.Name: {User.Identity?.Name}, Claims: {string.Join(",", User.Claims.Select(x => x.Type))}");
+                        return Ok(
+                            $"User: ClaimsCount: {User.Claims.Count()}, User.Identity.Name: {User.Identity?.Name}, Claims: {string.Join(",", User.Claims.Select(x => x.Type))}\n" +
+                            $"Context: ClaimsCount: {_context.ClaimsPrincipal?.Claims.Count()}, User.Identity.Name: {_context.ClaimsPrincipal?.Identity?.Name}, Claims: {string.Join(",", _context.ClaimsPrincipal?.Claims.Select(x => x.Type) ?? Enumerable.Empty<string>())}");
 
                         // var userId = _userIdProvider.UserId;
                         // return Ok(userId.ToString());
