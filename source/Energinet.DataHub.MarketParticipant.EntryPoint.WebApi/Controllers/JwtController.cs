@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
@@ -22,12 +23,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class JwtContoller : ControllerBase
+    public class JwtController : ControllerBase
     {
         private readonly ILogger<OrganizationController> _logger;
         private readonly IUserIdProvider _userIdProvider;
 
-        public JwtContoller(ILogger<OrganizationController> logger, IUserIdProvider userIdProvider)
+        public JwtController(ILogger<OrganizationController> logger, IUserIdProvider userIdProvider)
         {
             _logger = logger;
             _userIdProvider = userIdProvider;
@@ -40,8 +41,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 async () =>
                     {
                         await Task.CompletedTask.ConfigureAwait(false);
-                        var userId = _userIdProvider.UserId;
-                        return Ok(userId.ToString());
+                        return Ok(string.Join(",", User.Claims.Select(x => x.Type)));
+
+                        // var userId = _userIdProvider.UserId;
+                        // return Ok(userId.ToString());
                     },
                 _logger).ConfigureAwait(false);
         }

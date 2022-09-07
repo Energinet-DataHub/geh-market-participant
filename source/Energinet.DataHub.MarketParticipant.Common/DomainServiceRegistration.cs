@@ -51,9 +51,11 @@ namespace Energinet.DataHub.MarketParticipant.Common
                     var accessor = container.GetInstance<IHttpContextAccessor>();
                     return new UserIdProvider(() =>
                     {
-                        var subjectClaim = accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-                        var subject = subjectClaim!.Value;
-                        return Guid.Parse(subject);
+                        return Guid.NewGuid();
+
+                        // var subjectClaim = accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+                        // var subject = subjectClaim!.Value;
+                        // return Guid.Parse(subject);
                     });
                 },
                 Lifestyle.Scoped);
