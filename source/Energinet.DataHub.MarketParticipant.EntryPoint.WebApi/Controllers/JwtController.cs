@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 async () =>
                     {
                         await Task.CompletedTask.ConfigureAwait(false);
-                        return Ok(string.Join(",", User.Claims.Select(x => x.Type)));
+                        return Ok($"ClaimsCount: {User.Claims.Count()}, User.Identity.Name: {User.Identity?.Name}, Claims: {string.Join(",", User.Claims.Select(x => x.Type))}");
 
                         // var userId = _userIdProvider.UserId;
                         // return Ok(userId.ToString());
