@@ -17,12 +17,12 @@ using System;
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// ??
+    /// Provides access to the current users ID
     /// </summary>
     public interface IUserIdProvider
     {
         /// <summary>
-        /// ??
+        /// Returns the current users ID
         /// </summary>
         Guid UserId { get; }
     }
