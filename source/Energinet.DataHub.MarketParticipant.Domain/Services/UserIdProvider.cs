@@ -18,11 +18,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     public sealed class UserIdProvider : IUserIdProvider
     {
-        public UserIdProvider(Guid userId)
+        private readonly Func<Guid> _userIdFunc;
+
+        public UserIdProvider(Func<Guid> userIdFunc)
         {
-            UserId = userId;
+            _userIdFunc = userIdFunc;
         }
 
-        public Guid UserId { get; }
+        public Guid UserId => _userIdFunc();
     }
 }
