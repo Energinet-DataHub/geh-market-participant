@@ -44,12 +44,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 async () =>
                     {
                         await Task.CompletedTask.ConfigureAwait(false);
-                        return Ok(
-                            $"User: ClaimsCount: {User.Claims.Count()}, User.Identity.Name: {User.Identity?.Name}, Claims: {string.Join(",", User.Claims.Select(x => x.Type))}\n" +
-                            $"Context: ClaimsCount: {_context.ClaimsPrincipal?.Claims.Count()}, User.Identity.Name: {_context.ClaimsPrincipal?.Identity?.Name}, Claims: {string.Join(",", _context.ClaimsPrincipal?.Claims.Select(x => x.Type) ?? Enumerable.Empty<string>())}");
 
-                        // var userId = _userIdProvider.UserId;
-                        // return Ok(userId.ToString());
+                        // return Ok(
+                        //     $"User: ClaimsCount: {User.Claims.Count()}, User.Identity.Name: {User.Identity?.Name}, Claims: {string.Join(",", User.Claims.Select(x => x.Type))}\n" +
+                        //     $"Context: ClaimsCount: {_context.ClaimsPrincipal?.Claims.Count()}, User.Identity.Name: {_context.ClaimsPrincipal?.Identity?.Name}, Claims: {string.Join(",", _context.ClaimsPrincipal?.Claims.Select(x => x.Type) ?? Enumerable.Empty<string>())}");
+                        var userId = _userIdProvider.UserId;
+                        return Ok(userId.ToString());
                     },
                 _logger).ConfigureAwait(false);
         }

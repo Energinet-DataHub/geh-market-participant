@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -48,14 +49,11 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IUserIdProvider>(
                 () =>
                 {
-                    var accessor = container.GetInstance<IHttpContextAccessor>();
+                    var accessor = container.GetInstance<ClaimsPrincipalContext>();
                     return new UserIdProvider(() =>
                     {
-                        return Guid.NewGuid();
-
-                        // var subjectClaim = accessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
-                        // var subject = subjectClaim!.Value;
-                        // return Guid.Parse(subject);
+                        var subjectClaim = accessor.ClaimsPrincipal!.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
+                        return Guid.Parse(subjectClaim.Value);
                     });
                 },
                 Lifestyle.Scoped);
