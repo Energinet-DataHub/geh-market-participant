@@ -36,8 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             var entity = new GridAreaAuditLogEntryEntity
             {
                 UserId = logEntry.UserId,
-                Message = logEntry.Message,
                 Timestamp = logEntry.Timestamp,
+                Field = logEntry.Field,
+                OldValue = logEntry.OldValue,
+                NewValue = logEntry.NewValue,
                 GridAreaId = logEntry.GridAreaId
             };
 

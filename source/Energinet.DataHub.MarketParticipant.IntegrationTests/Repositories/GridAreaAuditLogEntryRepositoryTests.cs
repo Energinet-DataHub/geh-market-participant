@@ -47,8 +47,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
 
             var userId = Guid.NewGuid();
+
             var target = new GridAreaAuditLogEntryRepository(context);
-            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, Guid.NewGuid().ToString(), gridAreaId.Value);
+            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId.Value);
 
             // act
             await target
@@ -60,8 +61,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                                 select l).SingleAsync();
 
             // assert
-            Assert.Equal(entry.Message, actual.Message);
             Assert.Equal(entry.Timestamp, actual.Timestamp);
+            Assert.Equal(entry.UserId, actual.UserId);
+            Assert.Equal(entry.Field, actual.Field);
+            Assert.Equal(entry.OldValue, actual.OldValue);
+            Assert.Equal(entry.NewValue, actual.NewValue);
             Assert.Equal(entry.GridAreaId, actual.GridAreaId);
         }
     }
