@@ -16,9 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using SimpleInjector;
 using SimpleInjector.Lifestyles;
 
@@ -46,6 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
 
             host._startup.Container.Options.AllowOverridingRegistrations = true;
+            InitUserIdProvider(host._startup.Container);
             return Task.FromResult(host);
         }
 
@@ -72,6 +75,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .AddInMemoryCollection(keyValuePairs)
                 .AddEnvironmentVariables()
                 .Build();
+        }
+
+        private static void InitUserIdProvider(Container container)
+        {
+            var userIdProvider = new Mock<IUserIdProvider>();
+            userIdProvider.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            container.Register<IUserIdProvider>(() => userIdProvider.Object, Lifestyle.Singleton);
         }
     }
 }

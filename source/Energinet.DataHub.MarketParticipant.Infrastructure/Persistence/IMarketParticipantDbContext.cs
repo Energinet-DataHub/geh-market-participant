@@ -70,6 +70,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
 
         /// <summary>
+        ///     Represent access to the GridAreaAuditLogEntry database table
+        /// </summary>
+        DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; }
+
+        /// <summary>
         ///     Saves changes to the database.
         /// </summary>
         Task<int> SaveChangesAsync();
