@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -46,6 +49,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context.GridAreaAuditLogEntries.Add(entity);
 
             await _context.SaveChangesAsync().ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<GridAreaAuditLogEntry>> GetAsync(GridAreaId gridAreaId)
+        {
+            var query = from l in _context.GridAreaAuditLogEntries.AsQueryable()
+                        where l.GridAreaId == gridAreaId.Value
+                        select l;
+
+            return (await query.ToListAsync().ConfigureAwait(false))
+                .Select(x =>
+                    new GridAreaAuditLogEntry(
+                        x.Timestamp,
+                        x.UserId,
+                        x.Field,
+                        x.OldValue,
+                        x.NewValue,
+                        x.GridAreaId));
         }
     }
 }

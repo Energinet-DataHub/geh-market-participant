@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -25,6 +26,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Inserts a <see cref="GridAreaAuditLogEntry"/>
         /// </summary>
+        /// <param name="logEntry"></param>
         Task InsertAsync(GridAreaAuditLogEntry logEntry);
+
+        /// <summary>
+        /// Retrieves all log entries for a given grid area
+        /// </summary>
+        /// <param name="gridAreaId"></param>
+        /// <returns>Grid area log entries for the given grid area</returns>
+        Task<IEnumerable<GridAreaAuditLogEntry>> GetAsync(GridAreaId gridAreaId);
     }
 }

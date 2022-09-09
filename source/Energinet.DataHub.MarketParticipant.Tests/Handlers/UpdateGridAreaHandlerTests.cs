@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Domain.Model.GridAreaAuditLogEntryField;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {

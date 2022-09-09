@@ -94,5 +94,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 },
                 _logger).ConfigureAwait(false);
         }
+
+        [HttpGet]
+        [HttpGet("{gridAreaId:guid}/auditlogentry")]
+        public async Task<IActionResult> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var command = new GetGridAreaAuditLogEntriesCommand(gridAreaId);
+                    var response = await _mediator.Send(command).ConfigureAwait(false);
+                    return Ok(response.GridAreaAuditLogEntries);
+                },
+                _logger).ConfigureAwait(false);
+        }
     }
 }
