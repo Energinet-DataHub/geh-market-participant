@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
@@ -35,5 +36,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="changes">gridarea changes</param>
         /// <returns>update task</returns>
         Task UpdateGridAreaAsync(ChangeGridAreaDto changes);
+
+        /// <summary>
+        /// List all grid areas audit log entries for the given grid area.
+        /// </summary>
+        /// <param name="gridAreaId">ID of the grid area</param>
+        /// <returns>A list of <see cref="GridAreaAuditLogEntryDto"/>.</returns>
+        Task<IEnumerable<GridAreaAuditLogEntryDto>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId);
     }
 }
