@@ -95,7 +95,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpGet]
         [HttpGet("{gridAreaId:guid}/auditlogentry")]
         public async Task<IActionResult> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
