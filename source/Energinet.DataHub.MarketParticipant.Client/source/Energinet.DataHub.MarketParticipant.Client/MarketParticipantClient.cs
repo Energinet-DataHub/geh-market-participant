@@ -106,5 +106,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             return _marketParticipantGridAreaOverviewClient.GetGridAreaOverviewAsync();
         }
+
+        public Task<IEnumerable<GridAreaAuditLogEntryDto>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
+        {
+            return _marketParticipantGridAreaClient.GetGridAreaAuditLogEntriesAsync(gridAreaId);
+        }
     }
 }

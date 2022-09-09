@@ -65,5 +65,19 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .HandleAsync(
                     () => _httpClient.Request(GridAreasBaseUrl).PutJsonAsync(changes));
         }
+
+        public async Task<IEnumerable<GridAreaAuditLogEntryDto>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _httpClient.Request(GridAreasBaseUrl, gridAreaId, "auditlogentry").GetAsync())
+                .ConfigureAwait(false);
+
+            var gridAreas = await response
+                .GetJsonAsync<IEnumerable<GridAreaAuditLogEntryDto>>()
+                .ConfigureAwait(false);
+
+            return gridAreas;
+        }
     }
 }

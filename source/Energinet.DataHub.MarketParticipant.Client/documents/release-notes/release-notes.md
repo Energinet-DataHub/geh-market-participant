@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.5.2
+
+- API for retrieving audit log entries for a grid area.
+
 ## Version 2.5.1
 
 - Do not handle unexpected exceptions.

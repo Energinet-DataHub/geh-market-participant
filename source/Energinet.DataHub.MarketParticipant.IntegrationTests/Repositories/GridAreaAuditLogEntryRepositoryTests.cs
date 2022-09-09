@@ -68,5 +68,32 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(entry.NewValue, actual.NewValue);
             Assert.Equal(entry.GridAreaId, actual.GridAreaId);
         }
+
+        [Fact]
+        public async Task Get_GridAreaIdProvided_ReturnsLogEntriesForGridArea()
+        {
+            // arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+            var gridAreaRepo = new GridAreaRepository(context);
+            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
+
+            var userId = Guid.NewGuid();
+
+            var target = new GridAreaAuditLogEntryRepository(context);
+            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId.Value);
+            await target
+                .InsertAsync(entry)
+                .ConfigureAwait(false);
+
+            // act
+            var actual = (await target.GetAsync(gridAreaId)).ToList();
+
+            // assert
+            Assert.Equal(1, actual.Count);
+            Assert.Equal(gridAreaId.Value, actual.Single().GridAreaId);
+        }
     }
 }
