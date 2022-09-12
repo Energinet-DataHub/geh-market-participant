@@ -21,8 +21,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public UpdateGridAreaCommandRuleSet()
         {
-            RuleFor(command => command.GridAreaDto.Name)
-                .NotEmpty();
+            RuleFor(command => command.GridAreaDto)
+                .NotNull()
+                .ChildRules(validator =>
+                {
+                    validator
+                        .RuleFor(gridArea => gridArea.Name)
+                        .NotEmpty()
+                        .Length(1, 50);
+                });
         }
     }
 }
