@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -33,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // arrange
-            var target = new GetGridAreaAuditLogEntriesHandler(new Mock<IGridAreaAuditLogEntryRepository>().Object);
+            var target = new GetGridAreaAuditLogEntriesHandler(new Mock<IGridAreaAuditLogEntryRepository>().Object, new Mock<IUserDisplayNameProvider>().Object);
 
             // act assert
             await Assert
@@ -45,21 +46,27 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_Command_CallsRepository()
         {
             // arrange
+            var userId = Guid.NewGuid();
+
             var repositoryMock = new Mock<IGridAreaAuditLogEntryRepository>();
             repositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
                 .ReturnsAsync(new[]
                     {
-                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, Guid.NewGuid(), Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", Guid.NewGuid())
+                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", Guid.NewGuid())
                     });
 
-            var target = new GetGridAreaAuditLogEntriesHandler(repositoryMock.Object);
+            var userDisplayNameProviderMock = new Mock<IUserDisplayNameProvider>();
+            userDisplayNameProviderMock.Setup(x => x.GetUserDisplayNamesAsync(new[] { userId })).ReturnsAsync(new[] { new UserDisplayName(userId, "name") });
+
+            var target = new GetGridAreaAuditLogEntriesHandler(repositoryMock.Object, userDisplayNameProviderMock.Object);
 
             // act
             var actual = await target.Handle(new GetGridAreaAuditLogEntriesCommand(Guid.NewGuid()), CancellationToken.None).ConfigureAwait(false);
 
             // assert
             Assert.Single(actual.GridAreaAuditLogEntries);
+            Assert.Equal("name", actual.GridAreaAuditLogEntries.Single().UserDisplayName);
         }
     }
 }

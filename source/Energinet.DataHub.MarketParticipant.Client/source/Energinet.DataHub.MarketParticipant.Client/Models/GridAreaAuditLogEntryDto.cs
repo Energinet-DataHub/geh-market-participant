@@ -16,5 +16,5 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record GridAreaAuditLogEntryDto(DateTimeOffset Timestamp, Guid UserId, GridAreaAuditLogEntryField Field, string OldValue, string NewValue, Guid GridAreaId);
+    public sealed record GridAreaAuditLogEntryDto(DateTimeOffset Timestamp, string? UserDisplayName, GridAreaAuditLogEntryField Field, string OldValue, string NewValue, Guid GridAreaId);
 }

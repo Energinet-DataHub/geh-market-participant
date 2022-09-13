@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Application.Commands.GridArea.GridAreaAuditLogEntryField;
 
@@ -27,23 +28,28 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
     public sealed class GetGridAreaAuditLogEntriesHandler : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
     {
         private readonly IGridAreaAuditLogEntryRepository _repository;
+        private readonly IUserDisplayNameProvider _userDisplayNameProvider;
 
-        public GetGridAreaAuditLogEntriesHandler(IGridAreaAuditLogEntryRepository repository)
+        public GetGridAreaAuditLogEntriesHandler(IGridAreaAuditLogEntryRepository repository, IUserDisplayNameProvider userDisplayNameProvider)
         {
             _repository = repository;
+            _userDisplayNameProvider = userDisplayNameProvider;
         }
 
         public async Task<GetGridAreaAuditLogEntriesResponse> Handle(GetGridAreaAuditLogEntriesCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var entries = await _repository.GetAsync(new GridAreaId(request.GridAreaId)).ConfigureAwait(false);
+            var entries = (await _repository.GetAsync(new GridAreaId(request.GridAreaId)).ConfigureAwait(false)).ToList();
+
+            var users = (await _userDisplayNameProvider.GetUserDisplayNamesAsync(entries.Select(x => x.UserId).Except(new[] { Guid.Empty })).ConfigureAwait(false))
+                .ToDictionary(x => x.Id, x => x.Value);
 
             return new GetGridAreaAuditLogEntriesResponse(
-                entries.Select(x =>
-                    new GridAreaAuditLogEntryDto(
+                entries.Select(
+                    x => new GridAreaAuditLogEntryDto(
                         x.Timestamp,
-                        x.UserId,
+                        users.TryGetValue(x.UserId, out var userDisplayName) ? userDisplayName : null,
                         (GridAreaAuditLogEntryField)x.Field,
                         x.OldValue,
                         x.NewValue,
