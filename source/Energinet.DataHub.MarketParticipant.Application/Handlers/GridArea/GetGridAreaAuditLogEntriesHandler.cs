@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 
             var entries = (await _repository.GetAsync(new GridAreaId(request.GridAreaId)).ConfigureAwait(false)).ToList();
 
-            var users = (await _userDisplayNameProvider.GetUserDisplayNamesAsync(entries.Select(x => x.UserId).Except(new[] { Guid.Empty })).ConfigureAwait(false))
+            var users = (await _userDisplayNameProvider.GetUserDisplayNamesAsync(entries.Select(x => x.UserId)).ConfigureAwait(false))
                 .ToDictionary(x => x.Id, x => x.Value);
 
             return new GetGridAreaAuditLogEntriesResponse(
