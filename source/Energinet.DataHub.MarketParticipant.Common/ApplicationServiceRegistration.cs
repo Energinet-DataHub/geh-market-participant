@@ -53,6 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<ForceSendIntegrationEventsCommand>, ForceSendIntegrationEventsCommandRuleSet>();
             container.Register<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
+            container.Register<IValidator<GetGridAreaAuditLogEntriesCommand>, GetGridAreaAuditLogEntriesCommandRuleSet>();
 
             container.Register<IActiveDirectoryService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
@@ -81,6 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IMarketRoleRemovedFromActorIntegrationEventParser, MarketRoleRemovedFromActorIntegrationEventParser>();
             container.Register<IContactRemovedFromActorIntegrationEventParser, ContactRemovedFromActorIntegrationEventParser>();
             container.Register<IContactAddedToActorIntegrationEventParser, ContactAddedToActorIntegrationEventParser>();
+            container.Register<IUserDisplayNameProvider, UserDisplayNameProvider>();
 
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
         }

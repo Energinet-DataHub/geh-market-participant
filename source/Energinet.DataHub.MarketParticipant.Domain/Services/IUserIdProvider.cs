@@ -14,16 +14,16 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed record GridAreaOverviewItemDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo,
-        string? ActorNumber,
-        string? ActorName,
-        DateTimeOffset? FullFlexDate);
+    /// <summary>
+    /// Provides access to the current users ID
+    /// </summary>
+    public interface IUserIdProvider
+    {
+        /// <summary>
+        /// Returns the current users ID
+        /// </summary>
+        Guid UserId { get; }
+    }
 }

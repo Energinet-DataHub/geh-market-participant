@@ -12,18 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public sealed record GridAreaOverviewItemDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo,
-        string? ActorNumber,
-        string? ActorName,
-        DateTimeOffset? FullFlexDate);
+    public enum GridAreaAuditLogEntryField
+    {
+        Name
+    }
 }

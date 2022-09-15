@@ -14,16 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record GridAreaOverviewItemDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo,
-        string? ActorNumber,
-        string? ActorName,
-        DateTimeOffset? FullFlexDate);
+    public sealed record GridAreaAuditLogEntryDto(DateTimeOffset Timestamp, string? UserDisplayName, GridAreaAuditLogEntryField Field, string OldValue, string NewValue, Guid GridAreaId);
 }

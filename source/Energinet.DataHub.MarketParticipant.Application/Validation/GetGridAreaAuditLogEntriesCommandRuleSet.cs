@@ -17,19 +17,7 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class UpdateGridAreaCommandRuleSet : AbstractValidator<UpdateGridAreaCommand>
+    public sealed class GetGridAreaAuditLogEntriesCommandRuleSet : AbstractValidator<GetGridAreaAuditLogEntriesCommand>
     {
-        public UpdateGridAreaCommandRuleSet()
-        {
-            RuleFor(command => command.GridAreaDto)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(gridArea => gridArea.Name)
-                        .NotEmpty()
-                        .Length(1, 50);
-                });
-        }
     }
 }

@@ -42,6 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
         public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
         public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
         public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
+        public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
 
         public Task<int> SaveChangesAsync()
         {
@@ -60,6 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
             modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
             modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());
             modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
         }

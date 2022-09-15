@@ -13,17 +13,18 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record GridAreaOverviewItemDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo,
-        string? ActorNumber,
-        string? ActorName,
-        DateTimeOffset? FullFlexDate);
+    public sealed class GridAreaAuditLogEntryEntity
+    {
+        public int Id { get; set; }
+        public Guid UserId { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
+        public GridAreaAuditLogEntryField Field { get; set; }
+        public string OldValue { get; set; } = null!;
+        public string NewValue { get; set; } = null!;
+        public Guid GridAreaId { get; set; }
+    }
 }

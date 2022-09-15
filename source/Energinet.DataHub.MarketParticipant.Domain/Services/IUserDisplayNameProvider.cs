@@ -13,17 +13,19 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// Provides access to user display names
+/// </summary>
+public interface IUserDisplayNameProvider
 {
-    public sealed record GridAreaOverviewItemDto(
-        Guid Id,
-        string Code,
-        string Name,
-        string PriceAreaCode,
-        DateTimeOffset ValidFrom,
-        DateTimeOffset? ValidTo,
-        string? ActorNumber,
-        string? ActorName,
-        DateTimeOffset? FullFlexDate);
+    /// <summary>
+    /// Returns user display names
+    /// </summary>
+    Task<IEnumerable<UserDisplayName>> GetUserDisplayNamesAsync(IEnumerable<Guid> userIds);
 }

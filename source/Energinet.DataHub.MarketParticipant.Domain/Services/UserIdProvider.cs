@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using FluentValidation;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
-    public sealed class UpdateGridAreaCommandRuleSet : AbstractValidator<UpdateGridAreaCommand>
+    public sealed class UserIdProvider : IUserIdProvider
     {
-        public UpdateGridAreaCommandRuleSet()
+        private readonly Func<Guid> _userIdFunc;
+
+        public UserIdProvider(Func<Guid> userIdFunc)
         {
-            RuleFor(command => command.GridAreaDto)
-                .NotNull()
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(gridArea => gridArea.Name)
-                        .NotEmpty()
-                        .Length(1, 50);
-                });
+            _userIdFunc = userIdFunc;
         }
+
+        public Guid UserId => _userIdFunc();
     }
 }
