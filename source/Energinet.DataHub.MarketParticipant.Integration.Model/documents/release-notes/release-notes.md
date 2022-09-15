@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
+## Version 2.5.2
+
+- Protobuf contracts are now public.
+
 ## Version 2.5.1
 
 - Updated packages
