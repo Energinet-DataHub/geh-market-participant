@@ -2,7 +2,7 @@
 
 ## Version 2.5.2
 
-- Protobuf contracts are now public.
+- Contracts are now public.
 
 ## Version 2.5.1
 
