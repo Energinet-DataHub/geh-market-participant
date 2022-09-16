@@ -37,8 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [Theory]
         [InlineData(ActorStatus.New, true)]
         [InlineData(ActorStatus.Active, true)]
-        [InlineData(ActorStatus.Inactive, true)]
-        [InlineData(ActorStatus.Passive, true)]
         public void Activate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
@@ -57,7 +55,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         }
 
         [Theory]
-        [InlineData(ActorStatus.New, false)]
         [InlineData(ActorStatus.Active, true)]
         [InlineData(ActorStatus.Inactive, true)]
         [InlineData(ActorStatus.Passive, true)]
@@ -79,9 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         }
 
         [Theory]
-        [InlineData(ActorStatus.New, false)]
         [InlineData(ActorStatus.Active, true)]
-        [InlineData(ActorStatus.Inactive, true)]
         [InlineData(ActorStatus.Passive, true)]
         public void SetAsPassive_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
