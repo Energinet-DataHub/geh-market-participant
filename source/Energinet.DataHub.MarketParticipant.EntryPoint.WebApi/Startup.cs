@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            //app.UseMiddleware<JwtTokenMiddleware>();
+            app.UseMiddleware<JwtTokenMiddleware>();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
