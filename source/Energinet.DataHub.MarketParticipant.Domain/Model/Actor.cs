@@ -99,11 +99,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         /// Only Active and Inactive actors can be set to passive.
         /// </summary>
         public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
-
-        /// <summary>
-        /// Soft-deletes the current role, the status changes to Deleted.
-        /// The role becomes read-only after deletion.
-        /// </summary>
-        public void Delete() => _actorStatusTransitioner.Delete();
     }
 }

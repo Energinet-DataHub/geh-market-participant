@@ -68,7 +68,6 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [InlineData(ActorStatus.New)]
     [InlineData(ActorStatus.Active)]
     [InlineData(ActorStatus.Inactive)]
-    [InlineData(ActorStatus.Deleted)]
     [InlineData(ActorStatus.Passive)]
     public async Task Validate_UpdatedActorHasIdenticalMarketRoles_DoesNotThrow(ActorStatus status)
     {
@@ -93,7 +92,6 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [InlineData(ActorStatus.New)]
     [InlineData(ActorStatus.Active)]
     [InlineData(ActorStatus.Inactive)]
-    [InlineData(ActorStatus.Deleted)]
     [InlineData(ActorStatus.Passive)]
     public async Task Validate_UpdatedActorHasNewMarketRoleAdded_DoesNotThrow(ActorStatus status)
     {
@@ -119,7 +117,6 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [InlineData(ActorStatus.New, false)]
     [InlineData(ActorStatus.Active, true)]
     [InlineData(ActorStatus.Inactive, true)]
-    [InlineData(ActorStatus.Deleted, true)]
     [InlineData(ActorStatus.Passive, true)]
     public async Task Validate_GridAreaForMarketRoleIsRemoved_ThrowsIfStatusIsNotNew(ActorStatus status, bool throws)
     {
@@ -146,7 +143,6 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [InlineData(ActorStatus.New, false)]
     [InlineData(ActorStatus.Active, true)]
     [InlineData(ActorStatus.Inactive, true)]
-    [InlineData(ActorStatus.Deleted, true)]
     [InlineData(ActorStatus.Passive, true)]
     public async Task Validate_UpdatedActorHasUpdatedMeteringPointForMarketRoleGridArea_Throws(ActorStatus status, bool throws)
     {
@@ -173,7 +169,6 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [InlineData(ActorStatus.New, false)]
     [InlineData(ActorStatus.Active, true)]
     [InlineData(ActorStatus.Inactive, true)]
-    [InlineData(ActorStatus.Deleted, true)]
     [InlineData(ActorStatus.Passive, true)]
     public async Task Validate_UpdatedActorWithNoMarketRoles_Throws(ActorStatus status, bool throws)
     {

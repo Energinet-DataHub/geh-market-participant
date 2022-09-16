@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 {
                     case ActorStatusChangedIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(ActorStatus), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
@@ -133,21 +133,21 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
                     case MarketRoleAddedToActorIntegrationEvent or MarketRoleRemovedFromActorIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(ActorMarketRole), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
                     case GridAreaAddedToActorIntegrationEvent or GridAreaRemovedFromActorIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(ActorGridArea), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
                     case MeteringPointTypeAddedToActorIntegrationEvent or MeteringPointTypeRemovedFromActorIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(MeteringPointType), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
@@ -172,7 +172,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 Contact = new ActorContactEventData(contact.Name, contact.Email, contact.Category, contact.Phone)
             };
 
-            var domainEvent = new DomainEvent(actor.Id, nameof(ActorContact), actorCreatedEvent);
+            var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorCreatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
         }
 
@@ -189,7 +189,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 Contact = new ActorContactEventData(contact.Name, contact.Email, contact.Category, contact.Phone)
             };
 
-            var domainEvent = new DomainEvent(actor.Id, nameof(ActorContact), actorCreatedEvent);
+            var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorCreatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
         }
     }

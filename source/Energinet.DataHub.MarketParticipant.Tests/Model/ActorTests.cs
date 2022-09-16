@@ -39,7 +39,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData(ActorStatus.Active, true)]
         [InlineData(ActorStatus.Inactive, true)]
         [InlineData(ActorStatus.Passive, true)]
-        [InlineData(ActorStatus.Deleted, false)]
         public void Activate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
@@ -62,7 +61,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData(ActorStatus.Active, true)]
         [InlineData(ActorStatus.Inactive, true)]
         [InlineData(ActorStatus.Passive, true)]
-        [InlineData(ActorStatus.Deleted, false)]
         public void Deactivate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
@@ -85,7 +83,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData(ActorStatus.Active, true)]
         [InlineData(ActorStatus.Inactive, true)]
         [InlineData(ActorStatus.Passive, true)]
-        [InlineData(ActorStatus.Deleted, false)]
         public void SetAsPassive_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
@@ -100,29 +97,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             else
             {
                 Assert.Throws<ValidationException>(() => target.SetAsPassive());
-            }
-        }
-
-        [Theory]
-        [InlineData(ActorStatus.New, true)]
-        [InlineData(ActorStatus.Active, true)]
-        [InlineData(ActorStatus.Inactive, true)]
-        [InlineData(ActorStatus.Passive, true)]
-        [InlineData(ActorStatus.Deleted, true)]
-        public void Delete_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
-        {
-            // Arrange
-            var target = CreateTestActor(initialStatus);
-
-            // Act + Assert
-            if (isAllowed)
-            {
-                target.Delete();
-                Assert.Equal(ActorStatus.Deleted, target.Status);
-            }
-            else
-            {
-                Assert.Throws<ValidationException>(() => target.Delete());
             }
         }
 
