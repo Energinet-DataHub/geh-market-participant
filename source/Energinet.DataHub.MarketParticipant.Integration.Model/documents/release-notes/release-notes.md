@@ -1,9 +1,5 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
-## Version 2.6.0
-
-- Removed actor status deleted
-
 ## Version 2.5.2
 
 - Contracts are now public.
