@@ -20,8 +20,20 @@ BEGIN
 	SET [Status] = 3
 	WHERE Id = @act_id;
 
+    -- fetch newest 'ActorUpdatedIntegrationEvent' for the current actor
+    DECLARE @updatedEventData nvarchar(MAX) = (SELECT TOP 1 [Event] FROM [dbo].[DomainEvent] WHERE EntityId = @act_id AND EventTypeName = 'ActorUpdatedIntegrationEvent' ORDER BY [Timestamp] DESC)
+
+    -- replace properties; status, id and eventCreated
+    SET @updatedEventData = (SELECT STUFF(@updatedEventData, PATINDEX('%status%', @updatedEventData), 9, 'status":3'))
+    SET @updatedEventData = (SELECT STUFF(@updatedEventData, PATINDEX('%],"id"%', @updatedEventData), 45, '],"id":"' + LOWER(CONVERT(nvarchar(36), NEWID())) + '"'))
+    SET @updatedEventData = (SELECT STUFF(@updatedEventData, PATINDEX('%eventCreated%', @updatedEventData), 43, 'eventCreated":"' + FORMAT(GETUTCDATE(), 'yyyy-MM-ddTHH:mm:ss.999999Z') + '"'))
+	
+	-- insert 'ActorUpdatedIntegrationEvent' for current actor
+	INSERT INTO [dbo].[DomainEvent](EntityId, EntityType, IsSent, [Timestamp], [Event], EventTypeName)
+	VALUES(@act_id, 'Actor', 0, SYSDATETIMEOFFSET(), @updatedEventData, 'ActorUpdatedIntegrationEvent')
+
 	-- insert 'ActorStatusChangedIntegrationEvent' for current actor
-	DECLARE @eventData nvarchar(MAX) = 
+	DECLARE @statusChangedEventData nvarchar(MAX) = 
 		'{' +
             '"organizationId":{"value":"' + LOWER(CONVERT(nvarchar(36), @org_id)) + '"},' +
             '"actorId":"' + LOWER(CONVERT(nvarchar(36), @act_id)) + '",' +
@@ -31,7 +43,7 @@ BEGIN
         '}'
 	
 	INSERT INTO [dbo].[DomainEvent](EntityId, EntityType, IsSent, [Timestamp], [Event], EventTypeName)
-	VALUES(@act_id, 'Actor', 0, SYSDATETIMEOFFSET(), @eventData, 'ActorStatusChangedIntegrationEvent')
+	VALUES(@act_id, 'Actor', 0, SYSDATETIMEOFFSET(), @statusChangedEventData, 'ActorStatusChangedIntegrationEvent')
 
 	FETCH NEXT FROM actor_cursor
 	INTO @org_id, @act_id

@@ -20,5 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         Active = 2,
         Inactive = 3,
         Passive = 4,
+        Deleted = 5
     }
 }
