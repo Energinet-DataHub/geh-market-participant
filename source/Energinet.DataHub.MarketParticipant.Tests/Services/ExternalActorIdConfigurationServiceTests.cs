@@ -32,7 +32,6 @@ public sealed class ExternalActorIdConfigurationServiceTests
     [InlineData(new[] { ActorStatus.Active }, false)]
     [InlineData(new[] { ActorStatus.Active, ActorStatus.Passive }, false)]
     [InlineData(new[] { ActorStatus.Active, ActorStatus.Inactive }, true)]
-    [InlineData(new[] { ActorStatus.Deleted }, true)]
     public async Task AssignExternalActorIdAsync_HasExternalActorId_RemovesId(ActorStatus[] status, bool shouldDelete)
     {
         // Arrange
@@ -80,7 +79,6 @@ public sealed class ExternalActorIdConfigurationServiceTests
     [InlineData(new[] { ActorStatus.Active }, true)]
     [InlineData(new[] { ActorStatus.Active, ActorStatus.Passive }, true)]
     [InlineData(new[] { ActorStatus.Active, ActorStatus.Inactive }, false)]
-    [InlineData(new[] { ActorStatus.Deleted }, false)]
     public async Task AssignExternalActorIdAsync_HasNoExternalActorId_CreatesId(ActorStatus[] status, bool shouldCreate)
     {
         // Arrange
