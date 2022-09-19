@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                        x.Status,
                                        true,
                                        out var result) &&
-                                   result is ActorStatus actorStatus && actorStatus != ActorStatus.New && actorStatus != ActorStatus.Deleted)
+                                   result is ActorStatus actorStatus && actorStatus != ActorStatus.New)
                         .ChildRules(rolesValidator =>
                             rolesValidator
                                 .RuleForEach(x => x)

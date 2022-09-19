@@ -51,9 +51,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
                     case ActorStatus.Passive:
                         SetAsPassive();
                         break;
-                    case ActorStatus.Deleted:
-                        Delete();
-                        break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(value));
                 }
@@ -62,26 +59,20 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public void Activate()
         {
-            EnsureCorrectState(ActorStatus.Active, ActorStatus.New, ActorStatus.Inactive, ActorStatus.Passive);
+            EnsureCorrectState(ActorStatus.Active, ActorStatus.New);
             _status = ActorStatus.Active;
         }
 
         public void Deactivate()
         {
-            EnsureCorrectState(ActorStatus.Inactive, ActorStatus.Active, ActorStatus.Passive);
+            EnsureCorrectState(ActorStatus.Inactive, ActorStatus.Active, ActorStatus.Passive, ActorStatus.New);
             _status = ActorStatus.Inactive;
         }
 
         public void SetAsPassive()
         {
-            EnsureCorrectState(ActorStatus.Passive, ActorStatus.Active, ActorStatus.Inactive);
+            EnsureCorrectState(ActorStatus.Passive, ActorStatus.Active, ActorStatus.New);
             _status = ActorStatus.Passive;
-        }
-
-        public void Delete()
-        {
-            EnsureCorrectState(ActorStatus.Deleted, ActorStatus.New, ActorStatus.Active, ActorStatus.Inactive, ActorStatus.Passive);
-            _status = ActorStatus.Deleted;
         }
 
         private void New()

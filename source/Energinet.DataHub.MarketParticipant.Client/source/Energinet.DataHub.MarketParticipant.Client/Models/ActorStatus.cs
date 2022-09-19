@@ -20,6 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Active = 2,
         Inactive = 3,
         Passive = 4,
-        Deleted = 5
     }
 }

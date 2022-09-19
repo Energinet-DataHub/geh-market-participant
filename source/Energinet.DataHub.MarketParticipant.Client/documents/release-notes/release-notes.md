@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.7.0
+
+- Removed actor status deleted
+
 ## Version 2.6.0
 
 - User display name on audit log entry
