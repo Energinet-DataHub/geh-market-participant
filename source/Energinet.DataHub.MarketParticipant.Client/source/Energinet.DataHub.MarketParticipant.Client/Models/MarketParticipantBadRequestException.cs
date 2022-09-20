@@ -12,26 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Text.Json;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public class MarketParticipantException : Exception
+#pragma warning disable CA1032
+    public sealed class MarketParticipantBadRequestException : MarketParticipantException
     {
-        public MarketParticipantException() { }
+        private readonly string _json;
 
-        public MarketParticipantException(string message)
-            : base(message) { }
-
-        public MarketParticipantException(string message, Exception innerException)
-            : base(message, innerException) { }
-
-        public MarketParticipantException(int statusCode, string message)
-            : base(message)
+        public MarketParticipantBadRequestException(string json)
+            : base(400, "BadRequest")
         {
-            StatusCode = statusCode;
+            _json = json;
         }
 
-        public int StatusCode { get; }
+        public JsonElement JsonError => JsonSerializer.Deserialize<JsonElement>(_json);
     }
+#pragma warning restore CA1032
 }
