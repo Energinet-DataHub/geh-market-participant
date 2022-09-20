@@ -32,6 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 var responseJson = await ex.GetResponseStringAsync().ConfigureAwait(false);
                 throw new MarketParticipantException(400, message: responseJson);
             }
+            catch (FlurlHttpException ex)
+            {
+                throw new MarketParticipantException(ex.StatusCode ?? 500, string.Empty);
+            }
         }
     }
 }
