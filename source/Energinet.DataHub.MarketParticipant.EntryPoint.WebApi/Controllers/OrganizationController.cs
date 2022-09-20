@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
@@ -36,6 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
+        [Authorize(Permission.OrganizationRead)]
         public async Task<IActionResult> ListAllAsync()
         {
             return await this.ProcessAsync(
@@ -53,6 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}")]
+        [Authorize(Permission.OrganizationRead)]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
             return await this.ProcessAsync(
@@ -70,6 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Permission.OrganizationWrite)]
         public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             return await this.ProcessAsync(
@@ -87,6 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{organizationId:guid}")]
+        [Authorize(Permission.OrganizationWrite)]
         public async Task<IActionResult> UpdateOrganizationAsync(
             Guid organizationId,
             ChangeOrganizationDto organization)

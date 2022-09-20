@@ -14,8 +14,9 @@
 
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.WebApp.Authentication;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
@@ -55,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            app.UseMiddleware<JwtTokenMiddleware>();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
@@ -80,6 +81,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
+            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
+            services.AddJwtBearerAuthentication(openIdUrl, audience);
+            services.AddPermissionAuthorization();
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
             var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
@@ -127,9 +133,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         protected override void Configure(IConfiguration configuration, Container container)
         {
-            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
-            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
 
         protected override void ConfigureSimpleInjector(IServiceCollection services)

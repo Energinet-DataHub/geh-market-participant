@@ -49,11 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IUserIdProvider>(
                 () =>
                 {
-                    var accessor = container.GetInstance<ClaimsPrincipalContext>();
                     return new UserIdProvider(() =>
                     {
-                        var subjectClaim = accessor.ClaimsPrincipal?.Claims.First(x => x.Type == ClaimTypes.NameIdentifier);
-                        return subjectClaim != null ? Guid.Parse(subjectClaim.Value) : Guid.Parse("00000000-0000-0000-0000-000000000001");
+                        return Guid.Parse("00000000-0000-0000-0000-000000000001");
                     });
                 },
                 Lifestyle.Scoped);
