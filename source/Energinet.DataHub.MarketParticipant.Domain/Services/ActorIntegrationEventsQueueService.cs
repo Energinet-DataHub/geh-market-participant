@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 OrganizationId = organizationId,
                 ActorId = actor.Id,
                 ExternalActorId = actor.ExternalActorId,
-                ActorNumber = actor.ActorNumber,
+                ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value),
                 Status = actor.Status,
             };
 
@@ -81,8 +81,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             {
                 OrganizationId = organizationId,
                 ActorId = actor.Id,
-                ActorNumber = actor.ActorNumber,
                 Status = actor.Status,
+                ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value),
                 Name = actor.Name
             };
 

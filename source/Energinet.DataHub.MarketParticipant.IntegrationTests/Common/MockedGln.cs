@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
 {
@@ -29,6 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
         public static implicit operator ActorNumber(MockedGln mock)
         {
             return ActorNumber.Create(mock._gln);
+        }
+
+        public static implicit operator ActorNumberEventData(MockedGln mock)
+        {
+            return new ActorNumberEventData(mock._gln);
         }
 
         public static implicit operator ActorNumberDto(MockedGln mock)
