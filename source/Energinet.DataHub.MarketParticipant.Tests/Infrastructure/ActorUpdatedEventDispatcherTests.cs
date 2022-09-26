@@ -17,11 +17,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 ActorId = Guid.NewGuid(),
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ExternalActorId = new ExternalActorId(Guid.NewGuid()),
-                ActorNumber = new ActorNumber("gln"),
+                ActorNumber = new MockedGln(),
                 Status = ActorStatus.Active
             };
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);

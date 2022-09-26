@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Organiz
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -46,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             {
                 ActorId = Guid.NewGuid(),
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
-                ActorNumber = new ActorNumber("gln"),
+                ActorNumber = new MockedGln(),
                 Status = ActorStatus.Active,
                 Name = new ActorName("ActorName")
             };

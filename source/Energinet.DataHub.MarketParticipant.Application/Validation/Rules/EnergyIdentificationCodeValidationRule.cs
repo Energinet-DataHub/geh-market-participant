@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 using FluentValidation.Validators;
 
@@ -34,51 +34,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
 
         public override bool IsValid(ValidationContext<T> context, ActorNumberDto? value)
         {
-            return !string.IsNullOrEmpty(value?.Value) && IsValidEic(value.Value);
+            return !string.IsNullOrEmpty(value?.Value) && EicActorNumber.IsValid(value.Value);
         }
 
         protected override string GetDefaultMessageTemplate(string errorCode)
         {
             return "'{PropertyName}' must be a valid GLN or EIC.";
-        }
-
-        private static bool IsValidEic(string energyIdentificationCode)
-        {
-            return LengthIsValid(energyIdentificationCode)
-                   && ValidateTwoCharacterIssuingNumber(energyIdentificationCode)
-                   && ValidateObjectTypeCharacter(energyIdentificationCode)
-                   && ValidateTwelveDigitsUpperCaseCharacters(energyIdentificationCode)
-                   && ValidateCheckCharacter(energyIdentificationCode);
-        }
-
-        private static bool LengthIsValid(string energyIdentificationCode)
-        {
-            return energyIdentificationCode.Length == 16;
-        }
-
-        private static bool ValidateTwoCharacterIssuingNumber(string energyIdentificationCode)
-        {
-            return energyIdentificationCode[..2].All(char.IsNumber);
-        }
-
-        private static bool ValidateObjectTypeCharacter(string energyIdentificationCode)
-        {
-            return energyIdentificationCode.Substring(2, 1).All(char.IsLetter);
-        }
-
-        private static bool ValidateTwelveDigitsUpperCaseCharacters(string energyIdentificationCode)
-        {
-            return energyIdentificationCode
-                .Substring(3, 12)
-                .All(c =>
-                    c is '-'
-                    || char.IsDigit(c)
-                    || (char.IsLetterOrDigit(c) && char.IsUpper(c)));
-        }
-
-        private static bool ValidateCheckCharacter(string energyIdentificationCode)
-        {
-            return char.IsLetterOrDigit(energyIdentificationCode[^1]);
         }
     }
 }

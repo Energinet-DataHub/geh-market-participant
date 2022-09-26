@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -38,7 +39,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
-        var gln = new ActorNumber("fake_value");
+        var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
         var actor = new Actor(gln)
         {
@@ -85,7 +86,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
-        var gln = new ActorNumber("fake_value");
+        var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
         var actor = new Actor(gln)
         {

@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
 
@@ -28,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Ctor_NewRole_HasStatusNew()
         {
             // Arrange + Act
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
 
             // Assert
             Assert.Equal(ActorStatus.New, actor.Status);
@@ -100,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             return new Actor(
                 Guid.Empty,
                 new ExternalActorId(Guid.Empty),
-                new ActorNumber("fake_value"),
+                new MockedGln(),
                 status,
                 Enumerable.Empty<ActorMarketRole>(),
                 new ActorName("test_actor_name"));

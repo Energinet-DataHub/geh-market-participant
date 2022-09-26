@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -90,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var orgId = Guid.NewGuid();
             const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
-            const string actorGln = "SomeGln";
+            string actorGln = new MockedGln();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -102,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actor = new Actor(
                 actorId,
                 new ExternalActorId(actorId),
-                new ActorNumber(actorGln),
+                ActorNumber.Create(actorGln),
                 ActorStatus.Active,
                 Enumerable.Empty<ActorMarketRole>(),
                 new ActorName(string.Empty));

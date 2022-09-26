@@ -12,7 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record ActorNumber(string Value);
+    public abstract record ActorNumber
+    {
+        protected ActorNumber(string value)
+        {
+            Value = value;
+        }
+
+        public string Value { get; }
+
+        public static ActorNumber Create(string value) => value switch
+        {
+            _ when EicActorNumber.TryCreate(value, out var eic) => eic,
+            _ when GlnActorNumber.TryCreate(value, out var gln) => gln,
+            _ => throw new ArgumentException(string.Empty, nameof(value))
+        };
+    }
 }

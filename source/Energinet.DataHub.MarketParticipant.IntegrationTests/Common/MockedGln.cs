@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
 #pragma warning disable CA1062, CA2225, CA5394
         public static implicit operator ActorNumber(MockedGln mock)
         {
-            return new ActorNumber(mock._gln);
+            return ActorNumber.Create(mock._gln);
         }
 
         public static implicit operator ActorNumberDto(MockedGln mock)

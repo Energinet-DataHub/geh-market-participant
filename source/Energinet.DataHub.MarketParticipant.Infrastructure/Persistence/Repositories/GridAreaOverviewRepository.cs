@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     gridArea.PriceAreaCode,
                     gridArea.ValidFrom,
                     gridArea.ValidTo,
-                    actor != null ? new ActorNumber(actor.ActorNumber) : null,
+                    actor != null ? ActorNumber.Create(actor.ActorNumber) : null,
                     actor != null ? new ActorName(actor.Name) : null,
                     gridArea.FullFlexDate);
             });

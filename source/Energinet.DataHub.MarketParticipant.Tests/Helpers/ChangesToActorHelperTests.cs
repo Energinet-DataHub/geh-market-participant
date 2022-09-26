@@ -113,7 +113,7 @@ public class ChangesToActorHelperTests
         return new Actor(
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ExternalActorId(Guid.NewGuid()),
-            new ActorNumber("1234567890123"),
+            ActorNumber.Create("8814729239298"),
             ActorStatus.Active,
             new List<ActorMarketRole>
             {
