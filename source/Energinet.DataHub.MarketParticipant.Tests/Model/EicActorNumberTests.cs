@@ -21,6 +21,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
     [UnitTest]
     public sealed class EicActorNumberTests
     {
+        [Fact]
+        public void TryCreate_InvalidEicNumber_ReturnsFalse()
+        {
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData("  ")]
