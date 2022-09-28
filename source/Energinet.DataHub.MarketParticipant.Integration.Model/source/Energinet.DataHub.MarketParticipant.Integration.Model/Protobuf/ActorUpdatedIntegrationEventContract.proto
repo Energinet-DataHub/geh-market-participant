@@ -17,7 +17,6 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 import "google/protobuf/timestamp.proto";
-import "Protobuf/ActorNumber.proto";
 
 message ActorUpdatedIntegrationEventContract {
   reserved "MarketRoles", "GridAreaIds", "MeteringPointTypes";
@@ -28,12 +27,13 @@ message ActorUpdatedIntegrationEventContract {
   string ExternalActorId = 3;
 
   string OrganizationId = 4;
-  ActorNumber ActorNumber = 5;
+  string ActorNumber = 5;
   int32 Status = 6;
 
   repeated int32 BusinessRoles = 7;
   repeated ActorMarketRole ActorMarketRoles = 11;
   google.protobuf.Timestamp EventCreated = 12;
+  int32 ActorNumberType = 13;
 }
 
 message ActorMarketRole {

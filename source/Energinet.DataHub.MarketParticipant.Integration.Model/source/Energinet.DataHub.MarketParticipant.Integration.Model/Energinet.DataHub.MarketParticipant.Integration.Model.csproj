@@ -108,14 +108,6 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
       <OutputDir>obj\Debug\net6.0\</OutputDir>
       <Generator>MSBuild:Compile</Generator>
     </Protobuf>
-    <Protobuf Include="Protobuf\ActorNumber.proto">
-      <GrpcServices>None</GrpcServices>
-      <Access>Public</Access>
-      <ProtoCompile>True</ProtoCompile>
-      <CompileOutputs>True</CompileOutputs>
-      <OutputDir>obj\Debug\net6.0\</OutputDir>
-      <Generator>MSBuild:Compile</Generator>
-    </Protobuf>
     <Protobuf Include="Protobuf\ActorUpdatedIntegrationEventContract.proto">
       <GrpcServices>None</GrpcServices>
       <Access>Public</Access>
