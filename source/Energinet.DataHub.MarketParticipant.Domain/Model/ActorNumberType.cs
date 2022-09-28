@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record ActorNumberEventData(string Value, ActorNumberType Type);
+    public enum ActorNumberType
+    {
+        Unknown = 0,
+        Gln = 1,
+        Eic = 2
+    }
 }

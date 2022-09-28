@@ -24,6 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         private GlnActorNumber(string value)
             : base(value) { }
 
+        public override ActorNumberType Type => ActorNumberType.Gln;
+
         public static bool IsValid(string gln)
         {
             ArgumentNullException.ThrowIfNull(gln);

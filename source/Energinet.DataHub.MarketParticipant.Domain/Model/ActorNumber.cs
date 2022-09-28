@@ -25,11 +25,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public string Value { get; }
 
+        public abstract ActorNumberType Type { get; }
+
         public static ActorNumber Create(string value) => value switch
         {
             _ when EicActorNumber.TryCreate(value, out var eic) => eic,
             _ when GlnActorNumber.TryCreate(value, out var gln) => gln,
-            _ => throw new ArgumentException(string.Empty, nameof(value))
+            _ => throw new ArgumentOutOfRangeException(nameof(value))
         };
     }
 }

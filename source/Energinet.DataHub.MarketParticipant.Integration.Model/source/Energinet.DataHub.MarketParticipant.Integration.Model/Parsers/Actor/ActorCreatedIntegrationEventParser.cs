@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                 Guid.Parse(contract.ActorId),
                 Guid.Parse(contract.OrganizationId),
                 Enum.IsDefined(typeof(ActorStatus), contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
-                contract.ActorNumber,
+                new Dtos.ActorNumber(contract.ActorNumber.Value, (ActorNumberType)contract.ActorNumber.Type),
                 contract.Name,
                 contract.BusinessRoles
                     .Select(c => Enum.IsDefined(typeof(BusinessRoleCode), c) ? (BusinessRoleCode)c : throw new FormatException(nameof(contract.BusinessRoles)))
@@ -79,7 +79,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                 ActorId = integrationEvent.ActorId.ToString(),
                 OrganizationId = integrationEvent.OrganizationId.ToString(),
                 Status = (int)integrationEvent.Status,
-                ActorNumber = integrationEvent.ActorNumber,
+                ActorNumber = new Protobuf.ActorNumber
+                {
+                    Value = integrationEvent.ActorNumber.Value,
+                    Type = (int)integrationEvent.ActorNumber.Type
+                },
                 Name = integrationEvent.Name,
                 ActorMarketRoles =
                 {

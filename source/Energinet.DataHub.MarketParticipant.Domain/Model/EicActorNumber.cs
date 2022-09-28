@@ -23,6 +23,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         private EicActorNumber(string value)
             : base(value) { }
 
+        public override ActorNumberType Type => ActorNumberType.Eic;
+
         public static bool IsValid(string eic)
         {
             ArgumentNullException.ThrowIfNull(eic);

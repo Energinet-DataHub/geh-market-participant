@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common
 
         public static implicit operator ActorNumberEventData(MockedGln mock)
         {
-            return new ActorNumberEventData(mock._gln);
+            return new ActorNumberEventData(mock._gln, ActorNumberType.Gln);
         }
 
         public static implicit operator ActorNumberDto(MockedGln mock)
