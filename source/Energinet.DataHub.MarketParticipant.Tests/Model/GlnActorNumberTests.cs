@@ -21,6 +21,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
     [UnitTest]
     public sealed class GlnActorNumberTests
     {
+        [Fact]
+        public void Type_ReturnsGln()
+        {
+            // arrange, act
+            var actual = ActorNumber.Create("6790000555559");
+
+            // assert
+            Assert.Equal(ActorNumberType.Gln, actual.Type);
+        }
+
         [Theory]
         [InlineData("")]
         [InlineData("  ")]

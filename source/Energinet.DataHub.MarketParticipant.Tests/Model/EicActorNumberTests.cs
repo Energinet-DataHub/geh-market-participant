@@ -22,8 +22,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
     public sealed class EicActorNumberTests
     {
         [Fact]
-        public void TryCreate_InvalidEicNumber_ReturnsFalse()
+        public void Type_ReturnsEic()
         {
+            // arrange, act
+            var actual = ActorNumber.Create("23X--150401FFF-N");
+
+            // assert
+            Assert.Equal(ActorNumberType.Eic, actual.Type);
         }
 
         [Theory]
