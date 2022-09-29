@@ -49,13 +49,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
         }
 
         [Fact]
-        public void Create_InvalidNumber_Throws()
+        public void Create_InvalidNumber_ReturnsUnknownActorNumber()
         {
             // arrange
             const string InvalidNumber = "invalid";
 
-            // act, assert
-            Assert.Throws<ArgumentOutOfRangeException>(() => ActorNumber.Create(InvalidNumber));
+            // act
+            var actual = ActorNumber.Create(InvalidNumber);
+
+            // assert
+            Assert.IsType<UnknownActorNumber>(actual);
         }
     }
 }
