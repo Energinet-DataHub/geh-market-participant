@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 Guid.Parse(contract.ActorId),
                 Guid.Parse(contract.OrganizationId),
                 externalActorId,
-                new Dtos.ActorNumber(contract.ActorNumber, (ActorNumberType)contract.ActorNumberType),
+                new Dtos.ActorNumber(contract.ActorNumber, (Dtos.ActorNumberType)contract.ActorNumberType),
                 Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
                 contract.BusinessRoles.Select(
                     x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 ExternalActorId = externalActorId,
                 OrganizationId = integrationEvent.OrganizationId.ToString(),
                 ActorNumber = integrationEvent.ActorNumber.Value,
-                ActorNumberType = (int)integrationEvent.ActorNumber.Type,
+                ActorNumberType = (Protobuf.ActorNumberType)integrationEvent.ActorNumber.Type,
                 Status = (int)integrationEvent.Status,
                 ActorMarketRoles =
                 {
