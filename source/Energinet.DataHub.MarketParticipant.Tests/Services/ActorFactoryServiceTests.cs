@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Energinet.DataHub.MarketParticipant.Tests.Handlers;
 using Moq;
 using Xunit;
@@ -56,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 null!,
-                new ActorNumber("fake_value"),
+                new MockedGln(),
                 new ActorName("fake_value"),
                 Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
         }
@@ -100,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
                 new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
-                new ActorNumber("fake_value"),
+                new MockedGln(),
                 new ActorName("fake_value"),
                 null!)).ConfigureAwait(false);
         }
@@ -130,7 +131,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var response = await target
                 .CreateAsync(
                     organization,
-                    new ActorNumber("fake_value"),
+                    new MockedGln(),
                     new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
@@ -186,7 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await target
                 .CreateAsync(
                     organization,
-                    new ActorNumber("fake_value"),
+                    new MockedGln(),
                     new ActorName("fake_value"),
                     marketRoles)
                 .ConfigureAwait(false);
@@ -215,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var globalLocationNumber = new ActorNumber("fake_value");
+            var globalLocationNumber = new MockedGln();
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
             organizationRepository
@@ -253,7 +254,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var globalLocationNumber = new ActorNumber("fake_value");
+            var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
@@ -293,7 +294,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IExternalActorIdConfigurationService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var globalLocationNumber = new ActorNumber("fake_value");
+            var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
@@ -333,7 +334,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 externalActorIdConfigurationService.Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var globalLocationNumber = new ActorNumber("fake_value");
+            var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()) };

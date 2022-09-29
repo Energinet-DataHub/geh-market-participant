@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            var actorNumber = new ActorNumber(request.Actor.ActorNumber.Value);
+            var actorNumber = ActorNumber.Create(request.Actor.ActorNumber.Value);
             var actorName = new ActorName(request.Actor.Name.Value);
             var marketRoles = MarketRoleMapper.Map(request.Actor.MarketRoles).ToList();
 

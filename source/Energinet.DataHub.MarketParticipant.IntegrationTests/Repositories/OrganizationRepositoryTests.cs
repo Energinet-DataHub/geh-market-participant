@@ -176,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var initialActor = new Actor(new ActorNumber(Guid.NewGuid().ToString()));
+            var initialActor = new Actor(new MockedGln());
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
             organization.Actors.Add(initialActor);
@@ -185,7 +185,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var newActor = new Actor(new ActorNumber("fake_value"));
+            var newActor = new Actor(new MockedGln());
             organization!.Actors.Add(newActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);
@@ -216,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
-            var initalActor = new Actor(new ActorNumber("123"));
+            var initalActor = new Actor(new MockedGln());
             initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) }));
             organization.Actors.Add(initalActor);
 
@@ -246,7 +246,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
-            var balancePowerSupplierActor = new Actor(new ActorNumber("fake_value"));
+            var balancePowerSupplierActor = new Actor(new MockedGln());
             balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalancingServiceProvider, new List<ActorGridArea>()));
             organization.Actors.Add(balancePowerSupplierActor);
 
@@ -254,7 +254,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var meteringPointAdministratorActor = new Actor(new ActorNumber("fake_value"));
+            var meteringPointAdministratorActor = new Actor(new MockedGln());
             meteringPointAdministratorActor.MarketRoles.Add(new ActorMarketRole(EicFunction.MeteringPointAdministrator, new List<ActorGridArea>()));
             organization!.Actors.Add(meteringPointAdministratorActor);
 
@@ -290,7 +290,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
-            var someActor = new Actor(new ActorNumber("fake_value"));
+            var someActor = new Actor(new MockedGln());
             someActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>
             {
                 new(gridAreaToInsert_Id.Value, new List<MeteringPointType>
@@ -381,7 +381,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var meteringPointTypes = new List<MeteringPointType>() { MeteringPointType.D05NetProduction };
             var gridArea = new ActorGridArea(gridAreaToInsert_Id.Value, meteringPointTypes);
 
-            var actorWithMeteringTypes = new Actor(new ActorNumber("fake_value"));
+            var actorWithMeteringTypes = new Actor(new MockedGln());
             actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>() { gridArea }));
             organization.Actors.Add(actorWithMeteringTypes);
 
@@ -421,7 +421,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
-            var actorWithMeteringTypes = new Actor(new ActorNumber("fake_value"));
+            var actorWithMeteringTypes = new Actor(new MockedGln());
             actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.Producer, new List<ActorGridArea> { new(gridAreaToInsert_Id.Value, meteringPointTypesToAdd) }));
             organization.Actors.Add(actorWithMeteringTypes);
 
@@ -504,7 +504,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
 
-            var initialActor = new Actor(new ActorNumber(Guid.NewGuid().ToString())) { Name = new ActorName("ActorName") };
+            var initialActor = new Actor(new MockedGln()) { Name = new ActorName("ActorName") };
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
             organization.Actors.Add(initialActor);
@@ -513,7 +513,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization = await orgRepository.GetAsync(orgId).ConfigureAwait(false);
 
             // Act
-            var newActor = new Actor(new ActorNumber("fake_value")) { Name = new ActorName("fake_value") };
+            var newActor = new Actor(new MockedGln()) { Name = new ActorName("fake_value") };
             organization!.Actors.Add(newActor);
 
             await orgRepository.AddOrUpdateAsync(organization).ConfigureAwait(false);

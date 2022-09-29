@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using MediatR;
 using Moq;
 using Xunit;
@@ -90,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actor = new Actor(
                 Guid.NewGuid(),
                 new ExternalActorId(Guid.NewGuid()),
-                new ActorNumber("fake_value"),
+                new MockedGln(),
                 ActorStatus.Active,
                 new[] { marketRole },
                 new ActorName(string.Empty));
@@ -164,7 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actor = new Actor(
                 Guid.NewGuid(),
                 new ExternalActorId(Guid.NewGuid()),
-                new ActorNumber("fake_value"),
+                new MockedGln(),
                 ActorStatus.Active,
                 new[] { marketRole },
                 new ActorName(string.Empty));

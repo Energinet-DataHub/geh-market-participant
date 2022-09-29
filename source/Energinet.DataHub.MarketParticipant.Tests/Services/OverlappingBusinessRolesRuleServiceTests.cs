@@ -19,6 +19,7 @@ using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -48,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             businessRoleCodeDomainService.Setup(x => x.GetBusinessRoleCodes(It.IsAny<IEnumerable<EicFunction>>()))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
@@ -72,10 +73,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.BalanceResponsibleParty)))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var gln = new MockedGln();
+
+            var actor = new Actor(ActorNumber.Create(gln));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
-            var newActorWithSameGln = new Actor(new ActorNumber("fake_value"));
+            var newActorWithSameGln = new Actor(ActorNumber.Create(gln));
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
@@ -99,10 +102,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.BalanceResponsibleParty)))
                 .Returns(Enumerable.Empty<BusinessRoleCode>());
 
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var gln = new MockedGln();
+
+            var actor = new Actor(ActorNumber.Create(gln));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
-            var newActorWithSameGln = new Actor(new ActorNumber("fake_value"));
+            var newActorWithSameGln = new Actor(ActorNumber.Create(gln));
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
@@ -131,10 +136,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     It.Is<IEnumerable<EicFunction>>(y => y.Single() == EicFunction.EnergySupplier)))
                 .Returns(new[] { BusinessRoleCode.Ddq });
 
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var gln = new MockedGln();
+
+            var actor = new Actor(ActorNumber.Create(gln));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
-            var newActorWithSameGln = new Actor(new ActorNumber("fake_value"));
+            var newActorWithSameGln = new Actor(ActorNumber.Create(gln));
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
