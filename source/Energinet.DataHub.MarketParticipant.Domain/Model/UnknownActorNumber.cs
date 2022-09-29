@@ -16,7 +16,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record UnknownActorNumber : ActorNumber
     {
-        public UnknownActorNumber(string value)
+        internal UnknownActorNumber(string value)
             : base(value) { }
 
         public override ActorNumberType Type => ActorNumberType.Unknown;
