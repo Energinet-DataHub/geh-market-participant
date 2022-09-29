@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Common
 {
@@ -28,7 +29,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
 #pragma warning disable CA1062, CA2225, CA5394
         public static implicit operator ActorNumber(MockedGln mock)
         {
-            return new ActorNumber(mock._gln);
+            return ActorNumber.Create(mock._gln);
+        }
+
+        public static implicit operator ActorNumberEventData(MockedGln mock)
+        {
+            return new ActorNumberEventData(mock._gln, ActorNumberType.Gln);
         }
 
         public static implicit operator ActorNumberDto(MockedGln mock)

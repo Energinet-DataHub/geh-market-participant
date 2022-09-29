@@ -25,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -124,7 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
             organizationExistsHelperService
@@ -175,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
             organizationExistsHelperService
@@ -218,7 +219,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
             organizationExistsHelperService
@@ -261,7 +262,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var organizationId = Guid.NewGuid();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
             organizationExistsHelperService

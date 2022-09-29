@@ -12,26 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public abstract record ActorNumber
+    public enum ActorNumberType
     {
-        protected ActorNumber(string value)
-        {
-            Value = value;
-        }
-
-        public string Value { get; }
-
-        public abstract ActorNumberType Type { get; }
-
-        public static ActorNumber Create(string value) => value switch
-        {
-            _ when EicActorNumber.TryCreate(value, out var eic) => eic,
-            _ when GlnActorNumber.TryCreate(value, out var gln) => gln,
-            _ => throw new ArgumentOutOfRangeException(nameof(value))
-        };
+        Unknown = 0,
+        Gln = 1,
+        Eic = 2
     }
 }

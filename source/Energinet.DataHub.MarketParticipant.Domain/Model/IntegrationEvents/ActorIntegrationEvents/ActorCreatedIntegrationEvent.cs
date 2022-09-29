@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Act
     {
         public Guid ActorId { get; set; }
         public OrganizationId OrganizationId { get; set; } = null!;
-        public ActorNumber ActorNumber { get; set; } = null!;
+        public ActorNumberEventData ActorNumber { get; set; } = null!;
         public ActorStatus Status { get; set; }
         public ActorName Name { get; set; } = null!;
 

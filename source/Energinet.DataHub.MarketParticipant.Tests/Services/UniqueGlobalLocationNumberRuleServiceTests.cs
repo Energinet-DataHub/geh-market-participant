@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -44,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
-            var gln = new ActorNumber("fake_value");
+            var gln = new MockedGln();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
 
             organizationRepository
@@ -64,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
-            var gln = new ActorNumber("fake_value");
+            var gln = new MockedGln();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             organization.Actors.Add(new Actor(gln));
 
@@ -85,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
-            var gln = new ActorNumber("fake_value");
+            var gln = new MockedGln();
             var organization = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "fake_value",

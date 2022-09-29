@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                "0123456789012",
+                new ActorNumber("0123456789012", ActorNumberType.Gln),
                 ActorStatus.Active,
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
                 new[] { new ActorMarketRole(EicFunction.Agent, new[] { new ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) });
@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 ActorStatus.Active,
-                "0123456789012",
+                new ActorNumber("0123456789012", ActorNumberType.Gln),
                 "ActorName",
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
                 new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
