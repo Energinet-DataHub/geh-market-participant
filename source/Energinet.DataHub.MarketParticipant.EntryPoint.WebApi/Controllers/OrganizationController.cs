@@ -25,6 +25,7 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
+    [Authorize(UserRoles.Accountant)]
     [Route("[controller]")]
     public class OrganizationController : ControllerBase
     {
@@ -38,7 +39,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(UserRoles.Accountant)]
         public async Task<IActionResult> ListAllAsync()
         {
             return await this.ProcessAsync(
@@ -56,7 +56,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}")]
-        [Authorize(UserRoles.Accountant)]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
             return await this.ProcessAsync(
@@ -74,7 +73,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(UserRoles.Accountant)]
         public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             return await this.ProcessAsync(
@@ -92,7 +90,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{organizationId:guid}")]
-        [Authorize(UserRoles.Accountant)]
         public async Task<IActionResult> UpdateOrganizationAsync(
             Guid organizationId,
             ChangeOrganizationDto organization)

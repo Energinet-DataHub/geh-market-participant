@@ -23,9 +23,9 @@ limitations under the License.
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.0.4" />
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.2.0-alpha-289" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="7.2.0-alpha-289" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.2.0-alpha-289" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="7.2.0-alpha-291" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="7.2.0-alpha-291" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.2.0-alpha-291" />
     <PackageReference Include="MediatR" Version="10.0.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />

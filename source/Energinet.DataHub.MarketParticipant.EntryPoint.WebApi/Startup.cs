@@ -17,6 +17,7 @@ using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
@@ -57,6 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseMiddleware<ExtensionRolesClaimMiddleware>();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
