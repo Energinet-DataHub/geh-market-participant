@@ -12,13 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -67,7 +72,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             });
 
             app.UseSimpleInjector(Container);
-            Container.Verify();
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -127,6 +131,26 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         protected override void Configure(IConfiguration configuration, Container container)
         {
+            ArgumentNullException.ThrowIfNull(container);
+
+            container.Register<IUserIdProvider>(
+                () =>
+                {
+                    var accessor = container.GetInstance<ClaimsPrincipalContext>();
+                    return new UserIdProvider(() =>
+                    {
+                        var subjectClaim = accessor
+                            .ClaimsPrincipal?
+                            .Claims
+                            .First(x => x.Type == ClaimTypes.NameIdentifier);
+
+                        return subjectClaim != null
+                            ? Guid.Parse(subjectClaim.Value)
+                            : Guid.Parse("00000000-0000-0000-0000-000000000001");
+                    });
+                },
+                Lifestyle.Scoped);
+
             var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
             var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
             Container.AddJwtTokenSecurity(openIdUrl, audience);
