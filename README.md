@@ -202,25 +202,15 @@ The Following endpoints are available, separated by concerns.
 
 Integration events are a way for interested parties to know when data changes in the Market Participant domain and be informed of these changes.
 
-Integration events are published to a servicebus topic, where everyone who are interested can listen. What events you are listening for are up to the domain to decide, not all events are relevant for all domains. A description of how to subscribe to these events is found [here](#Subscribe-to-integration-events)
+Integration events are published to a servicebus topic, where everyone who are interested can listen. What events you are listening for are up to the domain to decide, not all events are relevant for all domains.
 
 The following integrations events are available:
 
 - **Actor Events**
-    - [ActorCreated](#integration-event-actor-created)
-    - [ActorStatusChanged](#integration-event-actor-status-changed)
-    - [ActorRoleAdded](#integration-event-actor-role-added)
-    - [ActorRoleRemoved](#integration-event-actor-role-removed)
-    - [ActorContactAdded](#integration-event-actor-contact-added)
-    - [ActorContactRemoved](#integration-event-actor-contact-removed)
-    - [ActorGridAreaAdded](#integration-event-actor-gridarea-added)
-    - [ActorGridAreaRemoved](#integration-event-actor-gridarea-removed)
-- **Organization Events**
-    - [OrganizationCreated](#integration-event-organization-created)
-    - [OrganizationNameChanged](#integration-event-organization-name-changed)
-    - [OrganizationAddressChanged](#integration-event-organization-address-changed)
-    - [OrganizationCommentChanged](#integration-event-organization-comment-changed)
-    - [OrganizationBusinessRegisterIdentifierChanged](#integration-event-actor-created)
+    - [ActorCreated](https://github.com/Energinet-DataHub/geh-market-participant/blob/main/source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Protobuf/ActorCreatedIntegrationEventContract.proto)
+    - [ActorStatusChanged](https://github.com/Energinet-DataHub/geh-market-participant/blob/main/source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Protobuf/ActorStatusChangedIntegrationEventContract.proto)
+    - [ActorExternalIdChanged](https://github.com/Energinet-DataHub/geh-market-participant/blob/main/source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Protobuf/ActorExternalIdChangedIntegrationEventContract.proto)
+    - [ActorGridAreaAdded](https://github.com/Energinet-DataHub/geh-market-participant/blob/main/source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Protobuf/GridAreaAddedToActorIntegrationEventContract.proto)
+    - [ActorGridAreaRemoved](https://github.com/Energinet-DataHub/geh-market-participant/blob/main/source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Protobuf/GridAreaRemovedFromActorIntegrationEventContract.proto)
 - **Grid Area Events**
-    - [GridAreaCreated](#integration-event-actor-created)
-    - [GridAreaNameChanged](#integration-event-actor-created)
+    - [GridAreaCreated](https://github.com/Energinet-DataHub/geh-market-participant/blob/main/source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Protobuf/GridAreaCreatedIntegrationEventContract.proto)

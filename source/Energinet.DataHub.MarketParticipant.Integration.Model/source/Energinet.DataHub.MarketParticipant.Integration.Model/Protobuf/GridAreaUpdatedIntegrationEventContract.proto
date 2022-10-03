@@ -17,6 +17,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 
+// Obsolete.
 message GridAreaUpdatedIntegrationEventContract {
   string Id = 1;
   string GridAreaId = 2;

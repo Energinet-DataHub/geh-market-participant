@@ -18,11 +18,19 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 import "google/protobuf/timestamp.proto";
 
-message ActorStatusChangedIntegrationEventContract{
+// An integration event raised when the status of the actor is changed.
+message ActorStatusChangedIntegrationEventContract {
+    // The id of the integration event. Is a GUID.
     string Id = 1;
+    // The id of the actor. Is a GUID.
     string ActorId = 2;
+    // The id of the organization. Is a GUID.
     string OrganizationId = 3;
+    // The new status of the actor.
+    // The values are: New, Active, Passive, Inactive.
     string Status = 4;
+    // The creation time of the integration event.
     google.protobuf.Timestamp EventCreated = 5;
+    // The type of the current event: ActorStatusChangedIntegrationEvent.
     string Type = 6;
 }

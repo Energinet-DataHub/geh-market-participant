@@ -18,13 +18,23 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 import "google/protobuf/timestamp.proto";
 
+// An integration event raised when a grid area is removed from an actor.
 message GridAreaCreatedIntegrationEventContract {
+    // The id of the integration event. Is a GUID.
     string Id = 1;
+    // The id of the grid area. Is a GUID.
     string GridAreaId = 2;
+    // The initial name of the grid area. Is a GUID.
     string Name = 3;
+    // The three digits representing the grid area code, from 000 to 999.
     string Code = 4;
+    // The price area code of the grid area.
+    // See PriceAreaCode.cs.
     int32 PriceAreaCode = 5;
-    string GridAreaLinkId = 6;
+    // The id of the grid area link. Is a GUID.
+    string GridAreaLinkId = 6; 
+    // The creation time of the integration event.
     google.protobuf.Timestamp EventCreated = 7;
+    // The type of the current event: GridAreaCreatedIntegrationEvent.
     string Type = 8;
 }

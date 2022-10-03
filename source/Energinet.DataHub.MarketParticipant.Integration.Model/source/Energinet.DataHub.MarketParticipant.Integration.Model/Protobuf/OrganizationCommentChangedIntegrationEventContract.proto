@@ -18,6 +18,7 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 import "google/protobuf/timestamp.proto";
 
+// Currently unused.
 message OrganizationCommentChangedIntegrationEventContract {
     string Id = 1;
     string OrganizationId = 2;
