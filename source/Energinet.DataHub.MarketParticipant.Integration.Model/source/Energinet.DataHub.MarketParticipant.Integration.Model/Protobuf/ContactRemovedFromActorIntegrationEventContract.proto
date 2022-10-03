@@ -19,6 +19,7 @@ option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model
 import "google/protobuf/timestamp.proto";
 import "Protobuf/ActorContactEventData.proto";
 
+// Currently unused.
 message ContactRemovedFromActorIntegrationEventContract {
     string Id = 1;
     string ActorId = 2;

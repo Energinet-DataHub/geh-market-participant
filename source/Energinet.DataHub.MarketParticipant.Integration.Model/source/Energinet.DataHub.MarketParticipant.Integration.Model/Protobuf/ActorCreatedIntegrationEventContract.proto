@@ -19,19 +19,30 @@ option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model
 import "google/protobuf/timestamp.proto";
 import "Protobuf/ActorNumberType.proto";
 
-message ActorCreatedIntegrationEventContract{
+// An integration event raised when a new actor is created.
+message ActorCreatedIntegrationEventContract {
+  // The id of the integration event. Is a GUID.
   string Id = 1;
+  // The id of the actor. Is a GUID.
   string ActorId = 2;
-
+  // The id of the organization. Is a GUID.
   string OrganizationId = 3;
+  // The identificaton number of the actor, for example GLN.
   string ActorNumber = 4;
+  // Always 1.
   int32 Status = 5;
-
+  // The business role codes assigned to the actor. See BusinessRoleCode.cs.
   repeated int32 BusinessRoles = 6;
+  // The EIC market role functions given to the actor.   
+  // For a list of possible values, see EicFunction.cs.
   repeated ActorMarketRoleEventData ActorMarketRoles = 7;
+  // The creation time of the integration event.
   google.protobuf.Timestamp EventCreated = 8;
+  // The type of the current event: ActorCreatedIntegrationEvent.
   string Type = 9;
+  // The name of the actor.
   string Name = 10;
+  // Specifies the type of the ActorNumber field.
   ActorNumberType ActorNumberType = 11;
 }
 
