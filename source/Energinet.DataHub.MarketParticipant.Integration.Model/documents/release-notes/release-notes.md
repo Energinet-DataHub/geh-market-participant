@@ -6,7 +6,7 @@
 
 ## Version 2.7.0
 
-- Added a type field describing the actor's number format. 
+- Added a type field describing the actor's number format.
 
 ## Version 2.6.0
 

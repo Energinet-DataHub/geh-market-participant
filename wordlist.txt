@@ -39,6 +39,7 @@ ActorContactAdded
 ActorContactRemoved
 ActorGridAreaAdded
 ActorGridAreaRemoved
+ActorExternalIdChanged
 OrganizationCreated
 OrganizationNameChanged
 OrganizationAddressChanged
