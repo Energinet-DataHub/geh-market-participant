@@ -18,11 +18,19 @@ syntax = "proto3";
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 import "google/protobuf/timestamp.proto";
 
+// An integration event raised when the external actor id is changed.
 message ActorExternalIdChangedIntegrationEventContract{
+    // The id of the integration event. Is a GUID.
     string Id = 1;
+    // The id of the actor. Is a GUID.
     string ActorId = 2;
+    // The id of the organization. Is a GUID.
     string OrganizationId = 3;
+    // The creation time of the integration event.
     google.protobuf.Timestamp EventCreated = 4;
+    // The type of the current event: GridAreaRemovedFromActorIntegrationEvent.
     string Type = 5;
+    // The external actor id of the current actor. This id is managed by Azure B2C and is provided through the Json Web Token.
+    // The format is not guaranteed.
     optional string ExternalActorId = 6;
 }

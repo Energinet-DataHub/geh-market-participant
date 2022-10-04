@@ -19,6 +19,7 @@ option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model
 import "google/protobuf/timestamp.proto";
 import "Protobuf/ActorNumberType.proto";
 
+// Obsolete.
 message ActorUpdatedIntegrationEventContract {
   reserved "MarketRoles", "GridAreaIds", "MeteringPointTypes";
   reserved 8, 9, 10;
