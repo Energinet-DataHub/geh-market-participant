@@ -99,7 +99,12 @@ The roles claim will contain the app roles granted to the user through the actor
 
 The access_token can now be passed to APIs.
 
-### Curls
+# Perform a change actor flow
+
+1. Refresh token
+2. Profit
+
+# SeaURLs
 
 ```
 curl --request GET \
