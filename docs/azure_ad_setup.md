@@ -100,3 +100,26 @@ The roles claim will contain the app roles granted to the user through the actor
 The access_token can now be passed to APIs.
 
 ### Curls
+
+```
+curl --request GET \
+  --url 'https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/authorize?client_id=<client_id>&nonce=defaultNonce&scope=openid%20offline_access&response_type=code'
+
+curl --request POST \
+  --url https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'client_secret=<client_secret>' \
+  --data 'client_id=<client_id>' \
+  --data 'grant_type=<authorization_code>' \
+  --data 'scope=<actor>' \
+  --data 'code=<auth_code>'
+
+curl --request POST \
+  --url https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/token \
+  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --data 'client_secret=<client_secret>' \
+  --data 'client_id=<client_id>' \
+  --data 'grant_type=<refresh_token>' \
+  --data 'scope=<actor_scope>' \
+  --data 'refresh_token=<refresh_token>'
+```
