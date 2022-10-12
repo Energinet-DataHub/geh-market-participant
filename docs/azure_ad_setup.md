@@ -101,8 +101,34 @@ The access_token can now be passed to APIs.
 
 # Perform a change actor flow
 
-1. Refresh token
-2. Profit
+1. It is assumed that the user has already been authenticated and has a valid refresh token, see [sign-in flow](#perform-a-sign-in-flow).
+2. Use the refresh_token with OAuth2 /token endpoint to request access token to another actor.
+
+```
+https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/token
+FORM:
+client_id=<frontend_app_id> // Authorize user to access the Frontend AR.
+client_secret=<frontend_client_secret> // Authorize user to access the Frontend AR.
+grant_type=refresh_token
+refresh_token=<refresh_token>
+scope=api://<actor_app_id>/<scope> // The scope of the actor AR.
+```
+
+The response will contain a new access_token for this other actor.
+The roles claim will contain the app roles granted to the user through the actor.
+
+```
+{
+    ...,
+    "roles": [
+      "metering_point:delete"
+    ],
+}
+```
+
+The access_token can now be passed to APIs.
+
+> NOTE: It is important that the access token only grants access to one actor/scope at a time. If more than one scope is specified to the /token endpoint, the following error is received: `AADSTS28000: Provided value for the input parameter scope is not valid because it contains more than one resource. Scope <x> <y> is not valid.`. This behaviour is a requirement.
 
 # SeaURLs
 
