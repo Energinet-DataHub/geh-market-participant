@@ -6,6 +6,7 @@
     - API permissions > User.ReadWrite.All (Graph API, application) (Should be a separate AR)
     - API permissions > openid (Graph API, delegated)
     - API permissions > offline_access (Graph API, delegated)
+    - Authentication > Implicit grant and hybrid flows > ID tokens.
     - Add extension 'actors' through Graph API:
         ```C#
         var extensionProperty = new ExtensionProperty
@@ -49,4 +50,53 @@
 - Azure AD > External Identities > User flows > Add User flow (singinflow)
 - Azure AD > External Identities > User flows > signinflow > Applications > Add application 'Frontend'
 
-# Setup sign in flow
+# Perform a sign in flow
+
+1. Contact the OAuth2 /authorize endpoint to authorize the user.
+
+```
+https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/authorize?
+client_id=<frontend_app_id>& // Authorize user to access the Frontend AR.
+nonce=<nounce>& // Required to prevent token replays, when using id_token.
+scope=openid offline_access& // openid scope for id_token, offline_access scope for refresh_token
+response_type=id_token+code // Use hybrid flow: id_token for the user, including actors; code for access_token.
+```
+
+The response will contain an authorization code and an id_token.
+The id_token will contain the following claim:
+```
+{
+    ...,
+    "extn.actors": [
+        "api://<actor_app_id>/<scope>"
+    ]
+}
+```
+
+2. Contact the OAuth2 /token endpoint to get an access token for an actor.
+
+```
+https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/token
+FORM:
+client_id=<frontend_app_id> // Authorize user to access the Frontend AR.
+client_secret=<frontend_client_secret> // Authorize user to access the Frontend AR.
+grant_type=authorization_code
+code=<authorization_code_from_auth_endpoint>
+scope=api://<actor_app_id>/<scope> // The scope of the actor AR.
+```
+
+The response will contain access_token and refresh_token.
+The roles claim will contain the app roles granted to the user through the actor.
+
+```
+{
+    ...,
+    "roles": [
+      "metering_point:create"
+    ],
+}
+```
+
+The access_token can now be passed to APIs.
+
+### Curls
