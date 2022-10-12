@@ -51,6 +51,7 @@
 - Azure AD > External Identities > User flows > signinflow > Applications > Add application 'Frontend'
 
 # Perform a sign in flow
+![loginflow](https://user-images.githubusercontent.com/77341673/195361659-338ebe5b-86e7-4113-ac91-f3a8ec7197e2.png)
 
 1. Contact the OAuth2 /authorize endpoint to authorize the user.
 
@@ -100,6 +101,7 @@ The roles claim will contain the app roles granted to the user through the actor
 The access_token can now be passed to APIs.
 
 # Perform a change actor flow
+![changeactorflow](https://user-images.githubusercontent.com/77341673/195361685-2e6c79f7-4738-4f6a-a0d9-a3ca8e2a310c.png)
 
 1. It is assumed that the user has already been authenticated and has a valid refresh token, see [sign-in flow](#perform-a-sign-in-flow).
 2. Use the refresh_token with OAuth2 /token endpoint to request access token to another actor.
