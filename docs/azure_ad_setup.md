@@ -41,7 +41,7 @@
     {
         AdditionalData = new Dictionary<string, object>()
         {
-            { "extension_{frontend_application_id_without_dash}_actors", "test:me test:me1" }
+            { "extension_{frontend_application_id_without_dash}_actors", "api://<actor_1_app_id>/<scope> api://<actor_n_app_id>/<scope>" }
         }
     };
 
