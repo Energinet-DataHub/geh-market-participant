@@ -1,7 +1,6 @@
 MarketParticipant
 ApplyDBMigrationsApp
 dk
-energinet
 Energinet
 greenenergyhub
 sql
