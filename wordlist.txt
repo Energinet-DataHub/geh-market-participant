@@ -1,7 +1,7 @@
 MarketParticipant
 ApplyDBMigrationsApp
 Energinet
-greenenergyhub@energinet.dk
+'greenenergyhub@energinet.dk'
 sql
 TBD
 yyyyMMddHHmm
