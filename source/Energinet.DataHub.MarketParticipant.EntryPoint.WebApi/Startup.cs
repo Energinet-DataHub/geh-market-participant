@@ -17,7 +17,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
@@ -62,7 +61,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
+
+            var rolesValidationEnabled = _configuration.GetSetting(Settings.RolesValidationEnabled);
+            if (rolesValidationEnabled)
+                app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -89,7 +92,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
             var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
             services.AddJwtBearerAuthentication(openIdUrl, audience);
-            services.AddPermissionAuthorization();
+
+            var rolesValidationEnabled = configuration.GetSetting(Settings.RolesValidationEnabled);
+            if (rolesValidationEnabled)
+                services.AddPermissionAuthorization();
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
             var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
@@ -142,24 +148,17 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             container.Register<IUserIdProvider>(
                 () =>
                 {
-                    var accessor = container.GetInstance<ClaimsPrincipalContext>();
+                    var accessor = container.GetInstance<ClaimsPrincipal>();
                     return new UserIdProvider(() =>
                     {
                         var subjectClaim = accessor
-                            .ClaimsPrincipal?
                             .Claims
                             .First(x => x.Type == ClaimTypes.NameIdentifier);
 
-                        return subjectClaim != null
-                            ? Guid.Parse(subjectClaim.Value)
-                            : Guid.Parse("00000000-0000-0000-0000-000000000001");
+                        return Guid.Parse(subjectClaim.Value);
                     });
                 },
                 Lifestyle.Scoped);
-
-            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
-            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
 
         protected override void ConfigureSimpleInjector(IServiceCollection services)
