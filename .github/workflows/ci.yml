@@ -33,7 +33,7 @@ jobs:
 
      # Build and test solution, and publish coverage report
   dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v8
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@aiu/update_azurite_version
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
       USE_SQLLOCALDB_2019: true
