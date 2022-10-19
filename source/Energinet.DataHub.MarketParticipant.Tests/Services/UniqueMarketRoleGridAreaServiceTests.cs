@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 
@@ -36,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var actor = new Actor(
                 Guid.NewGuid(),
                 null,
-                new ActorNumber("123456789"),
+                new MockedGln(),
                 ActorStatus.Active,
                 new[]
                 {
@@ -66,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var actor = new Actor(
                 Guid.NewGuid(),
                 null,
-                new ActorNumber("123456789"),
+                new MockedGln(),
                 ActorStatus.Active,
                 new[]
                 {
@@ -122,7 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 var actor = new Actor(
                     Guid.NewGuid(),
                     null,
-                    new ActorNumber("123456789"),
+                    new MockedGln(),
                     ActorStatus.Active,
                     new[]
                     {

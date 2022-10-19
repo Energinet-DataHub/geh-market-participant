@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Linq;
-using System.Security.Claims;
-using Energinet.DataHub.Core.App.Common.Identity;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Microsoft.AspNetCore.Http;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common
@@ -46,15 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
             container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
-            container.Register<IUserIdProvider>(
-                () =>
-                {
-                    return new UserIdProvider(() =>
-                    {
-                        return Guid.Parse("00000000-0000-0000-0000-000000000001");
-                    });
-                },
-                Lifestyle.Scoped);
             container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
             container.Collection.Register<IBusinessRole>(
                 new ElectricalSupplierRole(),

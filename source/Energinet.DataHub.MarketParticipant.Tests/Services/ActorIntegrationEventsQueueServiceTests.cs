@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIn
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IDomainEventRepository>().Object,
                 new Mock<IBusinessRoleCodeDomainService>().Object);
 
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
 
             // Act + Assert
             await Assert
@@ -73,7 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IBusinessRoleCodeDomainService>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
 
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.Agent, Enumerable.Empty<ActorGridArea>()));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.Consumer, Enumerable.Empty<ActorGridArea>()));
@@ -115,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 domainEventRepository.Object,
                 new Mock<IBusinessRoleCodeDomainService>().Object);
 
-            var actor = new Actor(new ActorNumber("fake_value"));
+            var actor = new Actor(new MockedGln());
             var organizationId = new OrganizationId(Guid.NewGuid());
 
             var integrationEvents = new List<IIntegrationEvent>();

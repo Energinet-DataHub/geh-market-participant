@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Guid actorId,
             Guid organizationId,
             Guid? externalActorId,
-            string actorNumber,
+            ActorNumber actorNumber,
             ActorStatus status,
             IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<ActorMarketRole> actorMarketRoles)
@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public Guid OrganizationId { get; }
 
         public Guid? ExternalActorId { get; }
-        public string ActorNumber { get; }
+        public ActorNumber ActorNumber { get; }
         public ActorStatus Status { get; }
 
         public IEnumerable<BusinessRoleCode> BusinessRoles { get; }

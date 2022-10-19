@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -196,7 +197,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         return new Actor(
             Guid.Parse("9B6CF046-94AC-4210-8D8E-138032F17AAB"),
             null,
-            new ActorNumber("gln"),
+            new MockedGln(),
             status,
             new[]
             {

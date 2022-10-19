@@ -20,9 +20,9 @@ on:
 
 jobs:
   publish_release:
-    uses: Energinet-DataHub/.github/.github/workflows/publish-release.yml@v8
-    secrets:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
+    uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v8
+    with:
+      RELEASE_NAME_PREFIX: dotnet
 
   dispatch_deployment_request:
     needs: publish_release
@@ -39,6 +39,7 @@ jobs:
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
       USE_SQLLOCALDB_2019: true
+      ENVIRONMENT: AzureAuth
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}

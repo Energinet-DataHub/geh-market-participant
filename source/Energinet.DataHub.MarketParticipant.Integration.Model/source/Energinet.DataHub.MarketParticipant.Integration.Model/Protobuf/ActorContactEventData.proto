@@ -17,6 +17,7 @@ syntax = "proto3";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Integration.Model.Protobuf";
 
+// Currently unused.
 message ActorContactEventData {
   string Name = 1;
   string Email = 2;

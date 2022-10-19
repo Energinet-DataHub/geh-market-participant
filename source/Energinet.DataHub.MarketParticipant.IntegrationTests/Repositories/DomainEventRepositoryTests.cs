@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             {
                 OrganizationId = new OrganizationId(Guid.NewGuid()),
                 ActorId = Guid.NewGuid(),
-                ActorNumber = new ActorNumber("fake_value"),
+                ActorNumber = new MockedGln()
             };
 
             actorUpdatedIntegrationEvent.ActorMarketRoles.Add(

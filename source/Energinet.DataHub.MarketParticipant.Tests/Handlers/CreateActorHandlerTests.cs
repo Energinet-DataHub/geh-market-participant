@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -53,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             const string orgName = "SomeName";
-            const string actorGln = "SomeGln";
+            string actorGln = new MockedGln();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
             var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
@@ -80,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test Comment",
                 OrganizationStatus.Active);
 
-            var actor = new Actor(new ActorNumber(actorGln));
+            var actor = new Actor(ActorNumber.Create(actorGln));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -112,7 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             const string orgName = "SomeName";
-            const string actorGln = "SomeGln";
+            string actorGln = new MockedGln();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
             var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
@@ -139,7 +140,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test Comment",
                 OrganizationStatus.Active);
 
-            var actor = new Actor(new ActorNumber(actorGln));
+            var actor = new Actor(ActorNumber.Create(actorGln));
             var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());
 
             organizationExistsHelperService
@@ -192,7 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 null,
                 OrganizationStatus.Active);
 
-            var actor = new Actor(new ActorNumber(string.Empty));
+            var actor = new Actor(ActorNumber.Create("9958000453672"));
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -208,7 +209,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(string.Empty), Enumerable.Empty<ActorMarketRoleDto>()));
+                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto("9958000453672"), Enumerable.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target
