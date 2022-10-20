@@ -41,7 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
             container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
             container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
-
             container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
             container.Collection.Register<IBusinessRole>(
                 new ElectricalSupplierRole(),
