@@ -13,13 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.Common.Identity;
+using Energinet.DataHub.Core.App.WebApp.Authentication;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.WebApp.Middleware;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
@@ -28,9 +29,11 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
 using SimpleInjector;
 
@@ -60,11 +63,17 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseHttpsRedirection();
             app.UseRouting();
 
-            app.UseMiddleware<JwtTokenMiddleware>();
+            app.UseAuthentication();
             app.UseAuthorization();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                var ds = endpoints.DataSources;
+                var dec = new EndpointDataSourceFilter(ds.Single(), _configuration);
+                endpoints.DataSources.Clear();
+                endpoints.DataSources.Add(dec);
 
                 // Health check
                 endpoints.MapLiveHealthChecks();
@@ -84,6 +93,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
+            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
+            services.AddJwtBearerAuthentication(openIdUrl, audience);
+            services.AddPermissionAuthorization();
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
             var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
@@ -136,24 +150,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             container.Register<IUserIdProvider>(
                 () =>
                 {
-                    var accessor = container.GetInstance<ClaimsPrincipalContext>();
+                    var accessor = container.GetRequiredService<IHttpContextAccessor>();
                     return new UserIdProvider(() =>
                     {
                         var subjectClaim = accessor
-                            .ClaimsPrincipal?
+                            .HttpContext!
+                            .User
                             .Claims
                             .First(x => x.Type == ClaimTypes.NameIdentifier);
 
-                        return subjectClaim != null
-                            ? Guid.Parse(subjectClaim.Value)
-                            : Guid.Parse("00000000-0000-0000-0000-000000000001");
+                        return Guid.Parse(subjectClaim.Value);
                     });
                 },
                 Lifestyle.Scoped);
-
-            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
-            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
-            Container.AddJwtTokenSecurity(openIdUrl, audience);
         }
 
         protected override void ConfigureSimpleInjector(IServiceCollection services)
@@ -168,6 +177,54 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             });
 
             services.UseSimpleInjectorAspNetRequestScoping(Container);
+        }
+
+        private sealed class EndpointDataSourceFilter : EndpointDataSource
+        {
+            private readonly EndpointDataSource _target;
+            private readonly IConfiguration _configuration;
+
+            public EndpointDataSourceFilter(EndpointDataSource target, IConfiguration configuration)
+            {
+                _target = target;
+                _configuration = configuration;
+            }
+
+            public override IReadOnlyList<Endpoint> Endpoints
+            {
+                get
+                {
+                    // This code is temporary while we test azure ad role based auth.
+                    // It allows u002 to use the new role based auth, while the remaining environments
+                    // do not.
+                    var enableUnsafeControllers = !_configuration.GetSetting(Settings.RolesValidationEnabled);
+
+                    if (enableUnsafeControllers)
+                    {
+                        var grouped = _target
+                            .Endpoints
+                            .Select(x => x.DisplayName!.Replace("Unsafe", string.Empty, StringComparison.Ordinal))
+                            .GroupBy(x => x);
+
+                        var toRemove = grouped
+                            .Where(x => x.Count() > 1)
+                            .Select(x => x.First())
+                            .ToList();
+
+                        return _target
+                            .Endpoints
+                            .Where(endpoint => !toRemove.Contains(endpoint.DisplayName!))
+                            .ToList();
+                    }
+
+                    return _target
+                        .Endpoints
+                        .Where(endpoint => endpoint.DisplayName?.Contains("UnsafeController", StringComparison.Ordinal) == false)
+                        .ToList();
+                }
+            }
+
+            public override IChangeToken GetChangeToken() => _target.GetChangeToken();
         }
     }
 }

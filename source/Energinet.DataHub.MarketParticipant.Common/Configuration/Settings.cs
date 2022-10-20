@@ -44,4 +44,7 @@ public static class Settings
 
     public static Setting<string> ServiceBusHealthCheckConnectionString { get; }
         = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
+
+    public static Setting<bool> RolesValidationEnabled { get; }
+        = new("ROLES_VALIDATION_ENABLED");
 }
