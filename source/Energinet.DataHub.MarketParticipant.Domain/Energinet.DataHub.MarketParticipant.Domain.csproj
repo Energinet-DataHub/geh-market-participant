@@ -28,4 +28,7 @@ limitations under the License.
     <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Client\source\Energinet.DataHub.MarketParticipant.Client\Energinet.DataHub.MarketParticipant.Client.csproj" />
+  </ItemGroup>
 </Project>
