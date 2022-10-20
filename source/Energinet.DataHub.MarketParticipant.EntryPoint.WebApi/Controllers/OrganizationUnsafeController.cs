@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
     [ApiExplorerSettings(IgnoreApi = true)]
-    [Route("[controller]")]
+    [Route("organization")]
     public class OrganizationUnsafeController : ControllerBase
     {
         private readonly ILogger<OrganizationController> _logger;

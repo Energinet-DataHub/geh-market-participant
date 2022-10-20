@@ -196,13 +196,20 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 {
                     // This code is temporary while we test azure ad role based auth.
                     // It allows u002 to use the new role based auth, while the remaining environments
-                    // does not.
+                    // do not.
                     var enableUnsafeControllers = !_configuration.GetSetting(Settings.RolesValidationEnabled);
 
                     if (enableUnsafeControllers)
                     {
-                        var grouped = _target.Endpoints.Select(x => x.DisplayName!.Replace("Unsafe", string.Empty)).GroupBy(x => x);
-                        var toRemove = grouped.Where(x => x.Count() > 1).Select(x => x.First()).ToList();
+                        var grouped = _target
+                            .Endpoints
+                            .Select(x => x.DisplayName!.Replace("Unsafe", string.Empty, StringComparison.Ordinal))
+                            .GroupBy(x => x);
+
+                        var toRemove = grouped
+                            .Where(x => x.Count() > 1)
+                            .Select(x => x.First())
+                            .ToList();
 
                         return _target
                             .Endpoints

@@ -25,7 +25,7 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
-    [Route("gridarea")]
+    [Route("[controller]")]
     public sealed class GridAreaController : ControllerBase
     {
         private readonly ILogger<GridAreaController> _logger;
