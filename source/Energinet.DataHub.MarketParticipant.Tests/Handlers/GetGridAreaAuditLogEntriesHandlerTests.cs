@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -53,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
                 .ReturnsAsync(new[]
                     {
-                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", Guid.NewGuid())
+                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "oldVal", "newVal", Guid.NewGuid())
                     });
 
             var userDisplayNameProviderMock = new Mock<IUserDisplayNameProvider>();

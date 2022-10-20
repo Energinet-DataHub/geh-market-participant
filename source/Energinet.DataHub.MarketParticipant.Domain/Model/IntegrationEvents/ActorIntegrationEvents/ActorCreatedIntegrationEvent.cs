@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {

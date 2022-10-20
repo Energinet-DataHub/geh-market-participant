@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -136,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
         private static void UpdateActorStatus(Domain.Model.Actor actor, UpdateActorCommand request)
         {
-            actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
+            actor.Status = request.ChangeActor.Status;
         }
 
         private void UpdateActorMarketRolesAndChildren(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)

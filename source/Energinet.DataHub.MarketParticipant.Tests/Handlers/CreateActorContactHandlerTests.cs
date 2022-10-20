@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -115,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateActorContactCommand(
                 orgId.Value,
                 wrongId,
-                new CreateActorContactDto("fake_value", "Default", "fake@value", null));
+                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
             // act + assert
             var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
@@ -185,7 +186,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateActorContactCommand(
                 orgId.Value,
                 actor.Id,
-                new CreateActorContactDto("fake_value", "Default", "fake@value", null));
+                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
             // Act
             await target
@@ -254,7 +255,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateActorContactCommand(
                 orgId.Value,
                 actor.Id,
-                new CreateActorContactDto("fake_value", "Default", "fake@value", null));
+                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
             // Act
             var response = await target

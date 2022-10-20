@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -45,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                     gridArea.Id.Value,
                     gridArea.Code.Value,
                     gridArea.Name.Value,
-                    gridArea.PriceAreaCode.ToString(),
+                    gridArea.PriceAreaCode,
                     gridArea.ValidFrom,
                     gridArea.ValidTo))
             };

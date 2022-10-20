@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -95,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 Guid.NewGuid(),
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto(ActorStatus.Active, new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
             await Assert
@@ -134,16 +135,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var meteringPoints = new[]
             {
-                MeteringPointType.D02Analysis.Name, MeteringPointType.E17Consumption.Name,
-                MeteringPointType.E17Consumption.Name
+                MeteringPointType.D02Analysis, MeteringPointType.E17Consumption,
+                MeteringPointType.E17Consumption
             };
             var gridAreas = new[] { new ActorGridAreaDto(actor.Id, meteringPoints) };
-            var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };
+            var marketRoles = new[] { new ActorMarketRoleDto(EicFunction.EnergySupplier, gridAreas) };
 
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), marketRoles));
+                new ChangeActorDto(ActorStatus.Active, new ActorNameDto(string.Empty), marketRoles));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -186,7 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto(ActorStatus.Active, new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -229,7 +230,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto(ActorStatus.Active, new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -272,7 +273,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateActorCommand(
                 organizationId,
                 actor.Id,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
+                new ChangeActorDto(ActorStatus.Active, new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

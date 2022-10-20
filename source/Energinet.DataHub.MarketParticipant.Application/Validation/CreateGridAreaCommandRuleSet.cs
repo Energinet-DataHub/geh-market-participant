@@ -14,6 +14,7 @@
 
 using System.Globalization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
@@ -38,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .Length(1, 3)
                         .Must(code => int.TryParse(code, NumberStyles.None, CultureInfo.InvariantCulture, out _));
 
-                    validator
+                    _ = validator
                         .RuleFor(gridArea => gridArea.PriceAreaCode)
                         .NotNull()
                         .IsEnumName(typeof(PriceAreaCode), false);

@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using FluentValidation;
 using Xunit;
 using Xunit.Categories;

@@ -29,9 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.HasKey(contact => contact.Id);
             builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
             builder.Property(contact => contact.Category)
-                .HasConversion(
-                    to => to.Value,
-                    from => ContactCategory.FromValue(from))
                 .HasColumnName("Category");
         }
     }

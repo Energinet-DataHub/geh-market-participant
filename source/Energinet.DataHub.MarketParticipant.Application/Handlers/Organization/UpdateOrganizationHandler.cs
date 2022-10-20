@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
             organization.Comment = request.Organization.Comment;
-            organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
+            organization.Status = request.Organization.Status;
 
             await _uniqueOrganizationBusinessRegisterIdentifierService
                 .EnsureUniqueBusinessRegisterIdentifierAsync(organization)

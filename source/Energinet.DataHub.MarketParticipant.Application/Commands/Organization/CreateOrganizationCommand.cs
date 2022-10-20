@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization

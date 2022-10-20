@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -326,10 +327,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(2, actorMeteringPointTypes.Count);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x == MeteringPointType.D02Analysis.Value);
+                x => x == MeteringPointType.D02Analysis);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x == MeteringPointType.D05NetProduction.Value);
+                x => x == MeteringPointType.D05NetProduction);
         }
 
         [Fact]

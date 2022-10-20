@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
@@ -46,7 +47,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         ArgumentNullException.ThrowIfNull(existingActor, nameof(existingActor));
         ArgumentNullException.ThrowIfNull(incomingActor, nameof(incomingActor));
 
-        AddChangeEventIfActorStatusChanged(organizationId, existingActor, incomingActor.ChangeActor.Status);
+        AddChangeEventIfActorStatusChanged(organizationId, existingActor, incomingActor.ChangeActor.Status.ToString());
         AddChangeEventIfActorNameChanged(organizationId, existingActor, incomingActor.ChangeActor.Name);
         await AddChangeEventsIfMarketRolesOrChildrenChangedAsync(organizationId, existingActor, incomingActor.ChangeActor.MarketRoles).ConfigureAwait(false);
 
@@ -116,7 +117,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             .ToList();
 
         var incomingEicFunctions = incomingMarketRoles
-            .Select(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction))
+            .Select(marketRole => marketRole.EicFunction)
             .ToList();
 
         var eicFunctionsToRemoveFromActor = existingEicFunctions.Except(incomingEicFunctions);
@@ -134,7 +135,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                     .GridAreas;
 
                 var incomingGridAreas = incomingMarketRoles
-                    .First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == existingEicFunction)
+                    .First(marketRole => marketRole.EicFunction == existingEicFunction)
                     .GridAreas;
 
                 var marketRole = new ActorMarketRole(existingActor.Id, existingEicFunction, existingGridAreas);
@@ -161,8 +162,8 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 
         foreach (var eicFunction in eicFunctionsToAddToActor)
         {
-            var gridAreas = incomingMarketRoles.First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == eicFunction).GridAreas;
-            var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas.Select(gridArea => new ActorGridArea(gridArea.Id, gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType)))));
+            var gridAreas = incomingMarketRoles.First(marketRole => marketRole.EicFunction == eicFunction).GridAreas;
+            var marketRole = new ActorMarketRole(existingActor.Id, eicFunction, gridAreas.Select(gridArea => new ActorGridArea(gridArea.Id, gridArea.MeteringPointTypes)));
 
             _changeEvents.Add(new MarketRoleAddedToActorIntegrationEvent
             {
@@ -178,7 +179,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 eicFunction,
                 gridAreas.Select(gridArea => new ActorGridArea(
                     gridArea.Id,
-                    gridArea.MeteringPointTypes.Select(meteringPointType => MeteringPointType.FromName(meteringPointType))))).ConfigureAwait(false);
+                    gridArea.MeteringPointTypes.Select(meteringPointType => meteringPointType)))).ConfigureAwait(false);
         }
     }
 
@@ -192,7 +193,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             .Select(id =>
                 new ActorGridArea(
                     id,
-                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => MeteringPointType.FromName(x, false))));
+                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes));
 
         var gridAreaIdsToRemoveFromActor = existingMarketRole
             .GridAreas
@@ -203,7 +204,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             .Select(id =>
                 new ActorGridArea(
                     id,
-                    existingMarketRole.GridAreas.First(x => x.Id == id).MeteringPointTypes.Select(x => x)));
+                    existingMarketRole.GridAreas.First(x => x.Id == id).MeteringPointTypes));
 
         await AddChangeEventsForAddedGridAreasAsync(organizationId, existingActorId, existingMarketRole.Function, gridAreasToAddToActor).ConfigureAwait(false);
         await AddChangeEventsForRemovedGridAreasAsync(organizationId, existingActorId, existingMarketRole.Function, gridAreasToRemoveFromActor).ConfigureAwait(false);
@@ -217,7 +218,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                     existingActorId,
                     existingMarketRole.Function,
                     gridArea,
-                    incomingDto.MeteringPointTypes.Select(m => MeteringPointType.FromName(m, false)));
+                    incomingDto.MeteringPointTypes);
             }
         }
     }
@@ -260,13 +261,13 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             }
 
             _changeEvents.Add(new GridAreaAddedToActorIntegrationEvent
-                {
-                    OrganizationId = organizationId,
-                    ActorId = existingActorId,
-                    Function = function,
-                    GridAreaId = gridArea.Id,
-                    GridAreaLinkId = gridAreaLink.Id.Value
-                });
+            {
+                OrganizationId = organizationId,
+                ActorId = existingActorId,
+                Function = function,
+                GridAreaId = gridArea.Id,
+                GridAreaLinkId = gridAreaLink.Id.Value
+            });
 
             AddChangeEventsForAddedMeteringPointTypes(
                 organizationId,

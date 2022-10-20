@@ -14,6 +14,7 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
@@ -60,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                     roleValidator
                                         .RuleFor(x => x.EicFunction)
                                         .NotEmpty()
-                                        .IsEnumName(typeof(EicFunction), false);
+                                        .IsInEnum();
                                 });
                         });
 
@@ -77,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
-                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                                .IsInEnum());
                                 });
                         });
                 });

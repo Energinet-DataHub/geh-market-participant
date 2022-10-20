@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
@@ -160,30 +161,30 @@ public class ChangesToActorHelperTests
             Guid.NewGuid(),
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ChangeActorDto(
-                "Passive",
+                ActorStatus.Passive,
                 new ActorNameDto("NewActorName"),
                 new List<ActorMarketRoleDto>
                 {
                     new ActorMarketRoleDto(
-                        EicFunction.EnergySupplier.ToString(),
+                        EicFunction.EnergySupplier,
                         new List<ActorGridAreaDto>
                         {
                             new ActorGridAreaDto(
                                 Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d"),
-                                new List<string>
+                                new List<MeteringPointType>
                                 {
-                                    "Unknown"
+                                  MeteringPointType.Unknown
                                 })
                         }),
                     new ActorMarketRoleDto(
-                        EicFunction.BillingAgent.ToString(),
+                        EicFunction.BillingAgent,
                         new List<ActorGridAreaDto>
                         {
                             new ActorGridAreaDto(
                                 Guid.NewGuid(),
-                                new List<string>
+                                new List<MeteringPointType>
                                 {
-                                    "D05NetProduction"
+                                    MeteringPointType.D05NetProduction
                                 })
                         })
                 }));

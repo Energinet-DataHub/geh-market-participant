@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Mappers
@@ -30,11 +31,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             {
                 var aggregatedGrids = marketRoleDto.GridAreas
                     .GroupBy(x => x.Id)
-                    .Select(x => new ActorGridArea(x.Key, x.SelectMany(x => x.MeteringPointTypes)
-                    .Select(x => MeteringPointType.FromName(x, true)).Distinct()));
+                    .Select(x => new ActorGridArea(x.Key, x.SelectMany(x => x.MeteringPointTypes)));
 
                 yield return new ActorMarketRole(
-                    Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true),
+                    marketRoleDto.EicFunction,
                     aggregatedGrids);
             }
         }

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -168,7 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actualContact = response.Contacts.Single();
             Assert.Equal(expected.Id.Value, actualContact.ContactId);
             Assert.Equal(expected.Name, actualContact.Name);
-            Assert.Equal(expected.Category.Name, actualContact.Category);
+            Assert.Equal(expected.Category, actualContact.Category);
             Assert.Equal(expected.Email.Address, actualContact.Email);
             Assert.Equal(expected.Phone?.Number, actualContact.Phone);
         }

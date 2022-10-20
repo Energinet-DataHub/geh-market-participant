@@ -15,8 +15,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
@@ -94,7 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value"),
                 "Test Comment",
-                "Active");
+                OrganizationStatus.Active);
 
             // Act
             var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value"),
                 "Test Comment",
-                "Blocked");
+                OrganizationStatus.Blocked);
 
             // Act
             var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);

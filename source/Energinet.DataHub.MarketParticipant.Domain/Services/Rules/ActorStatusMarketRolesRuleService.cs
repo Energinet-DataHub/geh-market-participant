@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -62,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             {
                 foreach (var grid in marketRole.GridAreas)
                 {
-                    yield return (marketRole.Function.ToString() + grid.Id + string.Join(string.Empty, grid.MeteringPointTypes.Select(mp => mp.Name).OrderBy(mp => mp))).ToUpperInvariant();
+                    yield return (marketRole.Function.ToString() + grid.Id + string.Join(string.Empty, grid.MeteringPointTypes.Select(mp => mp).OrderBy(mp => mp))).ToUpperInvariant();
                 }
             }
         }

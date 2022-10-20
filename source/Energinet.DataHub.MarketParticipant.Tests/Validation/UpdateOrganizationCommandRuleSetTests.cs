@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Xunit;
 using Xunit.Categories;
 
@@ -46,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(Guid.Empty, organizationDto);
@@ -98,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -120,15 +121,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
-        [InlineData("1", false)]
-        [InlineData("New", true)]
-        [InlineData("Active", true)]
-        [InlineData("Blocked", true)]
-        [InlineData("Deleted", true)]
-        public async Task Validate_OrganizationStatus_ValidatesProperty(string status, bool isValid)
+        [InlineData(OrganizationStatus.New, true)]
+        [InlineData(OrganizationStatus.Active, true)]
+        [InlineData(OrganizationStatus.Blocked, true)]
+        [InlineData(OrganizationStatus.Deleted, true)]
+        public async Task Validate_OrganizationStatus_ValidatesProperty(OrganizationStatus status, bool isValid)
         {
             // Arrange
             const string propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Status)}";
@@ -185,7 +182,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -227,7 +224,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -269,7 +266,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     value,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -311,7 +308,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     value),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -353,7 +350,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -395,7 +392,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                OrganizationStatus.Active);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);

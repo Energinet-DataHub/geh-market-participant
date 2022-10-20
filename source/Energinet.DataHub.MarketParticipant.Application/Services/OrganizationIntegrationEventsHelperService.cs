@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
@@ -52,12 +53,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 };
             }
 
-            var newStatus = Enum.Parse<OrganizationStatus>(organizationDto.Status);
-            if (organization.Status != newStatus)
+            if (organization.Status != organizationDto.Status)
             {
                 yield return new OrganizationStatusChangedIntegrationEvent
                 {
-                    Status = newStatus,
+                    Status = organizationDto.Status,
                     OrganizationId = organization.Id
                 };
             }
@@ -75,7 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             {
                 yield return new OrganizationCommentChangedIntegrationEvent
                 {
-                    Comment = organizationDto.Comment, OrganizationId = organization.Id
+                    Comment = organizationDto.Comment,
+                    OrganizationId = organization.Id
                 };
             }
 

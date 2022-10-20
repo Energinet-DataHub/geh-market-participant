@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
@@ -97,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(actorGln), Array.Empty<ActorMarketRoleDto>()));
+                new CreateActorDto(new ActorNumberDto(actorGln), new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             var response = await target
@@ -141,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 OrganizationStatus.Active);
 
             var actor = new Actor(ActorNumber.Create(actorGln));
-            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, Enumerable.Empty<ActorGridAreaDto>());
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -157,7 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto(actorGln), new[] { marketRole }));
+                new CreateActorDto(new ActorNumberDto(actorGln), new ActorNameDto(string.Empty), new[] { marketRole }));
 
             // Act
             var response = await target
@@ -209,7 +210,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorCommand(
                 orgId,
-                new CreateActorDto(new ActorNameDto(string.Empty), new ActorNumberDto("9958000453672"), Enumerable.Empty<ActorMarketRoleDto>()));
+                new CreateActorDto(new ActorNumberDto("9958000453672"), new ActorNameDto(string.Empty), Enumerable.Empty<ActorMarketRoleDto>().ToList()));
 
             // Act
             await target

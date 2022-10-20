@@ -17,57 +17,19 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class CreateOrganizationCommandRuleSet : AbstractValidator<CreateOrganizationCommand>
+    public sealed class CreateOrganizationCommandRuleSet
+        : AbstractValidator<CreateOrganizationCommand>
     {
         public CreateOrganizationCommandRuleSet()
         {
             RuleFor(command => command.Organization)
                 .NotNull()
+                .SetValidator(new OrganizationRuleSet())
                 .ChildRules(validator =>
                 {
                     validator
-                        .RuleFor(organization => organization.Name)
-                        .NotEmpty()
-                        .Length(1, 50);
-
-                    validator
-                        .RuleFor(organization => organization.BusinessRegisterIdentifier)
-                        .NotEmpty()
-                        .Length(1, 8);
-
-                    validator
                         .RuleFor(organization => organization.Address)
-                        .ChildRules(addressValidator =>
-                        {
-                            addressValidator
-                                .RuleFor(address => address.City)
-                                .NotEmpty()
-                                .Length(1, 50)
-                                .When(address => !string.IsNullOrEmpty(address.City));
-
-                            addressValidator
-                                .RuleFor(address => address.Country)
-                                .NotEmpty()
-                                .Length(1, 50);
-
-                            addressValidator
-                                .RuleFor(address => address.Number)
-                                .NotEmpty()
-                                .Length(1, 15)
-                                .When(address => !string.IsNullOrEmpty(address.Number));
-
-                            addressValidator
-                                .RuleFor(address => address.StreetName)
-                                .NotEmpty()
-                                .Length(1, 250)
-                                .When(address => !string.IsNullOrEmpty(address.StreetName));
-
-                            addressValidator
-                                .RuleFor(address => address.ZipCode)
-                                .NotEmpty()
-                                .Length(1, 15)
-                                .When(address => !string.IsNullOrEmpty(address.ZipCode));
-                        });
+                        .SetValidator(new AdressRuleSet());
                 });
         }
     }

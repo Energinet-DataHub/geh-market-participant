@@ -14,7 +14,7 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     changeActorValidator
                         .RuleFor(x => x.Status)
                         .NotEmpty()
-                        .IsEnumName(typeof(ActorStatus), false);
+                        .IsInEnum();
 
                     changeActorValidator
                         .RuleForEach(actor => actor.MarketRoles)
@@ -47,12 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
                         .NotEmpty()
-                        .When(x => Enum.TryParse(
-                                       typeof(ActorStatus),
-                                       x.Status,
-                                       true,
-                                       out var result) &&
-                                   result is ActorStatus actorStatus && actorStatus != ActorStatus.New)
+                        .When(x => x.Status is ActorStatus actorStatus && actorStatus != ActorStatus.New)
                         .ChildRules(rolesValidator =>
                             rolesValidator
                                 .RuleForEach(x => x)
@@ -62,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                     roleValidator
                                         .RuleFor(x => x.EicFunction)
                                         .NotEmpty()
-                                        .IsEnumName(typeof(EicFunction), false);
+                                        .IsInEnum();
                                 }));
 
                     changeActorValidator
@@ -78,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
-                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                                .IsInEnum());
                                 });
                         });
                 });

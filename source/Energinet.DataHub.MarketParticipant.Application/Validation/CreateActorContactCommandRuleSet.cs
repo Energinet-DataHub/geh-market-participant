@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(contact => contact.Category)
-                        .Must(category => ContactCategory.TryFromName(category, true, out _));
+                        .IsInEnum();
 
                     validator
                         .RuleFor(contact => contact.Email)

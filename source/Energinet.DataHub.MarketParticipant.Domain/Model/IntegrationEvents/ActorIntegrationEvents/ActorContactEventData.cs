@@ -14,6 +14,7 @@
 
 using System.Text.Json.Serialization;
 using Ardalis.SmartEnum.SystemTextJson;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
@@ -29,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Act
 
         public string Name { get; }
         public EmailAddress Email { get; }
-        [JsonConverter(typeof(SmartEnumNameConverter<ContactCategory, int>))]
+        [JsonConverter(typeof(ContactCategory))]
         public ContactCategory Category { get; }
         public PhoneNumber? Phone { get; }
     }

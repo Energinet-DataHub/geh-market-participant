@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Mappers
@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             ArgumentNullException.ThrowIfNull(contact, nameof(contact));
             return new ActorContactDto(
                 contact.Id.Value,
-                contact.Category.Name,
+                contact.Category,
                 contact.Name,
                 contact.Email.Address,
                 contact.Phone?.Number);

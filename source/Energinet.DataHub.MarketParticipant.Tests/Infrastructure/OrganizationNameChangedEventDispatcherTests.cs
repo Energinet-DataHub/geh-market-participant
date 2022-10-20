@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
@@ -75,12 +76,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
-              ActorNumber = new MockedGln(),
-              Status = ActorStatus.Active,
-              ActorId = Guid.NewGuid(),
-              BusinessRoles = { BusinessRoleCode.Ddk },
-              OrganizationId = new OrganizationId(Guid.NewGuid()),
-              ExternalActorId = new ExternalActorId(Guid.NewGuid())
+                ActorNumber = new MockedGln(),
+                Status = ActorStatus.Active,
+                ActorId = Guid.NewGuid(),
+                BusinessRoles = { BusinessRoleCode.Ddk },
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };
 
             // act

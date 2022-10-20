@@ -17,5 +17,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public record ActorGridAreaDto(Guid Id, IEnumerable<MarketParticipantMeteringPointType> MeteringPointTypes);
+    public record ActorGridAreaDto(Guid Id, IEnumerable<MeteringPointType> MeteringPointTypes);
 }

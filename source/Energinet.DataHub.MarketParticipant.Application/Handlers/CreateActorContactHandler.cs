@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -88,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new ActorContact(
                 actorId,
                 contactDto.Name,
-                ContactCategory.FromName(contactDto.Category, true),
+                contactDto.Category,
                 new EmailAddress(contactDto.Email),
                 optionalPhoneNumber);
         }

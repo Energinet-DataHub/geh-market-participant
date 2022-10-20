@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Xunit;
 using Xunit.Categories;
 
@@ -25,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     [UnitTest]
     public sealed class CreateActorContactCommandRuleSetTests
     {
-        private const string ValidCategory = "EnerginetInquiry";
+        private const ContactCategory ValidCategory = ContactCategory.EnerginetInquiry;
         private const string ValidName = "John Doe";
         private const string ValidEmail = "john@example.com";
         private const string ValidPhone = "+45 01 02 03 04";
@@ -80,13 +81,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
-        [InlineData("EnerginetInquiry", true)]
-        [InlineData("Reminder", true)]
-        [InlineData("NotAThing", false)]
-        public async Task Validate_Category_ValidatesProperty(string value, bool isValid)
+        [InlineData(ContactCategory.EnerginetInquiry, true)]
+        [InlineData(ContactCategory.Reminder, true)]
+        public async Task Validate_Category_ValidatesProperty(ContactCategory value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateActorContactCommand.Contact)}.{nameof(CreateActorContactDto.Category)}";

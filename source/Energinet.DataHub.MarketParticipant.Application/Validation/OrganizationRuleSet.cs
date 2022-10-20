@@ -12,11 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public enum PriceAreaCode
+    public sealed class OrganizationRuleSet : AbstractValidator<CreateOrganizationDto>
     {
-        DK1 = 1,
-        DK2 = 2
+        public OrganizationRuleSet()
+        {
+            RuleFor(organization => organization.Name).NotEmpty().Length(1, 50);
+
+            RuleFor(organization => organization.BusinessRegisterIdentifier)
+                .NotEmpty()
+                .Length(1, 8);
+        }
     }
 }

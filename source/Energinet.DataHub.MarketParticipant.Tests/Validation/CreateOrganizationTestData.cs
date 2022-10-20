@@ -15,6 +15,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {

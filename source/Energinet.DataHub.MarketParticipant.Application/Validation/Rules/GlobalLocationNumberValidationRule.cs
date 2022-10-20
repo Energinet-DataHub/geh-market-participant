@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 using FluentValidation.Validators;

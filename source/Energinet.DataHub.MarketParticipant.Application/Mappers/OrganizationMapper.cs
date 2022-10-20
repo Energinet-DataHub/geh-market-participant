@@ -13,10 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Mappers
@@ -27,23 +25,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
             return new OrganizationDto(
-                organization.Id.ToString(),
+                organization.Id.Value,
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
                 organization.Comment,
-                organization.Status.ToString(),
-                organization.Actors.Select(Map).ToList(),
-                Map(organization.Address));
+                organization.Status,
+                Map(organization.Address),
+                organization.Actors.Select(Map).ToList());
         }
 
         public static ActorDto Map(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             return new ActorDto(
-                actor.Id.ToString(),
-                actor.ExternalActorId?.ToString(),
+                actor.Id,
+                actor.ExternalActorId?.Value,
                 new ActorNumberDto(actor.ActorNumber.Value),
-                actor.Status.ToString(),
+                actor.Status,
                 new ActorNameDto(actor.Name.Value),
                 actor.MarketRoles.Select(Map).ToList());
         }
@@ -61,8 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         private static ActorMarketRoleDto Map(ActorMarketRole marketRole)
         {
             return new ActorMarketRoleDto(
-                marketRole.Function.ToString(),
-                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => m.Name))));
+                marketRole.Function,
+                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes)));
         }
     }
 }

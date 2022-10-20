@@ -14,6 +14,7 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
@@ -43,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(organization => organization.Status)
                         .NotEmpty()
-                        .IsEnumName(typeof(OrganizationStatus));
+                        .IsInEnum();
 
                     validator
                         .RuleFor(organization => organization.Address)

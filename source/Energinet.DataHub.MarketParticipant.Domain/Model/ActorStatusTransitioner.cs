@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {

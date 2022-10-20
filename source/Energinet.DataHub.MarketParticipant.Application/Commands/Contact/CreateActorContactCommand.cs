@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact

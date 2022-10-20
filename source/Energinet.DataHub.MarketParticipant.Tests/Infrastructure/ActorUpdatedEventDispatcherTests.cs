@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
@@ -53,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
 
             var meteringPointType = MeteringPointType.D03NotUsed;
-            var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.Name });
+            var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.ToString() });
             var marketRole = new ActorMarketRoleEventData(EicFunction.Consumer, new List<ActorGridAreaEventData> { actorGridArea });
             integrationEvent.ActorMarketRoles.Add(marketRole);
 

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -128,7 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(response.Actor);
-            Assert.Equal(actorId.ToString(), response.Actor.ActorId);
+            Assert.Equal(actorId, response.Actor.ActorId);
         }
     }
 }

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -142,8 +143,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var firstActor = response.Actors.First();
             var secondActor = response.Actors.Skip(1).First();
 
-            Assert.Equal(actor.Id.ToString(), firstActor.ActorId);
-            Assert.Equal(actor2.Id.ToString(), secondActor.ActorId);
+            Assert.Equal(actor.Id, firstActor.ActorId);
+            Assert.Equal(actor2.Id, secondActor.ActorId);
         }
     }
 }
