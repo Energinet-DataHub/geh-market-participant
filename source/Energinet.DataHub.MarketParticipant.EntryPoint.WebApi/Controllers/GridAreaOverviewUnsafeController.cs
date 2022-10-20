@@ -22,6 +22,7 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
+[ApiExplorerSettings(IgnoreApi = true)]
 [Route("gridareaoverview")]
 public sealed class GridAreaOverviewUnsafeController : ControllerBase
 {
