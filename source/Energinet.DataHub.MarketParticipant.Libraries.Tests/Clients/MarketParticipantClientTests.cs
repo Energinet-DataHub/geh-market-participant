@@ -38,20 +38,22 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
 
         private readonly string _validBusinessRegisterIdentifier = "87654321";
 
-        [Fact]
-        public async Task GetOrganizationsAsync_Unauthorized_ThrowsException()
+        [Theory]
+        [InlineData(HttpStatusCode.Forbidden)]
+        [InlineData(HttpStatusCode.Unauthorized)]
+        public async Task GetOrganizationsAsync_Unauthorized_ThrowsException(HttpStatusCode code)
         {
             // Arrange
             using var httpTest = new HttpTest();
             using var clientFactory = new PerBaseUrlFlurlClientFactory();
             var target = new MarketParticipantClient(clientFactory.Get("https://localhost"));
-            httpTest.RespondWith("unauthorized", (int)HttpStatusCode.Unauthorized);
+            httpTest.RespondWith("unauthorized", (int)code);
 
             // Act + Assert
             var exception = await Assert
-                .ThrowsAsync<FlurlHttpException>(() => target.GetOrganizationsAsync())
+                .ThrowsAsync<MarketParticipantException>(() => target.GetOrganizationsAsync())
                 .ConfigureAwait(false);
-            Assert.Equal((int)HttpStatusCode.Unauthorized, exception.StatusCode);
+            Assert.Equal((int)code, exception.StatusCode);
         }
 
         [Fact]
