@@ -1,5 +1,13 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.7.2
+
+- Updated deployment, no code changes.
+
+## Version 2.7.1
+
+- Show correct exception in backend for frontend.
+
 ## Version 2.7.0
 
 - Removed actor status deleted
