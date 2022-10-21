@@ -40,12 +40,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             if (integrationEvent is not Domain.Model.IntegrationEvents.ActorIntegrationEvents.ActorCreatedIntegrationEvent actorUpdatedIntegrationEvent)
                 return false;
 
+            var actorNumber = new ActorNumber(
+                actorUpdatedIntegrationEvent.ActorNumber.Value,
+                (ActorNumberType)actorUpdatedIntegrationEvent.ActorNumber.Type);
+
             var outboundIntegrationEvent = new ActorCreatedIntegrationEvent(
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.ActorId,
                 actorUpdatedIntegrationEvent.OrganizationId.Value,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
-                actorUpdatedIntegrationEvent.ActorNumber.Value,
+                actorNumber,
                 actorUpdatedIntegrationEvent.Name.Value,
                 actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)(int)x),
                 actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
