@@ -19,6 +19,9 @@ on:
   pull_request:
     branches:
       - main
+  push:
+    branches:
+      - djorgensen/publish-multiple-deployment-packages-in-ci
 
 jobs:
   #
