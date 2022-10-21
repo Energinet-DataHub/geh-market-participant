@@ -68,10 +68,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent.Id);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.ExternalActorId.Value, actualEvent.ExternalActorId);
-            Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber);
+            Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber.Value);
+            Assert.Equal((int)integrationEvent.ActorNumber.Type, (int)actualEvent.ActorNumber.Type);
             Assert.Equal((int)integrationEvent.Status, (int)actualEvent.Status);
             Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
             Assert.Equal((int)marketRole.Function, (int)actualMarketRole.Function);
