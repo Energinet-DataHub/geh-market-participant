@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.MediatR
             _requestValidator = requestValidator;
         }
 
-        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             await _requestValidator.ValidateAndThrowAsync(request, cancellationToken).ConfigureAwait(false);
             return await next().ConfigureAwait(false);
