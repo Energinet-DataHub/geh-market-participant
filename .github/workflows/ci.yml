@@ -76,8 +76,6 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
     with:
       TESTS_DLL_FILE_PATH: '\source\Energinet.DataHub.MarketParticipant.IntegrationTestsbin\Release\net6.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll'
-      ASPNETCORE_TEST_CONTENTROOT_VARIABLE_NAME: ASPNETCORE_TEST_CONTENTROOT_GREENENERGYHUB_CHARGES_WEBAPI
-      ASPNETCORE_TEST_CONTENTROOT_VARIABLE_VALUE: '\source\GreenEnergyHub.Charges\source\GreenEnergyHub.Charges.WebApi'
       DOWNLOAD_ATTEMPT_LIMIT: 12
       USE_AZURE_FUNCTIONS_TOOLS: true
       ENVIRONMENT: AzureAuth
@@ -111,51 +109,3 @@ jobs:
       !contains(needs.*.result, 'cancelled')
     steps:
       - run: echo "${{ toJSON(needs) }}"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     # Build and test solution, and publish coverage report
-  dotnet_solution_ci:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v8
-    with:
-      SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
-      USE_SQLLOCALDB_2019: true
-      PREPARE_OUTPUTS: true
-      CODE_COVERAGE_FLAGS: business
-      ENVIRONMENT: AzureAuth
-    secrets:
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
-      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-      AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
-
-  create_prerelease:
-    needs: [
-        ci_base,
-        terraform_validate,
-        dotnet_solution_ci
-    ]
-    uses: Energinet-DataHub/.github/.github/workflows/create-prerelease.yml@v8
-    with:
-      CALLER_REPOSITORY_PATH: Energinet-DataHub/geh-market-participant
-      RELEASE_NAME_PREFIX: dotnet
-    secrets:
-      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
