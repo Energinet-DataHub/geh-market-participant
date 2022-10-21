@@ -19,9 +19,6 @@ on:
   pull_request:
     branches:
       - main
-  push:
-    branches:
-      - djorgensen/publish-multiple-deployment-packages-in-ci
 
 jobs:
   #
@@ -73,7 +70,7 @@ jobs:
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
   # Run tests in 'IntegrationTests.dll' with category ChargeIngestionTestsChargeInformation'
-  int_test_charge_information_ingestion:
+  integration_test:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci-test.yml@v8
@@ -102,9 +99,7 @@ jobs:
       # .NET
       dotnet_ci_build,
       unit_test,
-      int_test_charge_information_ingestion,
-      int_test_charge_prices_ingestion,
-      int_test,
+      integration_test,
     ]
     if: |
       always() &&
