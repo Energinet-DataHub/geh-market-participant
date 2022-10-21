@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
+## Version 2.7.3
+
+- Updated packages.
+
 ## Version 2.7.2
 
 - Updated deployment, no code changes.

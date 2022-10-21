@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.7.3
+
+- Updated packages.
+
 ## Version 2.7.2
 
 - Updated deployment, no code changes.
