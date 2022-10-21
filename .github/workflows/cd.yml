@@ -97,5 +97,5 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           repository: '${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}'
-          event-type: 'geh-charges-deployment-request-domain'
+          event-type: 'geh-market-participant-deployment-request-domain'
           client-payload: '{"pr": "${{ steps.find_pull_request.outputs.pull_request_number }}", "infrastructure_deploy": "${{ needs.changes.outputs.infrastructure }}", "dotnet_deploy": "${{ needs.changes.outputs.dotnet }}"}'

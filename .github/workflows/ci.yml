@@ -69,7 +69,7 @@ jobs:
       TESTS_DLL_FILE_PATH: '\source\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
 
-  # Run tests in 'IntegrationTests.dll' with category ChargeIngestionTestsChargeInformation'
+  # Run tests in 'IntegrationTests.dll'
   integration_test:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
