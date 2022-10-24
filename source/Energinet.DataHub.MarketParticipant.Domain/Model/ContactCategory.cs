@@ -12,66 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
-using Ardalis.SmartEnum;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed class ContactCategory : SmartEnum<ContactCategory>
+    public enum ContactCategory
     {
-        public static readonly ContactCategory Default =
-            new ContactCategory(0);
-
-        public static readonly ContactCategory Charges =
-            new ContactCategory(1);
-
-        public static readonly ContactCategory ChargeLinks =
-            new ContactCategory(2);
-
-        public static readonly ContactCategory ElectricalHeating =
-            new ContactCategory(3);
-
-        public static readonly ContactCategory EndOfSupply =
-            new ContactCategory(4);
-
-        public static readonly ContactCategory EnerginetInquiry =
-            new ContactCategory(5);
-
-        public static readonly ContactCategory ErrorReport =
-            new ContactCategory(6);
-
-        public static readonly ContactCategory IncorrectMove =
-            new ContactCategory(7);
-
-        public static readonly ContactCategory IncorrectSwitch =
-            new ContactCategory(8);
-
-        public static readonly ContactCategory MeasurementData =
-            new ContactCategory(9);
-
-        public static readonly ContactCategory MeteringPoint =
-            new ContactCategory(10);
-
-        public static readonly ContactCategory NetSettlement =
-            new ContactCategory(11);
-
-        public static readonly ContactCategory Notification =
-            new ContactCategory(12);
-
-        public static readonly ContactCategory Recon =
-            new ContactCategory(13);
-
-        public static readonly ContactCategory Reminder =
-            new ContactCategory(14);
-
-        private ContactCategory(int value, [CallerMemberName] string name = "")
-            : base(name, value)
-        {
-        }
-
-        private ContactCategory()
-            : base("default", -1)
-        {
-        }
+        Default = 0,
+        ChargeLinks = 2,
+        Charges = 1,
+        ElectricalHeating = 3,
+        EndOfSupply = 4,
+        EnerginetInquiry = 5,
+        ErrorReport = 6,
+        IncorrectMove = 7,
+        IncorrectSwitch = 8,
+        MeteringPoint = 10,
+        MeasurementData = 9,
+        NetSettlement = 11,
+        Notification = 12,
+        Recon = 13,
+        Reminder = 14
     }
 }

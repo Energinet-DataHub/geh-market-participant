@@ -49,7 +49,7 @@ public sealed class ContactAddedToActorEventDispatcher : EventDispatcherBase
             new ActorContact(
                 contactAddedToActorIntegrationEvent.Contact.Name,
                 contactAddedToActorIntegrationEvent.Contact.Email.Address,
-                (ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category.Value,
+                (ContactCategory)contactAddedToActorIntegrationEvent.Contact.Category,
                 contactAddedToActorIntegrationEvent.Contact.Phone?.Number));
 
         var bytes = _eventParser.ParseToSharedIntegrationEvent(outboundIntegrationEvent);
