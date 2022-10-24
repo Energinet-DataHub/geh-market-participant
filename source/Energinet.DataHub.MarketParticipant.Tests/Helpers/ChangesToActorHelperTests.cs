@@ -26,7 +26,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Helpers;
 
@@ -125,9 +124,9 @@ public class ChangesToActorHelperTests
                     {
                         new ActorGridArea(
                             Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d"),
-                            new List<ClientModels.MeteringPointType>
+                            new List<MeteringPointType>
                             {
-                                ClientModels.MeteringPointType.E17Consumption
+                                MeteringPointType.E17Consumption
                             })
                     }),
                 new ActorMarketRole(
@@ -137,18 +136,18 @@ public class ChangesToActorHelperTests
                     {
                         new ActorGridArea(
                             Guid.Parse("2aca6c52-3282-40e5-a071-c740c9d432b6"),
-                            new List<ClientModels.MeteringPointType>
+                            new List<MeteringPointType>
                             {
-                                ClientModels.MeteringPointType.D02Analysis,
-                                ClientModels.MeteringPointType.E17Consumption,
-                                ClientModels.MeteringPointType.E18Production
+                                MeteringPointType.D02Analysis,
+                                MeteringPointType.E17Consumption,
+                                MeteringPointType.E18Production
                             }),
                         new ActorGridArea(
                             Guid.Parse("35d007b1-12d0-470f-8186-231b9e51f9e0"),
-                            new List<ClientModels.MeteringPointType>
+                            new List<MeteringPointType>
                             {
-                                ClientModels.MeteringPointType.E20Exchange,
-                                ClientModels.MeteringPointType.D01VeProduction
+                                MeteringPointType.E20Exchange,
+                                MeteringPointType.D01VeProduction
                             })
                     })
             },

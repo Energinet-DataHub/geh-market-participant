@@ -22,8 +22,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection("IntegrationTest")]
@@ -187,7 +185,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
                 foreach (var marketRole in marketRoles)
                 {
-                    actor.MarketRoles.Add(new ActorMarketRole(marketRoleId, marketRole, new[] { new ActorGridArea(gridAreaId.Value, new[] { ClientModels.MeteringPointType.D01VeProduction }) }));
+                    actor.MarketRoles.Add(new ActorMarketRole(marketRoleId, marketRole, new[] { new ActorGridArea(gridAreaId.Value, new[] { MeteringPointType.D01VeProduction }) }));
                 }
 
                 org.Actors.Add(actor);

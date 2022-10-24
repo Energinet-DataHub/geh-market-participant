@@ -22,8 +22,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection("IntegrationTest")]
@@ -85,11 +83,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var contactRepository = new ActorContactRepository(context);
             var categories = new[]
             {
-                ClientModels.ContactCategory.EndOfSupply,
-                ClientModels.ContactCategory.ChargeLinks,
-                ClientModels.ContactCategory.Notification,
-                ClientModels.ContactCategory.MeasurementData,
-                ClientModels.ContactCategory.Recon
+                ContactCategory.EndOfSupply,
+                ContactCategory.ChargeLinks,
+                ContactCategory.Notification,
+                ContactCategory.MeasurementData,
+                ContactCategory.Recon
             };
 
             for (var i = 0; i < 5; i++)
@@ -138,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testContact = new ActorContact(
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.Charges,
+                ContactCategory.Charges,
                 new EmailAddress("fake@fake.dk"),
                 new PhoneNumber("1234567"));
 
@@ -181,7 +179,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testContact = new ActorContact(
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.Charges,
+                ContactCategory.Charges,
                 new EmailAddress("fake@fake.dk"),
                 new PhoneNumber("1234567"));
 
@@ -210,7 +208,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new ContactId(Guid.NewGuid()),
                 Guid.NewGuid(),
                 "fake_value",
-                ClientModels.ContactCategory.Charges,
+                ContactCategory.Charges,
                 new EmailAddress("fake@fake.dk"),
                 new PhoneNumber("1234567"));
 
@@ -245,7 +243,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var testContact = new ActorContact(
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.Charges,
+                ContactCategory.Charges,
                 new EmailAddress("fake@fake.dk"),
                 new PhoneNumber("1234567"));
 

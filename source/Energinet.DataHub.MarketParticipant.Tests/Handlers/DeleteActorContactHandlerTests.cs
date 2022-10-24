@@ -26,7 +26,6 @@ using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
@@ -188,7 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 contactId,
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.EndOfSupply,
+                ContactCategory.EndOfSupply,
                 new EmailAddress("fake@value"),
                 null);
 

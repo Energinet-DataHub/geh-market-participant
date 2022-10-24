@@ -22,9 +22,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
-
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection("IntegrationTest")]
@@ -219,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
             var initalActor = new Actor(new MockedGln());
-            initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<ClientModels.MeteringPointType>()) }));
+            initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) }));
             organization.Actors.Add(initalActor);
 
             // Act
@@ -295,9 +292,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var someActor = new Actor(new MockedGln());
             someActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>
             {
-                new(gridAreaToInsert_Id.Value, new List<ClientModels.MeteringPointType>
+                new(gridAreaToInsert_Id.Value, new List<MeteringPointType>
                 {
-                    ClientModels.MeteringPointType.D02Analysis
+                    MeteringPointType.D02Analysis
                 })
             }));
             organization.Actors.Add(someActor);
@@ -312,7 +309,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 {
                     foreach (var actorGridArea in organizationActorMarketRole.GridAreas)
                     {
-                        actorGridArea.MeteringPointTypes.Add(ClientModels.MeteringPointType.D05NetProduction);
+                        actorGridArea.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
                     }
                 }
             }
@@ -328,10 +325,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(2, actorMeteringPointTypes.Count);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x == ClientModels.MeteringPointType.D02Analysis);
+                x => x == MeteringPointType.D02Analysis);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x == ClientModels.MeteringPointType.D05NetProduction);
+                x => x == MeteringPointType.D05NetProduction);
         }
 
         [Fact]
@@ -380,7 +377,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
-            var meteringPointTypes = new List<ClientModels.MeteringPointType>() { ClientModels.MeteringPointType.D05NetProduction };
+            var meteringPointTypes = new List<MeteringPointType>() { MeteringPointType.D05NetProduction };
             var gridArea = new ActorGridArea(gridAreaToInsert_Id.Value, meteringPointTypes);
 
             var actorWithMeteringTypes = new Actor(new MockedGln());
@@ -398,7 +395,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(organization);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x.Equals(ClientModels.MeteringPointType.D05NetProduction));
+                x => x.Equals(MeteringPointType.D05NetProduction));
         }
 
         [Fact]
@@ -419,7 +416,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 .AddOrUpdateAsync(gridAreaToInsert)
                 .ConfigureAwait(false);
 
-            var meteringPointTypesToAdd = new[] { ClientModels.MeteringPointType.D03NotUsed, ClientModels.MeteringPointType.D12TotalConsumption };
+            var meteringPointTypesToAdd = new[] { MeteringPointType.D03NotUsed, MeteringPointType.D12TotalConsumption };
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
@@ -435,10 +432,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(organization);
             Assert.Contains(
                 meteringPointTypesToAdd,
-                x => x.Equals(ClientModels.MeteringPointType.D03NotUsed));
+                x => x.Equals(MeteringPointType.D03NotUsed));
             Assert.Contains(
                 meteringPointTypesToAdd,
-                x => x.Equals(ClientModels.MeteringPointType.D12TotalConsumption));
+                x => x.Equals(MeteringPointType.D12TotalConsumption));
         }
 
         [Fact]

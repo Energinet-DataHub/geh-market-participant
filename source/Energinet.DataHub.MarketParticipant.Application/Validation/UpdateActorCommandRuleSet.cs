@@ -16,7 +16,6 @@ using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
-using ClientModel = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
@@ -79,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
-                                                .Must(x => Enum.TryParse<ClientModel.MeteringPointType>(x, true, out _)));
+                                                .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
                                 });
                         });
                 });

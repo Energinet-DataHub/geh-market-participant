@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 
@@ -67,7 +66,7 @@ public sealed class MeteringPointTypeAddedToActorEventDispatcherTests
             ActorId = Guid.NewGuid(),
             Function = EicFunction.EnergySupplier,
             GridAreaId = Guid.NewGuid(),
-            Type = ClientModels.MeteringPointType.E18Production
+            Type = MeteringPointType.E18Production
         };
 
         // Act
@@ -107,7 +106,7 @@ public sealed class MeteringPointTypeAddedToActorEventDispatcherTests
             ActorId = Guid.NewGuid(),
             Function = EicFunction.EnergySupplier,
             GridAreaId = Guid.NewGuid(),
-            Type = ClientModels.MeteringPointType.E18Production
+            Type = MeteringPointType.E18Production
         };
 
         // Act

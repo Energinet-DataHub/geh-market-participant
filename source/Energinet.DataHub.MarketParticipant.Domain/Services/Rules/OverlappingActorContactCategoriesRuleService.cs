@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules

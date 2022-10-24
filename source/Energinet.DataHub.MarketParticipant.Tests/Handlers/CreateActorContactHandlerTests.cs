@@ -29,7 +29,6 @@ using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
@@ -96,7 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ContactId(Guid.NewGuid()),
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.ElectricalHeating,
+                ContactCategory.ElectricalHeating,
                 new EmailAddress("john@doe"),
                 null);
 
@@ -167,7 +166,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ContactId(Guid.NewGuid()),
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.ElectricalHeating,
+                ContactCategory.ElectricalHeating,
                 new EmailAddress("john@doe"),
                 null);
 
@@ -240,7 +239,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ContactId(Guid.NewGuid()),
                 actor.Id,
                 "fake_value",
-                ClientModels.ContactCategory.ElectricalHeating,
+                ContactCategory.ElectricalHeating,
                 new EmailAddress("john@doe"),
                 null);
 

@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 
@@ -65,7 +64,7 @@ public sealed class ContactAddedToActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ClientModels.ContactCategory.Notification, new PhoneNumber("32323232"))
+            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ContactCategory.Notification, new PhoneNumber("32323232"))
         };
 
         // Act
@@ -104,7 +103,7 @@ public sealed class ContactAddedToActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ClientModels.ContactCategory.Notification, new PhoneNumber("32323232"))
+            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ContactCategory.Notification, new PhoneNumber("32323232"))
         };
 
         // Act

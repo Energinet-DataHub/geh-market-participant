@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
     public class ActorContactEventData
@@ -29,7 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Act
 
         public string Name { get; }
         public EmailAddress Email { get; }
-        [JsonConverter(typeof(ContactCategory))]
         public ContactCategory Category { get; }
         public PhoneNumber? Phone { get; }
     }

@@ -12,27 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public class ActorGridArea
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public ActorGridArea(IEnumerable<MeteringPointType> meteringPointTypes)
+    public enum ContactCategory
     {
-        MeteringPointTypes = meteringPointTypes.ToList();
+        Default = 0,
+        ChargeLinks = 2,
+        Charges = 1,
+        ElectricalHeating = 3,
+        EndOfSupply = 4,
+        EnerginetInquiry = 5,
+        ErrorReport = 6,
+        IncorrectMove = 7,
+        IncorrectSwitch = 8,
+        MeteringPoint = 10,
+        MeasurementData = 9,
+        NetSettlement = 11,
+        Notification = 12,
+        Recon = 13,
+        Reminder = 14
     }
-
-    public ActorGridArea(
-        Guid id,
-        IEnumerable<MeteringPointType> meteringPointTypes)
-    {
-        Id = id;
-        MeteringPointTypes = meteringPointTypes.ToList();
-    }
-
-    public Guid Id { get; }
-    public ICollection<MeteringPointType> MeteringPointTypes { get; }
 }

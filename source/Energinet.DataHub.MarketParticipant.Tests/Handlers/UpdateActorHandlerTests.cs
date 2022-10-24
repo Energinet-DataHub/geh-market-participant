@@ -30,8 +30,6 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
     [UnitTest]
@@ -136,8 +134,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var meteringPoints = new[]
             {
-                ClientModels.MeteringPointType.D02Analysis.ToString(), ClientModels.MeteringPointType.E17Consumption.ToString(),
-                ClientModels.MeteringPointType.E17Consumption.ToString()
+                MeteringPointType.D02Analysis.ToString(), MeteringPointType.E17Consumption.ToString(),
+                MeteringPointType.E17Consumption.ToString()
             };
             var gridAreas = new[] { new ActorGridAreaDto(actor.Id, meteringPoints) };
             var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };

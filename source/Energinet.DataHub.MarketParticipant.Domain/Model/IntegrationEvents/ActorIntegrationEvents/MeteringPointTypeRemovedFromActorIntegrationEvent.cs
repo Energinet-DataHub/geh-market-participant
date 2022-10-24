@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
-using Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 
@@ -24,6 +22,5 @@ public sealed class MeteringPointTypeRemovedFromActorIntegrationEvent : Integrat
     public Guid ActorId { get; set; }
     public EicFunction Function { get; set; }
     public Guid GridAreaId { get; set; }
-    [JsonConverter(typeof(MeteringPointType))]
     public MeteringPointType Type { get; set; } = MeteringPointType.Unknown;
 }

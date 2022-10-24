@@ -25,7 +25,6 @@ using Energinet.DataHub.MarketParticipant.Tests.Handlers;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
@@ -256,7 +255,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new MockedGln();
-            var meteringPointTypes = new[] { ClientModels.MeteringPointType.D02Analysis };
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
@@ -296,7 +295,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new MockedGln();
-            var meteringPointTypes = new[] { ClientModels.MeteringPointType.D02Analysis };
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
@@ -336,7 +335,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
             var globalLocationNumber = new MockedGln();
-            var meteringPointTypes = new[] { ClientModels.MeteringPointType.D02Analysis };
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()) };
 

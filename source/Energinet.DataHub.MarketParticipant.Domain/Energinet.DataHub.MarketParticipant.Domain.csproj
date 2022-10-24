@@ -22,9 +22,4 @@ limitations under the License.
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Client\source\Energinet.DataHub.MarketParticipant.Client\Energinet.DataHub.MarketParticipant.Client.csproj" />
-  </ItemGroup>
-
 </Project>

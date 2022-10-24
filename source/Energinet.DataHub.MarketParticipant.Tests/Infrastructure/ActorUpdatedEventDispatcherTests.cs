@@ -25,7 +25,6 @@ using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 {
@@ -53,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             };
             integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
 
-            var meteringPointType = ClientModels.MeteringPointType.D03NotUsed;
+            var meteringPointType = MeteringPointType.D03NotUsed;
             var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.ToString() });
             var marketRole = new ActorMarketRoleEventData(EicFunction.Consumer, new List<ActorGridAreaEventData> { actorGridArea });
             integrationEvent.ActorMarketRoles.Add(marketRole);

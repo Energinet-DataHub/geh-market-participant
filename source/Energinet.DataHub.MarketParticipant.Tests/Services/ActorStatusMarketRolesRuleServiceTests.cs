@@ -25,8 +25,6 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
-
 namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
 [UnitTest]
@@ -39,7 +37,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
 
         var target = new ActorStatusMarketRolesRuleService(repository.Object);
 
-        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.Agent, MeteringPointType.D01VeProduction);
 
         // act + assert
         var exc = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
@@ -58,7 +56,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
 
         var target = new ActorStatusMarketRolesRuleService(repository.Object);
 
-        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.Agent, MeteringPointType.D01VeProduction);
 
         // act + assert
         var exc = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
@@ -77,10 +75,10 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         // arrange
         var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
 
-        var existingActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var existingActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
 
-        var updatedActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var updatedActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
 
         var repository = new Mock<IOrganizationRepository>();
         repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
@@ -101,11 +99,11 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         // arrange
         var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
 
-        var existingActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var existingActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
 
-        var updatedActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
-        updatedActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[] { new ActorGridArea(new[] { ClientModels.MeteringPointType.D03NotUsed }) }));
+        var updatedActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
+        updatedActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[] { new ActorGridArea(new[] { MeteringPointType.D03NotUsed }) }));
 
         var repository = new Mock<IOrganizationRepository>();
         repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
@@ -126,10 +124,10 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         // arrange
         var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
 
-        var existingActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var existingActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
 
-        var updatedActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var updatedActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         updatedActor.MarketRoles.Single().GridAreas.Clear();
 
         var repository = new Mock<IOrganizationRepository>();
@@ -152,11 +150,11 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         // arrange
         var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
 
-        var existingActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var existingActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
 
-        var updatedActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
-        updatedActor.MarketRoles.Single().GridAreas.Single().MeteringPointTypes.Add(ClientModels.MeteringPointType.D02Analysis);
+        var updatedActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
+        updatedActor.MarketRoles.Single().GridAreas.Single().MeteringPointTypes.Add(MeteringPointType.D02Analysis);
 
         var repository = new Mock<IOrganizationRepository>();
         repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
@@ -178,10 +176,10 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
         // arrange
         var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
 
-        var existingActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var existingActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
 
-        var updatedActor = CreateActor(status, EicFunction.Agent, ClientModels.MeteringPointType.D01VeProduction);
+        var updatedActor = CreateActor(status, EicFunction.Agent, MeteringPointType.D01VeProduction);
         updatedActor.MarketRoles.Clear();
 
         var repository = new Mock<IOrganizationRepository>();
@@ -194,7 +192,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
             await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(organization.Id, updatedActor));
     }
 
-    private static Actor CreateActor(ActorStatus status, EicFunction eicFunction, ClientModels.MeteringPointType meteringPointType)
+    private static Actor CreateActor(ActorStatus status, EicFunction eicFunction, MeteringPointType meteringPointType)
     {
         return new Actor(
             Guid.Parse("9B6CF046-94AC-4210-8D8E-138032F17AAB"),

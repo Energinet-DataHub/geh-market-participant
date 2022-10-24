@@ -14,7 +14,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Energinet.DataHub.MarketParticipant.Client.Models;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Xunit;

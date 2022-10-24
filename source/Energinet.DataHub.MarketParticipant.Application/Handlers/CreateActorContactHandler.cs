@@ -24,7 +24,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
-using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
@@ -89,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new ActorContact(
                 actorId,
                 contactDto.Name,
-                Enum.Parse<ClientModels.ContactCategory>(contactDto.Category, true),
+                Enum.Parse<ContactCategory>(contactDto.Category, true),
                 new EmailAddress(contactDto.Email),
                 optionalPhoneNumber);
         }
