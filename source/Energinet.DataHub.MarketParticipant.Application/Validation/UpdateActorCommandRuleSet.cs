@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
-                                                .Must(x => Enum.TryParse<ClientModel.MeteringPointType>(x, out _)));
+                                                .Must(x => Enum.TryParse<ClientModel.MeteringPointType>(x, true, out _)));
                                 });
                         });
                 });
