@@ -193,7 +193,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             .Select(id =>
                 new ActorGridArea(
                     id,
-                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => Enum.Parse<ClientModels.MeteringPointType>(x))));
+                    incomingActorGridAreaDtos.First(x => x.Id == id).MeteringPointTypes.Select(x => Enum.Parse<ClientModels.MeteringPointType>(x, false))));
 
         var gridAreaIdsToRemoveFromActor = existingMarketRole
             .GridAreas
@@ -218,7 +218,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                     existingActorId,
                     existingMarketRole.Function,
                     gridArea,
-                    incomingDto.MeteringPointTypes.Select(x => Enum.Parse<ClientModels.MeteringPointType>(x)));
+                    incomingDto.MeteringPointTypes.Select(x => Enum.Parse<ClientModels.MeteringPointType>(x, false)));
             }
         }
     }
