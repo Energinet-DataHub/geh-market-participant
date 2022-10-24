@@ -26,6 +26,7 @@ using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
@@ -89,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ContactId(Guid.NewGuid()),
                 actor.Id,
                 "fake_value",
-                ContactCategory.EndOfSupply,
+                ClientModels.ContactCategory.EndOfSupply,
                 new EmailAddress("fake@value"),
                 new PhoneNumber("1234"));
 
@@ -149,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ContactId(Guid.NewGuid()),
                 actor.Id,
                 "fake_value",
-                ContactCategory.EndOfSupply,
+                ClientModels.ContactCategory.EndOfSupply,
                 new EmailAddress("fake@value"),
                 new PhoneNumber("1234"));
 
@@ -168,7 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actualContact = response.Contacts.Single();
             Assert.Equal(expected.Id.Value, actualContact.ContactId);
             Assert.Equal(expected.Name, actualContact.Name);
-            Assert.Equal(expected.Category.Name, actualContact.Category);
+            Assert.Equal(expected.Category.ToString(), actualContact.Category);
             Assert.Equal(expected.Email.Address, actualContact.Email);
             Assert.Equal(expected.Phone?.Number, actualContact.Phone);
         }

@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
@@ -78,13 +79,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         {
                             new ActorGridArea(
                                 Guid.NewGuid(),
-                                new[] { MeteringPointType.D02Analysis }),
+                                new[] { ClientModels.MeteringPointType.D02Analysis }),
                             new ActorGridArea(
                                 Guid.NewGuid(),
-                                new[] { MeteringPointType.D02Analysis }),
+                                new[] { ClientModels.MeteringPointType.D02Analysis }),
                             new ActorGridArea(
                                 Guid.NewGuid(),
-                                new[] { MeteringPointType.D02Analysis }),
+                                new[] { ClientModels.MeteringPointType.D02Analysis }),
                         })
                 },
                 new ActorName("fake_value"));

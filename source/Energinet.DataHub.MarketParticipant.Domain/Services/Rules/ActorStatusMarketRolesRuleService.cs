@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             {
                 foreach (var grid in marketRole.GridAreas)
                 {
-                    yield return (marketRole.Function.ToString() + grid.Id + string.Join(string.Empty, grid.MeteringPointTypes.Select(mp => mp.Name).OrderBy(mp => mp))).ToUpperInvariant();
+                    yield return (marketRole.Function.ToString() + grid.Id + string.Join(string.Empty, grid.MeteringPointTypes.Select(mp => mp.ToString()).OrderBy(mp => mp))).ToUpperInvariant();
                 }
             }
         }

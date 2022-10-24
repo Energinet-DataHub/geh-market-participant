@@ -20,6 +20,8 @@ using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Xunit;
 using Xunit.Categories;
 
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
+
 namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
 [UnitTest]
@@ -44,7 +46,7 @@ public sealed class AllowedGridAreasRuleServiceTests
 
         // Act + Assert
         Assert.Throws<ValidationException>(() =>
-            target.ValidateGridAreas(new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<MeteringPointType>()))) }));
+            target.ValidateGridAreas(new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<ClientModels.MeteringPointType>()))) }));
     }
 
     [Theory]
@@ -64,7 +66,7 @@ public sealed class AllowedGridAreasRuleServiceTests
         };
 
         // Act + Assert
-        target.ValidateGridAreas(new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<MeteringPointType>()))) });
+        target.ValidateGridAreas(new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<ClientModels.MeteringPointType>()))) });
     }
 
     [Theory]
@@ -81,6 +83,6 @@ public sealed class AllowedGridAreasRuleServiceTests
         };
 
         // Act + Assert
-        target.ValidateGridAreas(new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<MeteringPointType>()))) });
+        target.ValidateGridAreas(new[] { new ActorMarketRole(eicFunction, gridAreas.Select(e => new ActorGridArea(e.Value, Enumerable.Empty<ClientModels.MeteringPointType>()))) });
     }
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -29,9 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.HasKey(contact => contact.Id);
             builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
             builder.Property(contact => contact.Category)
-                .HasConversion(
-                    to => to.Value,
-                    from => ContactCategory.FromValue(from))
                 .HasColumnName("Category");
         }
     }

@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
@@ -106,7 +107,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     {
                         gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity
                         {
-                            MeteringTypeId = meteringPointType.Value
+                            MeteringTypeId = (int)meteringPointType
                         });
                     }
 
@@ -127,7 +128,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     var gridAres = marketRole
                         .GridAreas
                         .Select(grid => new ActorGridArea(grid.GridAreaId, grid.MeteringPointTypes
-                            .Select(e => (MeteringPointType)e.MeteringTypeId)));
+                            .Select(e => (ClientModels.MeteringPointType)e.MeteringTypeId)));
                     return new ActorMarketRole(marketRole.Id, function, gridAres.ToList());
                 });
 

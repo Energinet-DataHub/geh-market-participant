@@ -29,10 +29,7 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ardalis.SmartEnum.SystemTextJson" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.10" />
-    <PackageReference Include="Ardalis.SmartEnum" Version="2.1.0" />
-    <PackageReference Include="Ardalis.SmartEnum.EFCore" Version="2.1.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.0" />
     <PackageReference Include="Azure.Identity" Version="1.7.0" />
     <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.7.3" />

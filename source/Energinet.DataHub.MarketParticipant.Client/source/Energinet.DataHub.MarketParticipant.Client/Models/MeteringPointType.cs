@@ -14,7 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public enum MarketParticipantMeteringPointType
+    public enum MeteringPointType
     {
         Unknown = 0,
         D01VeProduction = 1,
