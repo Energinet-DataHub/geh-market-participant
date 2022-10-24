@@ -12,90 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Runtime.CompilerServices;
-using Ardalis.SmartEnum;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed class MeteringPointType : SmartEnum<MeteringPointType>
+    public enum MeteringPointType
     {
-        public static readonly MeteringPointType Unknown =
-            new MeteringPointType(0);
-
-        public static readonly MeteringPointType D01VeProduction =
-            new MeteringPointType(1);
-
-        public static readonly MeteringPointType D02Analysis =
-            new MeteringPointType(2);
-
-        public static readonly MeteringPointType D03NotUsed =
-            new MeteringPointType(3);
-
-        public static readonly MeteringPointType D04SurplusProductionGroup6 =
-            new MeteringPointType(4);
-
-        public static readonly MeteringPointType D05NetProduction =
-            new MeteringPointType(5);
-
-        public static readonly MeteringPointType D06SupplyToGrid =
-            new MeteringPointType(6);
-
-        public static readonly MeteringPointType D07ConsumptionFromGrid =
-            new MeteringPointType(7);
-
-        public static readonly MeteringPointType D08WholeSaleServicesInformation =
-            new MeteringPointType(8);
-
-        public static readonly MeteringPointType D09OwnProduction =
-            new MeteringPointType(9);
-
-        public static readonly MeteringPointType D10NetFromGrid =
-            new MeteringPointType(10);
-
-        public static readonly MeteringPointType D11NetToGrid =
-            new MeteringPointType(11);
-
-        public static readonly MeteringPointType D12TotalConsumption =
-            new MeteringPointType(12);
-
-        public static readonly MeteringPointType D13NetLossCorrection =
-            new MeteringPointType(13);
-
-        public static readonly MeteringPointType D14ElectricalHeating =
-            new MeteringPointType(14);
-
-        public static readonly MeteringPointType D15NetConsumption =
-            new MeteringPointType(15);
-
-        public static readonly MeteringPointType D17OtherConsumption =
-            new MeteringPointType(16);
-
-        public static readonly MeteringPointType D18OtherProduction =
-            new MeteringPointType(17);
-
-        public static readonly MeteringPointType D20ExchangeReactiveEnergy =
-            new MeteringPointType(18);
-
-        public static readonly MeteringPointType D99InternalUse =
-            new MeteringPointType(19);
-
-        public static readonly MeteringPointType E17Consumption =
-            new MeteringPointType(20);
-
-        public static readonly MeteringPointType E18Production =
-            new MeteringPointType(21);
-
-        public static readonly MeteringPointType E20Exchange =
-            new MeteringPointType(22);
-
-        private MeteringPointType(int value, [CallerMemberName] string name = "")
-            : base(name, value)
-        {
-        }
-
-        private MeteringPointType()
-            : base("default", -1)
-        {
-        }
+        Unknown = 0,
+        D01VeProduction = 1,
+        D02Analysis = 2,
+        D03NotUsed = 3,
+        D04SurplusProductionGroup6 = 4,
+        D05NetProduction = 5,
+        D06SupplyToGrid = 6,
+        D07ConsumptionFromGrid = 7,
+        D08WholeSaleServicesInformation = 8,
+        D09OwnProduction = 9,
+        D10NetFromGrid = 10,
+        D11NetToGrid = 11,
+        D12TotalConsumption = 12,
+        D13NetLossCorrection = 13,
+        D14ElectricalHeating = 14,
+        D15NetConsumption = 15,
+        D17OtherConsumption = 16,
+        D18OtherProduction = 17,
+        D20ExchangeReactiveEnergy = 18,
+        D99InternalUse = 19,
+        E17Consumption = 20,
+        E18Production = 21,
+        E20Exchange = 22,
     }
 }

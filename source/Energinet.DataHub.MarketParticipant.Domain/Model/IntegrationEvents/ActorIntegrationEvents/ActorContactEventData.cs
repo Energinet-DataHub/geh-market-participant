@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.Json.Serialization;
-using Ardalis.SmartEnum.SystemTextJson;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents
 {
     public class ActorContactEventData
@@ -29,7 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Act
 
         public string Name { get; }
         public EmailAddress Email { get; }
-        [JsonConverter(typeof(SmartEnumNameConverter<ContactCategory, int>))]
         public ContactCategory Category { get; }
         public PhoneNumber? Phone { get; }
     }

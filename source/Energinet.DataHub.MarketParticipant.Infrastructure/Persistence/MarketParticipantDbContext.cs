@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
-using SmartEnum.EFCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
@@ -62,7 +61,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
             modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
             modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());
-            modelBuilder.ConfigureSmartEnum();
             base.OnModelCreating(modelBuilder);
         }
     }
