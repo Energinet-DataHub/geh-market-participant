@@ -21,12 +21,12 @@ public class ActorGridAreaEventData
 {
     public ActorGridAreaEventData(
         Guid id,
-        ICollection<string> meteringPointTypes)
+        ICollection<MeteringPointType> meteringPointTypes)
     {
         Id = id;
         MeteringPointTypes = meteringPointTypes;
     }
 
     public Guid Id { get; }
-    public ICollection<string> MeteringPointTypes { get; }
+    public ICollection<MeteringPointType> MeteringPointTypes { get; }
 }
