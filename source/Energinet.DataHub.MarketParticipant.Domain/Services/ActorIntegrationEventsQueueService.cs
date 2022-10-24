@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                         actorMarketRole.GridAreas.Select(
                             x => new ActorGridAreaEventData(
                                 x.Id,
-                                x.MeteringPointTypes.Select(y => y).ToList()))
+                                x.MeteringPointTypes.Select(y => y.ToString()).ToList()))
                             .ToList()));
             }
 
@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                         actorMarketRole.GridAreas.Select(
                                 x => new ActorGridAreaEventData(
                                     x.Id,
-                                    x.MeteringPointTypes.Select(y => y).ToList()))
+                                    x.MeteringPointTypes.Select(y => y.ToString()).ToList()))
                             .ToList()));
             }
 
