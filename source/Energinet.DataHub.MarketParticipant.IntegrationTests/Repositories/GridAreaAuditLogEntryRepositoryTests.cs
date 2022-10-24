@@ -92,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var actual = (await target.GetAsync(gridAreaId)).ToList();
 
             // assert
-            Assert.Equal(1, actual.Count);
+            Assert.Single(actual);
             Assert.Equal(gridAreaId.Value, actual.Single().GridAreaId);
         }
     }
