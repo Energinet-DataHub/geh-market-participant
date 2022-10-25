@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Data.SqlClient;
 using System.Reflection;
+using System.Threading.Tasks;
 using DbUp;
 using DbUp.Engine;
 
@@ -21,14 +23,14 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public static class UpgradeFactory
     {
-        public static UpgradeEngine GetUpgradeEngine(string connectionString, Func<string, bool> scriptFilter, bool isDryRun = false)
+        public static async Task<UpgradeEngine> GetUpgradeEngineAsync(string connectionString, Func<string, bool> scriptFilter, bool isDryRun = false)
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
                 throw new ArgumentException("Connection string must have a value");
             }
 
-            EnsureDatabase.For.SqlDatabase(connectionString);
+            await EnsureSqlDatabaseAsync(connectionString).ConfigureAwait(false);
 
             var builder = DeployChanges.To
                 .SqlDatabase(connectionString)
@@ -46,6 +48,31 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
             }
 
             return builder.Build();
+        }
+
+        private static async Task EnsureSqlDatabaseAsync(string connectionString)
+        {
+            // Transient errors can occur right after DB is created,
+            // as it might not be instantly available, hence this retry loop.
+            // This is especially an issue when running against an Azure SQL DB.
+            var tryCount = 0;
+            do
+            {
+                ++tryCount;
+                try
+                {
+                    EnsureDatabase.For.SqlDatabase(connectionString);
+                    return;
+                }
+                catch (SqlException)
+                {
+                    if (tryCount > 10)
+                        throw;
+
+                    await Task.Delay(256 * tryCount).ConfigureAwait(false);
+                }
+            }
+            while (true);
         }
     }
 }
