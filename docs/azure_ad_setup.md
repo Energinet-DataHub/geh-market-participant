@@ -1,13 +1,23 @@
-# Setup Azure AD tenant
-- Create Azure AD tenant.
+# Setup Azure Active Directory
+- Create Azure Active Directory.
+- AD domain name is formatted as '<env>ADDataHub', e.g. 'dev002ADDataHub'.
+- Active P2 trial (or buy actual license).
 
 - Create 'Frontend' app registration (single tenant)
-    - Create secret (B-E8Q~p9edy4qUYqv.DNr-5JgjBJ-u9paRnambN5)
-    - API permissions > User.ReadWrite.All (Graph API, application) (Should be a separate AR)
+    - Add SPA authentication for following URLs:
+        - [dev-environments only] https://localhost
+        - [dev002] https://wonderful-field-057109603.1.azurestaticapps.net/
+    - [Optional, debugging only] Create secret.
+    - API permissions > User.Read > Remove
     - API permissions > openid (Graph API, delegated)
     - API permissions > offline_access (Graph API, delegated)
-    - Authentication > Implicit grant and hybrid flows > ID tokens.
+    - Authentication > Implicit grant and hybrid flows > ID tokens
     - Add extension 'actors' through Graph API:
+        - Create app registration 'GraphClient'
+        - Add application permission 'GraphAPI.User.ReadWriteAll'
+        - Add application permission 'GraphAPI.Application.ReadWriteAll'
+        - Grand admin consent
+        - Create client secret
         ```C#
         var extensionProperty = new ExtensionProperty
         {
@@ -25,9 +35,9 @@
         ```
 
 - Create 'Actor 1' and 'Actor 2' app registration (should be done through Graph API)
-    - Add permission 'metering_point:create' to actor as app roles for users.
     - Add application ID to actor AR
-    - Add scope to actor (actor_id, admins only, Actor n name, Name of actor n, enabled)
+    - Add scope to actor (https://<guid>/actor.default)
+    - Add permissions to actor as app roles for users.
 
 - For each actor: Frontend AR > API Permissions > Add a permission > My APIs > Add delegated permission
     - Grant admin consent for DH Titans
