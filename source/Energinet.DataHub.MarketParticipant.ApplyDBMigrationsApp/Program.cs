@@ -13,19 +13,20 @@
 // limitations under the License.
 
 using System.Linq;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp
 {
     public static class Program
     {
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
             var connectionString = ConnectionStringFactory.GetConnectionString(args);
             var filter = EnvironmentFilter.GetFilter(args);
             var isDryRun = args.Contains("dryRun");
 
-            var upgrader = UpgradeFactory.GetUpgradeEngine(connectionString, filter, isDryRun);
+            var upgrader = await UpgradeFactory.GetUpgradeEngineAsync(connectionString, filter, isDryRun).ConfigureAwait(false);
 
             var result = upgrader.PerformUpgrade();
 
