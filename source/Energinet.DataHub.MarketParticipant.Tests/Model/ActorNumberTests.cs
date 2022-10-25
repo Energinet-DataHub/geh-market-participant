@@ -23,6 +23,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
     public sealed class ActorNumberTests
     {
         [Fact]
+        public void FailingTest()
+        {
+            // arrange
+            const string InvalidGln = "5790";
+
+            // act
+            var actual = ActorNumber.Create(InvalidGln);
+
+            // assert
+            Assert.IsType<GlnActorNumber>(actual);
+        }
+
+        [Fact]
         public void Create_ValidEicNumber_ReturnsEicActorNumber()
         {
             // arrange
