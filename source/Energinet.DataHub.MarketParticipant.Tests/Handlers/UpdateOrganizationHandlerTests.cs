@@ -28,6 +28,7 @@ using MediatR;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
@@ -81,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var validAddressDto = new AddressDto(
+            var validAddressDto = new ClientModels.AddressDto(
                 "test Street",
                 "1",
                 "1111",
@@ -113,7 +114,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
-            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
+            var changeDto = new ClientModels.ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", ClientModels.OrganizationStatus.Active);
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
@@ -155,7 +156,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var validAddressDto = new AddressDto(
+            var validAddressDto = new ClientModels.AddressDto(
                 "test Street",
                 "1",
                 "1111",
@@ -187,7 +188,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new OrganizationId(orgId));
 
-            var changeOrganizationDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
+            var changeOrganizationDto = new ClientModels.ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", ClientModels.OrganizationStatus.Active);
 
             var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
 

@@ -142,8 +142,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var firstActor = response.Actors.First();
             var secondActor = response.Actors.Skip(1).First();
 
-            Assert.Equal(actor.Id.ToString(), firstActor.ActorId);
-            Assert.Equal(actor2.Id.ToString(), secondActor.ActorId);
+            Assert.Equal(actor.Id, firstActor.ActorId);
+            Assert.Equal(actor2.Id, secondActor.ActorId);
         }
     }
 }

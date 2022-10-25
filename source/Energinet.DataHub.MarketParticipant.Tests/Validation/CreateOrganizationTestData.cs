@@ -14,7 +14,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {
@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         {
             yield return new object[]
             {
-                string.Empty, string.Empty, new AddressDto(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty), false
+                string.Empty, string.Empty, new ClientModels.AddressDto(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty), false
             };
         }
 

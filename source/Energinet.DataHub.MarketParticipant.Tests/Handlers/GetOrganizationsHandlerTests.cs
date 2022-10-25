@@ -79,16 +79,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             Assert.NotEmpty(response.Organizations);
 
             var actualOrganization = response.Organizations.Single();
-            Assert.Equal(organization.Id.ToString(), actualOrganization.OrganizationId);
+            Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
 
             var actualActor = actualOrganization.Actors.Single();
-            Assert.Equal(actor.Id.ToString(), actualActor.ActorId);
-            Assert.Equal(actor.ExternalActorId?.ToString(), actualActor.ExternalActorId);
+            Assert.Equal(actor.Id, actualActor.ActorId);
+            Assert.Equal(actor.ExternalActorId?.Value, actualActor.ExternalActorId);
             Assert.Equal(actor.ActorNumber.Value, actualActor.ActorNumber.Value);
-            Assert.Equal(actor.Status.ToString(), actualActor.Status);
+            Assert.Equal(actor.Status, (ActorStatus)actualActor.Status);
 
             var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(marketRole.Function.ToString(), actualMarketRole.EicFunction);
+            Assert.Equal(marketRole.Function, (EicFunction)actualMarketRole.EicFunction);
         }
     }
 }

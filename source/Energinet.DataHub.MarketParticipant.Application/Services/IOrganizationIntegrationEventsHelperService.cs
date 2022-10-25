@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
@@ -38,6 +38,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
         /// <param name="organization"></param>
         /// <param name="organizationDto"></param>
         /// <returns>events</returns>
-        IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto);
+        IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ClientModels.ChangeOrganizationDto organizationDto);
     }
 }

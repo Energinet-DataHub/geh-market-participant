@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -75,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [Authorize(Permission.OrganizationManage)]
-        public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
+        public async Task<IActionResult> CreateOrganizationAsync(ClientModels.CreateOrganizationDto organization)
         {
             return await this.ProcessAsync(
                 async () =>
@@ -95,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [Authorize(Permission.OrganizationManage)]
         public async Task<IActionResult> UpdateOrganizationAsync(
             Guid organizationId,
-            ChangeOrganizationDto organization)
+            ClientModels.ChangeOrganizationDto organization)
         {
             return await this.ProcessAsync(
                 async () =>

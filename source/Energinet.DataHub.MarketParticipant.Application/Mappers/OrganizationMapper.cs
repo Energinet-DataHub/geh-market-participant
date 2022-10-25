@@ -14,42 +14,41 @@
 
 using System;
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Mappers
 {
     public static class OrganizationMapper
     {
-        public static OrganizationDto Map(Organization organization)
+        public static ClientModels.OrganizationDto Map(Organization organization)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
-            return new OrganizationDto(
-                organization.Id.ToString(),
+            return new ClientModels.OrganizationDto(
+                organization.Id.Value,
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
                 organization.Comment,
-                organization.Status.ToString(),
-                organization.Actors.Select(Map).ToList(),
-                Map(organization.Address));
+                (ClientModels.OrganizationStatus)organization.Status,
+                Map(organization.Address),
+                organization.Actors.Select(Map).ToList());
         }
 
-        public static ActorDto Map(Actor actor)
+        public static ClientModels.ActorDto Map(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
-            return new ActorDto(
-                actor.Id.ToString(),
-                actor.ExternalActorId?.ToString(),
-                new ActorNumberDto(actor.ActorNumber.Value),
-                actor.Status.ToString(),
-                new ActorNameDto(actor.Name.Value),
+            return new ClientModels.ActorDto(
+                actor.Id,
+                actor.ExternalActorId?.Value,
+                new ClientModels.ActorNumberDto(actor.ActorNumber.Value),
+                (ClientModels.ActorStatus)actor.Status,
+                new ClientModels.ActorNameDto(actor.Name.Value),
                 actor.MarketRoles.Select(Map).ToList());
         }
 
-        private static AddressDto Map(Address address)
+        private static ClientModels.AddressDto Map(Address address)
         {
-            return new AddressDto(
+            return new ClientModels.AddressDto(
                 address.StreetName,
                 address.Number,
                 address.ZipCode,
@@ -57,11 +56,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 address.Country);
         }
 
-        private static ActorMarketRoleDto Map(ActorMarketRole marketRole)
+        private static ClientModels.ActorMarketRoleDto Map(ActorMarketRole marketRole)
         {
-            return new ActorMarketRoleDto(
-                marketRole.Function.ToString(),
-                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => m.ToString()))));
+            return new ClientModels.ActorMarketRoleDto(
+                (ClientModels.EicFunction)marketRole.Function,
+                marketRole.GridAreas.Select(e => new ClientModels.ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => (ClientModels.MarketParticipantMeteringPointType)m))));
         }
     }
 }
