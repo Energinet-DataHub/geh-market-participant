@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public sealed class CreateOrganizationCommandRuleSet
-        : AbstractValidator<CreateOrganizationCommand>
+    public sealed class OrganizationRuleSet : AbstractValidator<CreateOrganizationDto>
     {
-        public CreateOrganizationCommandRuleSet()
+        public OrganizationRuleSet()
         {
-            RuleFor(command => command.Organization)
-                .NotNull()
-                .SetValidator(new OrganizationRuleSet())
-                .ChildRules(validator =>
-                {
-                    validator
-                        .RuleFor(organization => organization.Address)
-                        .SetValidator(new AdressRuleSet());
-                });
+            RuleFor(organization => organization.Name).NotEmpty().Length(1, 50);
+
+            RuleFor(organization => organization.BusinessRegisterIdentifier)
+                .NotEmpty()
+                .Length(1, 8);
         }
     }
 }
