@@ -42,6 +42,24 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
+        public async Task FailingIntegrationTest()
+        {
+            // Arrange
+            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var scope = host.BeginScope();
+            await using var context = _fixture.DatabaseManager.CreateDbContext();
+            var contactRepository = new ActorContactRepository(context);
+
+            // Act
+            var testContact = await contactRepository
+                .GetAsync(new ContactId(Guid.NewGuid()))
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.NotNull(testContact);
+        }
+
+        [Fact]
         public async Task GetAsync_ContactNotExists_ReturnsNull()
         {
             // Arrange
