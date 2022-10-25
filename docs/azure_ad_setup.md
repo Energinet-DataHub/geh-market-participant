@@ -1,7 +1,7 @@
 # Setup Azure Active Directory
 - Create Azure Active Directory.
-- AD domain name is formatted as '<env>ADDataHub', e.g. 'dev002ADDataHub'.
-- Active P2 trial (or buy actual license).
+    - AD domain name is formatted as '<env>ADDataHub', e.g. 'dev002ADDataHub'.
+    - Activate P2 trial (or buy actual license).
 
 - Create 'Frontend' app registration (single tenant)
     - Add SPA authentication for following URLs:
