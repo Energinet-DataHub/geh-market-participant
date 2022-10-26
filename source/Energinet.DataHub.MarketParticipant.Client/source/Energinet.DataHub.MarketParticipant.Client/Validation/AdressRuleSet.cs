@@ -15,7 +15,7 @@
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Client.Validation
 {
     public sealed class AdressRuleSet : AbstractValidator<AddressDto>
     {
