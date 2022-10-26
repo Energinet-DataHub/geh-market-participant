@@ -33,7 +33,7 @@ public sealed class DispatchEventsIntegrationTests
     }
 
     [Fact]
-    public async Task DispatchEventsCommand_NoEvents_ThrowsException()
+    public async Task DispatchEventsCommand_NoEvents_CompletesWithoutErrors()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);

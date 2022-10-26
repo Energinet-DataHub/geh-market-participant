@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
@@ -91,8 +92,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
         private static void InitTestServiceBus(Container container)
         {
-            var mock = new Mock<IMarketParticipantServiceBusClient>();
-            container.Register(() => mock.Object, Lifestyle.Singleton);
+            var mockSender = new Mock<ServiceBusSender>();
+            var mockClient = new Mock<IMarketParticipantServiceBusClient>();
+
+            mockClient
+                .Setup(mock => mock.CreateSender())
+                .Returns(mockSender.Object);
+
+            container.Register(() => mockClient.Object, Lifestyle.Singleton);
         }
 
         private static void InitUserIdProvider(Container container)
