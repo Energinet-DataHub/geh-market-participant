@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -26,28 +28,31 @@ using SimpleInjector.Lifestyles;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 {
-    public sealed class OrganizationHost : IAsyncDisposable
+    public sealed class OrganizationIntegrationTestHost : IAsyncDisposable
     {
         private readonly Startup _startup;
 
-        private OrganizationHost()
+        private OrganizationIntegrationTestHost()
         {
             _startup = new Startup();
         }
 
-        public static Task<OrganizationHost> InitializeAsync()
+        public static Task<OrganizationIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
         {
-            var host = new OrganizationHost();
+            ArgumentNullException.ThrowIfNull(databaseFixture);
 
-            var configuration = BuildConfig();
+            var host = new OrganizationIntegrationTestHost();
+
+            var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton(configuration);
             host._startup.Initialize(configuration, serviceCollection);
             serviceCollection
                 .BuildServiceProvider()
-                .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
+                .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = true);
 
             host._startup.Container.Options.AllowOverridingRegistrations = true;
+            InitTestServiceBus(host._startup.Container);
             InitUserIdProvider(host._startup.Container);
             return Task.FromResult(host);
         }
@@ -62,13 +67,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await _startup.DisposeAsync().ConfigureAwait(false);
         }
 
-        private static IConfiguration BuildConfig()
+        private static IConfiguration BuildConfig(string dbConnectionString)
         {
             KeyValuePair<string, string>[] keyValuePairs =
             {
-                new(Settings.SqlDbConnectionString.Key, "Data Source=(LocalDB)\\MSSQLLocalDB;Integrated Security=true;Database=marketparticipant;Connection Timeout=3"),
+                new(Settings.SqlDbConnectionString.Key, dbConnectionString),
                 new(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value"),
-                new(Settings.ServiceBusTopicName.Key, "fake_value")
+                new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
+                new(Settings.ServiceBusTopicName.Key, "fake_value"),
+                new(Settings.B2CTenant.Key, Guid.Empty.ToString()),
+                new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
+                new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
+                new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
+                new(Settings.B2CServicePrincipalNameId.Key, "fake_value"),
+                new(Settings.B2CServicePrincipalNameSecret.Key, "fake_value")
             };
 
             return new ConfigurationBuilder()
@@ -77,11 +89,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .Build();
         }
 
+        private static void InitTestServiceBus(Container container)
+        {
+            var mock = new Mock<IMarketParticipantServiceBusClient>();
+            container.Register(() => mock.Object, Lifestyle.Singleton);
+        }
+
         private static void InitUserIdProvider(Container container)
         {
             var userIdProvider = new Mock<IUserIdProvider>();
             userIdProvider.Setup(x => x.UserId).Returns(Guid.NewGuid());
-            container.Register<IUserIdProvider>(() => userIdProvider.Object, Lifestyle.Singleton);
+            container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         }
     }
 }

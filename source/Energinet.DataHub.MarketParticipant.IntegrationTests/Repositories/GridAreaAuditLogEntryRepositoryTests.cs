@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task Insert_CreatesNewLogEntry()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -52,9 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId.Value);
 
             // act
-            await target
-                .InsertAsync(entry)
-                .ConfigureAwait(false);
+            await target.InsertAsync(entry);
 
             var actual = await (from l in context.GridAreaAuditLogEntries.AsQueryable()
                                 where l.UserId == userId
@@ -73,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task Get_GridAreaIdProvided_ReturnsLogEntriesForGridArea()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -84,9 +82,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var target = new GridAreaAuditLogEntryRepository(context);
             var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId.Value);
-            await target
-                .InsertAsync(entry)
-                .ConfigureAwait(false);
+
+            await target.InsertAsync(entry);
 
             // act
             var actual = (await target.GetAsync(gridAreaId)).ToList();

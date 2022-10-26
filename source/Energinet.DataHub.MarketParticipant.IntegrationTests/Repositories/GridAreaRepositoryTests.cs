@@ -37,15 +37,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_GridNotExists_ReturnsNull()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridAreaRepository = new GridAreaRepository(context);
 
             // Act
             var testOrg = await gridAreaRepository
-                .GetAsync(new GridAreaId(Guid.NewGuid()))
-                .ConfigureAwait(false);
+                .GetAsync(new GridAreaId(Guid.NewGuid()));
 
             // Assert
             Assert.Null(testOrg);
@@ -55,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task AddOrUpdateAsync_OneGridArea_CanReadBack()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
@@ -65,8 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 PriceAreaCode.Dk1);
 
             // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
-            var newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
+            var newGrid = await gridRepository.GetAsync(gridId);
 
             // Assert
             Assert.NotNull(newGrid);
@@ -80,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task AddOrUpdateAsync_GridAreaChanged_CanReadBack()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
@@ -90,15 +89,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 PriceAreaCode.Dk1);
 
             // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
             var newGrid = new GridArea(
                 gridId,
                 new GridAreaName("NewName"),
                 new GridAreaCode("234"),
                 PriceAreaCode.Dk2);
 
-            await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
-            newGrid = await gridRepository.GetAsync(gridId).ConfigureAwait(false);
+            await gridRepository.AddOrUpdateAsync(newGrid);
+            newGrid = await gridRepository.GetAsync(gridId);
 
             // Assert
             Assert.NotNull(newGrid);
@@ -113,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task AddOrUpdateAsync_GridAreaChanged_NewContextCanReadBack()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
@@ -125,14 +124,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 PriceAreaCode.Dk1);
 
             // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
             var newGrid = new GridArea(
                 gridId,
                 new GridAreaName("NewName"),
                 new GridAreaCode("234"),
                 PriceAreaCode.Dk2);
-            await gridRepository.AddOrUpdateAsync(newGrid).ConfigureAwait(false);
-            newGrid = await gridRepository2.GetAsync(gridId).ConfigureAwait(false);
+            await gridRepository.AddOrUpdateAsync(newGrid);
+            newGrid = await gridRepository2.GetAsync(gridId);
 
             // Assert
             Assert.NotNull(newGrid);
@@ -147,7 +146,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetGridAreasAsync_ReturnsGridAreas()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var repository = new GridAreaRepository(context);
@@ -156,10 +155,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new GridAreaCode("801"),
                 PriceAreaCode.Dk1);
 
-            await repository.AddOrUpdateAsync(gridArea).ConfigureAwait(false);
+            await repository.AddOrUpdateAsync(gridArea);
 
             // Act
-            var actual = await repository.GetAsync().ConfigureAwait(false);
+            var actual = await repository.GetAsync();
 
             // Assert
             Assert.NotEmpty(actual);

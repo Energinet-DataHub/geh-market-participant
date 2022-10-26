@@ -14,12 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -42,41 +41,36 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
         public async Task TestAsync(bool commitUnitOfWork, bool entityCreated)
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var repository = CreateRepository(context);
+            var repository = scope.GetInstance<IOrganizationRepository>();
+            var uowProvider = scope.GetInstance<IUnitOfWorkProvider>();
+
             var entity = CreateEntity();
             OrganizationId id = null!;
 
-            //act
-            await ExecuteInUnitOfWork(context, commitUnitOfWork, async () =>
+            // act
+            await ExecuteInUnitOfWork(uowProvider, commitUnitOfWork, async () =>
             {
-                id = await repository.AddOrUpdateAsync(entity).ConfigureAwait(false);
-            }).ConfigureAwait(false);
+                id = await repository.AddOrUpdateAsync(entity);
+            });
 
             // assert
-            await using var newContext = _fixture.DatabaseManager.CreateDbContext();
-            var newRepository = CreateRepository(newContext);
-            var actualEntityCreated = await newRepository.GetAsync(id).ConfigureAwait(false) != null;
+            await using var newScope = host.BeginScope();
+            var newRepository = newScope.GetInstance<IOrganizationRepository>();
+            var actualEntityCreated = await newRepository.GetAsync(id) != null;
             Assert.Equal(entityCreated, actualEntityCreated);
         }
 
-        private static async Task ExecuteInUnitOfWork(DbContext context, bool commit, Func<Task> work)
+        private static async Task ExecuteInUnitOfWork(IUnitOfWorkProvider provider, bool commit, Func<Task> work)
         {
-            await using var uow = new UnitOfWork(context);
-            await uow.InitializeAsync().ConfigureAwait(false);
-            await work().ConfigureAwait(false);
+            await using var uow = await provider.NewUnitOfWorkAsync();
+            await work();
             if (commit)
             {
-                await uow.CommitAsync().ConfigureAwait(false);
+                await uow.CommitAsync();
             }
-        }
-
-        private static OrganizationRepository CreateRepository(Infrastructure.Persistence.MarketParticipantDbContext context)
-        {
-            return new OrganizationRepository(context);
         }
 
         private static Organization CreateEntity()
