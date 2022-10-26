@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Client</PackageId>
-    <PackageVersion>2.7.3$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.7.4$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Client library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -69,6 +69,7 @@ https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/E
     <PackageReference Include="Flurl.Serialization.TextJson" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    <PackageReference Include="FluentValidation" Version="11.2.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

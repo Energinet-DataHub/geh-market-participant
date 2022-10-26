@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record GetActorsResponse(IEnumerable<ActorDto> Actors);
+    public sealed record GetActorsResponse(IEnumerable<ClientModels.ActorDto> Actors);
 }

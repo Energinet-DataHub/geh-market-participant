@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record GetSingleActorResponse(ActorDto Actor);
+    public sealed record GetSingleActorResponse(ClientModels.ActorDto Actor);
 }

@@ -15,7 +15,6 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
@@ -25,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
@@ -84,17 +84,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 "Test Comment",
                 OrganizationStatus.Active);
 
-            var organisationDto = new ChangeOrganizationDto(
+            var organisationDto = new ClientModels.ChangeOrganizationDto(
                 "New Name",
                 "12345678",
-                new AddressDto(
+                new ClientModels.AddressDto(
                     "fake_value",
                     "fake_value",
                     "fake_value",
                     "fake_value",
                     "fake_value"),
                 "Test Comment",
-                "Active");
+                ClientModels.OrganizationStatus.Active);
 
             // Act
             var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);
@@ -126,17 +126,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 "Test Comment",
                 OrganizationStatus.Active);
 
-            var organisationDto = new ChangeOrganizationDto(
+            var organisationDto = new ClientModels.ChangeOrganizationDto(
                 "Name",
                 "12345678",
-                new AddressDto(
+                new ClientModels.AddressDto(
                     "fake_value",
                     "fake_value",
                     "fake_value",
                     "fake_value",
                     "fake_value"),
                 "Test Comment",
-                "Blocked");
+                ClientModels.OrganizationStatus.Blocked);
 
             // Act
             var changeEvents = helper.DetermineOrganizationUpdatedChangeEvents(organisationDomainModel, organisationDto);

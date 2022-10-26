@@ -14,10 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             };
         }
 
-        public IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto)
+        public IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ClientModels.ChangeOrganizationDto organizationDto)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
             ArgumentNullException.ThrowIfNull(organizationDto, nameof(organizationDto));
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 };
             }
 
-            var newStatus = Enum.Parse<OrganizationStatus>(organizationDto.Status);
+            OrganizationStatus newStatus = (OrganizationStatus)organizationDto.Status;
             if (organization.Status != newStatus)
             {
                 yield return new OrganizationStatusChangedIntegrationEvent
@@ -75,7 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             {
                 yield return new OrganizationCommentChangedIntegrationEvent
                 {
-                    Comment = organizationDto.Comment, OrganizationId = organization.Id
+                    Comment = organizationDto.Comment,
+                    OrganizationId = organization.Id
                 };
             }
 

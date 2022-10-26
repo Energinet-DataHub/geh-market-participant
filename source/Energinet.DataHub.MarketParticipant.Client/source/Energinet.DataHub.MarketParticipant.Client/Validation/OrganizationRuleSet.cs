@@ -12,14 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Client.Models;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
+namespace Energinet.DataHub.MarketParticipant.Client.Validation
 {
-    public sealed record CreateOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment);
+    public sealed class OrganizationRuleSet : AbstractValidator<CreateOrganizationDto>
+    {
+        public OrganizationRuleSet()
+        {
+            RuleFor(organization => organization.Name).NotEmpty().Length(1, 50);
+
+            RuleFor(organization => organization.BusinessRegisterIdentifier)
+                .NotEmpty()
+                .Length(1, 8);
+        }
+    }
 }

@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     validator
                         .RuleFor(organization => organization.Status)
                         .NotEmpty()
-                        .IsEnumName(typeof(OrganizationStatus));
+                        .IsInEnum();
 
                     validator
                         .RuleFor(organization => organization.Address)

@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Xunit;
 using Xunit.Categories;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {
@@ -54,16 +55,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationName_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.Name)}";
             const string validCvr = "123";
-            var validAddress = new AddressDto(
+            var validAddress = new ClientModels.AddressDto(
                 "test Street",
                 "1",
                 "1111",
                 "Test City",
                 "Test Country");
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 value,
                 validCvr,
                 validAddress,
@@ -97,12 +98,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationBusinessRegisterIdentifier_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.BusinessRegisterIdentifier)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.BusinessRegisterIdentifier)}";
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 ValidName,
                 value,
-                new AddressDto(
+                new ClientModels.AddressDto(
                     string.Empty,
                     string.Empty,
                     string.Empty,
@@ -138,12 +139,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressStreetname_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.StreetName)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.Address)}.{nameof(ClientModels.ChangeOrganizationDto.Address.StreetName)}";
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
-                new AddressDto(
+                new ClientModels.AddressDto(
                     value,
                     string.Empty,
                     string.Empty,
@@ -179,12 +180,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressCity_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.City)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.Address)}.{nameof(ClientModels.ChangeOrganizationDto.Address.City)}";
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
-                new AddressDto(
+                new ClientModels.AddressDto(
                     string.Empty,
                     string.Empty,
                     string.Empty,
@@ -220,12 +221,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressCountry_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Country)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.Address)}.{nameof(ClientModels.ChangeOrganizationDto.Address.Country)}";
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
-                new AddressDto(
+                new ClientModels.AddressDto(
                     string.Empty,
                     string.Empty,
                     string.Empty,
@@ -261,12 +262,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressNumber_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Number)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.Address)}.{nameof(ClientModels.ChangeOrganizationDto.Address.Number)}";
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
-                new AddressDto(
+                new ClientModels.AddressDto(
                     string.Empty,
                     value,
                     string.Empty,
@@ -302,12 +303,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressZipCode_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.ZipCode)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ClientModels.ChangeOrganizationDto.Address)}.{nameof(ClientModels.ChangeOrganizationDto.Address.ZipCode)}";
 
-            var organizationDto = new CreateOrganizationDto(
+            var organizationDto = new ClientModels.CreateOrganizationDto(
                 ValidName,
                 ValidCvr,
-                new AddressDto(
+                new ClientModels.AddressDto(
                     string.Empty,
                     string.Empty,
                     value,

@@ -128,7 +128,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.NotNull(response.Actor);
-            Assert.Equal(actorId.ToString(), response.Actor.ActorId);
+            Assert.Equal(actorId, response.Actor.ActorId);
         }
     }
 }

@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using ClientModels = Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
@@ -55,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "1111",
                 "Test City",
                 "Test Country");
-            var validAddressDto = new AddressDto(
+            var validAddressDto = new ClientModels.AddressDto(
                 "test Street",
                 "1",
                 "1111",
@@ -81,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     It.IsAny<string>()))
                 .ReturnsAsync(organization);
 
-            var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "Test Comment"));
+            var command = new CreateOrganizationCommand(new ClientModels.CreateOrganizationDto(orgName, validCvr, validAddressDto, "Test Comment"));
 
             // Act
             var response = await target

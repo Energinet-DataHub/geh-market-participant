@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
             organization.Comment = request.Organization.Comment;
-            organization.Status = Enum.Parse<OrganizationStatus>(request.Organization.Status, true);
+            organization.Status = (OrganizationStatus)request.Organization.Status;
 
             await _uniqueOrganizationBusinessRegisterIdentifierService
                 .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
