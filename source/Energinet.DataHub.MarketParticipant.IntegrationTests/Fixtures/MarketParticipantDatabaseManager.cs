@@ -39,22 +39,29 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
         /// <summary>
         ///     Creates the database schema using DbUp instead of a database context.
         /// </summary>
-        protected override Task<bool> CreateDatabaseSchemaAsync(MarketParticipantDbContext context)
+        protected override async Task<bool> CreateDatabaseSchemaAsync(MarketParticipantDbContext context)
         {
-            return Task.FromResult(CreateDatabaseSchema(context));
-        }
+            var upgradeEngine = await UpgradeFactory.GetUpgradeEngineAsync(ConnectionString, GetFilter()).ConfigureAwait(false);
 
-        /// <summary>
-        ///     Creates the database schema using DbUp instead of a database context.
-        /// </summary>
-        protected override bool CreateDatabaseSchema(MarketParticipantDbContext context)
-        {
-            var upgradeEngine = UpgradeFactory.GetUpgradeEngine(ConnectionString, GetFilter());
-            var result = upgradeEngine.PerformUpgrade();
-            if (result.Successful is false)
-                throw new InvalidOperationException("Database migration failed", result.Error);
+            // Transient errors can occur right after DB is created,
+            // as it might not be instantly available, hence this retry loop.
+            // This is especially an issue when running against an Azure SQL DB.
+            var tryCount = 0;
+            do
+            {
+                ++tryCount;
 
-            return true;
+                var result = upgradeEngine.PerformUpgrade();
+
+                if (result.Successful == true)
+                    return true;
+
+                if (tryCount > 10)
+                    throw new InvalidOperationException("Database migration failed", result.Error);
+
+                await Task.Delay(256 * tryCount).ConfigureAwait(false);
+            }
+            while (true);
         }
 
         private static Func<string, bool> GetFilter()
