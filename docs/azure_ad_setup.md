@@ -33,6 +33,7 @@
             .Request()
             .AddAsync(extensionProperty);
         ```
+        - Add 'extn.actors' claim in Token Configuration > Add optional claims for ID token.
 
 - Create 'Actor 1' and 'Actor 2' app registration (should be done through Graph API)
     - Add application ID to actor AR
