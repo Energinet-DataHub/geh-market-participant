@@ -84,7 +84,7 @@ public sealed class MeteringPointTypeRemovedFromActorEventDispatcherTests
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.Function.ToString(), actualEvent.Function.ToString());
         Assert.Equal(integrationEvent.GridAreaId, actualEvent.GridAreaId);
-        Assert.Equal(integrationEvent.Type.Name, actualEvent.MeteringPointType);
+        Assert.Equal(integrationEvent.Type.ToString(), actualEvent.MeteringPointType);
     }
 
     [Fact]

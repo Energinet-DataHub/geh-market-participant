@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                     {
                         gridAreaEntity.MeteringPointTypes.Add(new MeteringPointTypeEntity
                         {
-                            MeteringTypeId = meteringPointType.Value
+                            MeteringTypeId = (int)meteringPointType
                         });
                     }
 

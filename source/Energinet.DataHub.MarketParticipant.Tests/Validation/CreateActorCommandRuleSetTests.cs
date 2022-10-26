@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
-
 namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 {
     [UnitTest]
@@ -53,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = nameof(CreateActorCommand.OrganizationId);
 
-            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.Name };
+            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
             var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
 
@@ -88,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.ActorNumber)}";
 
-            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.Name };
+            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
             var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
 
@@ -165,7 +164,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(ActorMarketRoleDto.EicFunction)}";
 
-            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.Name };
+            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
 
             var organizationRoleDto = new CreateActorDto(

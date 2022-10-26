@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -28,7 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
 
             builder.ToTable("GridAreaAuditLogEntry");
             builder.HasKey(x => x.Id);
-            builder.Property(role => role.Field).HasConversion(x => (int)x, x => (GridAreaAuditLogEntryField)x);
         }
     }
 }

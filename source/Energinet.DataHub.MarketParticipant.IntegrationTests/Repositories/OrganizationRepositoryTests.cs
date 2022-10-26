@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
-
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection("IntegrationTest")]
@@ -326,10 +325,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(2, actorMeteringPointTypes.Count);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x == MeteringPointType.D02Analysis.Value);
+                x => x == MeteringPointType.D02Analysis);
             Assert.Contains(
                 actorMeteringPointTypes,
-                x => x == MeteringPointType.D05NetProduction.Value);
+                x => x == MeteringPointType.D05NetProduction);
         }
 
         [Fact]

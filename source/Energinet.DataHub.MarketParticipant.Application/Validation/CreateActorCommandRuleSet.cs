@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
     public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCommand>
@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                         .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
-                                                .Must(x => MeteringPointType.TryFromName(x, true, out _)));
+                                                .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
                                 });
                         });
                 });
