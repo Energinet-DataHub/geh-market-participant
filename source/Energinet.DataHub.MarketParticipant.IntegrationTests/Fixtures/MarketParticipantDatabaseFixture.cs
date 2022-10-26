@@ -17,7 +17,7 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
-    public class MarketParticipantDatabaseFixture : IAsyncLifetime
+    public sealed class MarketParticipantDatabaseFixture : IAsyncLifetime
     {
         public MarketParticipantDatabaseFixture()
         {

@@ -40,17 +40,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task TryAdd_NoGridAreaAssociatedWithMarketRole_ReturnsTrue()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var gridArea = await CreateGridAreaAsync(context).ConfigureAwait(false);
-            var actor = await CreateActorUnderNewOrganizationAsync(context).ConfigureAwait(false);
+            var gridArea = await CreateGridAreaAsync(context);
+            var actor = await CreateActorUnderNewOrganizationAsync(context);
 
             var target = new UniqueActorMarketRoleGridAreaRepository(context);
 
             // Act
-            var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
 
             // Assert
             Assert.True(actual);
@@ -60,20 +60,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task TryAdd_ExistingGridAreaAssociatedWithMarketRole_ReturnsFalse()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var gridArea = await CreateGridAreaAsync(context).ConfigureAwait(false);
-            var actor = await CreateActorUnderNewOrganizationAsync(context).ConfigureAwait(false);
+            var gridArea = await CreateGridAreaAsync(context);
+            var actor = await CreateActorUnderNewOrganizationAsync(context);
 
             var target = new UniqueActorMarketRoleGridAreaRepository(context);
-            await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
 
-            var newActor = await CreateActorUnderNewOrganizationAsync(context).ConfigureAwait(false);
+            var newActor = await CreateActorUnderNewOrganizationAsync(context);
 
             // Act
-            var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(newActor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
+            var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(newActor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
 
             // Assert
             Assert.False(actual);
@@ -83,21 +83,21 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task Remove_RemovesAssociationsFromActor()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var gridArea = await CreateGridAreaAsync(context).ConfigureAwait(false);
-            var actor = await CreateActorUnderNewOrganizationAsync(context).ConfigureAwait(false);
+            var gridArea = await CreateGridAreaAsync(context);
+            var actor = await CreateActorUnderNewOrganizationAsync(context);
 
             var target = new UniqueActorMarketRoleGridAreaRepository(context);
 
             // Act
-            var firstAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
-            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value)).ConfigureAwait(false);
-            await target.RemoveAsync(actor.Id).ConfigureAwait(false);
-            var thirdAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value)).ConfigureAwait(false);
-            var fourthAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value)).ConfigureAwait(false);
+            var firstAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
+            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value));
+            await target.RemoveAsync(actor.Id);
+            var thirdAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
+            var fourthAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value));
 
             // Assert
             Assert.True(firstAddResult);
@@ -110,8 +110,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(new Actor(new MockedGln()));
 
             var repository = new OrganizationRepository(context);
-            var id = await repository.AddOrUpdateAsync(organization).ConfigureAwait(false);
-            organization = (await repository.GetAsync(id).ConfigureAwait(false))!;
+            var id = await repository.AddOrUpdateAsync(organization);
+            organization = (await repository.GetAsync(id))!;
             return organization.Actors.First();
         }
 
@@ -121,8 +121,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var domain = new GridArea(new GridAreaName(name), new GridAreaCode("001"), PriceAreaCode.Dk1);
 
             var repository = new GridAreaRepository(context);
-            var id = await repository.AddOrUpdateAsync(domain).ConfigureAwait(false);
-            return (await repository.GetAsync(id).ConfigureAwait(false))!;
+            var id = await repository.AddOrUpdateAsync(domain);
+            return (await repository.GetAsync(id))!;
         }
     }
 }

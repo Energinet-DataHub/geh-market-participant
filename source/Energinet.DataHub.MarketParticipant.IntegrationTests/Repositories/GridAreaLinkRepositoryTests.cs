@@ -37,15 +37,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task AddOrUpdateAsync_GridNotExists_ReturnsNull()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var linkRepository = new GridAreaLinkRepository(context);
 
             // Act
             var testOrg = await linkRepository
-                .GetAsync(new GridAreaLinkId(Guid.NewGuid()))
-                .ConfigureAwait(false);
+                .GetAsync(new GridAreaLinkId(Guid.NewGuid()));
 
             // Assert
             Assert.Null(testOrg);
@@ -55,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task AddOrUpdateAsync_GridAreaLink_CanReadBack()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var linkRepository = new GridAreaLinkRepository(context);
@@ -66,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 PriceAreaCode.Dk1);
 
             // Act
-            var gridId = await gridRepository.AddOrUpdateAsync(testGrid).ConfigureAwait(false);
+            var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
             var testLink = new GridAreaLink(gridId);
             var gridLinkId = await linkRepository.AddOrUpdateAsync(testLink);
             var gridLink = await linkRepository.GetAsync(gridLinkId);
