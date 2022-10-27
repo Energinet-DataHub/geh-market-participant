@@ -21,7 +21,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
-    public class MarketParticipantDatabaseManager : SqlServerDatabaseManager<MarketParticipantDbContext>
+    public sealed class MarketParticipantDatabaseManager : SqlServerDatabaseManager<MarketParticipantDbContext>
     {
         public MarketParticipantDatabaseManager()
             : base("MarketParticipant")

@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
 {
     public sealed class UnitOfWork : IUnitOfWork
     {

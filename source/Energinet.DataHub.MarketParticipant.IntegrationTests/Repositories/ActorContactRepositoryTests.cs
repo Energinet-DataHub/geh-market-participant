@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_ContactNotExists_ReturnsNull()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var contactRepository = new ActorContactRepository(context);
@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Act
             var testContact = await contactRepository
                 .GetAsync(new ContactId(Guid.NewGuid()))
-                .ConfigureAwait(false);
+                ;
 
             // Assert
             Assert.Null(testContact);
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_ForAnOrganization_ReturnsNull()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -75,9 +75,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+                ;
 
-            organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
@@ -99,13 +99,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                         categories[i],
                         new EmailAddress("fake@fake.dk"),
                         new PhoneNumber("1234567")))
-                    .ConfigureAwait(false);
+                    ;
             }
 
             // Act
             var testContacts = await contactRepository
                 .GetAsync(actor.Id)
-                .ConfigureAwait(false);
+                ;
 
             // Assert
             Assert.Equal(5, testContacts.Count());
@@ -115,7 +115,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task AddAsync_OneContact_CanReadBack()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -126,9 +126,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+                ;
 
-            organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
@@ -141,8 +141,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new PhoneNumber("1234567"));
 
             // Act
-            var contactId = await contactRepository.AddAsync(testContact).ConfigureAwait(false);
-            var newContact = await contactRepository.GetAsync(contactId).ConfigureAwait(false);
+            var contactId = await contactRepository.AddAsync(testContact);
+            var newContact = await contactRepository.GetAsync(contactId);
 
             // Assert
             Assert.NotNull(newContact);
@@ -158,7 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task RemoveAsync_OneContact_RemovesContact()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -169,9 +169,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+                ;
 
-            organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
@@ -183,12 +183,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new EmailAddress("fake@fake.dk"),
                 new PhoneNumber("1234567"));
 
-            var contactId = await contactRepository.AddAsync(testContact).ConfigureAwait(false);
-            var newContact = await contactRepository.GetAsync(contactId).ConfigureAwait(false);
+            var contactId = await contactRepository.AddAsync(testContact);
+            var newContact = await contactRepository.GetAsync(contactId);
 
             // Act
-            await contactRepository.RemoveAsync(newContact!).ConfigureAwait(false);
-            var deletedContact = await contactRepository.GetAsync(contactId).ConfigureAwait(false);
+            await contactRepository.RemoveAsync(newContact!);
+            var deletedContact = await contactRepository.GetAsync(contactId);
 
             // Assert
             Assert.Null(deletedContact);
@@ -198,7 +198,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task RemoveAsync_NonExistentContact_DoesNothing()
         {
             // Arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -213,13 +213,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new PhoneNumber("1234567"));
 
             // Act + Assert
-            await contactRepository.RemoveAsync(testContact).ConfigureAwait(false);
+            await contactRepository.RemoveAsync(testContact);
         }
 
         [Fact]
         public async Task GetAsync_DifferentContexts_CanReadBack()
         {
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -230,9 +230,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
+                ;
 
-            organization = await organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
+            organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
 
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
@@ -248,8 +248,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 new PhoneNumber("1234567"));
 
             // Act
-            var contactId = await contactRepository.AddAsync(testContact).ConfigureAwait(false);
-            var newContact = await contactRepositoryReadback.GetAsync(contactId).ConfigureAwait(false);
+            var contactId = await contactRepository.AddAsync(testContact);
+            var newContact = await contactRepositoryReadback.GetAsync(contactId);
 
             // Assert
             Assert.NotNull(newContact);

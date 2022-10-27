@@ -39,15 +39,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_ReturnsGridAreas()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var target = new GridAreaOverviewRepository(context);
 
             // act
             var actual = (await target
-                .GetAsync()
-                .ConfigureAwait(false)).ToList();
+                .GetAsync()).ToList();
 
             // assert
             Assert.NotEmpty(actual);
@@ -57,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_GridAccessProviderAssigned_ReturnsWithActorNameAndNumber()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -67,8 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var actual = (await target
-                .GetAsync()
-                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+                .GetAsync()).Single(x => x.Id == gridAreaId);
 
             // assert
             Assert.NotNull(actual.ActorName);
@@ -79,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_OtherMarketRoleAssigned_DoesNotReturnWithActorNameAndNumber()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -89,8 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var actual = (await target
-                .GetAsync()
-                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+                .GetAsync()).Single(x => x.Id == gridAreaId);
 
             // assert
             Assert.Null(actual.ActorName);
@@ -101,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_NoMarketRoleAssigned_DoesNotReturnWithActorNameAndNumber()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -111,8 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var actual = (await target
-                .GetAsync()
-                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+                .GetAsync()).Single(x => x.Id == gridAreaId);
 
             // assert
             Assert.Null(actual.ActorName);
@@ -123,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_MultipleMarketRolesAssignedToGridAreaAndGridAccessProviderIsOneOfThem_ReturnsOnlyGridAccessProvider()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -133,8 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var actual = (await target
-                .GetAsync()
-                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+                .GetAsync()).Single(x => x.Id == gridAreaId);
 
             // assert
             Assert.NotNull(actual.ActorName);
@@ -145,7 +140,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         public async Task GetAsync_MultipleMarketRolesAssignedToGridAreaAndGridAccessProviderIsNotAmongThem_ReturnsWithoutActorInfo()
         {
             // arrange
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
@@ -155,8 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var actual = (await target
-                .GetAsync()
-                .ConfigureAwait(false)).Single(x => x.Id == gridAreaId);
+                .GetAsync()).Single(x => x.Id == gridAreaId);
 
             // assert
             Assert.Null(actual.ActorName);
@@ -165,7 +159,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
         private async Task<GridAreaId> CreateGridArea(params EicFunction[] marketRoles)
         {
-            await using var host = await OrganizationHost.InitializeAsync().ConfigureAwait(false);
+            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
