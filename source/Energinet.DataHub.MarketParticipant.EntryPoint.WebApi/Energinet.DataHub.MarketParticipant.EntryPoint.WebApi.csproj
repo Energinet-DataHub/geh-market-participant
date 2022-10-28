@@ -23,8 +23,8 @@ limitations under the License.
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.0.4" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="7.2.1-alpha-317" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.2.1-alpha-317" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="7.2.1" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.2.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.10" />

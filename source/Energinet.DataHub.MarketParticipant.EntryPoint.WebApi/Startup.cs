@@ -101,8 +101,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
-            var frontendId = configuration.GetSetting(Settings.FrontendAppId);
-            services.AddJwtBearerAuthentication(openIdUrl, frontendId);
+            var frontendAppId = configuration.GetSetting(Settings.FrontendAppId);
+            services.AddJwtBearerAuthentication(openIdUrl, frontendAppId);
             services.AddPermissionAuthorization();
 
             if (configuration.GetSetting(Settings.RolesValidationEnabled))
