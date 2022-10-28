@@ -24,6 +24,7 @@ using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -66,6 +67,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseAuthentication();
             app.UseAuthorization();
 
+            if (_configuration.GetSetting(Settings.RolesValidationEnabled))
+            {
+                app.UseUserMiddleware<FrontendUser>();
+            }
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -95,9 +101,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
-            var audience = configuration.GetSetting(Settings.FrontendOpenIdAudience);
-            services.AddJwtBearerAuthentication(openIdUrl, audience);
+            var frontendAppId = configuration.GetSetting(Settings.FrontendAppId);
+            services.AddJwtBearerAuthentication(openIdUrl, frontendAppId);
             services.AddPermissionAuthorization();
+
+            if (configuration.GetSetting(Settings.RolesValidationEnabled))
+            {
+                services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+            }
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
             var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
