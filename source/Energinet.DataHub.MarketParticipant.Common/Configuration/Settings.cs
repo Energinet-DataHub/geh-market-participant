@@ -39,7 +39,7 @@ public static class Settings
 
     public static Setting<string> FrontendOpenIdUrl { get; }
         = new("FRONTEND_OPEN_ID_URL");
-    public static Setting<string> FrontendOpenIdAudience { get; }
+    public static Setting<string> FrontendAppId { get; }
         = new("FRONTEND_SERVICE_APP_ID");
 
     public static Setting<string> ServiceBusHealthCheckConnectionString { get; }

@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [Authorize(Permission.GridAreasManage)]
+        [AuthorizeUser(Permission.GridAreasManage)]
         public async Task<IActionResult> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
         {
             return await this.ProcessAsync(
@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut]
-        [Authorize(Permission.GridAreasManage)]
+        [AuthorizeUser(Permission.GridAreasManage)]
         public async Task<IActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
         {
             return await this.ProcessAsync(
@@ -74,7 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        [Authorize(Permission.OrganizationView)]
+        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetGridAreasAsync()
         {
             return await this.ProcessAsync(
@@ -88,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{gridAreaId:guid}")]
-        [Authorize(Permission.OrganizationView)]
+        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetGridAreaAsync(Guid gridAreaId)
         {
             return await this.ProcessAsync(
@@ -102,7 +102,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{gridAreaId:guid}/auditlogentry")]
-        [Authorize(Permission.OrganizationView)]
+        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
             return await this.ProcessAsync(
