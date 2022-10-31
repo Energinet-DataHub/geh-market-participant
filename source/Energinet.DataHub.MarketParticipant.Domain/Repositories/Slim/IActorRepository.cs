@@ -13,19 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 
-namespace Energinet.DataHub.MarketParticipant.Common.Security;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 
-public sealed class FrontendUser
+/// <summary>
+/// sdfdfg
+/// </summary>
+public interface IActorRepository
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isEnerginet)
-    {
-        UserId = userId;
-        ActorId = actorId;
-        IsEnerginet = isEnerginet;
-    }
-
-    public Guid UserId { get; }
-    public Guid ActorId { get; }
-    public bool IsEnerginet { get; }
+    /// <summary>
+    /// gdfgdsfg
+    /// </summary>
+    /// <param name="externalActorId"></param>
+    /// <returns>asdasd</returns>
+    Task<Actor?> GetActorAsync(Guid externalActorId);
 }

@@ -14,18 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Common.Security;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 
-public sealed class FrontendUser
-{
-    public FrontendUser(Guid userId, Guid actorId, bool isEnerginet)
-    {
-        UserId = userId;
-        ActorId = actorId;
-        IsEnerginet = isEnerginet;
-    }
-
-    public Guid UserId { get; }
-    public Guid ActorId { get; }
-    public bool IsEnerginet { get; }
-}
+public sealed record Actor(Guid ActorId, ActorStatus Status);
