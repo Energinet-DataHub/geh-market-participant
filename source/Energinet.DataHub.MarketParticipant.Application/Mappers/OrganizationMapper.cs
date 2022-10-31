@@ -61,7 +61,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         {
             return new ActorMarketRoleDto(
                 marketRole.Function.ToString(),
-                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => m.ToString()))));
+                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => m.ToString()))),
+                marketRole.Comment);
         }
     }
 }

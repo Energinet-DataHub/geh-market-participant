@@ -138,7 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 MeteringPointType.E17Consumption.ToString()
             };
             var gridAreas = new[] { new ActorGridAreaDto(actor.Id, meteringPoints) };
-            var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas) };
+            var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas, string.Empty) };
 
             var command = new UpdateActorCommand(
                 organizationId,

@@ -128,7 +128,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                         .GridAreas
                         .Select(grid => new ActorGridArea(grid.GridAreaId, grid.MeteringPointTypes
                             .Select(e => (MeteringPointType)e.MeteringTypeId)));
-                    return new ActorMarketRole(marketRole.Id, function, gridAres.ToList());
+                    return new ActorMarketRole(marketRole.Id, function, gridAres.ToList(), marketRole.Comment);
                 });
 
                 var actorNumber = ActorNumber.Create(actor.ActorNumber);
