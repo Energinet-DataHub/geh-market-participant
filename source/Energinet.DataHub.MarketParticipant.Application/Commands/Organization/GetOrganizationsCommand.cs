@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
 {
-    public sealed record GetOrganizationsCommand : IRequest<GetOrganizationsResponse>;
+    public sealed record GetOrganizationsCommand(Guid? OrganizationId) : IRequest<GetOrganizationsResponse>;
 }

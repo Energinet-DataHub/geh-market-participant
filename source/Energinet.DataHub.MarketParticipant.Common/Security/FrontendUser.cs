@@ -18,14 +18,31 @@ namespace Energinet.DataHub.MarketParticipant.Common.Security;
 
 public sealed class FrontendUser
 {
-    public FrontendUser(Guid userId, Guid actorId, bool isEnerginet)
+    public FrontendUser(Guid userId, Guid organizationId, Guid actorId, bool isEnerginet)
     {
         UserId = userId;
+        OrganizationId = organizationId;
         ActorId = actorId;
         IsEnerginet = isEnerginet;
     }
 
     public Guid UserId { get; }
+    public Guid OrganizationId { get; }
     public Guid ActorId { get; }
     public bool IsEnerginet { get; }
+
+    public bool IsEnerginetOrAssignedToOrganization(Guid organizationId)
+    {
+        return IsEnerginet || organizationId == OrganizationId;
+    }
+
+    public bool IsEnerginetOrAssignedToActor(Guid actorId)
+    {
+        return IsEnerginet || actorId == ActorId;
+    }
+
+    public bool IsAssignedToActor(Guid actorId)
+    {
+        return actorId == ActorId;
+    }
 }

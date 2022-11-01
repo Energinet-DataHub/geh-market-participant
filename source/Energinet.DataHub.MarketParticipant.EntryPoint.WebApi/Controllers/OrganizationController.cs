@@ -14,9 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -30,11 +32,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     {
         private readonly ILogger<OrganizationController> _logger;
         private readonly IMediator _mediator;
+        private readonly IUserContext<FrontendUser> _userContext;
 
-        public OrganizationController(ILogger<OrganizationController> logger, IMediator mediator)
+        public OrganizationController(ILogger<OrganizationController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
         {
             _logger = logger;
             _mediator = mediator;
+            _userContext = userContext;
         }
 
         [HttpGet]
@@ -44,7 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                     {
-                        var getOrganizationsCommand = new GetOrganizationsCommand();
+                        var organizationId = !_userContext.CurrentUser.IsEnerginet ? _userContext.CurrentUser.OrganizationId : (Guid?)null;
+                        var getOrganizationsCommand = new GetOrganizationsCommand(organizationId);
 
                         var response = await _mediator
                             .Send(getOrganizationsCommand)
@@ -62,6 +67,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
+                    if (!_userContext.CurrentUser.IsEnerginetOrAssignedToOrganization(organizationId))
+                        return Unauthorized();
+
                     var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
                     var response = await _mediator
@@ -80,6 +88,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
+                    if (!_userContext.CurrentUser.IsEnerginet)
+                        return Unauthorized();
+
                     var createOrganizationCommand = new CreateOrganizationCommand(organization);
 
                     var response = await _mediator
@@ -100,6 +111,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
+                    if (!_userContext.CurrentUser.IsEnerginet)
+                        return Unauthorized();
+
                     var updateOrganizationCommand =
                         new UpdateOrganizationCommand(organizationId, organization);
 

@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync())
                 .ReturnsAsync(new[] { organization });
 
-            var command = new GetOrganizationsCommand();
+            var command = new GetOrganizationsCommand(null);
 
             // Act
             var response = await target

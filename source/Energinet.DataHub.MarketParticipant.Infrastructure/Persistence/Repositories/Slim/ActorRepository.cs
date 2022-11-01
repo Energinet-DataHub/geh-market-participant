@@ -40,6 +40,6 @@ public sealed class ActorRepository : IActorRepository
         if (foundActor == null)
             return null;
 
-        return new Actor(foundActor.Id, (ActorStatus)foundActor.Status);
+        return new Actor(foundActor.OrganizationId, foundActor.Id, (ActorStatus)foundActor.Status);
     }
 }
