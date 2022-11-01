@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common
@@ -31,11 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IUniqueActorMarketRoleGridAreaRepository, UniqueActorMarketRoleGridAreaRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaOverviewRepository, GridAreaOverviewRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>(Lifestyle.Scoped);
-        }
-
-        public static void AddRepositories(this IServiceCollection container)
-        {
-            container.AddScoped<Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim.IActorRepository, Infrastructure.Persistence.Repositories.Slim.ActorRepository>();
+            container.Register<Domain.Repositories.Slim.IActorRepository, Infrastructure.Persistence.Repositories.Slim.ActorRepository>(Lifestyle.Scoped);
         }
     }
 }
