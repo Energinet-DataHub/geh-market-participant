@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     /// <summary>
     /// Service for accessing Azure AD.
     /// </summary>
-    public interface IActiveDirectoryService
+    public interface IActiveDirectoryB2CService
     {
         /// <summary>
         /// Creates a consumer app registration.
