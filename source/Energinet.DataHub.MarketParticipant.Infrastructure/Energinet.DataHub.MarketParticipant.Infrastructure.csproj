@@ -29,6 +29,8 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="7.2.3-alpha-323" />
+    <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.2.3-alpha-323" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.Abstractions" Version="6.0.10" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.0" />
     <PackageReference Include="Azure.Identity" Version="1.7.0" />

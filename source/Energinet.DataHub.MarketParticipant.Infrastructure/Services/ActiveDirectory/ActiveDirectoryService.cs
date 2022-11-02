@@ -17,11 +17,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using AppPermission = Energinet.DataHub.Core.App.Common.Security.Permission;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory
 {
@@ -61,6 +61,87 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 });
             await pageIterator.IterateAsync().ConfigureAwait(false);
             return result;
+        }
+
+        public async Task<IEnumerable<AppPermission>> GetPermissionsToAppRegistrationAsync(Guid appRegistrationId)
+        {
+            var app = await _graphClient.Applications[appRegistrationId.ToString()]
+                .Request()
+                .GetAsync()
+                .ConfigureAwait(false);
+            var result = new List<AppPermission>();
+            if (app is null) return Enumerable.Empty<AppPermission>();
+            foreach (var appRole in app.AppRoles)
+            {
+                if (Enum.TryParse<AppPermission>(appRole.Value, out var permission))
+                {
+                    result.Add(permission);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task UpdatePermissionsToAppAsync(Guid appRegistrationId, IEnumerable<string> appRoles)
+        {
+            var app = await _graphClient.Applications[appRegistrationId.ToString()]
+                .Request()
+                .GetAsync()
+                .ConfigureAwait(false);
+            var updated = new Application
+            {
+                AppRoles = appRoles.Select(x =>
+                    new AppRole() { Id = Guid.NewGuid(), Value = x, DisplayName = x, Description = x })
+            };
+            await _graphClient.Applications[appRegistrationId.ToString()]
+                .Request()
+                .UpdateAsync(updated)
+                .ConfigureAwait(false);
+        }
+
+        public async Task<string> CreateAppRegistrationAsync(BusinessRegisterIdentifier identifier)
+        {
+            ArgumentNullException.ThrowIfNull(identifier);
+
+            var app = await _graphClient.Applications
+                .Request()
+                .AddAsync(new Application
+                {
+                    DisplayName = identifier.Identifier,
+                    Api = new ApiApplication
+                    {
+                        RequestedAccessTokenVersion = 2,
+                    },
+                    CreatedDateTime = DateTimeOffset.Now,
+                    SignInAudience = "AzureADMultipleOrgs",
+                }).ConfigureAwait(false);
+            var updated = new Application();
+            if (app.IdentifierUris.ToList().Count == 0)
+            {
+                updated.IdentifierUris = new string[] { $"https://WE_NEED_TENANT_DOMAIN_HERE/{app.AppId}" };
+            }
+
+            var appscope = app.Api.Oauth2PermissionScopes.ToList();
+            var newScope = new PermissionScope
+            {
+                Id = Guid.NewGuid(),
+                AdminConsentDescription = "default scope",
+                AdminConsentDisplayName = "default scope",
+                IsEnabled = true,
+                Type = "Admin",
+                Value = "actor.default"
+            };
+            appscope.Add(newScope);
+            updated.Api = new ApiApplication { Oauth2PermissionScopes = appscope };
+            return app.AppId;
+        }
+
+        public async Task DeleteAppRegistrationAsync(Guid appRegistrationId)
+        {
+            await _graphClient.Applications[appRegistrationId.ToString()]
+                .Request()
+                .DeleteAsync()
+                .ConfigureAwait(false);
         }
 
         //     public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
