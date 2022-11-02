@@ -133,6 +133,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             };
             appscope.Add(newScope);
             updated.Api = new ApiApplication { Oauth2PermissionScopes = appscope };
+            await _graphClient.Applications[app.Id]
+                .Request()
+                .UpdateAsync(updated)
+                .ConfigureAwait(false);
+
             return app.AppId;
         }
 
