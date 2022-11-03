@@ -237,7 +237,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Assert
             externalActorSynchronizationService.Verify(
                 x => x.ScheduleAsync(
-                    It.Is<OrganizationId>(oid => oid.Value == organizationId),
+                    It.Is<OrganizationId>(oid => oid == organization.Id),
                     It.Is<Guid>(aid => aid == actor.Id)),
                 Times.Once);
         }
