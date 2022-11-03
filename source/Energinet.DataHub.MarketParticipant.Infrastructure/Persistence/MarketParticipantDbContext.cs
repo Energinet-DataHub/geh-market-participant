@@ -18,50 +18,51 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfi
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+
+public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
-    public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
+    public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
+        : base(options)
     {
-        public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        // Used for mocking.
-        protected MarketParticipantDbContext()
-        {
-        }
+    // Used for mocking.
+    protected MarketParticipantDbContext()
+    {
+    }
 
-        public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
-        public DbSet<ActorEntity> Actors { get; private set; } = null!;
-        public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
-        public DbSet<MarketRoleEntity> MarketRoles { get; private set; } = null!;
-        public DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; private set; } = null!;
-        public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
-        public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
-        public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
-        public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
-        public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
+    public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
+    public DbSet<ActorEntity> Actors { get; private set; } = null!;
+    public DbSet<GridAreaEntity> GridAreas { get; private set; } = null!;
+    public DbSet<MarketRoleEntity> MarketRoles { get; private set; } = null!;
+    public DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; private set; } = null!;
+    public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
+    public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
+    public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
+    public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
+    public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
+    public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
 
-        public Task<int> SaveChangesAsync()
-        {
-            return base.SaveChangesAsync();
-        }
+    public Task<int> SaveChangesAsync()
+    {
+        return base.SaveChangesAsync();
+    }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
-            modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new MarketRoleGridAreaEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
-            modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());
-            base.OnModelCreating(modelBuilder);
-        }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
+        modelBuilder.ApplyConfiguration(new OrganizationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new MarketRoleEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new MarketRoleGridAreaEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorSynchronizationEntityConfiguration());
+        base.OnModelCreating(modelBuilder);
     }
 }

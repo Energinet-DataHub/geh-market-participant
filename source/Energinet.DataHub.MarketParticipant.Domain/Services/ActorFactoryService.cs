@@ -20,97 +20,89 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+public sealed class ActorFactoryService : IActorFactoryService
 {
-    public sealed class ActorFactoryService : IActorFactoryService
+    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
+    private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+    private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
+    private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
+
+    public ActorFactoryService(
+        IOrganizationRepository organizationRepository,
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
+        IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
+        IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
+        IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
-        private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
-        private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
-        private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
-        private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
+        _organizationRepository = organizationRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
+        _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
+        _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+        _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
+        _allowedGridAreasRuleService = allowedGridAreasRuleService;
+    }
 
-        public ActorFactoryService(
-            IOrganizationRepository organizationRepository,
-            IUnitOfWorkProvider unitOfWorkProvider,
-            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-            IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
-            IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-            IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorIdConfigurationService externalActorIdConfigurationService)
-        {
-            _organizationRepository = organizationRepository;
-            _unitOfWorkProvider = unitOfWorkProvider;
-            _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
-            _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
-            _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
-            _allowedGridAreasRuleService = allowedGridAreasRuleService;
-            _externalActorIdConfigurationService = externalActorIdConfigurationService;
-        }
+    public async Task<Actor> CreateAsync(
+        Organization organization,
+        ActorNumber actorNumber,
+        ActorName actorName,
+        IReadOnlyCollection<ActorMarketRole> marketRoles)
+    {
+        ArgumentNullException.ThrowIfNull(organization);
+        ArgumentNullException.ThrowIfNull(actorNumber);
+        ArgumentNullException.ThrowIfNull(marketRoles);
 
-        public async Task<Actor> CreateAsync(
-            Organization organization,
-            ActorNumber actorNumber,
-            ActorName actorName,
-            IReadOnlyCollection<ActorMarketRole> marketRoles)
-        {
-            ArgumentNullException.ThrowIfNull(organization);
-            ArgumentNullException.ThrowIfNull(actorNumber);
-            ArgumentNullException.ThrowIfNull(marketRoles);
+        await _uniqueGlobalLocationNumberRuleService
+            .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
+            .ConfigureAwait(false);
 
-            await _uniqueGlobalLocationNumberRuleService
-                .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
-                .ConfigureAwait(false);
+        _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
 
-            _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
+        var newActor = new Actor(actorNumber) { Name = actorName };
 
-            var newActor = new Actor(actorNumber) { Name = actorName };
+        foreach (var marketRole in marketRoles)
+            newActor.MarketRoles.Add(marketRole);
 
-            foreach (var marketRole in marketRoles)
-                newActor.MarketRoles.Add(marketRole);
+        organization.Actors.Add(newActor);
 
-            organization.Actors.Add(newActor);
+        _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
 
-            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
 
-            await _externalActorIdConfigurationService
-                .AssignExternalActorIdAsync(newActor)
-                .ConfigureAwait(false);
+        var savedActor = await SaveActorAsync(organization, newActor).ConfigureAwait(false);
 
-            var uow = await _unitOfWorkProvider
-                .NewUnitOfWorkAsync()
-                .ConfigureAwait(false);
+        await _actorIntegrationEventsQueueService
+            .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)
+            .ConfigureAwait(false);
 
-            var savedActor = await SaveActorAsync(organization, newActor).ConfigureAwait(false);
+        await _actorIntegrationEventsQueueService
+            .EnqueueActorCreatedEventsAsync(organization.Id, savedActor)
+            .ConfigureAwait(false);
 
-            await _actorIntegrationEventsQueueService
-                .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)
-                .ConfigureAwait(false);
+        await uow.CommitAsync().ConfigureAwait(false);
 
-            await _actorIntegrationEventsQueueService
-                .EnqueueActorCreatedEventsAsync(organization.Id, savedActor)
-                .ConfigureAwait(false);
+        return savedActor;
+    }
 
-            await uow.CommitAsync().ConfigureAwait(false);
+    private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
+    {
+        await _organizationRepository
+            .AddOrUpdateAsync(organization)
+            .ConfigureAwait(false);
 
-            return savedActor;
-        }
+        var savedOrganization = await _organizationRepository
+            .GetAsync(organization.Id)
+            .ConfigureAwait(false);
 
-        private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
-        {
-            await _organizationRepository
-                .AddOrUpdateAsync(organization)
-                .ConfigureAwait(false);
-
-            var savedOrganization = await _organizationRepository
-                .GetAsync(organization.Id)
-                .ConfigureAwait(false);
-
-            return savedOrganization!
-                .Actors
-                .Single(actor => actor.Id == newActor.Id);
-        }
+        return savedOrganization!
+            .Actors
+            .Single(actor => actor.Id == newActor.Id);
     }
 }
