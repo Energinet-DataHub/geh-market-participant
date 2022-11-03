@@ -49,4 +49,4 @@ jobs:
             - '.github/workflows/ci.yml'
             - '.github/workflows/detect-changes.yml'
             - '.github/actions/dotnet-*/**'
-            - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model)/**)/**'
+            - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
