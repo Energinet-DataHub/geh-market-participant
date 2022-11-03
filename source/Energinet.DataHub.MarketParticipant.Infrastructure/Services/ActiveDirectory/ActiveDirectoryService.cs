@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
+using Energinet.DataHub.MarketParticipant.Integration.Model.Exceptions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using AppPermission = Energinet.DataHub.Core.App.Common.Security.Permission;
@@ -103,42 +104,43 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         {
             ArgumentNullException.ThrowIfNull(identifier);
 
-            var app = await _graphClient.Applications
-                .Request()
-                .AddAsync(new Application
+            try
+            {
+                var frontendApp = await GetFrontendAppAsync(Guid.Empty).ConfigureAwait(false);
+                if (frontendApp is null)
                 {
-                    DisplayName = identifier.Identifier,
-                    Api = new ApiApplication
-                    {
-                        RequestedAccessTokenVersion = 2,
-                    },
-                    CreatedDateTime = DateTimeOffset.Now,
-                    SignInAudience = "AzureADMultipleOrgs",
-                }).ConfigureAwait(false);
-            var updated = new Application();
-            if (app.IdentifierUris.ToList().Count == 0)
-            {
-                updated.IdentifierUris = new string[] { $"https://WE_NEED_TENANT_DOMAIN_HERE/{app.AppId}" };
+                    throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}, Frontend App not found");
+                }
+
+                var app = await CreateAppRegistrationInternalAsync(identifier).ConfigureAwait(false);
+                if (app is null)
+                {
+                    throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}");
+                }
+
+                await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
+
+                var requiredAccess = new RequiredResourceAccess()
+                {
+                    ResourceAppId = app.AppId, ODataType = "Scope"
+                };
+                var updatedFrontend = new Application();
+                var accessList = new List<RequiredResourceAccess>();
+                accessList.AddRange(frontendApp.RequiredResourceAccess);
+                accessList.Add(requiredAccess);
+                updatedFrontend.RequiredResourceAccess = accessList;
+                await _graphClient
+                    .Applications[frontendApp.AppId]
+                    .Request()
+                    .UpdateAsync(updatedFrontend)
+                    .ConfigureAwait(false);
+
+                return app.AppId;
             }
-
-            var appscope = app.Api.Oauth2PermissionScopes.ToList();
-            var newScope = new PermissionScope
+            catch (Exception e) when (e is not MarketParticipantException)
             {
-                Id = Guid.NewGuid(),
-                AdminConsentDescription = "default scope",
-                AdminConsentDisplayName = "default scope",
-                IsEnabled = true,
-                Type = "Admin",
-                Value = "actor.default"
-            };
-            appscope.Add(newScope);
-            updated.Api = new ApiApplication { Oauth2PermissionScopes = appscope };
-            await _graphClient.Applications[app.Id]
-                .Request()
-                .UpdateAsync(updated)
-                .ConfigureAwait(false);
-
-            return app.AppId;
+                throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}", e);
+            }
         }
 
         public async Task DeleteAppRegistrationAsync(Guid appRegistrationId)
@@ -149,42 +151,75 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .ConfigureAwait(false);
         }
 
-        //     public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-        //         ActorNumber actorNumber,
-        //         IReadOnlyCollection<EicFunction> permissions)
-        //     {
-        //         ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
-        //         ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
-        //
-        //         var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
-        //         var b2CPermissions = await MapBusinessRoleCodesToB2CRoleIdsAsync(roles).ConfigureAwait(false);
-        //         var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
-        //         try
-        //         {
-        //             var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
-        //
-        //             var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId).ConfigureAwait(false);
-        //
-        //             foreach (var permission in b2CPermissions)
-        //             {
-        //                 await GrantAddedRoleToServicePrincipalAsync(
-        //                     servicePrincipal.Id,
-        //                     permission)
-        //                     .ConfigureAwait(false);
-        //             }
-        //
-        //             return new CreateAppRegistrationResponse(
-        //                 new ExternalActorId(app.AppId),
-        //                 app.Id,
-        //                 servicePrincipal.Id);
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
-        //             throw;
-        //         }
-        //     }
-        //
+        private async Task<Application?> GetFrontendAppAsync(Guid frontendAppId)
+        {
+           return (await _graphClient
+                .Applications
+                .Request()
+                .Filter($"appId eq '{frontendAppId}'")
+                .GetAsync()
+                .ConfigureAwait(false))
+               .FirstOrDefault();
+        }
+
+        private async Task AddApiScopesToAppRegistrationAsync(Application? app)
+        {
+            ArgumentNullException.ThrowIfNull(app);
+
+            try
+            {
+                var updated = new Application();
+                if (app.IdentifierUris.ToList().Count == 0)
+                {
+                    updated.IdentifierUris = new string[]
+                    {
+                        $"api://{app.AppId}"
+                    };
+                }
+
+                var appScopes = app.Api.Oauth2PermissionScopes?.ToList() ?? new List<PermissionScope>();
+                var newScope = new PermissionScope
+                {
+                    Id = Guid.NewGuid(),
+                    AdminConsentDescription = "default scope",
+                    AdminConsentDisplayName = "default scope",
+                    IsEnabled = true,
+                    Type = "Admin",
+                    Value = "actor.default"
+                };
+                appScopes.Add(newScope);
+                updated.Api = new ApiApplication
+                {
+                    Oauth2PermissionScopes = appScopes
+                };
+                await _graphClient.Applications[app.Id]
+                    .Request()
+                    .UpdateAsync(updated)
+                    .ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                throw new MarketParticipantException($"Error adding API and Scope to app registration for AppId '{app.AppId}'", e);
+            }
+        }
+
+        private async Task<Application?> CreateAppRegistrationInternalAsync(BusinessRegisterIdentifier identifier)
+        {
+            var app = await _graphClient.Applications
+                .Request()
+                .AddAsync(new Application
+                {
+                    DisplayName = $"Actor_{identifier.Identifier}",
+                    Api = new ApiApplication
+                    {
+                        RequestedAccessTokenVersion = 2,
+                    },
+                    CreatedDateTime = DateTimeOffset.Now,
+                    SignInAudience = SignInAudience.AzureADMyOrg.ToString(),
+                }).ConfigureAwait(false);
+            return app;
+        }
+
         //     public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId)
         //     {
         //         ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
@@ -236,178 +271,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         //             throw;
         //         }
         //     }
-        //
-        //     public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
-        //         AppRegistrationObjectId appRegistrationObjectId,
-        //         AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId)
-        //     {
-        //         ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-        //         ArgumentNullException.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
-        //
-        //         try
-        //         {
-        //             var retrievedApp = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
-        //                 .Request()
-        //                 .Select(a => new { a.AppId, a.Id, a.DisplayName, a.AppRoles })
-        //                 .GetAsync().ConfigureAwait(false);
-        //
-        //             var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
-        //
-        //             return new ActiveDirectoryAppInformation(
-        //                 retrievedApp.AppId,
-        //                 retrievedApp.Id,
-        //                 retrievedApp.DisplayName,
-        //                 appRoles);
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
-        //             throw;
-        //         }
-        //     }
-        //
-        //     private async Task<IEnumerable<Guid>> MapBusinessRoleCodesToB2CRoleIdsAsync(IEnumerable<BusinessRoleCode> businessRoleCodes)
-        //     {
-        //         var roles = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
-        //         var b2CIds = new List<Guid>();
-        //         foreach (var roleCode in businessRoleCodes)
-        //         {
-        //             switch (roleCode)
-        //             {
-        //                 case BusinessRoleCode.Ddk:
-        //                     b2CIds.Add(roles.DdkId);
-        //                     break;
-        //                 case BusinessRoleCode.Ddm:
-        //                     b2CIds.Add(roles.DdmId);
-        //                     break;
-        //                 case BusinessRoleCode.Ddq:
-        //                     b2CIds.Add(roles.DdqId);
-        //                     break;
-        //                 case BusinessRoleCode.Ddx:
-        //                     b2CIds.Add(roles.DdxId);
-        //                     break;
-        //                 case BusinessRoleCode.Ddz:
-        //                     b2CIds.Add(roles.DdzId);
-        //                     break;
-        //                 case BusinessRoleCode.Dgl:
-        //                     b2CIds.Add(roles.DglId);
-        //                     break;
-        //                 case BusinessRoleCode.Ez:
-        //                     b2CIds.Add(roles.EzId);
-        //                     break;
-        //                 case BusinessRoleCode.Mdr:
-        //                     b2CIds.Add(roles.MdrId);
-        //                     break;
-        //                 case BusinessRoleCode.Sts:
-        //                     b2CIds.Add(roles.StsId);
-        //                     break;
-        //                 case BusinessRoleCode.Tso:
-        //                     b2CIds.Add(roles.TsoId);
-        //                     break;
-        //                 default:
-        //                     throw new ArgumentNullException(nameof(businessRoleCodes));
-        //             }
-        //         }
-        //
-        //         return b2CIds;
-        //     }
-        //
-        //     private async Task<IEnumerable<ActiveDirectoryRole>> GetRolesAsync(string servicePrincipalObjectId)
-        //     {
-        //         try
-        //         {
-        //             var roles = await _graphClient.ServicePrincipals[servicePrincipalObjectId]
-        //                 .AppRoleAssignments
-        //                 .Request()
-        //                 .GetAsync()
-        //                 .ConfigureAwait(false);
-        //
-        //             if (roles is null)
-        //             {
-        //                 throw new InvalidOperationException($"'{nameof(roles)}' is null");
-        //             }
-        //
-        //             var roleIds = new List<ActiveDirectoryRole>();
-        //             foreach (var role in roles)
-        //             {
-        //                 roleIds.Add(new ActiveDirectoryRole(role.AppRoleId.ToString()!));
-        //             }
-        //
-        //             return roleIds;
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
-        //             throw;
-        //         }
-        //     }
-        //
-        //     private async ValueTask GrantAddedRoleToServicePrincipalAsync(
-        //         string consumerServicePrincipalObjectId,
-        //         Guid roleId)
-        //     {
-        //         var appRole = new AppRoleAssignment
-        //         {
-        //             PrincipalId = Guid.Parse(consumerServicePrincipalObjectId),
-        //             ResourceId = Guid.Parse(_azureAdConfig.BackendAppServicePrincipalObjectId),
-        //             AppRoleId = roleId
-        //         };
-        //
-        //         var role = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
-        //             .AppRoleAssignedTo
-        //             .Request()
-        //             .AddAsync(appRole).ConfigureAwait(false);
-        //
-        //         if (role is null)
-        //         {
-        //             throw new InvalidOperationException($"The object: '{nameof(role)}' is null.");
-        //         }
-        //     }
-        //
-        //     private async Task<Application> CreateAppInB2CAsync(
-        //         string consumerAppName,
-        //         IReadOnlyList<string> permissions)
-        //     {
-        //         var resourceAccesses = permissions.Select(permission =>
-        //             new ResourceAccess
-        //             {
-        //                 Id = Guid.Parse(permission),
-        //                 Type = "Role"
-        //             }).ToList();
-        //
-        //         return await _graphClient.Applications
-        //             .Request()
-        //             .AddAsync(new Application
-        //             {
-        //                 DisplayName = consumerAppName,
-        //                 Api = new ApiApplication
-        //                 {
-        //                     RequestedAccessTokenVersion = 2,
-        //                 },
-        //                 CreatedDateTime = DateTimeOffset.Now,
-        //                 RequiredResourceAccess = new[]
-        //                 {
-        //                     new RequiredResourceAccess
-        //                     {
-        //                         ResourceAppId = _azureAdConfig.BackendAppId,
-        //                         ResourceAccess = resourceAccesses
-        //                     }
-        //                 },
-        //                 SignInAudience = "AzureADMultipleOrgs"
-        //             }).ConfigureAwait(false);
-        //     }
-        //
-        //     private async Task<ServicePrincipal> AddServicePrincipalToAppInB2CAsync(string consumerAppId)
-        //     {
-        //         var consumerServicePrincipal = new ServicePrincipal
-        //         {
-        //             AppId = consumerAppId
-        //         };
-        //
-        //         return await _graphClient.ServicePrincipals
-        //             .Request()
-        //             .AddAsync(consumerServicePrincipal).ConfigureAwait(false);
-        //     }
-        // }
-    }
+   }
 }
