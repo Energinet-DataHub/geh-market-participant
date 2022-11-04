@@ -16,12 +16,12 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 /// <summary>
-/// Schedules and performs synchronization of actors into external systems.
+/// Schedules synchronization of actors into external systems.
 /// </summary>
-public interface IExternalActorSynchronizationService
+public interface IExternalActorSynchronizationRepository
 {
     /// <summary>
     /// Schedules synchronization of the specified actor.
@@ -31,8 +31,8 @@ public interface IExternalActorSynchronizationService
     Task ScheduleAsync(OrganizationId organizationId, Guid actorId);
 
     /// <summary>
-    /// Takes the next scheduled actor and synchronizes it with the external system.
-    /// Does nothing if there are no actors to synchronize.
+    /// Dequeue the next scheduled actor for synchronization.
+    /// Returns null if there are no actors to synchronize.
     /// </summary>
-    Task SyncNextAsync();
+    Task<(OrganizationId OrganizationId, Guid ActorId)?> DequeueNextAsync();
 }

@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
-        private readonly IExternalActorSynchronizationService _externalActorSynchronizationService;
+        private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
         private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
         private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
         private readonly IActorStatusMarketRolesRuleService _actorStatusMarketRolesRuleService;
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorSynchronizationService externalActorSynchronizationService,
+            IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
             IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
             ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
             IActorStatusMarketRolesRuleService actorStatusMarketRolesRuleService)
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
-            _externalActorSynchronizationService = externalActorSynchronizationService;
+            _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
             _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
             _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
             _actorStatusMarketRolesRuleService = actorStatusMarketRolesRuleService;
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     .AddOrUpdateAsync(organization)
                     .ConfigureAwait(false);
 
-                await _externalActorSynchronizationService
+                await _externalActorSynchronizationRepository
                     .ScheduleAsync(organization.Id, actor.Id)
                     .ConfigureAwait(false);
 

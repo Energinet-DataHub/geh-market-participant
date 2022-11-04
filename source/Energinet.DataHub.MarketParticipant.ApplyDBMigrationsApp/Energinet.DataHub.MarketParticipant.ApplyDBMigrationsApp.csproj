@@ -31,11 +31,4 @@ limitations under the License.
     <EmbeddedResource Include="Scripts\**\*.sql" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Scripts\B-001\Model\202211031500 Create ActorSynchronization Table.sql" />
-    <None Remove="Scripts\B-002\Model\202211031500 Create ActorSynchronization Table.sql" />
-    <None Remove="Scripts\T-001\202211031500 Create ActorSynchronization Table.sql" />
-    <None Remove="Scripts\U-001\Model\202211031500 Create ActorSynchronization Table.sql" />
-  </ItemGroup>
-
 </Project>

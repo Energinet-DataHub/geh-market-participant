@@ -1,8 +1,7 @@
 CREATE TABLE [dbo].[ActorSynchronization]
 (
-    [Id]             [int] NOT NULL,
+    [Id]             [int] IDENTITY(1, 1),
     [OrganizationId] [uniqueidentifier] NOT NULL,
-    [ActorId]        [uniqueidentifier] NOT NULL,
-    CONSTRAINT [PK_ActorSynchronization] PRIMARY KEY CLUSTERED ([Id])
+    [ActorId]        [uniqueidentifier] NOT NULL
 )
 GO
