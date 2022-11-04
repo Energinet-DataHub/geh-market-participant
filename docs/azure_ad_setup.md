@@ -17,6 +17,7 @@
         - Create app registration 'GraphClient'
         - Add application permission 'GraphAPI.User.ReadWriteAll'
         - Add application permission 'GraphAPI.Application.ReadWriteAll'
+        - API application permissions 'GraphAPI.DelegatedPermissionGrant.ReadWrite.All'
         - Grand admin consent
         - Create client secret
         ```C#
