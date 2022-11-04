@@ -92,7 +92,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             {
                 var marketRoleEntity = new MarketRoleEntity
                 {
-                    Function = marketRole.Function
+                    Function = marketRole.Function,
+                    Comment = marketRole.Comment
                 };
 
                 foreach (var marketRoleGridArea in marketRole.GridAreas)
