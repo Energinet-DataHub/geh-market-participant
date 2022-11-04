@@ -43,16 +43,29 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         private readonly IActiveDirectoryService _sut = CreateActiveDirectoryService();
 
         [Fact]
-        public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
+        public async Task ListActors_ReturnMoreThanZero()
         {
             // Arrange
             // Act
             var response = await _sut
-                .ListAppRegistrationsAsync()
+                .ListActorsAsync()
                 .ConfigureAwait(false);
 
             // Assert
             Assert.True(response.Any());
+        }
+
+        [Fact]
+        public async Task CreateActor_Success()
+        {
+            // Arrange
+            // Act
+            var response = await _sut
+                .CreateActorAsync(new BusinessRegisterIdentifier(Guid.NewGuid().ToString()), "JJ Test Actor")
+                .ConfigureAwait(false);
+
+            // Assert
+            Assert.False(string.IsNullOrEmpty(response));
         }
 
         private static IActiveDirectoryService CreateActiveDirectoryService()
@@ -61,9 +74,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
 
             // Graph Service Client
             var clientSecretCredential = new ClientSecretCredential(
-                integrationTestConfig.B2CSettings.Tenant,
-                integrationTestConfig.B2CSettings.ServicePrincipalId,
-                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+                "dhtitans.onmicrosoft.com",
+                "2b914bca-26d7-4d9b-a22e-8305f3259097",
+                "rqH8Q~R~Thgcf1fHsHd.wZ4IMnMmqS9p7rqK7ckU");
 
             var graphClient = new GraphServiceClient(
                 clientSecretCredential,

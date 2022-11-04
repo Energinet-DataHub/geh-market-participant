@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 
@@ -23,8 +24,23 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 public interface IActiveDirectoryService
 {
     /// <summary>
-    /// Lists all app registrations in AD
+    /// Lists all actor app registrations in AD
     /// </summary>
-    /// <returns>List of all App ids</returns>
-    Task<IEnumerable<string>> ListAppRegistrationsAsync();
+    /// <returns>List of all actor app registration ids</returns>
+    Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync();
+
+    /// <summary>
+    /// Creates an Actor in Azure AD
+    /// </summary>
+    /// <param name="identifier">The identifier of the actor</param>
+    /// <param name="name">Name of the actor</param>
+    /// <returns>The app id of the actor created</returns>
+    Task<string> CreateActorAsync(BusinessRegisterIdentifier identifier, string name);
+
+    /// <summary>
+    /// Deletes an actor from AD
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns>Nothing</returns>
+    Task DeleteActorAsync(string identifier);
 }
