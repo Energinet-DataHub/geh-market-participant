@@ -22,6 +22,13 @@ If seed data or test data should also be applied, add the relevant of these argu
 
 It's possible to do a dry run with the parameter `dryRun`. All scripts will be run inside a transaction that will be rolled back afterwards.
 
+ex.
+
+`dotnet run <connection string> env* includeSeedData** includeTestData** dryRun**`
+
+* Possble values "U-001", "U-002", "T-001", "B-001", "B-002", "P-001"
+** Optional params
+
 ## Adding a new script to be synced to SQL servers on deploy
 
 When a new script should be added to the tracked updates, a new .sql file should be added to the Scripts\{Type} folder. Where type can be Model/Seed/Test. It should be named with date and time (yyyyMMddHHmm) as prefix and a descriptive file name, i.e.: `202012312359 Add ActorRegistry model.sql`.
