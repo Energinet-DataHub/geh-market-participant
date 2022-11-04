@@ -27,7 +27,7 @@ ex.
 `dotnet run <connection string> env* includeSeedData** includeTestData** dryRun**`
 
 * Possble values "U-001", "U-002", "T-001", "B-001", "B-002", "P-001"
-** Optional params
+** Optional parameters
 
 ## Adding a new script to be synced to SQL servers on deploy
 
