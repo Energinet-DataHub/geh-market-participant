@@ -262,7 +262,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private async Task<Application> CreateAppInB2CAsync(
+        private async Task<Microsoft.Graph.Application> CreateAppInB2CAsync(
             string consumerAppName,
             IReadOnlyList<string> permissions)
         {
@@ -275,7 +275,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             return await _graphClient.Applications
                 .Request()
-                .AddAsync(new Application
+                .AddAsync(new Microsoft.Graph.Application
                 {
                     DisplayName = consumerAppName,
                     Api = new ApiApplication
