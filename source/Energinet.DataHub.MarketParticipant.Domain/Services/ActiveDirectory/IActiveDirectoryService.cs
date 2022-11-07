@@ -28,26 +28,25 @@ public interface IActiveDirectoryService
     /// Lists all Actor application registrations in AD
     /// </summary>
     /// <returns>List of all actor application registrations with id and display name</returns>
-    Task<IEnumerable<(string AppId, string DisplayName)>> ListAppsAsync();
+    Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync();
 
     /// <summary>
     /// Creates an Actor application registration in Azure AD
     /// </summary>
-    /// <param name="identifier">The identifier of the Actor</param>
-    /// <param name="name">Name of the Actor</param>
+    /// <param name="actor">The actor to create the App Registration for</param>
     /// <returns>The app id of the created Application registration to this Actor</returns>
-    Task<string> CreateAppAsync(BusinessRegisterIdentifier identifier, string name);
+    Task<string> CreateAppAsync(Actor actor);
 
     /// <summary>
     /// Deletes an actor from AD
     /// </summary>
-    /// <param name="identifier">The Application ID to delete</param>
+    /// <param name="actor"></param>
     /// <returns>Nothing</returns>
-    Task DeleteAppAsync(string identifier);
+    Task DeleteActorAsync(Actor actor);
 
     /// <summary>
     /// Check if application registration exists in AD
     /// </summary>
     /// <returns>true if found, false if not</returns>
-    Task<bool> AppExistsAsync(string identifier);
+    Task<bool> AppExistsAsync(Actor actor);
 }

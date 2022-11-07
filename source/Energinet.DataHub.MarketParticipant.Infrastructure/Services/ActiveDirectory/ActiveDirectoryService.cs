@@ -28,6 +28,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
 {
     public sealed class ActiveDirectoryService : IActiveDirectoryService
     {
+        private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor_";
+
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
@@ -48,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             _logger = logger;
         }
 
-        public async Task<IEnumerable<(string AppId, string DisplayName)>> ListAppsAsync()
+        public async Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync()
         {
             var appsCollection = await _graphClient.Applications.Request().GetAsync().ConfigureAwait(false);
             var applicationList = new List<(string AppId, string DisplayName)>();
@@ -57,7 +59,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 appsCollection,
                 application =>
                 {
-                    applicationList.Add((application.Id, application.DisplayName));
+                    if (application.DisplayName.StartsWith(ActorApplicationRegistrationDisplayNamePrefix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        applicationList.Add((application.Id, application.DisplayName));
+                    }
+
                     return true;
                 });
             await pageIterator.IterateAsync().ConfigureAwait(false);
@@ -102,25 +108,25 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .ConfigureAwait(false);
         }
 
-        public async Task DeleteAppAsync(string identifier)
+        public async Task DeleteActorAsync(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(identifier);
+            ArgumentNullException.ThrowIfNull(actor);
             var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false);
-            var actorApp = await GetAppFromIdentifierAsync(identifier).ConfigureAwait(false);
+            var actorApp = await GetAppFromIdentifierAsync(actor.Id).ConfigureAwait(false);
             if (frontendApp is null)
             {
-                throw new MarketParticipantException($"Error deleting app registration for {identifier}, Frontend App not found");
+                throw new MarketParticipantException($"Error deleting app registration for {actor}, Frontend App not found");
             }
 
             if (actorApp is null)
             {
-                throw new MarketParticipantException($"Error deleting app registration for {identifier}, App not found");
+                throw new MarketParticipantException($"Error deleting app registration for {actor}, App not found");
             }
 
             // Remove required access from frontend
             var accessList = new List<RequiredResourceAccess>();
             accessList.AddRange(frontendApp.RequiredResourceAccess
-                .Where(x => x.ResourceAppId != identifier));
+                .Where(x => x.ResourceAppId != actorApp.AppId));
 
             var updatedFrontend = new Application
             {
@@ -133,7 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .ConfigureAwait(false);
 
             // Remove service Principal for actor application registration
-            var appServicePrincipal = await GetServicePrincipalToAppAsync(identifier).ConfigureAwait(false);
+            var appServicePrincipal = await GetServicePrincipalToAppAsync(actorApp.AppId).ConfigureAwait(false);
             if (appServicePrincipal is not null)
             {
                 await _graphClient.ServicePrincipals[appServicePrincipal.Id]
@@ -149,41 +155,42 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .ConfigureAwait(false);
         }
 
-        public async Task<bool> AppExistsAsync(string identifier)
+        public async Task<bool> AppExistsAsync(Actor actor)
         {
-            var app = await GetAppFromIdentifierAsync(identifier).ConfigureAwait(false);
+            ArgumentNullException.ThrowIfNull(actor);
+
+            var app = await GetAppFromIdentifierAsync(actor.Id).ConfigureAwait(false);
             return app is not null;
         }
 
-        public async Task<string> CreateAppAsync(BusinessRegisterIdentifier identifier, string name)
+        public async Task<string> CreateAppAsync(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(identifier);
+            ArgumentNullException.ThrowIfNull(actor);
 
             try
             {
                 var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false); //Guid.Parse("2b914bca-26d7-4d9b-a22e-8305f3259097")
                 if (frontendApp is null)
                 {
-                    throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}, Frontend App not found");
+                    throw new MarketParticipantException($"Error creating app registration for {actor.Id}, Frontend App not found");
                 }
 
                 var frontendServicePrincipal = await GetServicePrincipalToAppAsync(frontendApp.AppId).ConfigureAwait(false);
-
                 if (frontendServicePrincipal is null)
                 {
-                    throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}, Frontend App Service Principal not found");
+                    throw new MarketParticipantException($"Error creating app registration for {actor.Id}, Frontend App Service Principal not found");
                 }
 
-                var app = await CreateAppRegistrationAsync(identifier, name).ConfigureAwait(false);
+                var app = await CreateAppRegistrationAsync(actor.Id).ConfigureAwait(false);
                 if (app is null)
                 {
-                    throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}");
+                    throw new MarketParticipantException($"Error creating app registration for {actor.Id}");
                 }
 
                 var scopeId = await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
                 if (scopeId is null)
                 {
-                    throw new MarketParticipantException($"Error creating app registration for {app.Id}, could not add Scope");
+                    throw new MarketParticipantException($"Error creating app registration for {actor.Id}, could not add Scope");
                 }
 
                 var actorServicePrincipal = await AddServicePrincipalToAppAsync(app, frontendServicePrincipal).ConfigureAwait(false);
@@ -206,7 +213,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             }
             catch (Exception e) when (e is not MarketParticipantException)
             {
-                throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}", e);
+                throw new MarketParticipantException($"Error creating app registration for {actor.Id}", e);
             }
         }
 
@@ -290,12 +297,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                .FirstOrDefault();
         }
 
-        private async Task<Application?> GetAppFromIdentifierAsync(string identifier)
+        private async Task<Application?> GetAppFromIdentifierAsync(Guid identifier)
         {
             return (await _graphClient
                     .Applications
                     .Request()
-                    .Filter($"appId eq '{identifier}'")
+                    .Filter($"displayName eq '{ActorApplicationRegistrationDisplayNamePrefix}{identifier}'")
                     .GetAsync()
                     .ConfigureAwait(false))
                 .FirstOrDefault();
@@ -367,13 +374,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             }
         }
 
-        private async Task<Application?> CreateAppRegistrationAsync(BusinessRegisterIdentifier identifier, string name)
+        private async Task<Application?> CreateAppRegistrationAsync(Guid identifier)
         {
             var app = await _graphClient.Applications
                 .Request()
                 .AddAsync(new Application
                 {
-                    DisplayName = $"Actor_{identifier.Identifier}_{name}",
+                    DisplayName = $"{ActorApplicationRegistrationDisplayNamePrefix}{identifier}",
                     Api = new ApiApplication
                     {
                         RequestedAccessTokenVersion = 2,
