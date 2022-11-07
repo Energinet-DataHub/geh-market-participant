@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Graph;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class SynchronizeActorsCommandRuleSet : AbstractValidator<SynchronizeActorsCommand>
 {
-    public sealed record CreateAppRegistrationResponse(Microsoft.Graph.Application Application, ServicePrincipal ServicePrincipal);
 }
