@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Graph;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class ActorSynchronizationEntity
 {
-    public sealed record CreateAppRegistrationResponse(Microsoft.Graph.Application Application, ServicePrincipal ServicePrincipal);
+    public int Id { get; set; }
+    public Guid OrganizationId { get; set; }
+    public Guid ActorId { get; set; }
 }

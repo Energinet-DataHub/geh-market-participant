@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Graph;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
-{
-    public sealed record CreateAppRegistrationResponse(Microsoft.Graph.Application Application, ServicePrincipal ServicePrincipal);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
+
+public sealed record SynchronizeActorsCommand : IRequest<Unit>;
