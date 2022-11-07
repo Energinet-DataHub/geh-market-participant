@@ -13,34 +13,41 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 
 /// <summary>
-/// Access to Active Directory
+/// This service provides access to Active directory for managing Actor Application registrations
 /// </summary>
 public interface IActiveDirectoryService
 {
     /// <summary>
-    /// Lists all actor app registrations in AD
+    /// Lists all Actor application registrations in AD
     /// </summary>
-    /// <returns>List of all actor app registration ids</returns>
-    Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync();
+    /// <returns>List of all actor application registrations with id and display name</returns>
+    Task<IEnumerable<(string AppId, string DisplayName)>> ListAppsAsync();
 
     /// <summary>
-    /// Creates an Actor in Azure AD
+    /// Creates an Actor application registration in Azure AD
     /// </summary>
-    /// <param name="identifier">The identifier of the actor</param>
-    /// <param name="name">Name of the actor</param>
-    /// <returns>The app id of the actor created</returns>
-    Task<string> CreateActorAsync(BusinessRegisterIdentifier identifier, string name);
+    /// <param name="identifier">The identifier of the Actor</param>
+    /// <param name="name">Name of the Actor</param>
+    /// <returns>The app id of the created Application registration to this Actor</returns>
+    Task<string> CreateAppAsync(BusinessRegisterIdentifier identifier, string name);
 
     /// <summary>
     /// Deletes an actor from AD
     /// </summary>
-    /// <param name="identifier"></param>
+    /// <param name="identifier">The Application ID to delete</param>
     /// <returns>Nothing</returns>
-    Task DeleteActorAsync(string identifier);
+    Task DeleteAppAsync(string identifier);
+
+    /// <summary>
+    /// Check if application registration exists in AD
+    /// </summary>
+    /// <returns>true if found, false if not</returns>
+    Task<bool> AppExistsAsync(string identifier);
 }

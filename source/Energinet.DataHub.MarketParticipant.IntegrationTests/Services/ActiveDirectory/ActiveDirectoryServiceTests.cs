@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             // Arrange
             // Act
             var response = await _sut
-                .ListActorsAsync()
+                .ListAppsAsync()
                 .ConfigureAwait(false);
 
             // Assert
@@ -58,14 +58,51 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         [Fact]
         public async Task CreateActor_Success()
         {
+            var actorId = string.Empty;
+            try
+            {
+                // Arrange
+                // Act
+              actorId = await _sut
+                    .CreateAppAsync(
+                        new BusinessRegisterIdentifier(
+                            Guid.NewGuid().ToString()),
+                        "JJ Test Actor")
+                    .ConfigureAwait(false);
+
+                // Assert
+              Assert.False(string.IsNullOrEmpty(actorId));
+            }
+            finally
+            {
+                // Cleanup
+                if (!string.IsNullOrEmpty(actorId))
+                {
+                    await _sut
+                        .DeleteAppAsync(actorId)
+                        .ConfigureAwait(false);
+                }
+            }
+        }
+
+        [Fact]
+        public async Task DeleteActor_Success()
+        {
             // Arrange
-            // Act
-            var response = await _sut
-                .CreateActorAsync(new BusinessRegisterIdentifier(Guid.NewGuid().ToString()), "JJ Test Actor")
+            // Create actor to delete
+            var actorIdToDelete = await _sut
+                .CreateAppAsync(new BusinessRegisterIdentifier(Guid.NewGuid().ToString()), "JJ Test Actor")
                 .ConfigureAwait(false);
 
+            // Act
+            await _sut
+                .DeleteAppAsync(actorIdToDelete)
+                .ConfigureAwait(false);
+
+            var exists = await _sut.AppExistsAsync(actorIdToDelete);
+
             // Assert
-            Assert.False(string.IsNullOrEmpty(response));
+            Assert.False(exists);
         }
 
         private static IActiveDirectoryService CreateActiveDirectoryService()

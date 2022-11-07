@@ -48,22 +48,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             _logger = logger;
         }
 
-        public async Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync()
+        public async Task<IEnumerable<(string AppId, string DisplayName)>> ListAppsAsync()
         {
             var appsCollection = await _graphClient.Applications.Request().GetAsync().ConfigureAwait(false);
-            var result = new List<(string AppId, string DisplayName)>();
+            var applicationList = new List<(string AppId, string DisplayName)>();
             var pageIterator = PageIterator<Application>.CreatePageIterator(
                 _graphClient,
                 appsCollection,
                 application =>
                 {
-                    result.Add((application.Id, application.DisplayName));
+                    applicationList.Add((application.Id, application.DisplayName));
                     return true;
                 });
             await pageIterator.IterateAsync().ConfigureAwait(false);
-
-            var test = await _graphClient.ServicePrincipals.Request().GetAsync().ConfigureAwait(false);
-            return result;
+            return applicationList;
         }
 
         public async Task<IEnumerable<AppPermission>> GetPermissionsToAppRegistrationAsync(Guid appRegistrationId)
@@ -91,36 +89,89 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .Request()
                 .GetAsync()
                 .ConfigureAwait(false);
+
             var updated = new Application
             {
                 AppRoles = appRoles.Select(x =>
                     new AppRole() { Id = Guid.NewGuid(), Value = x, DisplayName = x, Description = x })
             };
-            // TODO: Update to use ID
+
             await _graphClient.Applications[appRegistrationId.ToString()]
                 .Request()
                 .UpdateAsync(updated)
                 .ConfigureAwait(false);
         }
 
-        public async Task DeleteActorAsync(string identifier)
+        public async Task DeleteAppAsync(string identifier)
         {
-            await _graphClient.Applications[identifier]
+            ArgumentNullException.ThrowIfNull(identifier);
+            var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false);
+            var actorApp = await GetAppFromIdentifierAsync(identifier).ConfigureAwait(false);
+            if (frontendApp is null)
+            {
+                throw new MarketParticipantException($"Error deleting app registration for {identifier}, Frontend App not found");
+            }
+
+            if (actorApp is null)
+            {
+                throw new MarketParticipantException($"Error deleting app registration for {identifier}, App not found");
+            }
+
+            // Remove required access from frontend
+            var accessList = new List<RequiredResourceAccess>();
+            accessList.AddRange(frontendApp.RequiredResourceAccess
+                .Where(x => x.ResourceAppId != identifier));
+
+            var updatedFrontend = new Application
+            {
+                RequiredResourceAccess = accessList
+            };
+            await _graphClient
+                .Applications[frontendApp.Id]
+                .Request()
+                .UpdateAsync(updatedFrontend)
+                .ConfigureAwait(false);
+
+            // Remove service Principal for actor application registration
+            var appServicePrincipal = await GetServicePrincipalToAppAsync(identifier).ConfigureAwait(false);
+            if (appServicePrincipal is not null)
+            {
+                await _graphClient.ServicePrincipals[appServicePrincipal.Id]
+                    .Request()
+                    .DeleteAsync()
+                    .ConfigureAwait(false);
+            }
+
+            // Remove actor application
+            await _graphClient.Applications[actorApp.Id]
                 .Request()
                 .DeleteAsync()
                 .ConfigureAwait(false);
         }
 
-        public async Task<string> CreateActorAsync(BusinessRegisterIdentifier identifier, string name)
+        public async Task<bool> AppExistsAsync(string identifier)
+        {
+            var app = await GetAppFromIdentifierAsync(identifier).ConfigureAwait(false);
+            return app is not null;
+        }
+
+        public async Task<string> CreateAppAsync(BusinessRegisterIdentifier identifier, string name)
         {
             ArgumentNullException.ThrowIfNull(identifier);
 
             try
             {
-                var frontendApp = await GetFrontendAppAsync(Guid.Parse("2b914bca-26d7-4d9b-a22e-8305f3259097")).ConfigureAwait(false);
+                var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false); //Guid.Parse("2b914bca-26d7-4d9b-a22e-8305f3259097")
                 if (frontendApp is null)
                 {
                     throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}, Frontend App not found");
+                }
+
+                var frontendServicePrincipal = await GetServicePrincipalToAppAsync(frontendApp.AppId).ConfigureAwait(false);
+
+                if (frontendServicePrincipal is null)
+                {
+                    throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}, Frontend App Service Principal not found");
                 }
 
                 var app = await CreateAppRegistrationAsync(identifier, name).ConfigureAwait(false);
@@ -129,15 +180,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     throw new MarketParticipantException($"Error creating app registration for {identifier.Identifier}");
                 }
 
-                var test = await AddServicePrincipalToActorAsync(app).ConfigureAwait(false);
+                var scopeId = await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
+                if (scopeId is null)
+                {
+                    throw new MarketParticipantException($"Error creating app registration for {app.Id}, could not add Scope");
+                }
+
+                var actorServicePrincipal = await AddServicePrincipalToAppAsync(app, frontendServicePrincipal).ConfigureAwait(false);
                 await AddGraphApiRequiredAccessAsync(app).ConfigureAwait(false);
-                await AddRequiredAccessToFrontendAsync(app, frontendApp).ConfigureAwait(false);
+                await AddRequiredAccessToFrontendAsync(app, frontendApp, scopeId).ConfigureAwait(false);
 
                 var permissionGrant = new OAuth2PermissionGrant
                     {
-                        ClientId = "73aa3bad-dec5-4bad-9d2d-e9a218997b89",
-                        ConsentType = "AllPrincipals", //permissionGrant.PrincipalId = "principalId-value";
-                        ResourceId = test,
+                        ClientId = frontendServicePrincipal.Id,
+                        ConsentType = "AllPrincipals",
+                        ResourceId = actorServicePrincipal,
                         Scope = $"actor.default"
                     };
 
@@ -153,13 +210,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             }
         }
 
-        private async Task<string> AddServicePrincipalToActorAsync(Application app)
+        private async Task<string> AddServicePrincipalToAppAsync(Application app, ServicePrincipal frontendServicePrincipal)
         {
             var servicePrincipal = await AddServicePrincipalToAppAsync(app.AppId).ConfigureAwait(false);
             var appRole = new AppRoleAssignment
             {
                 PrincipalId = Guid.Parse(servicePrincipal.Id),
-                ResourceId = Guid.Parse("73aa3bad-dec5-4bad-9d2d-e9a218997b89"),
+                ResourceId = Guid.Parse(frontendServicePrincipal.Id),
                 AppRoleId = Guid.Empty
             };
 
@@ -171,14 +228,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             return servicePrincipal.Id;
         }
 
-        private async Task AddRequiredAccessToFrontendAsync(Application app, Application frontendApp)
+        private async Task AddRequiredAccessToFrontendAsync(Application app, Application frontendApp, Guid? scopeId)
         {
-            var scopeId = await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
-            if (scopeId is null)
-            {
-                throw new MarketParticipantException($"Error creating app registration for {app.Id}, could not add Scope");
-            }
-
             var requiredAccess = new RequiredResourceAccess()
             {
                 ResourceAppId = app.AppId,
@@ -188,11 +239,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 },
             };
 
-            var updatedFrontend = new Application();
             var accessList = new List<RequiredResourceAccess>();
             accessList.AddRange(frontendApp.RequiredResourceAccess);
             accessList.Add(requiredAccess);
-            updatedFrontend.RequiredResourceAccess = accessList;
+            var updatedFrontend = new Application
+            {
+                RequiredResourceAccess = accessList
+            };
+
             await _graphClient
                 .Applications[frontendApp.Id]
                 .Request()
@@ -204,16 +258,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         {
             var requiredAccessGraph = new RequiredResourceAccess()
             {
-                ResourceAppId = "00000003-0000-0000-c000-000000000000",
+                ResourceAppId = "00000003-0000-0000-c000-000000000000", // This is the id of the GraphAPI Resource, don't know if this can be obtained programmatically
                 ResourceAccess = new List<ResourceAccess>()
                 {
-                    new() { Id = Guid.Parse("e1fe6dd8-ba31-4d61-89e7-88639da4683d"), Type = "Scope" }
+                    new() { Id = Guid.Parse("e1fe6dd8-ba31-4d61-89e7-88639da4683d"), Type = "Scope" } // Id of the User.Read GraphAPI Delegated permission
                 },
             };
 
             var updatedApp = new Application();
-            var accessListGraph = new List<RequiredResourceAccess>();
-            accessListGraph.Add(requiredAccessGraph);
+            var accessListGraph = new List<RequiredResourceAccess>
+            {
+                requiredAccessGraph
+            };
+
             updatedApp.RequiredResourceAccess = accessListGraph;
             await _graphClient
                 .Applications[app.Id]
@@ -222,15 +279,37 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .ConfigureAwait(false);
         }
 
-        private async Task<Application?> GetFrontendAppAsync(Guid frontendAppId)
+        private async Task<Application?> GetFrontendAppAsync()
         {
            return (await _graphClient
                 .Applications
                 .Request()
-                .Filter($"appId eq '{frontendAppId}'")
+                .Filter($"displayName eq 'FrontEnd'")
                 .GetAsync()
                 .ConfigureAwait(false))
                .FirstOrDefault();
+        }
+
+        private async Task<Application?> GetAppFromIdentifierAsync(string identifier)
+        {
+            return (await _graphClient
+                    .Applications
+                    .Request()
+                    .Filter($"appId eq '{identifier}'")
+                    .GetAsync()
+                    .ConfigureAwait(false))
+                .FirstOrDefault();
+        }
+
+        private async Task<ServicePrincipal?> GetServicePrincipalToAppAsync(string appId)
+        {
+            return (await _graphClient
+                    .ServicePrincipals
+                    .Request()
+                    .Filter($"appId eq '{appId}'")
+                    .GetAsync()
+                    .ConfigureAwait(false))
+                .FirstOrDefault();
         }
 
         private async Task<ServicePrincipal> AddServicePrincipalToAppAsync(string appId)
@@ -279,6 +358,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     .Request()
                     .UpdateAsync(updated)
                     .ConfigureAwait(false);
+
                 return newScope.Id;
             }
             catch (Exception e)
@@ -303,57 +383,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 }).ConfigureAwait(false);
             return app;
         }
-
-        //     public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId)
-        //     {
-        //         ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-        //         var passwordCredential = new PasswordCredential
-        //         {
-        //             DisplayName = "App secret",
-        //             StartDateTime = DateTimeOffset.Now,
-        //             EndDateTime = DateTimeOffset.Now.AddMonths(6),
-        //             KeyId = Guid.NewGuid(),
-        //             CustomKeyIdentifier = null,
-        //         };
-        //
-        //         var secret = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
-        //             .AddPassword(passwordCredential)
-        //             .Request()
-        //             .PostAsync().ConfigureAwait(false);
-        //
-        //         return new AppRegistrationSecret(secret.SecretText);
-        //     }
-        //
-        //     public async Task DeleteAppRegistrationAsync(ExternalActorId externalActorId)
-        //     {
-        //         ArgumentNullException.ThrowIfNull(externalActorId);
-        //
-        //         try
-        //         {
-        //             var appId = externalActorId.Value.ToString();
-        //             var applicationUsingAppId = await _graphClient
-        //                 .Applications
-        //                 .Request()
-        //                 .Filter($"appId eq '{appId}'")
-        //                 .GetAsync()
-        //                 .ConfigureAwait(false);
-        //
-        //             var foundApp = applicationUsingAppId.SingleOrDefault();
-        //             if (foundApp == null)
-        //             {
-        //                 throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
-        //             }
-        //
-        //             await _graphClient.Applications[foundApp.Id]
-        //                 .Request()
-        //                 .DeleteAsync()
-        //                 .ConfigureAwait(false);
-        //         }
-        //         catch (Exception e)
-        //         {
-        //             _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
-        //             throw;
-        //         }
-        //     }
    }
 }
