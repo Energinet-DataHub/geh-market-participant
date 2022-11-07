@@ -12,14 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Text.RegularExpressions;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
-{
-    public static class NamingConvention
-    {
-        // Matches                                                  {type} {timestamp } {name}
-        // Energinet.DataHub.ActorRegistry.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
-        public static readonly Regex Regex = new Regex(@".*Scripts\.(?<environment>T_001|U_001|U_002|B_001|B_002|P_001|LocalDB)(\.(?<type>Model|Seed|Test))?\.(?<timestamp>\d{12}) (?<name>\D*).sql");
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
+
+public sealed record SynchronizeActorsCommand : IRequest<Unit>;

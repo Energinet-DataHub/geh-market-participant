@@ -16,5 +16,5 @@ using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
-    public sealed record CreateAppRegistrationResponse(Application Application, ServicePrincipal ServicePrincipal);
+    public sealed record CreateAppRegistrationResponse(Microsoft.Graph.Application Application, ServicePrincipal ServicePrincipal);
 }
