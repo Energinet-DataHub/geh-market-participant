@@ -55,7 +55,7 @@ jobs:
     with:
       TESTS_DLL_FILE_PATH: '\source\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
-      CODE_COVERAGE_FLAGS: business
+      CODE_COVERAGE_FLAGS: business_ut
 
   # Run tests in 'IntegrationTests.dll'
   integration_test:
@@ -66,7 +66,7 @@ jobs:
       TESTS_DLL_FILE_PATH: '\source\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
       USE_AZURE_FUNCTIONS_TOOLS: true
-      CODE_COVERAGE_FLAGS: business
+      CODE_COVERAGE_FLAGS: business_integration
       ENVIRONMENT: AzureAuth
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
