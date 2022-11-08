@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new CreateActorDto(new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), marketRole);
 
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new CreateActorDto(new ActorNameDto("fake_name"), new ActorNumberDto(value), marketRole);
 
@@ -170,7 +170,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var organizationRoleDto = new CreateActorDto(
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
-                new[] { new ActorMarketRoleDto(value, validGridAreas) });
+                new[] { new ActorMarketRoleDto(value, validGridAreas, string.Empty) });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
@@ -198,7 +198,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), null!) };
-            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var organizationRoleDto = new CreateActorDto(
                 new ActorNameDto("fake_name"),
@@ -223,7 +223,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), Array.Empty<string>()) };
-            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var organizationRoleDto = new CreateActorDto(
                 new ActorNameDto("fake_name"),
@@ -248,7 +248,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), new string[] { null! }) };
-            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var organizationRoleDto = new CreateActorDto(
                 new ActorNameDto("fake_name"),
@@ -281,7 +281,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), new[] { value }) };
-            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var marketRole = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var createActorDto = new CreateActorDto(
                 new ActorNameDto("fake_name"),

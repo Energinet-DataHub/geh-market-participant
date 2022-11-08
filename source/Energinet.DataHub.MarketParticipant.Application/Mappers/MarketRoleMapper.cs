@@ -35,7 +35,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
 
                 yield return new ActorMarketRole(
                     Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true),
-                    aggregatedGrids);
+                    aggregatedGrids,
+                    marketRoleDto.Comment);
             }
         }
     }

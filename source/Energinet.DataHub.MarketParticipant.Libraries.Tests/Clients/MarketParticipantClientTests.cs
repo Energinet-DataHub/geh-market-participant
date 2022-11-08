@@ -736,7 +736,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
                     new ChangeActorDto(
                         ActorStatus.Active,
                         new ActorNameDto("ActorName"),
-                        new[] { new ActorMarketRoleDto(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridAreaDto>()) }))
+                        new[] { new ActorMarketRoleDto(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridAreaDto>(), string.Empty) }))
                 .ConfigureAwait(false);
 
             var actual = await target

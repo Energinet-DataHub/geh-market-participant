@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(value, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -206,7 +206,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new(value, validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new(value, validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(
                 ValidStatus,
@@ -239,7 +239,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), null!) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -261,7 +261,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), Array.Empty<string>()) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -283,7 +283,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), new string[] { null! }) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -305,7 +305,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), null!) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
@@ -335,7 +335,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
 
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), new[] { value }) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas) };
+            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
 
             var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
