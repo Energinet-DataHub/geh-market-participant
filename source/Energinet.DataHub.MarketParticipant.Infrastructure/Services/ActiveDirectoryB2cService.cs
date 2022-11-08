@@ -83,26 +83,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId)
-        {
-            ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-            var passwordCredential = new PasswordCredential
-            {
-                DisplayName = "App secret",
-                StartDateTime = DateTimeOffset.Now,
-                EndDateTime = DateTimeOffset.Now.AddMonths(6),
-                KeyId = Guid.NewGuid(),
-                CustomKeyIdentifier = null,
-            };
-
-            var secret = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
-                .AddPassword(passwordCredential)
-                .Request()
-                .PostAsync().ConfigureAwait(false);
-
-            return new AppRegistrationSecret(secret.SecretText);
-        }
-
         public async Task DeleteAppRegistrationAsync(ExternalActorId externalActorId)
         {
             ArgumentNullException.ThrowIfNull(externalActorId);

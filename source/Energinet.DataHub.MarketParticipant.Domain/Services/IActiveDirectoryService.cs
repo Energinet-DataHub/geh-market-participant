@@ -35,13 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             IReadOnlyCollection<EicFunction> permissions);
 
         /// <summary>
-        /// Creates a new secret for the already registered app.
-        /// </summary>
-        /// <param name="appRegistrationObjectId">The object id for the registered app.</param>
-        /// <returns>A <see cref="AppRegistrationSecret"/> representing the secret.</returns>
-        Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId);
-
-        /// <summary>
         /// Gets an existing app from active directory.
         /// </summary>
         /// <param name="appRegistrationObjectId">The object id for the registered app.</param>
