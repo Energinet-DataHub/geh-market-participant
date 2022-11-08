@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -36,20 +35,4 @@ public interface IChangesToActorHelper
         OrganizationId organizationId,
         Actor existingActor,
         UpdateActorCommand incomingActor);
-
-    /// <summary>
-    /// Returns integration event for changed ExternalActorId, if any
-    /// </summary>
-    /// <param name="newActorState">Actor with updated state</param>
-    /// <param name="organizationId">Organization Id</param>
-    /// <param name="previousExternalId">Previous External Actor Id</param>
-    /// <param name="integrationEvents">List with integration events to add to</param>
-    /// <returns>Integration event for changed external actor id</returns>
-    void SetIntegrationEventForExternalActorId(
-        Actor newActorState,
-        OrganizationId organizationId,
-        Guid? previousExternalId,
-#pragma warning disable CA1002
-        List<IIntegrationEvent> integrationEvents);
-#pragma warning restore CA1002
 }

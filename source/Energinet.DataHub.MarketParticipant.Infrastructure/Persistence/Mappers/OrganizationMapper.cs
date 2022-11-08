@@ -123,7 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             {
                 var marketRoles = actor.MarketRoles.Select(marketRole =>
                 {
-                    var function = (EicFunction)marketRole.Function;
+                    var function = marketRole.Function;
                     var gridAres = marketRole
                         .GridAreas
                         .Select(grid => new ActorGridArea(grid.GridAreaId, grid.MeteringPointTypes
