@@ -29,5 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public Guid ActorInfoId { get; set; }
         public EicFunction Function { get; set; }
         public Collection<MarketRoleGridAreaEntity> GridAreas { get; }
+        public string? Comment { get; set; }
     }
 }

@@ -20,6 +20,29 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorMarketRole
     {
+        public ActorMarketRole(Guid id, EicFunction eic, IEnumerable<ActorGridArea> gridAreas, string? comment)
+        {
+            Id = id;
+            GridAreas = gridAreas.ToList();
+            Function = eic;
+            Comment = comment;
+        }
+
+        public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas, string? comment)
+        {
+            GridAreas = gridAreas.ToList();
+            Function = eic;
+            Comment = comment;
+        }
+
+        public ActorMarketRole(Guid id, EicFunction eic, string? comment)
+        {
+            Id = id;
+            Function = eic;
+            GridAreas = new List<ActorGridArea>();
+            Comment = comment;
+        }
+
         public ActorMarketRole(Guid id, EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
         {
             Id = id;
@@ -43,5 +66,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public Guid Id { get; }
         public ICollection<ActorGridArea> GridAreas { get; }
         public EicFunction Function { get; }
+        public string? Comment { get; }
     }
 }
