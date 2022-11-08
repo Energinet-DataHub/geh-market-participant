@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
     public sealed class UniqueActorMarketRoleGridAreaEntityConfiguration : IEntityTypeConfiguration<UniqueActorMarketRoleGridAreaEntity>
     {
