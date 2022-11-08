@@ -33,9 +33,9 @@ public interface IActiveDirectoryService
     /// <summary>
     /// Creates an Actor application registration in Azure AD
     /// </summary>
-    /// <param name="actor">The actor to create the App Registration for</param>
-    /// <returns>The app id of the created Application registration to this Actor</returns>
-    Task<string> CreateAppAsync(Actor actor);
+    /// <param name="actor">The actor to create or update the App Registration for</param>
+    /// <returns>The app id of the created or updated Application registration to this Actor</returns>
+    Task<string> CreateOrUpdateAppAsync(Actor actor);
 
     /// <summary>
     /// Deletes an actor from AD

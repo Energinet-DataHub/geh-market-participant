@@ -58,50 +58,79 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         [Fact]
         public async Task CreateActor_Success()
         {
-            var actorId = string.Empty;
+            // Arrange
+            var actorGln = new MockedGln();
+            var actor = new Actor(ActorNumber.Create(actorGln));
             try
             {
-                // Arrange
-                // Act
-              // actorId = await _sut
-              //       .CreateAppAsync(new BusinessRegisterIdentifier(
-              //               Guid.NewGuid().ToString()),
-              //           "JJ Test Actor")
-              //       .ConfigureAwait(false);
+              // Act
+              var result = await _sut
+                    .CreateOrUpdateAppAsync(actor)
+                    .ConfigureAwait(false);
 
                 // Assert
-              Assert.False(string.IsNullOrEmpty(actorId));
+              Assert.False(string.IsNullOrEmpty(result));
             }
             finally
             {
                 // Cleanup
-                // if (!string.IsNullOrEmpty(actorId))
-                // {
-                //     await _sut
-                //         .DeleteActorAsync(actorId)
-                //         .ConfigureAwait(false);
-                // }
+                await _sut
+                    .DeleteActorAsync(actor)
+                    .ConfigureAwait(false);
+            }
+        }
+
+        [Fact]
+        public async Task CreateActor_IsIdemPotent_Success()
+        {
+            // Arrange
+            var actorGln = new MockedGln();
+            var actor = new Actor(ActorNumber.Create(actorGln));
+            try
+            {
+                // Act
+                var result = await _sut
+                    .CreateOrUpdateAppAsync(actor)
+                    .ConfigureAwait(false);
+
+                var result2 = await _sut
+                    .CreateOrUpdateAppAsync(actor)
+                    .ConfigureAwait(false);
+
+                // Assert
+                Assert.False(string.IsNullOrEmpty(result));
+                Assert.False(string.IsNullOrEmpty(result2));
+                Assert.True(result == result2);
+            }
+            finally
+            {
+                // Cleanup
+                await _sut
+                    .DeleteActorAsync(actor)
+                    .ConfigureAwait(false);
             }
         }
 
         [Fact]
         public async Task DeleteActor_Success()
         {
-            // // Arrange
-            // // Create actor to delete
-            // var actorIdToDelete = await _sut
-            //     .CreateAppAsync(new BusinessRegisterIdentifier(Guid.NewGuid().ToString()), "JJ Test Actor")
-            //     .ConfigureAwait(false);
-            //
-            // // Act
-            // await _sut
-            //     .DeleteActorAsync(actorIdToDelete)
-            //     .ConfigureAwait(false);
-            //
-            // var exists = await _sut.AppExistsAsync(actorIdToDelete);
-            //
-            // // Assert
-            // Assert.False(exists);
+            // Arrange
+            var actor = new Actor(ActorNumber.Create(new MockedGln()));
+
+            // Create actor to delete
+            var actorToDelete = await _sut
+                .CreateOrUpdateAppAsync(actor)
+                .ConfigureAwait(false);
+
+            // Act
+            await _sut
+                .DeleteActorAsync(actor)
+                .ConfigureAwait(false);
+
+            var exists = await _sut.AppExistsAsync(actor);
+
+            // Assert
+            Assert.False(exists);
         }
 
         private static IActiveDirectoryService CreateActiveDirectoryService()

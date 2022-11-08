@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
     public sealed class ActiveDirectoryService : IActiveDirectoryService
     {
         private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor_";
+        private const string ActorDefaultScopeValue = "actor.default";
 
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
@@ -112,7 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         {
             ArgumentNullException.ThrowIfNull(actor);
             var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false);
-            var actorApp = await GetAppFromIdentifierAsync(actor.Id).ConfigureAwait(false);
+            var actorApp = await GetAppAsync(actor).ConfigureAwait(false);
             if (frontendApp is null)
             {
                 throw new MarketParticipantException($"Error deleting app registration for {actor}, Frontend App not found");
@@ -159,17 +160,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         {
             ArgumentNullException.ThrowIfNull(actor);
 
-            var app = await GetAppFromIdentifierAsync(actor.Id).ConfigureAwait(false);
+            var app = await GetAppAsync(actor).ConfigureAwait(false);
             return app is not null;
         }
 
-        public async Task<string> CreateAppAsync(Actor actor)
+        public async Task<string> CreateOrUpdateAppAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor);
 
             try
             {
-                var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false); //Guid.Parse("2b914bca-26d7-4d9b-a22e-8305f3259097")
+                var frontendApp = await GetFrontendAppAsync().ConfigureAwait(false);
                 if (frontendApp is null)
                 {
                     throw new MarketParticipantException($"Error creating app registration for {actor.Id}, Frontend App not found");
@@ -181,34 +182,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     throw new MarketParticipantException($"Error creating app registration for {actor.Id}, Frontend App Service Principal not found");
                 }
 
-                var app = await CreateAppRegistrationAsync(actor.Id).ConfigureAwait(false);
-                if (app is null)
-                {
-                    throw new MarketParticipantException($"Error creating app registration for {actor.Id}");
-                }
+                var app = await EnsureAppAsync(actor).ConfigureAwait(false);
+                var scopeId = await EnsureScopeIdAsync(app, actor).ConfigureAwait(false);
+                var actorServicePrincipal = await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
+                // await EnsureAppRoleForFrontendAsync(
+                //     app,
+                //     frontendServicePrincipal,
+                //     actorServicePrincipal)
+                // .ConfigureAwait(false);
 
-                var scopeId = await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
-                if (scopeId is null)
-                {
-                    throw new MarketParticipantException($"Error creating app registration for {actor.Id}, could not add Scope");
-                }
-
-                var actorServicePrincipal = await AddServicePrincipalToAppAsync(app, frontendServicePrincipal).ConfigureAwait(false);
-                await AddGraphApiRequiredAccessAsync(app).ConfigureAwait(false);
-                await AddRequiredAccessToFrontendAsync(app, frontendApp, scopeId).ConfigureAwait(false);
-
-                var permissionGrant = new OAuth2PermissionGrant
-                    {
-                        ClientId = frontendServicePrincipal.Id,
-                        ConsentType = "AllPrincipals",
-                        ResourceId = actorServicePrincipal,
-                        Scope = $"actor.default"
-                    };
-
-                await _graphClient.Oauth2PermissionGrants
-                    .Request()
-                    .AddAsync(permissionGrant)
-                    .ConfigureAwait(false);
+                // await AddGraphApiRequiredAccessAsync(app).ConfigureAwait(false);
+                await EnsureRequiredAccessToFrontendAsync(app, frontendApp, scopeId).ConfigureAwait(false);
+                await EnsurePermissionGrantAsync(frontendServicePrincipal, actorServicePrincipal).ConfigureAwait(false);
                 return app.AppId;
             }
             catch (Exception e) when (e is not MarketParticipantException)
@@ -217,26 +202,90 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             }
         }
 
-        private async Task<string> AddServicePrincipalToAppAsync(Application app, ServicePrincipal frontendServicePrincipal)
+        private async Task EnsurePermissionGrantAsync(
+            ServicePrincipal frontendServicePrincipal,
+            ServicePrincipal actorServicePrincipal)
         {
-            var servicePrincipal = await AddServicePrincipalToAppAsync(app.AppId).ConfigureAwait(false);
-            var appRole = new AppRoleAssignment
+            var permissionGrantExists = (await _graphClient
+                    .Oauth2PermissionGrants
+                    .Request()
+                    .Filter($"clientId eq '{frontendServicePrincipal.Id}' and resourceId eq '{actorServicePrincipal.Id}'")
+                    .GetAsync()
+                    .ConfigureAwait(false))
+                .Any(x => x.Scope == ActorDefaultScopeValue);
+
+            if (permissionGrantExists)
+                return;
+
+            var permissionGrant = new OAuth2PermissionGrant
             {
-                PrincipalId = Guid.Parse(servicePrincipal.Id),
-                ResourceId = Guid.Parse(frontendServicePrincipal.Id),
-                AppRoleId = Guid.Empty
+                ClientId = frontendServicePrincipal.Id,
+                ConsentType = "AllPrincipals",
+                ResourceId = actorServicePrincipal.Id,
+                Scope = ActorDefaultScopeValue
             };
 
-            await _graphClient.ServicePrincipals[servicePrincipal.Id]
-                .AppRoleAssignedTo
+            await _graphClient.Oauth2PermissionGrants
                 .Request()
-                .AddAsync(appRole).ConfigureAwait(false);
-
-            return servicePrincipal.Id;
+                .AddAsync(permissionGrant)
+                .ConfigureAwait(false);
         }
 
-        private async Task AddRequiredAccessToFrontendAsync(Application app, Application frontendApp, Guid? scopeId)
+        private async Task<Guid> EnsureScopeIdAsync(Application app, Actor actor)
         {
+            Guid? scopeId;
+            if (app.Api == null)
+            {
+                scopeId = await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
+            }
+            else
+            {
+                if (app.Api.Oauth2PermissionScopes.All(x => x.Value != ActorDefaultScopeValue))
+                {
+                    scopeId = await AddApiScopesToAppRegistrationAsync(app).ConfigureAwait(false);
+                }
+                else
+                {
+                    scopeId = app.Api.Oauth2PermissionScopes.First(x => x.Value == ActorDefaultScopeValue).Id;
+                }
+            }
+
+            return scopeId ?? throw new MarketParticipantException($"Error creating app registration for {actor.Id}, could not add or find default Scope");
+        }
+
+        private async Task EnsureAppRoleForFrontendAsync(
+            Application app,
+            ServicePrincipal frontendServicePrincipal,
+            ServicePrincipal appServicePrincipal)
+        {
+            var appRoles = (await _graphClient.ServicePrincipals[appServicePrincipal.Id]
+                    .AppRoleAssignedTo
+                    .Request()
+                    .GetAsync()
+                    .ConfigureAwait(false))
+                .ToList();
+
+            if (!appRoles.Any(x => x.ResourceId?.ToString() == frontendServicePrincipal.Id && x.PrincipalId?.ToString() == appServicePrincipal.Id))
+            {
+                var appRole = new AppRoleAssignment
+                {
+                    PrincipalId = Guid.Parse(appServicePrincipal.Id),
+                    ResourceId = Guid.Parse(frontendServicePrincipal.Id),
+                    AppRoleId = Guid.Empty
+                };
+
+                await _graphClient.ServicePrincipals[appServicePrincipal.Id]
+                    .AppRoleAssignedTo
+                    .Request()
+                    .AddAsync(appRole).ConfigureAwait(false);
+            }
+        }
+
+        private async Task EnsureRequiredAccessToFrontendAsync(Application app, Application frontendApp, Guid? scopeId)
+        {
+            if (frontendApp.RequiredResourceAccess.Any(x => x.ResourceAppId == app.AppId))
+                return;
+
             var requiredAccess = new RequiredResourceAccess()
             {
                 ResourceAppId = app.AppId,
@@ -297,12 +346,26 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                .FirstOrDefault();
         }
 
-        private async Task<Application?> GetAppFromIdentifierAsync(Guid identifier)
+        private async Task<Application> EnsureAppAsync(Actor actor)
         {
-            return (await _graphClient
+            var app = await GetAppAsync(actor).ConfigureAwait(false);
+            if (app is not null) return app;
+
+            app = await CreateAppRegistrationAsync(actor.Id).ConfigureAwait(false);
+            if (app is null)
+            {
+                throw new MarketParticipantException($"Error creating app registration for {actor.Id}");
+            }
+
+            return app;
+        }
+
+        private async Task<Application?> GetAppAsync(Actor actor)
+        {
+         return (await _graphClient
                     .Applications
                     .Request()
-                    .Filter($"displayName eq '{ActorApplicationRegistrationDisplayNamePrefix}{identifier}'")
+                    .Filter($"displayName eq '{ActorApplicationRegistrationDisplayNamePrefix}{actor.Id}'")
                     .GetAsync()
                     .ConfigureAwait(false))
                 .FirstOrDefault();
@@ -319,11 +382,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .FirstOrDefault();
         }
 
-        private async Task<ServicePrincipal> AddServicePrincipalToAppAsync(string appId)
+        private async Task<ServicePrincipal> EnsureServicePrincipalToAppAsync(Application app)
         {
-            var servicePrincipal = new ServicePrincipal
+            var servicePrincipal = (await _graphClient.ServicePrincipals
+                .Request()
+                .Filter($"appId eq '{app.AppId}'")
+                .GetAsync()
+                .ConfigureAwait(false))
+                .FirstOrDefault();
+
+            if (servicePrincipal is not null)
             {
-                AppId = appId
+                return servicePrincipal;
+            }
+
+            servicePrincipal = new ServicePrincipal
+            {
+                AppId = app.AppId
             };
 
             return await _graphClient.ServicePrincipals
@@ -346,7 +421,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     };
                 }
 
-                var appScopes = app.Api.Oauth2PermissionScopes?.ToList() ?? new List<PermissionScope>();
+                var appScopes = app.Api?.Oauth2PermissionScopes?.ToList() ?? new List<PermissionScope>();
                 var newScope = new PermissionScope
                 {
                     Id = Guid.NewGuid(),
@@ -354,7 +429,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     AdminConsentDisplayName = "default scope",
                     IsEnabled = true,
                     Type = "Admin",
-                    Value = "actor.default"
+                    Value = ActorDefaultScopeValue
                 };
                 appScopes.Add(newScope);
                 updated.Api = new ApiApplication
