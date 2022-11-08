@@ -53,30 +53,6 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
         return _changeEvents;
     }
 
-    public void SetIntegrationEventForExternalActorId(
-        Actor newActorState,
-        OrganizationId organizationId,
-        Guid? previousExternalId,
-        List<IIntegrationEvent> integrationEvents)
-    {
-        ArgumentNullException.ThrowIfNull(newActorState, nameof(newActorState));
-        ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
-        ArgumentNullException.ThrowIfNull(integrationEvents, nameof(integrationEvents));
-
-        var currentExternalActorId = newActorState.ExternalActorId?.Value;
-
-        if (previousExternalId != currentExternalActorId)
-        {
-            integrationEvents.Add(
-                new ActorExternalIdChangedIntegrationEvent
-                {
-                    ActorId = newActorState.Id,
-                    OrganizationId = organizationId.Value,
-                    ExternalActorId = newActorState.ExternalActorId?.Value
-                });
-        }
-    }
-
     private void AddChangeEventIfActorStatusChanged(OrganizationId organizationId, Actor existingActor, string incomingStatus)
     {
         var newStatus = Enum.Parse<ActorStatus>(incomingStatus);
