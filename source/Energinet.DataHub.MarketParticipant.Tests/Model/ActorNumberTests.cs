@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
+namespace Energinet.DataHub.MarketParticipant.Tests.Model
 {
     [UnitTest]
     public sealed class ActorNumberTests
