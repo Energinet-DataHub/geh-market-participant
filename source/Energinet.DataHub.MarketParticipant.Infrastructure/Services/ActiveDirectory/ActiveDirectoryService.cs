@@ -32,81 +32,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         private const string ActorDefaultScopeValue = "actor.default";
 
         private readonly GraphServiceClient _graphClient;
-        private readonly AzureAdConfig _azureAdConfig;
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
-        private readonly IActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
         private readonly ILogger<ActiveDirectoryService> _logger;
 
         public ActiveDirectoryService(
             GraphServiceClient graphClient,
-            AzureAdConfig config,
-            IBusinessRoleCodeDomainService businessRoleCodeDomainService,
-            IActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
             ILogger<ActiveDirectoryService> logger)
         {
             _graphClient = graphClient;
-            _azureAdConfig = config;
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
-            _activeDirectoryB2CRolesProvider = activeDirectoryB2CRolesProvider;
             _logger = logger;
-        }
-
-        public async Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync()
-        {
-            var appsCollection = await _graphClient.Applications.Request().GetAsync().ConfigureAwait(false);
-            var applicationList = new List<(string AppId, string DisplayName)>();
-            var pageIterator = PageIterator<Application>.CreatePageIterator(
-                _graphClient,
-                appsCollection,
-                application =>
-                {
-                    if (application.DisplayName.StartsWith(ActorApplicationRegistrationDisplayNamePrefix, StringComparison.OrdinalIgnoreCase))
-                    {
-                        applicationList.Add((application.Id, application.DisplayName));
-                    }
-
-                    return true;
-                });
-            await pageIterator.IterateAsync().ConfigureAwait(false);
-            return applicationList;
-        }
-
-        public async Task<IEnumerable<AppPermission>> GetPermissionsToAppRegistrationAsync(Guid appRegistrationId)
-        {
-            var app = await _graphClient.Applications[appRegistrationId.ToString()]
-                .Request()
-                .GetAsync()
-                .ConfigureAwait(false);
-            var result = new List<AppPermission>();
-            if (app is null) return Enumerable.Empty<AppPermission>();
-            foreach (var appRole in app.AppRoles)
-            {
-                if (Enum.TryParse<AppPermission>(appRole.Value, out var permission))
-                {
-                    result.Add(permission);
-                }
-            }
-
-            return result;
-        }
-
-        public async Task UpdatePermissionsToAppAsync(Guid appRegistrationId, IEnumerable<string> appRoles)
-        {
-            var app = await _graphClient.Applications[appRegistrationId.ToString()]
-                .Request()
-                .GetAsync()
-                .ConfigureAwait(false);
-
-            var updated = new Application
-            {
-                AppRoles = appRoles.Select(x =>
-                    new AppRole() { Id = Guid.NewGuid(), Value = x, DisplayName = x, Description = x })
-            };
-
-            await _graphClient.Applications[appRegistrationId.ToString()]
-                .Request()
-                .UpdateAsync(updated)
-                .ConfigureAwait(false);
         }
 
         public async Task DeleteActorAsync(Actor actor)
@@ -183,17 +116,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 }
 
                 var app = await EnsureAppAsync(actor).ConfigureAwait(false);
-                var scopeId = await EnsureScopeIdAsync(app, actor).ConfigureAwait(false);
-                var actorServicePrincipal = await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
-                // await EnsureAppRoleForFrontendAsync(
-                //     app,
-                //     frontendServicePrincipal,
-                //     actorServicePrincipal)
-                // .ConfigureAwait(false);
-
-                // await AddGraphApiRequiredAccessAsync(app).ConfigureAwait(false);
-                await EnsureRequiredAccessToFrontendAsync(app, frontendApp, scopeId).ConfigureAwait(false);
-                await EnsurePermissionGrantAsync(frontendServicePrincipal, actorServicePrincipal).ConfigureAwait(false);
+                await EnsureScopeIdAsync(app, actor).ConfigureAwait(false);
+                await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
                 return app.AppId;
             }
             catch (Exception e) when (e is not MarketParticipantException)
@@ -202,36 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             }
         }
 
-        private async Task EnsurePermissionGrantAsync(
-            ServicePrincipal frontendServicePrincipal,
-            ServicePrincipal actorServicePrincipal)
-        {
-            var permissionGrantExists = (await _graphClient
-                    .Oauth2PermissionGrants
-                    .Request()
-                    .Filter($"clientId eq '{frontendServicePrincipal.Id}' and resourceId eq '{actorServicePrincipal.Id}'")
-                    .GetAsync()
-                    .ConfigureAwait(false))
-                .Any(x => x.Scope == ActorDefaultScopeValue);
-
-            if (permissionGrantExists)
-                return;
-
-            var permissionGrant = new OAuth2PermissionGrant
-            {
-                ClientId = frontendServicePrincipal.Id,
-                ConsentType = "AllPrincipals",
-                ResourceId = actorServicePrincipal.Id,
-                Scope = ActorDefaultScopeValue
-            };
-
-            await _graphClient.Oauth2PermissionGrants
-                .Request()
-                .AddAsync(permissionGrant)
-                .ConfigureAwait(false);
-        }
-
-        private async Task<Guid> EnsureScopeIdAsync(Application app, Actor actor)
+        private async Task EnsureScopeIdAsync(Application app, Actor actor)
         {
             Guid? scopeId;
             if (app.Api == null)
@@ -249,65 +144,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     scopeId = app.Api.Oauth2PermissionScopes.First(x => x.Value == ActorDefaultScopeValue).Id;
                 }
             }
-
-            return scopeId ?? throw new MarketParticipantException($"Error creating app registration for {actor.Id}, could not add or find default Scope");
-        }
-
-        private async Task EnsureAppRoleForFrontendAsync(
-            Application app,
-            ServicePrincipal frontendServicePrincipal,
-            ServicePrincipal appServicePrincipal)
-        {
-            var appRoles = (await _graphClient.ServicePrincipals[appServicePrincipal.Id]
-                    .AppRoleAssignedTo
-                    .Request()
-                    .GetAsync()
-                    .ConfigureAwait(false))
-                .ToList();
-
-            if (!appRoles.Any(x => x.ResourceId?.ToString() == frontendServicePrincipal.Id && x.PrincipalId?.ToString() == appServicePrincipal.Id))
-            {
-                var appRole = new AppRoleAssignment
-                {
-                    PrincipalId = Guid.Parse(appServicePrincipal.Id),
-                    ResourceId = Guid.Parse(frontendServicePrincipal.Id),
-                    AppRoleId = Guid.Empty
-                };
-
-                await _graphClient.ServicePrincipals[appServicePrincipal.Id]
-                    .AppRoleAssignedTo
-                    .Request()
-                    .AddAsync(appRole).ConfigureAwait(false);
-            }
-        }
-
-        private async Task EnsureRequiredAccessToFrontendAsync(Application app, Application frontendApp, Guid? scopeId)
-        {
-            if (frontendApp.RequiredResourceAccess.Any(x => x.ResourceAppId == app.AppId))
-                return;
-
-            var requiredAccess = new RequiredResourceAccess()
-            {
-                ResourceAppId = app.AppId,
-                ResourceAccess = new List<ResourceAccess>()
-                {
-                    new() { Id = scopeId, Type = "Scope" }
-                },
-            };
-
-            var accessList = new List<RequiredResourceAccess>();
-            accessList.AddRange(frontendApp.RequiredResourceAccess);
-            accessList.Add(requiredAccess);
-            var updatedFrontend = new Application
-            {
-                RequiredResourceAccess = accessList
-            };
-
-            await _graphClient
-                .Applications[frontendApp.Id]
-                .Request()
-                .UpdateAsync(updatedFrontend)
-                .ConfigureAwait(false);
         }
 
         private async Task AddGraphApiRequiredAccessAsync(Application app)
@@ -382,7 +218,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .FirstOrDefault();
         }
 
-        private async Task<ServicePrincipal> EnsureServicePrincipalToAppAsync(Application app)
+        private async Task EnsureServicePrincipalToAppAsync(Application app)
         {
             var servicePrincipal = (await _graphClient.ServicePrincipals
                 .Request()
@@ -393,7 +229,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
 
             if (servicePrincipal is not null)
             {
-                return servicePrincipal;
+                return;
             }
 
             servicePrincipal = new ServicePrincipal
@@ -401,7 +237,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 AppId = app.AppId
             };
 
-            return await _graphClient.ServicePrincipals
+            await _graphClient.ServicePrincipals
                 .Request()
                 .AddAsync(servicePrincipal).ConfigureAwait(false);
         }

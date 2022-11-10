@@ -25,12 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 public interface IActiveDirectoryService
 {
     /// <summary>
-    /// Lists all Actor application registrations in AD
-    /// </summary>
-    /// <returns>List of all actor application registrations with id and display name</returns>
-    Task<IEnumerable<(string AppId, string DisplayName)>> ListActorsAsync();
-
-    /// <summary>
     /// Creates an Actor application registration in Azure AD
     /// </summary>
     /// <param name="actor">The actor to create or update the App Registration for</param>

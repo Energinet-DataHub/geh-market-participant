@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -41,19 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
     public sealed class ActiveDirectoryServiceTests
     {
         private readonly IActiveDirectoryService _sut = CreateActiveDirectoryService();
-
-        [Fact]
-        public async Task ListActors_ReturnMoreThanZero()
-        {
-            // Arrange
-            // Act
-            var response = await _sut
-                .ListActorsAsync()
-                .ConfigureAwait(false);
-
-            // Assert
-            Assert.True(response.Any());
-        }
 
         [Fact]
         public async Task CreateActor_Success()
@@ -147,11 +128,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
                 clientSecretCredential,
                 new[] { "https://graph.microsoft.com/.default" });
 
-            // Azure AD Config
-            var config = new AzureAdConfig(
-                integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-                integrationTestConfig.B2CSettings.BackendAppId);
-
             // Business Role Code Domain Service
             var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
@@ -167,9 +143,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
 
             return new ActiveDirectoryService(
                 graphClient,
-                config,
-                businessRoleCodeDomainService,
-                activeDirectoryB2CRoles,
                 logger);
         }
     }
