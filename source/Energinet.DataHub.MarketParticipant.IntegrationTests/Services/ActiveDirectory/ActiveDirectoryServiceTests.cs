@@ -116,11 +116,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
 
         private static IActiveDirectoryService CreateActiveDirectoryService()
         {
+            var integrationTestConfig = new IntegrationTestConfiguration();
             // Graph Service Client
             var clientSecretCredential = new ClientSecretCredential(
-                "dhtitans.onmicrosoft.com",
-                "2b914bca-26d7-4d9b-a22e-8305f3259097",
-                "rqH8Q~R~Thgcf1fHsHd.wZ4IMnMmqS9p7rqK7ckU");
+                integrationTestConfig.B2CSettings.Tenant,
+                integrationTestConfig.B2CSettings.ServicePrincipalId,
+                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
 
             var graphClient = new GraphServiceClient(
                 clientSecretCredential,
