@@ -116,8 +116,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
 
         private static IActiveDirectoryService CreateActiveDirectoryService()
         {
-            var integrationTestConfig = new IntegrationTestConfiguration();
-
             // Graph Service Client
             var clientSecretCredential = new ClientSecretCredential(
                 "dhtitans.onmicrosoft.com",
@@ -127,16 +125,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             var graphClient = new GraphServiceClient(
                 clientSecretCredential,
                 new[] { "https://graph.microsoft.com/.default" });
-
-            // Business Role Code Domain Service
-            var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
-            {
-                new MeteredDataResponsibleRole(), new SystemOperatorRole()
-            });
-
-            // Active Directory Roles
-            var activeDirectoryB2CRoles =
-                new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
             // Logger
             var logger = Mock.Of<ILogger<ActiveDirectoryService>>();
