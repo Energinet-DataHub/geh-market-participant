@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
 {
     public sealed class ActiveDirectoryService : IActiveDirectoryService
     {
-        private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor_";
+        private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor";
 
         private readonly GraphServiceClient _graphClient;
         private readonly ILogger<ActiveDirectoryService> _logger;
@@ -72,23 +72,30 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             return app is not null;
         }
 
-        public async Task<string> CreateOrUpdateAppAsync(Actor actor)
+        public async Task<(string ExternalActorId, string ActorDisplayName)> CreateOrUpdateAppAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor);
             var app = await EnsureAppAsync(actor).ConfigureAwait(false);
             await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
-            return app.AppId;
+            return (app.AppId, app.DisplayName);
         }
 
-        private async Task<Application?> GetFrontendAppAsync()
+        private static string GenerateActorDisplayName(Actor actor)
         {
-           return (await _graphClient
-                .Applications
-                .Request()
-                .Filter($"displayName eq 'FrontEnd'")
-                .GetAsync()
-                .ConfigureAwait(false))
-               .FirstOrDefault();
+            var lengthForActorName = $"{ActorApplicationRegistrationDisplayNamePrefix}_{actor.ActorNumber.Value}__{Guid.Empty}".Length;
+            if (string.IsNullOrEmpty(actor.Name.Value))
+            {
+                if (lengthForActorName < 120)
+                {
+                    return $"{ActorApplicationRegistrationDisplayNamePrefix}_{actor.ActorNumber.Value}_{actor.Id}";
+                }
+            }
+
+            var totalNameLength = actor.Name.Value.Length + lengthForActorName;
+            var actorName = totalNameLength > 120
+                ? new string(actor.Name.Value.Take(120 - lengthForActorName).ToArray())
+                : actor.Name.Value;
+            return $"{ActorApplicationRegistrationDisplayNamePrefix}_{actor.ActorNumber.Value}_{actorName ?? "-"}_{actor.Id}";
         }
 
         private async Task<Application> EnsureAppAsync(Actor actor)
@@ -96,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             var app = await GetAppAsync(actor).ConfigureAwait(false);
             if (app is not null) return app;
 
-            app = await CreateAppRegistrationAsync(actor.Id).ConfigureAwait(false);
+            app = await CreateAppRegistrationAsync(actor).ConfigureAwait(false);
             if (app is null)
             {
                 throw new MarketParticipantException($"Error creating app registration for {actor.Id}");
@@ -110,7 +117,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
          return (await _graphClient
                     .Applications
                     .Request()
-                    .Filter($"displayName eq '{ActorApplicationRegistrationDisplayNamePrefix}{actor.Id}'")
+                    .Filter($"displayName eq '{GenerateActorDisplayName(actor)}'")
                     .GetAsync()
                     .ConfigureAwait(false))
                 .FirstOrDefault();
@@ -151,13 +158,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .AddAsync(servicePrincipal).ConfigureAwait(false);
         }
 
-        private async Task<Application?> CreateAppRegistrationAsync(Guid identifier)
+        private async Task<Application?> CreateAppRegistrationAsync(Actor actor)
         {
             var app = await _graphClient.Applications
                 .Request()
                 .AddAsync(new Application
                 {
-                    DisplayName = $"{ActorApplicationRegistrationDisplayNamePrefix}{identifier}",
+                    DisplayName = GenerateActorDisplayName(actor),
                     Api = new ApiApplication
                     {
                         RequestedAccessTokenVersion = 2,
