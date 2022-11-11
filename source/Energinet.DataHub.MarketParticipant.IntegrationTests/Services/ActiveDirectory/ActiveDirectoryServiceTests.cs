@@ -114,6 +114,32 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             Assert.False(exists);
         }
 
+        [Fact]
+        public async Task DeleteActor_CalledMultipleTimesForSameActor_DontThrow()
+        {
+            // Arrange
+            var actor = new Actor(ActorNumber.Create(new MockedGln()));
+
+            // Create actor to delete
+            var actorToDelete = await _sut
+                .CreateOrUpdateAppAsync(actor)
+                .ConfigureAwait(false);
+
+            // Act
+            await _sut
+                .DeleteActorAsync(actor)
+                .ConfigureAwait(false);
+
+            await _sut
+                .DeleteActorAsync(actor)
+                .ConfigureAwait(false);
+
+            var exists = await _sut.AppExistsAsync(actor);
+
+            // Assert
+            Assert.False(exists);
+        }
+
         private static IActiveDirectoryService CreateActiveDirectoryService()
         {
             var integrationTestConfig = new IntegrationTestConfiguration();
