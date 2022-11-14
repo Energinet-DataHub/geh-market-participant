@@ -104,11 +104,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             if (app is not null) return app;
 
             app = await CreateAppRegistrationAsync(actor).ConfigureAwait(false);
-            if (app is null)
-            {
-                throw new MarketParticipantException($"Error creating app registration for {actor.Id}");
-            }
-
             return app;
         }
 
@@ -158,7 +153,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 .AddAsync(servicePrincipal).ConfigureAwait(false);
         }
 
-        private async Task<Microsoft.Graph.Application?> CreateAppRegistrationAsync(Actor actor)
+        private async Task<Microsoft.Graph.Application> CreateAppRegistrationAsync(Actor actor)
         {
             var app = await _graphClient.Applications
                 .Request()
