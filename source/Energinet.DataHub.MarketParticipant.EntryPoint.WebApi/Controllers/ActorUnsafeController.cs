@@ -14,11 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,30 +23,25 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
+    [ApiExplorerSettings(IgnoreApi = true)]
     [Route("organization")]
-    public class ActorController : ControllerBase
+    public class ActorUnsafeController : ControllerBase
     {
         private readonly ILogger<ActorController> _logger;
         private readonly IMediator _mediator;
-        private readonly IUserContext<FrontendUser> _userContext;
 
-        public ActorController(ILogger<ActorController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
+        public ActorUnsafeController(ILogger<ActorController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _userContext = userContext;
         }
 
         [HttpGet("{organizationId:guid}/actor")]
-        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetActorsAsync(Guid organizationId)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (_userContext.CurrentUser.IsEnerginetOrAssignedToOrganization(organizationId))
-                        return Unauthorized();
-
                     var getActorsCommand = new GetActorsCommand(organizationId);
 
                     var response = await _mediator
@@ -63,15 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
-        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginetOrAssignedToActor(actorId))
-                        return Unauthorized();
-
                     var getSingleActorCommand = new GetSingleActorCommand(actorId, organizationId);
 
                     var response = await _mediator
@@ -84,15 +71,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost("{organizationId:guid}/actor")]
-        [AuthorizeUser(Permission.OrganizationManage)]
         public async Task<IActionResult> CreateActorAsync(Guid organizationId, CreateActorDto actorDto)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginet)
-                        return Unauthorized();
-
                     var createActorCommand = new CreateActorCommand(organizationId, actorDto);
 
                     var response = await _mediator
@@ -105,15 +88,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{organizationId:guid}/actor/{actorId:guid}")]
-        [AuthorizeUser(Permission.OrganizationManage)]
         public async Task<IActionResult> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActor)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginetOrAssignedToActor(actorId))
-                        return Unauthorized();
-
                     var updateActorCommand = new UpdateActorCommand(organizationId, actorId, changeActor);
 
                     var response = await _mediator

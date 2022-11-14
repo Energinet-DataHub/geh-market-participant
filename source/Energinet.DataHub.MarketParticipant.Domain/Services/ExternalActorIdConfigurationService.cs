@@ -21,9 +21,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     public sealed class ExternalActorIdConfigurationService : IExternalActorIdConfigurationService
     {
-        private readonly IActiveDirectoryService _activeDirectoryService;
+        private readonly IActiveDirectoryB2CService _activeDirectoryService;
 
-        public ExternalActorIdConfigurationService(IActiveDirectoryService activeDirectoryService)
+        public ExternalActorIdConfigurationService(IActiveDirectoryB2CService activeDirectoryService)
         {
             _activeDirectoryService = activeDirectoryService;
         }

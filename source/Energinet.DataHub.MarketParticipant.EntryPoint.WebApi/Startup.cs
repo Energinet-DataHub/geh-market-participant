@@ -105,11 +105,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services.AddJwtBearerAuthentication(openIdUrl, frontendAppId);
             services.AddPermissionAuthorization();
 
-            if (configuration.GetSetting(Settings.RolesValidationEnabled))
-            {
-                services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
-            }
-
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
             var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
 
@@ -157,6 +152,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         protected override void Configure(IConfiguration configuration, Container container)
         {
             ArgumentNullException.ThrowIfNull(container);
+
+            if (configuration.GetSetting(Settings.RolesValidationEnabled))
+            {
+                container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+            }
 
             container.Register<IUserIdProvider>(
                 () =>

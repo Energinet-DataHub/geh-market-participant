@@ -13,9 +13,20 @@
 // limitations under the License.
 
 using System;
-using MediatR;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+
+/// <summary>
+/// Repository to provide access to Actors
+/// </summary>
+public interface IActorRepository
 {
-    public sealed record GetOrganizationsCommand(Guid? OrganizationId) : IRequest<GetOrganizationsResponse>;
+    /// <summary>
+    /// Get an actor from their external id,
+    /// </summary>
+    /// <param name="externalActorId">The external id for the actor</param>
+    /// <returns>An actor with the requested id, or null if not found</returns>
+    Task<Actor?> GetActorAsync(Guid externalActorId);
 }
