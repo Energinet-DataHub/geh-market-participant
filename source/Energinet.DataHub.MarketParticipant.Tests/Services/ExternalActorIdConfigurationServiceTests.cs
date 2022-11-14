@@ -36,7 +36,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
     public async Task AssignExternalActorIdAsync_HasExternalActorId_RemovesId(ActorStatus[] status, bool shouldDelete)
     {
         // Arrange
-        var activeDirectoryService = new Mock<IActiveDirectoryService>();
+        var activeDirectoryService = new Mock<IActiveDirectoryB2CService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
         var gln = new MockedGln();
@@ -83,7 +83,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
     public async Task AssignExternalActorIdAsync_HasNoExternalActorId_CreatesId(ActorStatus[] status, bool shouldCreate)
     {
         // Arrange
-        var activeDirectoryService = new Mock<IActiveDirectoryService>();
+        var activeDirectoryService = new Mock<IActiveDirectoryB2CService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
         var gln = new MockedGln();

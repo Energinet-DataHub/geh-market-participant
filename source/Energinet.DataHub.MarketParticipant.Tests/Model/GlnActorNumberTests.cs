@@ -16,7 +16,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
+namespace Energinet.DataHub.MarketParticipant.Tests.Model
 {
     [UnitTest]
     public sealed class GlnActorNumberTests

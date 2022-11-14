@@ -25,7 +25,7 @@ using CreateAppRegistrationResponse = Energinet.DataHub.MarketParticipant.Domain
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActiveDirectoryB2cService : IActiveDirectoryService
+    public sealed class ActiveDirectoryB2cService : IActiveDirectoryB2CService
     {
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;

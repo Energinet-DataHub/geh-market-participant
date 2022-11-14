@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.GridAreaIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;

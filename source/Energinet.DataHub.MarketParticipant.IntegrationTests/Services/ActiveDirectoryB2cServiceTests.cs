@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     [IntegrationTest]
     public sealed class ActiveDirectoryB2CServiceTests
     {
-        private readonly IActiveDirectoryService _sut = CreateActiveDirectoryService();
+        private readonly IActiveDirectoryB2CService _sut = CreateActiveDirectoryService();
 
         [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
@@ -153,7 +153,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             }
         }
 
-        private static IActiveDirectoryService CreateActiveDirectoryService()
+        private static IActiveDirectoryB2CService CreateActiveDirectoryService()
         {
             var integrationTestConfig = new IntegrationTestConfiguration();
 

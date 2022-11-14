@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
-{
-    public sealed record GetOrganizationsCommand(Guid? OrganizationId) : IRequest<GetOrganizationsResponse>;
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
+
+public sealed record Actor(Guid OrganizationId, Guid ActorId, ActorStatus Status);

@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                     {
-                        var getOrganizationsCommand = new GetOrganizationsCommand();
+                        var getOrganizationsCommand = new GetOrganizationsCommand(null);
 
                         var response = await _mediator
                             .Send(getOrganizationsCommand)
