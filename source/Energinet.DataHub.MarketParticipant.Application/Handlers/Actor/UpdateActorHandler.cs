@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
-        private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
+        private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
         private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
         private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
         private readonly IActorStatusMarketRolesRuleService _actorStatusMarketRolesRuleService;
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
-            IExternalActorIdConfigurationService externalActorIdConfigurationService,
+            IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
             IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
             ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
             IActorStatusMarketRolesRuleService actorStatusMarketRolesRuleService)
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
-            _externalActorIdConfigurationService = externalActorIdConfigurationService;
+            _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
             _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
             _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
             _actorStatusMarketRolesRuleService = actorStatusMarketRolesRuleService;
@@ -81,18 +81,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actorId = request.ActorId;
             var actor = organization.Actors.SingleOrDefault(actor => actor.Id == actorId) ?? throw new NotFoundValidationException(actorId);
 
-            var actorChangedIntegrationEvents = await _changesToActorHelper.FindChangesMadeToActorAsync(organization.Id, actor, request).ConfigureAwait(false);
+            var actorChangedIntegrationEvents = await _changesToActorHelper
+                .FindChangesMadeToActorAsync(organization.Id, actor, request)
+                .ConfigureAwait(false);
+
             UpdateActorStatus(actor, request);
             UpdateActorName(actor, request);
             UpdateActorMarketRolesAndChildren(organization, actor, request);
-
-            var externalActorIdBeforeAssign = actor.ExternalActorId?.Value;
-
-            await _externalActorIdConfigurationService
-                .AssignExternalActorIdAsync(actor)
-                .ConfigureAwait(false);
-
-            _changesToActorHelper.SetIntegrationEventForExternalActorId(actor, organization.Id, externalActorIdBeforeAssign, actorChangedIntegrationEvents);
 
             await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
 
@@ -113,6 +108,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             {
                 await _organizationRepository
                     .AddOrUpdateAsync(organization)
+                    .ConfigureAwait(false);
+
+                await _externalActorSynchronizationRepository
+                    .ScheduleAsync(organization.Id, actor.Id)
                     .ConfigureAwait(false);
 
                 await _actorIntegrationEventsQueueService

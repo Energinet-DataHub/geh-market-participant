@@ -174,7 +174,8 @@ public class ChangesToActorHelperTests
                                 {
                                     "Unknown"
                                 })
-                        }),
+                        },
+                        string.Empty),
                     new ActorMarketRoleDto(
                         EicFunction.BillingAgent.ToString(),
                         new List<ActorGridAreaDto>
@@ -185,7 +186,8 @@ public class ChangesToActorHelperTests
                                 {
                                     "D05NetProduction"
                                 })
-                        })
+                        },
+                        string.Empty)
                 }));
     }
 }

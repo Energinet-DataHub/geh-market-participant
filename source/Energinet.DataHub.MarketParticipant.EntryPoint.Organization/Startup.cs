@@ -24,30 +24,30 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
+
+internal sealed class Startup : StartupBase
 {
-    internal sealed class Startup : StartupBase
+    protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
-        protected override void Configure(IConfiguration configuration, IServiceCollection services)
-        {
-            var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
-            var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+        var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
+        var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
 
-            // Health check
-            services
-                .AddHealthChecks()
-                .AddLiveCheck()
-                .AddDbContextCheck<MarketParticipantDbContext>()
-                .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
-        }
+        // Health check
+        services
+            .AddHealthChecks()
+            .AddLiveCheck()
+            .AddDbContextCheck<MarketParticipantDbContext>()
+            .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
+    }
 
-        protected override void Configure(IConfiguration configuration, Container container)
-        {
-            Container.Register<DispatchEventsTimerTrigger>();
+    protected override void Configure(IConfiguration configuration, Container container)
+    {
+        Container.Register<DispatchEventsTimerTrigger>();
+        Container.Register<SynchronizeActorsTimerTrigger>();
 
-            // Health check
-            container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
-            container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
-        }
+        // Health check
+        container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
+        container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
     }
 }

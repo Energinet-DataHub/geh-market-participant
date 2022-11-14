@@ -141,7 +141,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 OrganizationStatus.Active);
 
             var actor = new Actor(ActorNumber.Create(actorGln));
-            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>());
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>(), string.Empty);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))

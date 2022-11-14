@@ -83,26 +83,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        public async Task<AppRegistrationSecret> CreateSecretForAppRegistrationAsync(AppRegistrationObjectId appRegistrationObjectId)
-        {
-            ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-            var passwordCredential = new PasswordCredential
-            {
-                DisplayName = "App secret",
-                StartDateTime = DateTimeOffset.Now,
-                EndDateTime = DateTimeOffset.Now.AddMonths(6),
-                KeyId = Guid.NewGuid(),
-                CustomKeyIdentifier = null,
-            };
-
-            var secret = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
-                .AddPassword(passwordCredential)
-                .Request()
-                .PostAsync().ConfigureAwait(false);
-
-            return new AppRegistrationSecret(secret.SecretText);
-        }
-
         public async Task DeleteAppRegistrationAsync(ExternalActorId externalActorId)
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
@@ -262,7 +242,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private async Task<Application> CreateAppInB2CAsync(
+        private async Task<Microsoft.Graph.Application> CreateAppInB2CAsync(
             string consumerAppName,
             IReadOnlyList<string> permissions)
         {
@@ -275,7 +255,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             return await _graphClient.Applications
                 .Request()
-                .AddAsync(new Application
+                .AddAsync(new Microsoft.Graph.Application
                 {
                     DisplayName = consumerAppName,
                     Api = new ApiApplication

@@ -17,72 +17,76 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+
+/// <summary>
+///     The interface used for the DB context for the MarketParticipant database
+/// </summary>
+public interface IMarketParticipantDbContext
 {
     /// <summary>
-    ///     The interface used for the DB context for the MarketParticipant database
+    ///     Represent access to the organization database table
     /// </summary>
-    public interface IMarketParticipantDbContext
-    {
-        /// <summary>
-        ///     Represent access to the organization database table
-        /// </summary>
-        DbSet<OrganizationEntity> Organizations { get; }
+    DbSet<OrganizationEntity> Organizations { get; }
 
-        /// <summary>
-        ///     Represent access to the actor database table
-        /// </summary>
-        DbSet<ActorEntity> Actors { get; }
+    /// <summary>
+    ///     Represent access to the actor database table
+    /// </summary>
+    DbSet<ActorEntity> Actors { get; }
 
-        /// <summary>
-        ///     Represent access to the GridAreas database table
-        /// </summary>
-        DbSet<GridAreaEntity> GridAreas { get; }
+    /// <summary>
+    ///     Represent access to the GridAreas database table
+    /// </summary>
+    DbSet<GridAreaEntity> GridAreas { get; }
 
-        /// <summary>
-        ///     Represent access to the MarketRole database table
-        /// </summary>
-        DbSet<MarketRoleEntity> MarketRoles { get; }
+    /// <summary>
+    ///     Represent access to the MarketRole database table
+    /// </summary>
+    DbSet<MarketRoleEntity> MarketRoles { get; }
 
-        /// <summary>
-        ///     Represent access to the MarketRoleGridArea database table
-        /// </summary>
-        DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; }
+    /// <summary>
+    ///     Represent access to the MarketRoleGridArea database table
+    /// </summary>
+    DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; }
 
-        /// <summary>
-        ///     Represent access to the ActorContacts database table
-        /// </summary>
-        DbSet<ActorContactEntity> ActorContacts { get; }
+    /// <summary>
+    ///     Represent access to the ActorContacts database table
+    /// </summary>
+    DbSet<ActorContactEntity> ActorContacts { get; }
 
-        /// <summary>
-        ///     Represent access to the DomainEvents database table
-        /// </summary>
-        DbSet<DomainEventEntity> DomainEvents { get; }
+    /// <summary>
+    ///     Represent access to the DomainEvents database table
+    /// </summary>
+    DbSet<DomainEventEntity> DomainEvents { get; }
 
-        /// <summary>
-        ///     Represent access to the GridAreas database table
-        /// </summary>
-        DbSet<GridAreaLinkEntity> GridAreaLinks { get; }
+    /// <summary>
+    ///     Represent access to the GridAreas database table
+    /// </summary>
+    DbSet<GridAreaLinkEntity> GridAreaLinks { get; }
 
-        /// <summary>
-        ///     Represent access to the UniqueActorMarketRoleGridArea database table
-        /// </summary>
-        DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
+    /// <summary>
+    ///     Represent access to the UniqueActorMarketRoleGridArea database table
+    /// </summary>
+    DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
 
-        /// <summary>
-        ///     Represent access to the GridAreaAuditLogEntry database table
-        /// </summary>
-        DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; }
+    /// <summary>
+    ///     Represent access to the GridAreaAuditLogEntry database table
+    /// </summary>
+    DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; }
 
-        /// <summary>
-        ///     Saves changes to the database.
-        /// </summary>
-        Task<int> SaveChangesAsync();
+    /// <summary>
+    ///     Represent access to the ActorSynchronization database table
+    /// </summary>
+    DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }
 
-        /// <summary>
-        ///     Gets the EntityEntry for the given Entry
-        /// </summary>
-        EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
-            where TEntity : class;
-    }
+    /// <summary>
+    ///     Saves changes to the database.
+    /// </summary>
+    Task<int> SaveChangesAsync();
+
+    /// <summary>
+    ///     Gets the EntityEntry for the given Entry
+    /// </summary>
+    EntityEntry<TEntity> Entry<TEntity>(TEntity entity)
+        where TEntity : class;
 }

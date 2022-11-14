@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
@@ -54,6 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<ForceSendIntegrationEventsCommand>, ForceSendIntegrationEventsCommandRuleSet>();
             container.Register<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
             container.Register<IValidator<GetGridAreaAuditLogEntriesCommand>, GetGridAreaAuditLogEntriesCommandRuleSet>();
+            container.Register<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
@@ -83,6 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IContactRemovedFromActorIntegrationEventParser, ContactRemovedFromActorIntegrationEventParser>();
             container.Register<IContactAddedToActorIntegrationEventParser, ContactAddedToActorIntegrationEventParser>();
             container.Register<IUserDisplayNameProvider, UserDisplayNameProvider>();
+            container.Register<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>(Lifestyle.Scoped);
 
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);
         }
