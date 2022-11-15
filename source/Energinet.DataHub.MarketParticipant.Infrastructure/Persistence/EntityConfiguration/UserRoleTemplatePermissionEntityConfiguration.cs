@@ -19,18 +19,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class UserRoleTemplateEntityConfiguration : IEntityTypeConfiguration<UserRoleTemplateEntity>
+    public sealed class UserRoleTemplatePermissionEntityConfiguration : IEntityTypeConfiguration<UserRoleTemplatePermissionEntity>
     {
-        public void Configure(EntityTypeBuilder<UserRoleTemplateEntity> builder)
+        public void Configure(EntityTypeBuilder<UserRoleTemplatePermissionEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("UserRoleTemplate");
-            builder.HasKey(userRole => userRole.Id);
-            builder.Property(userRole => userRole.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(userRole => userRole.Permissions)
-                .WithOne()
-                .HasForeignKey(permission => permission.UserRoleTemplateId);
+            builder.ToTable("UserRoleTemplatePermission");
+            builder.HasKey(userRolePermission => userRolePermission.Id);
+            builder.Property(userRolePermission => userRolePermission.Id).ValueGeneratedOnAdd();
         }
     }
 }

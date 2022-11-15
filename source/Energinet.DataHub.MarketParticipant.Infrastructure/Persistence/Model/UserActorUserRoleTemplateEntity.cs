@@ -20,13 +20,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
     public sealed class UserActorUserRoleTemplateEntity
     {
-        public UserActorUserRoleTemplateEntity(UserRoleTemplate userRoleTemplate)
+        public UserActorUserRoleTemplateEntity(UserRoleTemplateEntity userRoleTemplate)
         {
             UserRoleTemplate = userRoleTemplate;
         }
 
         public Guid Id { get; set; }
         public Guid UserActorId { get; set; }
-        public UserRoleTemplate UserRoleTemplate { get; set; }
+        public UserRoleTemplateEntity UserRoleTemplate { get; set; }
     }
 }

@@ -43,6 +43,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
     public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
     public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
+    public DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; private set; } = null!;
+    public DbSet<UserRoleTemplatePermissionEntity> UserRoleTemplatePermissions { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
     {
@@ -63,6 +65,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorSynchronizationEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleTemplateEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleTemplatePermissionEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }
