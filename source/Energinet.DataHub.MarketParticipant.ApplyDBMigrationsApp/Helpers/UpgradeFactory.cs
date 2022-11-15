@@ -16,8 +16,9 @@ using System;
 using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading.Tasks;
-using DbUp;
-using DbUp.Engine;
+using DbUp.Reboot;
+using DbUp.Reboot.Engine;
+using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
