@@ -81,14 +81,19 @@ public interface IMarketParticipantDbContext
     DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }
 
     /// <summary>
-    ///     Represent access to the ActorSynchronization database table
+    ///     Represent access to the UserRoleTemplate database table
     /// </summary>
     DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; }
 
     /// <summary>
-    ///     Represent access to the ActorSynchronization database table
+    ///     Represent access to the Permission database table
     /// </summary>
-    DbSet<UserRoleTemplatePermissionEntity> UserRoleTemplatePermissions { get; }
+    DbSet<PermissionEntity> Permissions { get; }
+
+    /// <summary>
+    ///     Represent access to the MarketRoleToUserRoleTemplate database table
+    /// </summary>
+    DbSet<MarketRoleToUserRoleTemplateEntity> MarketRoleToUserRoleTemplate { get; }
 
     /// <summary>
     ///     Saves changes to the database.

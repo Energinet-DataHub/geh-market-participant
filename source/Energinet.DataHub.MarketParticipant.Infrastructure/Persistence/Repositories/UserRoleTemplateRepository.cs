@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -105,14 +104,28 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return userRoleTemplate is null ? null : UserRoleTemplateMapper.MapFromEntity(userRoleTemplate);
         }
 
-        public Task<IEnumerable<UserRoleTemplate>> GetAsync()
+        public async Task<IEnumerable<UserRoleTemplate>> GetAsync()
         {
-            throw new NotImplementedException();
+            var result = await GetQuery()
+                .OrderBy(x => x.Name)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            return result.Select(UserRoleTemplateMapper.MapFromEntity);
         }
 
-        public Task<IEnumerable<UserRoleTemplate>> GetForMarketAsync()
+        public async Task<IEnumerable<UserRoleTemplate>> GetForMarketAsync(EicFunction marketRole)
         {
-            throw new NotImplementedException();
+            var result = await GetQuery()
+                .Join(
+                    _marketParticipantDbContext.MarketRoleToUserRoleTemplate,
+                    o => o.Id,
+                    i => i.UserRoleTemplateId,
+                    (o, i) => new { UserRoleTemplate = o, i.Function })
+                .Where(x => x.Function == marketRole)
+                .OrderBy(x => x.UserRoleTemplate.Name)
+                .ToListAsync()
+                .ConfigureAwait(false);
+            return result.Select(x => UserRoleTemplateMapper.MapFromEntity(x.UserRoleTemplate));
         }
 
         private IQueryable<UserRoleTemplateEntity> GetQuery()

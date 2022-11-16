@@ -41,13 +41,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Retrieves all User Role Templates
         /// </summary>
-        /// <returns>Grid areas</returns>
+        /// <returns>User Role Templates</returns>
         Task<IEnumerable<UserRoleTemplate>> GetAsync();
 
         /// <summary>
-        /// Retrieves all User Role Templates For a specific market role
+        /// Retrieves all User Role Templates For a specific market role / EicFunction
         /// </summary>
+        /// <param name="marketRole">The EicFunction to retrieve roles for.</param>
         /// <returns>User Role Templates</returns>
-        Task<IEnumerable<UserRoleTemplate>> GetForMarketAsync();
+        Task<IEnumerable<UserRoleTemplate>> GetForMarketAsync(EicFunction marketRole);
     }
 }
