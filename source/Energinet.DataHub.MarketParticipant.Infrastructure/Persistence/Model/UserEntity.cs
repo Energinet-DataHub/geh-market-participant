@@ -19,13 +19,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
     public sealed class UserEntity
     {
-        public UserEntity()
+        public UserEntity(string name)
         {
             Actors = new Collection<UserActorEntity>();
+            Name = name;
         }
 
         public Guid Id { get; set; }
         public Guid? ExternalId { get; set; }
+        public string Name { get; set; }
         public Collection<UserActorEntity> Actors { get; }
     }
 }

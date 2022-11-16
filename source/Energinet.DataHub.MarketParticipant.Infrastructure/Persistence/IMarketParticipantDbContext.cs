@@ -96,6 +96,16 @@ public interface IMarketParticipantDbContext
     DbSet<MarketRoleToUserRoleTemplateEntity> MarketRoleToUserRoleTemplate { get; }
 
     /// <summary>
+    ///     Represent access to the UserActor database table
+    /// </summary>
+    DbSet<UserActorEntity> UserActors { get; }
+
+    /// <summary>
+    ///     Represent access to the User database table
+    /// </summary>
+    DbSet<UserEntity> Users { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

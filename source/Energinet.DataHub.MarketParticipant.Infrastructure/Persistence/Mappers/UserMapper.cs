@@ -19,36 +19,41 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
-    internal sealed class UserRoleTemplateMapper
+    internal sealed class UserMapper
     {
-        public static void MapToEntity(UserRoleTemplate from, UserRoleTemplateEntity to)
+        public static void MapToEntity(User from, UserEntity to)
         {
             to.Id = from.Id;
             to.Name = from.Name;
 
-            var permissionEntities = to.Permissions.ToDictionary(x => x.PermissionId);
-            var toAdd = new List<UserRoleTemplatePermissionEntity>();
-            foreach (var permission in from.Permissions)
+            var existingActors = to.Actors.ToDictionary(x => x.Id);
+            var toAdd = new List<UserActorEntity>();
+            foreach (var actor in from.Actors)
             {
-                if (permissionEntities.TryGetValue(permission, out var existing))
+                if (existingActors.TryGetValue(actor.Id, out var existing))
                 {
                     toAdd.Add(existing);
                     continue;
                 }
 
-                toAdd.Add(new UserRoleTemplatePermissionEntity(permission, to.Id));
+                toAdd.Add(MapToEntity(actor));
             }
 
-            to.Permissions.Clear();
-            toAdd.ForEach(x => to.Permissions.Add(x));
+            to.Actors.Clear();
+            toAdd.ForEach(x => to.Actors.Add(x));
         }
 
-        public static UserRoleTemplate MapFromEntity(UserRoleTemplateEntity from)
+        public static User MapFromEntity(UserEntity from)
         {
-            return new UserRoleTemplate(
+            return new User(
                 from.Id,
                 from.Name,
-                from.Permissions.Select(x => x.PermissionId));
+                new List<UserActor>());
+        }
+
+        private static UserActorEntity MapToEntity(UserActor userActor)
+        {
+            return new UserActorEntity();
         }
     }
 }

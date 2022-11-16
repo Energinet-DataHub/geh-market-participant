@@ -23,10 +23,10 @@ public sealed class User
     {
         Id = id;
         Name = name;
-        ActorRoles = actorRoles;
+        Actors = actorRoles;
     }
 
     public Guid Id { get; }
     public string Name { get; }
-    public IEnumerable<UserActor> ActorRoles { get; }
+    public IEnumerable<UserActor> Actors { get; }
 }
