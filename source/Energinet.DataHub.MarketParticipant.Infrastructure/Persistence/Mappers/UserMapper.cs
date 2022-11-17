@@ -12,48 +12,100 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+
+internal sealed class UserMapper
 {
-    internal sealed class UserMapper
+    public static void MapToEntity(User from, UserEntity to)
     {
-        public static void MapToEntity(User from, UserEntity to)
+        to.Id = from.Id;
+        to.Name = from.Name;
+
+        var existingActors = to.Actors.ToDictionary(x => x.Id);
+        var toAdd = new List<UserActorEntity>();
+        foreach (var actor in from.Actors)
         {
-            to.Id = from.Id;
-            to.Name = from.Name;
-
-            var existingActors = to.Actors.ToDictionary(x => x.Id);
-            var toAdd = new List<UserActorEntity>();
-            foreach (var actor in from.Actors)
+            if (existingActors.TryGetValue(actor.Id, out var existing))
             {
-                if (existingActors.TryGetValue(actor.Id, out var existing))
-                {
-                    toAdd.Add(existing);
-                    continue;
-                }
-
-                toAdd.Add(MapToEntity(actor));
+                // TODO: Handle updates
+                toAdd.Add(existing);
+                continue;
             }
 
-            to.Actors.Clear();
-            toAdd.ForEach(x => to.Actors.Add(x));
+            var userActor = new UserActorEntity();
+            MapToEntity(actor, userActor, to);
+            toAdd.Add(userActor);
         }
 
-        public static User MapFromEntity(UserEntity from)
+        to.Actors.Clear();
+        toAdd.ForEach(x => to.Actors.Add(x));
+    }
+
+    public static User MapFromEntity(UserEntity from)
+    {
+        return new User(
+            from.Id,
+            from.Name,
+            new List<UserActor>());
+    }
+
+    private static void MapToEntity(UserActor from, UserActorEntity to, UserEntity user)
+    {
+        to.Id = from.Id;
+        to.ActorId = from.ActorId;
+        to.UserId = user.Id;
+        var existingRoles = to.UserRoles.ToDictionary(x => x.Id);
+        var toAdd = new List<UserActorUserRoleEntity>();
+        foreach (var role in from.UserRoles)
         {
-            return new User(
-                from.Id,
-                from.Name,
-                new List<UserActor>());
+            if (existingRoles.TryGetValue(role.Id, out var existing))
+            {
+                toAdd.Add(existing);
+                continue;
+            }
+
+            toAdd.Add(MapToNewEntity(role, from));
         }
 
-        private static UserActorEntity MapToEntity(UserActor userActor)
+        to.UserRoles.Clear();
+        toAdd.ForEach(x => to.UserRoles.Add(x));
+    }
+
+    private static void MapToEntity(UserActorUserRole from, UserActorUserRoleEntity to, UserActor userActor)
+    {
+        to.Id = from.Id;
+        to.UserActorId = userActor.Id;
+        //to.UserRoleTemplate
+    }
+
+    private static UserActorUserRoleEntity MapToNewEntity(UserActorUserRole from, UserActor userActor)
+    {
+        var newEntity = new UserActorUserRoleEntity(MapToNewEntity(from.UserRole))
         {
-            return new UserActorEntity();
-        }
+            Id = from.Id, UserActorId = userActor.Id
+        };
+        return newEntity;
+    }
+
+    private static UserRoleTemplateEntity MapToNewEntity(UserRoleTemplate from)
+    {
+        var newEntity = new UserRoleTemplateEntity(from.Name)
+        {
+            Id = Guid.Empty, Permissions = new Collection<UserRoleTemplatePermissionEntity>(from.Permissions.Select(MapToNewEntity).ToList())
+        };
+
+        return newEntity;
+    }
+
+    private static UserRoleTemplatePermissionEntity MapToNewEntity(Permission from)
+    {
+        return new UserRoleTemplatePermissionEntity(new PermissionEntity(from.Id, from.Description), Guid.Empty);
     }
 }

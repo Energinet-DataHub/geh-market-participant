@@ -20,15 +20,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class UserActor
     {
-        public UserActor(ICollection<UserRoleTemplate> userRoles)
+        public UserActor(ICollection<UserActorUserRole> userRoles)
         {
             Id = Guid.Empty;
             UserRoles = userRoles;
         }
 
         public Guid Id { get; }
-        public Guid UserId { get; }
         public Guid ActorId { get; }
-        public ICollection<UserRoleTemplate> UserRoles { get; }
+        public ICollection<UserActorUserRole> UserRoles { get; }
     }
 }

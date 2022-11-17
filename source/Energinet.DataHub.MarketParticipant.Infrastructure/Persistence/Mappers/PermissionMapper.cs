@@ -12,21 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
-    public sealed class UserActorEntity
+    internal sealed class PermissionMapper
     {
-        public UserActorEntity()
+        public static void MapToEntity(Permission from, PermissionEntity to)
         {
-            UserRoles = new Collection<UserActorUserRoleEntity>();
+            to.Id = from.Id;
+            to.Description = from.Description;
         }
 
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public Guid ActorId { get; set; }
-        public Collection<UserActorUserRoleEntity> UserRoles { get; }
+        public static Permission MapFromEntity(PermissionEntity from)
+        {
+            return new Permission(
+                from.Id,
+                from.Description);
+        }
     }
 }

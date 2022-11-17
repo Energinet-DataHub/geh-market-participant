@@ -26,17 +26,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Id = from.Id;
             to.Name = from.Name;
 
-            var permissionEntities = to.Permissions.ToDictionary(x => x.PermissionId);
+            var permissionEntities = to.Permissions.ToDictionary(x => x.Permission.Id);
             var toAdd = new List<UserRoleTemplatePermissionEntity>();
             foreach (var permission in from.Permissions)
             {
-                if (permissionEntities.TryGetValue(permission, out var existing))
+                if (permissionEntities.TryGetValue(permission.Id, out var existing))
                 {
-                    toAdd.Add(existing);
+                    var test = new UserRoleTemplatePermissionEntity(new PermissionEntity(permission.Id, permission.Description), existing.UserRoleTemplateId);
+                    test.Id = existing.Id;
+                    toAdd.Add(test);
                     continue;
                 }
 
-                toAdd.Add(new UserRoleTemplatePermissionEntity(permission, to.Id));
+                toAdd.Add(new UserRoleTemplatePermissionEntity(new PermissionEntity(permission.Id, permission.Description), to.Id));
             }
 
             to.Permissions.Clear();
@@ -48,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             return new UserRoleTemplate(
                 from.Id,
                 from.Name,
-                from.Permissions.Select(x => x.PermissionId));
+                new List<Permission>());
         }
     }
 }

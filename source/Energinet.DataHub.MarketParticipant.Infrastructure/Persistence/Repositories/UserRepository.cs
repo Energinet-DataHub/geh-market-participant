@@ -65,7 +65,7 @@ public sealed class UserRepository : IUserRepository
             .ConfigureAwait(false);
         return result is null
             ? null
-            : new UserActor(new List<UserRoleTemplate>());
+            : new UserActor(new List<UserActorUserRole>());
     }
 
     public async Task<IEnumerable<User>> GetAsync()
@@ -82,7 +82,7 @@ public sealed class UserRepository : IUserRepository
         return _marketParticipantDbContext
             .Users
             .Include(x => x.Actors)
-            .ThenInclude(x => x.UserRoleTemplates)
+            .ThenInclude(x => x.UserRoles)
             .ThenInclude(x => x.UserRoleTemplate)
             .ThenInclude(x => x.Permissions)
             .AsSingleQuery();

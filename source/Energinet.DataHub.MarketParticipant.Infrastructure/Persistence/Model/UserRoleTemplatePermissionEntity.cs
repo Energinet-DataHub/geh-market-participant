@@ -14,19 +14,20 @@
 
 using System;
 using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
     public sealed class UserRoleTemplatePermissionEntity
     {
-        public UserRoleTemplatePermissionEntity(string permissionId, Guid userRoleTemplateId)
+        public UserRoleTemplatePermissionEntity(PermissionEntity permission, Guid userRoleTemplateId)
         {
-            PermissionId = permissionId;
+            Permission = permission;
             UserRoleTemplateId = userRoleTemplateId;
         }
 
         public Guid Id { get; set; }
         public Guid UserRoleTemplateId { get; set; }
-        public string PermissionId { get; set; }
+        public PermissionEntity Permission { get; set; }
     }
 }

@@ -64,7 +64,7 @@ public sealed class UserActorRepository : IUserActorRepository
             .ConfigureAwait(false);
         return result is null
             ? null
-            : new UserActor(new List<UserRoleTemplate>());
+            : new UserActor(new List<UserActorUserRole>());
     }
 
     public async Task<IEnumerable<UserActor>> GetAsync()
@@ -74,14 +74,14 @@ public sealed class UserActorRepository : IUserActorRepository
             .OrderBy(x => x.Id)
             .ToListAsync()
             .ConfigureAwait(false);
-        return result.Select(x => new UserActor(new List<UserRoleTemplate>()));
+        return result.Select(x => new UserActor(new List<UserActorUserRole>()));
     }
 
     private IQueryable<UserActorEntity> GetQuery()
     {
         return _marketParticipantDbContext
             .UserActors
-            .Include(x => x.UserRoleTemplates)
+            .Include(x => x.UserRoles)
             .AsSingleQuery();
     }
 }

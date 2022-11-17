@@ -27,6 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public Collection<UserRoleTemplatePermissionEntity> Permissions { get; }
+        public Collection<UserRoleTemplatePermissionEntity> Permissions { get; init; }
     }
 }

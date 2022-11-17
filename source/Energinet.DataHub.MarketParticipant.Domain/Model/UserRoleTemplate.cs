@@ -19,14 +19,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class UserRoleTemplate
 {
-    public UserRoleTemplate(string name, IEnumerable<string> permissions)
+    public UserRoleTemplate(string name, IEnumerable<Permission> permissions)
     {
         Id = Guid.Empty;
         Name = name;
         Permissions = permissions;
     }
 
-    public UserRoleTemplate(Guid id, string name, IEnumerable<string> permissions)
+    public UserRoleTemplate(Guid id, string name, IEnumerable<Permission> permissions)
     {
         Id = id;
         Name = name;
@@ -35,5 +35,5 @@ public sealed class UserRoleTemplate
 
     public Guid Id { get; }
     public string Name { get; }
-    public IEnumerable<string> Permissions { get; }
+    public IEnumerable<Permission> Permissions { get; }
 }
