@@ -40,7 +40,11 @@ internal sealed class UserMapper
             }
 
             var userActor = new UserActorEntity();
-            MapToEntity(actor, userActor, to);
+            foreach (var fromActor in from.Actors)
+            {
+                to.Actors.Add(MapToEntity(fromActor));
+            }
+
             toAdd.Add(userActor);
         }
 
@@ -48,64 +52,69 @@ internal sealed class UserMapper
         toAdd.ForEach(x => to.Actors.Add(x));
     }
 
-    public static User MapFromEntity(UserEntity from)
+    private static UserActorEntity MapToEntity(UserActor userActor)
     {
-        return new User(
-            from.Id,
-            from.Name,
-            new List<UserActor>());
+        throw new NotImplementedException();
     }
 
-    private static void MapToEntity(UserActor from, UserActorEntity to, UserEntity user)
-    {
-        to.Id = from.Id;
-        to.ActorId = from.ActorId;
-        to.UserId = user.Id;
-        var existingRoles = to.UserRoles.ToDictionary(x => x.Id);
-        var toAdd = new List<UserActorUserRoleEntity>();
-        foreach (var role in from.UserRoles)
-        {
-            if (existingRoles.TryGetValue(role.Id, out var existing))
-            {
-                toAdd.Add(existing);
-                continue;
-            }
-
-            toAdd.Add(MapToNewEntity(role, from));
-        }
-
-        to.UserRoles.Clear();
-        toAdd.ForEach(x => to.UserRoles.Add(x));
-    }
-
-    private static void MapToEntity(UserActorUserRole from, UserActorUserRoleEntity to, UserActor userActor)
-    {
-        to.Id = from.Id;
-        to.UserActorId = userActor.Id;
-        //to.UserRoleTemplate
-    }
-
-    private static UserActorUserRoleEntity MapToNewEntity(UserActorUserRole from, UserActor userActor)
-    {
-        var newEntity = new UserActorUserRoleEntity(MapToNewEntity(from.UserRole))
-        {
-            Id = from.Id, UserActorId = userActor.Id
-        };
-        return newEntity;
-    }
-
-    private static UserRoleTemplateEntity MapToNewEntity(UserRoleTemplate from)
-    {
-        var newEntity = new UserRoleTemplateEntity(from.Name)
-        {
-            Id = Guid.Empty, Permissions = new Collection<UserRoleTemplatePermissionEntity>(from.Permissions.Select(MapToNewEntity).ToList())
-        };
-
-        return newEntity;
-    }
-
-    private static UserRoleTemplatePermissionEntity MapToNewEntity(Permission from)
-    {
-        return new UserRoleTemplatePermissionEntity(new PermissionEntity(from.Id, from.Description), Guid.Empty);
-    }
+    // public static User MapFromEntity(UserEntity from)
+    // {
+    //     return new User(
+    //         from.Id,
+    //         from.Name,
+    //         new List<UserActor>());
+    // }
+    //
+    // private static void MapToEntity(UserActor from, UserActorEntity to, UserEntity user)
+    // {
+    //     to.Id = from.Id;
+    //     to.ActorId = from.ActorId;
+    //     to.UserId = user.Id;
+    //     var existingRoles = to.UserRoles.ToDictionary(x => x.Id);
+    //     var toAdd = new List<UserActorUserRoleEntity>();
+    //     foreach (var role in from.UserRoles)
+    //     {
+    //         if (existingRoles.TryGetValue(role.Id, out var existing))
+    //         {
+    //             toAdd.Add(existing);
+    //             continue;
+    //         }
+    //
+    //         toAdd.Add(MapToNewEntity(role, from));
+    //     }
+    //
+    //     to.UserRoles.Clear();
+    //     toAdd.ForEach(x => to.UserRoles.Add(x));
+    // }
+    //
+    // private static void MapToEntity(UserActorUserRole from, UserActorUserRoleEntity to, UserActor userActor)
+    // {
+    //     to.Id = from.Id;
+    //     to.UserActorId = userActor.Id;
+    //     //to.UserRoleTemplate
+    // }
+    //
+    // private static UserActorUserRoleEntity MapToNewEntity(UserActorUserRole from, UserActor userActor)
+    // {
+    //     var newEntity = new UserActorUserRoleEntity()
+    //     {
+    //         Id = from.Id, UserActorId = userActor.Id, UserRoleTemplate = MapToNewEntity(from.UserRole)
+    //     };
+    //     return newEntity;
+    // }
+    //
+    // private static UserRoleTemplateEntity MapToNewEntity(UserRoleTemplate from)
+    // {
+    //     var newEntity = new UserRoleTemplateEntity(from.Name)
+    //     {
+    //         Id = Guid.Empty, Permissions = new Collection<UserRoleTemplatePermissionEntity>(from.Permissions.Select(MapToNewEntity).ToList())
+    //     };
+    //
+    //     return newEntity;
+    // }
+    //
+    // private static UserRoleTemplatePermissionEntity MapToNewEntity(Permission from)
+    // {
+    //     return new UserRoleTemplatePermissionEntity(Guid.Empty) { Permission = new PermissionEntity(from.Id, from.Description) };
+    // }
 }

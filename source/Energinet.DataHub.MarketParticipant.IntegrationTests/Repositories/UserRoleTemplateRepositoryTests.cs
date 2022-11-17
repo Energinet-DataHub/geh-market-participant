@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
             var userRoleTemplateRepository2 = new UserRoleTemplateRepository(context2);
-            var testRole = new UserRoleTemplate("Test", new List<Permission>());
+            var testRole = new UserRoleTemplate("Test", new List<UserRolePermission>());
 
             // Act
             var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             context.Permissions.Add(new PermissionEntity("perm1", "Test 1"));
             context.Permissions.Add(new PermissionEntity("perm2", "Test 2"));
             await context.SaveChangesAsync();
-            var testRole = new UserRoleTemplate("Test", new List<Permission>() { new("perm1", "perm1 desc"), new("perm2", "perm2 desc") });
+            var testRole = new UserRoleTemplate("Test", new List<UserRolePermission>() { new("perm1"), new("perm2") });
 
             // Act
             var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
@@ -93,12 +93,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
             var userRoleTemplateRepository2 = new UserRoleTemplateRepository(context2);
-            context.Permissions.Add(new PermissionEntity("perm1", "Test 1"));
-            context.Permissions.Add(new PermissionEntity("perm2", "Test 2"));
+            var perm1 = new PermissionEntity("perm1", "Test 1");
+            var perm2 = new PermissionEntity("perm2", "Test 2");
+            context.Permissions.Add(perm1);
+            context.Permissions.Add(perm2);
 
-            var testRole = new UserRoleTemplate("ATest", new List<Permission>() { new("perm1", "perm1 desc"), new("perm2", "perm2 desc") });
-            var testRole2 = new UserRoleTemplate("BTest", new List<Permission>() { new("perm1", "perm1 desc"), new("perm2", "perm2 desc") });
-            var testRole3 = new UserRoleTemplate("CTest", new List<Permission>() { new("perm1", "perm1 desc"), new("perm2", "perm2 desc") });
+            var testRole = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new("perm1"), new("perm2") });
+            var testRole2 = new UserRoleTemplate("BTest", new List<UserRolePermission>() { new("perm1"), new("perm2") });
+            var testRole3 = new UserRoleTemplate("CTest", new List<UserRolePermission>() { new("perm1"), new("perm2") });
 
             // Act
             var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);

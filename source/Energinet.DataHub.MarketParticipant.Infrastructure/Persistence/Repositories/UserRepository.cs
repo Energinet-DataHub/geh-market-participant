@@ -74,7 +74,7 @@ public sealed class UserRepository : IUserRepository
             .OrderBy(x => x.Id)
             .ToListAsync()
             .ConfigureAwait(false);
-        return result.Select(UserMapper.MapFromEntity);
+        return Enumerable.Empty<User>(); //result.Select(UserMapper.MapFromEntity);
     }
 
     private IQueryable<UserEntity> GetQuery()
@@ -84,7 +84,7 @@ public sealed class UserRepository : IUserRepository
             .Include(x => x.Actors)
             .ThenInclude(x => x.UserRoles)
             .ThenInclude(x => x.UserRoleTemplate)
-            .ThenInclude(x => x.Permissions)
+            .ThenInclude(x => x!.Permissions)
             .AsSingleQuery();
     }
 }
