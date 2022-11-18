@@ -65,9 +65,12 @@ public sealed class UserRepository : IUserRepository
         var result = await GetQuery()
             .FirstOrDefaultAsync(x => x.Id == id)
             .ConfigureAwait(false);
-        return result is null
-            ? null
-            : UserMapper.MapFromEntity(result);
+
+        if (result is null)
+            return null;
+
+        var roles = result.Actors.SelectMany(x => x.UserRoles.Select(y => y.UserRoleTemplateId)).Distinct();
+        return UserMapper.MapFromEntity(result);
     }
 
     public async Task<IEnumerable<User>> GetAsync()
