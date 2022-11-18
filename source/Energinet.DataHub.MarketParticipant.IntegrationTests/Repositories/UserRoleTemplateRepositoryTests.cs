@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
             var userRoleTemplateRepository2 = new UserRoleTemplateRepository(context2);
-            var testRole = new UserRoleTemplate("Test", new List<UserRolePermission>() { new() { PermissionId = "perm1" }, new() { PermissionId = "perm2" } });
+            var testRole = new UserRoleTemplate("Test", new List<UserRolePermission>() { new() { PermissionId = Core.App.Common.Security.Permission.OrganizationManage.ToString() }, new() { PermissionId = Core.App.Common.Security.Permission.GridAreasManage.ToString() } });
 
             // Act
             var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
@@ -90,9 +90,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
             var userRoleTemplateRepository2 = new UserRoleTemplateRepository(context2);
-            var testRole = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = "perm1" }, new() { PermissionId = "perm2" } });
-            var testRole2 = new UserRoleTemplate("BTest", new List<UserRolePermission>() { new() { PermissionId = "perm1" }, new() { PermissionId = "perm2" } });
-            var testRole3 = new UserRoleTemplate("CTest", new List<UserRolePermission>() { new() { PermissionId = "perm1" }, new() { PermissionId = "perm2" } });
+            var testRole = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = Core.App.Common.Security.Permission.OrganizationManage.ToString() }, new() { PermissionId = Core.App.Common.Security.Permission.GridAreasManage.ToString() } });
+            var testRole2 = new UserRoleTemplate("BTest", new List<UserRolePermission>() { new() { PermissionId = Core.App.Common.Security.Permission.OrganizationManage.ToString() }, new() { PermissionId = Core.App.Common.Security.Permission.GridAreasManage.ToString() } });
+            var testRole3 = new UserRoleTemplate("CTest", new List<UserRolePermission>() { new() { PermissionId = Core.App.Common.Security.Permission.OrganizationManage.ToString() }, new() { PermissionId = Core.App.Common.Security.Permission.GridAreasManage.ToString() } });
 
             // Act
             var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
@@ -130,8 +130,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            context.Permissions.Add(new PermissionEntity("perm1", "Test 1"));
-            context.Permissions.Add(new PermissionEntity("perm2", "Test 2"));
+            context.Permissions.Add(new PermissionEntity(Core.App.Common.Security.Permission.OrganizationManage.ToString(), "Test 1"));
+            context.Permissions.Add(new PermissionEntity(Core.App.Common.Security.Permission.GridAreasManage.ToString(), "Test 2"));
             await context.SaveChangesAsync();
         }
 
@@ -142,8 +142,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            context.Permissions.Remove(new PermissionEntity("perm1", "Test 1"));
-            context.Permissions.Remove(new PermissionEntity("perm2", "Test 2"));
+            context.Permissions.Remove(new PermissionEntity(Core.App.Common.Security.Permission.OrganizationManage.ToString(), "Test 1"));
+            context.Permissions.Remove(new PermissionEntity(Core.App.Common.Security.Permission.GridAreasManage.ToString(), "Test 2"));
             await context.SaveChangesAsync();
         }
     }

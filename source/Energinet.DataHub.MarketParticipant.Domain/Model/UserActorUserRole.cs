@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -21,9 +23,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public UserActorUserRole()
         {
             Id = Guid.Empty;
+            Permissions = new Collection<string>();
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; init; }
         public Guid UserRoleTemplateId { get; init; }
+        public Collection<string> Permissions { get; }
     }
 }

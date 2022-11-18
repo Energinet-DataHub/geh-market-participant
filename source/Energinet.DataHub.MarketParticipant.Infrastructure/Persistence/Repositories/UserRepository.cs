@@ -16,11 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph;
+using User = Energinet.DataHub.MarketParticipant.Domain.Model.User;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -70,7 +71,12 @@ public sealed class UserRepository : IUserRepository
             return null;
 
         var roles = result.Actors.SelectMany(x => x.UserRoles.Select(y => y.UserRoleTemplateId)).Distinct();
-        return UserMapper.MapFromEntity(result);
+        var permissions = _marketParticipantDbContext.UserRoleTemplates
+            .Where(x => roles.Contains(x.Id))
+            .Include(x => x.Permissions)
+            .ToList()
+            .SelectMany(x => x.Permissions).ToLookup(y => y.UserRoleTemplateId);
+        return UserMapper.MapFromEntity(result, permissions);
     }
 
     public async Task<IEnumerable<User>> GetAsync()
@@ -79,7 +85,15 @@ public sealed class UserRepository : IUserRepository
             .OrderBy(x => x.Id)
             .ToListAsync()
             .ConfigureAwait(false);
-        return result.Select(UserMapper.MapFromEntity);
+
+        var roles = result.SelectMany(x => x.Actors.SelectMany(y => y.UserRoles.Select(z => z.UserRoleTemplateId)).Distinct());
+        var permissions = _marketParticipantDbContext.UserRoleTemplates
+            .Where(x => roles.Contains(x.Id))
+            .Include(x => x.Permissions)
+            .ToList()
+            .SelectMany(x => x.Permissions).ToLookup(y => y.UserRoleTemplateId);
+
+        return result.Select(from => UserMapper.MapFromEntity(from, permissions));
     }
 
     private IQueryable<UserEntity> GetQuery()

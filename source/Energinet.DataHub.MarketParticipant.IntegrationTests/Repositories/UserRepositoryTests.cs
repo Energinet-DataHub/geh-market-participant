@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
+using Permission = Energinet.DataHub.Core.App.Common.Security.Permission;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
@@ -153,7 +154,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         organization.Actors.Add(testActor);
         var orgId = orgRepository.AddOrUpdateAsync(organization);
 
-        var testRole = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = "perm1" }, new() { PermissionId = "perm2" } });
+        var testRole = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
         var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
         var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleId };
         var testUserActor = new UserActor() { ActorId = testActor.Id, UserRoles = new List<UserActorUserRole>() { testUserActorRole } };
@@ -180,8 +181,8 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        context.Permissions.Add(new PermissionEntity("perm1", "Test 1"));
-        context.Permissions.Add(new PermissionEntity("perm2", "Test 2"));
+        context.Permissions.Add(new PermissionEntity(Permission.OrganizationManage.ToString(), "Test 1"));
+        context.Permissions.Add(new PermissionEntity(Permission.GridAreasManage.ToString(), "Test 2"));
         await context.SaveChangesAsync();
     }
 
@@ -192,8 +193,8 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        context.Permissions.Remove(new PermissionEntity("perm1", "Test 1"));
-        context.Permissions.Remove(new PermissionEntity("perm2", "Test 2"));
+        context.Permissions.Remove(new PermissionEntity(Permission.OrganizationManage.ToString(), "Test 1"));
+        context.Permissions.Remove(new PermissionEntity(Permission.GridAreasManage.ToString(), "Test 2"));
         await context.SaveChangesAsync();
     }
 }

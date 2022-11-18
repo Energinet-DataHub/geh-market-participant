@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -46,28 +47,49 @@ internal sealed class UserMapper
         toAdd.ForEach(x => to.Actors.Add(x));
     }
 
-    public static User MapFromEntity(UserEntity from)
+    public static User MapFromEntity(UserEntity from, ILookup<Guid, UserRoleTemplatePermissionEntity> permissions)
     {
-        return new User(
+        var user = new User(
             from.Id,
             from.Name,
             from.ExternalId,
-            from.Actors.Select(MapFromEntity));
+            from.Actors.Select(MapFromEntity).ToList());
+        var permissionsAsClaims = Core.App.Common.Security.PermissionsAsClaims.Lookup;
+        foreach (var userActor in user.Actors)
+        {
+            foreach (var actorUserRole in userActor.UserRoles)
+            {
+                foreach (var permissionEntity in permissions[actorUserRole.UserRoleTemplateId])
+                {
+                    if (Enum.TryParse<Core.App.Common.Security.Permission>(permissionEntity.PermissionId, out var permEnum))
+                    {
+                        actorUserRole.Permissions.Add(permissionsAsClaims[permEnum]);
+                    }
+                }
+            }
+        }
+
+        return user;
     }
 
     private static UserActor MapFromEntity(UserActorEntity from)
     {
         return new UserActor()
         {
+            Id = from.Id,
             ActorId = from.ActorId,
             UserId = from.UserId,
-            UserRoles = from.UserRoles.Select(MapFromEntity)
+            UserRoles = from.UserRoles.Select(MapFromEntity).ToList()
         };
     }
 
     private static UserActorUserRole MapFromEntity(UserActorUserRoleEntity from)
     {
-        return new UserActorUserRole() { UserRoleTemplateId = from.UserRoleTemplateId };
+        return new UserActorUserRole()
+        {
+            Id = from.Id,
+            UserRoleTemplateId = from.UserRoleTemplateId
+        };
     }
 
     private static void MapToEntity(UserActor from, UserActorEntity to)

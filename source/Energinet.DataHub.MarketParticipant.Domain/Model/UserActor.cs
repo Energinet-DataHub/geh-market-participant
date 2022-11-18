@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             UserRoles = new List<UserActorUserRole>();
         }
 
-        public Guid Id { get; }
+        public Guid Id { get; init; }
         public Guid ActorId { get; init; }
         public Guid UserId { get; init; }
         public IEnumerable<UserActorUserRole> UserRoles { get; init; }
