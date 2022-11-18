@@ -20,6 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public Guid Id { get; set; }
         public Guid UserActorId { get; set; }
-        public UserRoleTemplateEntity? UserRoleTemplate { get; set; }
+        public Guid UserRoleTemplateId { get; set; }
     }
 }

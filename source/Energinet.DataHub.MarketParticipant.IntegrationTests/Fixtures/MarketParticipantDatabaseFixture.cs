@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
@@ -26,9 +27,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 
         public MarketParticipantDatabaseManager DatabaseManager { get; }
 
-        public Task InitializeAsync()
+        public async Task InitializeAsync()
         {
-            return DatabaseManager.CreateDatabaseAsync();
+            await DatabaseManager.CreateDatabaseAsync();
         }
 
         public Task DisposeAsync()

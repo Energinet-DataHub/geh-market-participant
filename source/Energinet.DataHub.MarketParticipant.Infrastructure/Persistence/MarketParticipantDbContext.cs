@@ -73,6 +73,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new MarketRoleToUserRoleTemplateEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserActorEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserActorUserRoleEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

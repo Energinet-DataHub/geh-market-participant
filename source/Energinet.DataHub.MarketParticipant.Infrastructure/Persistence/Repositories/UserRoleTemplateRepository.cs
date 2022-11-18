@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             UserRoleTemplateEntity destination;
             if (userRoleTemplate.Id == Guid.Empty)
             {
-                destination = new UserRoleTemplateEntity(userRoleTemplate.Name);
+                destination = new UserRoleTemplateEntity();
             }
             else
             {

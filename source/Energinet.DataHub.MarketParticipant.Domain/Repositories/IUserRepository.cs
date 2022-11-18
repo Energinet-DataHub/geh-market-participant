@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -27,14 +28,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// Updates or adds a User, it adds it if it's not already present.
         /// </summary>
         /// <param name="user">The User to add or update</param>
-        Task AddOrUpdateAsync(User user);
+        Task<Guid> AddOrUpdateAsync(User user);
 
         /// <summary>
         /// Gets a User with the specified Id
         /// </summary>
         /// <param name="id">The Id of the User to get.</param>
         /// <returns>The specified User or null if not found</returns>
-        Task<UserActor?> GetAsync(string id);
+        Task<User?> GetAsync(Guid id);
 
         /// <summary>
         /// Retrieves all Users

@@ -19,9 +19,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
     public sealed class UserRoleTemplateEntity
     {
-        public UserRoleTemplateEntity(string name)
+        public UserRoleTemplateEntity()
         {
-            Name = name;
+            Name = string.Empty;
             Permissions = new Collection<UserRoleTemplatePermissionEntity>();
         }
 

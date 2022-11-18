@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 #pragma warning disable CA1711
 public sealed class UserRolePermission
 #pragma warning restore CA1711
 {
-    public UserRolePermission(string id)
+    public UserRolePermission()
     {
-        Id = id;
+        Id = Guid.Empty;
+        PermissionId = string.Empty;
     }
 
-    public string Id { get; }
+    public Guid Id { get; }
+    public string PermissionId { get; init; }
 }

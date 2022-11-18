@@ -13,20 +13,18 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class UserActorUserRole
     {
-        public UserActorUserRole(UserRoleTemplate userRole)
+        public UserActorUserRole()
         {
             Id = Guid.Empty;
-            UserRole = userRole;
         }
 
         public Guid Id { get; }
-        public UserRoleTemplate UserRole { get; }
+        public Guid UserActorId { get; }
+        public Guid UserRoleTemplateId { get; }
     }
 }

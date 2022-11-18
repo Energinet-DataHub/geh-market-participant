@@ -27,9 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("UserActorUserRole");
             builder.HasKey(userActor => userActor.Id);
             builder.Property(userActor => userActor.Id).ValueGeneratedOnAdd();
-            builder
-                .HasOne(userActor => userActor.UserRoleTemplate)
-                .WithOne();
         }
     }
 }

@@ -26,36 +26,35 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class PermissionRepositoryTests
+public sealed class UserRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public PermissionRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public UserRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_PermissionAdded_CanReadBack()
+    public async Task AddOrUpdateAsync_SimpleUserAdded_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var permissionRepository = new PermissionRepository(context);
-        var permissionRepositor2 = new PermissionRepository(context2);
-        var testPerm = new Permission("Test_Permission", "Test 1");
+        var userRepository = new UserRepository(context);
+        var userRepository2 = new UserRepository(context2);
+        var testUser = new User("Test User", Guid.NewGuid(), new List<UserActor>());
 
         // Act
-        await permissionRepository.AddOrUpdateAsync(testPerm);
-        var newPermission = await permissionRepositor2.GetAsync(testPerm.Id);
+        var userId = await userRepository.AddOrUpdateAsync(testUser);
+        var newUser = await userRepository2.GetAsync(userId);
 
         // Assert
-        Assert.NotNull(newPermission);
-        Assert.NotEqual(string.Empty, newPermission?.Id);
-        Assert.Equal(testPerm.Id, newPermission?.Id);
-        Assert.Equal(testPerm.Description, newPermission?.Description);
+        Assert.NotNull(newUser);
+        Assert.NotEqual(Guid.Empty, newUser?.Id);
+        Assert.Equal(testUser.Name, newUser?.Name);
     }
 
     [Fact]

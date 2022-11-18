@@ -19,14 +19,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class User
 {
-    public User(Guid id, string name, IEnumerable<UserActor> actorRoles)
+    public User(string name, Guid externalId, IEnumerable<UserActor> actorRoles)
     {
-        Id = id;
+        Id = Guid.Empty;
+        ExternalId = externalId;
         Name = name;
         Actors = actorRoles;
     }
 
+    public User(Guid id, string name, Guid externalId, IEnumerable<UserActor> actorRoles)
+    {
+        Id = id;
+        Name = name;
+        Actors = actorRoles;
+        ExternalId = externalId;
+    }
+
     public Guid Id { get; }
+    public Guid ExternalId { get; }
     public string Name { get; }
     public IEnumerable<UserActor> Actors { get; }
 }

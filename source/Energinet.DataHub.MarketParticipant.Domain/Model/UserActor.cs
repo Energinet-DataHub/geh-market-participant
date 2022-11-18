@@ -28,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public Guid Id { get; }
         public Guid ActorId { get; }
+        public Guid UserId { get; }
         public ICollection<UserActorUserRole> UserRoles { get; }
     }
 }

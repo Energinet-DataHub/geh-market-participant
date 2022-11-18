@@ -33,7 +33,7 @@ public sealed class UserRepository : IUserRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task AddOrUpdateAsync(User user)
+    public async Task<Guid> AddOrUpdateAsync(User user)
     {
         ArgumentNullException.ThrowIfNull(user);
 
@@ -42,30 +42,32 @@ public sealed class UserRepository : IUserRepository
             .FirstOrDefaultAsync(x => x.Id == user.Id)
             .ConfigureAwait(false);
 
-        // if (destination is null)
-        // {
-        //     destination = new PermissionEntity(permission.Id, permission.Description);
-        //     _marketParticipantDbContext.Permissions.Add(destination);
-        // }
-        // else
-        // {
-        //     destination.Description = permission.Description;
-        //     _marketParticipantDbContext.Permissions.Update(destination);
-        // }
+        if (destination is null)
+        {
+            destination = new UserEntity(user.Name);
+            UserMapper.MapToEntity(user, destination);
+            _marketParticipantDbContext.Users.Add(destination);
+        }
+        else
+        {
+            UserMapper.MapToEntity(user, destination);
+            _marketParticipantDbContext.Users.Update(destination);
+        }
+
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+        return destination.Id;
     }
 
-    public async Task<UserActor?> GetAsync(string id)
+    public async Task<User?> GetAsync(Guid id)
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        var result = await _marketParticipantDbContext
-            .Permissions
-            .FindAsync(id)
+        var result = await GetQuery()
+            .FirstOrDefaultAsync(x => x.Id == id)
             .ConfigureAwait(false);
         return result is null
             ? null
-            : new UserActor(new List<UserActorUserRole>());
+            : UserMapper.MapFromEntity(result);
     }
 
     public async Task<IEnumerable<User>> GetAsync()
@@ -74,7 +76,7 @@ public sealed class UserRepository : IUserRepository
             .OrderBy(x => x.Id)
             .ToListAsync()
             .ConfigureAwait(false);
-        return Enumerable.Empty<User>(); //result.Select(UserMapper.MapFromEntity);
+        return result.Select(UserMapper.MapFromEntity);
     }
 
     private IQueryable<UserEntity> GetQuery()
@@ -83,8 +85,6 @@ public sealed class UserRepository : IUserRepository
             .Users
             .Include(x => x.Actors)
             .ThenInclude(x => x.UserRoles)
-            .ThenInclude(x => x.UserRoleTemplate)
-            .ThenInclude(x => x!.Permissions)
             .AsSingleQuery();
     }
 }
