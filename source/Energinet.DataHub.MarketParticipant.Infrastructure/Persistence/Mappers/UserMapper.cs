@@ -61,14 +61,15 @@ internal sealed class UserMapper
         {
             ActorId = from.ActorId,
             UserId = from.UserId,
-            UserActorPermissions = new List<UserActorPermission>() // from.UserRoles.Select(MapFromEntity)
+            UserRoles = from.UserRoles.Select(MapFromEntity)
         };
     }
 
-    // private static UserActorUserRole MapFromEntity(UserActorUserRoleEntity from)
-    // {
-    //     return new UserActorUserRole() { UserRoleTemplateId = from.UserRoleTemplateId };
-    // }
+    private static UserActorUserRole MapFromEntity(UserActorUserRoleEntity from)
+    {
+        return new UserActorUserRole() { UserRoleTemplateId = from.UserRoleTemplateId };
+    }
+
     private static void MapToEntity(UserActor from, UserActorEntity to)
     {
         to.Id = from.Id;
@@ -76,17 +77,17 @@ internal sealed class UserMapper
         to.UserId = from.UserId;
         var existingRoles = to.UserRoles.ToDictionary(x => x.Id);
         var toAdd = new List<UserActorUserRoleEntity>();
-        foreach (var userRole in from.UserActorPermissions)
+        foreach (var userRole in from.UserRoles)
         {
             if (existingRoles.TryGetValue(userRole.Id, out var existing))
             {
-                //MapToEntity(userRole, existing);
+                MapToEntity(userRole, existing);
                 toAdd.Add(existing);
                 continue;
             }
 
             var userRoleEntity = new UserActorUserRoleEntity();
-            //MapToEntity(userRole, userRoleEntity);
+            MapToEntity(userRole, userRoleEntity);
             toAdd.Add(userRoleEntity);
         }
 
@@ -94,9 +95,9 @@ internal sealed class UserMapper
         toAdd.ForEach(x => to.UserRoles.Add(x));
     }
 
-    // private static void MapToEntity(UserActorUserRole from, UserActorUserRoleEntity to)
-    // {
-    //     to.Id = from.Id;
-    //     to.UserRoleTemplateId = from.UserRoleTemplateId;
-    // }
+    private static void MapToEntity(UserActorUserRole from, UserActorUserRoleEntity to)
+    {
+        to.Id = from.Id;
+        to.UserRoleTemplateId = from.UserRoleTemplateId;
+    }
 }

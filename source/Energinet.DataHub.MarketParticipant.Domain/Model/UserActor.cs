@@ -22,12 +22,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public UserActor()
         {
             Id = Guid.Empty;
-            UserActorPermissions = new List<UserActorPermission>();
+            UserRoles = new List<UserActorUserRole>();
         }
 
         public Guid Id { get; }
         public Guid ActorId { get; init; }
         public Guid UserId { get; init; }
-        public IEnumerable<UserActorPermission> UserActorPermissions { get; init; }
+        public IEnumerable<UserActorUserRole> UserRoles { get; init; }
     }
 }

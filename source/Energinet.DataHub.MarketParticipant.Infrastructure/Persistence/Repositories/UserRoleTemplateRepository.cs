@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .FirstOrDefaultAsync(x => x.Id == id)
                 .ConfigureAwait(false);
 
-            return userRoleTemplate is null ? null : null; // UserRoleTemplateMapper.MapFromEntity(userRoleTemplate);
+            return userRoleTemplate is null ? null : UserRoleTemplateMapper.MapFromEntity(userRoleTemplate);
         }
 
         public async Task<IEnumerable<UserRoleTemplate>> GetAsync()
@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .OrderBy(x => x.Name)
                 .ToListAsync()
                 .ConfigureAwait(false);
-            return new List<UserRoleTemplate>(); // result.Select(UserRoleTemplateMapper.MapFromEntity);
+            return result.Select(UserRoleTemplateMapper.MapFromEntity);
         }
 
         public async Task<IEnumerable<UserRoleTemplate>> GetForMarketAsync(EicFunction marketRole)
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .OrderBy(x => x.UserRoleTemplate.Name)
                 .ToListAsync()
                 .ConfigureAwait(false);
-            return new List<UserRoleTemplate>(); // result.Select(x => UserRoleTemplateMapper.MapFromEntity(x.UserRoleTemplate));
+            return result.Select(x => UserRoleTemplateMapper.MapFromEntity(x.UserRoleTemplate));
         }
 
         private IQueryable<UserRoleTemplateEntity> GetQuery()

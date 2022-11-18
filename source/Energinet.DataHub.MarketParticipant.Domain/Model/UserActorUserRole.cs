@@ -13,27 +13,17 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public sealed class UserRoleTemplate
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public UserRoleTemplate(string name, IEnumerable<UserRolePermission> permissions)
+    public class UserActorUserRole
     {
-        Id = Guid.Empty;
-        Name = name;
-        Permissions = permissions;
-    }
+        public UserActorUserRole()
+        {
+            Id = Guid.Empty;
+        }
 
-    public UserRoleTemplate(Guid id, string name, IEnumerable<UserRolePermission> permissions)
-    {
-        Id = id;
-        Name = name;
-        Permissions = permissions;
+        public Guid Id { get; }
+        public Guid UserRoleTemplateId { get; init; }
     }
-
-    public Guid Id { get; }
-    public string Name { get; }
-    public IEnumerable<UserRolePermission> Permissions { get; }
 }

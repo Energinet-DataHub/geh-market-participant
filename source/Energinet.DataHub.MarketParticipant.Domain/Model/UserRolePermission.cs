@@ -18,17 +18,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 // Disabled as we want to name this permission as it is relevant for us.
 #pragma warning disable CA1711
-public sealed class UserActorPermission
+public sealed class UserRolePermission
 #pragma warning restore CA1711
 {
-    public UserActorPermission()
+    public UserRolePermission()
     {
         Id = Guid.Empty;
         PermissionId = string.Empty;
-        PermissionKey = string.Empty;
     }
 
     public Guid Id { get; }
     public string PermissionId { get; init; }
-    public string PermissionKey { get; init; }
 }
