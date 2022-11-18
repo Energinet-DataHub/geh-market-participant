@@ -23,10 +23,13 @@ using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
@@ -40,15 +43,18 @@ public class TokenController : ControllerBase
 
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly ISigningKeyRing _signingKeyRing;
+    private readonly IConfiguration _configuration;
     private readonly IMediator _mediator;
 
     public TokenController(
         IExternalTokenValidator externalTokenValidator,
         ISigningKeyRing signingKeyRing,
+        IConfiguration configuration,
         IMediator mediator)
     {
         _externalTokenValidator = externalTokenValidator;
         _signingKeyRing = signingKeyRing;
+        _configuration = configuration;
         _mediator = mediator;
     }
 
@@ -116,6 +122,7 @@ public class TokenController : ControllerBase
 
         var dataHubTokenClaims = roleClaims
             .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
+            .Append(new Claim(JwtRegisteredClaimNames.Aud, _configuration.GetSetting(Settings.BackendAppId)))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
 
