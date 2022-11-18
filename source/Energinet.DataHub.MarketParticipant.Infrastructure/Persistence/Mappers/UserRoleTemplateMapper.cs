@@ -28,28 +28,27 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
             var permissionEntities = to.Permissions.ToDictionary(x => x.Id);
             var toAdd = new List<UserRoleTemplatePermissionEntity>();
-            foreach (var permission in from.Permissions)
-            {
-                if (permissionEntities.TryGetValue(permission.Id, out var existing))
-                {
-                    toAdd.Add(existing);
-                    continue;
-                }
-
-                var test2 = new UserRoleTemplatePermissionEntity(permission.PermissionId, to.Id);
-                toAdd.Add(test2);
-            }
-
+            // foreach (var permission in from.Permissions)
+            // {
+            //     if (permissionEntities.TryGetValue(permission.Id, out var existing))
+            //     {
+            //         toAdd.Add(existing);
+            //         continue;
+            //     }
+            //
+            //     var test2 = new UserRoleTemplatePermissionEntity(permission.PermissionId, to.Id);
+            //     toAdd.Add(test2);
+            // }
             to.Permissions.Clear();
             toAdd.ForEach(x => to.Permissions.Add(x));
         }
 
-        public static UserRoleTemplate MapFromEntity(UserRoleTemplateEntity from)
-        {
-            return new UserRoleTemplate(
-                from.Id,
-                from.Name,
-                from.Permissions.Select(x => new UserRolePermission() { PermissionId = x.PermissionId }));
-        }
+        // public static UserRoleTemplate MapFromEntity(UserRoleTemplateEntity from)
+        // {
+        //     return new UserRoleTemplate(
+        //         from.Id,
+        //         from.Name,
+        //         from.Permissions.Select(x => new UserRolePermission() { PermissionId = x.PermissionId }));
+        // }
     }
 }
