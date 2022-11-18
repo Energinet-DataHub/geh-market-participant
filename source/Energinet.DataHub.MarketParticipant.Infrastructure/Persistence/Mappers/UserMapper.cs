@@ -52,7 +52,22 @@ internal sealed class UserMapper
             from.Id,
             from.Name,
             from.ExternalId,
-            new List<UserActor>());
+            from.Actors.Select(MapFromEntity));
+    }
+
+    private static UserActor MapFromEntity(UserActorEntity from)
+    {
+        return new UserActor()
+        {
+            ActorId = from.ActorId,
+            UserId = from.UserId,
+            UserRoles = from.UserRoles.Select(MapFromEntity)
+        };
+    }
+
+    private static UserActorUserRole MapFromEntity(UserActorUserRoleEntity from)
+    {
+        return new UserActorUserRole() { UserRoleTemplateId = from.UserRoleTemplateId };
     }
 
     private static void MapToEntity(UserActor from, UserActorEntity to)
@@ -83,7 +98,6 @@ internal sealed class UserMapper
     private static void MapToEntity(UserActorUserRole from, UserActorUserRoleEntity to)
     {
         to.Id = from.Id;
-        to.UserActorId = from.UserActorId;
         to.UserRoleTemplateId = from.UserRoleTemplateId;
     }
 }

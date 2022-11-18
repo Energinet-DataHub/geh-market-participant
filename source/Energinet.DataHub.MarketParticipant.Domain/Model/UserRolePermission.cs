@@ -16,6 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
+// Disabled as we want to name this permission as it is relevant for us.
 #pragma warning disable CA1711
 public sealed class UserRolePermission
 #pragma warning restore CA1711

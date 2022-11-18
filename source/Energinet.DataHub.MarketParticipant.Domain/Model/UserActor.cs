@@ -14,21 +14,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class UserActor
     {
-        public UserActor(ICollection<UserActorUserRole> userRoles)
+        public UserActor()
         {
             Id = Guid.Empty;
-            UserRoles = userRoles;
+            UserRoles = new List<UserActorUserRole>();
         }
 
         public Guid Id { get; }
-        public Guid ActorId { get; }
-        public Guid UserId { get; }
-        public ICollection<UserActorUserRole> UserRoles { get; }
+        public Guid ActorId { get; init; }
+        public Guid UserId { get; init; }
+        public IEnumerable<UserActorUserRole> UserRoles { get; init; }
     }
 }

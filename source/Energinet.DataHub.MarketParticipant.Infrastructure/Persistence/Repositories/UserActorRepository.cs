@@ -64,7 +64,7 @@ public sealed class UserActorRepository : IUserActorRepository
             .ConfigureAwait(false);
         return result is null
             ? null
-            : new UserActor(new List<UserActorUserRole>());
+            : new UserActor();
     }
 
     public async Task<IEnumerable<UserActor>> GetAsync()
@@ -74,7 +74,7 @@ public sealed class UserActorRepository : IUserActorRepository
             .OrderBy(x => x.Id)
             .ToListAsync()
             .ConfigureAwait(false);
-        return result.Select(x => new UserActor(new List<UserActorUserRole>()));
+        return result.Select(x => new UserActor());
     }
 
     private IQueryable<UserActorEntity> GetQuery()
