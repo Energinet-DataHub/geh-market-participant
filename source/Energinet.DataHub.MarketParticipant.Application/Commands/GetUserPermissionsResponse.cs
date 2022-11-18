@@ -12,13 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Azure.Core;
-using Azure.Security.KeyVault.Keys.Cryptography;
+using System.Collections.Generic;
+using Energinet.DataHub.Core.App.Common.Security;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public interface ICryptographyClientProvider
-{
-    CryptographyClient GetClient(Uri keyId, TokenCredential credential);
-}
+public sealed record GetUserPermissionsResponse(IEnumerable<Permission> Permissions);

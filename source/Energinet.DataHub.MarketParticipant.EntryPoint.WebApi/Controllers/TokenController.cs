@@ -13,111 +13,152 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
-using Azure.Identity;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+public class TokenController : ControllerBase
 {
-    [ApiController]
-    public class TokenController : ControllerBase
+    private const string Issuer = "https://datahub.dk";
+    private const string RoleClaim = "role";
+    private const string TokenClaim = "token";
+
+    private readonly IExternalTokenValidator _externalTokenValidator;
+    private readonly ISigningKeyRing _signingKeyRing;
+    private readonly IMediator _mediator;
+
+    public TokenController(
+        IExternalTokenValidator externalTokenValidator,
+        ISigningKeyRing signingKeyRing,
+        IMediator mediator)
     {
-        private readonly IKeyClient _keyClient;
-        private readonly ICryptographyClientProvider _cryptographyClientProvider;
-        private readonly IMediator _mediator;
+        _externalTokenValidator = externalTokenValidator;
+        _signingKeyRing = signingKeyRing;
+        _mediator = mediator;
+    }
 
-        public TokenController(IKeyClient keyClient, ICryptographyClientProvider cryptographyClientProvider, IMediator mediator)
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("v2.0/.well-known/openid-configuration")]
+    public IActionResult GetConfig()
+    {
+        var configuration = new
         {
-            _keyClient = keyClient;
-            _cryptographyClientProvider = cryptographyClientProvider;
-            _mediator = mediator;
-        }
+            issuer = Issuer,
+            jwks_uri = $"http://{Request.Host}/discovery/v2.0/keys",
+        };
 
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("v2.0/.well-known/openid-configuration")]
-        public IActionResult GetConfig()
+        return Ok(configuration);
+    }
+
+    [HttpGet]
+    [AllowAnonymous]
+    [Route("discovery/v2.0/keys")]
+    public async Task<IActionResult> GetKeysAsync()
+    {
+        var jwks = await _signingKeyRing.GetKeysAsync().ConfigureAwait(false);
+        var keys = new
         {
-            return Ok(new
-            {
-                issuer = "https://datahub.dk",
-                jwks_uri = "http://localhost:6000/discovery/v2.0/keys",
-            });
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        [Route("discovery/v2.0/keys")]
-        public async Task<IActionResult> GetKeysAsync()
-        {
-            var keys = await _keyClient.GetKeysAsync().ConfigureAwait(false);
-
-            var response = JsonSerializer.Serialize(
-                new
+            keys = jwks.Select(
+                jwk => new
                 {
-                    keys = keys.Select(
-                        x => new
-                        {
-                            kid = x.Kid,
-                            kty = x.Kty,
-                            use = x.Use,
-                            n = x.N,
-                            e = x.E
-                        }).ToArray()
-                });
+                    kid = GetKeyVersionIdentifier(jwk.Id),
+                    kty = jwk.KeyType.ToString(),
+                    n = jwk.N,
+                    e = jwk.E
+                })
+        };
 
-            return Ok(response);
-        }
+        return Ok(keys);
+    }
 
-        [HttpPost]
-        [Route("token")]
-        public async Task<IActionResult> GetTokenAsync(TokenRequest tokenRequest)
+    [HttpPost]
+    [AllowAnonymous]
+    [Route("token")]
+    public async Task<IActionResult> GetTokenAsync(TokenRequest tokenRequest)
+    {
+        ArgumentNullException.ThrowIfNull(tokenRequest);
+        ArgumentNullException.ThrowIfNull(tokenRequest.ExternalToken);
+
+        var externalJwt = new JwtSecurityToken(tokenRequest.ExternalToken);
+
+        if (!await _externalTokenValidator
+                .ValidateTokenAsync(tokenRequest.ExternalToken)
+                .ConfigureAwait(false))
         {
-            if (tokenRequest is null)
-                throw new ArgumentNullException(nameof(tokenRequest));
-
-            var token = tokenRequest.ExternalToken;
-
-            var key = await _keyClient.GetKeyAsync().ConfigureAwait(false);
-
-            var jwtToken = new JwtSecurityToken(token);
-
-            var newToken = new JwtSecurityToken(
-                "https://datahub.dk",
-                jwtToken.Audiences.Single(),
-                new[]
-                {
-                    jwtToken.Claims.Single(x => x.Type == "sub"),
-                    new Claim("token", token),
-                    new Claim("role", "organization:view"),
-                    new Claim("azp", tokenRequest.ActorId.ToString())
-                },
-                jwtToken.ValidFrom,
-                jwtToken.ValidTo);
-
-            newToken.Header["typ"] = "JWT";
-            newToken.Header["alg"] = "RS256";
-            newToken.Header["kid"] = key.Kid;
-
-            var cryptoClient = _cryptographyClientProvider.GetClient(key.Id, new DefaultAzureCredential());
-
-            var headerPayload = new JwtSecurityTokenHandler().WriteToken(newToken)[..^1];
-
-            var result = await cryptoClient
-                 .SignDataAsync(new SignatureAlgorithm(newToken.SignatureAlgorithm), Encoding.UTF8.GetBytes(headerPayload))
-                 .ConfigureAwait(false);
-
-            return Ok(new TokenResponse($"{headerPayload}.{Base64UrlEncoder.Encode(result.Signature)}"));
+            return Unauthorized();
         }
+
+        var userId = GetUserId(externalJwt.Claims);
+        var actorId = tokenRequest.ExternalActorId;
+
+        var grantedPermissions = await _mediator
+            .Send(new GetUserPermissionsCommand(userId, actorId))
+            .ConfigureAwait(false);
+
+        var roleClaims = grantedPermissions.Permissions
+            .Select(p => new Claim(RoleClaim, PermissionsAsClaims.Lookup[p]));
+
+        var dataHubTokenClaims = roleClaims
+            .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
+            .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
+            .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
+
+        var dataHubToken = new JwtSecurityToken(
+            Issuer,
+            tokenRequest.ExternalActorId.ToString(),
+            dataHubTokenClaims,
+            externalJwt.ValidFrom,
+            externalJwt.ValidTo);
+
+        var finalToken = await CreateSignedTokenAsync(dataHubToken).ConfigureAwait(false);
+        return Ok(new TokenResponse(finalToken));
+    }
+
+    private static Guid GetUserId(IEnumerable<Claim> claims)
+    {
+        var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
+        return Guid.Parse(userIdClaim.Value);
+    }
+
+    private static string GetKeyVersionIdentifier(string key)
+    {
+        return key[key.LastIndexOf('/')..];
+    }
+
+    private async Task<string> CreateSignedTokenAsync(JwtSecurityToken dataHubToken)
+    {
+        var signingClient = await _signingKeyRing
+            .GetSigningClientAsync()
+            .ConfigureAwait(false);
+
+        dataHubToken.Header[JwtHeaderParameterNames.Typ] = JwtConstants.TokenType;
+        dataHubToken.Header[JwtHeaderParameterNames.Alg] = _signingKeyRing.Algorithm;
+        dataHubToken.Header[JwtHeaderParameterNames.Kid] = GetKeyVersionIdentifier(signingClient.KeyId);
+
+        var headerAndPayload = new JwtSecurityTokenHandler().WriteToken(dataHubToken);
+
+        var signResult = await signingClient
+            .SignDataAsync(
+                new SignatureAlgorithm(_signingKeyRing.Algorithm),
+                Encoding.UTF8.GetBytes(headerAndPayload[..^1]))
+            .ConfigureAwait(false);
+
+        return headerAndPayload + Base64UrlEncoder.Encode(signResult.Signature);
     }
 }

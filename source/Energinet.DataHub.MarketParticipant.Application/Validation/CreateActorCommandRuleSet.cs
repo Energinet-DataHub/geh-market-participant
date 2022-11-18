@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Validation.Rules;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
     public sealed class CreateActorCommandRuleSet : AbstractValidator<CreateActorCommand>

@@ -14,11 +14,28 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Keys.Cryptography;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
-public interface IKeyClient
+/// <summary>
+/// Manages keys for signing JWT.
+/// </summary>
+public interface ISigningKeyRing
 {
-    Task<IEnumerable<Key>> GetKeysAsync();
-    Task<Key> GetKeyAsync();
+    /// <summary>
+    /// The algorithm used to sign a JWT.
+    /// </summary>
+    string Algorithm { get; }
+
+    /// <summary>
+    /// Gets a signing client with the newest key.
+    /// </summary>
+    Task<CryptographyClient> GetSigningClientAsync();
+
+    /// <summary>
+    /// Returns all the valid public signing keys.
+    /// </summary>
+    Task<IEnumerable<JsonWebKey>> GetKeysAsync();
 }

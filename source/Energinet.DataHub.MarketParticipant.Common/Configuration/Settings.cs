@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 
 public static class Settings
@@ -37,15 +39,17 @@ public static class Settings
     public static Setting<string> B2CServicePrincipalNameSecret { get; }
         = new("AZURE_B2C_SPN_SECRET");
 
-    public static Setting<string> FrontendOpenIdUrl { get; }
-        = new("FRONTEND_OPEN_ID_URL");
-    public static Setting<string> FrontendAppId { get; }
-        = new("FRONTEND_SERVICE_APP_ID");
+    public static Setting<string> ExternalOpenIdUrl { get; }
+        = new("EXTERNAL_OPEN_ID_URL");
+    public static Setting<string> InternalOpenIdUrl { get; }
+        = new("INTERNAL_OPEN_ID_URL");
+    public static Setting<string> BackendAppId { get; }
+        = new("BACKEND_SERVICE_APP_ID");
 
     public static Setting<string> ServiceBusHealthCheckConnectionString { get; }
         = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
 
-    public static Setting<string> KeyVault { get; }
+    public static Setting<Uri> KeyVault { get; }
         = new("KEY_VAULT");
 
     public static Setting<string> KeyName { get; }

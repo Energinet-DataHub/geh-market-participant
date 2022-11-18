@@ -12,8 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
-public record Key(Uri Id, string Kid, string Kty, string Use, byte[] N, byte[] E);
+/// <summary>
+/// TODO: gfkghsdfkj
+/// </summary>
+public interface IExternalTokenValidator
+{
+    /// <summary>
+    /// TODO: dgfkjhsgj
+    /// </summary>
+    /// <param name="token"></param>
+    Task<bool> ValidateTokenAsync(string token);
+}

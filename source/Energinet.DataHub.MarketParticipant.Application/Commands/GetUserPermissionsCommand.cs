@@ -13,18 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Concurrent;
-using Azure.Core;
-using Azure.Security.KeyVault.Keys.Cryptography;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public class CryptographyClientProvider : ICryptographyClientProvider
-{
-    private static readonly ConcurrentDictionary<Uri, CryptographyClient> Cache = new ConcurrentDictionary<Uri, CryptographyClient>();
-
-    public CryptographyClient GetClient(Uri keyId, TokenCredential credential)
-    {
-        return Cache.GetOrAdd(keyId, (x) => new CryptographyClient(keyId, credential));
-    }
-}
+public sealed record GetUserPermissionsCommand(Guid UserId, Guid ActorId) : IRequest<GetUserPermissionsResponse>;
