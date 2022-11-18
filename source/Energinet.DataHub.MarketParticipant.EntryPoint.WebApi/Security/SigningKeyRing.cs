@@ -50,9 +50,9 @@ public sealed class SigningKeyRing : ISigningKeyRing
         var keyCache = await LoadKeysAsync().ConfigureAwait(false);
 
         var latestKey = keyCache
-            .Where(key => key.Properties.NotBefore <= DateTimeOffset.UtcNow)
-            .Where(key => key.Properties.ExpiresOn > DateTimeOffset.UtcNow)
-            .First(key => key.Properties.CreatedOn < DateTimeOffset.UtcNow.AddHours(-1));
+            .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= DateTimeOffset.UtcNow)
+            .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > DateTimeOffset.UtcNow)
+            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < DateTimeOffset.UtcNow.AddHours(-1));
 
         return _keyClient.GetCryptographyClient(_keyName, latestKey.Properties.Version);
     }
