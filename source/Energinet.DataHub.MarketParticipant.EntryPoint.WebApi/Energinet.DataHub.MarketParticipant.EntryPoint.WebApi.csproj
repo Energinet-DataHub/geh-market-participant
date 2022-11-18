@@ -21,10 +21,15 @@ limitations under the License.
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <RestoreSources>$(RestoreSources);./local-nuget-feed;https://api.nuget.org/v3/index.json</RestoreSources>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="6.0.4" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="7.2.3" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.2.3" />
+    <PackageReference Include="Azure.Identity" Version="1.8.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.4.0" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.2.4-vov5" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="6.0.11" />

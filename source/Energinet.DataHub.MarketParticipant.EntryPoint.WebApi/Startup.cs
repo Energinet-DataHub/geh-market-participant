@@ -35,6 +35,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using SimpleInjector;
 
@@ -47,6 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
+            LogHelper.Logger = new IdentityLogger();
+            AuthenticationExtensions.DisableHttpsConfiguration = true;
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -69,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             if (_configuration.GetSetting(Settings.RolesValidationEnabled))
             {
-                app.UseUserMiddleware<FrontendUser>();
+                // app.UseUserMiddleware<FrontendUser>();
             }
 
             app.UseEndpoints(endpoints =>
@@ -102,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
             var frontendAppId = configuration.GetSetting(Settings.FrontendAppId);
-            services.AddJwtBearerAuthentication(openIdUrl, frontendAppId);
+            services.AddJwtBearerAuthentication(openIdUrl, "http://localhost:6000/v2.0/.well-known/openid-configuration", frontendAppId);
             services.AddPermissionAuthorization();
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
@@ -155,6 +158,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             if (configuration.GetSetting(Settings.RolesValidationEnabled))
             {
+                container.RegisterSingleton<IKeyClient>(() => new KeyClient(configuration.GetSetting(Settings.KeyVault), configuration.GetSetting(Settings.KeyName)));
+                container.RegisterSingleton<ICryptographyClientProvider>(() => new CryptographyClientProvider());
                 container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
             }
 
