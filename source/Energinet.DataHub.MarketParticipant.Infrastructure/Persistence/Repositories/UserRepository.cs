@@ -71,12 +71,17 @@ public sealed class UserRepository : IUserRepository
             return null;
 
         var roles = result.Actors.SelectMany(x => x.UserRoles.Select(y => y.UserRoleTemplateId)).Distinct();
-        var permissions = _marketParticipantDbContext.UserRoleTemplates
+        var roleTemplates = (await _marketParticipantDbContext.UserRoleTemplates
             .Where(x => roles.Contains(x.Id))
-            .Include(x => x.Permissions)
-            .ToList()
+            .ToListAsync().ConfigureAwait(false)).ToDictionary(x => x.Id);
+
+        var permissions = (await _marketParticipantDbContext.UserRoleTemplates
+                .Where(x => roles.Contains(x.Id))
+                .Include(x => x.Permissions)
+                .ToListAsync()
+                .ConfigureAwait(false))
             .SelectMany(x => x.Permissions).ToLookup(y => y.UserRoleTemplateId);
-        return UserMapper.MapFromEntity(result, permissions);
+        return UserMapper.MapFromEntity(result, permissions, roleTemplates);
     }
 
     public async Task<IEnumerable<User>> GetAsync()
@@ -87,13 +92,16 @@ public sealed class UserRepository : IUserRepository
             .ConfigureAwait(false);
 
         var roles = result.SelectMany(x => x.Actors.SelectMany(y => y.UserRoles.Select(z => z.UserRoleTemplateId)).Distinct());
+        var roleTemplates = (await _marketParticipantDbContext.UserRoleTemplates
+            .Where(x => roles.Contains(x.Id))
+            .ToListAsync().ConfigureAwait(false)).ToDictionary(x => x.Id);
         var permissions = _marketParticipantDbContext.UserRoleTemplates
             .Where(x => roles.Contains(x.Id))
             .Include(x => x.Permissions)
             .ToList()
             .SelectMany(x => x.Permissions).ToLookup(y => y.UserRoleTemplateId);
 
-        return result.Select(from => UserMapper.MapFromEntity(from, permissions));
+        return result.Select(from => UserMapper.MapFromEntity(from, permissions, roleTemplates));
     }
 
     private IQueryable<UserEntity> GetQuery()

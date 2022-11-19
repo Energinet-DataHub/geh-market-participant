@@ -47,7 +47,10 @@ internal sealed class UserMapper
         toAdd.ForEach(x => to.Actors.Add(x));
     }
 
-    public static User MapFromEntity(UserEntity from, ILookup<Guid, UserRoleTemplatePermissionEntity> permissions)
+    public static User MapFromEntity(
+        UserEntity from,
+        ILookup<Guid, UserRoleTemplatePermissionEntity> permissions,
+        Dictionary<Guid, UserRoleTemplateEntity> userRoleTemplates)
     {
         var user = new User(
             from.Id,
@@ -59,6 +62,11 @@ internal sealed class UserMapper
         {
             foreach (var actorUserRole in userActor.UserRoles)
             {
+                if (userRoleTemplates.TryGetValue(actorUserRole.UserRoleTemplateId, out var template))
+                {
+                    actorUserRole.UserRoleName = template.Name;
+                }
+
                 foreach (var permissionEntity in permissions[actorUserRole.UserRoleTemplateId])
                 {
                     if (Enum.TryParse<Core.App.Common.Security.Permission>(permissionEntity.PermissionId, out var permEnum))
