@@ -80,7 +80,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         var testActor = new Actor(new MockedGln());
         var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
         organization.Actors.Add(testActor);
-        var orgId = orgRepository.AddOrUpdateAsync(organization);
+        await orgRepository.AddOrUpdateAsync(organization);
 
         var userActor = new UserActor() { ActorId = testActor.Id };
         var testUser = new User("Test User", Guid.NewGuid(), new List<UserActor>() { userActor });
@@ -135,7 +135,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_UserWithActorAndMarketRoleAdded_CanReadBack()
+    public async Task AddOrUpdateAsync_UserWithActorAndUserRoleTemplateAdded_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -148,13 +148,11 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         var orgRepository = new OrganizationRepository(context);
 
         var testActor = new Actor(new MockedGln());
-        var testMarketRole = new ActorMarketRole(EicFunction.Consumer, new List<ActorGridArea>());
-        testActor.MarketRoles.Add(testMarketRole);
         var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
         organization.Actors.Add(testActor);
-        var orgId = orgRepository.AddOrUpdateAsync(organization);
+        await orgRepository.AddOrUpdateAsync(organization);
 
-        var testRole = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
+        var testRole = new UserRoleTemplate("Test A", new List<UserRolePermission>());
         var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
         var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleId };
         var testUserActor = new UserActor() { ActorId = testActor.Id, UserRoles = new List<UserActorUserRole>() { testUserActorRole } };
@@ -175,7 +173,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_UserWithActorAndMultipleMarketRoleAdded_CanReadBack()
+    public async Task AddOrUpdateAsync_UserWithActorAndMultipleUserRoleTemplatesAdded_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -188,16 +186,12 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         var orgRepository = new OrganizationRepository(context);
 
         var testActor = new Actor(new MockedGln());
-        var testMarketRole = new ActorMarketRole(EicFunction.Consumer, new List<ActorGridArea>());
-        var testMarketRole2 = new ActorMarketRole(EicFunction.EnergySupplier, new List<ActorGridArea>());
-        testActor.MarketRoles.Add(testMarketRole);
-        testActor.MarketRoles.Add(testMarketRole2);
         var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
         organization.Actors.Add(testActor);
-        var orgId = orgRepository.AddOrUpdateAsync(organization);
+        await orgRepository.AddOrUpdateAsync(organization);
 
-        var testRoleTemplate = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
-        var testRoleTemplate2 = new UserRoleTemplate("BTest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
+        var testRoleTemplate = new UserRoleTemplate("Test A", new List<UserRolePermission>());
+        var testRoleTemplate2 = new UserRoleTemplate("Test B", new List<UserRolePermission>());
         var testRoleTemplateId = await userRoleTemplateRepository.AddOrUpdateAsync(testRoleTemplate);
         var testRoleTemplate2Id = await userRoleTemplateRepository.AddOrUpdateAsync(testRoleTemplate2);
         var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleTemplateId };
@@ -221,7 +215,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_UserWithActorAndMarketRoleWithPermissionAdded_CanReadBack()
+    public async Task AddOrUpdateAsync_UserWithActorAndUserRoleTemplatesWithPermissionAdded_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -234,13 +228,11 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         var orgRepository = new OrganizationRepository(context);
 
         var testActor = new Actor(new MockedGln());
-        var testMarketRole = new ActorMarketRole(EicFunction.Consumer, new List<ActorGridArea>());
-        testActor.MarketRoles.Add(testMarketRole);
         var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
         organization.Actors.Add(testActor);
-        var orgId = orgRepository.AddOrUpdateAsync(organization);
+        await orgRepository.AddOrUpdateAsync(organization);
 
-        var testRoleTemplate = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
+        var testRoleTemplate = new UserRoleTemplate("Test A", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
         var testRoleTemplateId = await userRoleTemplateRepository.AddOrUpdateAsync(testRoleTemplate);
         var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleTemplateId };
         var testUserActor = new UserActor() { ActorId = testActor.Id, UserRoles = new List<UserActorUserRole>() { testUserActorRole } };
@@ -262,7 +254,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_UserWithActorAndMultipleMarketRoleWithPermissionAdded_CanReadBack()
+    public async Task AddOrUpdateAsync_UserWithActorAndMultipleUserRoleTemplatesWithPermissionAdded_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -275,16 +267,12 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         var orgRepository = new OrganizationRepository(context);
 
         var testActor = new Actor(new MockedGln());
-        var testMarketRole = new ActorMarketRole(EicFunction.Consumer, new List<ActorGridArea>());
-        var testMarketRole2 = new ActorMarketRole(EicFunction.EnergySupplier, new List<ActorGridArea>());
-        testActor.MarketRoles.Add(testMarketRole);
-        testActor.MarketRoles.Add(testMarketRole2);
         var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
         organization.Actors.Add(testActor);
-        var orgId = orgRepository.AddOrUpdateAsync(organization);
+        await orgRepository.AddOrUpdateAsync(organization);
 
-        var testRoleTemplate = new UserRoleTemplate("ATest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
-        var testRoleTemplate2 = new UserRoleTemplate("BTest", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationView.ToString() } });
+        var testRoleTemplate = new UserRoleTemplate("Test A", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
+        var testRoleTemplate2 = new UserRoleTemplate("Test B", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationView.ToString() } });
         var testRoleTemplateId = await userRoleTemplateRepository.AddOrUpdateAsync(testRoleTemplate);
         var testRoleTemplate2Id = await userRoleTemplateRepository.AddOrUpdateAsync(testRoleTemplate2);
         var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleTemplateId };
@@ -307,6 +295,190 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         Assert.Equal(testRoleTemplate2Id, newUser!.Actors.First().UserRoles.Skip(1).First().UserRoleTemplateId);
         Assert.Equal(2, newUser!.Actors.First().UserRoles.First().Permissions.Count);
         Assert.Single(newUser!.Actors.First().UserRoles.Skip(1).First().Permissions);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_TwoUsersWithActorAdded_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+        var userRepository2 = new UserRepository(context2);
+        var orgRepository = new OrganizationRepository(context);
+        var testActor = new Actor(new MockedGln());
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
+        organization.Actors.Add(testActor);
+        await orgRepository.AddOrUpdateAsync(organization);
+
+        var userActor = new UserActor() { ActorId = testActor.Id };
+        var testUser = new User("Test User A", Guid.NewGuid(), new List<UserActor>() { userActor });
+        var testUser2 = new User("Test User B", Guid.NewGuid(), new List<UserActor>() { userActor });
+
+        // Act
+        var userId = await userRepository.AddOrUpdateAsync(testUser);
+        var user2Id = await userRepository.AddOrUpdateAsync(testUser2);
+        var newUser = await userRepository2.GetAsync(userId);
+        var newUser2 = await userRepository2.GetAsync(user2Id);
+
+        // Assert
+        Assert.NotNull(newUser);
+        Assert.NotNull(newUser2);
+        Assert.NotEqual(Guid.Empty, newUser!.Id);
+        Assert.NotEqual(Guid.Empty, newUser2!.Id);
+        Assert.NotEqual(newUser!.Id, newUser2!.Id);
+        Assert.Equal(testUser.Name, newUser!.Name);
+        Assert.Equal(testUser2.Name, newUser2!.Name);
+        Assert.Single(newUser!.Actors);
+        Assert.Single(newUser2!.Actors);
+        Assert.Equal(testActor.Id,  newUser.Actors.First().ActorId);
+        Assert.Equal(testActor.Id,  newUser2.Actors.First().ActorId);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_TwoUsersWithDifferentActorsAdded_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+        var userRepository2 = new UserRepository(context2);
+        var orgRepository = new OrganizationRepository(context);
+        var testActor = new Actor(new MockedGln());
+        var testActor2 = new Actor(new MockedGln());
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
+        organization.Actors.Add(testActor);
+        organization.Actors.Add(testActor2);
+        await orgRepository.AddOrUpdateAsync(organization);
+
+        var userActor = new UserActor() { ActorId = testActor.Id };
+        var user2Actor = new UserActor() { ActorId = testActor2.Id };
+        var testUser = new User("Test User A", Guid.NewGuid(), new List<UserActor>() { userActor });
+        var testUser2 = new User("Test User B", Guid.NewGuid(), new List<UserActor>() { user2Actor });
+
+        // Act
+        var userId = await userRepository.AddOrUpdateAsync(testUser);
+        var user2Id = await userRepository.AddOrUpdateAsync(testUser2);
+        var newUser = await userRepository2.GetAsync(userId);
+        var newUser2 = await userRepository2.GetAsync(user2Id);
+
+        // Assert
+        Assert.NotNull(newUser);
+        Assert.NotNull(newUser2);
+        Assert.NotEqual(Guid.Empty, newUser!.Id);
+        Assert.NotEqual(Guid.Empty, newUser2!.Id);
+        Assert.NotEqual(newUser!.Id, newUser2!.Id);
+        Assert.NotEqual(newUser.Actors.First().ActorId, newUser2.Actors.First().ActorId);
+        Assert.Equal(testUser.Name, newUser!.Name);
+        Assert.Equal(testUser2.Name, newUser2!.Name);
+        Assert.Single(newUser!.Actors);
+        Assert.Single(newUser2!.Actors);
+        Assert.Equal(testActor.Id,  newUser.Actors.First().ActorId);
+        Assert.Equal(testActor2.Id,  newUser2.Actors.First().ActorId);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_TwoUsersWithActorAndUserRoleTemplateAdded_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture).ConfigureAwait(false);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRepository2 = new UserRepository(context2);
+        var orgRepository = new OrganizationRepository(context);
+
+        var testActor = new Actor(new MockedGln());
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
+        organization.Actors.Add(testActor);
+        await orgRepository.AddOrUpdateAsync(organization);
+
+        var testRole = new UserRoleTemplate("Test A", new List<UserRolePermission>());
+        var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
+        var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleId };
+        var testUserActor = new UserActor() { ActorId = testActor.Id, UserRoles = new List<UserActorUserRole>() { testUserActorRole } };
+        var testUser = new User("Test User A", Guid.NewGuid(), new List<UserActor>() { testUserActor });
+        var testUser2 = new User("Test User B", Guid.NewGuid(), new List<UserActor>() { testUserActor });
+
+        // Act
+        var userId = await userRepository.AddOrUpdateAsync(testUser);
+        var user2Id = await userRepository.AddOrUpdateAsync(testUser2);
+        var newUser = await userRepository2.GetAsync(userId);
+        var newUser2 = await userRepository2.GetAsync(user2Id);
+
+        // Assert
+        Assert.NotNull(newUser);
+        Assert.NotNull(newUser2);
+        Assert.NotEqual(Guid.Empty, newUser!.Id);
+        Assert.NotEqual(Guid.Empty, newUser2!.Id);
+        Assert.Equal(testUser.Name, newUser!.Name);
+        Assert.Equal(testUser2.Name, newUser2!.Name);
+        Assert.Single(newUser!.Actors);
+        Assert.Single(newUser!.Actors.First().UserRoles);
+        Assert.Single(newUser2!.Actors);
+        Assert.Single(newUser2!.Actors.First().UserRoles);
+        Assert.Equal(testActor.Id,  newUser.Actors.First().ActorId);
+        Assert.Equal(testRoleId, newUser!.Actors.First().UserRoles.First().UserRoleTemplateId);
+        Assert.Equal(testActor.Id,  newUser2.Actors.First().ActorId);
+        Assert.Equal(testRoleId, newUser2!.Actors.First().UserRoles.First().UserRoleTemplateId);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_TwoUsersWithActorAndDifferentUserRoleTemplatesAdded_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRepository2 = new UserRepository(context2);
+        var orgRepository = new OrganizationRepository(context);
+
+        var testActor = new Actor(new MockedGln());
+        var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
+        organization.Actors.Add(testActor);
+        await orgRepository.AddOrUpdateAsync(organization);
+
+        var testRole = new UserRoleTemplate("Test A", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
+        var testRoleId = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
+        var testRole2 = new UserRoleTemplate("Test B", new List<UserRolePermission>() { new() { PermissionId = Permission.OrganizationManage.ToString() }, new() { PermissionId = Permission.GridAreasManage.ToString() } });
+        var testRole2Id = await userRoleTemplateRepository.AddOrUpdateAsync(testRole);
+        var testUserActorRole = new UserActorUserRole() { UserRoleTemplateId = testRoleId };
+        var testUserActorRole2 = new UserActorUserRole() { UserRoleTemplateId = testRole2Id };
+        var testUserActor = new UserActor() { ActorId = testActor.Id, UserRoles = new List<UserActorUserRole>() { testUserActorRole } };
+        var testUserActor2 = new UserActor() { ActorId = testActor.Id, UserRoles = new List<UserActorUserRole>() { testUserActorRole2 } };
+        var testUser = new User("Test User A", Guid.NewGuid(), new List<UserActor>() { testUserActor });
+        var testUser2 = new User("Test User B", Guid.NewGuid(), new List<UserActor>() { testUserActor2 });
+
+        // Act
+        var userId = await userRepository.AddOrUpdateAsync(testUser);
+        var user2Id = await userRepository.AddOrUpdateAsync(testUser2);
+        var newUser = await userRepository2.GetAsync(userId);
+        var newUser2 = await userRepository2.GetAsync(user2Id);
+
+        // Assert
+        Assert.NotNull(newUser);
+        Assert.NotNull(newUser2);
+        Assert.NotEqual(Guid.Empty, newUser!.Id);
+        Assert.NotEqual(Guid.Empty, newUser2!.Id);
+        Assert.Equal(testUser.Name, newUser!.Name);
+        Assert.Equal(testUser2.Name, newUser2!.Name);
+        Assert.Single(newUser!.Actors);
+        Assert.Single(newUser!.Actors.First().UserRoles);
+        Assert.Single(newUser2!.Actors);
+        Assert.Single(newUser2!.Actors.First().UserRoles);
+        Assert.Equal(testActor.Id,  newUser.Actors.First().ActorId);
+        Assert.Equal(testRoleId, newUser!.Actors.First().UserRoles.First().UserRoleTemplateId);
+        Assert.Equal(testActor.Id,  newUser2.Actors.First().ActorId);
+        Assert.Equal(testRole2Id, newUser2!.Actors.First().UserRoles.First().UserRoleTemplateId);
     }
 
     public async Task InitializeAsync()

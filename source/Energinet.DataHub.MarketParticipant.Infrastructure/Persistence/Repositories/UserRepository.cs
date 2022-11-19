@@ -47,7 +47,7 @@ public sealed class UserRepository : IUserRepository
         {
             destination = new UserEntity(user.Name);
             UserMapper.MapToEntity(user, destination);
-            _marketParticipantDbContext.Users.Add(destination);
+            await _marketParticipantDbContext.Users.AddAsync(destination).ConfigureAwait(false);
         }
         else
         {
