@@ -142,8 +142,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            context.Permissions.Remove(new PermissionEntity(Core.App.Common.Security.Permission.OrganizationManage.ToString(), "Test 1"));
-            context.Permissions.Remove(new PermissionEntity(Core.App.Common.Security.Permission.GridAreasManage.ToString(), "Test 2"));
+            var perm1 = await context.Permissions.FindAsync(Core.App.Common.Security.Permission.OrganizationManage.ToString());
+            var perm2 = await context.Permissions.FindAsync(Core.App.Common.Security.Permission.GridAreasManage.ToString());
+            if (perm1 is not null)
+            {
+                context.Permissions.Remove(perm1);
+            }
+
+            if (perm2 is not null)
+            {
+                context.Permissions.Remove(perm2);
+            }
+
             await context.SaveChangesAsync();
         }
     }

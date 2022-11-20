@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
@@ -26,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class PermissionRepositoryTests
+public sealed class PermissionRepositoryTests : IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -44,12 +43,12 @@ public sealed class PermissionRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
-        var permissionRepositor2 = new PermissionRepository(context2);
+        var permissionRepository2 = new PermissionRepository(context2);
         var testPerm = new Permission("Test_Permission", "Test 1");
 
         // Act
         await permissionRepository.AddOrUpdateAsync(testPerm);
-        var newPermission = await permissionRepositor2.GetAsync(testPerm.Id);
+        var newPermission = await permissionRepository2.GetAsync(testPerm.Id);
 
         // Assert
         Assert.NotNull(newPermission);
@@ -94,16 +93,16 @@ public sealed class PermissionRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
-        var permissionRepositor2 = new PermissionRepository(context2);
+        var permissionRepository2 = new PermissionRepository(context2);
         var testPerm = new Permission("Test_Permission", "Test 1");
         var testPerm2 = new Permission("Test_Permission2", "Test 2");
 
         // Act
         await permissionRepository.AddOrUpdateAsync(testPerm);
         await permissionRepository.AddOrUpdateAsync(testPerm2);
-        var expected = await permissionRepositor2.GetAsync(testPerm.Id);
-        var expected2 = await permissionRepositor2.GetAsync(testPerm2.Id);
-        var all = await permissionRepositor2.GetAsync();
+        var expected = await permissionRepository2.GetAsync(testPerm.Id);
+        var expected2 = await permissionRepository2.GetAsync(testPerm2.Id);
+        var all = await permissionRepository2.GetAsync();
 
         // Assert
         Assert.NotNull(expected);
@@ -151,5 +150,31 @@ public sealed class PermissionRepositoryTests
         Assert.Equal(testPerm2.Id, expected2?.Id);
         Assert.Equal(testPermUpdated.Description, expected?.Description);
         Assert.Equal(testPermUpdated2.Description, expected2?.Description);
+    }
+
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task DisposeAsync()
+    {
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var perm1 = await context.Permissions.FindAsync("Test_Permission");
+        var perm2 = await context.Permissions.FindAsync("Test_Permission2");
+        if (perm1 is not null)
+        {
+            context.Permissions.Remove(perm1);
+        }
+
+        if (perm2 is not null)
+        {
+            context.Permissions.Remove(perm2);
+        }
+
+        await context.SaveChangesAsync();
     }
 }

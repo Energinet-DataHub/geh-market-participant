@@ -491,6 +491,7 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         context.Permissions.Add(new PermissionEntity(Permission.OrganizationManage.ToString(), "Test 1"));
         context.Permissions.Add(new PermissionEntity(Permission.GridAreasManage.ToString(), "Test 2"));
         context.Permissions.Add(new PermissionEntity(Permission.OrganizationView.ToString(), "Test 3"));
+
         await context.SaveChangesAsync();
     }
 
@@ -501,9 +502,24 @@ public sealed class UserRepositoryTests : IAsyncLifetime
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        context.Permissions.Remove(new PermissionEntity(Permission.OrganizationManage.ToString(), "Test 1"));
-        context.Permissions.Remove(new PermissionEntity(Permission.GridAreasManage.ToString(), "Test 2"));
-        context.Permissions.Remove(new PermissionEntity(Permission.OrganizationView.ToString(), "Test 2"));
+        var perm1 = await context.Permissions.FindAsync(Permission.OrganizationManage.ToString());
+        var perm2 = await context.Permissions.FindAsync(Permission.GridAreasManage.ToString());
+        var perm3 = await context.Permissions.FindAsync(Permission.OrganizationView.ToString());
+        if (perm1 is not null)
+        {
+            context.Permissions.Remove(perm1);
+        }
+
+        if (perm2 is not null)
+        {
+            context.Permissions.Remove(perm2);
+        }
+
+        if (perm3 is not null)
+        {
+            context.Permissions.Remove(perm3);
+        }
+
         await context.SaveChangesAsync();
     }
 }
