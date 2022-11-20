@@ -12,29 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using System;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Xunit;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class MarketParticipantDatabaseFixture : IAsyncLifetime
+    public sealed class PermissionEntityConfiguration : IEntityTypeConfiguration<PermissionEntity>
     {
-        public MarketParticipantDatabaseFixture()
+        public void Configure(EntityTypeBuilder<PermissionEntity> builder)
         {
-            DatabaseManager = new MarketParticipantDatabaseManager();
-        }
-
-        public MarketParticipantDatabaseManager DatabaseManager { get; }
-
-        public async Task InitializeAsync()
-        {
-            await DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            builder.ToTable("AccessPermission");
+            builder.HasKey(permission => permission.Id);
+            builder.Property(permission => permission.Id).ValueGeneratedNever();
         }
     }
 }

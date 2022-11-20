@@ -12,29 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 {
-    public sealed class MarketParticipantDatabaseFixture : IAsyncLifetime
+    internal sealed class PermissionMapper
     {
-        public MarketParticipantDatabaseFixture()
+        public static void MapToEntity(Permission from, PermissionEntity to)
         {
-            DatabaseManager = new MarketParticipantDatabaseManager();
+            to.Id = from.Id;
+            to.Description = from.Description;
         }
 
-        public MarketParticipantDatabaseManager DatabaseManager { get; }
-
-        public async Task InitializeAsync()
+        public static Permission MapFromEntity(PermissionEntity from)
         {
-            await DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
+            return new Permission(
+                from.Id,
+                from.Description);
         }
     }
 }

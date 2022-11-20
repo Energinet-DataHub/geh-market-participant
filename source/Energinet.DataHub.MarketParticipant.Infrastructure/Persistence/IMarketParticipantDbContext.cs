@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -78,6 +79,31 @@ public interface IMarketParticipantDbContext
     ///     Represent access to the ActorSynchronization database table
     /// </summary>
     DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }
+
+    /// <summary>
+    ///     Represent access to the UserRoleTemplate database table
+    /// </summary>
+    DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; }
+
+    /// <summary>
+    ///     Represent access to the Permission database table
+    /// </summary>
+    DbSet<PermissionEntity> Permissions { get; }
+
+    /// <summary>
+    ///     Represent access to the MarketRoleToUserRoleTemplate database table
+    /// </summary>
+    DbSet<MarketRoleToUserRoleTemplateEntity> MarketRoleToUserRoleTemplate { get; }
+
+    /// <summary>
+    ///     Represent access to the UserActor database table
+    /// </summary>
+    DbSet<UserActorEntity> UserActors { get; }
+
+    /// <summary>
+    ///     Represent access to the User database table
+    /// </summary>
+    DbSet<UserEntity> Users { get; }
 
     /// <summary>
     ///     Saves changes to the database.
