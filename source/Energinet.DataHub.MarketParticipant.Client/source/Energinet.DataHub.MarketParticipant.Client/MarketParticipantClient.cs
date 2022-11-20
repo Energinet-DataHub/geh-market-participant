@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private readonly IMarketParticipantGridAreaClient _marketParticipantGridAreaClient;
         private readonly IMarketParticipantActorContactClient _marketParticipantActorContactClient;
         private readonly IMarketParticipantGridAreaOverviewClient _marketParticipantGridAreaOverviewClient;
+        private readonly IMarketParticipantTokenClient _marketParticipantTokenClient;
 
         public MarketParticipantClient(IFlurlClient client)
         {
@@ -35,6 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
             _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(client);
+            _marketParticipantTokenClient = new MarketParticipantTokenClient(client);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
@@ -110,6 +112,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public Task<IEnumerable<GridAreaAuditLogEntryDto>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
             return _marketParticipantGridAreaClient.GetGridAreaAuditLogEntriesAsync(gridAreaId);
+        }
+
+        public Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request)
+        {
+            throw new NotImplementedException();
         }
     }
 }
