@@ -18,12 +18,12 @@ using System.Threading.Tasks;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
 /// <summary>
-/// TODO: gfkghsdfkj
+/// Validates external token
 /// </summary>
 public interface IExternalTokenValidator
 {
     /// <summary>
-    /// TODO: dgfkjhsgj
+    /// Validates external token
     /// </summary>
     /// <param name="token"></param>
     Task<bool> ValidateTokenAsync(string token);
