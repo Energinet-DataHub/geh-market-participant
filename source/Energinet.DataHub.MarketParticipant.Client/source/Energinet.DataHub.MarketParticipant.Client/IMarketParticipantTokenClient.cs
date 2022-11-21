@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
+
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
+    /// BFF client for DataHub token retrieval
     /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantGridAreaClient, IMarketParticipantActorContactClient, IMarketParticipantGridAreaOverviewClient, IMarketParticipantTokenClient
+    public interface IMarketParticipantTokenClient
     {
+        /// <summary>
+        /// Retrieves a DataHub token
+        /// </summary>
+        Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request);
     }
 }

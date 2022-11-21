@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
+
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+
+/// <summary>
+/// Validates external token
+/// </summary>
+public interface IExternalTokenValidator
 {
     /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
+    /// Validates external token
     /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantGridAreaClient, IMarketParticipantActorContactClient, IMarketParticipantGridAreaOverviewClient, IMarketParticipantTokenClient
-    {
-    }
+    /// <param name="token"></param>
+    Task<bool> ValidateTokenAsync(string token);
 }
