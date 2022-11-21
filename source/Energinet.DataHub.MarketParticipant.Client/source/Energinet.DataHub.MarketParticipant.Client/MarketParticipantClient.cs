@@ -116,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request)
         {
-            throw new NotImplementedException();
+            return _marketParticipantTokenClient.GetTokenAsync(request);
         }
     }
 }
