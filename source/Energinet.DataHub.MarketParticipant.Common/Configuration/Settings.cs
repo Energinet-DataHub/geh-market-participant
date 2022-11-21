@@ -51,7 +51,6 @@ public static class Settings
 
     public static Setting<Uri> KeyVault { get; }
         = new("KEY_VAULT");
-
     public static Setting<string> KeyName { get; }
         = new("KEY_NAME");
 

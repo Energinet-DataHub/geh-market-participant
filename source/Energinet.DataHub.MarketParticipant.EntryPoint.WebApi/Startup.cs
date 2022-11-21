@@ -166,22 +166,22 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
             });
 
-            container.RegisterSingleton<ISigningKeyRing>(() =>
-            {
-                var keyVaultUri = configuration.GetSetting(Settings.KeyVault);
-                var keyName = configuration.GetSetting(Settings.KeyName);
-
-#if DEBUG
-                var tokenCredentials = new DefaultAzureCredential();
-#else
-                var tokenCredentials = new ManagedIdentityCredential();
-#endif
-
-                return new SigningKeyRing(keyVaultUri, tokenCredentials, keyName);
-            });
-
             if (configuration.GetSetting(Settings.RolesValidationEnabled))
             {
+                container.RegisterSingleton<ISigningKeyRing>(() =>
+                {
+                    var keyVaultUri = configuration.GetSetting(Settings.KeyVault);
+                    var keyName = configuration.GetSetting(Settings.KeyName);
+
+#if DEBUG
+                    var tokenCredentials = new DefaultAzureCredential();
+#else
+                    var tokenCredentials = new ManagedIdentityCredential();
+#endif
+
+                    return new SigningKeyRing(keyVaultUri, tokenCredentials, keyName);
+                });
+
                 container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
             }
 
