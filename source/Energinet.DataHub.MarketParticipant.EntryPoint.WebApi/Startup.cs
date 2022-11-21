@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using Azure.Identity;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
@@ -26,6 +27,7 @@ using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -100,9 +102,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            var openIdUrl = configuration.GetSetting(Settings.FrontendOpenIdUrl);
-            var frontendAppId = configuration.GetSetting(Settings.FrontendAppId);
-            services.AddJwtBearerAuthentication(openIdUrl, frontendAppId);
+            var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+            var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
+            var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+            services.AddJwtBearerAuthentication(
+                externalOpenIdUrl,
+                internalOpenIdUrl,
+                backendAppId);
             services.AddPermissionAuthorization();
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
@@ -153,8 +159,29 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         {
             ArgumentNullException.ThrowIfNull(container);
 
+            container.RegisterSingleton<IExternalTokenValidator>(() =>
+            {
+                var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+                var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+                return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
+            });
+
             if (configuration.GetSetting(Settings.RolesValidationEnabled))
             {
+                container.RegisterSingleton<ISigningKeyRing>(() =>
+                {
+                    var keyVaultUri = configuration.GetSetting(Settings.KeyVault);
+                    var keyName = configuration.GetSetting(Settings.KeyName);
+
+#if DEBUG
+                    var tokenCredentials = new DefaultAzureCredential();
+#else
+                    var tokenCredentials = new ManagedIdentityCredential();
+#endif
+
+                    return new SigningKeyRing(keyVaultUri, tokenCredentials, keyName);
+                });
+
                 container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
             }
 

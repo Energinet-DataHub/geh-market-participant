@@ -12,12 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
-{
-    /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
-    /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantGridAreaClient, IMarketParticipantActorContactClient, IMarketParticipantGridAreaOverviewClient, IMarketParticipantTokenClient
-    {
-    }
-}
+using System.Collections.Generic;
+using Energinet.DataHub.Core.App.Common.Security;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
+
+public sealed record GetUserPermissionsResponse(IEnumerable<Permission> Permissions);
