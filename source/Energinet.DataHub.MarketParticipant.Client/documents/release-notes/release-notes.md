@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.7.5
+
+- Token endpoint
+
 ## Version 2.7.3
 
 - Updated packages.

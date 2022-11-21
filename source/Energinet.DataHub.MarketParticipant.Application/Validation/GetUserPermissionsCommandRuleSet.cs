@@ -12,12 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+using Energinet.DataHub.MarketParticipant.Application.Commands;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetUserPermissionsCommandRuleSet : AbstractValidator<GetUserPermissionsCommand>
 {
-    /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
-    /// </summary>
-    public interface IMarketParticipantClient : IMarketParticipantOrganizationClient, IMarketParticipantActorClient, IMarketParticipantGridAreaClient, IMarketParticipantActorContactClient, IMarketParticipantGridAreaOverviewClient, IMarketParticipantTokenClient
-    {
-    }
 }
