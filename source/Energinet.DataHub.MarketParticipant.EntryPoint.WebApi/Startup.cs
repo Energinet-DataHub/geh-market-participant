@@ -37,7 +37,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Logging;
 using Microsoft.OpenApi.Models;
 using SimpleInjector;
 
@@ -50,8 +49,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         public Startup(IConfiguration configuration)
         {
             _configuration = configuration;
-            LogHelper.Logger = new IdentityLogger(); //TODO:remove
-            AuthenticationExtensions.DisableHttpsConfiguration = true;
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -74,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             if (_configuration.GetSetting(Settings.RolesValidationEnabled))
             {
-                // app.UseUserMiddleware<FrontendUser>();
+                app.UseUserMiddleware<FrontendUser>();
             }
 
             app.UseEndpoints(endpoints =>
