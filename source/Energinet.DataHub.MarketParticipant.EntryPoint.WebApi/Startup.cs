@@ -103,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
             var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-            var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
+            var internalOpenIdUrl = configuration.GetOptionalSetting(Settings.InternalOpenIdUrl);
             var backendAppId = configuration.GetSetting(Settings.BackendAppId);
             services.AddJwtBearerAuthentication(
                 externalOpenIdUrl,
