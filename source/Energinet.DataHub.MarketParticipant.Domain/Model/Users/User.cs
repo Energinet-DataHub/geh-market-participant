@@ -11,11 +11,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-#pragma warning disable CA1724
-public sealed record Actor(Guid OrganizationId, Guid ActorId, ActorStatus Status);
-#pragma warning restore CA1724
+public class User
+{
+    public User()
+    {
+        Id = Guid.Empty;
+        ExternalId = Guid.Empty;
+        Name = string.Empty;
+        RoleAssignments = new List<UserRoleAssignment>();
+    }
+
+    public Guid Id { get; set; }
+    public Guid ExternalId { get; set; }
+    public string Name { get; set; }
+    public IEnumerable<UserRoleAssignment> RoleAssignments { get; set; }
+}

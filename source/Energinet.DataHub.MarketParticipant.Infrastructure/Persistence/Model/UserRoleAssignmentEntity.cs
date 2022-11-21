@@ -14,8 +14,12 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
-
-#pragma warning disable CA1724
-public sealed record Actor(Guid OrganizationId, Guid ActorId, ActorStatus Status);
-#pragma warning restore CA1724
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+{
+    public sealed class UserRoleAssignmentEntity
+    {
+        public Guid UserId { get; set; }
+        public Guid ActorId { get; set; }
+        public Guid UserRoleTemplateId { get; set; }
+    }
+}

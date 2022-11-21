@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
-
-#pragma warning disable CA1724
-public sealed record Actor(Guid OrganizationId, Guid ActorId, ActorStatus Status);
-#pragma warning restore CA1724
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+{
+    public sealed class UserRoleTemplateEicFunctionEntity
+    {
+        public Guid UserRoleTemplateId { get; set; }
+        public EicFunction EicFunction { get; set; }
+    }
+}

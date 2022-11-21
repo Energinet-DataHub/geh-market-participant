@@ -13,9 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+{
+    public sealed class UserEntity
+    {
+        public UserEntity()
+        {
+            Name = string.Empty;
+            RoleAssigments = new Collection<UserRoleAssignmentEntity>();
+        }
 
-#pragma warning disable CA1724
-public sealed record Actor(Guid OrganizationId, Guid ActorId, ActorStatus Status);
-#pragma warning restore CA1724
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public Collection<UserRoleAssignmentEntity> RoleAssigments { get; }
+    }
+}
