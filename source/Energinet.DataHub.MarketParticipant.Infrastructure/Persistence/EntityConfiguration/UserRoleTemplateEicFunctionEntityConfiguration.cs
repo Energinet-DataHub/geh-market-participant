@@ -25,6 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("UserRoleTemplateEicFunction");
+            builder.HasKey(x => new { x.EicFunction, x.UserRoleTemplateId });
         }
     }
 }

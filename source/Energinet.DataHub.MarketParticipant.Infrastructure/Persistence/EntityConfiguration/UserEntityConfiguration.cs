@@ -24,13 +24,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         public void Configure(EntityTypeBuilder<UserEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("UserRoleTemplate");
+            builder.ToTable("User");
             builder.HasKey(user => user.Id);
             builder.Property(user => user.Id).ValueGeneratedOnAdd();
             builder
                 .HasMany(user => user.RoleAssigments)
                 .WithOne()
-                .HasForeignKey(assignment => assignment.UserRoleTemplateId);
+                .HasForeignKey(assignment => assignment.UserId);
         }
     }
 }

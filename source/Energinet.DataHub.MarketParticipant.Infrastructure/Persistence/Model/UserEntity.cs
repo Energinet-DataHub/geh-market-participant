@@ -21,11 +21,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
     {
         public UserEntity()
         {
+            Id = Guid.Empty;
             Name = string.Empty;
             RoleAssigments = new Collection<UserRoleAssignmentEntity>();
         }
 
         public Guid Id { get; set; }
+        public Guid ExternalId { get; set; }
         public string Name { get; set; }
         public Collection<UserRoleAssignmentEntity> RoleAssigments { get; }
     }

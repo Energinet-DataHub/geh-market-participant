@@ -25,6 +25,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("UserRoleTemplatePermission");
+            builder.Property(x => x.Permission).HasColumnName("PermissionId");
+            builder.HasKey(x => new { x.Permission,  x.UserRoleTemplateId });
         }
     }
 }
