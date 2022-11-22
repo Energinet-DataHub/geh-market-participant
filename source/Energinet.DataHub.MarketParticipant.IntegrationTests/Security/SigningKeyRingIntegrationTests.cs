@@ -240,7 +240,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         var futureClock = new Mock<IClock>();
         futureClock
             .Setup(clock => clock.GetCurrentInstant())
-            .Returns(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(-1)));
+            .Returns(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1)));
 
         var target = new SigningKeyRing(
             futureClock.Object,
@@ -251,7 +251,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             .KeyClient
             .UpdateKeyPropertiesAsync(new KeyProperties(_keyClientFixture.KeyName)
             {
-                ExpiresOn = DateTimeOffset.UtcNow.AddDays(1),
+                ExpiresOn = DateTimeOffset.UtcNow.AddDays(3),
                 NotBefore = _pastTime
             });
 
@@ -313,7 +313,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         var futureClock = new Mock<IClock>();
         futureClock
             .Setup(clock => clock.GetCurrentInstant())
-            .Returns(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(-1)));
+            .Returns(Instant.FromDateTimeOffset(DateTimeOffset.UtcNow.AddDays(1)));
 
         var target = new SigningKeyRing(
             futureClock.Object,
