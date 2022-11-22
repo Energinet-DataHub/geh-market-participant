@@ -88,6 +88,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 endpoints.MapReadyHealthChecks();
             });
 
+            // TODO disable until role auth is enabled on all envs
+            Container.Options.EnableAutoVerification = false;
             app.UseSimpleInjector(Container);
         }
 
