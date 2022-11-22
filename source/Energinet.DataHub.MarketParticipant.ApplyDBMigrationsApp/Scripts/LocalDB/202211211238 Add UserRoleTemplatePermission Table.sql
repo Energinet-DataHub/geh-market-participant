@@ -6,7 +6,7 @@ GO
 
 CREATE TABLE [dbo].[UserRoleTemplatePermission](
     [UserRoleTemplateId] [uniqueidentifier] NOT NULL,
-    [PermissionId] [uniqueidentifier] NOT NULL,
+    [PermissionId] [int] NOT NULL,
      CONSTRAINT [PK_UserRoleTemplatePermission] PRIMARY KEY CLUSTERED
     (
     [UserRoleTemplateId] ASC,
