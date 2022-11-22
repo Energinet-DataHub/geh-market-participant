@@ -14,25 +14,17 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
-using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
-    public sealed class MarketParticipantTokenClient : IMarketParticipantTokenClient
+    /// <summary>
+    /// BFF client for DataHub token retrieval
+    /// </summary>
+    public interface ITokenClient
     {
-        private readonly IFlurlClient _httpClient;
-
-        public MarketParticipantTokenClient(IFlurlClient client)
-        {
-            _httpClient = client;
-        }
-
-        public async Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request)
-        {
-            var response = await ValidationExceptionHandler
-                .HandleAsync(
-                    () => _httpClient.Request("token").PostJsonAsync(request)).ConfigureAwait(false);
-            return await response.GetJsonAsync<GetTokenResponseDto>().ConfigureAwait(false);
-        }
+        /// <summary>
+        /// Retrieves a DataHub token
+        /// </summary>
+        Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request);
     }
 }
