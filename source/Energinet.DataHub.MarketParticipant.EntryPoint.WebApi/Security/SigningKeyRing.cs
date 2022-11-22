@@ -18,16 +18,17 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Core;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Microsoft.IdentityModel.Tokens;
+using NodaTime;
 using JsonWebKey = Azure.Security.KeyVault.Keys.JsonWebKey;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
 public sealed class SigningKeyRing : ISigningKeyRing
 {
+    private readonly IClock _clock;
     private readonly KeyClient _keyClient;
     private readonly string _keyName;
 
@@ -37,9 +38,13 @@ public sealed class SigningKeyRing : ISigningKeyRing
     private DateTimeOffset _lastCache = DateTimeOffset.MinValue;
     private volatile List<KeyVaultKey>? _keyCache;
 
-    public SigningKeyRing(Uri keyVaultAddress, TokenCredential keyVaultCredential, string keyName)
+    public SigningKeyRing(
+        IClock clock,
+        KeyClient keyClient,
+        string keyName)
     {
-        _keyClient = new KeyClient(keyVaultAddress, keyVaultCredential);
+        _clock = clock;
+        _keyClient = keyClient;
         _keyName = keyName;
     }
 
@@ -48,11 +53,14 @@ public sealed class SigningKeyRing : ISigningKeyRing
     public async Task<CryptographyClient> GetSigningClientAsync()
     {
         var keyCache = await LoadKeysAsync().ConfigureAwait(false);
+        var currentTime = _clock
+            .GetCurrentInstant()
+            .ToDateTimeOffset();
 
         var latestKey = keyCache
-            .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= DateTimeOffset.UtcNow)
-            .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > DateTimeOffset.UtcNow)
-            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < DateTimeOffset.UtcNow.AddHours(-1));
+            .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= currentTime)
+            .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > currentTime)
+            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddHours(-1));
 
         return _keyClient.GetCryptographyClient(_keyName, latestKey.Properties.Version);
     }
@@ -100,6 +108,6 @@ public sealed class SigningKeyRing : ISigningKeyRing
     [MemberNotNullWhen(true, nameof(_keyCache))]
     private bool IsCacheValid()
     {
-        return _keyCache != null && _lastCache > DateTimeOffset.UtcNow + _cacheLifeTime;
+        return _keyCache != null && _lastCache + _cacheLifeTime > DateTimeOffset.UtcNow;
     }
 }
