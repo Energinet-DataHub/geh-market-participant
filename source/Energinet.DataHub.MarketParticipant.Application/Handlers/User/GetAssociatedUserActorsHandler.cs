@@ -26,12 +26,12 @@ public class GetAssociatedUserActorsHandler : IRequestHandler<GetAssociatedUserA
         GetAssociatedUserActorsCommand request,
         CancellationToken cancellationToken)
     {
-        var associatedActors = new[]
+        var associatedActorsExternalIds = new[]
         {
             Guid.Parse("091C180F-2230-42C8-8209-7C134926BF2E"),
             Guid.Parse("3143B0D4-C3E0-4727-8266-EC0A03B0B356")
         };
 
-        return Task.FromResult(new GetAssociatedUserActorsResponse(associatedActors));
+        return Task.FromResult(new GetAssociatedUserActorsResponse(associatedActorsExternalIds));
     }
 }
