@@ -107,7 +107,7 @@ public sealed class UserRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
-            BusinessRegisterIdentifier = "12345678"
+            BusinessRegisterIdentifier = "11111111"
         };
 
         await context.Organizations.AddAsync(orgEntity);
@@ -179,7 +179,7 @@ public sealed class UserRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
-            BusinessRegisterIdentifier = "12345678"
+            BusinessRegisterIdentifier = "22222222"
         };
 
         await context.Organizations.AddAsync(orgEntity);
@@ -260,7 +260,7 @@ public sealed class UserRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
-            BusinessRegisterIdentifier = "12345678"
+            BusinessRegisterIdentifier = "33333333"
         };
 
         await context.Organizations.AddAsync(orgEntity);

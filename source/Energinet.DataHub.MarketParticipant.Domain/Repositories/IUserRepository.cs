@@ -32,15 +32,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         Task<IEnumerable<Core.App.Common.Security.Permission>> GetPermissionsAsync(
             Guid externalActorId,
             Guid externalUserId);
-
-        /// <summary>
-        /// List all permissions a user has through a given Actor
-        /// </summary>
-        /// <param name="externalActorId">The external id for the Actor you want the permissions for</param>
-        /// <param name="externalUserId">The user you want the permissions for</param>
-        /// <returns>A List of the applicable permissions</returns>
-        Task<IEnumerable<Core.App.Common.Security.Permission>> GetPermissionsWithJoinsAsync(
-            Guid externalActorId,
-            Guid externalUserId);
     }
 }
