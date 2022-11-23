@@ -113,7 +113,7 @@ public sealed class UserRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
-            BusinessRegisterIdentifier = "11111111"
+            BusinessRegisterIdentifier = "44444444"
         };
 
         await context.Organizations.AddAsync(orgEntity);
