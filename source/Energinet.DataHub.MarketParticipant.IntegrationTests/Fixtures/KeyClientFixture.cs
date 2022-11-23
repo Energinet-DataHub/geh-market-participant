@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public sealed class KeyClientFixture : IAsyncLifetime
+public sealed class KeyClientFixture // TODO: IAsyncLifetime
 {
     public string KeyName { get; } = $"IntegrationTestTokenKey-{Guid.NewGuid()}";
 
