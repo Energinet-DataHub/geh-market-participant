@@ -21,14 +21,22 @@ public class UserRoleTemplate
 {
     public UserRoleTemplate()
     {
-        Id = Guid.Empty;
-        Name = string.Empty;
+        Id = new UserRoleTemplateId(Guid.Empty);
+        Name = new UserRoleTemplateName(string.Empty);
         AllowedMarkedRoles = new List<EicFunction>();
         Permissions = new List<Permission>();
     }
 
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public IEnumerable<EicFunction> AllowedMarkedRoles { get; set; }
-    public IEnumerable<Permission> Permissions { get; set; }
+    public UserRoleTemplate(UserRoleTemplateId id, UserRoleTemplateName name, IEnumerable<EicFunction> allowedMarkedRoles, IEnumerable<Permission> permissions)
+    {
+        Id = id;
+        Name = name;
+        AllowedMarkedRoles = allowedMarkedRoles;
+        Permissions = permissions;
+    }
+
+    public UserRoleTemplateId Id { get; }
+    public UserRoleTemplateName Name { get; set; }
+    public IEnumerable<EicFunction> AllowedMarkedRoles { get; }
+    public IEnumerable<Permission> Permissions { get; }
 }

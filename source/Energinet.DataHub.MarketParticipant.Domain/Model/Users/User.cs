@@ -20,14 +20,22 @@ public class User
 {
     public User()
     {
-        Id = Guid.Empty;
-        ExternalId = Guid.Empty;
-        Name = string.Empty;
+        Id = new UserId(Guid.Empty);
+        ExternalId = new ExternalUserId(Guid.Empty);
+        Name = new UserName(string.Empty);
         RoleAssignments = new List<UserRoleAssignment>();
     }
 
-    public Guid Id { get; set; }
-    public Guid ExternalId { get; set; }
-    public string Name { get; set; }
-    public IEnumerable<UserRoleAssignment> RoleAssignments { get; set; }
+    public User(UserId id, ExternalUserId externalId, UserName name, IEnumerable<UserRoleAssignment> roleAssignments)
+    {
+        Id = id;
+        ExternalId = externalId;
+        Name = name;
+        RoleAssignments = roleAssignments;
+    }
+
+    public UserId Id { get; }
+    public ExternalUserId ExternalId { get; set; }
+    public UserName Name { get; }
+    public IEnumerable<UserRoleAssignment> RoleAssignments { get; }
 }

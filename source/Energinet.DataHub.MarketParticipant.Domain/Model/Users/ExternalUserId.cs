@@ -11,27 +11,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System;
+using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public class UserRoleAssignment
+public record ExternalUserId
 {
-    public UserRoleAssignment()
+    public ExternalUserId(string value)
     {
-        Id = new UserRoleAssignmentId(Guid.Empty);
-        ActorId = Guid.Empty;
-        TemplateId = new UserRoleTemplateId(Guid.Empty);
+        Value = Guid.Parse(value);
     }
 
-    public UserRoleAssignment(UserRoleAssignmentId id, Guid actorId, UserRoleTemplateId templateId)
+    [JsonConstructor]
+    public ExternalUserId(Guid value)
     {
-        Id = id;
-        ActorId = actorId;
-        TemplateId = templateId;
+        Value = value;
     }
 
-    public UserRoleAssignmentId Id { get; }
-    public Guid ActorId { get; }
-    public UserRoleTemplateId TemplateId { get; }
+    public Guid Value { get; }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }
