@@ -24,6 +24,6 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.2.4" />
+    <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.2.5" />
   </ItemGroup>
 </Project>

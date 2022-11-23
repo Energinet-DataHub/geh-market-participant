@@ -18,9 +18,7 @@ using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-#pragma warning disable CA1724
 public sealed class Actor
-#pragma warning restore CA1724
 {
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
 
