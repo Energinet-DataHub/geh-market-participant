@@ -55,7 +55,7 @@ public sealed class TokenControllerIntegrationTests :
     public async Task OpenIdConfiguration_Get_ContainsConfiguration()
     {
         // Arrange
-        const string target = "v2.0/.well-known/openid-configuration";
+        const string target = ".well-known/openid-configuration";
 
         using var client = CreateClient();
 
@@ -72,14 +72,14 @@ public sealed class TokenControllerIntegrationTests :
         var configuration = Deserialize(rawConfiguration, expectedStructure);
         Assert.NotNull(configuration);
         Assert.Equal("https://datahub.dk", configuration.issuer);
-        Assert.Equal("https://localhost/discovery/v2.0/keys", configuration.jwks_uri);
+        Assert.Equal("https://localhost/token/keys", configuration.jwks_uri);
     }
 
     [Fact]
     public async Task DiscoveryKeys_Get_ContainsKeys()
     {
         // Arrange
-        const string target = "discovery/v2.0/keys";
+        const string target = "token/keys";
 
         using var client = CreateClient();
 
@@ -199,7 +199,7 @@ public sealed class TokenControllerIntegrationTests :
 
         var validationParameters = new TokenValidationParameters
         {
-            ValidAudience = "fake_value",
+            ValidAudience = TestBackendAppId,
             ValidateAudience = true,
             ValidateIssuer = true,
             ValidateIssuerSigningKey = true,
@@ -208,7 +208,7 @@ public sealed class TokenControllerIntegrationTests :
             RequireSignedTokens = true,
             ClockSkew = TimeSpan.Zero,
             ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
-                "http://locahost/v2.0/.well-known/openid-configuration",
+                "http://locahost/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever(),
                 new HttpDocumentRetriever(CreateClient()) { RequireHttps = false }),
         };

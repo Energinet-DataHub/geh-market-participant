@@ -60,13 +60,13 @@ public class TokenController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("v2.0/.well-known/openid-configuration")]
+    [Route(".well-known/openid-configuration")]
     public IActionResult GetConfig()
     {
         var configuration = new
         {
             issuer = Issuer,
-            jwks_uri = $"https://{Request.Host}/discovery/v2.0/keys",
+            jwks_uri = $"https://{Request.Host}/token/keys",
         };
 
         return Ok(configuration);
@@ -74,7 +74,7 @@ public class TokenController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("discovery/v2.0/keys")]
+    [Route("token/keys")]
     public async Task<IActionResult> GetKeysAsync()
     {
         var jwks = await _signingKeyRing.GetKeysAsync().ConfigureAwait(false);
