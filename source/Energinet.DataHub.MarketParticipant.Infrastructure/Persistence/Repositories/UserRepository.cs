@@ -53,35 +53,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ConfigureAwait(false);
             return perms.SelectMany(x => x.RoleAssigments.SelectMany(y => y.UserRoleTemplate.Permissions.Select(z => z.Permission)));
         }
-
-        public async Task<IEnumerable<Permission>> GetPermissionsWithJoinsAsync(Guid externalActorId, Guid externalUserId)
-        {
-            var actorId = await _marketParticipantDbContext
-                .Actors
-                .Where(x => x.ActorId == externalActorId)
-                .Select(x => x.Id)
-                .SingleOrDefaultAsync().ConfigureAwait(false);
-
-            var test = await _marketParticipantDbContext
-                .Users
-                .Where(u => u.ExternalId == externalUserId)
-                .Select(u =>
-                    new
-                    {
-                        User = u,
-                        RoleAssignments = u.RoleAssigments
-                            .Where(r => r.ActorId == actorId)
-                            .Join(
-                                _marketParticipantDbContext.UserRoleTemplates
-                                    .Include(t => t.Permissions),
-                                assignment => assignment.UserRoleTemplateId,
-                                template => template.Id,
-                                (assignment, template) => new { Assignment = assignment, Template = template })
-                            .ToList(),
-                    })
-                .ToListAsync()
-                .ConfigureAwait(false);
-            return new List<Permission>();
-        }
     }
 }

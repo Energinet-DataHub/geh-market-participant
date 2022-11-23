@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -23,120 +24,284 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
+
+[Collection("IntegrationTest")]
+[IntegrationTest]
+public sealed class UserRepositoryTests
 {
-    [Collection("IntegrationTest")]
-    [IntegrationTest]
-    public sealed class UserRepositoryTests
+    private readonly MarketParticipantDatabaseFixture _fixture;
+
+    public UserRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
-        private readonly MarketParticipantDatabaseFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public UserRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    [Fact]
+    public async Task GetPermissionsAsync_UserDoesntExist_ReturnsEmptyPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        // Act
+        var perms = await userRepository
+            .GetPermissionsAsync(Guid.NewGuid(), Guid.NewGuid());
+
+        // Assert
+        Assert.Empty(perms);
+    }
+
+    [Fact]
+    public async Task GetPermissionsAsync_UserExistWithNoPermissions_ReturnsZeroPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var userEntity = new UserEntity() { ExternalId = userExternalId, Name = "Test User", RoleAssigments = { } };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var perms = await userRepository
+            .GetPermissionsAsync(Guid.NewGuid(), userExternalId);
+
+        // Assert
+        Assert.Empty(perms);
+    }
+
+    [Fact]
+    public async Task GetPermissionsAsync_UserExistWithPermissions_ReturnsPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var externalActorId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
         {
-            _fixture = fixture;
-        }
-
-        [Fact]
-        public async Task GetPermissionsAsync_UserDoesntExist_ReturnsEmptyPermissions()
+            Id = Guid.NewGuid(),
+            ActorId = externalActorId,
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+        var orgEntity = new OrganizationEntity()
         {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var userRepository = new UserRepository(context);
+            Actors = { actorEntity },
+            Address = new AddressEntity()
+            {
+                City = "test city",
+                Country = "Denmark",
+                Number = "1",
+                StreetName = "Teststreet",
+                ZipCode = "1234"
+            },
+            Name = "Test Org",
+            BusinessRegisterIdentifier = "12345678"
+        };
 
-            // Act
-            var perms = await userRepository
-                .GetPermissionsAsync(Guid.NewGuid(), Guid.NewGuid());
-
-            // Assert
-            Assert.Empty(perms);
-        }
-
-        [Fact]
-        public async Task GetPermissionsAsync_UserExistWithNoPermissions_ReturnsZeroPermissions()
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+        var userRoleTemplate = new UserRoleTemplateEntity()
         {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var userRepository = new UserRepository(context);
-
-            var userExternalId = Guid.NewGuid();
-            var userEntity = new UserEntity() { ExternalId = userExternalId, Name = "Test User", RoleAssigments = { } };
-            await context.Users.AddAsync(userEntity);
-            await context.SaveChangesAsync();
-
-            // Act
-            var perms = await userRepository
-                .GetPermissionsAsync(Guid.NewGuid(), userExternalId);
-
-            // Assert
-            Assert.Empty(perms);
-        }
-
-        [Fact]
-        public async Task GetPermissionsAsync_UserExistWithPermissions_ReturnsPermissions()
+            Name = "Test Template",
+            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+        };
+        await context.Entry(actorEntity).ReloadAsync();
+        var roleAssignment = new UserRoleAssignmentEntity()
         {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var userRepository = new UserRepository(context);
+            ActorId = actorEntity.Id, UserRoleTemplate = userRoleTemplate
+        };
+        var userEntity = new UserEntity()
+        {
+            ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment }
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
 
-            var userExternalId = Guid.NewGuid();
-            var externalActorId = Guid.NewGuid();
-            var actorEntity = new ActorEntity()
-            {
-                ActorId = externalActorId,
-                Name = "Test Actor",
-                ActorNumber = new MockedGln(),
-                Status = (int)ActorStatus.Active
-            };
-            var orgEntity = new OrganizationEntity()
-            {
-                Actors = { actorEntity },
-                Address = new AddressEntity()
-                {
-                    City = "test city",
-                    Country = "Denmark",
-                    Number = "1",
-                    StreetName = "Teststreet",
-                    ZipCode = "1234"
-                },
-                Name = "Test Org",
-                BusinessRegisterIdentifier = "12345678"
-            };
+        // Act
+        var perms = (await userRepository
+            .GetPermissionsAsync(externalActorId, userExternalId)).ToList();
 
-            await context.Organizations.AddAsync(orgEntity);
-            await context.SaveChangesAsync();
-            var userRoleTemplate = new UserRoleTemplateEntity()
-            {
-                Name = "Test Template",
-                Permissions =
-                {
-                    new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage }
-                },
-                EicFunctions =
-                {
-                    new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent }
-                },
-            };
-            await context.Entry(actorEntity).ReloadAsync();
-            var roleAssignment = new UserRoleAssignmentEntity()
-            {
-                ActorId = actorEntity.Id, UserRoleTemplate = userRoleTemplate,
-            };
-            var userEntity = new UserEntity() { ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment } };
-            await context.Users.AddAsync(userEntity);
-            await context.SaveChangesAsync();
+        // Assert
+        Assert.NotEmpty(perms);
+        Assert.Equal(Permission.OrganizationManage, perms.First());
+    }
 
-            // Act
-            var perms = await userRepository
-                .GetPermissionsAsync(externalActorId, userExternalId);
+    [Fact]
+    public async Task GetPermissionsAsync_UserExistWithPermissionsForMultipleActors_ReturnsCorrectPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
 
-            // Assert
-            Assert.NotEmpty(perms);
-        }
+        var userExternalId = Guid.NewGuid();
+        var externalActorId = Guid.NewGuid();
+        var externalActor2Id = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            ActorId = externalActorId,
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+        var actor2Entity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            ActorId = externalActor2Id,
+            Name = "Test Actor 2",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity, actor2Entity },
+            Address = new AddressEntity()
+            {
+                City = "test city",
+                Country = "Denmark",
+                Number = "1",
+                StreetName = "Teststreet",
+                ZipCode = "1234"
+            },
+            Name = "Test Org",
+            BusinessRegisterIdentifier = "12345678"
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+        var userRoleTemplate = new UserRoleTemplateEntity()
+        {
+            Name = "Test Template",
+            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+        };
+        var userRoleTemplate2 = new UserRoleTemplateEntity()
+        {
+            Name = "Test Template 2",
+            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.GridAreasManage } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
+        };
+        await context.Entry(actorEntity).ReloadAsync();
+        await context.Entry(actor2Entity).ReloadAsync();
+        var roleAssignment = new UserRoleAssignmentEntity()
+        {
+            ActorId = actorEntity.Id, UserRoleTemplate = userRoleTemplate
+        };
+        var roleAssignment2 = new UserRoleAssignmentEntity()
+        {
+            ActorId = actor2Entity.Id, UserRoleTemplate = userRoleTemplate2
+        };
+        var userEntity = new UserEntity()
+        {
+            ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment, roleAssignment2 }
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var permsActor = (await userRepository
+            .GetPermissionsAsync(externalActorId, userExternalId)).ToList();
+
+        var permsActor2 = (await userRepository
+            .GetPermissionsAsync(externalActor2Id, userExternalId)).ToList();
+
+        // Assert
+        Assert.NotEmpty(permsActor);
+        Assert.NotEmpty(permsActor2);
+        Assert.Single(permsActor);
+        Assert.Single(permsActor2);
+        Assert.Equal(Permission.OrganizationManage, permsActor.First());
+        Assert.Equal(Permission.GridAreasManage, permsActor2.First());
+    }
+
+    [Fact]
+    public async Task GetPermissionsAsync_UserExistWithMultiplePermissionsForActor_ReturnsCorrectPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var externalActorId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            ActorId = externalActorId,
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity()
+            {
+                City = "test city",
+                Country = "Denmark",
+                Number = "1",
+                StreetName = "Teststreet",
+                ZipCode = "1234"
+            },
+            Name = "Test Org",
+            BusinessRegisterIdentifier = "12345678"
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+        var userRoleTemplate = new UserRoleTemplateEntity()
+        {
+            Name = "Test Template",
+            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage },  new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationView } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+        };
+        var userRoleTemplate2 = new UserRoleTemplateEntity()
+        {
+            Name = "Test Template 2",
+            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.GridAreasManage } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
+        };
+        await context.Entry(actorEntity).ReloadAsync();
+        var roleAssignment = new UserRoleAssignmentEntity()
+        {
+            ActorId = actorEntity.Id, UserRoleTemplate = userRoleTemplate
+        };
+        var roleAssignment2 = new UserRoleAssignmentEntity()
+        {
+            ActorId = actorEntity.Id, UserRoleTemplate = userRoleTemplate2
+        };
+        var userEntity = new UserEntity()
+        {
+            ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment, roleAssignment2 }
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var permsActor = (await userRepository
+            .GetPermissionsAsync(externalActorId, userExternalId)).ToList();
+
+        // Assert
+        Assert.NotEmpty(permsActor);
+        Assert.Equal(3, permsActor.Count);
+        Assert.Contains(Permission.OrganizationManage, permsActor);
+        Assert.Contains(Permission.OrganizationView, permsActor);
+        Assert.Contains(Permission.GridAreasManage, permsActor);
     }
 }
