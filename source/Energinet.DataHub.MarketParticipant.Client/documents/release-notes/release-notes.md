@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.7.7
+
+- Fixed query parameter.
+
 ## Version 2.7.6
 
 - Add endpoint for getting actors for user.

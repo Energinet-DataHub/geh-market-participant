@@ -32,7 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _httpClient
-                        .Request("user/actors", accessToken)
+                        .Request("user/actors")
+                        .SetQueryParam("externalToken", accessToken)
                         .GetAsync())
                 .ConfigureAwait(false);
 
