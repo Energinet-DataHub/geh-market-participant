@@ -53,6 +53,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Disables validation of external token and CreatedOn limit for KeyVault keys.
+        /// This property is intended for testing purposes only.
+        /// </summary>
+        public static bool EnableIntegrationTestKeys { get; set; }
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())

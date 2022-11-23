@@ -60,7 +60,7 @@ public sealed class SigningKeyRing : ISigningKeyRing
         var latestKey = keyCache
             .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= currentTime)
             .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > currentTime)
-            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddHours(-1));
+            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddHours(-1) || Startup.EnableIntegrationTestKeys);
 
         return _keyClient.GetCryptographyClient(_keyName, latestKey.Properties.Version);
     }
