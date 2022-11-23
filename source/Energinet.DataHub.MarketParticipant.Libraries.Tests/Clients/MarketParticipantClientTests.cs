@@ -18,7 +18,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client;
 using Energinet.DataHub.MarketParticipant.Client.Models;
-using Flurl.Http;
 using Flurl.Http.Configuration;
 using Flurl.Http.Testing;
 using Xunit;
