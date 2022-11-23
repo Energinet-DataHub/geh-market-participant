@@ -19,19 +19,19 @@ public class UserRoleAssignment
 {
     public UserRoleAssignment()
     {
-        Id = new UserRoleAssignmentId(Guid.Empty);
+        UserId = new UserId(Guid.Empty);
         ActorId = Guid.Empty;
         TemplateId = new UserRoleTemplateId(Guid.Empty);
     }
 
-    public UserRoleAssignment(UserRoleAssignmentId id, Guid actorId, UserRoleTemplateId templateId)
+    public UserRoleAssignment(UserId userId, Guid actorId, UserRoleTemplateId templateId)
     {
-        Id = id;
+        UserId = userId;
         ActorId = actorId;
         TemplateId = templateId;
     }
 
-    public UserRoleAssignmentId Id { get; }
+    public UserId UserId { get; }
     public Guid ActorId { get; }
     public UserRoleTemplateId TemplateId { get; }
 }

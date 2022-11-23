@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -35,6 +36,116 @@ public sealed class UserRepositoryTests
     public UserRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
+    }
+
+    [Fact]
+    public async Task GetUserAsync_UserDoesntExist_ReturnsNull()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        // Act
+        var user = await userRepository.GetAsync(new ExternalUserId(Guid.Empty));
+
+        // Assert
+        Assert.Null(user);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_SimpleUserExist_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context2);
+
+        var email = "fake@mail.com";
+        var userExternalId = Guid.NewGuid();
+        var userEntity = new UserEntity() { ExternalId = userExternalId, Email = email, RoleAssignments = { } };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var user = await userRepository.GetAsync(new ExternalUserId(userExternalId));
+
+        // Assert
+        Assert.NotNull(user);
+        Assert.Equal(userExternalId, user.ExternalId.Value);
+        Assert.NotEqual(Guid.Empty, user.Id.Value);
+        Assert.Equal(email, user.Email.Address);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_UserExist_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context2);
+
+        var email = "fake@mail.com";
+        var userExternalId = Guid.NewGuid();
+        var externalActorId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            ActorId = externalActorId,
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity()
+            {
+                City = "test city",
+                Country = "Denmark",
+                Number = "1",
+                StreetName = "Teststreet",
+                ZipCode = "1234"
+            },
+            Name = "Test Org",
+            BusinessRegisterIdentifier = "11111111"
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+        var userRoleTemplate = new UserRoleTemplateEntity()
+        {
+            Name = "Test Template",
+            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+        };
+        await context.Entry(actorEntity).ReloadAsync();
+        var roleAssignment = new UserRoleAssignmentEntity()
+        {
+            ActorId = actorEntity.Id, UserRoleTemplate = userRoleTemplate
+        };
+        var userEntity = new UserEntity()
+        {
+            ExternalId = userExternalId, Email = email, RoleAssignments = { roleAssignment }
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var user = await userRepository.GetAsync(new ExternalUserId(userExternalId));
+
+        // Assert
+        Assert.NotNull(user);
+        Assert.Equal(userExternalId, user.ExternalId.Value);
+        Assert.NotEqual(Guid.Empty, user.Id.Value);
+        Assert.Equal(email, user.Email.Address);
+        Assert.Single(user.RoleAssignments);
+        Assert.Equal(userRoleTemplate.Id, user.RoleAssignments.First().TemplateId.Value);
     }
 
     [Fact]
@@ -64,7 +175,7 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         var userExternalId = Guid.NewGuid();
-        var userEntity = new UserEntity() { ExternalId = userExternalId, Name = "Test User", RoleAssigments = { } };
+        var userEntity = new UserEntity() { ExternalId = userExternalId, Email = "fake@mail.com", RoleAssignments = { } };
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
 
@@ -125,7 +236,7 @@ public sealed class UserRepositoryTests
         };
         var userEntity = new UserEntity()
         {
-            ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment }
+            ExternalId = userExternalId, Email = "fake@mail.com", RoleAssignments = { roleAssignment }
         };
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
@@ -208,7 +319,7 @@ public sealed class UserRepositoryTests
         };
         var userEntity = new UserEntity()
         {
-            ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment, roleAssignment2 }
+            ExternalId = userExternalId, Email = "fake@mail.com", RoleAssignments = { roleAssignment, roleAssignment2 }
         };
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
@@ -288,7 +399,7 @@ public sealed class UserRepositoryTests
         };
         var userEntity = new UserEntity()
         {
-            ExternalId = userExternalId, Name = "Test User", RoleAssigments = { roleAssignment, roleAssignment2 }
+            ExternalId = userExternalId, Email = "fake@mail.com", RoleAssignments = { roleAssignment, roleAssignment2 }
         };
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
