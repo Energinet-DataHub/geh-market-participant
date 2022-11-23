@@ -8,6 +8,7 @@ CREATE TABLE [dbo].[User](
     [Id] [uniqueidentifier] NOT NULL,
     [ExternalId] [uniqueidentifier] NOT NULL,
     [Name] [nvarchar](250) NULL,
+    [Email] [nvarchar](250) NULL,
     CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED
 (
 [Id] ASC

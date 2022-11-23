@@ -18,24 +18,28 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public class User
 {
-    public User()
+    public User(UserEmail email)
     {
+        Email = email;
         Id = new UserId(Guid.Empty);
         ExternalId = new ExternalUserId(Guid.Empty);
         Name = new UserName(string.Empty);
+        Email = new UserEmail(string.Empty);
         RoleAssignments = new List<UserRoleAssignment>();
     }
 
-    public User(UserId id, ExternalUserId externalId, UserName name, IEnumerable<UserRoleAssignment> roleAssignments)
+    public User(UserId id, ExternalUserId externalId, UserName name, IEnumerable<UserRoleAssignment> roleAssignments, UserEmail email)
     {
         Id = id;
         ExternalId = externalId;
         Name = name;
         RoleAssignments = roleAssignments;
+        Email = email;
     }
 
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; set; }
     public UserName Name { get; }
+    public UserEmail Email { get; }
     public IEnumerable<UserRoleAssignment> RoleAssignments { get; }
 }
