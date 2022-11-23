@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Models;
+using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetAssociatedUserActorsCommandRuleSet : AbstractValidator<GetAssociatedUserActorsCommand>
 {
-    /// <summary>
-    /// BFF client for DataHub token retrieval
-    /// </summary>
-    public interface IMarketParticipantTokenClient
+    public GetAssociatedUserActorsCommandRuleSet()
     {
-        /// <summary>
-        /// Retrieves a DataHub token
-        /// </summary>
-        Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request);
+        RuleFor(command => command.UserId)
+            .NotEmpty();
     }
 }

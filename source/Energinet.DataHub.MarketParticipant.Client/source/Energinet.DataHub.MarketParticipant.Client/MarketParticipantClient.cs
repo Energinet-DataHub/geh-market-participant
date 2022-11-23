@@ -23,20 +23,22 @@ namespace Energinet.DataHub.MarketParticipant.Client
     public sealed class MarketParticipantClient : IMarketParticipantClient
     {
         private readonly IMarketParticipantOrganizationClient _marketParticipantOrganizationClient;
+        private readonly IMarketParticipantUserClient _marketParticipantUserClient;
         private readonly IMarketParticipantActorClient _marketParticipantActorClient;
         private readonly IMarketParticipantGridAreaClient _marketParticipantGridAreaClient;
         private readonly IMarketParticipantActorContactClient _marketParticipantActorContactClient;
         private readonly IMarketParticipantGridAreaOverviewClient _marketParticipantGridAreaOverviewClient;
-        private readonly IMarketParticipantTokenClient _marketParticipantTokenClient;
+        private readonly ITokenClient _tokenClient;
 
         public MarketParticipantClient(IFlurlClient client)
         {
             _marketParticipantOrganizationClient = new MarketParticipantOrganizationClient(client);
+            _marketParticipantUserClient = new MarketParticipantUserClient(client);
             _marketParticipantActorClient = new MarketParticipantActorClient(client);
             _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
             _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(client);
-            _marketParticipantTokenClient = new MarketParticipantTokenClient(client);
+            _tokenClient = new TokenClient(client);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
@@ -116,7 +118,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request)
         {
-            return _marketParticipantTokenClient.GetTokenAsync(request);
+            return _tokenClient.GetTokenAsync(request);
+        }
+
+        public Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(string accessToken)
+        {
+            return _marketParticipantUserClient.GetUserActorsAsync(accessToken);
         }
     }
 }
