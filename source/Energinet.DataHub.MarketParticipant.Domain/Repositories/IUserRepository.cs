@@ -12,33 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+/// <summary>
+/// Provides access to Users.
+/// </summary>
+public interface IUserRepository
 {
     /// <summary>
-    /// Provides access to Users.
+    /// returns a user has through a given Actor
     /// </summary>
-    public interface IUserRepository
-    {
-        /// <summary>
-        /// List all permissions a user has through a given Actor
-        /// </summary>
-        /// <param name="externalActorId">The external id for the Actor you want the permissions for</param>
-        /// <param name="externalUserId">The user you want the permissions for</param>
-        /// <returns>A List of the applicable permissions</returns>
-        Task<IEnumerable<Core.App.Common.Security.Permission>> GetPermissionsAsync(
-            Guid externalActorId,
-            Guid externalUserId);
-
-        /// <summary>
-        /// returns a user has through a given Actor
-        /// </summary>
-        /// <param name="externalUserId">The user you want to get</param>
-        /// <returns>The user if it exists, otherwise null</returns>
-        Task<User?> GetAsync(ExternalUserId externalUserId);
-    }
+    /// <param name="externalUserId">The user you want to get</param>
+    /// <returns>The user if it exists, otherwise null</returns>
+    Task<User?> GetAsync(ExternalUserId externalUserId);
 }

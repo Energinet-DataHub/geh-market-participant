@@ -50,6 +50,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
 
         host._startup.Container.Options.AllowOverridingRegistrations = true;
+        host._startup.Container.RegisterInstance(configuration);
         InitUserIdProvider(host._startup.Container);
         return Task.FromResult(host);
     }

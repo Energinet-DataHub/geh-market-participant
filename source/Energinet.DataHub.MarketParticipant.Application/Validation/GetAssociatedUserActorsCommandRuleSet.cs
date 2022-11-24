@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using FluentValidation;
 
@@ -22,7 +21,7 @@ public sealed class GetAssociatedUserActorsCommandRuleSet : AbstractValidator<Ge
 {
     public GetAssociatedUserActorsCommandRuleSet()
     {
-        RuleFor(command => command.UserId)
+        RuleFor(command => command.ExternalUserId)
             .NotEmpty();
     }
 }
