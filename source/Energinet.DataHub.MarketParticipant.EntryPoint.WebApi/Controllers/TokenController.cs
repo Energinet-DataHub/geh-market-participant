@@ -60,13 +60,13 @@ public class TokenController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("v2.0/.well-known/openid-configuration")]
+    [Route(".well-known/openid-configuration")]
     public IActionResult GetConfig()
     {
         var configuration = new
         {
             issuer = Issuer,
-            jwks_uri = $"http://{Request.Host}/discovery/v2.0/keys",
+            jwks_uri = $"https://{Request.Host}/token/keys",
         };
 
         return Ok(configuration);
@@ -74,7 +74,7 @@ public class TokenController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("discovery/v2.0/keys")]
+    [Route("token/keys")]
     public async Task<IActionResult> GetKeysAsync()
     {
         var jwks = await _signingKeyRing.GetKeysAsync().ConfigureAwait(false);
@@ -112,6 +112,7 @@ public class TokenController : ControllerBase
 
         var userId = GetUserId(externalJwt.Claims);
         var actorId = tokenRequest.ExternalActorId;
+        var issuedAt = EpochTime.GetIntDate(DateTime.UtcNow);
 
         var grantedPermissions = await _mediator
             .Send(new GetUserPermissionsCommand(userId, actorId))
@@ -122,16 +123,17 @@ public class TokenController : ControllerBase
 
         var dataHubTokenClaims = roleClaims
             .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
-            .Append(new Claim(JwtRegisteredClaimNames.Aud, _configuration.GetSetting(Settings.BackendAppId)))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
 
         var dataHubToken = new JwtSecurityToken(
             Issuer,
-            tokenRequest.ExternalActorId.ToString(),
+            _configuration.GetSetting(Settings.BackendAppId),
             dataHubTokenClaims,
             externalJwt.ValidFrom,
             externalJwt.ValidTo);
+
+        dataHubToken.Payload[JwtRegisteredClaimNames.Iat] = issuedAt;
 
         var finalToken = await CreateSignedTokenAsync(dataHubToken).ConfigureAwait(false);
         return Ok(new TokenResponse(finalToken));
@@ -145,7 +147,7 @@ public class TokenController : ControllerBase
 
     private static string GetKeyVersionIdentifier(string key)
     {
-        return key[key.LastIndexOf('/')..];
+        return key[(key.LastIndexOf('/') + 1)..];
     }
 
     private async Task<string> CreateSignedTokenAsync(JwtSecurityToken dataHubToken)

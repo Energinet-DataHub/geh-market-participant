@@ -18,6 +18,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
@@ -38,6 +39,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Primitives;
 using Microsoft.OpenApi.Models;
+using NodaTime;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
@@ -50,6 +52,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         {
             _configuration = configuration;
         }
+
+        /// <summary>
+        /// Disables validation of external token and CreatedOn limit for KeyVault keys.
+        /// This property is intended for testing purposes only.
+        /// </summary>
+        public static bool EnableIntegrationTestKeys { get; set; }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -181,7 +189,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     var tokenCredentials = new ManagedIdentityCredential();
 #endif
 
-                    return new SigningKeyRing(keyVaultUri, tokenCredentials, keyName);
+                    var keyClient = new KeyClient(keyVaultUri, tokenCredentials);
+                    return new SigningKeyRing(SystemClock.Instance, keyClient, keyName);
                 });
 
                 container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
