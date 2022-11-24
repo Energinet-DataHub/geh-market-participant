@@ -23,9 +23,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserRepository
 {
     /// <summary>
-    /// returns a user has through a given Actor
+    /// Gets the user having the specified external id.
     /// </summary>
-    /// <param name="externalUserId">The user you want to get</param>
-    /// <returns>The user if it exists, otherwise null</returns>
+    /// <param name="externalUserId">The external id of the user.</param>
+    /// <returns>The user if it exists; otherwise null.</returns>
     Task<User?> GetAsync(ExternalUserId externalUserId);
 }
