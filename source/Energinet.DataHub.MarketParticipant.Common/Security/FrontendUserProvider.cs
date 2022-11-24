@@ -39,7 +39,11 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
     {
         var actor = await _actorRepository.GetActorAsync(externalActorId).ConfigureAwait(false);
         return actor is { Status: ActorStatus.Active or ActorStatus.Passive }
-            ? new FrontendUser(userId, actor.OrganizationId, actor.ActorId, claims.Any(c => c.Type == "extn.fas"))
+            ? new FrontendUser(
+                userId,
+                actor.OrganizationId,
+                actor.ActorId,
+                claims.Any(c => c.Type == "energinet.fas" && c.Value == "true"))
             : null;
     }
 }
