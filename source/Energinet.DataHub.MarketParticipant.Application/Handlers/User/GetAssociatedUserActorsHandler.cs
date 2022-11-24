@@ -13,25 +13,35 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public class GetAssociatedUserActorsHandler : IRequestHandler<GetAssociatedUserActorsCommand, GetAssociatedUserActorsResponse>
 {
-    public Task<GetAssociatedUserActorsResponse> Handle(
+    private readonly IOrganizationRepository _repository;
+
+    public GetAssociatedUserActorsHandler(IOrganizationRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task<GetAssociatedUserActorsResponse> Handle(
         GetAssociatedUserActorsCommand request,
         CancellationToken cancellationToken)
     {
-        var associatedActorsExternalIds = new[]
-        {
-            Guid.Parse("091C180F-2230-42C8-8209-7C134926BF2E"),
-            Guid.Parse("3143B0D4-C3E0-4727-8266-EC0A03B0B356")
-        };
+        var orgs = await _repository.GetAsync().ConfigureAwait(false);
+        var actor = orgs
+            .First(x => x.Actors.Any(y => y.ExternalActorId != null))
+            .Actors
+            .First(y => y.ExternalActorId != null);
 
-        return Task.FromResult(new GetAssociatedUserActorsResponse(associatedActorsExternalIds));
+        var associatedActorsExternalIds = new[] { actor.ExternalActorId!.Value };
+        return new GetAssociatedUserActorsResponse(associatedActorsExternalIds);
     }
 }
