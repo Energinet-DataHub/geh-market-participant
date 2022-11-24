@@ -12,22 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers;
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetUserPermissionsCommandHandler
     : IRequestHandler<GetUserPermissionsCommand, GetUserPermissionsResponse>
 {
-    public Task<GetUserPermissionsResponse> Handle(
+    private readonly IUserRepository _userRepository;
+
+    public GetUserPermissionsCommandHandler(IUserRepository userRepository)
+    {
+        _userRepository = userRepository;
+    }
+
+    public async Task<GetUserPermissionsResponse> Handle(
         GetUserPermissionsCommand request,
         CancellationToken cancellationToken)
     {
-        var defaultPermissions = new[] { Permission.OrganizationView };
-        return Task.FromResult(new GetUserPermissionsResponse(defaultPermissions));
+        ArgumentNullException.ThrowIfNull(request);
+
+        var permissions = await _userRepository
+            .GetPermissionsAsync(
+                new ExternalActorId(request.ExternalActorId),
+                new ExternalUserId(request.ExternalUserId))
+            .ConfigureAwait(false);
+
+        return new GetUserPermissionsResponse(permissions);
     }
 }
