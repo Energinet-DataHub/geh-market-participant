@@ -117,7 +117,7 @@ public sealed class UserRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
-            BusinessRegisterIdentifier = "22222222"
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
 
         await context.Organizations.AddAsync(orgEntity);
@@ -305,7 +305,7 @@ public sealed class UserRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
-            BusinessRegisterIdentifier = "22222222"
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
 
         await context.Organizations.AddAsync(orgEntity);
