@@ -19,14 +19,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 
 /// <summary>
-/// Repository to provide access to Actors
+/// Repository for specialized fast read-only access to actors.
 /// </summary>
 public interface IActorRepository
 {
     /// <summary>
-    /// Get an actor from their external id,
+    /// Gets an actor directly by their external id.
     /// </summary>
-    /// <param name="externalActorId">The external id for the actor</param>
-    /// <returns>An actor with the requested id, or null if not found</returns>
+    /// <param name="externalActorId">The external id of the actor.</param>
+    /// <returns>An actor for the specified external id; or null if not found.</returns>
     Task<Actor?> GetActorAsync(Guid externalActorId);
 }
