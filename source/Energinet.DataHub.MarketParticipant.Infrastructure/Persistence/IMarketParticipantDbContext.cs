@@ -80,6 +80,31 @@ public interface IMarketParticipantDbContext
     DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }
 
     /// <summary>
+    ///     Represent access to the User database table
+    /// </summary>
+    DbSet<UserEntity> Users { get; }
+
+    /// <summary>
+    ///     Represent access to the User Role Templates database table
+    /// </summary>
+    DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; }
+
+    /// <summary>
+    ///     Represent access to the User Role Template permission database table
+    /// </summary>
+    DbSet<UserRoleTemplatePermissionEntity> TemplatePermissions { get; }
+
+    /// <summary>
+    ///     Represent access to the User role template Eicfunctions database table
+    /// </summary>
+    DbSet<UserRoleTemplatePermissionEntity> TemplateEicFunctions { get; }
+
+    /// <summary>
+    ///     Represent access to the User role Assignments database table
+    /// </summary>
+    DbSet<UserRoleTemplatePermissionEntity> UserRoleAssignments { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();
