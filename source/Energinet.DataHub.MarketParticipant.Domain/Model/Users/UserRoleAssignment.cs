@@ -17,13 +17,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public class UserRoleAssignment
 {
-    public UserRoleAssignment()
-    {
-        UserId = new UserId(Guid.Empty);
-        ActorId = Guid.Empty;
-        TemplateId = new UserRoleTemplateId(Guid.Empty);
-    }
-
     public UserRoleAssignment(UserId userId, Guid actorId, UserRoleTemplateId templateId)
     {
         UserId = userId;

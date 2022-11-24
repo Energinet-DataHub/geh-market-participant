@@ -19,14 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public class UserRoleTemplate
 {
-    public UserRoleTemplate()
-    {
-        Id = new UserRoleTemplateId(Guid.Empty);
-        Name = new UserRoleTemplateName(string.Empty);
-        AllowedMarkedRoles = new List<EicFunction>();
-        Permissions = new List<Permission>();
-    }
-
     public UserRoleTemplate(UserRoleTemplateId id, UserRoleTemplateName name, IEnumerable<EicFunction> allowedMarkedRoles, IEnumerable<Permission> permissions)
     {
         Id = id;
