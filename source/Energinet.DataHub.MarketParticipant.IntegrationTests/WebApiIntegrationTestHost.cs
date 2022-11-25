@@ -44,6 +44,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         var host = new WebApiIntegrationTestHost(configuration);
 
         var serviceCollection = new ServiceCollection();
+        serviceCollection.AddSingleton(configuration);
         host._startup.ConfigureServices(serviceCollection);
         serviceCollection
             .BuildServiceProvider()
