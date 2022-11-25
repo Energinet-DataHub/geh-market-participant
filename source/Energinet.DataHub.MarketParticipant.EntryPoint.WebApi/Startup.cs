@@ -15,8 +15,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
@@ -59,7 +61,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         /// </summary>
         public static bool EnableIntegrationTestKeys { get; set; }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IHostApplicationLifetime appLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -99,6 +104,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             // TODO disable until role auth is enabled on all envs
             Container.Options.EnableAutoVerification = false;
             app.UseSimpleInjector(Container);
+
+            var internalOpenIdUrl = _configuration.GetSetting(Settings.InternalOpenIdUrl);
+            appLifetime?.ApplicationStarted.Register(() => OnApplicationStartedAsync(internalOpenIdUrl));
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -226,6 +234,16 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             });
 
             services.UseSimpleInjectorAspNetRequestScoping(Container);
+        }
+
+        private static async Task OnApplicationStartedAsync(string internalOpenIdUrl)
+        {
+            using var httpclient = new HttpClient();
+
+            var uriOpenId = new Uri(internalOpenIdUrl);
+            var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/cachesigningkey");
+
+            await httpclient.GetAsync(uriKeyGet).ConfigureAwait(false);
         }
 
         private sealed class EndpointDataSourceFilter : EndpointDataSource
