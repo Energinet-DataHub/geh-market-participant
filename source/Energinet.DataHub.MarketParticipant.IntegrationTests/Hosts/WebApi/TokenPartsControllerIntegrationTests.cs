@@ -49,7 +49,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         _keyClientFixture = keyClientFixture;
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_Issuer_IsKnown()
     {
         // Arrange
@@ -62,7 +62,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal("https://datahub.dk", internalToken.Issuer);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_Audience_IsKnown()
     {
         // Arrange
@@ -75,7 +75,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal(TestBackendAppId, internalToken.Audiences.Single());
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_UserId_IsKnown()
     {
         // Arrange
@@ -89,7 +89,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal(userId, internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Sub).Value);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_ActorId_IsKnown()
     {
         // Arrange
@@ -103,7 +103,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal(actorId.ToString(), internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Azp).Value);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_Role_IsKnown()
     {
         // Arrange
@@ -116,7 +116,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role"));
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_NotBefore_IsValid()
     {
         // Arrange
@@ -132,7 +132,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal(notBefore, internalToken.ValidFrom);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_Expires_IsValid()
     {
         // Arrange
@@ -146,7 +146,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal(expires, internalToken.ValidTo);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_Type_IsValid()
     {
         // Arrange
@@ -159,7 +159,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         Assert.Equal(JwtConstants.TokenType, internalToken.Header[JwtHeaderParameterNames.Typ]);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task Token_Algorithm_IsValid()
     {
         // Arrange
