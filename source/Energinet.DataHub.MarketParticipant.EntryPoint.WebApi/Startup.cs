@@ -105,8 +105,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             Container.Options.EnableAutoVerification = false;
             app.UseSimpleInjector(Container);
 
-            var internalOpenIdUrl = _configuration.GetSetting(Settings.InternalOpenIdUrl);
-            appLifetime?.ApplicationStarted.Register(() => OnApplicationStartedAsync(internalOpenIdUrl));
+            var internalOpenIdUrl = _configuration.GetOptionalSetting(Settings.InternalOpenIdUrl);
+            if (!string.IsNullOrWhiteSpace(internalOpenIdUrl))
+            {
+                appLifetime?.ApplicationStarted.Register(() => OnApplicationStartedAsync(internalOpenIdUrl));
+            }
         }
 
         public void ConfigureServices(IServiceCollection services)
