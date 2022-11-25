@@ -75,10 +75,9 @@ public class TokenController : ControllerBase
     [HttpGet]
     [AllowAnonymous]
     [Route("cachesigningkey")]
-    public async Task<IActionResult> InitSigningKeyAsync()
+    public async Task InitSigningKeyAsync()
     {
         await _signingKeyRing.GetKeysAsync().ConfigureAwait(false);
-        return Ok();
     }
 
     [HttpGet]

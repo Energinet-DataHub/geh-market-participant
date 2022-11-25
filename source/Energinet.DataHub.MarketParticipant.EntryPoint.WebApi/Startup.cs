@@ -238,12 +238,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
         private static async Task OnApplicationStartedAsync(string internalOpenIdUrl)
         {
-            using var httpclient = new HttpClient();
+            try
+            {
+                using var httpclient = new HttpClient();
 
-            var uriOpenId = new Uri(internalOpenIdUrl);
-            var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/cachesigningkey");
+                var uriOpenId = new Uri(internalOpenIdUrl);
+                var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/cachesigningkey");
 
-            await httpclient.GetAsync(uriKeyGet).ConfigureAwait(false);
+                await httpclient.GetAsync(uriKeyGet).ConfigureAwait(false);
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         private sealed class EndpointDataSourceFilter : EndpointDataSource
