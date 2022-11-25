@@ -33,6 +33,8 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseSetting(Settings.SqlDbConnectionString.Key, _fixture.DatabaseManager.ConnectionString);
+        builder.UseSetting(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value");
+        builder.UseSetting(Settings.ServiceBusTopicName.Key, "fake_value");
         builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.BackendAppId.Key, TestBackendAppId);
