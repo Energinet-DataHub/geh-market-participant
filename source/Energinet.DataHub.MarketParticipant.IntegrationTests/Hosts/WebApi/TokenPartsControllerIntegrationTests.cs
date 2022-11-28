@@ -114,14 +114,14 @@ public sealed class TokenPartsControllerIntegrationTests :
         var organizationView = Permission.OrganizationView;
 
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var (externalUserId, _) = await _fixture
+        var (externalUserId, externalActorId) = await _fixture
             .DatabaseManager
             .CreateUserAsync(new[] { organizationView });
 
         var externalToken = CreateExternalTestToken(userId: externalUserId.ToString());
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, externalActorId);
 
         // Assert
         Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == PermissionsAsClaims.Lookup[organizationView]));
