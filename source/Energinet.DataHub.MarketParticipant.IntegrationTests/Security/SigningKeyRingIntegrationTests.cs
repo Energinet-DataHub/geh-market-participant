@@ -39,7 +39,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         _keyClientFixture = keyClientFixture;
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetKeysAsync_HasTestKey_ReturnsKey()
     {
         // Arrange
@@ -56,7 +56,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         Assert.Equal(_keyClientFixture.KeyName + "/", new Uri(jwk.Id).Segments[^2]);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetKeysAsync_Twice_ReturnsFromCache()
     {
         // Arrange
@@ -74,7 +74,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         Assert.Equal(initialKeys.Single(), keys.Single());
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetKeysAsync_WithDisabledKey_ReturnsNothing()
     {
         // Arrange
@@ -104,7 +104,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             });
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetKeysAsync_WithExpiredKey_ReturnsKey()
     {
         // Arrange
@@ -137,7 +137,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             });
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetKeysAsync_AndSigningClient_ReturnsSameKey()
     {
         // Arrange
@@ -160,7 +160,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         Assert.Single(keys, x => x.Id == signingClient.KeyId);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetSigningClientAsync_GivenData_SignsData()
     {
         // Arrange
@@ -185,8 +185,8 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         Assert.NotEmpty(signature.Signature);
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
-    public async Task GetSigningClientAsync_KeyNewerThan1Hour_NoKey()
+    [Fact]
+    public async Task GetSigningClientAsync_KeyNewerThan10Minutes_NoKey()
     {
         // Arrange
         var target = new SigningKeyRing(
@@ -198,7 +198,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         await Assert.ThrowsAsync<InvalidOperationException>(() => target.GetSigningClientAsync());
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetSigningClientAsync_KeyExpired_NoKey()
     {
         // Arrange
@@ -233,7 +233,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             });
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetSigningClientAsync_KeyExpires_ReturnsKey()
     {
         // Arrange
@@ -271,7 +271,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             });
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetSigningClientAsync_NotBefore_NoKey()
     {
         // Arrange
@@ -306,7 +306,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             });
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetSigningClientAsync_PastNotBefore_ReturnsKey()
     {
         // Arrange
@@ -344,7 +344,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             });
     }
 
-    [Fact(Skip = "Do not have KV permissions.")]
+    [Fact]
     public async Task GetSigningClientAsync_KeyNotActive_NoKey()
     {
         // Arrange
