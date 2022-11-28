@@ -34,6 +34,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -44,262 +45,280 @@ using Microsoft.OpenApi.Models;
 using NodaTime;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+
+public sealed class Startup : Common.StartupBase
 {
-    public sealed class Startup : Common.StartupBase
+    private readonly IConfiguration _configuration;
+    private string? _internalOpenIdUrl;
+
+    public Startup(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public Startup(IConfiguration configuration)
+    /// <summary>
+    /// Disables validation of external token and CreatedOn limit for KeyVault keys.
+    /// This property is intended for testing purposes only.
+    /// </summary>
+    public static bool EnableIntegrationTestKeys { get; set; }
+
+    public void Configure(
+        IApplicationBuilder app,
+        IWebHostEnvironment env,
+        IHostApplicationLifetime appLifetime)
+    {
+        if (env.IsDevelopment())
         {
-            _configuration = configuration;
+            app.UseDeveloperExceptionPage();
         }
 
-        /// <summary>
-        /// Disables validation of external token and CreatedOn limit for KeyVault keys.
-        /// This property is intended for testing purposes only.
-        /// </summary>
-        public static bool EnableIntegrationTestKeys { get; set; }
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint(
+            "/swagger/v1/swagger.json",
+            "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi v1"));
 
-        public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IHostApplicationLifetime appLifetime)
+        app.UseHttpsRedirection();
+        app.UseRouting();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        if (_configuration.GetSetting(Settings.RolesValidationEnabled))
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint(
-                "/swagger/v1/swagger.json",
-                "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi v1"));
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            if (_configuration.GetSetting(Settings.RolesValidationEnabled))
-            {
-                app.UseUserMiddleware<FrontendUser>();
-            }
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-
-                var ds = endpoints.DataSources;
-                var dec = new EndpointDataSourceFilter(ds.Single(), _configuration);
-                endpoints.DataSources.Clear();
-                endpoints.DataSources.Add(dec);
-
-                // Health check
-                endpoints.MapLiveHealthChecks();
-                endpoints.MapReadyHealthChecks();
-            });
-
-            // TODO disable until role auth is enabled on all envs
-            Container.Options.EnableAutoVerification = false;
-            app.UseSimpleInjector(Container);
-
-            var internalOpenIdUrl = _configuration.GetOptionalSetting(Settings.InternalOpenIdUrl);
-            if (!string.IsNullOrWhiteSpace(internalOpenIdUrl))
-            {
-                appLifetime?.ApplicationStarted.Register(() => OnApplicationStartedAsync(internalOpenIdUrl));
-            }
+            app.UseUserMiddleware<FrontendUser>();
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        app.UseEndpoints(endpoints =>
         {
-            Initialize(_configuration, services);
-        }
+            endpoints.MapControllers();
 
-        protected override void Configure(IConfiguration configuration, IServiceCollection services)
-        {
-            services
-                .AddControllers()
-                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
-            var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-            var internalOpenIdUrl = configuration.GetOptionalSetting(Settings.InternalOpenIdUrl);
-            var backendAppId = configuration.GetSetting(Settings.BackendAppId);
-            services.AddJwtBearerAuthentication(
-                externalOpenIdUrl,
-                internalOpenIdUrl,
-                backendAppId);
-            services.AddPermissionAuthorization();
-
-            var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
-            var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+            var ds = endpoints.DataSources;
+            var dec = new EndpointDataSourceFilter(ds.Single(), _configuration);
+            endpoints.DataSources.Clear();
+            endpoints.DataSources.Add(dec);
 
             // Health check
-            services
-                .AddHealthChecks()
-                .AddLiveCheck()
-                .AddDbContextCheck<MarketParticipantDbContext>()
-                .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
+            endpoints.MapLiveHealthChecks();
+            endpoints.MapReadyHealthChecks();
+        });
 
-            services.AddSwaggerGen(c =>
-            {
-                c.SupportNonNullableReferenceTypes();
-                c.SwaggerDoc(
-                    "v1",
-                    new OpenApiInfo
-                    {
-                        Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi",
-                        Version = "v1"
-                    });
+        // TODO disable until role auth is enabled on all envs
+        Container.Options.EnableAutoVerification = false;
+        app.UseSimpleInjector(Container);
 
-                var securitySchema = new OpenApiSecurityScheme
-                {
-                    Description =
-                        "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.Http,
-                    Scheme = "bearer",
-                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer", },
-                };
-
-                c.AddSecurityDefinition("Bearer", securitySchema);
-
-                var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } } };
-
-                c.AddSecurityRequirement(securityRequirement);
-            });
-
-            services.AddTransient<IMiddlewareFactory>(_ => new SimpleInjectorMiddlewareFactory(Container));
-        }
-
-        protected override void Configure(IConfiguration configuration, Container container)
+        if (_configuration.GetSetting(Settings.RolesValidationEnabled))
         {
-            ArgumentNullException.ThrowIfNull(container);
+            var internalOpenIdUrl = GetInternalOpenIdAddress(app);
+            appLifetime.ApplicationStarted.Register(() => OnApplicationStartedAsync(internalOpenIdUrl));
+        }
+    }
 
-            container.RegisterSingleton<IExternalTokenValidator>(() =>
-            {
-                var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-                var backendAppId = configuration.GetSetting(Settings.BackendAppId);
-                return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
-            });
+    public void ConfigureServices(IServiceCollection services)
+    {
+        Initialize(_configuration, services);
+    }
 
-            if (configuration.GetSetting(Settings.RolesValidationEnabled))
-            {
-                container.RegisterSingleton<ISigningKeyRing>(() =>
+    protected override void Configure(IConfiguration configuration, IServiceCollection services)
+    {
+        services
+            .AddControllers()
+            .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+        var internalOpenIdUrl = configuration.GetSetting(Settings.RolesValidationEnabled)
+            ? GetInternalOpenIdAddress(null)
+            : string.Empty;
+
+        var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+        var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+        services.AddJwtBearerAuthentication(
+            externalOpenIdUrl,
+            internalOpenIdUrl,
+            backendAppId);
+        services.AddPermissionAuthorization();
+
+        var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
+        var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
+
+        // Health check
+        services
+            .AddHealthChecks()
+            .AddLiveCheck()
+            .AddDbContextCheck<MarketParticipantDbContext>()
+            .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
+
+        services.AddSwaggerGen(c =>
+        {
+            c.SupportNonNullableReferenceTypes();
+            c.SwaggerDoc(
+                "v1",
+                new OpenApiInfo
                 {
-                    var keyVaultUri = configuration.GetSetting(Settings.KeyVault);
-                    var keyName = configuration.GetSetting(Settings.KeyName);
+                    Title = "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi",
+                    Version = "v1"
+                });
+
+            var securitySchema = new OpenApiSecurityScheme
+            {
+                Description =
+                    "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer", },
+            };
+
+            c.AddSecurityDefinition("Bearer", securitySchema);
+
+            var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } } };
+
+            c.AddSecurityRequirement(securityRequirement);
+        });
+
+        services.AddTransient<IMiddlewareFactory>(_ => new SimpleInjectorMiddlewareFactory(Container));
+    }
+
+    protected override void Configure(IConfiguration configuration, Container container)
+    {
+        ArgumentNullException.ThrowIfNull(container);
+
+        container.RegisterSingleton<IExternalTokenValidator>(() =>
+        {
+            var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+            var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+            return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
+        });
+
+        if (configuration.GetSetting(Settings.RolesValidationEnabled))
+        {
+            container.RegisterSingleton<ISigningKeyRing>(() =>
+            {
+                var keyVaultUri = configuration.GetSetting(Settings.KeyVault);
+                var keyName = configuration.GetSetting(Settings.KeyName);
 
 #if DEBUG
-                    var tokenCredentials = new DefaultAzureCredential();
+                var tokenCredentials = new DefaultAzureCredential();
 #else
                     var tokenCredentials = new ManagedIdentityCredential();
 #endif
 
-                    var keyClient = new KeyClient(keyVaultUri, tokenCredentials);
-                    return new SigningKeyRing(SystemClock.Instance, keyClient, keyName);
-                });
-
-                container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
-            }
-
-            container.Register<IUserIdProvider>(
-                () =>
-                {
-                    var accessor = container.GetRequiredService<IHttpContextAccessor>();
-                    return new UserIdProvider(() =>
-                    {
-                        var subjectClaim = accessor
-                            .HttpContext!
-                            .User
-                            .Claims
-                            .First(x => x.Type == ClaimTypes.NameIdentifier);
-
-                        return Guid.Parse(subjectClaim.Value);
-                    });
-                },
-                Lifestyle.Scoped);
-        }
-
-        protected override void ConfigureSimpleInjector(IServiceCollection services)
-        {
-            services.AddSimpleInjector(Container, options =>
-            {
-                options
-                    .AddAspNetCore()
-                    .AddControllerActivation();
-
-                options.AddLogging();
+                var keyClient = new KeyClient(keyVaultUri, tokenCredentials);
+                return new SigningKeyRing(SystemClock.Instance, keyClient, keyName);
             });
 
-            services.UseSimpleInjectorAspNetRequestScoping(Container);
+            container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
         }
 
-        private static async Task OnApplicationStartedAsync(string internalOpenIdUrl)
-        {
-            try
+        container.Register<IUserIdProvider>(
+            () =>
             {
-                using var httpclient = new HttpClient();
-
-                var uriOpenId = new Uri(internalOpenIdUrl);
-                var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/cachesigningkey");
-
-                await httpclient.GetAsync(uriKeyGet).ConfigureAwait(false);
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-
-        private sealed class EndpointDataSourceFilter : EndpointDataSource
-        {
-            private readonly EndpointDataSource _target;
-            private readonly IConfiguration _configuration;
-
-            public EndpointDataSourceFilter(EndpointDataSource target, IConfiguration configuration)
-            {
-                _target = target;
-                _configuration = configuration;
-            }
-
-            public override IReadOnlyList<Endpoint> Endpoints
-            {
-                get
+                var accessor = container.GetRequiredService<IHttpContextAccessor>();
+                return new UserIdProvider(() =>
                 {
-                    // This code is temporary while we test azure ad role based auth.
-                    // It allows u002 to use the new role based auth, while the remaining environments
-                    // do not.
-                    var enableUnsafeControllers = !_configuration.GetSetting(Settings.RolesValidationEnabled);
+                    var subjectClaim = accessor
+                        .HttpContext!
+                        .User
+                        .Claims
+                        .First(x => x.Type == ClaimTypes.NameIdentifier);
 
-                    if (enableUnsafeControllers)
-                    {
-                        var grouped = _target
-                            .Endpoints
-                            .Select(x => x.DisplayName!.Replace("Unsafe", string.Empty, StringComparison.Ordinal))
-                            .GroupBy(x => x);
+                    return Guid.Parse(subjectClaim.Value);
+                });
+            },
+            Lifestyle.Scoped);
+    }
 
-                        var toRemove = grouped
-                            .Where(x => x.Count() > 1)
-                            .Select(x => x.First())
-                            .ToList();
+    protected override void ConfigureSimpleInjector(IServiceCollection services)
+    {
+        services.AddSimpleInjector(Container, options =>
+        {
+            options
+                .AddAspNetCore()
+                .AddControllerActivation();
 
-                        return _target
-                            .Endpoints
-                            .Where(endpoint => !toRemove.Contains(endpoint.DisplayName!))
-                            .ToList();
-                    }
+            options.AddLogging();
+        });
+
+        services.UseSimpleInjectorAspNetRequestScoping(Container);
+    }
+
+    private static async Task OnApplicationStartedAsync(string internalOpenIdUrl)
+    {
+        try
+        {
+            using var httpclient = new HttpClient();
+
+            var uriOpenId = new Uri(internalOpenIdUrl);
+            var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/cachesigningkey");
+
+            await httpclient.GetAsync(uriKeyGet).ConfigureAwait(false);
+        }
+        catch
+        {
+            // ignored
+        }
+    }
+
+    private string GetInternalOpenIdAddress(IApplicationBuilder? app)
+    {
+        if (_internalOpenIdUrl != null)
+            return _internalOpenIdUrl;
+
+        if (app == null)
+            throw new InvalidOperationException("Cannot obtain internal OpenId url this early.");
+
+        var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
+        if (serverAddressesFeature == null)
+            throw new InvalidOperationException("IServerAddressesFeature is not available this early.");
+
+        return _internalOpenIdUrl = $"{serverAddressesFeature.Addresses.First()}/.well-known/openid-configuration";
+    }
+
+    private sealed class EndpointDataSourceFilter : EndpointDataSource
+    {
+        private readonly EndpointDataSource _target;
+        private readonly IConfiguration _configuration;
+
+        public EndpointDataSourceFilter(EndpointDataSource target, IConfiguration configuration)
+        {
+            _target = target;
+            _configuration = configuration;
+        }
+
+        public override IReadOnlyList<Endpoint> Endpoints
+        {
+            get
+            {
+                // This code is temporary while we test azure ad role based auth.
+                // It allows u002 to use the new role based auth, while the remaining environments
+                // do not.
+                var enableUnsafeControllers = !_configuration.GetSetting(Settings.RolesValidationEnabled);
+
+                if (enableUnsafeControllers)
+                {
+                    var grouped = _target
+                        .Endpoints
+                        .Select(x => x.DisplayName!.Replace("Unsafe", string.Empty, StringComparison.Ordinal))
+                        .GroupBy(x => x);
+
+                    var toRemove = grouped
+                        .Where(x => x.Count() > 1)
+                        .Select(x => x.First())
+                        .ToList();
 
                     return _target
                         .Endpoints
-                        .Where(endpoint => endpoint.DisplayName?.Contains("UnsafeController", StringComparison.Ordinal) == false)
+                        .Where(endpoint => !toRemove.Contains(endpoint.DisplayName!))
                         .ToList();
                 }
-            }
 
-            public override IChangeToken GetChangeToken() => _target.GetChangeToken();
+                return _target
+                    .Endpoints
+                    .Where(endpoint => endpoint.DisplayName?.Contains("UnsafeController", StringComparison.Ordinal) == false)
+                    .ToList();
+            }
         }
+
+        public override IChangeToken GetChangeToken() => _target.GetChangeToken();
     }
 }

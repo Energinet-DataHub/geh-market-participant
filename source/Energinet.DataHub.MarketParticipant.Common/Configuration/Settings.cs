@@ -41,8 +41,6 @@ public static class Settings
 
     public static Setting<string> ExternalOpenIdUrl { get; }
         = new("EXTERNAL_OPEN_ID_URL");
-    public static Setting<string> InternalOpenIdUrl { get; }
-        = new("INTERNAL_OPEN_ID_URL");
     public static Setting<string> BackendAppId { get; }
         = new("BACKEND_SERVICE_APP_ID");
 
