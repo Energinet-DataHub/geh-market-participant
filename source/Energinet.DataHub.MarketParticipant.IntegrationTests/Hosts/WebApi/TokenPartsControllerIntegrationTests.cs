@@ -22,9 +22,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.IdentityModel.Tokens;
@@ -40,6 +42,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     IClassFixture<KeyClientFixture>
 {
     private readonly KeyClientFixture _keyClientFixture;
+    private readonly MarketParticipantDatabaseFixture _fixture;
 
     public TokenPartsControllerIntegrationTests(
         KeyClientFixture keyClientFixture,
@@ -47,6 +50,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         : base(fixture)
     {
         _keyClientFixture = keyClientFixture;
+        _fixture = fixture;
     }
 
     [Fact]
@@ -107,13 +111,20 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Role_IsKnown()
     {
         // Arrange
-        var externalToken = CreateExternalTestToken();
+        var organizationView = Permission.OrganizationView;
+
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var (externalUserId, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync(new[] { organizationView });
+
+        var externalToken = CreateExternalTestToken(userId: externalUserId.ToString());
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
 
         // Assert
-        Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role"));
+        Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == PermissionsAsClaims.Lookup[organizationView]));
     }
 
     [Fact]
