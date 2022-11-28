@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
@@ -24,7 +25,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         {
             var host = Host
                 .CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(builder => builder.UseStartup<Startup>())
+                .ConfigureWebHostDefaults(builder =>
+                {
+                    builder
+                        .UseStartup<Startup>()
+                        .ConfigureServices(s => s.AddApplicationInsightsTelemetry());
+                })
                 .Build();
 
             await host.RunAsync().ConfigureAwait(false);

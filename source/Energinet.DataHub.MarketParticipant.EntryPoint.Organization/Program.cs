@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
 using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Microsoft.Extensions.Hosting;
 using SimpleInjector;
@@ -31,7 +32,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
             {
                 var host = new HostBuilder()
                     .ConfigureFunctionsWorkerDefaults(options => options.UseMiddleware<SimpleInjectorScopedRequest>())
-                    .ConfigureServices((context, services) => startup.Initialize(context.Configuration, services))
+                    .ConfigureServices((context, services) =>
+                    {
+                        startup.Initialize(context.Configuration, services);
+                        services.AddApplicationInsights();
+                    })
                     .Build()
                     .UseSimpleInjector(startup.Container);
 
