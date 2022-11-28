@@ -38,7 +38,7 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.BackendAppId.Key, TestBackendAppId);
-        builder.UseSetting(Settings.KeyVault.Key, "fake_value");
-        builder.UseSetting(Settings.KeyName.Key, "fake_value");
+        builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
+        builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
     }
 }

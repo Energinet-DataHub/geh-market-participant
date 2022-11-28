@@ -189,8 +189,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             {
                 container.RegisterSingleton<ISigningKeyRing>(() =>
                 {
-                    var keyVaultUri = configuration.GetSetting(Settings.KeyVault);
-                    var keyName = configuration.GetSetting(Settings.KeyName);
+                    var tokenKeyVaultUri = configuration.GetSetting(Settings.TokenKeyVault);
+                    var tokenKeyName = configuration.GetSetting(Settings.TokenKeyName);
 
 #if DEBUG
                     var tokenCredentials = new DefaultAzureCredential();
@@ -198,8 +198,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     var tokenCredentials = new ManagedIdentityCredential();
 #endif
 
-                    var keyClient = new KeyClient(keyVaultUri, tokenCredentials);
-                    return new SigningKeyRing(SystemClock.Instance, keyClient, keyName);
+                    var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
+                    return new SigningKeyRing(SystemClock.Instance, keyClient, tokenKeyName);
                 });
 
                 container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
