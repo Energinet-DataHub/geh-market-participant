@@ -192,11 +192,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     var tokenKeyVaultUri = configuration.GetSetting(Settings.TokenKeyVault);
                     var tokenKeyName = configuration.GetSetting(Settings.TokenKeyName);
 
-#if DEBUG
                     var tokenCredentials = new DefaultAzureCredential();
-#else
-                    var tokenCredentials = new ManagedIdentityCredential();
-#endif
 
                     var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
                     return new SigningKeyRing(SystemClock.Instance, keyClient, tokenKeyName);
