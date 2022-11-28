@@ -224,8 +224,8 @@ public sealed class TokenControllerIntegrationTests :
         base.ConfigureWebHost(builder);
         Startup.EnableIntegrationTestKeys = true;
 
-        builder.UseSetting(Settings.KeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
-        builder.UseSetting(Settings.KeyName.Key, _keyClientFixture.KeyName);
+        builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
+        builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);
         builder.UseSetting(Settings.RolesValidationEnabled.Key, "true");
     }
 
