@@ -33,7 +33,7 @@ public sealed class SigningKeyRing : ISigningKeyRing
     private readonly string _keyName;
 
     private readonly SemaphoreSlim _cacheLock = new(1);
-    private readonly TimeSpan _cacheLifeTime = TimeSpan.FromMinutes(28);
+    private readonly TimeSpan _cacheLifeTime = TimeSpan.FromMinutes(7);
 
     private DateTimeOffset _lastCache = DateTimeOffset.MinValue;
     private volatile List<KeyVaultKey>? _keyCache;
@@ -60,7 +60,7 @@ public sealed class SigningKeyRing : ISigningKeyRing
         var latestKey = keyCache
             .Where(key => !key.Properties.NotBefore.HasValue || key.Properties.NotBefore <= currentTime)
             .Where(key => !key.Properties.ExpiresOn.HasValue || key.Properties.ExpiresOn > currentTime)
-            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddHours(-1) || Startup.EnableIntegrationTestKeys);
+            .First(key => !key.Properties.CreatedOn.HasValue || key.Properties.CreatedOn < currentTime.AddMinutes(-10) || Startup.EnableIntegrationTestKeys);
 
         return _keyClient.GetCryptographyClient(_keyName, latestKey.Properties.Version);
     }

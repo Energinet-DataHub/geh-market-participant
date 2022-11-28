@@ -186,7 +186,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
     }
 
     [Fact]
-    public async Task GetSigningClientAsync_KeyNewerThan1Hour_NoKey()
+    public async Task GetSigningClientAsync_KeyNewerThan10Minutes_NoKey()
     {
         // Arrange
         var target = new SigningKeyRing(
