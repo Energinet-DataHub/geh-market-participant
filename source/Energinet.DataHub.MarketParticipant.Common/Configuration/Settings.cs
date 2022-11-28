@@ -49,10 +49,10 @@ public static class Settings
     public static Setting<string> ServiceBusHealthCheckConnectionString { get; }
         = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
 
-    public static Setting<Uri> KeyVault { get; }
-        = new("KEY_VAULT");
-    public static Setting<string> KeyName { get; }
-        = new("KEY_NAME");
+    public static Setting<Uri> TokenKeyVault { get; }
+        = new("TOKEN_KEY_VAULT");
+    public static Setting<string> TokenKeyName { get; }
+        = new("TOKEN_KEY_NAME");
 
     public static Setting<bool> RolesValidationEnabled { get; }
         = new("ROLES_VALIDATION_ENABLED");
