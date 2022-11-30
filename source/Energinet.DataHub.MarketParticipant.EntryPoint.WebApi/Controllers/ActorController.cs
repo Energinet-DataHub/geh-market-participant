@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (_userContext.CurrentUser.IsEnerginetOrAssignedToOrganization(organizationId))
+                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
                         return Unauthorized();
 
                     var getActorsCommand = new GetActorsCommand(organizationId);
@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginetOrAssignedToActor(actorId))
+                    if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                         return Unauthorized();
 
                     var getSingleActorCommand = new GetSingleActorCommand(actorId, organizationId);
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginet)
+                    if (!_userContext.CurrentUser.IsFas)
                         return Unauthorized();
 
                     var createActorCommand = new CreateActorCommand(organizationId, actorDto);
@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginetOrAssignedToActor(actorId))
+                    if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                         return Unauthorized();
 
                     var updateActorCommand = new UpdateActorCommand(organizationId, actorId, changeActor);

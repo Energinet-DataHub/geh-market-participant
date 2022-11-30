@@ -23,19 +23,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class TestUserHelper
 {
-    public static async Task<(Guid ExternalUserId, Guid ExternalActorId)> CreateUserAsync(
+    public static async Task<(Guid ExternalUserId, Guid ActorId)> CreateUserAsync(
         this MarketParticipantDatabaseManager manager,
         Permission[] permissions)
     {
         await using var context = manager.CreateDbContext();
 
         var externalUserId = Guid.NewGuid();
-        var externalActorId = Guid.NewGuid();
 
         var actorEntity = new ActorEntity
         {
             Id = Guid.NewGuid(),
-            ActorId = externalActorId,
             Name = string.Empty,
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active
@@ -90,6 +88,6 @@ internal static class TestUserHelper
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
 
-        return (externalUserId, externalActorId);
+        return (externalUserId, actorEntity.Id);
     }
 }

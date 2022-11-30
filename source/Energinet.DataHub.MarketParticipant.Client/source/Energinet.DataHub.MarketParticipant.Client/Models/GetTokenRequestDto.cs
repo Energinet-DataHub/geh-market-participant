@@ -16,5 +16,5 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public record GetTokenRequestDto(Guid ExternalActorId, string ExternalToken);
+    public record GetTokenRequestDto(Guid ActorId, string ExternalToken);
 }

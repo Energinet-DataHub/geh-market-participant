@@ -72,7 +72,7 @@ public sealed class TokenControllerIntegrationTests :
         var configuration = Deserialize(rawConfiguration, expectedStructure);
         Assert.NotNull(configuration);
         Assert.Equal("https://datahub.dk", configuration.issuer);
-        Assert.Equal("https://localhost/token/keys", configuration.jwks_uri);
+        Assert.Equal("http://localhost/token/keys", configuration.jwks_uri);
     }
 
     [Fact]

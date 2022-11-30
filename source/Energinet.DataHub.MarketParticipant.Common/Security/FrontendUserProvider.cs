@@ -34,16 +34,17 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 
     public async Task<FrontendUser?> ProvideUserAsync(
         Guid userId,
-        Guid externalActorId,
+        Guid actorId,
+        bool isFas,
         IEnumerable<Claim> claims)
     {
-        var actor = await _actorRepository.GetActorAsync(externalActorId).ConfigureAwait(false);
+        var actor = await _actorRepository.GetActorAsync(actorId).ConfigureAwait(false);
         return actor is { Status: ActorStatus.Active or ActorStatus.Passive }
             ? new FrontendUser(
                 userId,
                 actor.OrganizationId,
                 actor.ActorId,
-                claims.Any(c => c.Type == "energinet.fas" && c.Value == "true"))
+                isFas)
             : null;
     }
 }

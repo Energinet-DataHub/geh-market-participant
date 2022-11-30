@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                     {
-                        var organizationId = !_userContext.CurrentUser.IsEnerginet ? _userContext.CurrentUser.OrganizationId : (Guid?)null;
+                        var organizationId = !_userContext.CurrentUser.IsFas ? _userContext.CurrentUser.OrganizationId : (Guid?)null;
                         var getOrganizationsCommand = new GetOrganizationsCommand(organizationId);
 
                         var response = await _mediator
@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginetOrAssignedToOrganization(organizationId))
+                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
                         return Unauthorized();
 
                     var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
@@ -88,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginet)
+                    if (!_userContext.CurrentUser.IsFas)
                         return Unauthorized();
 
                     var createOrganizationCommand = new CreateOrganizationCommand(organization);
@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (!_userContext.CurrentUser.IsEnerginet)
+                    if (!_userContext.CurrentUser.IsFas)
                         return Unauthorized();
 
                     var updateOrganizationCommand =
