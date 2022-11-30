@@ -41,10 +41,12 @@ public sealed class UserRepository : IUserRepository
             .Where(u => u.ExternalId == externalUserId.Value)
             .Include(u => u.RoleAssignments)
             .SelectMany(u => u.RoleAssignments)
+            .Select(x => x.ActorId)
+            .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return roleAssignmentsQuery.Select(x => x.ActorId).Distinct();
+        return roleAssignmentsQuery;
     }
 
     public async Task<IEnumerable<Permission>> GetPermissionsAsync(Guid actorId, ExternalUserId externalUserId)
