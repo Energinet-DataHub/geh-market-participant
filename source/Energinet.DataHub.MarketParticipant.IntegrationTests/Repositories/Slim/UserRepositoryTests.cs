@@ -96,11 +96,9 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         var userExternalId = Guid.NewGuid();
-        var externalActorId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
         {
             Id = Guid.NewGuid(),
-            ActorId = externalActorId,
             Name = "Test Actor",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active
@@ -156,7 +154,7 @@ public sealed class UserRepositoryTests
         // Assert
         Assert.NotEmpty(actorIds);
         Assert.Single(actorIds);
-        Assert.Equal(externalActorId, actorIds.First().Value);
+        Assert.Equal(actorEntity.Id, actorIds.First());
     }
 
     [Fact]
@@ -170,7 +168,7 @@ public sealed class UserRepositoryTests
 
         // Act
         var perms = await userRepository
-            .GetPermissionsAsync(new ExternalActorId(Guid.NewGuid()), new ExternalUserId(Guid.NewGuid()));
+            .GetPermissionsAsync(Guid.NewGuid(), new ExternalUserId(Guid.NewGuid()));
 
         // Assert
         Assert.Empty(perms);
@@ -192,7 +190,7 @@ public sealed class UserRepositoryTests
 
         // Act
         var perms = await userRepository
-            .GetPermissionsAsync(new ExternalActorId(Guid.NewGuid()), new ExternalUserId(userExternalId));
+            .GetPermissionsAsync(Guid.NewGuid(), new ExternalUserId(userExternalId));
 
         // Assert
         Assert.Empty(perms);
@@ -208,11 +206,9 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         var userExternalId = Guid.NewGuid();
-        var externalActorId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
         {
             Id = Guid.NewGuid(),
-            ActorId = externalActorId,
             Name = "Test Actor",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active
@@ -257,7 +253,7 @@ public sealed class UserRepositoryTests
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(new ExternalActorId(externalActorId), new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
             .ToList();
 
         // Assert
@@ -275,12 +271,9 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         var userExternalId = Guid.NewGuid();
-        var externalActorId = Guid.NewGuid();
-        var externalActor2Id = Guid.NewGuid();
         var actorEntity = new ActorEntity()
         {
             Id = Guid.NewGuid(),
-            ActorId = externalActorId,
             Name = "Test Actor",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active
@@ -288,7 +281,6 @@ public sealed class UserRepositoryTests
         var actor2Entity = new ActorEntity()
         {
             Id = Guid.NewGuid(),
-            ActorId = externalActor2Id,
             Name = "Test Actor 2",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active
@@ -345,11 +337,11 @@ public sealed class UserRepositoryTests
 
         // Act
         var permsActor = (await userRepository
-            .GetPermissionsAsync(new ExternalActorId(externalActorId), new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
             .ToList();
 
         var permsActor2 = (await userRepository
-            .GetPermissionsAsync(new ExternalActorId(externalActor2Id), new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor2Entity.Id, new ExternalUserId(userExternalId)))
             .ToList();
 
         // Assert
@@ -371,11 +363,9 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         var userExternalId = Guid.NewGuid();
-        var externalActorId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
         {
             Id = Guid.NewGuid(),
-            ActorId = externalActorId,
             Name = "Test Actor",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active
@@ -431,7 +421,7 @@ public sealed class UserRepositoryTests
 
         // Act
         var permsActor = (await userRepository
-            .GetPermissionsAsync(new ExternalActorId(externalActorId), new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
             .ToList();
 
         // Assert

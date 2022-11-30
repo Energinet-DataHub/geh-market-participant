@@ -30,11 +30,11 @@ public sealed class ActorRepository : IActorRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<Actor?> GetActorAsync(Guid externalActorId)
+    public async Task<Actor?> GetActorAsync(Guid actorId)
     {
         var foundActor = await _marketParticipantDbContext
             .Actors
-            .FirstOrDefaultAsync(actor => actor.ActorId == externalActorId)
+            .FirstOrDefaultAsync(actor => actor.Id == actorId)
             .ConfigureAwait(false);
 
         if (foundActor == null)

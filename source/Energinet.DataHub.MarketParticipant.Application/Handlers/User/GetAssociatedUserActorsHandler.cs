@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -38,10 +37,10 @@ public sealed class GetAssociatedUserActorsHandler : IRequestHandler<GetAssociat
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var actors = await _userRepository
+        var actorIds = await _userRepository
             .GetActorsAsync(new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
-        return new GetAssociatedUserActorsResponse(actors.Select(actor => actor.Value));
+        return new GetAssociatedUserActorsResponse(actorIds);
     }
 }

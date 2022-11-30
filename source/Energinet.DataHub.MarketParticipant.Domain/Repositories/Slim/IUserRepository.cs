@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
@@ -28,16 +28,16 @@ public interface IUserRepository
     /// Gets all actors that are attached to the specified user through permissions.
     /// </summary>
     /// <param name="externalUserId">The external id of the user.</param>
-    /// <returns>A list of external actor ids attached to the specified user.</returns>
-    Task<IEnumerable<ExternalActorId>> GetActorsAsync(ExternalUserId externalUserId);
+    /// <returns>A list of actor ids attached to the specified user.</returns>
+    Task<IEnumerable<Guid>> GetActorsAsync(ExternalUserId externalUserId);
 
     /// <summary>
     /// Gets all permissions a user has for the given actor.
     /// </summary>
-    /// <param name="externalActorId">The external id for the actor.</param>
+    /// <param name="actorId">The id of the actor.</param>
     /// <param name="externalUserId">The external id of the user.</param>
     /// <returns>A list of the applicable permissions.</returns>
     Task<IEnumerable<Core.App.Common.Security.Permission>> GetPermissionsAsync(
-        ExternalActorId externalActorId,
+        Guid actorId,
         ExternalUserId externalUserId);
 }

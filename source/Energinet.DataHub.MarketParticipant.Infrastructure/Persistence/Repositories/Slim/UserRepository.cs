@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using Microsoft.EntityFrameworkCore;
@@ -33,40 +32,27 @@ public sealed class UserRepository : IUserRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<IEnumerable<ExternalActorId>> GetActorsAsync(ExternalUserId externalUserId)
+    public async Task<IEnumerable<Guid>> GetActorsAsync(ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        var roleAssignmentsQuery = _marketParticipantDbContext
+        var roleAssignmentsQuery = await _marketParticipantDbContext
             .Users
             .Where(u => u.ExternalId == externalUserId.Value)
             .Include(u => u.RoleAssignments)
-            .SelectMany(u => u.RoleAssignments);
-
-        var externalActorIdQuery =
-            from assignment in roleAssignmentsQuery
-            join actor in _marketParticipantDbContext.Actors
-                on assignment.ActorId equals actor.Id
-            select actor.ActorId;
-
-        var ids = await externalActorIdQuery
+            .SelectMany(u => u.RoleAssignments)
+            .Select(x => x.ActorId)
             .Distinct()
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return ids.Select(id => new ExternalActorId(id!.Value));
+        return roleAssignmentsQuery;
     }
 
-    public async Task<IEnumerable<Permission>> GetPermissionsAsync(ExternalActorId externalActorId, ExternalUserId externalUserId)
+    public async Task<IEnumerable<Permission>> GetPermissionsAsync(Guid actorId, ExternalUserId externalUserId)
     {
-        ArgumentNullException.ThrowIfNull(externalActorId);
+        ArgumentNullException.ThrowIfNull(actorId);
         ArgumentNullException.ThrowIfNull(externalUserId);
-
-        var actorId = await _marketParticipantDbContext
-            .Actors
-            .Where(x => x.ActorId == externalActorId.Value)
-            .Select(x => x.Id)
-            .SingleOrDefaultAsync().ConfigureAwait(false);
 
         var perms = await _marketParticipantDbContext
             .Users

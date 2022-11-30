@@ -17,4 +17,4 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetAssociatedUserActorsResponse(IEnumerable<Guid> ExternalActorIds);
+public sealed record GetAssociatedUserActorsResponse(IEnumerable<Guid> ActorIds);

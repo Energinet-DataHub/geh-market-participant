@@ -87,7 +87,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         Assert.NotNull(response);
-        Assert.Empty(response.ExternalActorIds);
+        Assert.Empty(response.ActorIds);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
         const string target = "user/actors";
 
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var (externalUserId, externalActorId) = await _fixture
+        var (externalUserId, actorId) = await _fixture
             .DatabaseManager
             .CreateUserAsync(new[] { Permission.OrganizationView });
 
@@ -120,6 +120,6 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         Assert.NotNull(response);
-        Assert.Equal(externalActorId, response.ExternalActorIds.Single());
+        Assert.Equal(actorId, response.ActorIds.Single());
     }
 }
