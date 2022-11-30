@@ -26,7 +26,7 @@ public interface IActorRepository
     /// <summary>
     /// Gets an actor directly by their external id.
     /// </summary>
-    /// <param name="externalActorId">The external id of the actor.</param>
-    /// <returns>An actor for the specified external id; or null if not found.</returns>
-    Task<Actor?> GetActorAsync(Guid externalActorId);
+    /// <param name="actorId">The id of the actor.</param>
+    /// <returns>An actor for the specified id; or null if not found.</returns>
+    Task<Actor?> GetActorAsync(Guid actorId);
 }

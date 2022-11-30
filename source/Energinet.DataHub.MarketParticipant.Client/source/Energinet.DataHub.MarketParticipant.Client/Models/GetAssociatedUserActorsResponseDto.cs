@@ -17,5 +17,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record GetAssociatedUserActorsResponseDto(IEnumerable<Guid> ExternalActorIds);
+    public sealed record GetAssociatedUserActorsResponseDto(IEnumerable<Guid> ActorIds);
 }
