@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return await this.ProcessAsync(
                 async () =>
                 {
-                    if (_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
+                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
                         return Unauthorized();
 
                     var getActorsCommand = new GetActorsCommand(organizationId);
