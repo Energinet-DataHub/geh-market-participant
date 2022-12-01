@@ -14,6 +14,8 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
@@ -36,6 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}/contact")]
+        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> ListAllAsync(Guid organizationId, Guid actorId)
         {
             return await this.ProcessAsync(
@@ -53,6 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost("{organizationId:guid}/actor/{actorId:guid}/contact")]
+        [AuthorizeUser(Permission.ActorManage)]
         public async Task<IActionResult> CreateContactAsync(Guid organizationId, Guid actorId, CreateActorContactDto contactDto)
         {
             return await this.ProcessAsync(
@@ -70,6 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpDelete("{organizationId:guid}/actor/{actorId:guid}/contact/{contactId:guid}")]
+        [AuthorizeUser(Permission.ActorManage)]
         public async Task<IActionResult> DeleteContactAsync(Guid organizationId, Guid actorId, Guid contactId)
         {
             return await this.ProcessAsync(
