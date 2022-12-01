@@ -36,5 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 
         public Guid OrganizationId { get; set; }
         public bool New { get; set; }
+        public bool IsFas { get; set; }
     }
 }
