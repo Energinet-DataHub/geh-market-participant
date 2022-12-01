@@ -66,4 +66,15 @@ public sealed class UserRepository : IUserRepository
 
         return perms.SelectMany(x => x.RoleAssignments.SelectMany(y => y.UserRoleTemplate.Permissions.Select(z => z.Permission)));
     }
+
+    public Task<bool> IsFasAsync(Guid actorId, ExternalUserId externalUserId)
+    {
+        var query = from u in _marketParticipantDbContext.Users
+                    join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+                    join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
+                    where u.ExternalId == externalUserId.Value
+                    select a.IsFas;
+
+        return query.FirstOrDefaultAsync();
+    }
 }
