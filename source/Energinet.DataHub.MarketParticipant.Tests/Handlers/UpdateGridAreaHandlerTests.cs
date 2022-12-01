@@ -15,8 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -39,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                new Mock<IUserIdProvider>().Object);
+                new Mock<IUserContext<FrontendUser>>().Object);
 
             // act + Assert
             await Assert
@@ -63,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                new Mock<IUserIdProvider>().Object);
+                new Mock<IUserContext<FrontendUser>>().Object);
 
             // act
             await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);
@@ -90,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 eventQueue.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                new Mock<IUserIdProvider>().Object);
+                new Mock<IUserContext<FrontendUser>>().Object);
 
             // act
             await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);
@@ -117,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 auditLogEntryRepository.Object,
-                new Mock<IUserIdProvider>().Object);
+                new Mock<IUserContext<FrontendUser>>().Object);
 
             // act
             await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);

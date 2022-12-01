@@ -53,7 +53,4 @@ public static class Settings
         = new("TOKEN_KEY_VAULT");
     public static Setting<string> TokenKeyName { get; }
         = new("TOKEN_KEY_NAME");
-
-    public static Setting<bool> RolesValidationEnabled { get; }
-        = new("ROLES_VALIDATION_ENABLED");
 }

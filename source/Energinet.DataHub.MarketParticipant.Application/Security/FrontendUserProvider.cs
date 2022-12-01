@@ -14,14 +14,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 
-namespace Energinet.DataHub.MarketParticipant.Common.Security;
+namespace Energinet.DataHub.MarketParticipant.Application.Security;
 
 public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 {

@@ -15,7 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -32,20 +34,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
         private readonly IGridAreaIntegrationEventsQueueService _gridAreaIntegrationEventsQueueService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IGridAreaAuditLogEntryRepository _gridAreaAuditLogEntryRepository;
-        private readonly IUserIdProvider _userIdProvider;
+        private readonly IUserContext<FrontendUser> _userContext;
 
         public UpdateGridAreaHandler(
             IGridAreaRepository gridAreaRepository,
             IGridAreaIntegrationEventsQueueService gridAreaIntegrationEventsQueueService,
             IUnitOfWorkProvider unitOfWorkProvider,
             IGridAreaAuditLogEntryRepository gridAreaAuditLogEntryRepository,
-            IUserIdProvider userIdProvider)
+            IUserContext<FrontendUser> userContext)
         {
             _gridAreaRepository = gridAreaRepository;
             _gridAreaIntegrationEventsQueueService = gridAreaIntegrationEventsQueueService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _gridAreaAuditLogEntryRepository = gridAreaAuditLogEntryRepository;
-            _userIdProvider = userIdProvider;
+            _userContext = userContext;
         }
 
         public async Task<Unit> Handle(UpdateGridAreaCommand request, CancellationToken cancellationToken)
@@ -81,14 +83,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
             }
         }
 
-        private async Task CreateLogEntryAsync(Guid gridAreaId, GridAreaAuditLogEntryField field, string oldvalue, string newValue)
+        private async Task CreateLogEntryAsync(Guid gridAreaId, GridAreaAuditLogEntryField field, string oldValue, string newValue)
         {
             await _gridAreaAuditLogEntryRepository.InsertAsync(
                 new GridAreaAuditLogEntry(
                     DateTimeOffset.UtcNow,
-                    _userIdProvider.UserId,
+                    _userContext.CurrentUser.UserId,
                     field,
-                    oldvalue,
+                    oldValue,
                     newValue,
                     gridAreaId)).ConfigureAwait(false);
         }

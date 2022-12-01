@@ -226,7 +226,6 @@ public sealed class TokenControllerIntegrationTests :
 
         builder.UseSetting(Settings.TokenKeyVault.Key, _keyClientFixture.KeyClient.VaultUri.ToString());
         builder.UseSetting(Settings.TokenKeyName.Key, _keyClientFixture.KeyName);
-        builder.UseSetting(Settings.RolesValidationEnabled.Key, "true");
     }
 
     private static string CreateExternalTestToken(

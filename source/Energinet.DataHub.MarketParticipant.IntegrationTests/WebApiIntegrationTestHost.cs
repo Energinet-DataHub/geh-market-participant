@@ -15,8 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
@@ -85,8 +86,9 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
     private static void InitUserIdProvider(Container container)
     {
-        var userIdProvider = new Mock<IUserIdProvider>();
-        userIdProvider.Setup(x => x.UserId).Returns(Guid.NewGuid());
+        var mockUser = new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false);
+        var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+        userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
         container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
     }
 }
