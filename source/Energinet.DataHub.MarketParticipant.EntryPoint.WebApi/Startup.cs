@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                endpoints.MapControllers().RequireAuthorization();
 
                 // Health check
                 endpoints.MapLiveHealthChecks();
