@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Microsoft.AspNetCore.Hosting;
@@ -40,5 +41,11 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         builder.UseSetting(Settings.BackendAppId.Key, TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
+        builder.UseSetting(Settings.B2CTenant.Key, Guid.Empty.ToString());
+        builder.UseSetting(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString());
+        builder.UseSetting(Settings.B2CBackendId.Key, Guid.Empty.ToString());
+        builder.UseSetting(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString());
+        builder.UseSetting(Settings.B2CServicePrincipalNameId.Key, "fake_value");
+        builder.UseSetting(Settings.B2CServicePrincipalNameSecret.Key, "fake_value");
     }
 }
