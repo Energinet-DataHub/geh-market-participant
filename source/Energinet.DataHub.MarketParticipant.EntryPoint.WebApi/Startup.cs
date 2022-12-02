@@ -62,6 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                Container.Options.EnableAutoVerification = false;
                 AuthenticationExtensions.DisableHttpsConfiguration = true;
             }
 

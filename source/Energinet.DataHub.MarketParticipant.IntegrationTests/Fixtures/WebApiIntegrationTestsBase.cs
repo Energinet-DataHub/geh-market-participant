@@ -35,18 +35,11 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
     {
         builder.UseSetting(Settings.SqlDbConnectionString.Key, _fixture.DatabaseManager.ConnectionString);
         builder.UseSetting(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value");
-        builder.UseSetting(Settings.ServiceBusTopicConnectionString.Key, "fake_value");
         builder.UseSetting(Settings.ServiceBusTopicName.Key, "fake_value");
         builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.BackendAppId.Key, TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
-        builder.UseSetting(Settings.B2CTenant.Key, Guid.Empty.ToString());
-        builder.UseSetting(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString());
-        builder.UseSetting(Settings.B2CBackendId.Key, Guid.Empty.ToString());
-        builder.UseSetting(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString());
-        builder.UseSetting(Settings.B2CServicePrincipalNameId.Key, "fake_value");
-        builder.UseSetting(Settings.B2CServicePrincipalNameSecret.Key, "fake_value");
     }
 }
