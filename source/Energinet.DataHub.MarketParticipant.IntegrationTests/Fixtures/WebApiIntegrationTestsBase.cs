@@ -35,6 +35,7 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
     {
         builder.UseSetting(Settings.SqlDbConnectionString.Key, _fixture.DatabaseManager.ConnectionString);
         builder.UseSetting(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value");
+        builder.UseSetting(Settings.ServiceBusTopicConnectionString.Key, "fake_value");
         builder.UseSetting(Settings.ServiceBusTopicName.Key, "fake_value");
         builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
