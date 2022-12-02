@@ -15,7 +15,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Security;
@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object);
+                CreateMockedUser());
 
             // act + Assert
             await Assert
@@ -65,13 +65,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object);
+                CreateMockedUser());
 
             // act
             await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);
 
             // assert
-            gridAreaRepository.Verify(x => x.AddOrUpdateAsync(It.Is<GridArea>(x => x.Name.Value == "newName")), Times.Once);
+            gridAreaRepository.Verify(x => x.AddOrUpdateAsync(It.Is<GridArea>(y => y.Name.Value == "newName")), Times.Once);
         }
 
         [Fact]
@@ -92,13 +92,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 eventQueue.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object);
+                CreateMockedUser());
 
             // act
             await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);
 
             // assert
-            eventQueue.Verify(x => x.EnqueueGridAreaNameChangedEventAsync(It.Is<GridArea>(x => x.Name.Value == "newName")), Times.Once);
+            eventQueue.Verify(x => x.EnqueueGridAreaNameChangedEventAsync(It.Is<GridArea>(y => y.Name.Value == "newName")), Times.Once);
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 auditLogEntryRepository.Object,
-                new Mock<IUserContext<FrontendUser>>().Object);
+                CreateMockedUser());
 
             // act
             await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);
@@ -127,8 +127,21 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // assert
             auditLogEntryRepository.Verify(
                 x => x.InsertAsync(
-                    It.Is<GridAreaAuditLogEntry>(x => x.Field == GridAreaAuditLogEntryField.Name && x.OldValue == "name" && x.NewValue == "newName")),
+                    It.Is<GridAreaAuditLogEntry>(y => y.Field == GridAreaAuditLogEntryField.Name && y.OldValue == "name" && y.NewValue == "newName")),
                 Times.Once);
+        }
+
+        private static UserContext<FrontendUser> CreateMockedUser()
+        {
+            var frontendUser = new FrontendUser(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                false);
+
+            var userContext = new UserContext<FrontendUser>();
+            userContext.SetCurrentUser(frontendUser);
+            return userContext;
         }
     }
 }
