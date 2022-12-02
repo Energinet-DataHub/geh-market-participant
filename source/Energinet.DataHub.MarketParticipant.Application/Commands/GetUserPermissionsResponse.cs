@@ -17,4 +17,4 @@ using Energinet.DataHub.Core.App.Common.Security;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public sealed record GetUserPermissionsResponse(IEnumerable<Permission> Permissions);
+public sealed record GetUserPermissionsResponse(bool IsFas, IEnumerable<Permission> Permissions);

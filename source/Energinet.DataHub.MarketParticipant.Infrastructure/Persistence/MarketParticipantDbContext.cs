@@ -44,10 +44,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
     public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
     public DbSet<UserEntity> Users { get; private set; } = null!;
-    public DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; private set; } = null!;
-    public DbSet<UserRoleTemplatePermissionEntity> TemplatePermissions { get; private set; } = null!;
-    public DbSet<UserRoleTemplatePermissionEntity> TemplateEicFunctions { get; private set; } = null!;
-    public DbSet<UserRoleTemplatePermissionEntity> UserRoleAssignments { get; private set; } = null!;
+    public DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
     {

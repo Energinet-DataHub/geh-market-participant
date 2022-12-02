@@ -44,6 +44,12 @@ public sealed class GetUserPermissionsCommandHandler
                 new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
-        return new GetUserPermissionsResponse(permissions);
+        var isFas = await _userRepository
+            .IsFasAsync(
+                request.ActorId,
+                new ExternalUserId(request.ExternalUserId))
+            .ConfigureAwait(false);
+
+        return new GetUserPermissionsResponse(isFas, permissions);
     }
 }
