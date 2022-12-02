@@ -431,4 +431,71 @@ public sealed class UserRepositoryTests
         Assert.Contains(Permission.OrganizationView, permsActor);
         Assert.Contains(Permission.GridAreasManage, permsActor);
     }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task IsFas_Correct(bool isFas)
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active,
+            IsFas = isFas
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity
+            {
+                Country = "DK",
+            },
+            Name = "Name",
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+
+        var userRoleTemplate = new UserRoleTemplateEntity
+        {
+            Name = "Test Template",
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
+        };
+
+        await context.Entry(actorEntity).ReloadAsync();
+
+        var roleAssignment = new UserRoleAssignmentEntity
+        {
+            ActorId = actorEntity.Id,
+            UserRoleTemplate = userRoleTemplate
+        };
+
+        var userEntity = new UserEntity
+        {
+            ExternalId = userExternalId,
+            Email = "fake@mail.com",
+            RoleAssignments = { roleAssignment }
+        };
+
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var actual = await userRepository
+            .IsFasAsync(actorEntity.Id, new ExternalUserId(userExternalId));
+
+        // Assert
+        Assert.Equal(isFas, actual);
+    }
 }

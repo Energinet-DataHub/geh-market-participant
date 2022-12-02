@@ -41,6 +41,8 @@ public class TokenController : ControllerBase
     private const string Issuer = "https://datahub.dk";
     private const string RoleClaim = "role";
     private const string TokenClaim = "token";
+    private const string MembershipClaim = "membership";
+    private const string FasMembership = "fas";
 
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly ISigningKeyRing _signingKeyRing;
@@ -138,6 +140,11 @@ public class TokenController : ControllerBase
             .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
+
+        if (grantedPermissions.IsFas)
+        {
+            dataHubTokenClaims = dataHubTokenClaims.Append(new Claim(MembershipClaim, FasMembership));
+        }
 
         var dataHubToken = new JwtSecurityToken(
             Issuer,
