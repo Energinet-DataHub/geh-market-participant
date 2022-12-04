@@ -221,6 +221,8 @@ public sealed class TokenControllerIntegrationTests :
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         base.ConfigureWebHost(builder);
         Startup.EnableIntegrationTestKeys = true;
 

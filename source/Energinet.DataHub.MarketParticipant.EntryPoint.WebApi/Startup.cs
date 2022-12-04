@@ -245,7 +245,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
                 await httpclient.GetAsync(uriKeyGet).ConfigureAwait(false);
             }
+#pragma warning disable CA1031
             catch
+#pragma warning restore CA1031
             {
                 // ignored
             }
