@@ -49,6 +49,9 @@ public static class Settings
     public static Setting<string> ServiceBusHealthCheckConnectionString { get; }
         = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
 
+    public static Setting<bool> AllowAllTokens { get; }
+        = new("ALLOW_ALL_TOKENS", false);
+
     public static Setting<Uri> TokenKeyVault { get; }
         = new("TOKEN_KEY_VAULT");
     public static Setting<string> TokenKeyName { get; }
