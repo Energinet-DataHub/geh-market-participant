@@ -53,7 +53,7 @@ public sealed class UserRepository : IUserRepository
 
         var fasActorQuery = await _marketParticipantDbContext
             .Actors
-            .Where(a => a.IsFas)
+            .Where(a => a.IsFas && a.ActorId != null)
             .Select(a => a.ActorId!.Value)
             .Take(1)
             .ToListAsync()
