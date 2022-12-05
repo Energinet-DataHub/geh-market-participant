@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseSimpleInjector(Container);
 
             var internalOpenIdUrl = _configuration.GetSetting(Settings.InternalOpenIdUrl);
-            appLifetime?.ApplicationStarted.Register(() => OnApplicationStartedAsync(internalOpenIdUrl));
+            appLifetime?.ApplicationStarted.Register(() => OnApplicationStarted(internalOpenIdUrl));
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -191,7 +191,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services.UseSimpleInjectorAspNetRequestScoping(Container);
         }
 
-        private static async void OnApplicationStartedAsync(string internalOpenIdUrl)
+#pragma warning disable VSTHRD100
+        private static async void OnApplicationStarted(string internalOpenIdUrl)
+#pragma warning restore VSTHRD100
         {
             try
             {
@@ -202,7 +204,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
                 await httpClient.GetAsync(uriKeyGet).ConfigureAwait(false);
             }
+#pragma warning disable CA1031
             catch
+#pragma warning restore CA1031
             {
                 // ignored
             }
