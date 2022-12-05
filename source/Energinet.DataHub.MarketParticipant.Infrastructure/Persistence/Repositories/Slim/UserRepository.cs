@@ -46,7 +46,20 @@ public sealed class UserRepository : IUserRepository
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return roleAssignmentsQuery;
+        if (roleAssignmentsQuery.Any())
+        {
+            return roleAssignmentsQuery;
+        }
+
+        var fasActorQuery = await _marketParticipantDbContext
+            .Actors
+            .Where(a => a.IsFas)
+            .Select(a => a.ActorId!.Value)
+            .Take(1)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return fasActorQuery;
     }
 
     public async Task<IEnumerable<Permission>> GetPermissionsAsync(Guid actorId, ExternalUserId externalUserId)
