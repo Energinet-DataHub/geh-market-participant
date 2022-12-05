@@ -21,7 +21,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys.Cryptography;
 using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
@@ -66,14 +65,10 @@ public class TokenController : ControllerBase
     [Route(".well-known/openid-configuration")]
     public IActionResult GetConfig()
     {
-        var protocol = AuthenticationExtensions.DisableHttpsConfiguration
-            ? "http://"
-            : "https://";
-
         var configuration = new
         {
             issuer = Issuer,
-            jwks_uri = $"{protocol}{Request.Host}/token/keys",
+            jwks_uri = $"https://{Request.Host}/token/keys",
         };
 
         return Ok(configuration);
