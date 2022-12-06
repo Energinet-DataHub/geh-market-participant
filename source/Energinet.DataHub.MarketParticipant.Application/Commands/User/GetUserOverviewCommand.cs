@@ -12,20 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client
+using System;
+using MediatR;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
 {
-    /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
-    /// </summary>
-    public interface IMarketParticipantClient :
-        IMarketParticipantOrganizationClient,
-        IMarketParticipantUserClient,
-        IMarketParticipantActorClient,
-        IMarketParticipantGridAreaClient,
-        IMarketParticipantActorContactClient,
-        IMarketParticipantGridAreaOverviewClient,
-        ITokenClient,
-        IMarketParticipantUserOverviewClient
-    {
-    }
+    public sealed record GetUserOverviewCommand(int PageNumber, int PageSize, Guid? ActorId) : IRequest<GetUserOverviewResponse>;
 }

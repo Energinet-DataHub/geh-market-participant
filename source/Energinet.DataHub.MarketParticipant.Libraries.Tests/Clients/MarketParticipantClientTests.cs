@@ -835,5 +835,40 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Clients
             Assert.Equal("Name", actualContact.Name);
             Assert.Equal(PriceAreaCode.Dk2, actualContact.PriceAreaCode);
         }
+
+        [Fact]
+        public async Task GetUserOverviewAsync_All_FAS()
+        {
+            // Arrange
+            const string incomingJson = @"
+            [
+              {
+                ""id"": ""301372EC-C44C-42CA-BE41-9C1F33D14971"",
+                ""email"": ""test1@energinet.dk""
+              },
+              {
+                ""id"": ""301372EC-C44C-42CA-BE41-9C1F33D14972"",
+                ""email"": ""test2@energinet.dk""
+              },
+              {
+                ""id"": ""301372EC-C44C-42CA-BE41-9C1F33D14973"",
+                ""email"": ""test3@energinet.dk""
+              }
+            ]";
+            using var httpTest = new HttpTest();
+            using var clientFactory = new PerBaseUrlFlurlClientFactory();
+            var target = new MarketParticipantUserOverviewClient(clientFactory.Get("https://localhost"));
+            httpTest.RespondWith(incomingJson);
+
+            var pageNumber = 1;
+            var pageSize = 50;
+
+            // Act
+            var actual = await target.GetUserOverviewAsync(pageNumber, pageSize).ConfigureAwait(false);
+
+            // Assert
+            var actualUsers = actual.ToList();
+            Assert.Equal(3, actualUsers.Count);
+        }
     }
 }
