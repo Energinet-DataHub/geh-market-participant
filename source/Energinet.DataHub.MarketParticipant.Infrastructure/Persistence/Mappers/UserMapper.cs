@@ -28,6 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.ExternalId = from.ExternalId.Value;
             foreach (var fromRoleAssignment in from.RoleAssignments)
             {
+                var existing = to.RoleAssignments.FirstOrDefault(x =>
+                    x.ActorId == fromRoleAssignment.ActorId &&
+                    x.UserId == fromRoleAssignment.UserId.Value &&
+                    x.UserRoleTemplateId == fromRoleAssignment.TemplateId.Value);
+                if (existing is not null)
+                    continue;
+
                 to.RoleAssignments.Add(MapToEntity(fromRoleAssignment, from.Id));
             }
         }

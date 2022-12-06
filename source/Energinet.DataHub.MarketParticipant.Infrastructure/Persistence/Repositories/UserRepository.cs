@@ -77,8 +77,6 @@ public sealed class UserRepository : IUserRepository
     {
         return _marketParticipantDbContext
             .Users
-            .Include(u => u.RoleAssignments)
-            .ThenInclude(r => r.UserRoleTemplate)
-            .ThenInclude(t => t.Permissions);
+            .Include(u => u.RoleAssignments);
     }
 }

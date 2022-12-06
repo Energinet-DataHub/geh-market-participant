@@ -39,7 +39,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
     }
 
     [Fact]
-    public async Task UpdateUserRoleTemplates_NewTemplate_ReturnsNewTemplate()
+    public async Task UpdateUserRoleTemplates_AddNewTemplateToEmptyCollection_ReturnsNewTemplate()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -73,7 +73,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
     }
 
     [Fact]
-    public async Task GetUserRoleTemplates_HasTwoTemplates_ReturnsBoth()
+    public async Task UpdateUserRoleTemplates_AddToExistingTemplates_ReturnsBoth()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -84,60 +84,31 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .CreateUserAsync();
 
-        await _fixture
+        var roleTemplateId = await _fixture
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        await _fixture
+        var templateId = await _fixture
             .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.OrganizationView });
+            .CreateRoleTemplate("fake_value_2", new[] { Permission.ActorManage });
 
-        var command = new GetUserRoleTemplatesCommand(actorId, userId);
+        var updateDto = new UpdateUserRoleTemplatesDto(
+            UserRoleTemplateAssignments: new Dictionary<Guid, List<UserRoleTemplateId>>
+            {
+                { actorId, new List<UserRoleTemplateId>() { templateId, new(roleTemplateId) } },
+            });
+
+        var updateCommand = new UpdateUserRoleTemplatesCommand(userId, updateDto);
+        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
 
         // Act
-        var response = await mediator.Send(command);
+        await mediator.Send(updateCommand);
+        var response = await mediator.Send(getCommand);
 
         // Assert
+        Assert.NotEmpty(response.Templates);
         Assert.Equal(2, response.Templates.Count());
-    }
-
-    [Fact]
-    public async Task GetUserRoleTemplates_HasTwoActors_ReturnsTemplateFromEach()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
-
-        var (actorId1, userId) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
-
-        var (actorId2, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
-
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId1, userId, new[] { Permission.UsersManage });
-
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId2, userId, new[] { Permission.OrganizationView });
-
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId2, userId, new[] { Permission.GridAreasManage });
-
-        var command1 = new GetUserRoleTemplatesCommand(actorId1, userId);
-        var command2 = new GetUserRoleTemplatesCommand(actorId2, userId);
-
-        // Act
-        var response1 = await mediator.Send(command1);
-        var response2 = await mediator.Send(command2);
-
-        // Assert
-        Assert.Single(response1.Templates);
-        Assert.Equal(2, response2.Templates.Count());
+        Assert.Contains(response.Templates, x => x.Name == "fake_value");
+        Assert.Contains(response.Templates, x => x.Name == "fake_value_2");
     }
 }
