@@ -45,6 +45,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
     public DbSet<UserEntity> Users { get; private set; } = null!;
     public DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; private set; } = null!;
+    public DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
     {

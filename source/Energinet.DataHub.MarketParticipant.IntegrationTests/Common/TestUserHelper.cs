@@ -23,6 +23,86 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class TestUserHelper
 {
+    public static async Task<(Guid ActorId, Guid UserId)> CreateUserAsync(
+        this MarketParticipantDatabaseManager manager)
+    {
+        await using var context = manager.CreateDbContext();
+
+        var actorEntity = new ActorEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = string.Empty,
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+
+        var organizationEntity = new OrganizationEntity
+        {
+            Id = Guid.NewGuid(),
+            Actors = { actorEntity },
+            Address = new AddressEntity
+            {
+                Country = "Denmark"
+            },
+            Name = string.Empty,
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
+        };
+
+        await context.Organizations.AddAsync(organizationEntity);
+        await context.SaveChangesAsync();
+
+        var userEntity = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            ExternalId = Guid.NewGuid(),
+            Email = "test@test.test",
+        };
+
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        return (actorEntity.Id, userEntity.Id);
+    }
+
+    public static async Task AddUserPermissionsAsync(
+        this MarketParticipantDatabaseManager manager,
+        Guid actorId,
+        Guid userId,
+        Permission[] permissions)
+    {
+        await using var context = manager.CreateDbContext();
+
+        var userRoleTemplate = new UserRoleTemplateEntity();
+
+        foreach (var permission in permissions)
+        {
+            userRoleTemplate.Permissions.Add(new UserRoleTemplatePermissionEntity
+            {
+                Permission = permission
+            });
+        }
+
+        foreach (var eicFunction in new[] { EicFunction.BillingAgent })
+        {
+            userRoleTemplate.EicFunctions.Add(new UserRoleTemplateEicFunctionEntity
+            {
+                EicFunction = eicFunction
+            });
+        }
+
+        var roleAssignment = new UserRoleAssignmentEntity
+        {
+            ActorId = actorId,
+            UserRoleTemplate = userRoleTemplate
+        };
+
+        var userEntity = await context.Users.FindAsync(userId);
+        userEntity!.RoleAssignments.Add(roleAssignment);
+
+        context.Users.Update(userEntity);
+        await context.SaveChangesAsync();
+    }
+
     public static async Task<(Guid ExternalUserId, Guid ActorId)> CreateUserAsync(
         this MarketParticipantDatabaseManager manager,
         Permission[] permissions)

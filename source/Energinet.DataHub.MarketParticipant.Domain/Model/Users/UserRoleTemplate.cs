@@ -11,15 +11,19 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
+
 using System.Collections.Generic;
 using Energinet.DataHub.Core.App.Common.Security;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public class UserRoleTemplate
+public sealed class UserRoleTemplate
 {
-    public UserRoleTemplate(UserRoleTemplateId id, UserRoleTemplateName name, IEnumerable<EicFunction> allowedMarkedRoles, IEnumerable<Permission> permissions)
+    public UserRoleTemplate(
+        UserRoleTemplateId id,
+        string name,
+        IEnumerable<EicFunction> allowedMarkedRoles,
+        IEnumerable<Permission> permissions)
     {
         Id = id;
         Name = name;
@@ -28,7 +32,7 @@ public class UserRoleTemplate
     }
 
     public UserRoleTemplateId Id { get; }
-    public UserRoleTemplateName Name { get; set; }
+    public string Name { get; set; }
     public IEnumerable<EicFunction> AllowedMarkedRoles { get; }
     public IEnumerable<Permission> Permissions { get; }
 }
