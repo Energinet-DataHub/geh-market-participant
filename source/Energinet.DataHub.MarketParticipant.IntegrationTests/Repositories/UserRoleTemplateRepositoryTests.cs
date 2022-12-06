@@ -39,18 +39,49 @@ public sealed class UserRoleTemplateRepositoryTests
     }
 
     [Fact]
-    public async Task GetUserAsync_UserDoesntExist_ReturnsNull()
+    public async Task GetAsync_TemplateDoesNotExist_ReturnsNull()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
 
         // Act
-        var user = await userRepository.GetAsync(new ExternalUserId(Guid.Empty));
+        var user = await userRoleTemplateRepository.GetAsync(new UserRoleTemplateId(Guid.Empty));
 
         // Assert
         Assert.Null(user);
+    }
+
+    [Fact]
+    public async Task GetAsync_HasTemplate_ReturnsTemplate()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+
+        var userRoleTemplateEntity = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity);
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRoleTemplate = await userRoleTemplateRepository.GetAsync(new UserRoleTemplateId(userRoleTemplateEntity.Id));
+
+        // Assert
+        Assert.NotNull(userRoleTemplate);
+        Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
+        Assert.Single(userRoleTemplate.AllowedMarkedRoles, EicFunction.Agent);
+        Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
     }
 }
