@@ -48,7 +48,7 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         // Act
-        var user = await userRepository.GetAsync(new ExternalUserId(Guid.Empty));
+        var user = await userRepository.GetAsync(new ExternalUserId(Guid.NewGuid()));
 
         // Assert
         Assert.Null(user);
@@ -161,7 +161,7 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         // Act
-        var user = await userRepository.GetAsync(new UserId(Guid.Empty));
+        var user = await userRepository.GetAsync(new UserId(Guid.NewGuid()));
 
         // Assert
         Assert.Null(user);
