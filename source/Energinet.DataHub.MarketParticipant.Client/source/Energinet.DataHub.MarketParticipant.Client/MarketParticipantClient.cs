@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private readonly IMarketParticipantActorContactClient _marketParticipantActorContactClient;
         private readonly IMarketParticipantGridAreaOverviewClient _marketParticipantGridAreaOverviewClient;
         private readonly ITokenClient _tokenClient;
+        private readonly IMarketParticipantUserOverviewClient _marketParticipantUserOverviewClient;
 
         public MarketParticipantClient(IFlurlClient client)
         {
@@ -39,6 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
             _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(client);
             _tokenClient = new TokenClient(client);
+            _marketParticipantUserOverviewClient = new MarketParticipantUserOverviewClient(client);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()
@@ -124,6 +126,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(string accessToken)
         {
             return _marketParticipantUserClient.GetUserActorsAsync(accessToken);
+        }
+
+        public Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize)
+        {
+            return _marketParticipantUserOverviewClient.GetUserOverviewAsync(pageNumber, pageSize);
         }
     }
 }

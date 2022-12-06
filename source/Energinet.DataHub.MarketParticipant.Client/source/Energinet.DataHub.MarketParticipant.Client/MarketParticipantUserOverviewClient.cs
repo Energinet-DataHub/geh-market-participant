@@ -29,14 +29,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _httpClient = client;
         }
 
-        public async Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageSize, int pageNumber)
+        public async Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _httpClient
                         .Request("useroverview/users")
-                        .SetQueryParam("pageSize", pageSize)
                         .SetQueryParam("pageNumber", pageNumber)
+                        .SetQueryParam("pageSize", pageSize)
                         .GetAsync())
                 .ConfigureAwait(false);
 
