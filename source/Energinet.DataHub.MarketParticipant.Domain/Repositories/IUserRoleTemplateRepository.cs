@@ -32,9 +32,9 @@ public interface IUserRoleTemplateRepository
     Task<UserRoleTemplate?> GetAsync(UserRoleTemplateId userRoleTemplateId);
 
     /// <summary>
-    /// Gets user role templates that support the specified Eic-functions.
+    /// Gets user role templates that support the specified EIC-functions.
     /// </summary>
-    /// <param name="eicFunctions">The list of Eic-functions the templates must support.</param>
+    /// <param name="eicFunctions">The list of EIC-functions the templates must support.</param>
     /// <returns>A list of templates.</returns>
     Task<IEnumerable<UserRoleTemplate>> GetAsync(IEnumerable<EicFunction> eicFunctions);
 }
