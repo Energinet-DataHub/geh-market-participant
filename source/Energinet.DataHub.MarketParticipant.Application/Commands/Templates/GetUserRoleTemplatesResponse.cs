@@ -13,8 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.Core.App.Common.Security;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Templates;
 
-public sealed record GetUserPermissionsResponse(bool IsFas, IEnumerable<Permission> Permissions);
+public sealed record GetUserRoleTemplatesResponse(IEnumerable<UserRoleTemplateDto> Templates);

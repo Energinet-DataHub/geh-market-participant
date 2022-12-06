@@ -41,4 +41,17 @@ public sealed class UserRepository : IUserRepository
 
         return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
     }
+
+    public async Task<User?> GetAsync(UserId userId)
+    {
+        var userEntity = await _marketParticipantDbContext
+            .Users
+            .Include(u => u.RoleAssignments)
+            .ThenInclude(r => r.UserRoleTemplate)
+            .ThenInclude(t => t.Permissions)
+            .SingleOrDefaultAsync(x => x.Id == userId.Value)
+            .ConfigureAwait(false);
+
+        return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
+    }
 }
