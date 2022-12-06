@@ -18,21 +18,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Provides access to Users.
+/// Provides access to user role templates.
 /// </summary>
-public interface IUserRepository
+public interface IUserRoleTemplateRepository
 {
     /// <summary>
-    /// Gets the user having the specified external id.
+    /// Gets the user role template having the specified external id.
     /// </summary>
-    /// <param name="externalUserId">The external id of the user.</param>
-    /// <returns>The user if it exists; otherwise null.</returns>
-    Task<User?> GetAsync(ExternalUserId externalUserId);
-
-    /// <summary>
-    /// Gets the user having the specified id.
-    /// </summary>
-    /// <param name="userId">The id of the user.</param>
-    /// <returns>The user if it exists; otherwise null.</returns>
-    Task<User?> GetAsync(UserId userId);
+    /// <param name="userRoleTemplateId">The id of the user role template.</param>
+    /// <returns>The template if it exists; otherwise null.</returns>
+    Task<UserRoleTemplate?> GetAsync(UserRoleTemplateId userRoleTemplateId);
 }

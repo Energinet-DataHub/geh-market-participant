@@ -90,6 +90,11 @@ public interface IMarketParticipantDbContext
     DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; }
 
     /// <summary>
+    ///     Represent access to the UserRoleTemplate database table
+    /// </summary>
+    DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

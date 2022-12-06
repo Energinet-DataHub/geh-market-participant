@@ -15,7 +15,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public class UserRoleAssignment
+public sealed class UserRoleAssignment
 {
     public UserRoleAssignment(UserId userId, Guid actorId, UserRoleTemplateId templateId)
     {
