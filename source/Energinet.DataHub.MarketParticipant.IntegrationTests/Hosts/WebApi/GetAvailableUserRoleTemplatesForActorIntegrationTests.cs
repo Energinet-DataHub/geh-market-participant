@@ -27,11 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class GetUserRoleTemplatesForActorIntegrationTests
+public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public GetUserRoleTemplatesForActorIntegrationTests(MarketParticipantDatabaseFixture fixture)
+    public GetAvailableUserRoleTemplatesForActorIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -48,7 +48,7 @@ public sealed class GetUserRoleTemplatesForActorIntegrationTests
             .DatabaseManager
             .CreateActorAsync(new[] { EicFunction.BalanceResponsibleParty });
 
-        var command = new GetUserRoleTemplatesForActorCommand(actorId);
+        var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
         // Act
         var response = await mediator.Send(command);
@@ -90,7 +90,7 @@ public sealed class GetUserRoleTemplatesForActorIntegrationTests
         await context.UserRoleTemplates.AddAsync(userRoleTemplate2);
         await context.SaveChangesAsync();
 
-        var command = new GetUserRoleTemplatesForActorCommand(actorId);
+        var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
         // Act
         var response = await mediator.Send(command);
@@ -125,7 +125,7 @@ public sealed class GetUserRoleTemplatesForActorIntegrationTests
         await context.UserRoleTemplates.AddAsync(userRoleTemplate);
         await context.SaveChangesAsync();
 
-        var command = new GetUserRoleTemplatesForActorCommand(actorId);
+        var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
         // Act
         var response = await mediator.Send(command);

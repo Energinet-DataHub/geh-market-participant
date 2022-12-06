@@ -24,14 +24,14 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetUserRoleTemplatesForActorCommandHandler
-    : IRequestHandler<GetUserRoleTemplatesForActorCommand, GetUserRoleTemplatesResponse>
+public sealed class GetAvailableUserRoleTemplatesForActorCommandHandler
+    : IRequestHandler<GetAvailableUserRoleTemplatesForActorCommand, GetUserRoleTemplatesResponse>
 {
     private readonly IActorRepository _actorRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUserRoleTemplateRepository _userRoleTemplateRepository;
 
-    public GetUserRoleTemplatesForActorCommandHandler(
+    public GetAvailableUserRoleTemplatesForActorCommandHandler(
         IActorRepository actorRepository,
         IOrganizationRepository organizationRepository,
         IUserRoleTemplateRepository userRoleTemplateRepository)
@@ -42,7 +42,7 @@ public sealed class GetUserRoleTemplatesForActorCommandHandler
     }
 
     public async Task<GetUserRoleTemplatesResponse> Handle(
-        GetUserRoleTemplatesForActorCommand request,
+        GetAvailableUserRoleTemplatesForActorCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);

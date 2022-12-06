@@ -74,7 +74,7 @@ public sealed class UserRoleTemplateController : ControllerBase
                 if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                     return Unauthorized();
 
-                var command = new GetUserRoleTemplatesForActorCommand(actorId);
+                var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
                 var associatedActors = await _mediator
                     .Send(command)
