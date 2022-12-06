@@ -215,6 +215,6 @@ public sealed class UserRoleTemplateRepositoryTests
         var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BillingAgent });
 
         // Assert
-        Assert.Empty(userRoleTemplates);
+        Assert.DoesNotContain(userRoleTemplates, t => t.Id.Value == userRoleTemplateEntity.Id);
     }
 }
