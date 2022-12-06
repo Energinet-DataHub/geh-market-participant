@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User
 {
     public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
     {

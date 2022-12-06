@@ -14,7 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -28,19 +32,26 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     {
         private readonly ILogger<UserOverviewController> _logger;
         private readonly IMediator _mediator;
+        private readonly IUserContext<FrontendUser> _userContext;
 
-        public UserOverviewController(ILogger<UserOverviewController> logger, IMediator mediator)
+        public UserOverviewController(ILogger<UserOverviewController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
         {
             _logger = logger;
             _mediator = mediator;
+            _userContext = userContext;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, Guid? actorId)
+        [AuthorizeUser(Permission.UsersManage)]
+        public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
+                    var actorId = !_userContext.CurrentUser.IsFas
+                        ? _userContext.CurrentUser.ActorId
+                        : (Guid?)null;
+
                     var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId);
                     var response = await _mediator.Send(command).ConfigureAwait(false);
                     return Ok(response.Users);

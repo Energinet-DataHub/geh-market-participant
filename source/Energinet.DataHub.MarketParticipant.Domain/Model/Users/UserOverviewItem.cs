@@ -13,7 +13,7 @@
 // limitations under the License.
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public class UserOverviewItem
 {

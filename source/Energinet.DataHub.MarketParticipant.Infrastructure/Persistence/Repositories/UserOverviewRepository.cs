@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -44,18 +44,16 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
-        return (await query.ToListAsync().ConfigureAwait(false))
-            .Select(
-                x => new UserOverviewItem(
-                    new UserId(x.Id),
-                    new Domain.Model.EmailAddress(x.Email)));
+        return (await query.Select(x => new { x.Id, x.Email }).ToListAsync().ConfigureAwait(false))
+            .Select(x => new UserOverviewItem(
+                new UserId(x.Id),
+                new Domain.Model.EmailAddress(x.Email)));
     }
 
     private IQueryable<UserEntity> BuildUsersQuery(Guid? actorId)
     {
         var query = from user in _marketParticipantDbContext.Users
-                    orderby user.Email
-                    select new UserEntity { Id = user.Id, Email = user.Email };
+                    select user;
 
         if (actorId != null)
         {
@@ -65,12 +63,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     select user;
         }
 
-        return query.Distinct();
-    }
-
-    private sealed record UserEntity
-    {
-        public Guid Id { get; set; }
-        public string Email { get; set; } = null!;
+        return query.OrderBy(x => x.Email).Distinct();
     }
 }
