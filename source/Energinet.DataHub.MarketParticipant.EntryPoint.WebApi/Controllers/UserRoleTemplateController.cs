@@ -63,4 +63,25 @@ public sealed class UserRoleTemplateController : ControllerBase
             },
             _logger).ConfigureAwait(false);
     }
+
+    [HttpGet("actors/{actorId:guid}/templates")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetAssignableAsync(Guid actorId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                    return Unauthorized();
+
+                var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
+
+                var associatedActors = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(associatedActors);
+            },
+            _logger).ConfigureAwait(false);
+    }
 }
