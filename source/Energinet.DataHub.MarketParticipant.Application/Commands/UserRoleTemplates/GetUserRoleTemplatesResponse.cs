@@ -14,6 +14,6 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Templates;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 
 public sealed record GetUserRoleTemplatesResponse(IEnumerable<UserRoleTemplateDto> Templates);

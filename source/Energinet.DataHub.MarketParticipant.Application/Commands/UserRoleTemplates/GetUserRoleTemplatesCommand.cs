@@ -15,6 +15,6 @@
 using System;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Templates;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 
 public sealed record GetUserRoleTemplatesCommand(Guid ActorId, Guid UserId) : IRequest<GetUserRoleTemplatesResponse>;

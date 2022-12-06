@@ -14,6 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Templates;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 
 public sealed record UserRoleTemplateDto(Guid Id, string Name);
