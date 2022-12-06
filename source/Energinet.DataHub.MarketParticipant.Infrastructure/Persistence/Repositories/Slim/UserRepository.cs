@@ -67,12 +67,26 @@ public sealed class UserRepository : IUserRepository
         ArgumentNullException.ThrowIfNull(actorId);
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        var perms = await _marketParticipantDbContext
+        var actorEicFunctions = _marketParticipantDbContext
+            .Actors
+            .Include(a => a.MarketRoles)
+            .SelectMany(a => a.MarketRoles)
+            .Select(r => r.Function);
+
+        var query = _marketParticipantDbContext
             .Users
             .Where(u => u.ExternalId == externalUserId.Value)
             .Include(u => u.RoleAssignments.Where(r => r.ActorId == actorId))
             .ThenInclude(r => r.UserRoleTemplate)
             .ThenInclude(t => t.Permissions)
+            .Where(user => user
+                .RoleAssignments
+                .All(assignment => assignment
+                    .UserRoleTemplate
+                    .EicFunctions
+                    .All(q => actorEicFunctions.Contains(q.EicFunction))));
+
+        var perms = await query
             .AsNoTracking()
             .ToListAsync()
             .ConfigureAwait(false);
