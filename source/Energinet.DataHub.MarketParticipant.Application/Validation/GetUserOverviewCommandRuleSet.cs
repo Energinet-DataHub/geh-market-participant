@@ -12,8 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-public sealed record AzureAdConfig(
-    string BackendAppServicePrincipalObjectId,
-    string BackendAppId);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
+{
+    public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOverviewCommand>
+    {
+        public GetUserOverviewCommandRuleSet()
+        {
+            RuleFor(command => command.PageNumber)
+                .GreaterThan(0);
+
+            RuleFor(command => command.PageSize)
+                .GreaterThan(0);
+        }
+    }
+}

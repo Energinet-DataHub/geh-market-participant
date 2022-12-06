@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+using System;
+using MediatR;
 
-public sealed record AzureAdConfig(
-    string BackendAppServicePrincipalObjectId,
-    string BackendAppId);
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+
+public sealed record GetAvailableUserRoleTemplatesForActorCommand(Guid ActorId) : IRequest<GetUserRoleTemplatesResponse>;

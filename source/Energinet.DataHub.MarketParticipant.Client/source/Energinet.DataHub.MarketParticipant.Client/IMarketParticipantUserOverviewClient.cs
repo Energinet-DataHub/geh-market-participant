@@ -12,8 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
-public sealed record AzureAdConfig(
-    string BackendAppServicePrincipalObjectId,
-    string BackendAppId);
+namespace Energinet.DataHub.MarketParticipant.Client
+{
+    /// <summary>
+    /// Manages users.
+    /// </summary>
+    public interface IMarketParticipantUserOverviewClient
+    {
+        /// <summary>
+        /// Gets users by actor and page state.
+        /// </summary>
+        Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize);
+    }
+}

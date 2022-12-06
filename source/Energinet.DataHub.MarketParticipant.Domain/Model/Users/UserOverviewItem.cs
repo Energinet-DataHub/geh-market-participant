@@ -11,9 +11,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record AzureAdConfig(
-    string BackendAppServicePrincipalObjectId,
-    string BackendAppId);
+public class UserOverviewItem
+{
+    public UserOverviewItem(
+        UserId id,
+        EmailAddress email)
+    {
+        Id = id;
+        Email = email;
+    }
+
+    public UserId Id { get; }
+    public EmailAddress Email { get; }
+}

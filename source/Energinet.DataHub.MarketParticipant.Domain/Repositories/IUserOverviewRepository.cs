@@ -12,29 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 
 /// <summary>
-/// Provides access to user role templates.
+/// Repository for presenting an overview of users paged.
 /// </summary>
-public interface IUserRoleTemplateRepository
+public interface IUserOverviewRepository
 {
     /// <summary>
-    /// Gets the user role template having the specified external id.
+    /// Calculates total page count.
     /// </summary>
-    /// <param name="userRoleTemplateId">The id of the user role template.</param>
-    /// <returns>The template if it exists; otherwise null.</returns>
-    Task<UserRoleTemplate?> GetAsync(UserRoleTemplateId userRoleTemplateId);
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="actorId">The id of the actor.</param>
+    /// <returns>A list of users.</returns>
+    Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId);
 
     /// <summary>
-    /// Gets user role templates that support the specified EIC-functions.
+    /// Retrieve users paged.
     /// </summary>
-    /// <param name="eicFunctions">The list of EIC-functions the templates must support.</param>
-    /// <returns>A list of templates.</returns>
-    Task<IEnumerable<UserRoleTemplate>> GetAsync(IEnumerable<EicFunction> eicFunctions);
+    /// <param name="pageNumber">Page number.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="actorId">The id of the actor.</param>
+    /// <returns>A list of users.</returns>
+    Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId);
 }

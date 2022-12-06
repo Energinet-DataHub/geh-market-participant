@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+using System.Collections.Generic;
 
-public sealed record AzureAdConfig(
-    string BackendAppServicePrincipalObjectId,
-    string BackendAppId);
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
+{
+    public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users);
+}

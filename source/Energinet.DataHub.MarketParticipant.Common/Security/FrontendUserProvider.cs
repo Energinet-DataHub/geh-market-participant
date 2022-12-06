@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
@@ -42,7 +41,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         return actor is { Status: ActorStatus.Active or ActorStatus.Passive }
             ? new FrontendUser(
                 userId,
-                actor.OrganizationId,
+                actor.OrganizationId.Value,
                 actor.ActorId,
                 isFas)
             : null;
