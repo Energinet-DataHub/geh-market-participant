@@ -20,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -83,5 +82,139 @@ public sealed class UserRoleTemplateRepositoryTests
         Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
         Assert.Single(userRoleTemplate.AllowedMarkedRoles, EicFunction.Agent);
         Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
+    }
+
+    [Fact]
+    public async Task GetAsync_NoFunctions_ReturnsNothing()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+
+        var userRoleTemplateEntity = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity);
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(Array.Empty<EicFunction>());
+
+        // Assert
+        Assert.Empty(userRoleTemplates);
+    }
+
+    [Fact]
+    public async Task GetAsync_TwoFunctions_ReturnsBoth()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+
+        var userRoleTemplateEntity1 = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        var userRoleTemplateEntity2 = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity1);
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity2);
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.Agent });
+
+        // Assert
+        Assert.Equal(2, userRoleTemplates.Count());
+    }
+
+    [Fact]
+    public async Task GetAsync_TwoDifferentFunctions_ReturnsCorrectOne()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+
+        var userRoleTemplateEntity1 = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        var userRoleTemplateEntity2 = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty } },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity1);
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity2);
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BalanceResponsibleParty });
+
+        // Assert
+        Assert.Equal(userRoleTemplateEntity2.Id, userRoleTemplates.Single().Id.Value);
+    }
+
+    [Fact]
+    public async Task GetAsync_MultipleFunctions_DoesNotReturnWhenMissingFunction()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+
+        var userRoleTemplateEntity = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value",
+            EicFunctions =
+            {
+                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent },
+                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
+            },
+            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+        };
+
+        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity);
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BillingAgent });
+
+        // Assert
+        Assert.Empty(userRoleTemplates);
     }
 }
