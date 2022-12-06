@@ -39,7 +39,7 @@ public sealed class UserRepositoryTests
     }
 
     [Fact]
-    public async Task GetUserAsync_UserDoesntExist_ReturnsNull()
+    public async Task GetUserAsyncExternalId_UserDoesntExist_ReturnsNull()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -48,14 +48,14 @@ public sealed class UserRepositoryTests
         var userRepository = new UserRepository(context);
 
         // Act
-        var user = await userRepository.GetAsync(new ExternalUserId(Guid.Empty));
+        var user = await userRepository.GetAsync(new ExternalUserId(Guid.NewGuid()));
 
         // Assert
         Assert.Null(user);
     }
 
     [Fact]
-    public async Task GetUserAsync_SimpleUserExist_CanReadBack()
+    public async Task GetUserAsyncExternalId_SimpleUserExist_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -66,7 +66,7 @@ public sealed class UserRepositoryTests
 
         var email = "fake@mail.com";
         var userExternalId = Guid.NewGuid();
-        var userEntity = new UserEntity() { ExternalId = userExternalId, Email = email, RoleAssignments = { } };
+        var userEntity = new UserEntity() { ExternalId = userExternalId, Email = email };
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
 
@@ -81,7 +81,7 @@ public sealed class UserRepositoryTests
     }
 
     [Fact]
-    public async Task GetUserAsync_UserExist_CanReadBack()
+    public async Task GetUserAsyncExternalId_UserExist_CanReadBack()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -149,5 +149,68 @@ public sealed class UserRepositoryTests
         Assert.Equal(email, user.Email.Address);
         Assert.Single(user.RoleAssignments);
         Assert.Equal(userRoleTemplate.Id, user.RoleAssignments.First().TemplateId.Value);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_UserDoesntExist_ReturnsNull()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        // Act
+        var user = await userRepository.GetAsync(new UserId(Guid.NewGuid()));
+
+        // Assert
+        Assert.Null(user);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_SimpleUserExist_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context2);
+
+        var email = "fake@mail.com";
+        var userEntity = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var user = await userRepository.GetAsync(new UserId(userEntity.Id));
+
+        // Assert
+        Assert.NotNull(user);
+        Assert.NotEqual(Guid.Empty, user.Id.Value);
+        Assert.Equal(email, user.Email.Address);
+    }
+
+    [Fact]
+    public async Task GetUserAsync_UserExist_CanReadBack()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserRepository(context);
+
+        var (_, userId) = await _fixture.DatabaseManager.CreateUserAsync();
+
+        // Act
+        var user = await userRepository.GetAsync(new UserId(userId));
+
+        // Assert
+        Assert.NotNull(user);
+        Assert.NotEqual(Guid.Empty, user.Id.Value);
     }
 }

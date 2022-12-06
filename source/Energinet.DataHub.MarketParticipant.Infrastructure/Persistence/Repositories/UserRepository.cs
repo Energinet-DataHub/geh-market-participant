@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -31,14 +33,28 @@ public sealed class UserRepository : IUserRepository
 
     public async Task<User?> GetAsync(ExternalUserId externalUserId)
     {
-        var userEntity = await _marketParticipantDbContext
-            .Users
-            .Include(u => u.RoleAssignments)
-            .ThenInclude(r => r.UserRoleTemplate)
-            .ThenInclude(t => t.Permissions)
+        var userEntity = await BuildUserQuery()
             .SingleOrDefaultAsync(x => x.ExternalId == externalUserId.Value)
             .ConfigureAwait(false);
 
         return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
+    }
+
+    public async Task<User?> GetAsync(UserId userId)
+    {
+        var userEntity = await BuildUserQuery()
+            .SingleOrDefaultAsync(x => x.Id == userId.Value)
+            .ConfigureAwait(false);
+
+        return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
+    }
+
+    private IQueryable<UserEntity> BuildUserQuery()
+    {
+        return _marketParticipantDbContext
+            .Users
+            .Include(u => u.RoleAssignments)
+            .ThenInclude(r => r.UserRoleTemplate)
+            .ThenInclude(t => t.Permissions);
     }
 }
