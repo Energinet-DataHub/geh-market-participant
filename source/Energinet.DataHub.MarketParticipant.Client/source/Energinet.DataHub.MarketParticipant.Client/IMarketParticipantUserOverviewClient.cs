@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using FluentValidation;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Client
 {
-    public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOverviewCommand>
+    /// <summary>
+    /// Manages users.
+    /// </summary>
+    public interface IMarketParticipantUserOverviewClient
     {
-        public GetUserOverviewCommandRuleSet()
-        {
-            RuleFor(command => command.PageNumber)
-                .GreaterThan(0);
-
-            RuleFor(command => command.PageSize)
-                .GreaterThan(0);
-        }
+        /// <summary>
+        /// Gets users by actor and page state.
+        /// </summary>
+        Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageSize, int pageNumber);
     }
 }

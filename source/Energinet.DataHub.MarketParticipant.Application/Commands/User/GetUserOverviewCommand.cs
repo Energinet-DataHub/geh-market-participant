@@ -13,10 +13,9 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
 {
-    public sealed record UserOverviewItemDto(
-        Guid Id,
-        string Mail);
+    public sealed record GetUserOverviewCommand(int PageNumber, int PageSize, Guid? ActorId) : IRequest<GetUserOverviewResponse>;
 }

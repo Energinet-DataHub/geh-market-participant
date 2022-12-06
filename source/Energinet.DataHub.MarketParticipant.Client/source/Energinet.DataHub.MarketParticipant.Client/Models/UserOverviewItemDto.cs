@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users);
+    public sealed record UserOverviewItemDto(
+        Guid Id,
+        string Email);
 }

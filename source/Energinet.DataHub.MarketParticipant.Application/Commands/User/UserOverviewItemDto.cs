@@ -12,20 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using FluentValidation;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
 {
-    public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOverviewCommand>
-    {
-        public GetUserOverviewCommandRuleSet()
-        {
-            RuleFor(command => command.PageNumber)
-                .GreaterThan(0);
-
-            RuleFor(command => command.PageSize)
-                .GreaterThan(0);
-        }
-    }
+    public sealed record UserOverviewItemDto(
+        Guid Id,
+        string Email);
 }

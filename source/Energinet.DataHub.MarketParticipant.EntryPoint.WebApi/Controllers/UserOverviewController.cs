@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _userContext = userContext;
         }
 
-        [HttpGet]
+        [HttpGet("users")]
         [AuthorizeUser(Permission.UsersManage)]
         public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize)
         {

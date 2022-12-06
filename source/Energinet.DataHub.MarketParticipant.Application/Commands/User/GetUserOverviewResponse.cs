@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
 {
-    public sealed record GetUserOverviewCommand(int PageNumber, int PageSize, Guid? ActorId) : IRequest<GetUserOverviewResponse>;
+    public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users);
 }
