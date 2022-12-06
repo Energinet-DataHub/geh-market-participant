@@ -46,7 +46,7 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.TransmissionCapacityAllocator });
+            .CreateActorAsync(new[] { EicFunction.CoordinatedCapacityCalculator });
 
         var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
