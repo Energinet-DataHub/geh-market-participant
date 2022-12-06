@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
+
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
+    /// Manages users.
     /// </summary>
-    public interface IMarketParticipantClient :
-        IMarketParticipantOrganizationClient,
-        IMarketParticipantUserClient,
-        IMarketParticipantActorClient,
-        IMarketParticipantGridAreaClient,
-        IMarketParticipantActorContactClient,
-        IMarketParticipantGridAreaOverviewClient,
-        ITokenClient,
-        IMarketParticipantUserOverviewClient
+    public interface IMarketParticipantUserOverviewClient
     {
+        /// <summary>
+        /// Gets users by actor and page state.
+        /// </summary>
+        Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize);
     }
 }

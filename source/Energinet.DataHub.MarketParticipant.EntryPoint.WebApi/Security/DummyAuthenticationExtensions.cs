@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -40,7 +41,8 @@ public static class DummyAuthenticationExtensions
             ValidateIssuerSigningKey = false,
             ValidateLifetime = false,
             RequireExpirationTime = false,
-            RequireSignedTokens = false
+            RequireSignedTokens = false,
+            SignatureValidator = (t, p) => new JwtSecurityToken(t)
         };
     }
 }

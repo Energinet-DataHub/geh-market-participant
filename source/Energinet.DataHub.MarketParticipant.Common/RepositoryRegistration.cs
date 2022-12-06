@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using SimpleInjector;
 
@@ -29,8 +30,9 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IGridAreaLinkRepository, GridAreaLinkRepository>(Lifestyle.Scoped);
             container.Register<IUniqueActorMarketRoleGridAreaRepository, UniqueActorMarketRoleGridAreaRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaOverviewRepository, GridAreaOverviewRepository>(Lifestyle.Scoped);
+            container.Register<IUserOverviewRepository, UserOverviewRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IUserRepository, UserRepository>(Lifestyle.Scoped);
+            container.Register<Domain.Repositories.IUserRepository, Infrastructure.Persistence.Repositories.UserRepository>(Lifestyle.Scoped);
             container.Register<IUserRoleTemplateRepository, UserRoleTemplateRepository>(Lifestyle.Scoped);
             container.Register<Domain.Repositories.Slim.IActorRepository, Infrastructure.Persistence.Repositories.Slim.ActorRepository>(Lifestyle.Scoped);
             container.Register<Domain.Repositories.Slim.IUserRepository, Infrastructure.Persistence.Repositories.Slim.UserRepository>(Lifestyle.Scoped);
