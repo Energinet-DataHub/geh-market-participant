@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -38,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             return new User(
                 new UserId(from.Id),
                 new ExternalUserId(from.ExternalId),
-                from.RoleAssignments.Select(MapFromEntity),
+                from.RoleAssignments.Select(MapFromEntity).ToList(),
                 new EmailAddress(from.Email));
         }
 
@@ -48,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             {
                 ActorId = fromRoleAssignment.ActorId,
                 UserId = fromId.Value,
-                UserRoleTemplateId = fromRoleAssignment.TemplateId.Value
+                UserRoleTemplateId = fromRoleAssignment.TemplateId.Value,
             };
         }
 

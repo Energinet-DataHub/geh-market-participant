@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -104,6 +105,20 @@ internal static class DbTestHelper
         await context.SaveChangesAsync();
 
         return (actorEntity.Id, userEntity.Id);
+    }
+
+    public static async Task<UserRoleTemplateId> CreateRoleTemplate(this MarketParticipantDatabaseManager manager)
+    {
+        await using var context = manager.CreateDbContext();
+        var template = new UserRoleTemplateEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = "fake_value"
+        };
+
+        await context.UserRoleTemplates.AddAsync(template);
+        await context.SaveChangesAsync();
+        return new UserRoleTemplateId(template.Id);
     }
 
     public static async Task AddUserPermissionsAsync(

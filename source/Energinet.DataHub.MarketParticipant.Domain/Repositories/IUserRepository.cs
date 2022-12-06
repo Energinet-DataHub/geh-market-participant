@@ -23,6 +23,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserRepository
 {
     /// <summary>
+    /// Adds the given User to the repository, or updates it, if it already exists.
+    /// </summary>
+    /// <param name="user">The User to add or update.</param>
+    /// <returns>The id of the added User.</returns>
+    Task<UserId> AddOrUpdateAsync(User user);
+
+    /// <summary>
     /// Gets the user having the specified external id.
     /// </summary>
     /// <param name="externalUserId">The external id of the user.</param>
