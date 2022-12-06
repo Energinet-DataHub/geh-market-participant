@@ -60,14 +60,14 @@ public sealed class GetAvailableUserRoleTemplatesForActorCommandHandler
             .GetAsync(actor.OrganizationId)
             .ConfigureAwait(false);
 
-        var select = organization!
+        var eicFunctions = organization!
             .Actors
             .Where(a => a.Id == actor.ActorId)
             .SelectMany(a => a.MarketRoles)
             .Select(r => r.Function);
 
         var templates = await _userRoleTemplateRepository
-            .GetAsync(select)
+            .GetAsync(eicFunctions)
             .ConfigureAwait(false);
 
         return new GetUserRoleTemplatesResponse(templates.Select(t =>
