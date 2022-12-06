@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.9.0
+
+- Add endpoint for getting user overview.
+
 ## Version 2.7.7
 
 - Fixed query parameter.
