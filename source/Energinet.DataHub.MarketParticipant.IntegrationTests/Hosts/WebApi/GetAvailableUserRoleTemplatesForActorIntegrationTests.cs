@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -46,7 +46,7 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.BalanceResponsibleParty });
+            .CreateActorAsync(new[] { EicFunction.TransmissionCapacityAllocator });
 
         var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
@@ -72,6 +72,7 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
 
         var userRoleTemplate1 = new UserRoleTemplateEntity
         {
+            Id = Guid.NewGuid(),
             EicFunctions =
             {
                 new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent }
@@ -80,6 +81,7 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
 
         var userRoleTemplate2 = new UserRoleTemplateEntity
         {
+            Id = Guid.NewGuid(),
             EicFunctions =
             {
                 new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.CapacityTrader }
@@ -96,7 +98,8 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Equal(2, response.Templates.Count());
+        Assert.Contains(response.Templates, t => t.Id == userRoleTemplate1.Id);
+        Assert.Contains(response.Templates, t => t.Id == userRoleTemplate2.Id);
     }
 
     [Fact]
@@ -114,6 +117,7 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
 
         var userRoleTemplate = new UserRoleTemplateEntity
         {
+            Id = Guid.NewGuid(),
             EicFunctions =
             {
                 new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent },
@@ -131,6 +135,6 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Empty(response.Templates);
+        Assert.DoesNotContain(response.Templates, t => t.Id == userRoleTemplate.Id);
     }
 }
