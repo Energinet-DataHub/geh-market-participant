@@ -69,6 +69,7 @@ public sealed class UserRepository : IUserRepository
 
         var actorEicFunctions = _marketParticipantDbContext
             .Actors
+            .Where(a => a.Id == actorId)
             .Include(a => a.MarketRoles)
             .SelectMany(a => a.MarketRoles)
             .Select(r => r.Function);
@@ -76,15 +77,14 @@ public sealed class UserRepository : IUserRepository
         var query = _marketParticipantDbContext
             .Users
             .Where(u => u.ExternalId == externalUserId.Value)
-            .Include(u => u.RoleAssignments.Where(r => r.ActorId == actorId))
-            .ThenInclude(r => r.UserRoleTemplate)
-            .ThenInclude(t => t.Permissions)
-            .Where(user => user
+            .Include(u => u
                 .RoleAssignments
-                .All(assignment => assignment
-                    .UserRoleTemplate
+                .Where(r => r.ActorId == actorId)
+                .Where(r => r.UserRoleTemplate
                     .EicFunctions
-                    .All(q => actorEicFunctions.Contains(q.EicFunction))));
+                    .All(q => actorEicFunctions.Contains(q.EicFunction))))
+            .ThenInclude(r => r.UserRoleTemplate)
+            .ThenInclude(t => t.Permissions);
 
         var perms = await query
             .AsNoTracking()
