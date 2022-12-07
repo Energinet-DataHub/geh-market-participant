@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record UserRoleTemplateName(string Value);
-}
+using System.Collections.Generic;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+
+public sealed record GetUserRoleTemplatesResponse(IEnumerable<UserRoleTemplateDto> Templates);

@@ -32,14 +32,14 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.8.0" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.11.1" />
-    <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.2.8" />
-    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="7.2.8" />
+    <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.2.10" />
+    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="7.2.10" />
     <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.7.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0" />
-    <PackageReference Include="NodaTime" Version="3.1.5" />
+    <PackageReference Include="NodaTime" Version="3.1.6" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageReference Include="Microsoft.Graph" Version="4.47.0" />
+    <PackageReference Include="Microsoft.Graph" Version="4.48.0" />
   </ItemGroup>
 
 </Project>

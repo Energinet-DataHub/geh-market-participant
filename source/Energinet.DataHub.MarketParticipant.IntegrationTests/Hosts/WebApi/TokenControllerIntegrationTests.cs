@@ -72,7 +72,7 @@ public sealed class TokenControllerIntegrationTests :
         var configuration = Deserialize(rawConfiguration, expectedStructure);
         Assert.NotNull(configuration);
         Assert.Equal("https://datahub.dk", configuration.issuer);
-        Assert.Equal("http://localhost/token/keys", configuration.jwks_uri);
+        Assert.Equal("https://localhost/token/keys", configuration.jwks_uri);
     }
 
     [Fact]
@@ -221,6 +221,8 @@ public sealed class TokenControllerIntegrationTests :
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         base.ConfigureWebHost(builder);
         Startup.EnableIntegrationTestKeys = true;
 

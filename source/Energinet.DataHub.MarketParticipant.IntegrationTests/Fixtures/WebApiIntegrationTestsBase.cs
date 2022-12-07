@@ -29,10 +29,12 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         _fixture = fixture;
     }
 
-    public string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
+    public static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         builder.UseSetting(Settings.SqlDbConnectionString.Key, _fixture.DatabaseManager.ConnectionString);
         builder.UseSetting(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value");
         builder.UseSetting(Settings.ServiceBusTopicName.Key, "fake_value");

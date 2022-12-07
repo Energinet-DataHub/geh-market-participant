@@ -17,7 +17,7 @@ using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public record UserRoleTemplateId
+public sealed record UserRoleTemplateId
 {
     public UserRoleTemplateId(string value)
     {

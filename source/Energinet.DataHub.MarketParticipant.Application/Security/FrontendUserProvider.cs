@@ -41,7 +41,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         return actor is { Status: ActorStatus.Active or ActorStatus.Passive }
             ? new FrontendUser(
                 userId,
-                actor.OrganizationId,
+                actor.OrganizationId.Value,
                 actor.ActorId,
                 isFas)
             : null;

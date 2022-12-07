@@ -131,7 +131,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_NotBefore_IsValid()
     {
         // Arrange
-        var notBefore = DateTime.UtcNow.Date.AddDays(Random.Shared.Next(3));
+        var notBefore = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
         var externalToken = CreateExternalTestToken(
             notBefore: notBefore,
             expires: notBefore.AddDays(1));
@@ -147,7 +147,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Expires_IsValid()
     {
         // Arrange
-        var expires = DateTime.UtcNow.Date.AddDays(Random.Shared.Next(3));
+        var expires = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
         var externalToken = CreateExternalTestToken(expires: expires);
 
         // Act
@@ -185,6 +185,8 @@ public sealed class TokenPartsControllerIntegrationTests :
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         base.ConfigureWebHost(builder);
         Startup.EnableIntegrationTestKeys = true;
 

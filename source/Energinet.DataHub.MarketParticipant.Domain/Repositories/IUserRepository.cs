@@ -28,4 +28,11 @@ public interface IUserRepository
     /// <param name="externalUserId">The external id of the user.</param>
     /// <returns>The user if it exists; otherwise null.</returns>
     Task<User?> GetAsync(ExternalUserId externalUserId);
+
+    /// <summary>
+    /// Gets the user having the specified id.
+    /// </summary>
+    /// <param name="userId">The id of the user.</param>
+    /// <returns>The user if it exists; otherwise null.</returns>
+    Task<User?> GetAsync(UserId userId);
 }

@@ -63,7 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             {
                 app.UseDeveloperExceptionPage();
                 Container.Options.EnableAutoVerification = false;
-                AuthenticationExtensions.DisableHttpsConfiguration = true;
             }
 
             app.UseSwagger();
@@ -104,10 +103,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-            var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-            var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
-            var backendAppId = configuration.GetSetting(Settings.BackendAppId);
-            services.AddJwtBearerAuthentication(externalOpenIdUrl, internalOpenIdUrl, backendAppId);
+            if (_configuration.GetSetting(Settings.AllowAllTokens))
+            {
+                services.AddDummyJwtBearerAuthentication();
+            }
+            else
+            {
+                var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+                var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
+                var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+                services.AddJwtBearerAuthentication(externalOpenIdUrl, internalOpenIdUrl, backendAppId);
+            }
+
             services.AddPermissionAuthorization();
 
             var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
