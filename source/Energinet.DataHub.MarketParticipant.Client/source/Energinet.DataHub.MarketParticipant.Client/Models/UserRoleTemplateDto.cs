@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+using System;
 
-public sealed class ServiceBusConfig
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public ServiceBusConfig(string connectionString, string integrationEventsTopicName)
-    {
-        ConnectionString = connectionString;
-        IntegrationEventsTopicName = integrationEventsTopicName;
-    }
-
-    public string ConnectionString { get; }
-    public string IntegrationEventsTopicName { get; }
+    public sealed record UserRoleTemplateDto(Guid Id, string Name);
 }
