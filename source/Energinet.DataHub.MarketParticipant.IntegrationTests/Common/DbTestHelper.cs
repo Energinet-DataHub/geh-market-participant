@@ -158,7 +158,8 @@ internal static class DbTestHelper
             Id = Guid.NewGuid(),
             Name = string.Empty,
             ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active
+            Status = (int)ActorStatus.Active,
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.ConsentAdministrator } }
         };
 
         var organizationEntity = new OrganizationEntity
@@ -186,7 +187,7 @@ internal static class DbTestHelper
             });
         }
 
-        foreach (var eicFunction in new[] { EicFunction.BillingAgent })
+        foreach (var eicFunction in new[] { EicFunction.ConsentAdministrator })
         {
             userRoleTemplate.EicFunctions.Add(new UserRoleTemplateEicFunctionEntity
             {
