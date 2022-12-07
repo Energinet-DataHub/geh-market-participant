@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,4 +30,11 @@ public interface IUserRoleTemplateRepository
     /// <param name="userRoleTemplateId">The id of the user role template.</param>
     /// <returns>The template if it exists; otherwise null.</returns>
     Task<UserRoleTemplate?> GetAsync(UserRoleTemplateId userRoleTemplateId);
+
+    /// <summary>
+    /// Gets user role templates that support the specified EIC-functions.
+    /// </summary>
+    /// <param name="eicFunctions">The list of EIC-functions the templates must support.</param>
+    /// <returns>A list of templates.</returns>
+    Task<IEnumerable<UserRoleTemplate>> GetAsync(IEnumerable<EicFunction> eicFunctions);
 }

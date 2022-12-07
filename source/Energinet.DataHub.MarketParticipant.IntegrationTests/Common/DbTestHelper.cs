@@ -21,8 +21,50 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
-internal static class TestUserHelper
+internal static class DbTestHelper
 {
+    public static async Task<Guid> CreateActorAsync(
+        this MarketParticipantDatabaseManager manager,
+        EicFunction[] marketRoles)
+    {
+        await using var context = manager.CreateDbContext();
+
+        var actorEntity = new ActorEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = string.Empty,
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+
+        foreach (var eicFunction in marketRoles)
+        {
+            actorEntity.MarketRoles.Add(new MarketRoleEntity
+            {
+                Id = Guid.NewGuid(),
+                ActorInfoId = actorEntity.Id,
+                Function = eicFunction
+            });
+        }
+
+        var organizationEntity = new OrganizationEntity
+        {
+            Id = Guid.NewGuid(),
+            Actors = { actorEntity },
+            Address = new AddressEntity
+            {
+                Country = "Denmark"
+            },
+            Name = string.Empty,
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
+        };
+
+        await context.Organizations.AddAsync(organizationEntity);
+        await context.SaveChangesAsync();
+
+        return actorEntity.Id;
+    }
+
     public static async Task<(Guid ActorId, Guid UserId)> CreateUserAsync(
         this MarketParticipantDatabaseManager manager)
     {
