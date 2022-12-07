@@ -44,7 +44,7 @@ jobs:
         uses: Energinet-DataHub/.github/.github/actions/nuget-checkout-repository@v9
 
       - name: Setup dotnet and tools
-        uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v8
+        uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v9
         with:
           USE_AZURE_FUNCTIONS_TOOLS: 'true'
 
