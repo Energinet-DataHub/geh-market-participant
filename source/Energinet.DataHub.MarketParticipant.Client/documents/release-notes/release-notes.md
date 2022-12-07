@@ -2,7 +2,7 @@
 
 ## Version 2.9.2
 
-- Updated internal IoC registrations.
+- Updated internal registrations.
 
 ## Version 2.9.1
 
