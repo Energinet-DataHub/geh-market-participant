@@ -20,18 +20,19 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantUserClient : IMarketParticipantUserClient
     {
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantUserClient(IFlurlClient client)
+        public MarketParticipantUserClient(IMarketParticipantClientFactory clientFactory)
         {
-            _httpClient = client;
+            _clientFactory = clientFactory;
         }
 
         public async Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(string accessToken)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient
+                    () => _clientFactory
+                        .CreateClient()
                         .Request("user/actors")
                         .SetQueryParam("externalToken", accessToken)
                         .GetAsync())

@@ -20,18 +20,23 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class TokenClient : ITokenClient
     {
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public TokenClient(IFlurlClient client)
+        public TokenClient(IMarketParticipantClientFactory clientFactory)
         {
-            _httpClient = client;
+            _clientFactory = clientFactory;
         }
 
         public async Task<GetTokenResponseDto> GetTokenAsync(GetTokenRequestDto request)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request("token").PostJsonAsync(request)).ConfigureAwait(false);
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("token")
+                        .PostJsonAsync(request))
+                .ConfigureAwait(false);
+
             return await response.GetJsonAsync<GetTokenResponseDto>().ConfigureAwait(false);
         }
     }

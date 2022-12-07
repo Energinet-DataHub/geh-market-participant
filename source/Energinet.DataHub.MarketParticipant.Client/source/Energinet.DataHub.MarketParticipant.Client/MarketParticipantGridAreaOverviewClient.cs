@@ -23,18 +23,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
     {
         private const string GridAreasBaseUrl = "gridareaoverview";
 
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantGridAreaOverviewClient(IFlurlClient client)
+        public MarketParticipantGridAreaOverviewClient(IMarketParticipantClientFactory clientFactory)
         {
-            _httpClient = client;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IEnumerable<GridAreaOverviewItemDto>> GetGridAreaOverviewAsync()
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(GridAreasBaseUrl).GetAsync())
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(GridAreasBaseUrl)
+                        .GetAsync())
                 .ConfigureAwait(false);
 
             var gridAreas = await response
