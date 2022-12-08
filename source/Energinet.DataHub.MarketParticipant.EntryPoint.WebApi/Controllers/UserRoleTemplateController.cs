@@ -94,6 +94,9 @@ public sealed class UserRoleTemplateController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
+                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userRoleAssignmentsDto.ActorId))
+                    return Unauthorized();
+
                 var result = await _mediator
                     .Send(new UpdateUserRoleAssignmentsCommand(userId, userRoleAssignmentsDto))
                     .ConfigureAwait(false);
