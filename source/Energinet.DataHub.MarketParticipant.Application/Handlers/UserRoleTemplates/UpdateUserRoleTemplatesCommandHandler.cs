@@ -39,6 +39,7 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        ArgumentNullException.ThrowIfNull(request.UserId);
 
         var user = await _userRepository
             .GetAsync(new UserId(request.UserId))
@@ -49,17 +50,15 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
             throw new NotFoundValidationException(request.UserId);
         }
 
-        var updatedUserRoleAssignments = new List<UserRoleAssignment>();
+        user.RoleAssignments.Clear();
         foreach (var userRoleTemplateId in request.RoleAssignmentsDto.UserRoleTemplateAssignments)
         {
-            updatedUserRoleAssignments.Add(new UserRoleAssignment(
+            user.RoleAssignments.Add(new UserRoleAssignment(
                 user.Id,
                 request.RoleAssignmentsDto.ActorId,
                 userRoleTemplateId));
         }
 
-        user.RoleAssignments.Clear();
-        updatedUserRoleAssignments.ForEach(x => user.RoleAssignments.Add(x));
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
         return Unit.Value;
