@@ -13,7 +13,20 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed record UserOverviewItem(UserId Id, EmailAddress Email, string Name, string? PhoneNumber, DateTime CreatedDateUtc, bool Active);
+/// <summary>
+/// Gives access to user identity information
+/// </summary>
+public interface IUserIdentityRepository
+{
+    /// <summary>
+    /// Retrieves user identities for the provided set of external ids.
+    /// </summary>
+    /// <param name="externalIds"></param>
+    Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<Guid> externalIds);
+}
