@@ -13,35 +13,27 @@
 // limitations under the License.
 
 using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client;
+using Flurl.Http;
+using Flurl.Http.Configuration;
 
-namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Common
+namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Common;
+
+internal sealed class MarketParticipantClientTestFactory : IMarketParticipantClientFactory
 {
-    internal sealed class MockedHttpMessageHandler : HttpMessageHandler
+    private readonly IFlurlClientFactory _flurlClientFactory;
+    private readonly Uri _addressBase;
+
+    public MarketParticipantClientTestFactory(
+        IFlurlClientFactory flurlClientFactory,
+        Uri addressBase)
     {
-        private readonly HttpResponseMessage _responseMessage;
+        _flurlClientFactory = flurlClientFactory;
+        _addressBase = addressBase;
+    }
 
-        public MockedHttpMessageHandler(string stringContent)
-        {
-            _responseMessage = new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(stringContent) };
-        }
-
-        public MockedHttpMessageHandler(HttpStatusCode statusCode)
-        {
-            _responseMessage = new HttpResponseMessage(statusCode);
-        }
-
-        public HttpClient CreateHttpClient()
-        {
-            return new HttpClient(this) { BaseAddress = new Uri("https://localhost") };
-        }
-
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(_responseMessage);
-        }
+    public IFlurlClient CreateClient()
+    {
+        return _flurlClientFactory.Get(_addressBase);
     }
 }

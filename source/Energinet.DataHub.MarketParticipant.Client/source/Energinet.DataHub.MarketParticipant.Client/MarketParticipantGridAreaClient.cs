@@ -24,18 +24,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
     {
         private const string GridAreasBaseUrl = "gridarea";
 
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantGridAreaClient(IFlurlClient client)
+        public MarketParticipantGridAreaClient(IMarketParticipantClientFactory clientFactory)
         {
-            _httpClient = client;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IEnumerable<GridAreaDto>> GetGridAreasAsync()
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(GridAreasBaseUrl).GetAsync())
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(GridAreasBaseUrl)
+                        .GetAsync())
                 .ConfigureAwait(false);
 
             var gridAreas = await response
@@ -49,7 +52,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(GridAreasBaseUrl, gridAreaId).GetAsync())
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(GridAreasBaseUrl, gridAreaId)
+                        .GetAsync())
                 .ConfigureAwait(false);
 
             var gridArea = await response
@@ -63,14 +69,20 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             return ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(GridAreasBaseUrl).PutJsonAsync(changes));
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(GridAreasBaseUrl)
+                        .PutJsonAsync(changes));
         }
 
         public async Task<IEnumerable<GridAreaAuditLogEntryDto>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(GridAreasBaseUrl, gridAreaId, "auditlogentry").GetAsync())
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(GridAreasBaseUrl, gridAreaId, "auditlogentry")
+                        .GetAsync())
                 .ConfigureAwait(false);
 
             var gridAreas = await response

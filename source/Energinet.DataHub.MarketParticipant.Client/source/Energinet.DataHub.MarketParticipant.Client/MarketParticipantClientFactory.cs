@@ -23,22 +23,27 @@ using Microsoft.AspNetCore.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
-    public sealed class MarketParticipantClientFactory
+    public sealed class MarketParticipantClientFactory : IMarketParticipantClientFactory
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IFlurlClientFactory _flurlClientFactory;
+        private readonly Uri _baseAddress;
 
-        public MarketParticipantClientFactory(IHttpContextAccessor httpContextAccessor, IFlurlClientFactory flurlClientFactory)
+        public MarketParticipantClientFactory(
+            IHttpContextAccessor httpContextAccessor,
+            IFlurlClientFactory flurlClientFactory,
+            Uri baseAddress)
         {
             _flurlClientFactory = flurlClientFactory;
+            _baseAddress = baseAddress;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public IMarketParticipantClient CreateClient(Uri baseUrl)
+        public IFlurlClient CreateClient()
         {
-            var httpClient = _flurlClientFactory.Get(baseUrl);
+            var httpClient = _flurlClientFactory.Get(_baseAddress);
             ConfigureClient(httpClient);
-            return new MarketParticipantClient(httpClient);
+            return httpClient;
         }
 
         private void ConfigureClient(IFlurlClient client)

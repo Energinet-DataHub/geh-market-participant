@@ -22,18 +22,19 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantUserRoleTemplateClient : IMarketParticipantUserRoleTemplateClient
     {
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantUserRoleTemplateClient(IFlurlClient client)
+        public MarketParticipantUserRoleTemplateClient(IMarketParticipantClientFactory factory)
         {
-            _httpClient = client;
+            _clientFactory = factory;
         }
 
         public async Task<IEnumerable<UserRoleTemplateDto>> GetAsync(Guid actorId, Guid userId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient
+                    () => _clientFactory
+                        .CreateClient()
                         .Request($"actors/{actorId}/users/{userId}/templates")
                         .GetAsync())
                 .ConfigureAwait(false);
@@ -47,7 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient
+                    () => _clientFactory
+                        .CreateClient()
                         .Request($"actors/{actorId}/templates")
                         .GetAsync())
                 .ConfigureAwait(false);
