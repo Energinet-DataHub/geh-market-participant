@@ -25,7 +25,7 @@ using MediatR;
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoleTemplates;
 
 public sealed class UpdateUserRoleTemplatesCommandHandler
-    : IRequestHandler<UpdateUserRoleTemplatesCommand>
+    : IRequestHandler<UpdateUserRoleAssignmentsCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleTemplateRepository _userRoleTemplateRepository;
@@ -39,7 +39,7 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
     }
 
     public async Task<Unit> Handle(
-        UpdateUserRoleTemplatesCommand request,
+        UpdateUserRoleAssignmentsCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -53,12 +53,12 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
             throw new NotFoundValidationException(request.UserId);
         }
 
-        var assignments = new List<UserRoleAssignment>();
-        foreach (var userRoleTemplateAssignment in request.RoleTemplatesDto.UserRoleTemplateAssignments)
+        var updatedUserRoleAssignments = new List<UserRoleAssignment>();
+        foreach (var userRoleTemplateAssignment in request.RoleAssignmentsDto.UserRoleTemplateAssignments)
         {
             foreach (var userRoleTemplateId in userRoleTemplateAssignment.Value)
             {
-                assignments.Add(new UserRoleAssignment(
+                updatedUserRoleAssignments.Add(new UserRoleAssignment(
                     user.Id,
                     userRoleTemplateAssignment.Key,
                     userRoleTemplateId));
@@ -66,7 +66,7 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
         }
 
         user.RoleAssignments.Clear();
-        assignments.ForEach(x => user.RoleAssignments.Add(x));
+        updatedUserRoleAssignments.ForEach(x => user.RoleAssignments.Add(x));
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
         return Unit.Value;

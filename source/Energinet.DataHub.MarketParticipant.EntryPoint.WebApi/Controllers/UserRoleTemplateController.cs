@@ -87,18 +87,18 @@ public sealed class UserRoleTemplateController : ControllerBase
 
     [HttpGet("users/{userId:guid}/templates")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> UpdateUserRoleTemplates(Guid userId, UpdateUserRoleTemplatesDto userRoleTemplatesDto)
+    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid userId, UpdateUserRoleAssignmentsDto userRoleAssignmentsDto)
     {
         ArgumentNullException.ThrowIfNull(userId);
-        ArgumentNullException.ThrowIfNull(userRoleTemplatesDto);
+        ArgumentNullException.ThrowIfNull(userRoleAssignmentsDto);
         return await this.ProcessAsync(
             async () =>
             {
-                var associatedActors = await _mediator
-                    .Send(new UpdateUserRoleTemplatesCommand(userId, userRoleTemplatesDto))
+                var result = await _mediator
+                    .Send(new UpdateUserRoleAssignmentsCommand(userId, userRoleAssignmentsDto))
                     .ConfigureAwait(false);
 
-                return Ok(associatedActors);
+                return Ok(result);
             },
             _logger).ConfigureAwait(false);
     }

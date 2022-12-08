@@ -13,9 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 
-public record UpdateUserRoleTemplatesDto(Dictionary<Guid, List<UserRoleTemplateId>> UserRoleTemplateAssignments);
+public sealed record UpdateUserRoleAssignmentsCommand(Guid UserId, UpdateUserRoleAssignmentsDto RoleAssignmentsDto) : IRequest;

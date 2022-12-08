@@ -39,7 +39,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
     }
 
     [Fact]
-    public async Task UpdateUserRoleTemplates_AddNewTemplateToEmptyCollection_ReturnsNewTemplate()
+    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_ReturnsNewTemplate()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -54,13 +54,13 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .CreateRoleTemplate();
 
-        var updateDto = new UpdateUserRoleTemplatesDto(
+        var updateDto = new UpdateUserRoleAssignmentsDto(
             UserRoleTemplateAssignments: new Dictionary<Guid, List<UserRoleTemplateId>>
             {
                 { actorId, new List<UserRoleTemplateId>() { templateId } }
             });
 
-        var updateCommand = new UpdateUserRoleTemplatesCommand(userId, updateDto);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
         var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
 
         // Act
@@ -73,7 +73,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
     }
 
     [Fact]
-    public async Task UpdateUserRoleTemplates_AddToExistingTemplates_ReturnsBoth()
+    public async Task UpdateUserRoleTemplateAssignments_AddToExistingTemplates_ReturnsBoth()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -92,13 +92,13 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .CreateRoleTemplate("fake_value_2", new[] { Permission.ActorManage });
 
-        var updateDto = new UpdateUserRoleTemplatesDto(
+        var updateDto = new UpdateUserRoleAssignmentsDto(
             UserRoleTemplateAssignments: new Dictionary<Guid, List<UserRoleTemplateId>>
             {
                 { actorId, new List<UserRoleTemplateId>() { templateId, new(roleTemplateId) } },
             });
 
-        var updateCommand = new UpdateUserRoleTemplatesCommand(userId, updateDto);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
         var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
 
         // Act

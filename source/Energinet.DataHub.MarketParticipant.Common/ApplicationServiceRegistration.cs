@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetAssociatedUserActorsCommand>, GetAssociatedUserActorsCommandRuleSet>();
             container.Register<IValidator<GetUserRoleTemplatesCommand>, GetUserRoleTemplatesCommandRuleSet>();
             container.Register<IValidator<GetAvailableUserRoleTemplatesForActorCommand>, GetAvailableUserRoleTemplatesForActorCommandRuleSet>();
-            container.Register<IValidator<UpdateUserRoleTemplatesCommand>, UpdateUserRoleTemplatesCommandRuleSet>();
+            container.Register<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
