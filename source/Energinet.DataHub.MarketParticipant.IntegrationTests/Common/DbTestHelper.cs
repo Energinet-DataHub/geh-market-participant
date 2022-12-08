@@ -109,12 +109,12 @@ internal static class DbTestHelper
         return (actorEntity.Id, userEntity.Id);
     }
 
-    public static Task<UserRoleTemplateId> CreateRoleTemplate(this MarketParticipantDatabaseManager manager)
+    public static Task<UserRoleTemplateId> CreateRoleTemplateAsync(this MarketParticipantDatabaseManager manager)
     {
-        return CreateRoleTemplate(manager, "fake_value", new Permission[] { Permission.OrganizationView });
+        return CreateRoleTemplateAsync(manager, "fake_value", new Permission[] { Permission.OrganizationView });
     }
 
-    public static async Task<UserRoleTemplateId> CreateRoleTemplate(
+    public static async Task<UserRoleTemplateId> CreateRoleTemplateAsync(
         this MarketParticipantDatabaseManager manager,
         string name,
         Permission[] permissions)

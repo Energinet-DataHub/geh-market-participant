@@ -52,7 +52,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
 
         var templateId = await _fixture
             .DatabaseManager
-            .CreateRoleTemplate();
+            .CreateRoleTemplateAsync();
 
         var updateDto = new UpdateUserRoleAssignmentsDto(
             actorId,
@@ -88,7 +88,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
 
         var templateId = await _fixture
             .DatabaseManager
-            .CreateRoleTemplate("fake_value_2", new[] { Permission.ActorManage });
+            .CreateRoleTemplateAsync("fake_value_2", new[] { Permission.ActorManage });
 
         var updateDto = new UpdateUserRoleAssignmentsDto(
             actorId,
