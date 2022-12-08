@@ -85,7 +85,7 @@ public sealed class UserRoleTemplateController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
-    [HttpGet("users/{userId:guid}/templates")]
+    [HttpPut("users/{userId:guid}/userroles")]
     [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid userId, UpdateUserRoleAssignmentsDto userRoleAssignmentsDto)
     {
