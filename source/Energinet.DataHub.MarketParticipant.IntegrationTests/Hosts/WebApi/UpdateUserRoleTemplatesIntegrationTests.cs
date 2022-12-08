@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -55,10 +55,8 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .CreateRoleTemplate();
 
         var updateDto = new UpdateUserRoleAssignmentsDto(
-            UserRoleTemplateAssignments: new Dictionary<Guid, List<UserRoleTemplateId>>
-            {
-                { actorId, new List<UserRoleTemplateId>() { templateId } }
-            });
+            actorId,
+            new List<UserRoleTemplateId> { templateId });
 
         var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
         var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
@@ -93,10 +91,8 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .CreateRoleTemplate("fake_value_2", new[] { Permission.ActorManage });
 
         var updateDto = new UpdateUserRoleAssignmentsDto(
-            UserRoleTemplateAssignments: new Dictionary<Guid, List<UserRoleTemplateId>>
-            {
-                { actorId, new List<UserRoleTemplateId>() { templateId, new(roleTemplateId) } },
-            });
+            actorId,
+            new List<UserRoleTemplateId> { templateId, new(roleTemplateId) });
 
         var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
         var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);

@@ -28,14 +28,10 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
     : IRequestHandler<UpdateUserRoleAssignmentsCommand>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IUserRoleTemplateRepository _userRoleTemplateRepository;
 
-    public UpdateUserRoleTemplatesCommandHandler(
-        IUserRepository userRepository,
-        IUserRoleTemplateRepository userRoleTemplateRepository)
+    public UpdateUserRoleTemplatesCommandHandler(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        _userRoleTemplateRepository = userRoleTemplateRepository;
     }
 
     public async Task<Unit> Handle(
@@ -54,15 +50,12 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
         }
 
         var updatedUserRoleAssignments = new List<UserRoleAssignment>();
-        foreach (var userRoleTemplateAssignment in request.RoleAssignmentsDto.UserRoleTemplateAssignments)
+        foreach (var userRoleTemplateId in request.RoleAssignmentsDto.UserRoleTemplateAssignments)
         {
-            foreach (var userRoleTemplateId in userRoleTemplateAssignment.Value)
-            {
-                updatedUserRoleAssignments.Add(new UserRoleAssignment(
-                    user.Id,
-                    userRoleTemplateAssignment.Key,
-                    userRoleTemplateId));
-            }
+            updatedUserRoleAssignments.Add(new UserRoleAssignment(
+                user.Id,
+                request.RoleAssignmentsDto.ActorId,
+                userRoleTemplateId));
         }
 
         user.RoleAssignments.Clear();
