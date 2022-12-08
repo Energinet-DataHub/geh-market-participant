@@ -26,18 +26,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private const string ActorBaseUrl = "Actor";
         private const string ContactBaseUrl = "Contact";
 
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantActorContactClient(IFlurlClient client)
+        public MarketParticipantActorContactClient(IMarketParticipantClientFactory clientFactory)
         {
-            _httpClient = client;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid organizationId, Guid actorId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl).GetAsync())
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl)
+                        .GetAsync())
                 .ConfigureAwait(false);
 
             var contacts = await response
@@ -51,7 +54,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl).PostJsonAsync(contactDto))
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl)
+                        .PostJsonAsync(contactDto))
                 .ConfigureAwait(false);
 
             var contact = await response
@@ -65,7 +71,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             return ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient.Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl, contactId).DeleteAsync());
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl, contactId)
+                        .DeleteAsync());
         }
     }
 }

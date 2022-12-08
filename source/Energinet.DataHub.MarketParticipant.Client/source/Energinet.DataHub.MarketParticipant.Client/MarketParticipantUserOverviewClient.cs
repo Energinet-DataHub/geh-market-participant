@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
@@ -22,18 +21,19 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantUserOverviewClient : IMarketParticipantUserOverviewClient
     {
-        private readonly IFlurlClient _httpClient;
+        private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantUserOverviewClient(IFlurlClient client)
+        public MarketParticipantUserOverviewClient(IMarketParticipantClientFactory clientFactory)
         {
-            _httpClient = client;
+            _clientFactory = clientFactory;
         }
 
         public async Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _httpClient
+                    () => _clientFactory
+                        .CreateClient()
                         .Request("useroverview/users")
                         .SetQueryParam("pageNumber", pageNumber)
                         .SetQueryParam("pageSize", pageSize)
