@@ -41,21 +41,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: Energinet-DataHub/.github/.github/actions/nuget-checkout-repository@v8
+        uses: Energinet-DataHub/.github/.github/actions/nuget-checkout-repository@v9
 
       - name: Setup dotnet and tools
-        uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v8
+        uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v9
         with:
           USE_AZURE_FUNCTIONS_TOOLS: 'true'
 
       - name: Build and test solution
-        uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v8
+        uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v9
         with:
           SOLUTION_FILE_PATH: './source/Energinet.DataHub.MarketParticipant.Libraries.sln'
           CODE_COVERAGE_FLAGS: clientlibraries
 
       - name: Pack Client project
-        uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@v8
+        uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@v9
         with:
           PROJECT_PATH: './source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Energinet.DataHub.MarketParticipant.Integration.Model.csproj'
 
@@ -68,7 +68,7 @@ jobs:
             .github/workflows/publish-marketparticipant-model.yml
 
       - name: Assert versions of NuGet packages and push them to NuGet.org
-        uses: Energinet-DataHub/.github/.github/actions/nuget-packages-assert-and-push@v8
+        uses: Energinet-DataHub/.github/.github/actions/nuget-packages-assert-and-push@v9
         with:
           PUSH_PACKAGES: ${{ env.PUSH_PACKAGES }}
           CONTENT_CHANGED: ${{ steps.changed-content.outputs.any_changed }}
