@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
-using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
@@ -31,16 +30,16 @@ namespace Energinet.DataHub.MarketParticipant.Client
         private readonly ITokenClient _tokenClient;
         private readonly IMarketParticipantUserOverviewClient _marketParticipantUserOverviewClient;
 
-        public MarketParticipantClient(IFlurlClient client)
+        public MarketParticipantClient(IMarketParticipantClientFactory clientFactory)
         {
-            _marketParticipantOrganizationClient = new MarketParticipantOrganizationClient(client);
-            _marketParticipantUserClient = new MarketParticipantUserClient(client);
-            _marketParticipantActorClient = new MarketParticipantActorClient(client);
-            _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(client);
-            _marketParticipantActorContactClient = new MarketParticipantActorContactClient(client);
-            _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(client);
-            _tokenClient = new TokenClient(client);
-            _marketParticipantUserOverviewClient = new MarketParticipantUserOverviewClient(client);
+            _marketParticipantOrganizationClient = new MarketParticipantOrganizationClient(clientFactory);
+            _marketParticipantUserClient = new MarketParticipantUserClient(clientFactory);
+            _marketParticipantActorClient = new MarketParticipantActorClient(clientFactory);
+            _marketParticipantGridAreaClient = new MarketParticipantGridAreaClient(clientFactory);
+            _marketParticipantActorContactClient = new MarketParticipantActorContactClient(clientFactory);
+            _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(clientFactory);
+            _tokenClient = new TokenClient(clientFactory);
+            _marketParticipantUserOverviewClient = new MarketParticipantUserOverviewClient(clientFactory);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()

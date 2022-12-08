@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.9.2
+
+- Updated internal registrations.
+
 ## Version 2.9.1
 
 - Add endpoint for getting user role templates.
