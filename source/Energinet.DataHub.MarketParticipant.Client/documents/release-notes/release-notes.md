@@ -1,6 +1,6 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.10.0
+## Version 2.9.3
 
 - Updated endpoint for getting user overview.
 
