@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -36,7 +35,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         var ids = externalIds.Distinct().ToList();
         var result = new List<Domain.Model.UserIdentity>();
 
-        foreach (var segment in ids.Batch(15))
+        foreach (var segment in Enumerable.Chunk(ids, 15))
         {
             var users = await _graphClient.Users
                 .Request()
