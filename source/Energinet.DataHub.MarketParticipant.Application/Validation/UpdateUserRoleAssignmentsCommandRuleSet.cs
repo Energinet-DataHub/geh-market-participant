@@ -19,4 +19,22 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
 public sealed class UpdateUserRoleAssignmentsCommandRuleSet : AbstractValidator<UpdateUserRoleAssignmentsCommand>
 {
+    public UpdateUserRoleAssignmentsCommandRuleSet()
+    {
+        RuleFor(command => command.UserId)
+            .NotEmpty();
+
+        RuleFor(command => command.RoleAssignmentsDto)
+            .NotNull()
+            .ChildRules(validator =>
+            {
+                validator
+                    .RuleFor(e => e.ActorId)
+                    .NotEmpty();
+
+                validator
+                    .RuleFor(e => e.UserRoleTemplateAssignments)
+                    .NotNull();
+            });
+    }
 }

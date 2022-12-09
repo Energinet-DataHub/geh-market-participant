@@ -13,7 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
@@ -39,7 +39,6 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        ArgumentNullException.ThrowIfNull(request.UserId);
 
         var user = await _userRepository
             .GetAsync(new UserId(request.UserId))
@@ -50,7 +49,8 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
             throw new NotFoundValidationException(request.UserId);
         }
 
-        user.RoleAssignments.Clear();
+        ClearUserRolesForActorBeforeUpdate(request, user);
+
         foreach (var userRoleTemplateId in request.RoleAssignmentsDto.UserRoleTemplateAssignments)
         {
             user.RoleAssignments.Add(new UserRoleAssignment(
@@ -62,5 +62,13 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
         return Unit.Value;
+    }
+
+    private static void ClearUserRolesForActorBeforeUpdate(UpdateUserRoleAssignmentsCommand request, Domain.Model.Users.User user)
+    {
+        foreach (var userRoleAssignment in user.RoleAssignments.Where(e => e.ActorId == request.RoleAssignmentsDto.ActorId))
+        {
+            user.RoleAssignments.Remove(userRoleAssignment);
+        }
     }
 }
