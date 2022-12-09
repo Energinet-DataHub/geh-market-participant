@@ -19,11 +19,13 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -48,12 +50,13 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, _) = await CreateUserAndActor(context, false);
-        var (otherUserId, _) = await CreateUserAndActor(context, false);
-        var target = new UserOverviewRepository(context);
+        var (userId, _, _) = await CreateUserAndActor(context, false);
+        var (otherUserId, _, _) = await CreateUserAndActor(context, false);
+
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var actual = await target.GetUsersAsync(1, 1000, null);
+        var actual = (await target.GetUsersAsync(1, 1000, null)).ToList();
 
         // Assert
         Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
@@ -68,13 +71,13 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, actorId) = await CreateUserAndActor(context, false);
-        var (otherUserId, otherActorId) = await CreateUserAndActor(context, false);
+        var (userId, _, actorId) = await CreateUserAndActor(context, false);
+        var (otherUserId, _, _) = await CreateUserAndActor(context, false);
 
-        var target = new UserOverviewRepository(context);
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var actual = await target.GetUsersAsync(1, 1000, actorId);
+        var actual = (await target.GetUsersAsync(1, 1000, actorId)).ToList();
 
         // Assert
         Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
@@ -90,8 +93,7 @@ public sealed class UserOverviewRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var (actorId, userIds) = await CreateUsersForSameActorAsync(context, 100);
 
-        var target = new UserOverviewRepository(context);
-        var users = new List<UserOverviewItem>();
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
         var pageCount = await target.GetUsersPageCountAsync(7, actorId);
@@ -102,35 +104,46 @@ public sealed class UserOverviewRepositoryTests
         }
 
         // Assert
-        Assert.Equal(userIds.OrderBy(x => x), actual.Select(x => x.Id.Value).OrderBy(x => x));
+        Assert.Equal(userIds.Select(x => x.UserId).OrderBy(x => x), actual.Select(x => x.Id.Value).OrderBy(x => x));
     }
 
-    private static async Task<(Guid ActorId, IEnumerable<Guid> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
+    private static Mock<IUserIdentityRepository> CreateUserIdentityRepository()
     {
-        var (userExternalId, orgEntity, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
+            .Returns<IEnumerable<Guid>>(x =>
+                Task.FromResult(
+                    x.Select(y =>
+                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+        return userIdentityRepository;
+    }
 
-        var users = new List<Guid>();
+    private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
+    {
+        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
+
+        var users = new List<(Guid UserId, Guid ExternalId)>();
 
         for (var i = 0; i < count; ++i)
         {
-            users.Add((await CreateUserAsync(context, userExternalId, actorEntity, userRoleTemplate)).Id);
+            var user = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+            users.Add((user.Id, user.ExternalId));
         }
 
         return (actorEntity.Id, users);
     }
 
-    private static async Task<(Guid UserId, Guid ActorId)> CreateUserAndActor(MarketParticipantDbContext context, bool isFas)
+    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserAndActor(MarketParticipantDbContext context, bool isFas)
     {
-        var (userExternalId, _, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
-        var userEntity = await CreateUserAsync(context, userExternalId, actorEntity, userRoleTemplate);
+        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
+        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
 
-        return (userEntity.Id, actorEntity.Id);
+        return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
-    private static async Task<(Guid UserId, OrganizationEntity Organization, ActorEntity Actor, UserRoleTemplateEntity Template)> CreateActorAndTemplate(MarketParticipantDbContext context, bool isFas)
+    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleTemplateEntity Template)> CreateActorAndTemplate(MarketParticipantDbContext context, bool isFas)
     {
-        var userExternalId = Guid.NewGuid();
-
         var actorEntity = new ActorEntity
         {
             Id = Guid.NewGuid(),
@@ -163,10 +176,10 @@ public sealed class UserOverviewRepositoryTests
 
         await context.Entry(actorEntity).ReloadAsync();
 
-        return (userExternalId, orgEntity, actorEntity, userRoleTemplate);
+        return (orgEntity, actorEntity, userRoleTemplate);
     }
 
-    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, Guid userExternalId, ActorEntity actorEntity, UserRoleTemplateEntity userRoleTemplate)
+    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleTemplateEntity userRoleTemplate)
     {
         var roleAssignment = new UserRoleAssignmentEntity
         {
@@ -176,7 +189,7 @@ public sealed class UserOverviewRepositoryTests
 
         var userEntity = new UserEntity
         {
-            ExternalId = userExternalId,
+            ExternalId = Guid.NewGuid(),
             Email = "test@example.com",
             RoleAssignments = { roleAssignment }
         };

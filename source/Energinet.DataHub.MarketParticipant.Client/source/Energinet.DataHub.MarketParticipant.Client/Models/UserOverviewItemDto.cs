@@ -16,7 +16,11 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserOverviewItemDto(
+public sealed record UserOverviewItemDto(
         Guid Id,
-        string Email);
+        string Email,
+        string Name,
+        string? PhoneNumber,
+        DateTimeOffset CreatedDate,
+        bool Active);
 }
