@@ -26,15 +26,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Email = from.Email.Address;
             to.Id = from.Id.Value;
             to.ExternalId = from.ExternalId.Value;
+            to.RoleAssignments.Clear();
             foreach (var fromRoleAssignment in from.RoleAssignments)
             {
-                var existing = to.RoleAssignments.FirstOrDefault(x =>
-                    x.ActorId == fromRoleAssignment.ActorId &&
-                    x.UserId == fromRoleAssignment.UserId.Value &&
-                    x.UserRoleTemplateId == fromRoleAssignment.TemplateId.Value);
-                if (existing is not null)
-                    continue;
-
                 to.RoleAssignments.Add(MapToEntity(fromRoleAssignment, from.Id));
             }
         }
