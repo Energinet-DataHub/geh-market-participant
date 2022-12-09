@@ -20,4 +20,4 @@ Currently, the key does not expire and is not rotated. This must be reconfigured
 
 ## Overview of Components
 
-![geh-market-participant-ressources drawio](https://user-images.githubusercontent.com/77341673/206713903-e529e95e-965e-4024-96ae-4243d0c3eccf.png)
+![geh-market-participant-resources](https://user-images.githubusercontent.com/77341673/206713903-e529e95e-965e-4024-96ae-4243d0c3eccf.png)
