@@ -66,7 +66,7 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
 
     private static void ClearUserRolesForActorBeforeUpdate(UpdateUserRoleAssignmentsCommand request, Domain.Model.Users.User user)
     {
-        foreach (var userRoleAssignment in user.RoleAssignments.Where(e => e.ActorId == request.RoleAssignmentsDto.ActorId))
+        foreach (var userRoleAssignment in user.RoleAssignments.Where(e => e.ActorId == request.RoleAssignmentsDto.ActorId).ToList())
         {
             user.RoleAssignments.Remove(userRoleAssignment);
         }
