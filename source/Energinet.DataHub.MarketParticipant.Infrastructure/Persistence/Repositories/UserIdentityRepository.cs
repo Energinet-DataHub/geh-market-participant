@@ -32,10 +32,10 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     public async Task<IEnumerable<Domain.Model.UserIdentity>> GetUserIdentitiesAsync(IEnumerable<Guid> externalIds)
     {
-        var ids = externalIds.Distinct().ToList();
+        var ids = externalIds.Distinct();
         var result = new List<Domain.Model.UserIdentity>();
 
-        foreach (var segment in Enumerable.Chunk(ids, 15))
+        foreach (var segment in ids.Chunk(15))
         {
             var users = await _graphClient.Users
                 .Request()
