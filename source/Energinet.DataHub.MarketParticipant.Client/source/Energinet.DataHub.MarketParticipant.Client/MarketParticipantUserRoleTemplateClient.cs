@@ -12,34 +12,50 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
-    public sealed class MarketParticipantUserClient : IMarketParticipantUserClient
+    public sealed class MarketParticipantUserRoleTemplateClient : IMarketParticipantUserRoleTemplateClient
     {
         private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantUserClient(IMarketParticipantClientFactory clientFactory)
+        public MarketParticipantUserRoleTemplateClient(IMarketParticipantClientFactory factory)
         {
-            _clientFactory = clientFactory;
+            _clientFactory = factory;
         }
 
-        public async Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(string accessToken)
+        public async Task<IEnumerable<UserRoleTemplateDto>> GetAsync(Guid actorId, Guid userId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request("user/actors")
-                        .SetQueryParam("externalToken", accessToken)
+                        .Request($"actors/{actorId}/users/{userId}/templates")
                         .GetAsync())
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<GetAssociatedUserActorsResponseDto>()
+                .GetJsonAsync<IEnumerable<UserRoleTemplateDto>>()
+                .ConfigureAwait(false);
+        }
+
+        public async Task<IEnumerable<UserRoleTemplateDto>> GetAssignableAsync(Guid actorId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request($"actors/{actorId}/templates")
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<IEnumerable<UserRoleTemplateDto>>()
                 .ConfigureAwait(false);
         }
     }

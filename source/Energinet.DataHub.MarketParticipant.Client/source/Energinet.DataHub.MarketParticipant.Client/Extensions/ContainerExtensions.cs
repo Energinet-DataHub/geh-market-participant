@@ -21,14 +21,20 @@ namespace Energinet.DataHub.MarketParticipant.Client.Extensions
 {
     public static class ContainerExtensions
     {
-        public static IServiceCollection AddMarketParticipantClient(this IServiceCollection source, Uri baseUrl)
+        public static IServiceCollection AddMarketParticipantClient(
+            this IServiceCollection source,
+            Uri baseUrl)
         {
             source.AddHttpContextAccessor();
-            source.AddScoped(x =>
+            source.AddScoped<IMarketParticipantClient, MarketParticipantClient>();
+            source.AddScoped<IMarketParticipantUserRoleTemplateClient, MarketParticipantUserRoleTemplateClient>();
+
+            source.AddSingleton<IMarketParticipantClientFactory>(provider =>
                 new MarketParticipantClientFactory(
-                    x.GetRequiredService<IHttpContextAccessor>(),
-                    new PerBaseUrlFlurlClientFactory())
-                .CreateClient(baseUrl));
+                    provider.GetRequiredService<IHttpContextAccessor>(),
+                    new PerBaseUrlFlurlClientFactory(),
+                    baseUrl));
+
             return source;
         }
     }

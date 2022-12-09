@@ -55,11 +55,11 @@ public sealed class UserRoleTemplateController : ControllerBase
 
                 var command = new GetUserRoleTemplatesCommand(userId, actorId);
 
-                var associatedActors = await _mediator
+                var response = await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
-                return Ok(associatedActors);
+                return Ok(response.Templates);
             },
             _logger).ConfigureAwait(false);
     }
@@ -76,11 +76,11 @@ public sealed class UserRoleTemplateController : ControllerBase
 
                 var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
 
-                var associatedActors = await _mediator
+                var response = await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
-                return Ok(associatedActors);
+                return Ok(response.Templates);
             },
             _logger).ConfigureAwait(false);
     }
