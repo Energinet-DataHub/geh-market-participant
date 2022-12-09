@@ -69,7 +69,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 new EmailAddress(userIdentity.Email ?? user.Email),
                 userIdentity.Name,
                 userIdentity.PhoneNumber,
-                userIdentity.CreatedDateUtc,
+                userIdentity.CreatedDate,
                 userIdentity.Enabled);
         });
     }

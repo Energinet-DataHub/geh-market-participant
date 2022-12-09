@@ -21,6 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
         string Email,
         string Name,
         string? PhoneNumber,
-        DateTime CreatedDateUtc,
+        DateTimeOffset CreatedDate,
         bool Active);
 }

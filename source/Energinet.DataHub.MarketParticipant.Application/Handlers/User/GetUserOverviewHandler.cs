@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User
                     x.Email.Address,
                     x.Name,
                     x.PhoneNumber,
-                    x.CreatedDateUtc,
+                    x.CreatedDate,
                     x.Active)));
         }
     }

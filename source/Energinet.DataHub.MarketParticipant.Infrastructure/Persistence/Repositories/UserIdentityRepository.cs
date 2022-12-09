@@ -55,7 +55,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                             user.DisplayName,
                             user.Mail,
                             user.MobilePhone,
-                            user.CreatedDateTime!.Value.UtcDateTime,
+                            user.CreatedDateTime!.Value,
                             user.AccountEnabled == true));
 
                         return true;

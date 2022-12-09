@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserOverviewItem(UserId Id, EmailAddress Email, string Name, string? PhoneNumber, DateTime CreatedDateUtc, bool Active);
+public sealed record UserOverviewItem(UserId Id, EmailAddress Email, string Name, string? PhoneNumber, DateTimeOffset CreatedDate, bool Active);
