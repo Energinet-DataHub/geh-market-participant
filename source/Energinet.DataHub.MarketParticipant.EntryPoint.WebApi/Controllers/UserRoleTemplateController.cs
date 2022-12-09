@@ -91,6 +91,7 @@ public sealed class UserRoleTemplateController : ControllerBase
     {
         ArgumentNullException.ThrowIfNull(userId);
         ArgumentNullException.ThrowIfNull(userRoleAssignmentsDto);
+
         return await this.ProcessAsync(
             async () =>
             {
