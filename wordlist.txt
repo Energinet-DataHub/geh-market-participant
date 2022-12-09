@@ -4,6 +4,7 @@ dk
 energinet
 Energinet
 greenenergyhub
+geh
 sql
 TBD
 yyyyMMddHHmm
@@ -30,6 +31,10 @@ MeteringPointTypes
 ActorCreated
 GridAreas
 API's
+APIM
+OpenId
+RSA
+JWT
 servicebus
 integrations
 ActorStatusChanged
