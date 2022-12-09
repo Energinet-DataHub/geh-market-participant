@@ -16,6 +16,8 @@ Currently, the key does not expire and is not rotated. This must be reconfigured
 
 ## Login Sequence
 
-
+![User sign-in sequence diagram (Short)](https://user-images.githubusercontent.com/77341673/206713883-70f26640-0f45-46fd-9871-f829e73f465a.png)
 
 ## Overview of Components
+
+![geh-market-participant-ressources drawio](https://user-images.githubusercontent.com/77341673/206713903-e529e95e-965e-4024-96ae-4243d0c3eccf.png)
