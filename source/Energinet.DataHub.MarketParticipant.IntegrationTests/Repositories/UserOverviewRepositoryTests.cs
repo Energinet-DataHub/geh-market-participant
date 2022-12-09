@@ -50,13 +50,13 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, userExternalId, _) = await CreateUserAndActor(context, false);
-        var (otherUserId, otherUserExternalId, _) = await CreateUserAndActor(context, false);
+        var (userId, _, _) = await CreateUserAndActor(context, false);
+        var (otherUserId, _, _) = await CreateUserAndActor(context, false);
 
         var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var actual = await target.GetUsersAsync(1, 1000, null);
+        var actual = (await target.GetUsersAsync(1, 1000, null)).ToList();
 
         // Assert
         Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
@@ -71,13 +71,13 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, userExternalId, actorId) = await CreateUserAndActor(context, false);
-        var (otherUserId, otherUserExternalId, otherActorId) = await CreateUserAndActor(context, false);
+        var (userId, _, actorId) = await CreateUserAndActor(context, false);
+        var (otherUserId, _, _) = await CreateUserAndActor(context, false);
 
         var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var actual = await target.GetUsersAsync(1, 1000, actorId);
+        var actual = (await target.GetUsersAsync(1, 1000, actorId)).ToList();
 
         // Assert
         Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
@@ -92,10 +92,8 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var (actorId, userIds) = await CreateUsersForSameActorAsync(context, 100);
-        var externalIds = userIds.Select(x => x.ExternalId);
 
         var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
-        var users = new List<UserOverviewItem>();
 
         // Act
         var pageCount = await target.GetUsersPageCountAsync(7, actorId);
@@ -115,7 +113,7 @@ public sealed class UserOverviewRepositoryTests
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
             .Returns<IEnumerable<Guid>>(x =>
-                Task.FromResult<IEnumerable<UserIdentity>>(
+                Task.FromResult(
                     x.Select(y =>
                         new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
         return userIdentityRepository;
@@ -123,7 +121,7 @@ public sealed class UserOverviewRepositoryTests
 
     private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
     {
-        var (orgEntity, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
+        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
 
         var users = new List<(Guid UserId, Guid ExternalId)>();
 
