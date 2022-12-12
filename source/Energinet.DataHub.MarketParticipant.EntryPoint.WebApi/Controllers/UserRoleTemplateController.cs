@@ -84,4 +84,26 @@ public sealed class UserRoleTemplateController : ControllerBase
             },
             _logger).ConfigureAwait(false);
     }
+
+    [HttpPut("users/{userId:guid}/roles")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid userId, UpdateUserRoleAssignmentsDto userRoleAssignmentsDto)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(userRoleAssignmentsDto);
+
+        return await this.ProcessAsync(
+            async () =>
+            {
+                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userRoleAssignmentsDto.ActorId))
+                    return Unauthorized();
+
+                var result = await _mediator
+                    .Send(new UpdateUserRoleAssignmentsCommand(userId, userRoleAssignmentsDto))
+                    .ConfigureAwait(false);
+
+                return Ok(result);
+            },
+            _logger).ConfigureAwait(false);
+    }
 }

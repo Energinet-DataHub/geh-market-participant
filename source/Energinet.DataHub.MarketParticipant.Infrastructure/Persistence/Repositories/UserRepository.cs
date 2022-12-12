@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -29,6 +30,29 @@ public sealed class UserRepository : IUserRepository
     public UserRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+    }
+
+    public async Task<UserId> AddOrUpdateAsync(User user)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+
+        UserEntity destination;
+
+        if (user.Id.Value == default)
+        {
+            destination = new UserEntity();
+        }
+        else
+        {
+            destination = await BuildUserQuery()
+                .FirstAsync(x => x.Id == user.Id.Value)
+                .ConfigureAwait(false);
+        }
+
+        UserMapper.MapToEntity(user, destination);
+        _marketParticipantDbContext.Users.Update(destination);
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+        return new UserId(destination.Id);
     }
 
     public async Task<User?> GetAsync(ExternalUserId externalUserId)
@@ -53,8 +77,6 @@ public sealed class UserRepository : IUserRepository
     {
         return _marketParticipantDbContext
             .Users
-            .Include(u => u.RoleAssignments)
-            .ThenInclude(r => r.UserRoleTemplate)
-            .ThenInclude(t => t.Permissions);
+            .Include(u => u.RoleAssignments);
     }
 }

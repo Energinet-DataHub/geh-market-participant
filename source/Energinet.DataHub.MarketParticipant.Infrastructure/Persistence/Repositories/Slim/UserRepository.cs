@@ -46,10 +46,7 @@ public sealed class UserRepository : IUserRepository
             .ToListAsync()
             .ConfigureAwait(false);
 
-        if (roleAssignmentsQuery.Any())
-        {
-            return roleAssignmentsQuery;
-        }
+        if (roleAssignmentsQuery.Any()) return roleAssignmentsQuery;
 
         var fasActorQuery = await _marketParticipantDbContext
             .Actors
@@ -74,33 +71,22 @@ public sealed class UserRepository : IUserRepository
             .SelectMany(a => a.MarketRoles)
             .Select(r => r.Function);
 
-        var query = _marketParticipantDbContext
-            .Users
-            .Where(u => u.ExternalId == externalUserId.Value)
-            .Include(u => u
-                .RoleAssignments
-                .Where(r => r.ActorId == actorId)
-                .Where(r => r.UserRoleTemplate
-                    .EicFunctions
-                    .All(q => actorEicFunctions.Contains(q.EicFunction))))
-            .ThenInclude(r => r.UserRoleTemplate)
-            .ThenInclude(t => t.Permissions);
+        var query = from u in _marketParticipantDbContext.Users
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+            join ur in _marketParticipantDbContext.UserRoleTemplates on r.UserRoleTemplateId equals ur.Id
+            where u.ExternalId == externalUserId.Value && r.ActorId == actorId && ur.EicFunctions.All(q => actorEicFunctions.Contains(q.EicFunction))
+            select ur.Permissions;
 
-        var perms = await query
-            .AsNoTracking()
-            .ToListAsync()
-            .ConfigureAwait(false);
-
-        return perms.SelectMany(x => x.RoleAssignments.SelectMany(y => y.UserRoleTemplate.Permissions.Select(z => z.Permission)));
+        return await query.SelectMany(x => x.Select(y => y.Permission)).ToListAsync().ConfigureAwait(false);
     }
 
     public Task<bool> IsFasAsync(Guid actorId, ExternalUserId externalUserId)
     {
         var query = from u in _marketParticipantDbContext.Users
-                    join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
-                    join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
-                    where u.ExternalId == externalUserId.Value
-                    select a.IsFas;
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+            join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
+            where u.ExternalId == externalUserId.Value
+            select a.IsFas;
 
         return query.FirstOrDefaultAsync();
     }
