@@ -41,7 +41,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User
                 request.ActorId).ConfigureAwait(false);
 
             return new GetUserOverviewResponse(
-                users.Select(x => new UserOverviewItemDto(x.Id.Value, x.Email.Address)));
+                users.Select(x => new UserOverviewItemDto(
+                    x.Id.Value,
+                    x.Email.Address,
+                    x.Name,
+                    x.PhoneNumber,
+                    x.CreatedDate,
+                    x.Active)));
         }
     }
 }
