@@ -67,7 +67,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
 
         // Assert
         Assert.NotEmpty(response.Templates);
-        Assert.Equal("fake_value", response.Templates.First().Name);
+        Assert.Contains(response.Templates, x => x.Id == templateId.Value);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
 
         var templateId = await _fixture
             .DatabaseManager
-            .CreateRoleTemplateAsync("fake_value_2", new[] { Permission.ActorManage });
+            .CreateRoleTemplateAsync(new[] { Permission.ActorManage });
 
         var updateDto = new UpdateUserRoleAssignmentsDto(
             actorId,
@@ -104,7 +104,53 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         // Assert
         Assert.NotEmpty(response.Templates);
         Assert.Equal(2, response.Templates.Count());
-        Assert.Contains(response.Templates, x => x.Name == "fake_value");
-        Assert.Contains(response.Templates, x => x.Name == "fake_value_2");
+        Assert.Contains(response.Templates, x => x.Id == templateId.Value);
+        Assert.Contains(response.Templates, x => x.Id == roleTemplateId);
+    }
+
+    [Fact]
+    public async Task UpdateUserRoleTemplateAssignments_AddToUserWithMultipleActorsAndExistingTemplates_ReturnsCorrectForBothActors()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.GetInstance<IMediator>();
+
+        var (actorId, actor2Id, userId) = await _fixture
+            .DatabaseManager
+            .CreateUserWithTwoActorsAsync();
+
+        var roleTemplateId = await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+
+        var roleTemplate2Id = await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actor2Id, userId, new[] { Permission.OrganizationManage });
+
+        var templateId = await _fixture
+            .DatabaseManager
+            .CreateRoleTemplateAsync(new[] { Permission.ActorManage });
+
+        var updateDto = new UpdateUserRoleAssignmentsDto(
+            actorId,
+            new List<UserRoleTemplateId> { templateId, new(roleTemplateId) });
+
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
+        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
+        var getCommand2 = new GetUserRoleTemplatesCommand(actor2Id, userId);
+
+        // Act
+        await mediator.Send(updateCommand);
+        var response = await mediator.Send(getCommand);
+        var response2 = await mediator.Send(getCommand2);
+
+        // Assert
+        Assert.NotEmpty(response.Templates);
+        Assert.Equal(2, response.Templates.Count());
+        Assert.Single(response2.Templates);
+        Assert.Contains(response.Templates, x => x.Id == roleTemplateId);
+        Assert.Contains(response.Templates, x => x.Id == templateId.Value);
+        Assert.Contains(response2.Templates, x => x.Id == roleTemplate2Id);
     }
 }
