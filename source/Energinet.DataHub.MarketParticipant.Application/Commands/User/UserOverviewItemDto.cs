@@ -18,5 +18,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
 {
     public sealed record UserOverviewItemDto(
         Guid Id,
-        string Email);
+        string Email,
+        string Name,
+        string? PhoneNumber,
+        DateTimeOffset CreatedDate,
+        bool Active);
 }

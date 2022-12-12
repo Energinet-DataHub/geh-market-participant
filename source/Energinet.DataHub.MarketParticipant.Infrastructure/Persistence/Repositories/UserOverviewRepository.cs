@@ -16,7 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +28,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserOverviewRepository : IUserOverviewRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IUserIdentityRepository _userIdentityRepository;
 
-    public UserOverviewRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public UserOverviewRepository(
+        IMarketParticipantDbContext marketParticipantDbContext,
+        IUserIdentityRepository userIdentityRepository)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+        _userIdentityRepository = userIdentityRepository;
     }
 
     public Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
@@ -44,10 +50,28 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
-        return (await query.Select(x => new { x.Id, x.Email }).ToListAsync().ConfigureAwait(false))
-            .Select(x => new UserOverviewItem(
-                new UserId(x.Id),
-                new Domain.Model.EmailAddress(x.Email)));
+        var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
+            .Select(x => new
+                {
+                    x.Id,
+                    x.ExternalId,
+                    x.Email
+                })
+            .ToDictionary(x => x.ExternalId);
+
+        var userIdentities = await _userIdentityRepository.GetUserIdentitiesAsync(userLookup.Keys).ConfigureAwait(false);
+
+        return userIdentities.Select(userIdentity =>
+        {
+            var user = userLookup[userIdentity.Id];
+            return new UserOverviewItem(
+                new UserId(user.Id),
+                new EmailAddress(userIdentity.Email ?? user.Email),
+                userIdentity.Name,
+                userIdentity.PhoneNumber,
+                userIdentity.CreatedDate,
+                userIdentity.Enabled);
+        });
     }
 
     private IQueryable<UserEntity> BuildUsersQuery(Guid? actorId)
@@ -57,10 +81,10 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         if (actorId != null)
         {
-            query = from user in query
-                    join assi in _marketParticipantDbContext.UserRoleAssignments
-                        on new { UserId = user.Id, ActorId = actorId.Value } equals new { UserId = assi.UserId, ActorId = assi.ActorId }
-                    select user;
+            query = from u in query
+                    join a in _marketParticipantDbContext.UserRoleAssignments
+                        on new { UserId = u.Id, ActorId = actorId.Value } equals new { a.UserId, a.ActorId }
+                    select u;
         }
 
         return query.OrderBy(x => x.Email).Distinct();
