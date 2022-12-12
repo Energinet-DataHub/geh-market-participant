@@ -13,13 +13,8 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class UserRoleAssignmentEntity
-    {
-        public Guid UserId { get; set; }
-        public Guid ActorId { get; set; }
-        public Guid UserRoleTemplateId { get; set; }
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+
+public sealed record UpdateUserRoleAssignmentsCommand(Guid UserId, UpdateUserRoleAssignmentsDto RoleAssignmentsDto) : IRequest;

@@ -124,11 +124,14 @@ public sealed class UserRepositoryTests
             Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
             EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
+        context.UserRoleTemplates.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+
         await context.Entry(actorEntity).ReloadAsync();
         var roleAssignment = new UserRoleAssignmentEntity()
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplate = userRoleTemplate
+            UserRoleTemplateId = userRoleTemplate.Id
         };
         var userEntity = new UserEntity()
         {

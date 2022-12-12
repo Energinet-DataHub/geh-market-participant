@@ -184,7 +184,7 @@ public sealed class UserOverviewRepositoryTests
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplate = userRoleTemplate
+            UserRoleTemplateId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity

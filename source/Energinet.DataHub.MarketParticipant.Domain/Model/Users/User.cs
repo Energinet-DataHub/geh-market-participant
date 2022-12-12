@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
+
 using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -21,7 +21,7 @@ public class User
     public User(
         UserId id,
         ExternalUserId externalId,
-        IEnumerable<UserRoleAssignment> roleAssignments,
+        ICollection<UserRoleAssignment> roleAssignments,
         EmailAddress email)
     {
         Id = id;
@@ -33,5 +33,5 @@ public class User
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; set; }
     public EmailAddress Email { get; }
-    public IEnumerable<UserRoleAssignment> RoleAssignments { get; }
+    public ICollection<UserRoleAssignment> RoleAssignments { get; }
 }
