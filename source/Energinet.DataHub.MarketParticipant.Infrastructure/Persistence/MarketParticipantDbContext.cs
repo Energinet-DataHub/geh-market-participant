@@ -46,6 +46,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UserEntity> Users { get; private set; } = null!;
     public DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; private set; } = null!;
     public DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; private set; } = null!;
+    public DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
     {
@@ -71,6 +72,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UserRoleTemplateEicFunctionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleTemplateEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleTemplatePermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleAssignmentAuditLogEntryEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }
