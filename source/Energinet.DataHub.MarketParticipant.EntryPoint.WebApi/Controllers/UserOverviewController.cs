@@ -17,46 +17,45 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public sealed class UserOverviewController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]")]
-    public sealed class UserOverviewController : ControllerBase
+    private readonly ILogger<UserOverviewController> _logger;
+    private readonly IMediator _mediator;
+    private readonly IUserContext<FrontendUser> _userContext;
+
+    public UserOverviewController(ILogger<UserOverviewController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
     {
-        private readonly ILogger<UserOverviewController> _logger;
-        private readonly IMediator _mediator;
-        private readonly IUserContext<FrontendUser> _userContext;
+        _logger = logger;
+        _mediator = mediator;
+        _userContext = userContext;
+    }
 
-        public UserOverviewController(ILogger<UserOverviewController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
-        {
-            _logger = logger;
-            _mediator = mediator;
-            _userContext = userContext;
-        }
+    [HttpGet("users")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var actorId = !_userContext.CurrentUser.IsFas
+                    ? _userContext.CurrentUser.ActorId
+                    : (Guid?)null;
 
-        [HttpGet("users")]
-        [AuthorizeUser(Permission.UsersManage)]
-        public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize)
-        {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var actorId = !_userContext.CurrentUser.IsFas
-                        ? _userContext.CurrentUser.ActorId
-                        : (Guid?)null;
-
-                    var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId);
-                    var response = await _mediator.Send(command).ConfigureAwait(false);
-                    return Ok(response.Users);
-                },
-                _logger).ConfigureAwait(false);
-        }
+                var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId);
+                var response = await _mediator.Send(command).ConfigureAwait(false);
+                return Ok(response.Users);
+            },
+            _logger).ConfigureAwait(false);
     }
 }

@@ -18,10 +18,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Slim;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 
 public sealed class UserRepository : IUserRepository
 {

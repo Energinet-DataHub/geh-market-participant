@@ -15,9 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Query;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 
 /// <summary>
 /// Repository for specialized fast read-only access to actors.

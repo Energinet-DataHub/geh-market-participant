@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
-{
-    public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+
+public sealed record GetSelectionActorsQueryCommand(Guid UserId) : IRequest<GetSelectionActorsQueryResponse>;

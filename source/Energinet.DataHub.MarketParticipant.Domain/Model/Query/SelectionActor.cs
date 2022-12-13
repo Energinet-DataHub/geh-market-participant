@@ -14,6 +14,6 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
 
 public sealed record SelectionActor(Guid Id, string Gln, string Name);

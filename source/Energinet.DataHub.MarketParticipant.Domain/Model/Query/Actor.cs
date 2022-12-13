@@ -12,10 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
-{
-    public sealed record GetSelectionActorsQueryResponse(IEnumerable<SelectionActorDto> Actors);
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+
+public sealed record Actor(OrganizationId OrganizationId, Guid ActorId, ActorStatus Status);
