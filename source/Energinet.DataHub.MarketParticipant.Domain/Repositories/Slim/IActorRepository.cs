@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 
@@ -29,4 +30,11 @@ public interface IActorRepository
     /// <param name="actorId">The id of the actor.</param>
     /// <returns>An actor for the specified id; or null if not found.</returns>
     Task<Actor?> GetActorAsync(Guid actorId);
+
+    /// <summary>
+    /// Gets actors used for actor selection.
+    /// </summary>
+    /// <param name="actorIds">The list of actor ids.</param>
+    /// <returns>A list of actors.</returns>
+    Task<IEnumerable<SelectionActor>> GetSelectionActorsAsync(IEnumerable<Guid> actorIds);
 }

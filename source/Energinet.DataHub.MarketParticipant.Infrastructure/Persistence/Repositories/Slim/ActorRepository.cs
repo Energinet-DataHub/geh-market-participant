@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using Microsoft.EntityFrameworkCore;
 using Actor = Energinet.DataHub.MarketParticipant.Domain.Model.Slim.Actor;
@@ -44,5 +47,18 @@ public sealed class ActorRepository : IActorRepository
             new OrganizationId(foundActor.OrganizationId),
             foundActor.Id,
             (ActorStatus)foundActor.Status);
+    }
+
+    public async Task<IEnumerable<SelectionActor>> GetSelectionActorsAsync(IEnumerable<Guid> actorIds)
+    {
+        var ids = actorIds.Distinct().ToList();
+
+        var actors = await _marketParticipantDbContext
+            .Actors
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return actors.Select(x => new SelectionActor(x.Id, x.ActorNumber, x.Name));
     }
 }
