@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -57,6 +58,10 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+
+        await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
         var command = new GetUserOverviewCommand(1, 100, actorId);
 
