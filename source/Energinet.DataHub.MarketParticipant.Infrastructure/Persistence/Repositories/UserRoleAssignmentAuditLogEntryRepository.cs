@@ -14,10 +14,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -35,9 +37,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return InsertAuditLogAsync(logEntry);
         }
 
-        public Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId)
+        public async Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId, Guid actorId)
         {
-            throw new NotImplementedException();
+            var userRoleAssignmentLogs = _context.UserRoleAssignmentAuditLogEntries
+                .Where(e => e.UserId == userId.Value && e.ActorId == actorId)
+                .Select(log => new UserRoleAssignmentAuditLogEntry(
+                    new UserId(log.UserId),
+                    log.ActorId,
+                    new UserRoleTemplateId(log.UserRoleTemplateId),
+                    new UserId(log.ChangedByUserId),
+                    log.Timestamp,
+                    (UserRoleAssignmentTypeAuditLog)log.AssignmentType));
+
+            return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
         }
 
         private async Task InsertAuditLogAsync(UserRoleAssignmentAuditLogEntry logEntry)

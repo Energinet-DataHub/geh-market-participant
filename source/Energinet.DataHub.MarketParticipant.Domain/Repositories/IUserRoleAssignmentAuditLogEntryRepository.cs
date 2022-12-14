@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -33,7 +34,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// Retrieves all log entries for a given user
         /// </summary>
         /// <param name="userId"></param>
+        /// <param name="actorId"></param>
         /// <returns>UserAssignment log entries for the given user</returns>
-        Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId);
+        Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId, Guid actorId);
     }
 }

@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using FluentAssertions;
 using MediatR;
 using Xunit;
 using Xunit.Categories;
@@ -46,20 +47,12 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
-
-        var templateId = await _fixture
-            .DatabaseManager
-            .CreateRoleTemplateAsync();
-
-        var updateDto = new UpdateUserRoleAssignmentsDto(
-            actorId,
-            new List<UserRoleTemplateId> { templateId });
+        var (actorId, userId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var templateId = await _fixture.DatabaseManager.CreateRoleTemplateAsync();
+        var updateDto = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId });
 
         var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
-        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
+        var getCommand = new GetUserRoleTemplatesCommand(updateCommand.RoleAssignmentsDto.ActorId, updateCommand.UserId);
 
         // Act
         await mediator.Send(updateCommand);
@@ -152,5 +145,67 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         Assert.Contains(response.Templates, x => x.Id == roleTemplateId);
         Assert.Contains(response.Templates, x => x.Id == templateId.Value);
         Assert.Contains(response2.Templates, x => x.Id == roleTemplate2Id);
+    }
+
+    [Fact]
+    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_TwoAuditLogsAdded()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.GetInstance<IMediator>();
+
+        var (actorId, userId) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var updateDto = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId1, templateId2 });
+
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
+        var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand.UserId, updateCommand.RoleAssignmentsDto.ActorId);
+
+        // Act
+        await mediator.Send(updateCommand);
+        var response = await mediator.Send(getCommand);
+
+        // Assert
+        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        responseLogs.Should().HaveCount(2);
+        responseLogs.TrueForAll(e => e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_ThreeAuditLogsAdded_OneRemoved()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.GetInstance<IMediator>();
+
+        var (actorId, userId) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var updateDto1 = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId1, templateId2 });
+
+        var templateId3 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var updateDto2 = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId2, templateId3 });
+
+        var updateCommand1 = new UpdateUserRoleAssignmentsCommand(userId, updateDto1);
+        var updateCommand2 = new UpdateUserRoleAssignmentsCommand(userId, updateDto2);
+        var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand1.UserId, updateCommand2.RoleAssignmentsDto.ActorId);
+
+        // Act
+        await mediator.Send(updateCommand1);
+        await mediator.Send(updateCommand2);
+
+        var response = await mediator.Send(getCommand);
+
+        // Assert
+        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        responseLogs.Should().HaveCount(4);
+
+        var addedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Added);
+        var removedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed);
+        addedLogs.Should().HaveCount(3);
+        removedLogs.Should().HaveCount(1);
     }
 }
