@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 UserId = logEntry.UserId.Value,
                 ActorId = logEntry.ActorId,
                 UserRoleTemplateId = logEntry.UserRoleTemplateId.Value,
-                Timestamp = logEntry.ChangedTimeOffset,
+                Timestamp = logEntry.Timestamp,
                 ChangedByUserId = logEntry.ChangedByUserId.Value,
                 AssignmentType = (int)logEntry.AssignmentType
             };
