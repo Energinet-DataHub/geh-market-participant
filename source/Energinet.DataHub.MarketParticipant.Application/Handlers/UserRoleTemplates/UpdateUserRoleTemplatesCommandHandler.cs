@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,24 +22,20 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoleTemplates;
 
-public sealed class GetUserRoleTemplatesCommandHandler
-    : IRequestHandler<GetUserRoleTemplatesCommand, GetUserRoleTemplatesResponse>
+public sealed class UpdateUserRoleTemplatesCommandHandler
+    : IRequestHandler<UpdateUserRoleAssignmentsCommand>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IUserRoleTemplateRepository _userRoleTemplateRepository;
 
-    public GetUserRoleTemplatesCommandHandler(
-        IUserRepository userRepository,
-        IUserRoleTemplateRepository userRoleTemplateRepository)
+    public UpdateUserRoleTemplatesCommandHandler(IUserRepository userRepository)
     {
         _userRepository = userRepository;
-        _userRoleTemplateRepository = userRoleTemplateRepository;
     }
 
-    public async Task<GetUserRoleTemplatesResponse> Handle(
-        GetUserRoleTemplatesCommand request,
+    public async Task<Unit> Handle(
+        UpdateUserRoleAssignmentsCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -54,27 +49,26 @@ public sealed class GetUserRoleTemplatesCommandHandler
             throw new NotFoundValidationException(request.UserId);
         }
 
-        var assignments = user
-            .RoleAssignments
-            .Where(a => a.ActorId == request.ActorId)
-            .Select(x => x.TemplateId)
-            .Distinct();
+        ClearUserRolesForActorBeforeUpdate(request, user);
 
-        var templates = new List<UserRoleTemplateDto>();
-
-        foreach (var assignment in assignments)
+        foreach (var userRoleTemplateId in request.RoleAssignmentsDto.UserRoleTemplateAssignments)
         {
-            var template = await _userRoleTemplateRepository
-                .GetAsync(assignment)
-                .ConfigureAwait(false);
-
-            if (template != null)
-            {
-                var userRoleTemplate = new UserRoleTemplateDto(template.Id.Value, template.Name);
-                templates.Add(userRoleTemplate);
-            }
+            user.RoleAssignments.Add(new UserRoleAssignment(
+                user.Id,
+                request.RoleAssignmentsDto.ActorId,
+                userRoleTemplateId));
         }
 
-        return new GetUserRoleTemplatesResponse(templates);
+        await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+
+        return Unit.Value;
+    }
+
+    private static void ClearUserRolesForActorBeforeUpdate(UpdateUserRoleAssignmentsCommand request, Domain.Model.Users.User user)
+    {
+        foreach (var userRoleAssignment in user.RoleAssignments.Where(e => e.ActorId == request.RoleAssignmentsDto.ActorId).ToList())
+        {
+            user.RoleAssignments.Remove(userRoleAssignment);
+        }
     }
 }

@@ -13,9 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -106,15 +109,65 @@ internal static class DbTestHelper
         return (actorEntity.Id, userEntity.Id);
     }
 
-    public static async Task AddUserPermissionsAsync(
-        this MarketParticipantDatabaseManager manager,
-        Guid actorId,
-        Guid userId,
-        Permission[] permissions)
+    public static async Task<(Guid Actor1Id, Guid Actor2Id, Guid UserId)> CreateUserWithTwoActorsAsync(
+        this MarketParticipantDatabaseManager manager)
     {
         await using var context = manager.CreateDbContext();
 
-        var userRoleTemplate = new UserRoleTemplateEntity();
+        var actorEntity = new ActorEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = string.Empty,
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+        var actor2Entity = new ActorEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = string.Empty,
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active
+        };
+
+        var organizationEntity = new OrganizationEntity
+        {
+            Id = Guid.NewGuid(),
+            Actors = { actorEntity, actor2Entity },
+            Address = new AddressEntity
+            {
+                Country = "Denmark"
+            },
+            Name = string.Empty,
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
+        };
+
+        await context.Organizations.AddAsync(organizationEntity);
+        await context.SaveChangesAsync();
+
+        var userEntity = new UserEntity
+        {
+            Id = Guid.NewGuid(),
+            ExternalId = Guid.NewGuid(),
+            Email = "test@test.test",
+        };
+
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        return (actorEntity.Id, actor2Entity.Id, userEntity.Id);
+    }
+
+    public static Task<UserRoleTemplateId> CreateRoleTemplateAsync(this MarketParticipantDatabaseManager manager)
+    {
+        return CreateRoleTemplateAsync(manager, new Permission[] { Permission.OrganizationView });
+    }
+
+    public static async Task<UserRoleTemplateId> CreateRoleTemplateAsync(
+        this MarketParticipantDatabaseManager manager,
+        Permission[] permissions)
+    {
+        await using var context = manager.CreateDbContext();
+        var userRoleTemplate = new UserRoleTemplateEntity { Name = "fake_value" };
 
         foreach (var permission in permissions)
         {
@@ -132,10 +185,44 @@ internal static class DbTestHelper
             });
         }
 
+        context.UserRoleTemplates.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+        return new UserRoleTemplateId(userRoleTemplate.Id);
+    }
+
+    public static async Task<Guid> AddUserPermissionsAsync(
+        this MarketParticipantDatabaseManager manager,
+        Guid actorId,
+        Guid userId,
+        Permission[] permissions)
+    {
+        await using var context = manager.CreateDbContext();
+
+        var userRoleTemplate = new UserRoleTemplateEntity { Name = "fake_value" };
+
+        foreach (var permission in permissions)
+        {
+            userRoleTemplate.Permissions.Add(new UserRoleTemplatePermissionEntity
+            {
+                Permission = permission
+            });
+        }
+
+        foreach (var eicFunction in new[] { EicFunction.BillingAgent })
+        {
+            userRoleTemplate.EicFunctions.Add(new UserRoleTemplateEicFunctionEntity
+            {
+                EicFunction = eicFunction
+            });
+        }
+
+        context.UserRoleTemplates.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorId,
-            UserRoleTemplate = userRoleTemplate
+            UserRoleTemplateId = userRoleTemplate.Id
         };
 
         var userEntity = await context.Users.FindAsync(userId);
@@ -143,6 +230,8 @@ internal static class DbTestHelper
 
         context.Users.Update(userEntity);
         await context.SaveChangesAsync();
+
+        return userRoleTemplate.Id;
     }
 
     public static async Task<(Guid ExternalUserId, Guid ActorId)> CreateUserAsync(
@@ -195,10 +284,13 @@ internal static class DbTestHelper
             });
         }
 
+        context.UserRoleTemplates.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplate = userRoleTemplate
+            UserRoleTemplateId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity

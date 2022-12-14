@@ -13,13 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed class UserRoleAssignmentEntity
-    {
-        public Guid UserId { get; set; }
-        public Guid ActorId { get; set; }
-        public Guid UserRoleTemplateId { get; set; }
-    }
+    public record UpdateUserRoleAssignmentsDto(Guid ActorId, IEnumerable<UserRoleTemplateIdDto> UserRoleTemplateAssignments);
 }

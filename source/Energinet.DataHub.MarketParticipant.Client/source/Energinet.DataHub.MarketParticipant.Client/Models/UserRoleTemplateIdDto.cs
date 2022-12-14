@@ -14,12 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed class UserRoleAssignmentEntity
-    {
-        public Guid UserId { get; set; }
-        public Guid ActorId { get; set; }
-        public Guid UserRoleTemplateId { get; set; }
-    }
+    public sealed record UserRoleTemplateIdDto(Guid Id);
 }
