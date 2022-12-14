@@ -35,10 +35,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class UserOverviewRepositoryTests
+public sealed class UserOverviewRepositoryTests : IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
-
+    private List<(Guid UserId, Guid ExternalUserId, Guid ActorId)> _searchUsers;
+    private UserOverviewRepository _sut;
     public UserOverviewRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
@@ -283,6 +284,16 @@ public sealed class UserOverviewRepositoryTests
         Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
     }
 
+    public async Task InitializeAsync()
+    {
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await CreateSearchTestDataAsync(context);
+    }
+
+    public Task DisposeAsync() { return Task.CompletedTask; }
+
     private static Mock<IUserIdentityRepository> CreateUserIdentityRepository()
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
@@ -404,5 +415,17 @@ public sealed class UserOverviewRepositoryTests
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
         return userEntity;
+    }
+
+    private async Task CreateSearchTestDataAsync(MarketParticipantDbContext context)
+    {
+        _searchUsers.Add(await CreateUserWithActorName(context, false, "Axolotl"));
+        _searchUsers.Add(await CreateUserWithActorName(context, false, "Bahamut"));
+        _searchUsers.Add(await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent));
+        _searchUsers.Add(await CreateUserWithEicFunction(context, false, EicFunction.TransmissionCapacityAllocator));
+
+        _sut = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>(_searchUsers.Select(x => x.ExternalUserId).ToList())).Object);
     }
 }
