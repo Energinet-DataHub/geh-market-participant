@@ -14,6 +14,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -42,9 +43,13 @@ public sealed class GetSelectionActorsQueryHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, _, externalUseId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
 
-        var command = new GetSelectionActorsQueryCommand(externalUseId);
+        var roleTemplateId = await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+
+        var command = new GetSelectionActorsQueryCommand(externalUserId);
 
         // act
         var actual = await mediator.Send(command);
