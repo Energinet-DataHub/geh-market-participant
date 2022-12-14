@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -159,7 +157,7 @@ internal static class DbTestHelper
 
     public static Task<UserRoleTemplateId> CreateRoleTemplateAsync(this MarketParticipantDatabaseManager manager)
     {
-        return CreateRoleTemplateAsync(manager, new Permission[] { Permission.OrganizationView });
+        return CreateRoleTemplateAsync(manager, new[] { Permission.OrganizationView });
     }
 
     public static async Task<UserRoleTemplateId> CreateRoleTemplateAsync(
