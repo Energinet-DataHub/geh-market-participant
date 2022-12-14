@@ -25,6 +25,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserIdentityRepository
 {
     /// <summary>
+    /// Searches for users using a search text
+    /// </summary>
+    /// <param name="searchText">The text to search for</param>
+    /// <param name="onlyActive">Include only active users</param>
+    /// <returns>A List of users matching the search text</returns>
+    /// <remarks>Currently searches Name, Phone and Email</remarks>
+    Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? onlyActive);
+
+    /// <summary>
     /// Retrieves user identities for the provided set of external ids.
     /// </summary>
     /// <param name="externalIds"></param>

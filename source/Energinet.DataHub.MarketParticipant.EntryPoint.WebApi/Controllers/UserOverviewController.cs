@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         ? _userContext.CurrentUser.ActorId
                         : (Guid?)null;
 
-                    var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId);
+                    var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId, null);
                     var response = await _mediator.Send(command).ConfigureAwait(false);
                     return Ok(response.Users);
                 },

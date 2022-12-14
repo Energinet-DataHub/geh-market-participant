@@ -14,9 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,6 +28,8 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
 using Xunit;
 using Xunit.Categories;
+using Permission = Energinet.DataHub.Core.App.Common.Security.Permission;
+using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
@@ -98,13 +100,187 @@ public sealed class UserOverviewRepositoryTests
         // Act
         var pageCount = await target.GetUsersPageCountAsync(7, actorId);
         var actual = new List<UserOverviewItem>();
-        for (var i = 0; i < pageCount; ++i)
-        {
-            actual.AddRange(await target.GetUsersAsync(i + 1, 7, actorId));
-        }
+        for (var i = 0; i < pageCount; ++i) actual.AddRange(await target.GetUsersAsync(i + 1, 7, actorId));
 
         // Assert
         Assert.Equal(userIds.Select(x => x.UserId).OrderBy(x => x), actual.Select(x => x.Id.Value).OrderBy(x => x));
+    }
+
+    [Fact]
+    public async Task SearchUsers_ActorIdProvidedAndNoOtherSearchParameters_ReturnsOnlyUsersUnderActor()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, actorId) = await CreateUserAndActor(context, false);
+        var (otherUserId, otherExternalId, _) = await CreateUserAndActor(context, false);
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(1, 1000, actorId, null, null, null)).ToList();
+
+        // Assert
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+    }
+
+    [Fact]
+    public async Task SearchUsers_EicFunctionParam_ReturnsOnlyUsersWithEicFunction()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
+        var (otherUserId, otherExternalId, _) =
+            await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                null,
+                null,
+                null,
+                new Collection<EicFunction>() { EicFunction.BillingAgent }))
+            .ToList();
+
+        // Assert
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+    }
+
+    [Fact]
+    public async Task SearchUsers_EicFunctionParamWithWrongActor_ReturnsNone()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
+        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                otherActorId,
+                null,
+                null,
+                new Collection<EicFunction>() { EicFunction.BillingAgent }))
+            .ToList();
+
+        // Assert
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+    }
+
+    [Fact]
+    public async Task SearchUsers_EicFunctionParam_ReturnsMultipleUsersWithEicFunction()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
+        var (user2Id, external2Id, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
+        var (otherUserId, otherExternalId, _) =
+            await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId, external2Id }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                null,
+                null,
+                null,
+                new Collection<EicFunction>() { EicFunction.BillingAgent }))
+            .ToList();
+
+        // Assert
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == user2Id));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+    }
+
+    [Fact]
+    public async Task SearchUsers_ActorNameParam_ReturnsOnlyUsersWithName()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (otherUserId, otherExternalId, _) = await CreateUserWithActorName(context, false, "Bahamut");
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                null,
+                "Axolotl",
+                null,
+                null))
+            .ToList();
+
+        // Assert
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+    }
+
+    [Fact]
+    public async Task SearchUsers_ActorNameParamWithWrongActor_ReturnsNone()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithActorName(context, false, "Bahamut");
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                otherActorId,
+                "Axolotl",
+                null,
+                null))
+            .ToList();
+
+        // Assert
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
     }
 
     private static Mock<IUserIdentityRepository> CreateUserIdentityRepository()
@@ -119,7 +295,20 @@ public sealed class UserOverviewRepositoryTests
         return userIdentityRepository;
     }
 
-    private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
+    private static Mock<IUserIdentityRepository> CreateUserIdentityRepositoryForSearch(Collection<Guid> userIdsToReturn)
+    {
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), It.IsAny<bool?>()))
+            .Returns<string?, bool?>((searchText, onlyActive) =>
+                Task.FromResult(
+                    userIdsToReturn.Select(y =>
+                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+        return userIdentityRepository;
+    }
+
+    private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)>
+        CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
 
@@ -134,20 +323,40 @@ public sealed class UserOverviewRepositoryTests
         return (actorEntity.Id, users);
     }
 
-    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserAndActor(MarketParticipantDbContext context, bool isFas)
+    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserAndActor(
+        MarketParticipantDbContext context, bool isFas)
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
         var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
-
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
-    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleTemplateEntity Template)> CreateActorAndTemplate(MarketParticipantDbContext context, bool isFas)
+    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithEicFunction(
+        MarketParticipantDbContext context, bool isFas, EicFunction eicFunction)
+    {
+        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, eicFunction: eicFunction);
+        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+        return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
+    }
+
+    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithActorName(
+        MarketParticipantDbContext context, bool isFas, string actorName)
+    {
+        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, actorName);
+        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+        return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
+    }
+
+    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleTemplateEntity Template)> CreateActorAndTemplate(
+            MarketParticipantDbContext context,
+            bool isFas,
+            string actorName = "Actor name",
+            EicFunction eicFunction = EicFunction.TransmissionCapacityAllocator)
     {
         var actorEntity = new ActorEntity
         {
             Id = Guid.NewGuid(),
-            Name = "Actor name",
+            Name = actorName,
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active,
             IsFas = isFas
@@ -156,10 +365,7 @@ public sealed class UserOverviewRepositoryTests
         var orgEntity = new OrganizationEntity
         {
             Actors = { actorEntity },
-            Address = new AddressEntity
-            {
-                Country = "DK",
-            },
+            Address = new AddressEntity { Country = "DK" },
             Name = "Organization name",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
@@ -171,27 +377,28 @@ public sealed class UserOverviewRepositoryTests
         {
             Name = "Template name",
             Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.TransmissionCapacityAllocator } }
+            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = eicFunction } }
         };
-
+        await context.UserRoleTemplates.AddAsync(userRoleTemplate);
+        await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         return (orgEntity, actorEntity, userRoleTemplate);
     }
 
-    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleTemplateEntity userRoleTemplate)
+    private static async Task<UserEntity> CreateUserAsync(
+        MarketParticipantDbContext context,
+        ActorEntity actorEntity,
+        UserRoleTemplateEntity userRoleTemplate)
     {
         var roleAssignment = new UserRoleAssignmentEntity
         {
-            ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            ActorId = actorEntity.Id, UserRoleTemplateId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity
         {
-            ExternalId = Guid.NewGuid(),
-            Email = "test@example.com",
-            RoleAssignments = { roleAssignment }
+            ExternalId = Guid.NewGuid(), Email = "test@example.com", RoleAssignments = { roleAssignment }
         };
 
         await context.Users.AddAsync(userEntity);

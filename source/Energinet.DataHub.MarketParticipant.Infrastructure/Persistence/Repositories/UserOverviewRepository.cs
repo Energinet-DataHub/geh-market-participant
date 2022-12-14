@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -22,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -40,28 +42,19 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
     {
-        var query = BuildUsersQuery(actorId);
+        var query = BuildUsersQuery(actorId, null, string.Empty);
         return query.CountAsync();
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
-        var query = BuildUsersQuery(actorId);
-
-        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
+        var query = BuildUsersQuery(actorId, null, null);
         var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
-            .Select(x => new
-                {
-                    x.Id,
-                    x.ExternalId,
-                    x.Email
-                })
             .ToDictionary(x => x.ExternalId);
 
         var userIdentities = await _userIdentityRepository.GetUserIdentitiesAsync(userLookup.Keys).ConfigureAwait(false);
 
-        return userIdentities.Select(userIdentity =>
+        return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id];
             return new UserOverviewItem(
@@ -74,18 +67,46 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         });
     }
 
-    private IQueryable<UserEntity> BuildUsersQuery(Guid? actorId)
+    public async Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
+        int pageNumber,
+        int pageSize,
+        Guid? actorId,
+        string? searchText,
+        bool? onlyActive,
+        Collection<EicFunction>? eicFunctions)
     {
-        var query = from user in _marketParticipantDbContext.Users
-                    select user;
+        var query = BuildUsersQuery(actorId, eicFunctions, searchText);
+        var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
+            .ToDictionary(x => x.ExternalId);
+        var userIdentities = await _userIdentityRepository.SearchUserIdentitiesAsync(searchText, onlyActive).ConfigureAwait(false);
 
-        if (actorId != null)
+        // Filter User Identities to only be from our user pool
+        return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
         {
-            query = from u in query
-                    join a in _marketParticipantDbContext.UserRoleAssignments
-                        on new { UserId = u.Id, ActorId = actorId.Value } equals new { a.UserId, a.ActorId }
-                    select u;
-        }
+            var user = userLookup[userIdentity.Id];
+            return new UserOverviewItem(
+                new UserId(user.Id),
+                new EmailAddress(userIdentity.Email ?? user.Email),
+                userIdentity.Name,
+                userIdentity.PhoneNumber,
+                userIdentity.CreatedDate,
+                userIdentity.Enabled);
+        });
+    }
+
+    private IQueryable<UserEntity> BuildUsersQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
+    {
+        var query = from u in _marketParticipantDbContext.Users
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
+            from urr in urj.DefaultIfEmpty()
+            join ur in _marketParticipantDbContext.UserRoleTemplates on urr.UserRoleTemplateId equals ur.Id into urt
+            from urtj in urt.DefaultIfEmpty()
+            join actor in _marketParticipantDbContext.Actors on urr.ActorId equals actor.Id
+            where
+                (actorId == null || urr.ActorId == actorId)
+                && (eicFunctions == null || !eicFunctions.Any() || urtj.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
+                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || urtj.Name.Contains(searchText))
+            select u;
 
         return query.OrderBy(x => x.Email).Distinct();
     }

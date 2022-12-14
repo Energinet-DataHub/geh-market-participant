@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Graph;
+using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -30,11 +31,61 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         _graphClient = graphClient;
     }
 
-    public async Task<IEnumerable<Domain.Model.UserIdentity>> GetUserIdentitiesAsync(IEnumerable<Guid> externalIds)
+    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? onlyActive)
+    {
+        var result = new List<UserIdentity>();
+        var queryOptions = new List<Option>()
+        {
+            new HeaderOption("ConsistencyLevel", "eventual"),
+            new QueryOption("$count", "true"),
+        };
+
+        var users = await _graphClient.Users
+            .Request(queryOptions)
+            .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            // TODO: Add MobilePhone once we are switched to Azure AD, since currently we are running on Azure B2C where it is Is not supported.
+            users = await _graphClient.Users
+                .Request(queryOptions)
+                .Filter($"startswith(displayName, '{searchText}') OR startswith(mail, '{searchText}')")
+                .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+                .GetAsync()
+                .ConfigureAwait(false);
+        }
+
+        var pageIterator = PageIterator<User>
+            .CreatePageIterator(
+                _graphClient,
+                users,
+                (user) =>
+                {
+                    result.Add(new UserIdentity(
+                        new Guid(user.Id),
+                        user.DisplayName,
+                        user.Mail,
+                        user.MobilePhone,
+                        user.CreatedDateTime!.Value,
+                        user.AccountEnabled == true));
+
+                    return true;
+                });
+
+        while (pageIterator.State != PagingState.Complete)
+        {
+            await pageIterator.IterateAsync().ConfigureAwait(false);
+        }
+
+        return result;
+    }
+
+    public async Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<Guid> externalIds)
     {
         var ids = externalIds.Distinct();
-        var result = new List<Domain.Model.UserIdentity>();
-
+        var result = new List<UserIdentity>();
         foreach (var segment in ids.Chunk(15))
         {
             var users = await _graphClient.Users
