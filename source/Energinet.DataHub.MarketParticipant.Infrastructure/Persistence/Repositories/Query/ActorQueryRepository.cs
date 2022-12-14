@@ -23,11 +23,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 
-public sealed class ActorRepository : IActorRepository
+public sealed class ActorQueryRepository : IActorQueryRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public ActorRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public ActorQueryRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
     }

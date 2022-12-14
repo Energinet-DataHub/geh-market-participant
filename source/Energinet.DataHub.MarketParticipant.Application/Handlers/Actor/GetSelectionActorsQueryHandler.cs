@@ -21,37 +21,36 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
+
+public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectionActorsQueryCommand, GetSelectionActorsQueryResponse>
 {
-    public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectionActorsQueryCommand, GetSelectionActorsQueryResponse>
+    private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IActorQueryRepository _actorQueryRepository;
+
+    public GetSelectionActorsQueryHandler(
+        IUserQueryRepository userQueryRepository,
+        IActorQueryRepository actorQueryRepository)
     {
-        private readonly IUserRepository _userRepository;
-        private readonly IActorRepository _actorRepository;
+        _userQueryRepository = userQueryRepository;
+        _actorQueryRepository = actorQueryRepository;
+    }
 
-        public GetSelectionActorsQueryHandler(
-            IUserRepository userRepository,
-            IActorRepository actorRepository)
-        {
-            _userRepository = userRepository;
-            _actorRepository = actorRepository;
-        }
+    public async Task<GetSelectionActorsQueryResponse> Handle(
+        GetSelectionActorsQueryCommand request,
+        CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        public async Task<GetSelectionActorsQueryResponse> Handle(
-            GetSelectionActorsQueryCommand request,
-            CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var actorIds = await _userQueryRepository
+            .GetActorsAsync(new ExternalUserId(request.UserId))
+            .ConfigureAwait(false);
 
-            var actorIds = await _userRepository
-                .GetActorsAsync(new ExternalUserId(request.UserId))
-                .ConfigureAwait(false);
+        var actors = await _actorQueryRepository
+            .GetSelectionActorsAsync(actorIds)
+            .ConfigureAwait(false);
 
-            var actors = await _actorRepository
-                .GetSelectionActorsAsync(actorIds)
-                .ConfigureAwait(false);
-
-            return new GetSelectionActorsQueryResponse(
-                actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.Name)));
-        }
+        return new GetSelectionActorsQueryResponse(
+            actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.Name)));
     }
 }

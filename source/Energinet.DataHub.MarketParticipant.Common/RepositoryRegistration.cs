@@ -32,10 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IGridAreaOverviewRepository, GridAreaOverviewRepository>(Lifestyle.Scoped);
             container.Register<IUserOverviewRepository, UserOverviewRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<Domain.Repositories.IUserRepository, UserRepository>(Lifestyle.Scoped);
+            container.Register<IUserRepository, UserRepository>(Lifestyle.Scoped);
             container.Register<IUserRoleTemplateRepository, UserRoleTemplateRepository>(Lifestyle.Scoped);
-            container.Register<IActorRepository, Infrastructure.Persistence.Repositories.Query.ActorRepository>(Lifestyle.Scoped);
-            container.Register<Domain.Repositories.Query.IUserRepository, Infrastructure.Persistence.Repositories.Query.UserRepository>(Lifestyle.Scoped);
+            container.Register<IActorQueryRepository, Infrastructure.Persistence.Repositories.Query.ActorQueryRepository>(Lifestyle.Scoped);
+            container.Register<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>(Lifestyle.Scoped);
             container.Register<IUserIdentityRepository, UserIdentityRepository>(Lifestyle.Scoped);
         }
     }

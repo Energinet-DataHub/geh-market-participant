@@ -29,11 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories.Quer
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class UserRepositoryTests
+public sealed class UserQueryRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public UserRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public UserQueryRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -45,7 +45,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
 
@@ -65,7 +65,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var userEntity = new UserEntity
@@ -93,7 +93,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
@@ -165,7 +165,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         // Act
         var perms = await userRepository
@@ -182,7 +182,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var userEntity = new UserEntity { ExternalId = userExternalId, Email = "fake@mail.com" };
@@ -204,7 +204,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
@@ -272,7 +272,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
@@ -341,7 +341,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
@@ -420,7 +420,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
@@ -523,7 +523,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()
@@ -612,7 +612,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userRepository = new UserQueryRepository(context);
 
         var userExternalId = Guid.NewGuid();
         var actorEntity = new ActorEntity()

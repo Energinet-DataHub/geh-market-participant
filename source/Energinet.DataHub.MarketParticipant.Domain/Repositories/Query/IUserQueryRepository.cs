@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 /// <summary>
 /// Repository for specialized fast read-only access to users.
 /// </summary>
-public interface IUserRepository
+public interface IUserQueryRepository
 {
     /// <summary>
     /// Gets all actors that are attached to the specified user through permissions.

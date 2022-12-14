@@ -25,11 +25,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 public sealed class GetUserPermissionsCommandHandler
     : IRequestHandler<GetUserPermissionsCommand, GetUserPermissionsResponse>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserQueryRepository _userQueryRepository;
 
-    public GetUserPermissionsCommandHandler(IUserRepository userRepository)
+    public GetUserPermissionsCommandHandler(IUserQueryRepository userQueryRepository)
     {
-        _userRepository = userRepository;
+        _userQueryRepository = userQueryRepository;
     }
 
     public async Task<GetUserPermissionsResponse> Handle(
@@ -38,13 +38,13 @@ public sealed class GetUserPermissionsCommandHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var permissions = await _userRepository
+        var permissions = await _userQueryRepository
             .GetPermissionsAsync(
                 request.ActorId,
                 new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
-        var isFas = await _userRepository
+        var isFas = await _userQueryRepository
             .IsFasAsync(
                 request.ActorId,
                 new ExternalUserId(request.ExternalUserId))
