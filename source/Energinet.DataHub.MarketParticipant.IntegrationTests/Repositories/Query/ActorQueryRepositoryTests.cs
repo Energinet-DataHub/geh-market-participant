@@ -59,16 +59,17 @@ public sealed class ActorQueryRepositoryTests
                 Country = "DK"
             },
         };
-
-        organization.Actors.Add(
-            new ActorEntity
-            {
-                Id = actorId,
-                ActorNumber = new MockedGln().ToString(),
-                Name = Guid.NewGuid().ToString()
-            });
-
         context.Add(organization);
+
+        var actor = new ActorEntity
+        {
+            Id = actorId,
+            ActorNumber = new MockedGln().ToString(),
+            Name = Guid.NewGuid().ToString(),
+            OrganizationId = organization.Id,
+        };
+        context.Add(actor);
+
         await context.SaveChangesAsync();
 
         // act
