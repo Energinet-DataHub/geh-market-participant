@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -44,33 +42,9 @@ public sealed class ActorQueryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var actorId = await _fixture.DatabaseManager.CreateActorAsync(new[] { EicFunction.Agent });
+
         var target = new ActorQueryRepository(context);
-
-        var actorId = Guid.NewGuid();
-
-        var organization = new OrganizationEntity
-        {
-            Id = Guid.NewGuid(),
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().ToString(),
-            Name = Guid.NewGuid().ToString(),
-            Status = (int)OrganizationStatus.Active,
-            Address = new AddressEntity
-            {
-                Country = "DK"
-            },
-        };
-        context.Add(organization);
-
-        var actor = new ActorEntity
-        {
-            Id = actorId,
-            ActorNumber = new MockedGln().ToString(),
-            Name = Guid.NewGuid().ToString(),
-            OrganizationId = organization.Id,
-        };
-        context.Add(actor);
-
-        await context.SaveChangesAsync();
 
         // act
         var actual = (await target.GetSelectionActorsAsync(new[] { actorId })).ToList();
