@@ -66,7 +66,7 @@ internal static class DbTestHelper
         return actorEntity.Id;
     }
 
-    public static async Task<(Guid ActorId, Guid UserId)> CreateUserAsync(
+    public static async Task<(Guid ActorId, Guid UserId, Guid ExternalUserId)> CreateUserAsync(
         this MarketParticipantDatabaseManager manager)
     {
         await using var context = manager.CreateDbContext();
@@ -104,7 +104,7 @@ internal static class DbTestHelper
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
 
-        return (actorEntity.Id, userEntity.Id);
+        return (actorEntity.Id, userEntity.Id, userEntity.ExternalId);
     }
 
     public static async Task<(Guid Actor1Id, Guid Actor2Id, Guid UserId)> CreateUserWithTwoActorsAsync(
