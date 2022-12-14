@@ -50,6 +50,7 @@ public sealed class ActorQueryRepositoryTests
 
         var organization = new OrganizationEntity
         {
+            Id = Guid.NewGuid(),
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().ToString(),
             Name = Guid.NewGuid().ToString(),
             Status = (int)OrganizationStatus.Active,
