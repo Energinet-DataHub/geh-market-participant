@@ -872,6 +872,47 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(3, actualUsers.Count);
     }
 
+    [Fact]
+    public async Task GetSelectionActorsAsync_Returns()
+    {
+        // arrange
+        var id = Guid.Parse("8CC33D1F-2E3D-4752-A231-851A2C0589D9");
+        const string gln = "9326018586901";
+        const string name = "Actor";
+
+        var incomingJson = $@"
+            [
+              {{
+                ""id"": ""{id}"",
+                ""gln"": ""{gln}"",
+                ""name"": ""{name}""
+              }},
+              {{
+                ""id"": ""{id}"",
+                ""gln"": ""{gln}"",
+                ""name"": ""{name}""
+              }},
+              {{
+                ""id"": ""{id}"",
+                ""gln"": ""{gln}"",
+                ""name"": ""{name}""
+              }},
+            ]";
+
+        using var httpTest = new HttpTest();
+        using var clientFactory = new PerBaseUrlFlurlClientFactory();
+
+        var target = CreateMarketParticipantClient(clientFactory);
+        httpTest.RespondWith(incomingJson);
+
+        // act
+        var actual = (await target.GetSelectionActorsAsync().ConfigureAwait(false)).ToList();
+
+        // assert
+        Assert.Equal(3, actual.Count);
+        Assert.All(actual, x => Assert.Equal(x, new SelectionActorDto(id, gln, name)));
+    }
+
     private static MarketParticipantClient CreateMarketParticipantClient(IFlurlClientFactory clientFactory)
     {
         var factory = new MarketParticipantClientTestFactory(

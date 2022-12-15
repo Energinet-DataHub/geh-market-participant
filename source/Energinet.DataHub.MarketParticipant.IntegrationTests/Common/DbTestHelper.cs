@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -68,7 +66,7 @@ internal static class DbTestHelper
         return actorEntity.Id;
     }
 
-    public static async Task<(Guid ActorId, Guid UserId)> CreateUserAsync(
+    public static async Task<(Guid ActorId, Guid UserId, Guid ExternalUserId)> CreateUserAsync(
         this MarketParticipantDatabaseManager manager)
     {
         await using var context = manager.CreateDbContext();
@@ -106,7 +104,7 @@ internal static class DbTestHelper
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
 
-        return (actorEntity.Id, userEntity.Id);
+        return (actorEntity.Id, userEntity.Id, userEntity.ExternalId);
     }
 
     public static async Task<(Guid Actor1Id, Guid Actor2Id, Guid UserId)> CreateUserWithTwoActorsAsync(
@@ -159,7 +157,7 @@ internal static class DbTestHelper
 
     public static Task<UserRoleTemplateId> CreateRoleTemplateAsync(this MarketParticipantDatabaseManager manager)
     {
-        return CreateRoleTemplateAsync(manager, new Permission[] { Permission.OrganizationView });
+        return CreateRoleTemplateAsync(manager, new[] { Permission.OrganizationView });
     }
 
     public static async Task<UserRoleTemplateId> CreateRoleTemplateAsync(

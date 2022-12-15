@@ -45,8 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // act
             var id = await target
-                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), CreateIntegrationEvent()))
-                ;
+                .InsertAsync(new DomainEvent(Guid.NewGuid(), nameof(Organization), CreateIntegrationEvent()));
 
             // assert
             var actual = await FindAsync(target, id);
@@ -86,11 +85,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(actual);
         }
 
-        private static async Task<DomainEvent?> FindAsync(DomainEventRepositoryDecorator reopository, DomainEventId id)
+        private static async Task<DomainEvent?> FindAsync(DomainEventRepositoryDecorator repository, DomainEventId id)
         {
             DomainEvent? actual = null;
 
-            foreach (var e in await reopository.GetOldestUnsentDomainEventsAsync(100))
+            foreach (var e in await repository.GetOldestUnsentDomainEventsAsync(100))
             {
                 if (e.Id == id)
                     actual = e;

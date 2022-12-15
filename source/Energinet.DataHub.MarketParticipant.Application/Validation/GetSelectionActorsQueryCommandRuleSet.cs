@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetSelectionActorsQueryCommandRuleSet : AbstractValidator<GetSelectionActorsQueryCommand>
 {
-    public sealed record GetUserOverviewCommand(int PageNumber, int PageSize, Guid? ActorId) : IRequest<GetUserOverviewResponse>;
 }

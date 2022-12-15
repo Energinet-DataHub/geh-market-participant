@@ -13,24 +13,26 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Microsoft.EntityFrameworkCore;
-using Actor = Energinet.DataHub.MarketParticipant.Domain.Model.Slim.Actor;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Slim;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 
-public sealed class ActorRepository : IActorRepository
+public sealed class ActorQueryRepository : IActorQueryRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public ActorRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public ActorQueryRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<Actor?> GetActorAsync(Guid actorId)
+    public async Task<Domain.Model.Query.Actor?> GetActorAsync(Guid actorId)
     {
         var foundActor = await _marketParticipantDbContext
             .Actors
@@ -40,9 +42,22 @@ public sealed class ActorRepository : IActorRepository
         if (foundActor == null)
             return null;
 
-        return new Actor(
+        return new Domain.Model.Query.Actor(
             new OrganizationId(foundActor.OrganizationId),
             foundActor.Id,
             (ActorStatus)foundActor.Status);
+    }
+
+    public async Task<IEnumerable<SelectionActor>> GetSelectionActorsAsync(IEnumerable<Guid> actorIds)
+    {
+        var ids = actorIds.Distinct().ToList();
+
+        var actors = await _marketParticipantDbContext
+            .Actors
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return actors.Select(x => new SelectionActor(x.Id, x.ActorNumber, x.Name));
     }
 }
