@@ -17,9 +17,9 @@ using Energinet.DataHub.Core.App.Common.Security;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class UserRoleTemplatePermissionEntity
+    public sealed class UserRolePermissionEntity
     {
-        public Guid UserRoleTemplateId { get; set; }
+        public Guid UserRoleId { get; set; }
         public Permission Permission { get; set; }
     }
 }

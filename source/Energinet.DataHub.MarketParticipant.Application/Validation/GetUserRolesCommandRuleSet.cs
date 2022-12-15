@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public record UpdateUserRoleAssignmentsDto(Guid ActorId, IEnumerable<UserRoleTemplateId> UserRoleTemplateAssignments);
+public sealed class GetUserRolesCommandRuleSet : AbstractValidator<GetUserRolesCommand>
+{
+}

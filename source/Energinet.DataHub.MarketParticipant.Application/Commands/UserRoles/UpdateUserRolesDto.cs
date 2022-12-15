@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record UserRoleTemplateIdDto(Guid Id);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+
+public record UpdateUserRolesDto(IEnumerable<UserRoleId> UserRoleAssignments);

@@ -13,8 +13,27 @@
 // limitations under the License.
 
 using System;
-using MediatR;
+using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record GetAvailableUserRoleTemplatesForActorCommand(Guid ActorId) : IRequest<GetUserRoleTemplatesResponse>;
+public sealed record UserRoleId
+{
+    public UserRoleId(string value)
+    {
+        Value = Guid.Parse(value);
+    }
+
+    [JsonConstructor]
+    public UserRoleId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
+}

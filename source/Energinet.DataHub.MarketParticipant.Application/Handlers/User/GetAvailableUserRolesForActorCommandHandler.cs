@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -24,25 +24,25 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetAvailableUserRoleTemplatesForActorCommandHandler
-    : IRequestHandler<GetAvailableUserRoleTemplatesForActorCommand, GetUserRoleTemplatesResponse>
+public sealed class GetAvailableUserRolesForActorCommandHandler
+    : IRequestHandler<GetAvailableUserRolesForActorCommand, GetUserRolesResponse>
 {
     private readonly IActorQueryRepository _actorQueryRepository;
     private readonly IOrganizationRepository _organizationRepository;
-    private readonly IUserRoleTemplateRepository _userRoleTemplateRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetAvailableUserRoleTemplatesForActorCommandHandler(
+    public GetAvailableUserRolesForActorCommandHandler(
         IActorQueryRepository actorQueryRepository,
         IOrganizationRepository organizationRepository,
-        IUserRoleTemplateRepository userRoleTemplateRepository)
+        IUserRoleRepository userRoleRepository)
     {
         _actorQueryRepository = actorQueryRepository;
         _organizationRepository = organizationRepository;
-        _userRoleTemplateRepository = userRoleTemplateRepository;
+        _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<GetUserRoleTemplatesResponse> Handle(
-        GetAvailableUserRoleTemplatesForActorCommand request,
+    public async Task<GetUserRolesResponse> Handle(
+        GetAvailableUserRolesForActorCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -66,13 +66,13 @@ public sealed class GetAvailableUserRoleTemplatesForActorCommandHandler
             .SelectMany(a => a.MarketRoles)
             .Select(r => r.Function);
 
-        var templates = await _userRoleTemplateRepository
+        var userRoles = await _userRoleRepository
             .GetAsync(eicFunctions)
             .ConfigureAwait(false);
 
-        return new GetUserRoleTemplatesResponse(templates.Select(t =>
+        return new GetUserRolesResponse(userRoles.Select(t =>
         {
-            return new UserRoleTemplateDto(t.Id.Value, t.Name);
+            return new UserRoleDto(t.Id.Value, t.Name);
         }));
     }
 }

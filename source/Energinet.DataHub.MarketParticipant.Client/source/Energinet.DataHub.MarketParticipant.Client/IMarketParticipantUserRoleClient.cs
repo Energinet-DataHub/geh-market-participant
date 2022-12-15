@@ -20,23 +20,23 @@ using Energinet.DataHub.MarketParticipant.Client.Models;
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
-    /// Manages user role templates.
+    /// Manages user roles.
     /// </summary>
-    public interface IMarketParticipantUserRoleTemplateClient
+    public interface IMarketParticipantUserRoleClient
     {
         /// <summary>
-        /// Gets user role templates assigned to the specified user and actor.
+        /// Gets user roles assigned to the specified user and actor.
         /// </summary>
         /// <param name="actorId">The id of the actor.</param>
         /// <param name="userId">The id of the user.</param>
-        /// <returns>The list of currently assigned user role templates.</returns>
-        Task<IEnumerable<UserRoleTemplateDto>> GetAsync(Guid actorId, Guid userId);
+        /// <returns>The list of currently assigned user roles.</returns>
+        Task<IEnumerable<UserRoleDto>> GetAsync(Guid actorId, Guid userId);
 
         /// <summary>
-        /// Gets all user role templates that can be assigned to the specified actor.
+        /// Gets all user roles that can be assigned to the specified actor.
         /// </summary>
         /// <param name="actorId">The id of the actor.</param>
-        /// <returns>The list of assignable user role templates.</returns>
-        Task<IEnumerable<UserRoleTemplateDto>> GetAssignableAsync(Guid actorId);
+        /// <returns>The list of assignable user roles.</returns>
+        Task<IEnumerable<UserRoleDto>> GetAssignableAsync(Guid actorId);
     }
 }

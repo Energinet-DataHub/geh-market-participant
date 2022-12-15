@@ -23,29 +23,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class UserRoleTemplateRepository : IUserRoleTemplateRepository
+public sealed class UserRoleRepository : IUserRoleRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public UserRoleTemplateRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public UserRoleRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<UserRoleTemplate?> GetAsync(UserRoleTemplateId userRoleTemplateId)
+    public async Task<UserRole?> GetAsync(UserRoleId userRoleId)
     {
-        var userRoleTemplate = await BuildUserRoleQuery()
-            .SingleOrDefaultAsync(t => t.Id == userRoleTemplateId.Value)
+        var userRole = await BuildUserRoleQuery()
+            .SingleOrDefaultAsync(t => t.Id == userRoleId.Value)
             .ConfigureAwait(false);
 
-        return userRoleTemplate == null
+        return userRole == null
             ? null
-            : MapUserRoleTemplate(userRoleTemplate);
+            : MapUserRole(userRole);
     }
 
-    public async Task<IEnumerable<UserRoleTemplate>> GetAsync(IEnumerable<EicFunction> eicFunctions)
+    public async Task<IEnumerable<UserRole>> GetAsync(IEnumerable<EicFunction> eicFunctions)
     {
-        var userRoleTemplates = await BuildUserRoleQuery()
+        var userRoles = await BuildUserRoleQuery()
             .Where(t => t
                 .EicFunctions
                 .Select(f => f.EicFunction)
@@ -53,22 +53,22 @@ public sealed class UserRoleTemplateRepository : IUserRoleTemplateRepository
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return userRoleTemplates.Select(MapUserRoleTemplate);
+        return userRoles.Select(MapUserRole);
     }
 
-    private static UserRoleTemplate MapUserRoleTemplate(UserRoleTemplateEntity userRoleTemplate)
+    private static UserRole MapUserRole(UserRoleEntity userRole)
     {
-        return new UserRoleTemplate(
-            new UserRoleTemplateId(userRoleTemplate.Id),
-            userRoleTemplate.Name,
-            userRoleTemplate.EicFunctions.Select(f => f.EicFunction),
-            userRoleTemplate.Permissions.Select(p => p.Permission));
+        return new UserRole(
+            new UserRoleId(userRole.Id),
+            userRole.Name,
+            userRole.EicFunctions.Select(f => f.EicFunction),
+            userRole.Permissions.Select(p => p.Permission));
     }
 
-    private IQueryable<UserRoleTemplateEntity> BuildUserRoleQuery()
+    private IQueryable<UserRoleEntity> BuildUserRoleQuery()
     {
         return _marketParticipantDbContext
-            .UserRoleTemplates
+            .UserRoles
             .Include(x => x.EicFunctions)
             .Include(x => x.Permissions);
     }

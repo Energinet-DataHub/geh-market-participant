@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
@@ -27,14 +27,14 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
-public sealed class UserRoleTemplateController : ControllerBase
+public sealed class UserRoleController : ControllerBase
 {
-    private readonly ILogger<UserRoleTemplateController> _logger;
+    private readonly ILogger<UserRoleController> _logger;
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
-    public UserRoleTemplateController(
-        ILogger<UserRoleTemplateController> logger,
+    public UserRoleController(
+        ILogger<UserRoleController> logger,
         IUserContext<FrontendUser> userContext,
         IMediator mediator)
     {
@@ -43,7 +43,7 @@ public sealed class UserRoleTemplateController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("actors/{actorId:guid}/users/{userId:guid}/templates")]
+    [HttpGet("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid actorId, Guid userId)
     {
@@ -53,18 +53,18 @@ public sealed class UserRoleTemplateController : ControllerBase
                 if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                     return Unauthorized();
 
-                var command = new GetUserRoleTemplatesCommand(userId, actorId);
+                var command = new GetUserRolesCommand(actorId, userId);
 
                 var response = await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
-                return Ok(response.Templates);
+                return Ok(response.Roles);
             },
             _logger).ConfigureAwait(false);
     }
 
-    [HttpGet("actors/{actorId:guid}/templates")]
+    [HttpGet("actors/{actorId:guid}/roles")]
     [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetAssignableAsync(Guid actorId)
     {
@@ -74,32 +74,32 @@ public sealed class UserRoleTemplateController : ControllerBase
                 if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                     return Unauthorized();
 
-                var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
+                var command = new GetAvailableUserRolesForActorCommand(actorId);
 
                 var response = await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
-                return Ok(response.Templates);
+                return Ok(response.Roles);
             },
             _logger).ConfigureAwait(false);
     }
 
-    [HttpPut("users/{userId:guid}/roles")]
+    [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid userId, UpdateUserRoleAssignmentsDto userRoleAssignmentsDto)
+    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, UpdateUserRolesDto userRolesDto)
     {
         ArgumentNullException.ThrowIfNull(userId);
-        ArgumentNullException.ThrowIfNull(userRoleAssignmentsDto);
+        ArgumentNullException.ThrowIfNull(userRolesDto);
 
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userRoleAssignmentsDto.ActorId))
+                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                     return Unauthorized();
 
                 var result = await _mediator
-                    .Send(new UpdateUserRoleAssignmentsCommand(userId, userRoleAssignmentsDto))
+                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, userRolesDto))
                     .ConfigureAwait(false);
 
                 return Ok(result);

@@ -20,42 +20,42 @@ using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
-    public sealed class MarketParticipantUserRoleTemplateClient : IMarketParticipantUserRoleTemplateClient
+    public sealed class MarketParticipantUserRoleClient : IMarketParticipantUserRoleClient
     {
         private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantUserRoleTemplateClient(IMarketParticipantClientFactory factory)
+        public MarketParticipantUserRoleClient(IMarketParticipantClientFactory factory)
         {
             _clientFactory = factory;
         }
 
-        public async Task<IEnumerable<UserRoleTemplateDto>> GetAsync(Guid actorId, Guid userId)
+        public async Task<IEnumerable<UserRoleDto>> GetAsync(Guid actorId, Guid userId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request($"actors/{actorId}/users/{userId}/templates")
+                        .Request($"actors/{actorId}/users/{userId}/roles")
                         .GetAsync())
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<IEnumerable<UserRoleTemplateDto>>()
+                .GetJsonAsync<IEnumerable<UserRoleDto>>()
                 .ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<UserRoleTemplateDto>> GetAssignableAsync(Guid actorId)
+        public async Task<IEnumerable<UserRoleDto>> GetAssignableAsync(Guid actorId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request($"actors/{actorId}/templates")
+                        .Request($"actors/{actorId}/roles")
                         .GetAsync())
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<IEnumerable<UserRoleTemplateDto>>()
+                .GetJsonAsync<IEnumerable<UserRoleDto>>()
                 .ConfigureAwait(false);
         }
     }
