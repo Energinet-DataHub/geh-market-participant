@@ -18,7 +18,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Common.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -34,15 +38,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     {
         private readonly ILogger<UserController> _logger;
         private readonly IExternalTokenValidator _externalTokenValidator;
+        private readonly IUserContext<FrontendUser> _userContext;
         private readonly IMediator _mediator;
 
         public UserController(
             ILogger<UserController> logger,
             IExternalTokenValidator externalTokenValidator,
+            IUserContext<FrontendUser> userContext,
             IMediator mediator)
         {
             _logger = logger;
             _externalTokenValidator = externalTokenValidator;
+            _userContext = userContext;
             _mediator = mediator;
         }
 
@@ -71,6 +78,34 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .ConfigureAwait(false);
 
                     return Ok(associatedActors);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
+        [HttpGet("{guid:userId}/actors")]
+        [AuthorizeUser(Permission.UsersManage)]
+        public async Task<IActionResult> GetAssociatedUserActorsAsync(Guid userId)
+        {
+            ArgumentNullException.ThrowIfNull(userId);
+
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var associatedActors = await _mediator
+                        .Send(new GetAssociatedUserActorsCommand(userId))
+                        .ConfigureAwait(false);
+
+                    if (_userContext.CurrentUser.IsFas)
+                        return Ok(associatedActors);
+
+                    var allowedActors = new List<Guid>();
+                    foreach (var actorId in associatedActors.ActorIds)
+                    {
+                        if (_userContext.CurrentUser.IsAssignedToActor(actorId))
+                            allowedActors.Add(actorId);
+                    }
+
+                    return Ok(new GetAssociatedUserActorsResponse(allowedActors));
                 },
                 _logger).ConfigureAwait(false);
         }
