@@ -207,7 +207,7 @@ public sealed class UserRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserRepository(context);
 
-        var (_, userId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var (_, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
 
         // Act
         var user = await userRepository.GetAsync(new UserId(userId));

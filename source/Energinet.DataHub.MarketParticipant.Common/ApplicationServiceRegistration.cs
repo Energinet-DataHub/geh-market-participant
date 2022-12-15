@@ -17,6 +17,8 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 using Energinet.DataHub.MarketParticipant.Application.Helpers;
@@ -64,6 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetUserRoleTemplatesCommand>, GetUserRoleTemplatesCommandRuleSet>();
             container.Register<IValidator<GetAvailableUserRoleTemplatesForActorCommand>, GetAvailableUserRoleTemplatesForActorCommandRuleSet>();
             container.Register<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
+            container.Register<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
             container.Register<IValidator<GetUserRoleAssignmentAuditLogsCommand>, GetUserRoleAssignmentAuditLogEntriesCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);

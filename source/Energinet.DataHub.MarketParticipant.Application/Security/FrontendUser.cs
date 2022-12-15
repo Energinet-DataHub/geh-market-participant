@@ -14,7 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Common.Security;
+namespace Energinet.DataHub.MarketParticipant.Application.Security;
 
 public sealed class FrontendUser
 {

@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request($"users/{userId:guid}/roles")
+                        .Request($"users/{userId}/roles")
                         .PutJsonAsync(updateUserRoleAssignmentsDto))
                 .ConfigureAwait(false);
         }

@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
-{
-    public sealed record GetUserOverviewCommand(int PageNumber, int PageSize, Guid? ActorId) : IRequest<GetUserOverviewResponse>;
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+
+public sealed record SelectionActor(Guid Id, string Gln, string Name);

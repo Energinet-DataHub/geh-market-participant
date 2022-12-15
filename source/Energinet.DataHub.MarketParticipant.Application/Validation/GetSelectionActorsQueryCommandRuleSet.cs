@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetSelectionActorsQueryCommandRuleSet : AbstractValidator<GetSelectionActorsQueryCommand>
 {
-    /// <summary>
-    /// Provides access to the current users ID
-    /// </summary>
-    public interface IUserIdProvider
-    {
-        /// <summary>
-        /// Returns the current users ID
-        /// </summary>
-        Guid UserId { get; }
-    }
 }

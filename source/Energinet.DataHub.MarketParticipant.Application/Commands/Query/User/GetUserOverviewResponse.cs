@@ -12,19 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
-{
-    public sealed class UserIdProvider : IUserIdProvider
-    {
-        private readonly Func<Guid> _userIdFunc;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-        public UserIdProvider(Func<Guid> userIdFunc)
-        {
-            _userIdFunc = userIdFunc;
-        }
-
-        public Guid UserId => _userIdFunc();
-    }
-}
+public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users);

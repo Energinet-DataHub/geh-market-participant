@@ -18,17 +18,17 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 
-namespace Energinet.DataHub.MarketParticipant.Common.Security;
+namespace Energinet.DataHub.MarketParticipant.Application.Security;
 
 public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
 {
-    private readonly IActorRepository _actorRepository;
+    private readonly IActorQueryRepository _actorQueryRepository;
 
-    public FrontendUserProvider(IActorRepository actorRepository)
+    public FrontendUserProvider(IActorQueryRepository actorQueryRepository)
     {
-        _actorRepository = actorRepository;
+        _actorQueryRepository = actorQueryRepository;
     }
 
     public async Task<FrontendUser?> ProvideUserAsync(
@@ -37,7 +37,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         bool isFas,
         IEnumerable<Claim> claims)
     {
-        var actor = await _actorRepository.GetActorAsync(actorId).ConfigureAwait(false);
+        var actor = await _actorQueryRepository.GetActorAsync(actorId).ConfigureAwait(false);
         return actor is { Status: ActorStatus.Active or ActorStatus.Passive }
             ? new FrontendUser(
                 userId,

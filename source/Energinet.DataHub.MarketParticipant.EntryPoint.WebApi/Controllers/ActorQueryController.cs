@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,29 +24,37 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
-[ApiExplorerSettings(IgnoreApi = true)]
-[Route("gridareaoverview")]
-public sealed class GridAreaOverviewUnsafeController : ControllerBase
+[Route("query")]
+public sealed class ActorQueryController : ControllerBase
 {
-    private readonly ILogger<GridAreaOverviewController> _logger;
+    private readonly ILogger<ActorContactController> _logger;
     private readonly IMediator _mediator;
+    private readonly IUserContext<FrontendUser> _userContext;
 
-    public GridAreaOverviewUnsafeController(ILogger<GridAreaOverviewController> logger, IMediator mediator)
+    public ActorQueryController(
+        ILogger<ActorContactController> logger,
+        IMediator mediator,
+        IUserContext<FrontendUser> userContext)
     {
         _logger = logger;
         _mediator = mediator;
+        _userContext = userContext;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetGridAreaOverviewAsync()
+    [HttpGet("selection-actors")]
+    public async Task<IActionResult> GetSelectionActorsAsync()
     {
         return await this.ProcessAsync(
             async () =>
-            {
-                var command = new GetGridAreaOverviewCommand();
-                var response = await _mediator.Send(command).ConfigureAwait(false);
-                return Ok(response.GridAreas);
-            },
+                {
+                    var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.UserId);
+
+                    var response = await _mediator
+                        .Send(command)
+                        .ConfigureAwait(false);
+
+                    return Ok(response.Actors);
+                },
             _logger).ConfigureAwait(false);
     }
 }

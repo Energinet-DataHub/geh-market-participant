@@ -14,6 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
-
-public sealed record Actor(OrganizationId OrganizationId, Guid ActorId, ActorStatus Status);
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public sealed record SelectionActorDto(Guid Id, string Gln, string Name);
+}

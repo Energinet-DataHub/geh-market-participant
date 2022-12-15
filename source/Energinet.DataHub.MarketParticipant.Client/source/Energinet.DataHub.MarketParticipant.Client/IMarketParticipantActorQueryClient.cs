@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
+
 namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
-    /// BFF client for Energinet.DataHub.MarketParticipant.
+    /// BFF client for actor queries
     /// </summary>
-    public interface IMarketParticipantClient :
-        IMarketParticipantOrganizationClient,
-        IMarketParticipantUserClient,
-        IMarketParticipantActorClient,
-        IMarketParticipantGridAreaClient,
-        IMarketParticipantActorContactClient,
-        IMarketParticipantGridAreaOverviewClient,
-        ITokenClient,
-        IMarketParticipantUserOverviewClient,
-        IMarketParticipantActorQueryClient
+    public interface IMarketParticipantActorQueryClient
     {
+        /// <summary>
+        /// Lists available actors for selection for the current user.
+        /// </summary>
+        /// <returns>A list of <see cref="SelectionActorDto"/> available to the user.</returns>
+        Task<IEnumerable<SelectionActorDto>> GetSelectionActorsAsync();
     }
 }

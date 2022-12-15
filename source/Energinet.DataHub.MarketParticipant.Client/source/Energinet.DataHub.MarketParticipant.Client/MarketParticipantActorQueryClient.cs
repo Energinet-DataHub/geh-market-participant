@@ -12,51 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
-    public sealed class MarketParticipantUserClient : IMarketParticipantUserClient
+    public sealed class MarketParticipantActorQueryClient : IMarketParticipantActorQueryClient
     {
         private readonly IMarketParticipantClientFactory _clientFactory;
 
-        public MarketParticipantUserClient(IMarketParticipantClientFactory clientFactory)
+        public MarketParticipantActorQueryClient(IMarketParticipantClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
         }
 
-        public async Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(string accessToken)
+        public async Task<IEnumerable<SelectionActorDto>> GetSelectionActorsAsync()
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request("user/actors")
-                        .SetQueryParam("externalToken", accessToken)
+                        .Request("query", "selection-actors")
                         .GetAsync())
                 .ConfigureAwait(false);
 
-            return await response
-                .GetJsonAsync<GetAssociatedUserActorsResponseDto>()
-                .ConfigureAwait(false);
-        }
-
-        public async Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(Guid userId)
-        {
-            var response = await ValidationExceptionHandler
-                .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request("user", userId, "actors")
-                        .GetAsync())
+            var actors = await response
+                .GetJsonAsync<IEnumerable<SelectionActorDto>>()
                 .ConfigureAwait(false);
 
-            return await response
-                .GetJsonAsync<GetAssociatedUserActorsResponseDto>()
-                .ConfigureAwait(false);
+            return actors;
         }
     }
 }

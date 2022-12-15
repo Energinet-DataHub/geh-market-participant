@@ -47,12 +47,20 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture.DatabaseManager.CreateUserAsync();
-        var templateId = await _fixture.DatabaseManager.CreateRoleTemplateAsync();
-        var updateDto = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId });
+        var (actorId, userId, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
+        var templateId = await _fixture
+            .DatabaseManager
+            .CreateRoleTemplateAsync();
+
+        var updateDto = new UpdateUserRoleAssignmentsDto(
+            actorId,
+            new List<UserRoleTemplateId> { templateId });
 
         var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
-        var getCommand = new GetUserRoleTemplatesCommand(updateCommand.RoleAssignmentsDto.ActorId, updateCommand.UserId);
+        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
 
         // Act
         await mediator.Send(updateCommand);
@@ -71,7 +79,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture
+        var (actorId, userId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
