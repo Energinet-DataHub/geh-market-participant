@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 
@@ -26,5 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Gets actors assigned to the owner of the specified access token.
         /// </summary>
         Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(string accessToken);
+
+        /// <summary>
+        /// Gets actors assigned to the userId specified
+        /// </summary>
+        Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(Guid userId);
     }
 }
