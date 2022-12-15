@@ -1,6 +1,6 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.9.5
+## Version 2.9.6
 
 - Added endpoint to get actors to a user.
 
