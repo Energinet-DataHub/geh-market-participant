@@ -19,9 +19,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class UserRoleTemplateEntityConfiguration : IEntityTypeConfiguration<UserRoleTemplateEntity>
+    public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserRoleEntity>
     {
-        public void Configure(EntityTypeBuilder<UserRoleTemplateEntity> builder)
+        public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("UserRoleTemplate");
@@ -30,11 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder
                 .HasMany(template => template.Permissions)
                 .WithOne()
-                .HasForeignKey(permission => permission.UserRoleTemplateId);
+                .HasForeignKey(permission => permission.UserRoleId);
             builder
                 .HasMany(template => template.EicFunctions)
                 .WithOne()
-                .HasForeignKey(eic => eic.UserRoleTemplateId);
+                .HasForeignKey(eic => eic.UserRoleId);
         }
     }
 }

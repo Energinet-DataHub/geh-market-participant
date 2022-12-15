@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record GetUserRoleTemplatesResponse(IEnumerable<UserRoleTemplateDto> Templates);
+public record UpdateUserRolesDto(IEnumerable<UserRoleId> UserRoleAssignments);

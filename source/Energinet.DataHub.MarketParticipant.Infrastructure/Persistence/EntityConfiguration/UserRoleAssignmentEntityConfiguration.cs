@@ -25,8 +25,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("UserRoleAssignment");
-            builder.HasKey(x => new { x.ActorId, x.UserId, x.UserRoleTemplateId });
-            builder.Property(x => x.UserRoleTemplateId).HasColumnName("TemplateId");
+            builder.Property(x => x.UserRoleId).HasColumnName("TemplateId");
+            builder.HasKey(x => new { x.ActorId, x.UserId, x.UserRoleId });
         }
     }
 }

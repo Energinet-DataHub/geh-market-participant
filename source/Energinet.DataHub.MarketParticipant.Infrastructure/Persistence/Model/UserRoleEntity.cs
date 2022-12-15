@@ -17,18 +17,18 @@ using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed class UserRoleTemplateEntity
+    public sealed class UserRoleEntity
     {
-        public UserRoleTemplateEntity()
+        public UserRoleEntity()
         {
             Name = string.Empty;
-            EicFunctions = new Collection<UserRoleTemplateEicFunctionEntity>();
-            Permissions = new Collection<UserRoleTemplatePermissionEntity>();
+            EicFunctions = new Collection<UserRoleEicFunctionEntity>();
+            Permissions = new Collection<UserRolePermissionEntity>();
         }
 
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public Collection<UserRoleTemplateEicFunctionEntity> EicFunctions { get; }
-        public Collection<UserRoleTemplatePermissionEntity> Permissions { get; }
+        public Collection<UserRoleEicFunctionEntity> EicFunctions { get; }
+        public Collection<UserRolePermissionEntity> Permissions { get; }
     }
 }

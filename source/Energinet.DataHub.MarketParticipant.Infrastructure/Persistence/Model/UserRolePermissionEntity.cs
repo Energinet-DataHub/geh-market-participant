@@ -12,27 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using Energinet.DataHub.Core.App.Common.Security;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-
-public sealed class UserRoleTemplate
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public UserRoleTemplate(
-        UserRoleTemplateId id,
-        string name,
-        IEnumerable<EicFunction> allowedMarkedRoles,
-        IEnumerable<Permission> permissions)
+    public sealed class UserRolePermissionEntity
     {
-        Id = id;
-        Name = name;
-        AllowedMarkedRoles = allowedMarkedRoles;
-        Permissions = permissions;
+        public Guid UserRoleId { get; set; }
+        public Permission Permission { get; set; }
     }
-
-    public UserRoleTemplateId Id { get; }
-    public string Name { get; set; }
-    public IEnumerable<EicFunction> AllowedMarkedRoles { get; }
-    public IEnumerable<Permission> Permissions { get; }
 }

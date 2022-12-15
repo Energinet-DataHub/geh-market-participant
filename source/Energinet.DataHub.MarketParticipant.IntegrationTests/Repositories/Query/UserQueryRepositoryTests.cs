@@ -121,20 +121,20 @@ public sealed class UserQueryRepositoryTests
         await context.Organizations.AddAsync(orgEntity);
         await context.SaveChangesAsync();
 
-        var userRoleTemplate = new UserRoleTemplateEntity
+        var userRoleTemplate = new UserRoleEntity
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity
@@ -232,19 +232,19 @@ public sealed class UserQueryRepositoryTests
 
         await context.Organizations.AddAsync(orgEntity);
         await context.SaveChangesAsync();
-        var userRoleTemplate = new UserRoleTemplateEntity()
+        var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
         var roleAssignment = new UserRoleAssignmentEntity()
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
         var userEntity = new UserEntity()
         {
@@ -300,20 +300,20 @@ public sealed class UserQueryRepositoryTests
         };
 
         await context.Organizations.AddAsync(orgEntity);
-        var userRoleTemplate = new UserRoleTemplateEntity()
+        var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity
@@ -378,20 +378,20 @@ public sealed class UserQueryRepositoryTests
         };
         await context.Organizations.AddAsync(orgEntity);
 
-        var userRoleTemplate = new UserRoleTemplateEntity()
+        var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity
@@ -461,20 +461,20 @@ public sealed class UserQueryRepositoryTests
         };
         await context.Organizations.AddAsync(orgEntity);
 
-        var userRoleTemplate = new UserRoleTemplateEntity()
+        var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
-        var userRoleTemplate2 = new UserRoleTemplateEntity()
+        var userRoleTemplate2 = new UserRoleEntity()
         {
             Name = "Test Template 2",
-            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.GridAreasManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.GridAreasManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
-        context.UserRoleTemplates.Add(userRoleTemplate2);
+        context.UserRoles.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate2);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
         await context.Entry(actor2Entity).ReloadAsync();
@@ -482,12 +482,12 @@ public sealed class UserQueryRepositoryTests
         var roleAssignment = new UserRoleAssignmentEntity()
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
         var roleAssignment2 = new UserRoleAssignmentEntity()
         {
             ActorId = actor2Entity.Id,
-            UserRoleTemplateId = userRoleTemplate2.Id
+            UserRoleId = userRoleTemplate2.Id
         };
         var userEntity = new UserEntity()
         {
@@ -554,32 +554,32 @@ public sealed class UserQueryRepositoryTests
         };
         await context.Organizations.AddAsync(orgEntity);
 
-        var userRoleTemplate = new UserRoleTemplateEntity()
+        var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage }, new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationView } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage }, new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
-        var userRoleTemplate2 = new UserRoleTemplateEntity()
+        var userRoleTemplate2 = new UserRoleEntity()
         {
             Name = "Test Template 2",
-            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.GridAreasManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.GridAreasManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
-        context.UserRoleTemplates.Add(userRoleTemplate2);
+        context.UserRoles.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate2);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity()
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
         var roleAssignment2 = new UserRoleAssignmentEntity()
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate2.Id
+            UserRoleId = userRoleTemplate2.Id
         };
         var userEntity = new UserEntity()
         {
@@ -636,20 +636,20 @@ public sealed class UserQueryRepositoryTests
         };
         await context.Organizations.AddAsync(orgEntity);
 
-        var userRoleTemplate = new UserRoleTemplateEntity
+        var userRoleTemplate = new UserRoleEntity
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity

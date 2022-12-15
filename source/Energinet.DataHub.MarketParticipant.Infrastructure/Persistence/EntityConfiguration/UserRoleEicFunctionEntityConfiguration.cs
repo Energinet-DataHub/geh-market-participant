@@ -19,13 +19,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class UserRoleTemplateEicFunctionEntityConfiguration : IEntityTypeConfiguration<UserRoleTemplateEicFunctionEntity>
+    public sealed class UserRoleEicFunctionEntityConfiguration : IEntityTypeConfiguration<UserRoleEicFunctionEntity>
     {
-        public void Configure(EntityTypeBuilder<UserRoleTemplateEicFunctionEntity> builder)
+        public void Configure(EntityTypeBuilder<UserRoleEicFunctionEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("UserRoleTemplateEicFunction");
-            builder.HasKey(x => new { x.EicFunction, x.UserRoleTemplateId });
+            builder.Property(x => x.UserRoleId).HasColumnName("UserRoleTemplateId");
+            builder.HasKey(x => new { x.EicFunction, x.UserRoleId });
         }
     }
 }

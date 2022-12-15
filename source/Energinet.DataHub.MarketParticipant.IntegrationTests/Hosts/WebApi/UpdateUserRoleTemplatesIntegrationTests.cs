@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -54,20 +53,18 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .CreateRoleTemplateAsync();
 
-        var updateDto = new UpdateUserRoleAssignmentsDto(
-            actorId,
-            new List<UserRoleTemplateId> { templateId });
+        var updateDto = new UpdateUserRolesDto(new List<UserRoleId> { templateId });
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
-        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updateDto);
+        var getCommand = new GetUserRolesCommand(actorId, userId);
 
         // Act
         await mediator.Send(updateCommand);
         var response = await mediator.Send(getCommand);
 
         // Assert
-        Assert.NotEmpty(response.Templates);
-        Assert.Contains(response.Templates, x => x.Id == templateId.Value);
+        Assert.NotEmpty(response.Roles);
+        Assert.Contains(response.Roles, x => x.Id == templateId.Value);
     }
 
     [Fact]
@@ -90,22 +87,20 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .CreateRoleTemplateAsync(new[] { Permission.ActorManage });
 
-        var updateDto = new UpdateUserRoleAssignmentsDto(
-            actorId,
-            new List<UserRoleTemplateId> { templateId, new(roleTemplateId) });
+        var updateDto = new UpdateUserRolesDto(new List<UserRoleId> { templateId, new(roleTemplateId) });
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
-        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updateDto);
+        var getCommand = new GetUserRolesCommand(actorId, userId);
 
         // Act
         await mediator.Send(updateCommand);
         var response = await mediator.Send(getCommand);
 
         // Assert
-        Assert.NotEmpty(response.Templates);
-        Assert.Equal(2, response.Templates.Count());
-        Assert.Contains(response.Templates, x => x.Id == templateId.Value);
-        Assert.Contains(response.Templates, x => x.Id == roleTemplateId);
+        Assert.NotEmpty(response.Roles);
+        Assert.Equal(2, response.Roles.Count());
+        Assert.Contains(response.Roles, x => x.Id == templateId.Value);
+        Assert.Contains(response.Roles, x => x.Id == roleTemplateId);
     }
 
     [Fact]
@@ -132,13 +127,11 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .CreateRoleTemplateAsync(new[] { Permission.ActorManage });
 
-        var updateDto = new UpdateUserRoleAssignmentsDto(
-            actorId,
-            new List<UserRoleTemplateId> { templateId, new(roleTemplateId) });
+        var updateDto = new UpdateUserRolesDto(new List<UserRoleId> { templateId, new(roleTemplateId) });
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(userId, updateDto);
-        var getCommand = new GetUserRoleTemplatesCommand(actorId, userId);
-        var getCommand2 = new GetUserRoleTemplatesCommand(actor2Id, userId);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updateDto);
+        var getCommand = new GetUserRolesCommand(actorId, userId);
+        var getCommand2 = new GetUserRolesCommand(actor2Id, userId);
 
         // Act
         await mediator.Send(updateCommand);
@@ -146,11 +139,11 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         var response2 = await mediator.Send(getCommand2);
 
         // Assert
-        Assert.NotEmpty(response.Templates);
-        Assert.Equal(2, response.Templates.Count());
-        Assert.Single(response2.Templates);
-        Assert.Contains(response.Templates, x => x.Id == roleTemplateId);
-        Assert.Contains(response.Templates, x => x.Id == templateId.Value);
-        Assert.Contains(response2.Templates, x => x.Id == roleTemplate2Id);
+        Assert.NotEmpty(response.Roles);
+        Assert.Equal(2, response.Roles.Count());
+        Assert.Single(response2.Roles);
+        Assert.Contains(response.Roles, x => x.Id == roleTemplateId);
+        Assert.Contains(response.Roles, x => x.Id == templateId.Value);
+        Assert.Contains(response2.Roles, x => x.Id == roleTemplate2Id);
     }
 }

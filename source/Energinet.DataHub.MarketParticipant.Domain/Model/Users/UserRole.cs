@@ -12,10 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.Core.App.Common.Security;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public record UpdateUserRoleAssignmentsDto(Guid ActorId, IEnumerable<UserRoleTemplateId> UserRoleTemplateAssignments);
+public sealed class UserRole
+{
+    public UserRole(
+        UserRoleId id,
+        string name,
+        IEnumerable<EicFunction> allowedMarkedRoles,
+        IEnumerable<Permission> permissions)
+    {
+        Id = id;
+        Name = name;
+        AllowedMarkedRoles = allowedMarkedRoles;
+        Permissions = permissions;
+    }
+
+    public UserRoleId Id { get; }
+    public string Name { get; set; }
+    public IEnumerable<EicFunction> AllowedMarkedRoles { get; }
+    public IEnumerable<Permission> Permissions { get; }
+}

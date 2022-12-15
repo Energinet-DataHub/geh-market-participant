@@ -13,13 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class UserRoleTemplatePermissionEntity
-    {
-        public Guid UserRoleTemplateId { get; set; }
-        public Permission Permission { get; set; }
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+
+public sealed record GetAvailableUserRolesForActorCommand(Guid ActorId) : IRequest<GetUserRolesResponse>;

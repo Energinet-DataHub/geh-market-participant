@@ -155,21 +155,21 @@ internal static class DbTestHelper
         return (actorEntity.Id, actor2Entity.Id, userEntity.Id);
     }
 
-    public static Task<UserRoleTemplateId> CreateRoleTemplateAsync(this MarketParticipantDatabaseManager manager)
+    public static Task<UserRoleId> CreateRoleTemplateAsync(this MarketParticipantDatabaseManager manager)
     {
         return CreateRoleTemplateAsync(manager, new[] { Permission.OrganizationView });
     }
 
-    public static async Task<UserRoleTemplateId> CreateRoleTemplateAsync(
+    public static async Task<UserRoleId> CreateRoleTemplateAsync(
         this MarketParticipantDatabaseManager manager,
         Permission[] permissions)
     {
         await using var context = manager.CreateDbContext();
-        var userRoleTemplate = new UserRoleTemplateEntity { Name = "fake_value" };
+        var userRoleTemplate = new UserRoleEntity { Name = "fake_value" };
 
         foreach (var permission in permissions)
         {
-            userRoleTemplate.Permissions.Add(new UserRoleTemplatePermissionEntity
+            userRoleTemplate.Permissions.Add(new UserRolePermissionEntity
             {
                 Permission = permission
             });
@@ -177,15 +177,15 @@ internal static class DbTestHelper
 
         foreach (var eicFunction in new[] { EicFunction.BillingAgent })
         {
-            userRoleTemplate.EicFunctions.Add(new UserRoleTemplateEicFunctionEntity
+            userRoleTemplate.EicFunctions.Add(new UserRoleEicFunctionEntity
             {
                 EicFunction = eicFunction
             });
         }
 
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
-        return new UserRoleTemplateId(userRoleTemplate.Id);
+        return new UserRoleId(userRoleTemplate.Id);
     }
 
     public static async Task<Guid> AddUserPermissionsAsync(
@@ -196,11 +196,11 @@ internal static class DbTestHelper
     {
         await using var context = manager.CreateDbContext();
 
-        var userRoleTemplate = new UserRoleTemplateEntity { Name = "fake_value" };
+        var userRoleTemplate = new UserRoleEntity { Name = "fake_value" };
 
         foreach (var permission in permissions)
         {
-            userRoleTemplate.Permissions.Add(new UserRoleTemplatePermissionEntity
+            userRoleTemplate.Permissions.Add(new UserRolePermissionEntity
             {
                 Permission = permission
             });
@@ -208,19 +208,19 @@ internal static class DbTestHelper
 
         foreach (var eicFunction in new[] { EicFunction.BillingAgent })
         {
-            userRoleTemplate.EicFunctions.Add(new UserRoleTemplateEicFunctionEntity
+            userRoleTemplate.EicFunctions.Add(new UserRoleEicFunctionEntity
             {
                 EicFunction = eicFunction
             });
         }
 
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorId,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
 
         var userEntity = await context.Users.FindAsync(userId);
@@ -264,11 +264,11 @@ internal static class DbTestHelper
         await context.Organizations.AddAsync(organizationEntity);
         await context.SaveChangesAsync();
 
-        var userRoleTemplate = new UserRoleTemplateEntity();
+        var userRoleTemplate = new UserRoleEntity();
 
         foreach (var permission in permissions)
         {
-            userRoleTemplate.Permissions.Add(new UserRoleTemplatePermissionEntity
+            userRoleTemplate.Permissions.Add(new UserRolePermissionEntity
             {
                 Permission = permission
             });
@@ -276,19 +276,19 @@ internal static class DbTestHelper
 
         foreach (var eicFunction in new[] { EicFunction.ConsentAdministrator })
         {
-            userRoleTemplate.EicFunctions.Add(new UserRoleTemplateEicFunctionEntity
+            userRoleTemplate.EicFunctions.Add(new UserRoleEicFunctionEntity
             {
                 EicFunction = eicFunction
             });
         }
 
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
 
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
 
         var userEntity = new UserEntity

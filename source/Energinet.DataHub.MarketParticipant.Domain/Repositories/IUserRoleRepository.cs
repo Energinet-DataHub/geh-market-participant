@@ -22,19 +22,19 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 /// <summary>
 /// Provides access to user role templates.
 /// </summary>
-public interface IUserRoleTemplateRepository
+public interface IUserRoleRepository
 {
     /// <summary>
     /// Gets the user role template having the specified external id.
     /// </summary>
-    /// <param name="userRoleTemplateId">The id of the user role template.</param>
+    /// <param name="userRoleId">The id of the user role template.</param>
     /// <returns>The template if it exists; otherwise null.</returns>
-    Task<UserRoleTemplate?> GetAsync(UserRoleTemplateId userRoleTemplateId);
+    Task<UserRole?> GetAsync(UserRoleId userRoleId);
 
     /// <summary>
     /// Gets user role templates that support the specified EIC-functions.
     /// </summary>
     /// <param name="eicFunctions">The list of EIC-functions the templates must support.</param>
     /// <returns>A list of templates.</returns>
-    Task<IEnumerable<UserRoleTemplate>> GetAsync(IEnumerable<EicFunction> eicFunctions);
+    Task<IEnumerable<UserRole>> GetAsync(IEnumerable<EicFunction> eicFunctions);
 }
