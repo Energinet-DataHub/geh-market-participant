@@ -333,8 +333,8 @@ public sealed class UserOverviewRepositoryTests
     private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithEicFunction(
         MarketParticipantDbContext context, bool isFas, EicFunction eicFunction)
     {
-        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, eicFunction: eicFunction);
-        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+        var (_, actorEntity, roles) = await CreateActorAndTwoTemplates(context, isFas, eicFunction: eicFunction);
+        var userEntity = await CreateUserWithMultipleRolesAsync(context, actorEntity, roles);
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
@@ -385,6 +385,57 @@ public sealed class UserOverviewRepositoryTests
         return (orgEntity, actorEntity, userRoleTemplate);
     }
 
+    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, List<UserRoleEntity> UserRoles)> CreateActorAndTwoTemplates(
+        MarketParticipantDbContext context,
+        bool isFas,
+        string actorName = "Actor name",
+        EicFunction eicFunction = EicFunction.TransmissionCapacityAllocator)
+    {
+        var actorEntity = new ActorEntity
+        {
+            Id = Guid.NewGuid(),
+            Name = actorName,
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active,
+            IsFas = isFas
+        };
+
+        var orgEntity = new OrganizationEntity
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity { Country = "DK" },
+            Name = "Organization name",
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+
+        var userRoleTemplate = new UserRoleEntity
+        {
+            Name = "Template name",
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
+        };
+        var userRoleTemplate2 = new UserRoleEntity
+        {
+            Name = "Template name 2",
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
+        };
+        await context.UserRoles.AddAsync(userRoleTemplate);
+        await context.UserRoles.AddAsync(userRoleTemplate2);
+
+        await context.SaveChangesAsync();
+        await context.Entry(actorEntity).ReloadAsync();
+
+        var roles = new List<UserRoleEntity>()
+        {
+            userRoleTemplate, userRoleTemplate2
+        };
+        return (orgEntity, actorEntity, roles);
+    }
+
     private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole)
     {
         var roleAssignment = new UserRoleAssignmentEntity
@@ -396,6 +447,26 @@ public sealed class UserOverviewRepositoryTests
         var userEntity = new UserEntity
         {
             ExternalId = Guid.NewGuid(), Email = "test@example.com", RoleAssignments = { roleAssignment }
+        };
+
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+        return userEntity;
+    }
+
+    private static async Task<UserEntity> CreateUserWithMultipleRolesAsync(MarketParticipantDbContext context, ActorEntity actorEntity, List<UserRoleEntity> userRoles)
+    {
+        var assignments = userRoles.Select(userRole => new UserRoleAssignmentEntity
+            {
+                ActorId = actorEntity.Id, UserRoleId = userRole.Id
+            })
+            .ToList();
+
+        var userEntity = new UserEntity
+        {
+            ExternalId = Guid.NewGuid(),
+            Email = "test@example.com",
+            RoleAssignments = new Collection<UserRoleAssignmentEntity>(assignments)
         };
 
         await context.Users.AddAsync(userEntity);
