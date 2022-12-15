@@ -17,7 +17,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -30,13 +32,16 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUserContext<FrontendUser> _userContext;
 
     public UpdateUserRoleTemplatesCommandHandler(
         IUserRepository userRepository,
-        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
+        IUserContext<FrontendUser> userContext)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
+        _userContext = userContext;
     }
 
     public async Task<Unit> Handle(
@@ -68,7 +73,12 @@ public sealed class UpdateUserRoleTemplatesCommandHandler
 
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
-        await CreateLogEntriesAsync(user.Id, user.Id, request.RoleAssignmentsDto.ActorId, removedRoles, addedRoles).ConfigureAwait(false);
+        await CreateLogEntriesAsync(
+            user.Id,
+            new UserId(_userContext.CurrentUser.UserId),
+            request.RoleAssignmentsDto.ActorId,
+            removedRoles,
+            addedRoles).ConfigureAwait(false);
 
         return Unit.Value;
     }

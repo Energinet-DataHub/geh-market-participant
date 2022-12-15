@@ -16,8 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -48,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userRoleAssignments,
                 new EmailAddress("test@test.dk"));
 
+            var userContextMock = CreateMockedUser();
             var userRepositoryMock = new Mock<IUserRepository>();
             userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))
                 .ReturnsAsync(user);
@@ -56,7 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateUserRoleTemplatesCommandHandler(
                 userRepositoryMock.Object,
-                auditLogEntryRepository.Object);
+                auditLogEntryRepository.Object,
+                userContextMock);
 
             var updatedRoleAssignments = new List<UserRoleTemplateId>() { new(Guid.NewGuid()), new(Guid.NewGuid()) };
 
@@ -101,6 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userRoleAssignments,
                 new EmailAddress("test@test.dk"));
 
+            var userContextMock = CreateMockedUser();
             var userRepositoryMock = new Mock<IUserRepository>();
             userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))
                 .ReturnsAsync(user);
@@ -109,7 +114,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateUserRoleTemplatesCommandHandler(
                 userRepositoryMock.Object,
-                auditLogEntryRepository.Object);
+                auditLogEntryRepository.Object,
+                userContextMock);
 
             var updatedRoleAssignments = new List<UserRoleTemplateId>() { new(userRoleId1), new(userRoleId2) };
 
@@ -130,6 +136,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 x => x.InsertAuditLogEntryAsync(
                     It.Is<UserRoleAssignmentAuditLogEntry>(a => a.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed)),
                 Times.Never);
+        }
+
+        private static UserContext<FrontendUser> CreateMockedUser()
+        {
+            var frontendUser = new FrontendUser(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                false);
+
+            var userContext = new UserContext<FrontendUser>();
+            userContext.SetCurrentUser(frontendUser);
+            return userContext;
         }
     }
 }
