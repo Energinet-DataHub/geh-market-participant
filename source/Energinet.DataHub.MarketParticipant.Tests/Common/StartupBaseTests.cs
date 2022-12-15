@@ -16,10 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
@@ -107,9 +109,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
             {
                 container.Options.AllowOverridingRegistrations = true;
 
+                container.Register<IUserContext<FrontendUser>>(() => new UserContext<FrontendUser>());
+
                 container.Register(() => new Mock<IUnitOfWorkProvider>().Object);
                 container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
-                container.Register(() => new Mock<IUserIdProvider>().Object, Lifestyle.Scoped);
                 container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
                 container.RegisterSingleton(() => new GraphServiceClient(new HttpClient()));
             }

@@ -16,8 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -104,8 +105,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
         private static void InitUserIdProvider(Container container)
         {
-            var userIdProvider = new Mock<IUserIdProvider>();
-            userIdProvider.Setup(x => x.UserId).Returns(Guid.NewGuid());
+            var mockUser = new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false);
+            var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+            userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
             container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         }
     }
