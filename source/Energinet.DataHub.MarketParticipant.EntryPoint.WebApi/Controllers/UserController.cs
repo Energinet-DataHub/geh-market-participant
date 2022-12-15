@@ -82,9 +82,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpGet("{guid:userId}/actors")]
+        [HttpGet("{userId:guid}/actors")]
         [AuthorizeUser(Permission.UsersManage)]
-        public async Task<IActionResult> GetAssociatedUserActorsAsync(Guid userId)
+        public async Task<IActionResult> GetUserActorsAsync(Guid userId)
         {
             ArgumentNullException.ThrowIfNull(userId);
 
