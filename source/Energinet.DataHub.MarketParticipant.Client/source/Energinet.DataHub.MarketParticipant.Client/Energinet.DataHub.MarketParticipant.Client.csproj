@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Client</PackageId>
-    <PackageVersion>2.9.6$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.10.0$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Client library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
