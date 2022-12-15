@@ -46,7 +46,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture
+        var (actorId, userId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -78,7 +78,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture
+        var (actorId, userId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 

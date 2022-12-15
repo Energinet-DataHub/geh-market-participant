@@ -6,7 +6,7 @@
 
 ## Version 2.9.4
 
-- Added endpoints for user role assignments.
+- Added endpoints for actor selection.
 
 ## Version 2.9.3
 

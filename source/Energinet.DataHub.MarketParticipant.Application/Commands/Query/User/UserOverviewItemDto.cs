@@ -13,20 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Slim;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-/// <summary>
-/// Repository for specialized fast read-only access to actors.
-/// </summary>
-public interface IActorRepository
-{
-    /// <summary>
-    /// Gets an actor directly by their external id.
-    /// </summary>
-    /// <param name="actorId">The id of the actor.</param>
-    /// <returns>An actor for the specified id; or null if not found.</returns>
-    Task<Actor?> GetActorAsync(Guid actorId);
-}
+public sealed record UserOverviewItemDto(
+    Guid Id,
+    string Email,
+    string Name,
+    string? PhoneNumber,
+    DateTimeOffset CreatedDate,
+    bool Active);
