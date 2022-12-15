@@ -12,15 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
-{
-    public sealed record UserOverviewItemDto(
-        Guid Id,
-        string Email,
-        string Name,
-        string? PhoneNumber,
-        DateTimeOffset CreatedDate,
-        bool Active);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+
+public sealed record GetUserOverviewResponse(IEnumerable<UserOverviewItemDto> Users);

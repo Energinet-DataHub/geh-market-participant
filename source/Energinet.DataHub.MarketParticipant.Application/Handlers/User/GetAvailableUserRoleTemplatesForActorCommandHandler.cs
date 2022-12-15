@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
@@ -27,16 +27,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 public sealed class GetAvailableUserRoleTemplatesForActorCommandHandler
     : IRequestHandler<GetAvailableUserRoleTemplatesForActorCommand, GetUserRoleTemplatesResponse>
 {
-    private readonly IActorRepository _actorRepository;
+    private readonly IActorQueryRepository _actorQueryRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUserRoleTemplateRepository _userRoleTemplateRepository;
 
     public GetAvailableUserRoleTemplatesForActorCommandHandler(
-        IActorRepository actorRepository,
+        IActorQueryRepository actorQueryRepository,
         IOrganizationRepository organizationRepository,
         IUserRoleTemplateRepository userRoleTemplateRepository)
     {
-        _actorRepository = actorRepository;
+        _actorQueryRepository = actorQueryRepository;
         _organizationRepository = organizationRepository;
         _userRoleTemplateRepository = userRoleTemplateRepository;
     }
@@ -47,7 +47,7 @@ public sealed class GetAvailableUserRoleTemplatesForActorCommandHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var actor = await _actorRepository
+        var actor = await _actorQueryRepository
             .GetActorAsync(request.ActorId)
             .ConfigureAwait(false);
 

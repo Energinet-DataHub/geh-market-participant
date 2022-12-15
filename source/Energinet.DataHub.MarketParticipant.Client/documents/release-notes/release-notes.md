@@ -1,8 +1,8 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.9.4
+## Version 2.9.5
 
-- Added endpoints for user role assignments.
+- Added endpoints for actor selection.
 
 ## Version 2.9.3
 

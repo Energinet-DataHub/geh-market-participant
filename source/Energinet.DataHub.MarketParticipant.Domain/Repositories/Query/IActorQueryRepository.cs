@@ -15,29 +15,26 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Query;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 
 /// <summary>
-/// Repository for presenting an overview of users paged.
+/// Repository for specialized fast read-only access to actors.
 /// </summary>
-public interface IUserOverviewRepository
+public interface IActorQueryRepository
 {
     /// <summary>
-    /// Calculates total page count.
+    /// Gets an actor directly by their external id.
     /// </summary>
-    /// <param name="pageSize">Page size.</param>
     /// <param name="actorId">The id of the actor.</param>
-    /// <returns>A list of users.</returns>
-    Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId);
+    /// <returns>An actor for the specified id; or null if not found.</returns>
+    Task<Actor?> GetActorAsync(Guid actorId);
 
     /// <summary>
-    /// Retrieve users paged.
+    /// Gets actors used for actor selection.
     /// </summary>
-    /// <param name="pageNumber">Page number.</param>
-    /// <param name="pageSize">Page size.</param>
-    /// <param name="actorId">The id of the actor.</param>
-    /// <returns>A list of users.</returns>
-    Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId);
+    /// <param name="actorIds">The list of actor ids.</param>
+    /// <returns>A list of actors.</returns>
+    Task<IEnumerable<SelectionActor>> GetSelectionActorsAsync(IEnumerable<Guid> actorIds);
 }
