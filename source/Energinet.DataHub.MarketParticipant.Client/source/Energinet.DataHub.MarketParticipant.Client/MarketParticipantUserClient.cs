@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -35,6 +36,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .CreateClient()
                         .Request("user/actors")
                         .SetQueryParam("externalToken", accessToken)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<GetAssociatedUserActorsResponseDto>()
+                .ConfigureAwait(false);
+        }
+
+        public async Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(Guid userId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user", userId, "actors")
                         .GetAsync())
                 .ConfigureAwait(false);
 
