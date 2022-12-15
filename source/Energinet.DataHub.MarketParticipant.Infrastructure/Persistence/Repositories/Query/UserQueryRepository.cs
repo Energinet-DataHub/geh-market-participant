@@ -73,7 +73,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
 
         var query = from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
-            join ur in _marketParticipantDbContext.UserRoleTemplates on r.UserRoleTemplateId equals ur.Id
+            join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
             where u.ExternalId == externalUserId.Value && r.ActorId == actorId && ur.EicFunctions.All(q => actorEicFunctions.Contains(q.EicFunction))
             select ur.Permissions;
 

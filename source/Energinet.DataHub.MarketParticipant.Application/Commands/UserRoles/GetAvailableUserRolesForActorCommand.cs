@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UserRoleTemplateDto(Guid Id, string Name);
+public sealed record GetAvailableUserRolesForActorCommand(Guid ActorId) : IRequest<GetUserRolesResponse>;

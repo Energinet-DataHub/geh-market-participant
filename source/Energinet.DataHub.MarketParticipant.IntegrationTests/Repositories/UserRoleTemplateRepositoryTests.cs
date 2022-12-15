@@ -44,10 +44,10 @@ public sealed class UserRoleTemplateRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRoleTemplateRepository = new UserRoleRepository(context);
 
         // Act
-        var user = await userRoleTemplateRepository.GetAsync(new UserRoleTemplateId(Guid.Empty));
+        var user = await userRoleTemplateRepository.GetAsync(new UserRoleId(Guid.Empty));
 
         // Assert
         Assert.Null(user);
@@ -61,21 +61,21 @@ public sealed class UserRoleTemplateRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRoleTemplateRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity = new UserRoleTemplateEntity
+        var userRoleTemplateEntity = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity);
         await context2.SaveChangesAsync();
 
         // Act
-        var userRoleTemplate = await userRoleTemplateRepository.GetAsync(new UserRoleTemplateId(userRoleTemplateEntity.Id));
+        var userRoleTemplate = await userRoleTemplateRepository.GetAsync(new UserRoleId(userRoleTemplateEntity.Id));
 
         // Assert
         Assert.NotNull(userRoleTemplate);
@@ -92,17 +92,17 @@ public sealed class UserRoleTemplateRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRoleTemplateRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity = new UserRoleTemplateEntity
+        var userRoleTemplateEntity = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity);
         await context2.SaveChangesAsync();
 
         // Act
@@ -120,26 +120,26 @@ public sealed class UserRoleTemplateRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRoleTemplateRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity1 = new UserRoleTemplateEntity
+        var userRoleTemplateEntity1 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        var userRoleTemplateEntity2 = new UserRoleTemplateEntity
+        var userRoleTemplateEntity2 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity1);
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity2);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity1);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity2);
         await context2.SaveChangesAsync();
 
         // Act
@@ -157,26 +157,26 @@ public sealed class UserRoleTemplateRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRoleTemplateRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity1 = new UserRoleTemplateEntity
+        var userRoleTemplateEntity1 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent } },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        var userRoleTemplateEntity2 = new UserRoleTemplateEntity
+        var userRoleTemplateEntity2 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty } },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity1);
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity2);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity1);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity2);
         await context2.SaveChangesAsync();
 
         // Act
@@ -194,21 +194,21 @@ public sealed class UserRoleTemplateRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleTemplateRepository(context);
+        var userRoleTemplateRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity = new UserRoleTemplateEntity
+        var userRoleTemplateEntity = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
             EicFunctions =
             {
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent },
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
             },
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.UsersManage } },
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
-        await context2.UserRoleTemplates.AddAsync(userRoleTemplateEntity);
+        await context2.UserRoles.AddAsync(userRoleTemplateEntity);
         await context2.SaveChangesAsync();
 
         // Act

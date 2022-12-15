@@ -44,11 +44,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
         private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)
         {
-            return new UserRoleAssignmentEntity()
+            return new UserRoleAssignmentEntity
             {
                 ActorId = fromRoleAssignment.ActorId,
                 UserId = fromId.Value,
-                UserRoleTemplateId = fromRoleAssignment.TemplateId.Value,
+                UserRoleId = fromRoleAssignment.UserRoleId.Value,
             };
         }
 
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             return new UserRoleAssignment(
                 new UserId(from.UserId),
                 from.ActorId,
-                new UserRoleTemplateId(from.UserRoleTemplateId));
+                new UserRoleId(from.UserRoleId));
         }
     }
 }
