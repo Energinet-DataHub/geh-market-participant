@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
 {
     /// <summary>
-    /// Repository giving access to grid area audit log entries
+    /// Repository for inserting and querying user roles audit logs
     /// </summary>
     public interface IUserRoleAssignmentAuditLogEntryRepository
     {

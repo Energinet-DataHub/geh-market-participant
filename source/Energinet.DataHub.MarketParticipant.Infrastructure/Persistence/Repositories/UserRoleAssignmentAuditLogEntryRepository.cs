@@ -32,11 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context = context;
         }
 
-        public Task InsertAuditLogEntryAsync(UserRoleAssignmentAuditLogEntry logEntry)
-        {
-            return InsertAuditLogAsync(logEntry);
-        }
-
         public async Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId, Guid actorId)
         {
             var userRoleAssignmentLogs = _context.UserRoleAssignmentAuditLogEntries
@@ -52,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
         }
 
-        private async Task InsertAuditLogAsync(UserRoleAssignmentAuditLogEntry logEntry)
+        public Task InsertAuditLogEntryAsync(UserRoleAssignmentAuditLogEntry logEntry)
         {
             ArgumentNullException.ThrowIfNull(logEntry);
 
@@ -68,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             _context.UserRoleAssignmentAuditLogEntries.Add(entity);
 
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            return _context.SaveChangesAsync();
         }
     }
 }
