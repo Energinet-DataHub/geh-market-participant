@@ -25,7 +25,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         IMarketParticipantActorContactClient,
         IMarketParticipantGridAreaOverviewClient,
         ITokenClient,
-        IMarketParticipantUserOverviewClient
+        IMarketParticipantUserOverviewClient,
+        IMarketParticipantActorQueryClient
     {
     }
 }

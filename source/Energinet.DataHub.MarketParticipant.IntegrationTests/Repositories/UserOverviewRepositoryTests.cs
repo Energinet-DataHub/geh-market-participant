@@ -38,8 +38,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 public sealed class UserOverviewRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
-    private List<(Guid UserId, Guid ExternalUserId, Guid ActorId)> _searchUsers;
-    private UserOverviewRepository _sut;
     public UserOverviewRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
@@ -348,7 +346,7 @@ public sealed class UserOverviewRepositoryTests
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
-    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleTemplateEntity Template)> CreateActorAndTemplate(
+    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleEntity Template)> CreateActorAndTemplate(
             MarketParticipantDbContext context,
             bool isFas,
             string actorName = "Actor name",
@@ -374,27 +372,25 @@ public sealed class UserOverviewRepositoryTests
         await context.Organizations.AddAsync(orgEntity);
         await context.SaveChangesAsync();
 
-        var userRoleTemplate = new UserRoleTemplateEntity
+        var userRoleTemplate = new UserRoleEntity
         {
             Name = "Template name",
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = eicFunction } }
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
         };
-        await context.UserRoleTemplates.AddAsync(userRoleTemplate);
+        await context.UserRoles.AddAsync(userRoleTemplate);
         await context.SaveChangesAsync();
         await context.Entry(actorEntity).ReloadAsync();
 
         return (orgEntity, actorEntity, userRoleTemplate);
     }
 
-    private static async Task<UserEntity> CreateUserAsync(
-        MarketParticipantDbContext context,
-        ActorEntity actorEntity,
-        UserRoleTemplateEntity userRoleTemplate)
+    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole)
     {
         var roleAssignment = new UserRoleAssignmentEntity
         {
-            ActorId = actorEntity.Id, UserRoleTemplateId = userRoleTemplate.Id
+            ActorId = actorEntity.Id,
+            UserRoleId = userRole.Id
         };
 
         var userEntity = new UserEntity

@@ -28,13 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = factory;
         }
 
-        public async Task UpdateUserRoleAssignmentsAsync(Guid userId, UpdateUserRoleAssignmentsDto updateUserRoleAssignmentsDto)
+        public async Task UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, UpdateUserRoleAssignmentsDto updateUserRoleAssignmentsDto)
         {
             await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request($"users/{userId:guid}/roles")
+                        .Request($"actors/{actorId}/users/{userId}/roles")
                         .PutJsonAsync(updateUserRoleAssignmentsDto))
                 .ConfigureAwait(false);
         }

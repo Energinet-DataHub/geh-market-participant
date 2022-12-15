@@ -14,7 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -48,13 +48,13 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
             .DatabaseManager
             .CreateActorAsync(new[] { EicFunction.CoordinatedCapacityCalculator });
 
-        var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actorId);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Empty(response.Templates);
+        Assert.Empty(response.Roles);
     }
 
     [Fact]
@@ -70,36 +70,36 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
             .DatabaseManager
             .CreateActorAsync(new[] { EicFunction.Agent, EicFunction.CapacityTrader });
 
-        var userRoleTemplate1 = new UserRoleTemplateEntity
+        var userRoleTemplate1 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent }
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent }
             }
         };
 
-        var userRoleTemplate2 = new UserRoleTemplateEntity
+        var userRoleTemplate2 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.CapacityTrader }
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.CapacityTrader }
             }
         };
 
-        await context.UserRoleTemplates.AddAsync(userRoleTemplate1);
-        await context.UserRoleTemplates.AddAsync(userRoleTemplate2);
+        await context.UserRoles.AddAsync(userRoleTemplate1);
+        await context.UserRoles.AddAsync(userRoleTemplate2);
         await context.SaveChangesAsync();
 
-        var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actorId);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Contains(response.Templates, t => t.Id == userRoleTemplate1.Id);
-        Assert.Contains(response.Templates, t => t.Id == userRoleTemplate2.Id);
+        Assert.Contains(response.Roles, t => t.Id == userRoleTemplate1.Id);
+        Assert.Contains(response.Roles, t => t.Id == userRoleTemplate2.Id);
     }
 
     [Fact]
@@ -115,26 +115,26 @@ public sealed class GetAvailableUserRoleTemplatesForActorIntegrationTests
             .DatabaseManager
             .CreateActorAsync(new[] { EicFunction.Agent, EicFunction.CapacityTrader });
 
-        var userRoleTemplate = new UserRoleTemplateEntity
+        var userRoleTemplate = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Agent },
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.CapacityTrader },
-                new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.Consumer },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.CapacityTrader },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Consumer },
             }
         };
 
-        await context.UserRoleTemplates.AddAsync(userRoleTemplate);
+        await context.UserRoles.AddAsync(userRoleTemplate);
         await context.SaveChangesAsync();
 
-        var command = new GetAvailableUserRoleTemplatesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actorId);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.DoesNotContain(response.Templates, t => t.Id == userRoleTemplate.Id);
+        Assert.DoesNotContain(response.Roles, t => t.Id == userRoleTemplate.Id);
     }
 }

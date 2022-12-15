@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
@@ -99,7 +99,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         var query = from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
             from urr in urj.DefaultIfEmpty()
-            join ur in _marketParticipantDbContext.UserRoleTemplates on urr.UserRoleTemplateId equals ur.Id into urt
+            join ur in _marketParticipantDbContext.UserRoles on urr.UserRoleId equals ur.Id into urt
             from urtj in urt.DefaultIfEmpty()
             join actor in _marketParticipantDbContext.Actors on urr.ActorId equals actor.Id
             where

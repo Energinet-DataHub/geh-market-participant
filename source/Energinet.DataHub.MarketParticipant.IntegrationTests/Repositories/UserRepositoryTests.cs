@@ -118,20 +118,20 @@ public sealed class UserRepositoryTests
 
         await context.Organizations.AddAsync(orgEntity);
         await context.SaveChangesAsync();
-        var userRoleTemplate = new UserRoleTemplateEntity()
+        var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRoleTemplatePermissionEntity() { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
-        context.UserRoleTemplates.Add(userRoleTemplate);
+        context.UserRoles.Add(userRoleTemplate);
         await context.SaveChangesAsync();
 
         await context.Entry(actorEntity).ReloadAsync();
         var roleAssignment = new UserRoleAssignmentEntity()
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRoleTemplate.Id
         };
         var userEntity = new UserEntity()
         {
@@ -151,7 +151,7 @@ public sealed class UserRepositoryTests
         Assert.NotEqual(Guid.Empty, user.Id.Value);
         Assert.Equal(email, user.Email.Address);
         Assert.Single(user.RoleAssignments);
-        Assert.Equal(userRoleTemplate.Id, user.RoleAssignments.First().TemplateId.Value);
+        Assert.Equal(userRoleTemplate.Id, user.RoleAssignments.First().UserRoleId.Value);
     }
 
     [Fact]
@@ -207,7 +207,7 @@ public sealed class UserRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserRepository(context);
 
-        var (_, userId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var (_, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
 
         // Act
         var user = await userRepository.GetAsync(new UserId(userId));

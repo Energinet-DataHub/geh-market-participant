@@ -17,18 +17,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetAssociatedUserActorsHandler : IRequestHandler<GetAssociatedUserActorsCommand, GetAssociatedUserActorsResponse>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserQueryRepository _userQueryRepository;
 
-    public GetAssociatedUserActorsHandler(IUserRepository userRepository)
+    public GetAssociatedUserActorsHandler(IUserQueryRepository userQueryRepository)
     {
-        _userRepository = userRepository;
+        _userQueryRepository = userQueryRepository;
     }
 
     public async Task<GetAssociatedUserActorsResponse> Handle(
@@ -37,7 +37,7 @@ public sealed class GetAssociatedUserActorsHandler : IRequestHandler<GetAssociat
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var actorIds = await _userRepository
+        var actorIds = await _userQueryRepository
             .GetActorsAsync(new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 

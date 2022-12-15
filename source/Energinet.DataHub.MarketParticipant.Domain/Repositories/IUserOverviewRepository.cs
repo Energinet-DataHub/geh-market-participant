@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Slim;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 
 /// <summary>
 /// Repository for presenting an overview of users paged.

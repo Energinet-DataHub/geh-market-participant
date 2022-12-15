@@ -12,20 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOverviewCommand>
-    {
-        public GetUserOverviewCommandRuleSet()
-        {
-            RuleFor(command => command.PageNumber)
-                .GreaterThan(0);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-            RuleFor(command => command.PageSize)
-                .GreaterThan(0);
-        }
+public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOverviewCommand>
+{
+    public GetUserOverviewCommandRuleSet()
+    {
+        RuleFor(command => command.PageNumber)
+            .GreaterThan(0);
+
+        RuleFor(command => command.PageSize)
+            .GreaterThan(0);
     }
 }

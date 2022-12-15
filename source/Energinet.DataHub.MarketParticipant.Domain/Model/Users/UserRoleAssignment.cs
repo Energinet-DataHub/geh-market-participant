@@ -17,14 +17,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class UserRoleAssignment
 {
-    public UserRoleAssignment(UserId userId, Guid actorId, UserRoleTemplateId templateId)
+    public UserRoleAssignment(UserId userId, Guid actorId, UserRoleId userRoleId)
     {
         UserId = userId;
         ActorId = actorId;
-        TemplateId = templateId;
+        UserRoleId = userRoleId;
     }
 
     public UserId UserId { get; }
     public Guid ActorId { get; }
-    public UserRoleTemplateId TemplateId { get; }
+    public UserRoleId UserRoleId { get; }
 }

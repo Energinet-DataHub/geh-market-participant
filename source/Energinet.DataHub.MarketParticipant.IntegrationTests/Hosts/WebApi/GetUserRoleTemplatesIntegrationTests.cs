@@ -15,7 +15,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -43,17 +43,17 @@ public sealed class GetUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture
+        var (actorId, userId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
-        var command = new GetUserRoleTemplatesCommand(actorId, userId);
+        var command = new GetUserRolesCommand(actorId, userId);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Empty(response.Templates);
+        Assert.Empty(response.Roles);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public sealed class GetUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture
+        var (actorId, userId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -76,13 +76,13 @@ public sealed class GetUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.OrganizationView });
 
-        var command = new GetUserRoleTemplatesCommand(actorId, userId);
+        var command = new GetUserRolesCommand(actorId, userId);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Equal(2, response.Templates.Count());
+        Assert.Equal(2, response.Roles.Count());
     }
 
     [Fact]
@@ -93,11 +93,11 @@ public sealed class GetUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId1, userId) = await _fixture
+        var (actorId1, userId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
-        var (actorId2, _) = await _fixture
+        var (actorId2, _, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -113,15 +113,15 @@ public sealed class GetUserRoleTemplatesIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId2, userId, new[] { Permission.GridAreasManage });
 
-        var command1 = new GetUserRoleTemplatesCommand(actorId1, userId);
-        var command2 = new GetUserRoleTemplatesCommand(actorId2, userId);
+        var command1 = new GetUserRolesCommand(actorId1, userId);
+        var command2 = new GetUserRolesCommand(actorId2, userId);
 
         // Act
         var response1 = await mediator.Send(command1);
         var response2 = await mediator.Send(command2);
 
         // Assert
-        Assert.Single(response1.Templates);
-        Assert.Equal(2, response2.Templates.Count());
+        Assert.Single(response1.Roles);
+        Assert.Equal(2, response2.Roles.Count());
     }
 }

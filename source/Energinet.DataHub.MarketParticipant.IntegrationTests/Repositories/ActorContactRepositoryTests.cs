@@ -52,8 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var testContact = await contactRepository
-                .GetAsync(new ContactId(Guid.NewGuid()))
-                ;
+                .GetAsync(new ContactId(Guid.NewGuid()));
 
             // Assert
             Assert.Null(testContact);
@@ -74,8 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(actor);
 
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization)
-                ;
+                .AddOrUpdateAsync(organization);
 
             organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
@@ -98,14 +96,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                         "fake_value",
                         categories[i],
                         new EmailAddress("fake@fake.dk"),
-                        new PhoneNumber("1234567")))
-                    ;
+                        new PhoneNumber("1234567")));
             }
 
             // Act
             var testContacts = await contactRepository
-                .GetAsync(actor.Id)
-                ;
+                .GetAsync(actor.Id);
 
             // Assert
             Assert.Equal(5, testContacts.Count());
@@ -125,8 +121,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(actor);
 
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization)
-                ;
+                .AddOrUpdateAsync(organization);
 
             organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
@@ -146,12 +141,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Assert
             Assert.NotNull(newContact);
-            Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
-            Assert.NotEqual(Guid.Empty, newContact?.ActorId);
-            Assert.Equal(testContact.Category, newContact?.Category);
-            Assert.Equal(testContact.Email.Address, newContact?.Email.Address);
-            Assert.Equal(testContact.Name, newContact?.Name);
-            Assert.Equal(testContact.Phone?.Number, newContact?.Phone?.Number);
+            Assert.NotEqual(Guid.Empty, newContact.Id.Value);
+            Assert.NotEqual(Guid.Empty, newContact.ActorId);
+            Assert.Equal(testContact.Category, newContact.Category);
+            Assert.Equal(testContact.Email.Address, newContact.Email.Address);
+            Assert.Equal(testContact.Name, newContact.Name);
+            Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
         }
 
         [Fact]
@@ -168,8 +163,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(actor);
 
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization)
-                ;
+                .AddOrUpdateAsync(organization);
 
             organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
@@ -229,8 +223,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(actor);
 
             var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization)
-                ;
+                .AddOrUpdateAsync(organization);
 
             organization = await organizationRepository.GetAsync(organizationId);
             actor = organization!.Actors.First();
@@ -253,11 +246,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Assert
             Assert.NotNull(newContact);
-            Assert.NotEqual(Guid.Empty, newContact?.Id.Value);
-            Assert.Equal(testContact.Category, newContact?.Category);
-            Assert.Equal(testContact.Email.Address, newContact?.Email.Address);
-            Assert.Equal(testContact.Name, newContact?.Name);
-            Assert.Equal(testContact.Phone?.Number, newContact?.Phone?.Number);
+            Assert.NotEqual(Guid.Empty, newContact.Id.Value);
+            Assert.Equal(testContact.Category, newContact.Category);
+            Assert.Equal(testContact.Email.Address, newContact.Email.Address);
+            Assert.Equal(testContact.Name, newContact.Name);
+            Assert.Equal(testContact.Phone?.Number, newContact.Phone?.Number);
         }
     }
 }

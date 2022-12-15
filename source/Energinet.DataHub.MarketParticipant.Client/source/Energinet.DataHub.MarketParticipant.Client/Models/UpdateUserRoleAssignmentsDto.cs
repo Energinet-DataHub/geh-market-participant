@@ -17,5 +17,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public record UpdateUserRoleAssignmentsDto(Guid ActorId, IEnumerable<UserRoleTemplateIdDto> UserRoleTemplateAssignments);
+    public record UpdateUserRoleAssignmentsDto(IEnumerable<Guid> UserRoleAssignments);
 }

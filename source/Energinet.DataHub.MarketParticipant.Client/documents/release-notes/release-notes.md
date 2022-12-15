@@ -1,8 +1,16 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.10.0
+
+- Rename user role to not contain 'template'.
+
+## Version 2.9.6
+
+- Added endpoint to get actors to a user.
+
 ## Version 2.9.4
 
-- Added endpoints for user role assignments.
+- Added endpoints for actor selection.
 
 ## Version 2.9.3
 

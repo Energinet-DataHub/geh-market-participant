@@ -45,7 +45,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
     public DbSet<UserEntity> Users { get; private set; } = null!;
     public DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; private set; } = null!;
-    public DbSet<UserRoleTemplateEntity> UserRoleTemplates { get; private set; } = null!;
+    public DbSet<UserRoleEntity> UserRoles { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
     {
@@ -68,9 +68,9 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new ActorSynchronizationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserRoleTemplateEicFunctionEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserRoleTemplateEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new UserRoleTemplatePermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleEicFunctionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRolePermissionEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }
