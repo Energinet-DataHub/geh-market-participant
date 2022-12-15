@@ -163,7 +163,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
         var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
         var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
         var updateDto = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId1, templateId2 });
@@ -189,7 +189,7 @@ public sealed class UpdateUserRoleTemplatesIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
         var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
         var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
         var updateDto1 = new UpdateUserRoleAssignmentsDto(actorId, new List<UserRoleTemplateId> { templateId1, templateId2 });
