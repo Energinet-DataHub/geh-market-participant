@@ -42,7 +42,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor")]
-        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetActorsAsync(Guid organizationId)
         {
             return await this.ProcessAsync(
@@ -63,7 +62,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
-        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
         {
             return await this.ProcessAsync(
