@@ -44,5 +44,23 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<UserOverviewItemDto>>()
                 .ConfigureAwait(false);
         }
+
+        public async Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("useroverview/users")
+                        .SetQueryParam("pageNumber", pageNumber)
+                        .SetQueryParam("pageSize", pageSize)
+                        .SetQueryParam("searchText", searchText)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<IEnumerable<UserOverviewItemDto>>()
+                .ConfigureAwait(false);
+        }
     }
 }

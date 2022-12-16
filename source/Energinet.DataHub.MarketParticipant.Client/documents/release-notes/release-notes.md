@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.10.1
+
+- Added optional searchText param to user overview
+
 ## Version 2.10.0
 
 - Rename user role to not contain 'template'.

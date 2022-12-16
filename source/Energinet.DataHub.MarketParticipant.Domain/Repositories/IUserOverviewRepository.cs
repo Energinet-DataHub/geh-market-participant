@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -40,4 +42,22 @@ public interface IUserOverviewRepository
     /// <param name="actorId">The id of the actor.</param>
     /// <returns>A list of users.</returns>
     Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId);
+
+    /// <summary>
+    /// Searches users paged
+    /// </summary>
+    /// <param name="pageNumber">Page number.</param>
+    /// <param name="pageSize">Page size.</param>
+    /// <param name="actorId">The id of the actor.</param>
+    /// <param name="searchText">A text to search for, can be empty</param>
+    /// <param name="onlyActive">only search active users, default is false</param>
+    /// <param name="eicFunctions">The list of Eic functions to search for</param>
+    /// <returns>A List of users matching the criteria supplied</returns>
+    Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
+        int pageNumber,
+        int pageSize,
+        Guid? actorId,
+        string? searchText,
+        bool? onlyActive,
+        Collection<EicFunction>? eicFunctions);
 }

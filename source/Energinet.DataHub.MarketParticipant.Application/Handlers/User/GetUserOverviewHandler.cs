@@ -13,41 +13,57 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
+
+public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
 {
-    public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
+    private readonly IUserOverviewRepository _repository;
+
+    public GetUserOverviewHandler(IUserOverviewRepository repository)
     {
-        private readonly IUserOverviewRepository _repository;
+        _repository = repository;
+    }
 
-        public GetUserOverviewHandler(IUserOverviewRepository repository)
+    public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        IEnumerable<UserOverviewItem> users;
+
+        // The GetUsers function is kept, as it is more performant if no search criteria are used
+        if (!string.IsNullOrEmpty(request.SearchText))
         {
-            _repository = repository;
+            users = await _repository.SearchUsersAsync(
+                request.PageNumber,
+                request.PageSize,
+                request.ActorId,
+                request.SearchText,
+                false,
+                null).ConfigureAwait(false);
         }
-
-        public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
+        else
         {
-            ArgumentNullException.ThrowIfNull(request);
-
-            var users = await _repository.GetUsersAsync(
+            users = await _repository.GetUsersAsync(
                 request.PageNumber,
                 request.PageSize,
                 request.ActorId).ConfigureAwait(false);
-
-            return new GetUserOverviewResponse(
-                users.Select(x => new UserOverviewItemDto(
-                    x.Id.Value,
-                    x.Email.Address,
-                    x.Name,
-                    x.PhoneNumber,
-                    x.CreatedDate,
-                    x.Active)));
         }
+
+        return new GetUserOverviewResponse(
+            users.Select(x => new UserOverviewItemDto(
+                x.Id.Value,
+                x.Email.Address,
+                x.Name,
+                x.PhoneNumber,
+                x.CreatedDate,
+                x.Active)));
     }
 }

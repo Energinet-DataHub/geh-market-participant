@@ -43,7 +43,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize)
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText)
     {
         return await this.ProcessAsync(
             async () =>
@@ -52,7 +52,7 @@ public sealed class UserOverviewController : ControllerBase
                     ? _userContext.CurrentUser.ActorId
                     : (Guid?)null;
 
-                var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId, null);
+                var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId, searchText);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
                 return Ok(response.Users);
             },
