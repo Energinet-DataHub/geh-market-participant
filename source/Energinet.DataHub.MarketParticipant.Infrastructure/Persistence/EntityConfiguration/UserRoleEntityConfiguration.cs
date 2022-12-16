@@ -17,24 +17,22 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserRoleEntity>
 {
-    public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserRoleEntity>
+    public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("UserRoleTemplate");
-            builder.HasKey(template => template.Id);
-            builder.Property(template => template.Id).ValueGeneratedOnAdd();
-            builder
-                .HasMany(template => template.Permissions)
-                .WithOne()
-                .HasForeignKey(permission => permission.UserRoleId);
-            builder
-                .HasMany(template => template.EicFunctions)
-                .WithOne()
-                .HasForeignKey(eic => eic.UserRoleId);
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("UserRole");
+        builder.Property(userRole => userRole.Id).ValueGeneratedOnAdd();
+        builder
+            .HasMany(userRole => userRole.Permissions)
+            .WithOne()
+            .HasForeignKey(permission => permission.UserRoleId);
+        builder
+            .HasMany(userRole => userRole.EicFunctions)
+            .WithOne()
+            .HasForeignKey(eic => eic.UserRoleId);
     }
 }

@@ -17,16 +17,15 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
+
+public sealed class UserRoleAssignmentEntityConfiguration : IEntityTypeConfiguration<UserRoleAssignmentEntity>
 {
-    public sealed class UserRoleAssignmentEntityConfiguration : IEntityTypeConfiguration<UserRoleAssignmentEntity>
+    public void Configure(EntityTypeBuilder<UserRoleAssignmentEntity> builder)
     {
-        public void Configure(EntityTypeBuilder<UserRoleAssignmentEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("UserRoleAssignment");
-            builder.Property(x => x.UserRoleId).HasColumnName("TemplateId");
-            builder.HasKey(x => new { x.ActorId, x.UserId, x.UserRoleId });
-        }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("UserRoleAssignment");
+        builder.Property(x => x.UserRoleId);
+        builder.HasKey(x => new { x.ActorId, x.UserId, x.UserRoleId });
     }
 }

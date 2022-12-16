@@ -28,11 +28,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class UserRoleTemplateRepositoryTests
+public sealed class UserRoleRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public UserRoleTemplateRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public UserRoleRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
