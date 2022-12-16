@@ -20,9 +20,6 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -31,39 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     [UnitTest]
     public sealed class OrganizationIntegrationEventsQueueServiceTests
     {
-        [Fact]
-        public async Task EnqueueOrganizationUpdatedEventAsync_CreatesEvent()
-        {
-            // Arrange
-            var domainEventRepository = new Mock<IDomainEventRepository>();
-            var target = new OrganizationIntegrationEventsQueueService(domainEventRepository.Object);
-            var helper = new OrganizationIntegrationEventsHelperService();
-
-            var organizationArea = new Organization(
-                new OrganizationId(Guid.NewGuid()),
-                "fake_value",
-                Enumerable.Empty<Actor>(),
-                new BusinessRegisterIdentifier("12345678"),
-                new Address(
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value",
-                    "fake_value"),
-                "Test Comment",
-                OrganizationStatus.Active);
-
-            var changeEvent = helper.BuildOrganizationCreatedEvents(organizationArea);
-
-            // Act
-            await target.EnqueueOrganizationIntegrationEventsAsync(organizationArea.Id, changeEvent).ConfigureAwait(false);
-
-            // Assert
-            domainEventRepository.Verify(
-                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == organizationArea.Id.Value)),
-                Times.Once);
-        }
-
         [Fact]
         public Task EnqueueOrganizationNameChangedEventAsync_CreatesEvent()
         {
