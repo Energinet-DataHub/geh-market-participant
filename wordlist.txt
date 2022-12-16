@@ -57,3 +57,4 @@ eventparsers
 FullFlexDate
 frontend
 backend
+searchText
