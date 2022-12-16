@@ -105,7 +105,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             where
                 (actorId == null || urr.ActorId == actorId)
                 && (eicFunctions == null || !eicFunctions.Any() || urtj.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
-                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || urtj.Name.Contains(searchText))
+                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || urtj.Name.Contains(searchText) || u.Email.Contains(searchText))
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();

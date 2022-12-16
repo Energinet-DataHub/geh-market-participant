@@ -282,6 +282,102 @@ public sealed class UserOverviewRepositoryTests
         Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
     }
 
+    [Fact]
+    public async Task SearchUsers_SearchTextMatchesEmail_ReturnsOne()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithEmailActorName(context, false, "Bahamut", "alexander@example.com");
+        var (otherUser2Id, otherExternal2Id, otherActor2Id) = await CreateUserWithEmailActorName(context, false, "Shiva", "shiva@example.com");
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId, otherExternal2Id }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                null,
+                "Alex",
+                null,
+                null))
+            .ToList();
+
+        // Assert
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUser2Id));
+    }
+
+    [Fact]
+    public async Task SearchUsers_SearchTextMatchesEmailAndActorName_ReturnsBoth()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithEmailActorName(context, false, "Bahamut", "axol@example.com");
+        var (otherUser2Id, otherExternal2Id, otherActor2Id) = await CreateUserWithEmailActorName(context, false, "Shiva", "shiva@example.com");
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId, otherExternal2Id }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                null,
+                "axol",
+                null,
+                null))
+            .ToList();
+
+        // Assert
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUser2Id));
+    }
+
+    [Fact]
+    public async Task SearchUsers_SearchTextMatchesEmailAndActorNameBothNotActorId_ReturnsOne()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithEmailActorName(context, false, "Bahamut", "axol@example.com");
+        var (otherUser2Id, otherExternal2Id, otherActor2Id) = await CreateUserWithActorName(context, false, "Shiva");
+
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>() { externalId, otherExternalId, otherExternal2Id }).Object);
+
+        // Act
+        var actual = (await target.SearchUsersAsync(
+                1,
+                1000,
+                otherActorId,
+                "axol",
+                null,
+                null))
+            .ToList();
+
+        // Assert
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == userId));
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == otherUserId));
+        Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUser2Id));
+    }
+
     private static Mock<IUserIdentityRepository> CreateUserIdentityRepository()
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
@@ -343,6 +439,14 @@ public sealed class UserOverviewRepositoryTests
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, actorName);
         var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+        return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
+    }
+
+    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithEmailActorName(
+        MarketParticipantDbContext context, bool isFas, string actorName, string email)
+    {
+        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, actorName);
+        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate, email);
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
@@ -436,7 +540,7 @@ public sealed class UserOverviewRepositoryTests
         return (orgEntity, actorEntity, roles);
     }
 
-    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole)
+    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole, string email = "test@example.com")
     {
         var roleAssignment = new UserRoleAssignmentEntity
         {
@@ -446,7 +550,7 @@ public sealed class UserOverviewRepositoryTests
 
         var userEntity = new UserEntity
         {
-            ExternalId = Guid.NewGuid(), Email = "test@example.com", RoleAssignments = { roleAssignment }
+            ExternalId = Guid.NewGuid(), Email = email, RoleAssignments = { roleAssignment }
         };
 
         await context.Users.AddAsync(userEntity);
