@@ -25,14 +25,13 @@ public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserR
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         builder.ToTable("UserRole");
-        builder.HasKey(template => template.Id);
-        builder.Property(template => template.Id).ValueGeneratedOnAdd();
+        builder.Property(userRole => userRole.Id).ValueGeneratedOnAdd();
         builder
-            .HasMany(template => template.Permissions)
+            .HasMany(userRole => userRole.Permissions)
             .WithOne()
             .HasForeignKey(permission => permission.UserRoleId);
         builder
-            .HasMany(template => template.EicFunctions)
+            .HasMany(userRole => userRole.EicFunctions)
             .WithOne()
             .HasForeignKey(eic => eic.UserRoleId);
     }
