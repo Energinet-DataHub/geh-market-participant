@@ -23,21 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     public class OrganizationIntegrationEventsHelperService : IOrganizationIntegrationEventsHelperService
     {
-        public IEnumerable<IIntegrationEvent> BuildOrganizationCreatedEvents(Organization organization)
-        {
-            ArgumentNullException.ThrowIfNull(organization, nameof(organization));
-
-            yield return new OrganizationCreatedIntegrationEvent
-            {
-                Address = organization.Address,
-                Name = organization.Name,
-                OrganizationId = organization.Id,
-                BusinessRegisterIdentifier = organization.BusinessRegisterIdentifier,
-                Comment = organization.Comment,
-                Status = organization.Status
-            };
-        }
-
         public IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));

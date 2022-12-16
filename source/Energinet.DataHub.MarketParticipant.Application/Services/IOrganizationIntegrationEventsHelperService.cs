@@ -17,26 +17,18 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+/// <summary>
+/// Organization helper service for integration events
+/// </summary>
+public interface IOrganizationIntegrationEventsHelperService
 {
     /// <summary>
-    /// Organization helper service for integration events
+    /// test
     /// </summary>
-    public interface IOrganizationIntegrationEventsHelperService
-    {
-        /// <summary>
-        /// Build organization created event
-        /// </summary>
-        /// <param name="organization">organization to build event for</param>
-        /// <returns>Organization created events</returns>
-        IEnumerable<IIntegrationEvent> BuildOrganizationCreatedEvents(Organization organization);
-
-        /// <summary>
-        /// test
-        /// </summary>
-        /// <param name="organization"></param>
-        /// <param name="organizationDto"></param>
-        /// <returns>events</returns>
-        IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto);
-    }
+    /// <param name="organization"></param>
+    /// <param name="organizationDto"></param>
+    /// <returns>events</returns>
+    IEnumerable<IIntegrationEvent> DetermineOrganizationUpdatedChangeEvents(Organization organization, ChangeOrganizationDto organizationDto);
 }
