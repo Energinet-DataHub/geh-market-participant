@@ -378,6 +378,31 @@ public sealed class UserOverviewRepositoryTests
         Assert.Null(actual.FirstOrDefault(x => x.Id.Value == otherUser2Id));
     }
 
+    [Fact]
+    public async Task SearchUsers_PagesResults()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var (actorId, userIds) = await CreateUsersForSameActorAsync(context, 20);
+        var userIdList = userIds.ToList();
+        var target = new UserOverviewRepository(
+            context,
+            CreateUserIdentityRepositoryForSearch(new Collection<Guid>(userIdList.Select(x => x.ExternalId).ToList())).Object);
+
+        // Act
+        var actual = new List<UserOverviewItem>();
+        var actualPage2 = new List<UserOverviewItem>();
+        var actualPage3 = new List<UserOverviewItem>();
+        actual.AddRange(await target.SearchUsersAsync(1, 8, actorId, "Name", true, null));
+        actual.AddRange(await target.SearchUsersAsync(2, 8, actorId, "Name", true, null));
+        actual.AddRange(await target.SearchUsersAsync(3, 8, actorId, "Name", true, null));
+
+        // Assert
+        Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x), actual.Select(x => x.Id.Value).OrderBy(x => x));
+    }
+
     private static Mock<IUserIdentityRepository> CreateUserIdentityRepository()
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
@@ -402,8 +427,7 @@ public sealed class UserOverviewRepositoryTests
         return userIdentityRepository;
     }
 
-    private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)>
-        CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
+    private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
 
