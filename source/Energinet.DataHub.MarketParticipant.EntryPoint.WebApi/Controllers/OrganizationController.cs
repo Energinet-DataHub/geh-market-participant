@@ -42,7 +42,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        [AuthorizeUser(Permission.OrganizationView, Permission.OrganizationManage)]
         public async Task<IActionResult> ListAllAsync()
         {
             return await this.ProcessAsync(
@@ -61,7 +60,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}")]
-        [AuthorizeUser(Permission.OrganizationView, Permission.OrganizationManage)]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
             return await this.ProcessAsync(
