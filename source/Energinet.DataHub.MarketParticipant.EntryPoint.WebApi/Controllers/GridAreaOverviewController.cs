@@ -37,7 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetGridAreaOverviewAsync()
         {
             return await this.ProcessAsync(
