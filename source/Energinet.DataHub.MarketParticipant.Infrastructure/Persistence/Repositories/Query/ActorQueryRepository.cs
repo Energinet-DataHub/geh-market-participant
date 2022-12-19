@@ -52,12 +52,19 @@ public sealed class ActorQueryRepository : IActorQueryRepository
     {
         var ids = actorIds.Distinct().ToList();
 
-        var actors = await _marketParticipantDbContext
-            .Actors
-            .Where(x => ids.Contains(x.Id))
-            .ToListAsync()
-            .ConfigureAwait(false);
+        var query = from a in _marketParticipantDbContext.Actors
+                    join o in _marketParticipantDbContext.Organizations
+                        on a.OrganizationId equals o.Id
+                    where ids.Contains(a.Id)
+                    select new
+                    {
+                        ActorId = a.Id,
+                        a.ActorNumber,
+                        OrganizationName = o.Name
+                    };
 
-        return actors.Select(x => new SelectionActor(x.Id, x.ActorNumber, x.Name));
+        var actors = await query.ToListAsync().ConfigureAwait(false);
+
+        return actors.Select(x => new SelectionActor(x.ActorId, x.ActorNumber, x.OrganizationName));
     }
 }
