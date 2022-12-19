@@ -51,6 +51,6 @@ public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectio
             .ConfigureAwait(false);
 
         return new GetSelectionActorsQueryResponse(
-            actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.Name)));
+            actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.OrganizationName)));
     }
 }
