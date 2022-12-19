@@ -51,7 +51,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             // TODO: Add MobilePhone once we are switched to Azure AD, since currently we are running on Azure B2C where it is Is not supported.
             users = await _graphClient.Users
                 .Request(queryOptions)
-                .Filter($"startswith(displayName, '{searchText}') OR startswith(mail, '{searchText}')")
+                .Filter($"startswith(displayName, '{searchText}')")
                 .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
                 .GetAsync()
                 .ConfigureAwait(false);
