@@ -72,4 +72,42 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         Assert.NotEmpty(actual.Users);
         Assert.NotNull(actual.Users.First(x => x.Id == userId));
     }
+
+    [Fact]
+    public async Task GetUserOverview_GivenActorWithPermissionUsersManage_ReturnsUserOverviewUsingSearch()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var mock = new Mock<IUserIdentityRepository>();
+        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var userIdsToReturn = new List<Guid>()
+        {
+            externalUserId
+        };
+        mock
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), It.IsAny<bool?>()))
+            .Returns<string?, bool?>((searchText, onlyActive) =>
+                Task.FromResult(
+                    userIdsToReturn.Select(y =>
+                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+
+        scope.Container!.Register(() => mock.Object);
+
+        var mediator = scope.GetInstance<IMediator>();
+
+        await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+
+        var command = new GetUserOverviewCommand(1, 100, actorId, "test");
+
+        // act
+        var actual = await mediator.Send(command);
+
+        // assert
+        Assert.NotEmpty(actual.Users);
+        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+    }
 }

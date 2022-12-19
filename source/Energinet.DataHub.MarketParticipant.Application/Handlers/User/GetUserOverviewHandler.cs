@@ -39,7 +39,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
         IEnumerable<UserOverviewItem> users;
 
         // The GetUsers function is kept, as it is more performant if no search criteria are used
-        if (string.IsNullOrEmpty(request.SearchText))
+        if (!string.IsNullOrEmpty(request.SearchText))
         {
             users = await _repository.SearchUsersAsync(
                 request.PageNumber,
