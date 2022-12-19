@@ -13,10 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,10 +31,17 @@ public sealed class UpdateUserRolesCommandHandler
     : IRequestHandler<UpdateUserRoleAssignmentsCommand>
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUserContext<FrontendUser> _userContext;
 
-    public UpdateUserRolesCommandHandler(IUserRepository userRepository)
+    public UpdateUserRolesCommandHandler(
+        IUserRepository userRepository,
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
+        IUserContext<FrontendUser> userContext)
     {
         _userRepository = userRepository;
+        _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
+        _userContext = userContext;
     }
 
     public async Task<Unit> Handle(
@@ -49,6 +59,8 @@ public sealed class UpdateUserRolesCommandHandler
             throw new NotFoundValidationException(request.UserId);
         }
 
+        var (removedRoles, addedRoles) = FindUserRoleAssignmentChanges(request, user);
+
         ClearUserRolesForActorBeforeUpdate(request, user);
 
         foreach (var userRoleId in request.UserRoleAssignments)
@@ -61,7 +73,31 @@ public sealed class UpdateUserRolesCommandHandler
 
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
+        await CreateLogEntriesAsync(
+            user.Id,
+            new ExternalUserId(_userContext.CurrentUser.ExternalUserId),
+            request.ActorId,
+            removedRoles,
+            addedRoles).ConfigureAwait(false);
+
         return Unit.Value;
+    }
+
+    private static (IEnumerable<Guid> RemovedUserRoles, IEnumerable<Guid> AddedUserRoles) FindUserRoleAssignmentChanges(UpdateUserRoleAssignmentsCommand request, Domain.Model.Users.User user)
+    {
+        var removedRoles = user.RoleAssignments
+            .Where(a => a.ActorId == request.ActorId)
+            .Select(e => e.UserRoleId.Value)
+            .Except(request.UserRoleAssignments)
+            .ToList();
+
+        var addedRoles = request.UserRoleAssignments
+            .Except(user.RoleAssignments
+                .Where(a => a.ActorId == request.ActorId)
+                .Select(e => e.UserRoleId.Value))
+            .ToList();
+
+        return (removedRoles, addedRoles);
     }
 
     private static void ClearUserRolesForActorBeforeUpdate(UpdateUserRoleAssignmentsCommand request, Domain.Model.Users.User user)
@@ -69,6 +105,38 @@ public sealed class UpdateUserRolesCommandHandler
         foreach (var userRoleAssignment in user.RoleAssignments.Where(e => e.ActorId == request.ActorId).ToList())
         {
             user.RoleAssignments.Remove(userRoleAssignment);
+        }
+    }
+
+    private async Task CreateLogEntriesAsync(
+        UserId userId,
+        ExternalUserId changedByUserId,
+        Guid actorId,
+        IEnumerable<Guid> removedUserRoles,
+        IEnumerable<Guid> addedUserRoles)
+    {
+        foreach (var userRoleId in addedUserRoles)
+        {
+            await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
+                new UserRoleAssignmentAuditLogEntry(
+                    userId,
+                    actorId,
+                    new UserRoleId(userRoleId),
+                    changedByUserId,
+                    DateTimeOffset.UtcNow,
+                    UserRoleAssignmentTypeAuditLog.Added)).ConfigureAwait(false);
+        }
+
+        foreach (var userRoleId in removedUserRoles)
+        {
+            await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
+                new UserRoleAssignmentAuditLogEntry(
+                    userId,
+                    actorId,
+                    new UserRoleId(userRoleId),
+                    changedByUserId,
+                    DateTimeOffset.UtcNow,
+                    UserRoleAssignmentTypeAuditLog.Removed)).ConfigureAwait(false);
         }
     }
 }
