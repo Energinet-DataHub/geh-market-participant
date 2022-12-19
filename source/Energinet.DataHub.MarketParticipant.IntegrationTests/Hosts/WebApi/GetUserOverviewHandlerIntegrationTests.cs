@@ -87,7 +87,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             externalUserId
         };
         mock
-            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), It.IsAny<bool?>()))
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>()))
             .Returns<string?, bool?>((searchText, onlyActive) =>
                 Task.FromResult(
                     userIdsToReturn.Select(y =>

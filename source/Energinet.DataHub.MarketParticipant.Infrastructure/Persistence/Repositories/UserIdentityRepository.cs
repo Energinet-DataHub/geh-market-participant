@@ -31,7 +31,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         _graphClient = graphClient;
     }
 
-    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? onlyActive)
+    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText)
     {
         var result = new List<UserIdentity>();
         var queryOptions = new List<Option>()

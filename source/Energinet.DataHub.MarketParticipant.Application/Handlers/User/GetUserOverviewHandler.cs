@@ -46,7 +46,6 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 request.PageSize,
                 request.ActorId,
                 request.SearchText,
-                false,
                 null).ConfigureAwait(false);
         }
         else

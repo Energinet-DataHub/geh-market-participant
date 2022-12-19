@@ -42,13 +42,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
     {
-        var query = BuildUsersQuery(actorId, null, string.Empty);
+        var query = BuildUsersSearchQuery(actorId, null, string.Empty);
         return query.CountAsync();
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
-        var query = BuildUsersQuery(actorId, null, null);
+        var query = BuildUsersSearchQuery(actorId, null, null);
         var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
             .ToDictionary(x => x.ExternalId);
 
@@ -72,16 +72,37 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
-        bool? onlyActive,
         Collection<EicFunction>? eicFunctions)
     {
-        var query = BuildUsersQuery(actorId, eicFunctions, searchText);
-        var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
-            .ToDictionary(x => x.ExternalId);
-        var userIdentities = await _userIdentityRepository.SearchUserIdentitiesAsync(searchText, onlyActive).ConfigureAwait(false);
+        // We need to do two searches and two lookup, since the queries in either our data or AD can return results not in the other, and we need AD data for both
+        // Search and then Filter only users from the AD search that have an ID in our local data
+        var searchUserIdentities = (await _userIdentityRepository
+            .SearchUserIdentitiesAsync(searchText)
+            .ConfigureAwait(false))
+            .ToList();
+
+        var knownLocalUsers = await BuildUserLookupQuery(actorId, searchUserIdentities.Select(x => x.Id))
+            .Select(y => new { y.Id, y.ExternalId, y.Email })
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var knownLocalIds = knownLocalUsers.Select(x => x.ExternalId);
+        searchUserIdentities = searchUserIdentities.Where(x => knownLocalIds.Contains(x.Id)).ToList();
+
+        // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
+        var searchQuery = await BuildUsersSearchQuery(actorId, eicFunctions, searchText)
+            .Select(x => new { x.Id, x.ExternalId, x.Email })
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var localUserIdentitiesLookup = await _userIdentityRepository
+            .GetUserIdentitiesAsync(searchQuery.Select(x => x.ExternalId).Except(knownLocalIds))
+            .ConfigureAwait(false);
+
+        //Combine results and create final search result
+        var allIdentities = searchUserIdentities.Union(localUserIdentitiesLookup);
+        var userLookup = searchQuery.Select(x => x).Union(knownLocalUsers.Select(x => x)).ToDictionary(x => x.ExternalId);
 
         // Filter User Identities to only be from our user pool
-        return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
+        return allIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id];
             return new UserOverviewItem(
@@ -94,7 +115,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         });
     }
 
-    private IQueryable<UserEntity> BuildUsersQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
+    private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
     {
         var query = from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
@@ -106,6 +127,19 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 (actorId == null || urr.ActorId == actorId)
                 && (eicFunctions == null || !eicFunctions.Any() || urtj.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || urtj.Name.Contains(searchText) || u.Email.Contains(searchText))
+            select u;
+
+        return query.OrderBy(x => x.Email).Distinct();
+    }
+
+    private IQueryable<UserEntity> BuildUserLookupQuery(Guid? actorId, IEnumerable<Guid> externalUserIds)
+    {
+        var query = from u in _marketParticipantDbContext.Users
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
+            from urr in urj.DefaultIfEmpty()
+            where
+                (actorId == null || urr.ActorId == actorId)
+                && externalUserIds.Contains(u.ExternalId)
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();
