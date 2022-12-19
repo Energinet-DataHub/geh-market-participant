@@ -76,7 +76,7 @@ public class TokenController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [Route("cachesigningkey")]
+    [Route("token/cache")]
     public async Task InitSigningKeyAsync()
     {
         await _signingKeyRing.GetKeysAsync().ConfigureAwait(false);
@@ -106,10 +106,10 @@ public class TokenController : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [Route("token")]
-    public async Task<IActionResult> GetTokenAsync(TokenRequest tokenRequest)
+    public async Task<IActionResult> GetTokenAsync(TokenRequest? tokenRequest)
     {
-        ArgumentNullException.ThrowIfNull(tokenRequest);
-        ArgumentNullException.ThrowIfNull(tokenRequest.ExternalToken);
+        if (tokenRequest == null || string.IsNullOrWhiteSpace(tokenRequest.ExternalToken))
+            return BadRequest();
 
         var externalJwt = new JwtSecurityToken(tokenRequest.ExternalToken);
 

@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
@@ -46,18 +47,18 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_Command_CallsRepository()
         {
             // arrange
-            var userId = Guid.NewGuid();
+            var externalUserId = new ExternalUserId(Guid.NewGuid());
 
             var repositoryMock = new Mock<IGridAreaAuditLogEntryRepository>();
             repositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
                 .ReturnsAsync(new[]
                     {
-                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", Guid.NewGuid())
+                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, externalUserId, Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", new GridAreaId(Guid.NewGuid()))
                     });
 
             var userDisplayNameProviderMock = new Mock<IUserDisplayNameProvider>();
-            userDisplayNameProviderMock.Setup(x => x.GetUserDisplayNamesAsync(new[] { userId })).ReturnsAsync(new[] { new UserDisplayName(userId, "name") });
+            userDisplayNameProviderMock.Setup(x => x.GetUserDisplayNamesAsync(new[] { externalUserId })).ReturnsAsync(new[] { new UserDisplayName(externalUserId, "name") });
 
             var target = new GetGridAreaAuditLogEntriesHandler(repositoryMock.Object, userDisplayNameProviderMock.Object);
 

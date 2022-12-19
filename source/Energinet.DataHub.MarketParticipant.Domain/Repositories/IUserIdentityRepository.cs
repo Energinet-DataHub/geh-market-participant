@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -28,5 +28,5 @@ public interface IUserIdentityRepository
     /// Retrieves user identities for the provided set of external ids.
     /// </summary>
     /// <param name="externalIds"></param>
-    Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<Guid> externalIds);
+    Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
 }

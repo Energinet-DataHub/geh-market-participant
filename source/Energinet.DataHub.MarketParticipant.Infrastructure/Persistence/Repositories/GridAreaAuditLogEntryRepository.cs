@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -38,12 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var entity = new GridAreaAuditLogEntryEntity
             {
-                UserId = logEntry.UserId,
+                UserId = logEntry.ExternalUserId.Value,
                 Timestamp = logEntry.Timestamp,
                 Field = logEntry.Field,
                 OldValue = logEntry.OldValue,
                 NewValue = logEntry.NewValue,
-                GridAreaId = logEntry.GridAreaId
+                GridAreaId = logEntry.GridAreaId.Value
             };
 
             _context.GridAreaAuditLogEntries.Add(entity);
@@ -53,19 +54,20 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<GridAreaAuditLogEntry>> GetAsync(GridAreaId gridAreaId)
         {
-            var query = from l in _context.GridAreaAuditLogEntries.AsQueryable()
-                        where l.GridAreaId == gridAreaId.Value
-                        select l;
+            var query =
+                from l in _context.GridAreaAuditLogEntries.AsQueryable()
+                where l.GridAreaId == gridAreaId.Value
+                select l;
 
             return (await query.ToListAsync().ConfigureAwait(false))
                 .Select(x =>
                     new GridAreaAuditLogEntry(
                         x.Timestamp,
-                        x.UserId,
+                        new ExternalUserId(x.UserId),
                         x.Field,
                         x.OldValue,
                         x.NewValue,
-                        x.GridAreaId));
+                        new GridAreaId(x.GridAreaId)));
         }
     }
 }

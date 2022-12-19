@@ -47,7 +47,7 @@ public sealed class ActorQueryController : ControllerBase
         return await this.ProcessAsync(
             async () =>
                 {
-                    var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.UserId);
+                    var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.ExternalUserId);
 
                     var response = await _mediator
                         .Send(command)

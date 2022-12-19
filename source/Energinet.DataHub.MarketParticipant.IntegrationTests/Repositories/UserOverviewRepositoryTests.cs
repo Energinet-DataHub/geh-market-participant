@@ -111,8 +111,8 @@ public sealed class UserOverviewRepositoryTests
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
-            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
-            .Returns<IEnumerable<Guid>>(x =>
+            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
+            .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
                     x.Select(y =>
                         new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));

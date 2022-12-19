@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.12.0
+
+- Simplify call to assignment of user roles.
+
 ## Version 2.11.0
 
 - Organization name for each actor in actor selection API.

@@ -25,7 +25,8 @@ using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Applicati
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 {
-    public sealed class GetGridAreaAuditLogEntriesHandler : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
+    public sealed class GetGridAreaAuditLogEntriesHandler
+        : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
     {
         private readonly IGridAreaAuditLogEntryRepository _repository;
         private readonly IUserDisplayNameProvider _userDisplayNameProvider;
@@ -42,18 +43,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 
             var entries = (await _repository.GetAsync(new GridAreaId(request.GridAreaId)).ConfigureAwait(false)).ToList();
 
-            var users = (await _userDisplayNameProvider.GetUserDisplayNamesAsync(entries.Select(x => x.UserId)).ConfigureAwait(false))
+            var users = (await _userDisplayNameProvider.GetUserDisplayNamesAsync(entries.Select(x => x.ExternalUserId)).ConfigureAwait(false))
                 .ToDictionary(x => x.Id, x => x.Value);
 
             return new GetGridAreaAuditLogEntriesResponse(
                 entries.Select(
                     x => new GridAreaAuditLogEntryDto(
                         x.Timestamp,
-                        users.TryGetValue(x.UserId, out var userDisplayName) ? userDisplayName : null,
+                        users.TryGetValue(x.ExternalUserId, out var userDisplayName) ? userDisplayName : null,
                         (GridAreaAuditLogEntryField)x.Field,
                         x.OldValue,
                         x.NewValue,
-                        x.GridAreaId)));
+                        x.GridAreaId.Value)));
         }
     }
 }
