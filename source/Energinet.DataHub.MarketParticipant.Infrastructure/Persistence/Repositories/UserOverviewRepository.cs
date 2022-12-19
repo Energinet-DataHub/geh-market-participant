@@ -49,17 +49,31 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, null);
-        var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
-            .ToDictionary(x => x.ExternalId);
+        var users = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new { x.Id, x.ExternalId, x.Email })
+            .ToListAsync()
+            .ConfigureAwait(false);
+        var userLookup = users.ToDictionary(
+            x => new ExternalUserId(x.ExternalId),
+            y => new
+            {
+                Id = new UserId(y.Id),
+                ExternalId = new ExternalUserId(y.ExternalId),
+                Email = new EmailAddress(y.Email)
+            });
 
-        var userIdentities = await _userIdentityRepository.GetUserIdentitiesAsync(userLookup.Keys).ConfigureAwait(false);
+        var userIdentities = await _userIdentityRepository
+            .GetUserIdentitiesAsync(userLookup.Keys)
+            .ConfigureAwait(false);
 
         return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id];
             return new UserOverviewItem(
-                new UserId(user.Id),
-                new EmailAddress(userIdentity.Email ?? user.Email),
+                user.Id,
+                userIdentity.Email ?? user.Email,
                 userIdentity.Name,
                 userIdentity.PhoneNumber,
                 userIdentity.CreatedDate,
@@ -86,28 +100,37 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ToListAsync()
             .ConfigureAwait(false);
         var knownLocalIds = knownLocalUsers.Select(x => x.ExternalId);
-        searchUserIdentities = searchUserIdentities.Where(x => knownLocalIds.Contains(x.Id)).ToList();
+        searchUserIdentities = searchUserIdentities
+            .Where(x => knownLocalIds.Contains(x.Id.Value))
+            .ToList();
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
         var searchQuery = await BuildUsersSearchQuery(actorId, eicFunctions, searchText)
             .Select(x => new { x.Id, x.ExternalId, x.Email })
             .ToListAsync()
             .ConfigureAwait(false);
+
         var localUserIdentitiesLookup = await _userIdentityRepository
-            .GetUserIdentitiesAsync(searchQuery.Select(x => x.ExternalId).Except(knownLocalIds))
+            .GetUserIdentitiesAsync(searchQuery
+                .Select(x => x.ExternalId)
+                .Except(knownLocalIds)
+                .Select(x => new ExternalUserId(x)))
             .ConfigureAwait(false);
 
         //Combine results and create final search result
         var allIdentities = searchUserIdentities.Union(localUserIdentitiesLookup);
-        var userLookup = searchQuery.Select(x => x).Union(knownLocalUsers.Select(x => x)).ToDictionary(x => x.ExternalId);
+        var userLookup = searchQuery
+            .Select(x => x)
+            .Union(knownLocalUsers.Select(x => x))
+            .ToDictionary(x => x.ExternalId);
 
         // Filter User Identities to only be from our user pool
-        return allIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
+        return allIdentities.Where(x => userLookup.ContainsKey(x.Id.Value)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
         {
-            var user = userLookup[userIdentity.Id];
+            var user = userLookup[userIdentity.Id.Value];
             return new UserOverviewItem(
                 new UserId(user.Id),
-                new EmailAddress(userIdentity.Email ?? user.Email),
+                userIdentity.Email ?? new EmailAddress(user.Email),
                 userIdentity.Name,
                 userIdentity.PhoneNumber,
                 userIdentity.CreatedDate,
@@ -132,14 +155,15 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return query.OrderBy(x => x.Email).Distinct();
     }
 
-    private IQueryable<UserEntity> BuildUserLookupQuery(Guid? actorId, IEnumerable<Guid> externalUserIds)
+    private IQueryable<UserEntity> BuildUserLookupQuery(Guid? actorId, IEnumerable<ExternalUserId> externalUserIds)
     {
+        var guids = externalUserIds.Select(x => x.Value);
         var query = from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
             from urr in urj.DefaultIfEmpty()
             where
                 (actorId == null || urr.ActorId == actorId)
-                && externalUserIds.Contains(u.ExternalId)
+                && guids.Contains(u.ExternalId)
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();

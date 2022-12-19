@@ -385,7 +385,7 @@ public sealed class UserOverviewRepositoryTests
         var userIdList = userIds.ToList();
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<Guid>(userIdList.Select(x => x.ExternalId).ToList()), new Collection<Guid>()).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(userIdList.Select(x => x.ExternalId).ToList()), new Collection<ExternalUserId>()).Object);
 
         // Act
         var actual = new List<UserOverviewItem>();
@@ -403,15 +403,15 @@ public sealed class UserOverviewRepositoryTests
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
-            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
-            .Returns<IEnumerable<Guid>>(x =>
+            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
+            .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
                     x.Select(y =>
                         new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
         return userIdentityRepository;
     }
 
-    private static Mock<IUserIdentityRepository> CreateUserIdentityRepositoryForSearch(Collection<Guid> userIdsToReturnFromSearch, Collection<Guid> userIdsToReturnFromGet)
+    private static Mock<IUserIdentityRepository> CreateUserIdentityRepositoryForSearch(Collection<ExternalUserId> userIdsToReturnFromSearch, Collection<ExternalUserId> userIdsToReturnFromGet)
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
@@ -422,15 +422,15 @@ public sealed class UserOverviewRepositoryTests
                         new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
 
         userIdentityRepository
-            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
-            .Returns<IEnumerable<Guid>>((_) =>
+            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
+            .Returns<IEnumerable<ExternalUserId>>((_) =>
                 Task.FromResult(
                     userIdsToReturnFromGet.Select(y =>
                         new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
         return userIdentityRepository;
     }
 
-    private static async Task<(Guid ActorId, IEnumerable<(Guid UserId, Guid ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
+    private static async Task<(Guid ActorId, IEnumerable<(UserId UserId, ExternalUserId ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
 
@@ -445,7 +445,7 @@ public sealed class UserOverviewRepositoryTests
         return (actorEntity.Id, users);
     }
 
-    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserAndActor(
+    private static async Task<(UserId UserId, ExternalUserId ExternalId, Guid ActorId)> CreateUserAndActor(
         MarketParticipantDbContext context, bool isFas)
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
@@ -453,7 +453,7 @@ public sealed class UserOverviewRepositoryTests
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
-    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithEicFunction(
+    private static async Task<(UserId UserId, ExternalUserId ExternalId, Guid ActorId)> CreateUserWithEicFunction(
         MarketParticipantDbContext context, bool isFas, EicFunction eicFunction)
     {
         var (_, actorEntity, roles) = await CreateActorAndTwoTemplates(context, isFas, eicFunction: eicFunction);
@@ -461,12 +461,12 @@ public sealed class UserOverviewRepositoryTests
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
-    private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithActorName(
+    private static async Task<(UserId UserId, ExternalUserId ExternalId, Guid ActorId)> CreateUserWithActorName(
         MarketParticipantDbContext context, bool isFas, string actorName)
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, actorName);
         var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
-        return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
+        return (new UserId(userEntity.Id), new ExternalUserId(userEntity.ExternalId), actorEntity.Id);
     }
 
     private static async Task<(Guid UserId, Guid ExternalId, Guid ActorId)> CreateUserWithEmailActorName(

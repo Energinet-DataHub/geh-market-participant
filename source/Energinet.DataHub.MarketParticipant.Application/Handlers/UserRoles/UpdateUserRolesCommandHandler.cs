@@ -51,12 +51,12 @@ public sealed class UpdateUserRolesCommandHandler
 
         ClearUserRolesForActorBeforeUpdate(request, user);
 
-        foreach (var userRoleId in request.RolesDto.UserRoleAssignments)
+        foreach (var userRoleId in request.UserRoleAssignments)
         {
             user.RoleAssignments.Add(new UserRoleAssignment(
                 user.Id,
                 request.ActorId,
-                userRoleId));
+                new UserRoleId(userRoleId)));
         }
 
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);

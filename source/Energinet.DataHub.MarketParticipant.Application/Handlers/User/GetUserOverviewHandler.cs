@@ -61,7 +61,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 x.Id.Value,
                 x.Email.Address,
                 x.Name,
-                x.PhoneNumber,
+                x.PhoneNumber?.Number,
                 x.CreatedDate,
                 x.Active)));
     }
