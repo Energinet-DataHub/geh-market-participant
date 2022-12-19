@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -49,8 +50,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var mock = new Mock<IUserIdentityRepository>();
 
-        mock.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
-            .ReturnsAsync((IEnumerable<Guid> x) =>
+        mock.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
+            .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
                 x.Select(y => new UserIdentity(y, y.ToString(), null, null, DateTimeOffset.UtcNow, true)));
 
         scope.Container!.Register(() => mock.Object);

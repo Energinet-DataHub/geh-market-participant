@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record UserDisplayName(Guid Id, string Value);
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record UserDisplayName(ExternalUserId Id, string Value);

@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Graph;
+using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
+using User = Microsoft.Graph.User;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -30,7 +33,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         _graphClient = graphClient;
     }
 
-    public async Task<IEnumerable<Domain.Model.UserIdentity>> GetUserIdentitiesAsync(IEnumerable<Guid> externalIds)
+    public async Task<IEnumerable<Domain.Model.UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds)
     {
         var ids = externalIds.Distinct();
         var result = new List<Domain.Model.UserIdentity>();
@@ -39,7 +42,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         {
             var users = await _graphClient.Users
                 .Request()
-                .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x.ToString()}'"))})")
+                .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x}'"))})")
                 .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
                 .GetAsync()
                 .ConfigureAwait(false);
@@ -48,13 +51,13 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 .CreatePageIterator(
                     _graphClient,
                     users,
-                    (user) =>
+                    user =>
                     {
                         result.Add(new Domain.Model.UserIdentity(
-                            new Guid(user.Id),
+                            new ExternalUserId(user.Id),
                             user.DisplayName,
-                            user.Mail,
-                            user.MobilePhone,
+                            string.IsNullOrWhiteSpace(user.Mail) ? null : new EmailAddress(user.Mail),
+                            string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
                             user.CreatedDateTime!.Value,
                             user.AccountEnabled == true));
 

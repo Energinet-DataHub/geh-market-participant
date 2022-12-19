@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -87,11 +88,8 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, UpdateUserRolesDto userRolesDto)
+    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, IEnumerable<Guid> userRoleAssignments)
     {
-        ArgumentNullException.ThrowIfNull(userId);
-        ArgumentNullException.ThrowIfNull(userRolesDto);
-
         return await this.ProcessAsync(
             async () =>
             {
@@ -99,7 +97,7 @@ public sealed class UserRoleController : ControllerBase
                     return Unauthorized();
 
                 var result = await _mediator
-                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, userRolesDto))
+                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, userRoleAssignments))
                     .ConfigureAwait(false);
 
                 return Ok(result);
