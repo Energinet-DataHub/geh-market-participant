@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Microsoft.Graph;
 
@@ -31,19 +31,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _graphClient = graphClient;
         }
 
-        public async Task<IEnumerable<UserDisplayName>> GetUserDisplayNamesAsync(IEnumerable<Guid> userIds)
+        public async Task<IEnumerable<UserDisplayName>> GetUserDisplayNamesAsync(IEnumerable<ExternalUserId> externalUserIds)
         {
             try
             {
                 var users = await _graphClient
                     .Users
                     .Request()
-                    .Filter(string.Join(" or ", userIds.Distinct().Select(x => $"id eq '{x}'")))
+                    .Filter(string.Join(" or ", externalUserIds.Distinct().Select(x => $"id eq '{x}'")))
                     .Select(x => new { x.Id, x.DisplayName })
                     .GetAsync()
                     .ConfigureAwait(false);
 
-                return users.Select(x => new UserDisplayName(Guid.Parse(x.Id), x.DisplayName));
+                return users.Select(x => new UserDisplayName(new ExternalUserId(x.Id), x.DisplayName));
             }
             catch (ServiceException)
             {

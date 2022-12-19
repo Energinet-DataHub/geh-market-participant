@@ -43,7 +43,7 @@ public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectio
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
         var actorIds = await _userQueryRepository
-            .GetActorsAsync(new ExternalUserId(request.UserId))
+            .GetActorsAsync(new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
         var actors = await _actorQueryRepository
@@ -51,6 +51,6 @@ public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectio
             .ConfigureAwait(false);
 
         return new GetSelectionActorsQueryResponse(
-            actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.Name)));
+            actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.OrganizationName)));
     }
 }

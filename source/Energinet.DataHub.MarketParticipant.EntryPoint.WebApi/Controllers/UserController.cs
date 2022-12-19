@@ -57,13 +57,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAssociatedUserActorsAsync(string externalToken)
         {
-            ArgumentNullException.ThrowIfNull(externalToken);
-
-            var externalJwt = new JwtSecurityToken(externalToken);
-
             return await this.ProcessAsync(
                 async () =>
                 {
+                    if (string.IsNullOrWhiteSpace(externalToken))
+                        return BadRequest();
+
+                    var externalJwt = new JwtSecurityToken(externalToken);
+
                     if (!await _externalTokenValidator
                             .ValidateTokenAsync(externalToken)
                             .ConfigureAwait(false))
@@ -71,10 +72,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         return Unauthorized();
                     }
 
-                    var userId = GetUserId(externalJwt.Claims);
+                    var externalUserId = GetUserId(externalJwt.Claims);
 
                     var associatedActors = await _mediator
-                        .Send(new GetAssociatedUserActorsCommand(userId))
+                        .Send(new GetAssociatedUserActorsCommand(externalUserId))
                         .ConfigureAwait(false);
 
                     return Ok(associatedActors);
@@ -86,8 +87,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(Permission.UsersManage)]
         public async Task<IActionResult> GetUserActorsAsync(Guid userId)
         {
-            ArgumentNullException.ThrowIfNull(userId);
-
             return await this.ProcessAsync(
                 async () =>
                 {
@@ -99,6 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         return Ok(associatedActors);
 
                     var allowedActors = new List<Guid>();
+
                     foreach (var actorId in associatedActors.ActorIds)
                     {
                         if (_userContext.CurrentUser.IsAssignedToActor(actorId))

@@ -20,14 +20,14 @@ public sealed class UserRoleAssignmentAuditLogEntry
     public UserRoleAssignmentAuditLogEntry(
         UserId userId,
         Guid actorId,
-        UserRoleTemplateId userRoleTemplateId,
-        UserId changedByUserId,
+        UserRoleId userRoleId,
+        ExternalUserId changedByUserId,
         DateTimeOffset timestamp,
         UserRoleAssignmentTypeAuditLog assignmentType)
     {
         UserId = userId;
         ActorId = actorId;
-        UserRoleTemplateId = userRoleTemplateId;
+        UserRoleId = userRoleId;
         Timestamp = timestamp;
         ChangedByUserId = changedByUserId;
         AssignmentType = assignmentType;
@@ -35,8 +35,8 @@ public sealed class UserRoleAssignmentAuditLogEntry
 
     public UserId UserId { get; }
     public Guid ActorId { get; }
-    public UserRoleTemplateId UserRoleTemplateId { get; }
-    public UserId ChangedByUserId { get; }
+    public UserRoleId UserRoleId { get; }
+    public ExternalUserId ChangedByUserId { get; }
     public DateTimeOffset Timestamp { get; }
     public UserRoleAssignmentTypeAuditLog AssignmentType { get; }
 }

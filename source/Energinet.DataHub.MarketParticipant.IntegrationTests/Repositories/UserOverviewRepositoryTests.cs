@@ -111,8 +111,8 @@ public sealed class UserOverviewRepositoryTests
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
-            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<Guid>>()))
-            .Returns<IEnumerable<Guid>>(x =>
+            .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
+            .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
                     x.Select(y =>
                         new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
@@ -142,7 +142,7 @@ public sealed class UserOverviewRepositoryTests
         return (userEntity.Id, userEntity.ExternalId, actorEntity.Id);
     }
 
-    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleTemplateEntity Template)> CreateActorAndTemplate(MarketParticipantDbContext context, bool isFas)
+    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleEntity Template)> CreateActorAndTemplate(MarketParticipantDbContext context, bool isFas)
     {
         var actorEntity = new ActorEntity
         {
@@ -167,11 +167,11 @@ public sealed class UserOverviewRepositoryTests
         await context.Organizations.AddAsync(orgEntity);
         await context.SaveChangesAsync();
 
-        var userRoleTemplate = new UserRoleTemplateEntity
+        var userRoleTemplate = new UserRoleEntity
         {
             Name = "Template name",
-            Permissions = { new UserRoleTemplatePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleTemplateEicFunctionEntity { EicFunction = EicFunction.TransmissionCapacityAllocator } }
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.TransmissionCapacityAllocator } }
         };
 
         await context.Entry(actorEntity).ReloadAsync();
@@ -179,12 +179,12 @@ public sealed class UserOverviewRepositoryTests
         return (orgEntity, actorEntity, userRoleTemplate);
     }
 
-    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleTemplateEntity userRoleTemplate)
+    private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole)
     {
         var roleAssignment = new UserRoleAssignmentEntity
         {
             ActorId = actorEntity.Id,
-            UserRoleTemplateId = userRoleTemplate.Id
+            UserRoleId = userRole.Id
         };
 
         var userEntity = new UserEntity

@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor/{actorId:guid}/contact")]
-        [AuthorizeUser(Permission.OrganizationView)]
+        [AuthorizeUser(Permission.ActorManage)]
         public async Task<IActionResult> ListAllAsync(Guid organizationId, Guid actorId)
         {
             return await this.ProcessAsync(

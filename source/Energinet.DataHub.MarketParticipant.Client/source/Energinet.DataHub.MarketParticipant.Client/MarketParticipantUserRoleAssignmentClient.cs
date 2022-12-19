@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
 
 namespace Energinet.DataHub.MarketParticipant.Client
@@ -28,14 +28,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = factory;
         }
 
-        public async Task UpdateUserRoleAssignmentsAsync(Guid userId, UpdateUserRoleAssignmentsDto updateUserRoleAssignmentsDto)
+        public async Task UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, IEnumerable<Guid> userRoleAssignments)
         {
             await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request($"users/{userId}/roles")
-                        .PutJsonAsync(updateUserRoleAssignmentsDto))
+                        .Request($"actors/{actorId}/users/{userId}/roles")
+                        .PutJsonAsync(userRoleAssignments))
                 .ConfigureAwait(false);
         }
     }

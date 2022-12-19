@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
@@ -21,20 +21,13 @@ public sealed class UpdateUserRoleAssignmentsCommandRuleSet : AbstractValidator<
 {
     public UpdateUserRoleAssignmentsCommandRuleSet()
     {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+
         RuleFor(command => command.UserId)
             .NotEmpty();
 
-        RuleFor(command => command.RoleAssignmentsDto)
-            .NotNull()
-            .ChildRules(validator =>
-            {
-                validator
-                    .RuleFor(e => e.ActorId)
-                    .NotEmpty();
-
-                validator
-                    .RuleFor(e => e.UserRoleTemplateAssignments)
-                    .NotNull();
-            });
+        RuleFor(command => command.UserRoleAssignments)
+            .NotEmpty();
     }
 }

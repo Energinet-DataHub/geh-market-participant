@@ -16,5 +16,5 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record SelectionActorDto(Guid Id, string Gln, string Name);
+    public sealed record SelectionActorDto(Guid Id, string Gln, string OrganizationName);
 }

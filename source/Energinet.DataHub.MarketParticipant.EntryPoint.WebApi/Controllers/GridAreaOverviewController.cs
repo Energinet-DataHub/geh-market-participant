@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
@@ -37,7 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        [AuthorizeUser(Permission.OrganizationView)]
         public async Task<IActionResult> GetGridAreaOverviewAsync()
         {
             return await this.ProcessAsync(

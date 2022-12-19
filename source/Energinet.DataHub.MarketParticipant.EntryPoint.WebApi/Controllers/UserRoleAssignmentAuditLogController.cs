@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoleTemplates;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
@@ -43,7 +43,7 @@ public sealed class UserRoleAssignmentAuditLogController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet("auditlogs/userroles/user/{userId:guid}/actor/{actorId:guid}")]
+    [HttpGet("actors/{actorId:guid}/users/{userId:guid}/auditlogentry")]
     [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid userId, Guid actorId)
     {

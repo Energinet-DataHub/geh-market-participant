@@ -207,7 +207,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 using var httpClient = new HttpClient();
 
                 var uriOpenId = new Uri(internalOpenIdUrl);
-                var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/cachesigningkey");
+                var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/token/cache");
 
                 await httpClient.GetAsync(uriKeyGet).ConfigureAwait(false);
             }

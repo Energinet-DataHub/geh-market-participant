@@ -48,25 +48,32 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var query = BuildUsersQuery(actorId);
 
-        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+        var users = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x => new { x.Id, x.ExternalId, x.Email })
+            .ToListAsync()
+            .ConfigureAwait(false);
 
-        var userLookup = (await query.Select(x => new { x.Id, x.ExternalId, x.Email }).ToListAsync().ConfigureAwait(false))
-            .Select(x => new
-                {
-                    x.Id,
-                    x.ExternalId,
-                    x.Email
-                })
-            .ToDictionary(x => x.ExternalId);
+        var userLookup = users.ToDictionary(
+            x => new ExternalUserId(x.ExternalId),
+            y => new
+            {
+                Id = new UserId(y.Id),
+                ExternalId = new ExternalUserId(y.ExternalId),
+                Email = new EmailAddress(y.Email)
+            });
 
-        var userIdentities = await _userIdentityRepository.GetUserIdentitiesAsync(userLookup.Keys).ConfigureAwait(false);
+        var userIdentities = await _userIdentityRepository
+            .GetUserIdentitiesAsync(userLookup.Keys)
+            .ConfigureAwait(false);
 
         return userIdentities.Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id];
             return new UserOverviewItem(
-                new UserId(user.Id),
-                new EmailAddress(userIdentity.Email ?? user.Email),
+                user.Id,
+                userIdentity.Email ?? user.Email,
                 userIdentity.Name,
                 userIdentity.PhoneNumber,
                 userIdentity.CreatedDate,
