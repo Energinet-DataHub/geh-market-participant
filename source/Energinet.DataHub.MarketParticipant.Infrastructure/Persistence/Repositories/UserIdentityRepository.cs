@@ -48,7 +48,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         if (!string.IsNullOrEmpty(searchText))
         {
-            // TODO: Add MobilePhone once we are switched to Azure AD, since currently we are running on Azure B2C where it is Is not supported.
+            // TODO: Add MobilePhone once we are switched to Azure AD, since currently we are running on Azure B2C where it is not supported.
             users = await _graphClient.Users
                 .Request(queryOptions)
                 .Filter($"startswith(displayName, '{searchText}')")
