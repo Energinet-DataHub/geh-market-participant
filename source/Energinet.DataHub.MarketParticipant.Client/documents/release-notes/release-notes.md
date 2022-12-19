@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.11.0
+
+- Simplify call to assignment of user roles.
+
 ## Version 2.10.0
 
 - Rename user role to not contain 'template'.
