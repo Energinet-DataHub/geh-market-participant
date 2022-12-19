@@ -27,13 +27,7 @@ public sealed class UpdateUserRoleAssignmentsCommandRuleSet : AbstractValidator<
         RuleFor(command => command.UserId)
             .NotEmpty();
 
-        RuleFor(command => command.RolesDto)
-            .NotNull()
-            .ChildRules(validator =>
-            {
-                validator
-                    .RuleFor(e => e.UserRoleAssignments)
-                    .NotNull();
-            });
+        RuleFor(command => command.UserRoleAssignments)
+            .NotEmpty();
     }
 }

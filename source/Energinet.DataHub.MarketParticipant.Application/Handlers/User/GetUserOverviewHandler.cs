@@ -20,34 +20,33 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
+
+public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
 {
-    public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
+    private readonly IUserOverviewRepository _repository;
+
+    public GetUserOverviewHandler(IUserOverviewRepository repository)
     {
-        private readonly IUserOverviewRepository _repository;
+        _repository = repository;
+    }
 
-        public GetUserOverviewHandler(IUserOverviewRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
 
-        public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request);
+        var users = await _repository.GetUsersAsync(
+            request.PageNumber,
+            request.PageSize,
+            request.ActorId).ConfigureAwait(false);
 
-            var users = await _repository.GetUsersAsync(
-                request.PageNumber,
-                request.PageSize,
-                request.ActorId).ConfigureAwait(false);
-
-            return new GetUserOverviewResponse(
-                users.Select(x => new UserOverviewItemDto(
-                    x.Id.Value,
-                    x.Email.Address,
-                    x.Name,
-                    x.PhoneNumber,
-                    x.CreatedDate,
-                    x.Active)));
-        }
+        return new GetUserOverviewResponse(
+            users.Select(x => new UserOverviewItemDto(
+                x.Id.Value,
+                x.Email.Address,
+                x.Name,
+                x.PhoneNumber?.Number,
+                x.CreatedDate,
+                x.Active)));
     }
 }

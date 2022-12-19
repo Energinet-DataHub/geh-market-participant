@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
@@ -71,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                     var updatedGridArea = new Domain.Model.GridArea(gridArea.Id, new GridAreaName(request.GridAreaDto.Name), gridArea.Code, gridArea.PriceAreaCode);
 
                     await _gridAreaRepository.AddOrUpdateAsync(updatedGridArea).ConfigureAwait(false);
-                    await CreateLogEntryAsync(gridArea.Id.Value, GridAreaAuditLogEntryField.Name, gridArea.Name.Value, updatedGridArea.Name.Value).ConfigureAwait(false);
+                    await CreateLogEntryAsync(gridArea.Id, GridAreaAuditLogEntryField.Name, gridArea.Name.Value, updatedGridArea.Name.Value).ConfigureAwait(false);
                     await _gridAreaIntegrationEventsQueueService
                         .EnqueueGridAreaNameChangedEventAsync(updatedGridArea)
                         .ConfigureAwait(false);
@@ -83,12 +84,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
             }
         }
 
-        private async Task CreateLogEntryAsync(Guid gridAreaId, GridAreaAuditLogEntryField field, string oldValue, string newValue)
+        private async Task CreateLogEntryAsync(GridAreaId gridAreaId, GridAreaAuditLogEntryField field, string oldValue, string newValue)
         {
             await _gridAreaAuditLogEntryRepository.InsertAsync(
                 new GridAreaAuditLogEntry(
                     DateTimeOffset.UtcNow,
-                    _userContext.CurrentUser.UserId,
+                    new ExternalUserId(_userContext.CurrentUser.ExternalUserId),
                     field,
                     oldValue,
                     newValue,

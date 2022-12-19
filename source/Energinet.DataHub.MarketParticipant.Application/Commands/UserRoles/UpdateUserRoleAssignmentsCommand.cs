@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UpdateUserRoleAssignmentsCommand(Guid ActorId, Guid UserId, UpdateUserRolesDto RolesDto) : IRequest;
+public sealed record UpdateUserRoleAssignmentsCommand(Guid ActorId, Guid UserId, IEnumerable<Guid> UserRoleAssignments) : IRequest;

@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record GridAreaAuditLogEntry(DateTimeOffset Timestamp, Guid UserId, GridAreaAuditLogEntryField Field, string OldValue, string NewValue, Guid GridAreaId);
+    public sealed record GridAreaAuditLogEntry(DateTimeOffset Timestamp, ExternalUserId ExternalUserId, GridAreaAuditLogEntryField Field, string OldValue, string NewValue, GridAreaId GridAreaId);
 }
