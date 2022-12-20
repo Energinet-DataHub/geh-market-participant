@@ -68,17 +68,19 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .GetUserIdentitiesAsync(userLookup.Keys)
             .ConfigureAwait(false);
 
-        return userIdentities.Select(userIdentity =>
-        {
-            var user = userLookup[userIdentity.Id];
-            return new UserOverviewItem(
-                user.Id,
-                userIdentity.Email ?? user.Email,
-                userIdentity.Name,
-                userIdentity.PhoneNumber,
-                userIdentity.CreatedDate,
-                userIdentity.Enabled);
-        });
+        return userIdentities
+            .OrderBy(x => x.Email)
+            .Select(userIdentity =>
+                {
+                    var user = userLookup[userIdentity.Id];
+                    return new UserOverviewItem(
+                        user.Id,
+                        userIdentity.Email ?? user.Email,
+                        userIdentity.Name,
+                        userIdentity.PhoneNumber,
+                        userIdentity.CreatedDate,
+                        userIdentity.Enabled);
+                });
     }
 
     public async Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
@@ -118,7 +120,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ConfigureAwait(false);
 
         //Combine results and create final search result
-        var allIdentities = searchUserIdentities.Union(localUserIdentitiesLookup);
+        var allIdentities = searchUserIdentities
+            .Union(localUserIdentitiesLookup)
+            .OrderBy(x => x.Email);
         var userLookup = searchQuery
             .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
