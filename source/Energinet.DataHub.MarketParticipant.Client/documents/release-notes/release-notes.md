@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.13.0
+
+- Add total number of users to help with paging.
+
 ## Version 2.12.0
 
 - Simplify call to assignment of user roles.

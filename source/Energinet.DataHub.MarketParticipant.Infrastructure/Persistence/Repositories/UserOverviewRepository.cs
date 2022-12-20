@@ -19,7 +19,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +37,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         _userIdentityRepository = userIdentityRepository;
     }
 
-    public Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
+    public Task<int> GetTotalUserCountAsync(Guid? actorId)
     {
         var query = BuildUsersQuery(actorId);
         return query.CountAsync();
@@ -83,8 +82,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     private IQueryable<UserEntity> BuildUsersQuery(Guid? actorId)
     {
-        var query = from user in _marketParticipantDbContext.Users
-                    select user;
+        var query =
+            from user in _marketParticipantDbContext.Users
+            select user;
 
         if (actorId != null)
         {

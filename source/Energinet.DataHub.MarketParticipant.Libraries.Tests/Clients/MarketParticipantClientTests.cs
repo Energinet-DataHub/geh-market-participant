@@ -868,8 +868,8 @@ public sealed class MarketParticipantClientTests
         var actual = await target.GetUserOverviewAsync(pageNumber, pageSize).ConfigureAwait(false);
 
         // Assert
-        var actualUsers = actual.ToList();
-        Assert.Equal(3, actualUsers.Count);
+        var actualUsers = actual.Users;
+        Assert.Equal(3, actualUsers.Count());
     }
 
     [Fact]

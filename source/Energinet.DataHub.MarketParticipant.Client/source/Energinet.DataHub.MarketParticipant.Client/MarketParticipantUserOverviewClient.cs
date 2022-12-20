@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -28,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize)
+        public async Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -41,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<IEnumerable<UserOverviewItemDto>>()
+                .GetJsonAsync<UserOverviewResultDto>()
                 .ConfigureAwait(false);
         }
     }

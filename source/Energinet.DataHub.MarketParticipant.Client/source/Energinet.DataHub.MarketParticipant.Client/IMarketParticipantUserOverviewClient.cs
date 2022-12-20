@@ -26,6 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// Gets users by actor and page state.
         /// </summary>
-        Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize);
+        Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize);
     }
 }

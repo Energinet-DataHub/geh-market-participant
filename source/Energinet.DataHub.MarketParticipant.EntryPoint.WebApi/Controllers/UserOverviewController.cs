@@ -54,7 +54,7 @@ public sealed class UserOverviewController : ControllerBase
 
                 var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
-                return Ok(response.Users);
+                return Ok(response);
             },
             _logger).ConfigureAwait(false);
     }

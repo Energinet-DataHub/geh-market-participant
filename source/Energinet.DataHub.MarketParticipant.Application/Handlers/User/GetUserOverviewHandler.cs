@@ -17,7 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
@@ -40,13 +40,18 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             request.PageSize,
             request.ActorId).ConfigureAwait(false);
 
-        return new GetUserOverviewResponse(
-            users.Select(x => new UserOverviewItemDto(
-                x.Id.Value,
-                x.Email.Address,
-                x.Name,
-                x.PhoneNumber?.Number,
-                x.CreatedDate,
-                x.Active)));
+        var userCount = await _repository
+            .GetTotalUserCountAsync(request.ActorId)
+            .ConfigureAwait(false);
+
+        var mappedUsers = users.Select(x => new UserOverviewItemDto(
+            x.Id.Value,
+            x.Email.Address,
+            x.Name,
+            x.PhoneNumber?.Number,
+            x.CreatedDate,
+            x.Active));
+
+        return new GetUserOverviewResponse(mappedUsers, userCount);
     }
 }

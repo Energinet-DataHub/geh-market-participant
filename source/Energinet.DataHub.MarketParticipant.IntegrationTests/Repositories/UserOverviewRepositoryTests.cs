@@ -91,20 +91,62 @@ public sealed class UserOverviewRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
+
         var (actorId, userIds) = await CreateUsersForSameActorAsync(context, 100);
 
         var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var pageCount = await target.GetUsersPageCountAsync(7, actorId);
+        var userCount = await target.GetTotalUserCountAsync(actorId);
         var actual = new List<UserOverviewItem>();
-        for (var i = 0; i < pageCount; ++i)
+
+        for (var i = 0; i < Math.Ceiling(userCount / 7.0); ++i)
         {
             actual.AddRange(await target.GetUsersAsync(i + 1, 7, actorId));
         }
 
         // Assert
         Assert.Equal(userIds.Select(x => x.UserId).OrderBy(x => x), actual.Select(x => x.Id.Value).OrderBy(x => x));
+    }
+
+    [Fact]
+    public async Task GetTotalUserCount_GivenActor_ReturnsCount()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        const int userCount = 7;
+
+        var (actorId, _) = await CreateUsersForSameActorAsync(context, userCount);
+
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+
+        // Act
+        var actual = await target.GetTotalUserCountAsync(actorId);
+
+        // Assert
+        Assert.Equal(userCount, actual);
+    }
+
+    [Fact]
+    public async Task GetTotalUserCount_WithoutActor_ReturnsCount()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        await CreateUsersForSameActorAsync(context, 1);
+
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+
+        // Act
+        var actual = await target.GetTotalUserCountAsync(null);
+
+        // Assert
+        Assert.True(actual >= 1);
     }
 
     private static Mock<IUserIdentityRepository> CreateUserIdentityRepository()

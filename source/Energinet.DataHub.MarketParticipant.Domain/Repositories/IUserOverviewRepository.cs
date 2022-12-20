@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
 /// Repository for presenting an overview of users paged.
@@ -25,12 +25,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 public interface IUserOverviewRepository
 {
     /// <summary>
-    /// Calculates total page count.
+    /// Calculates total number of users.
     /// </summary>
-    /// <param name="pageSize">Page size.</param>
     /// <param name="actorId">The id of the actor.</param>
-    /// <returns>A list of users.</returns>
-    Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId);
+    /// <returns>The number of users.</returns>
+    Task<int> GetTotalUserCountAsync(Guid? actorId);
 
     /// <summary>
     /// Retrieve users paged.
