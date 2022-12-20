@@ -52,6 +52,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         var query = BuildUsersSearchQuery(actorId, null, null);
         var users = await query
             .Select(x => new { x.Id, x.ExternalId, x.Email })
+            .Skip((pageNumber - 1) * pageSize).Take(pageSize)
             .ToListAsync()
             .ConfigureAwait(false);
         var userLookup = users.ToDictionary(
@@ -67,7 +68,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .GetUserIdentitiesAsync(userLookup.Keys)
             .ConfigureAwait(false);
 
-        return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
+        return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id];
             return new UserOverviewItem(

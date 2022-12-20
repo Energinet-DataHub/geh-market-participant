@@ -69,8 +69,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     result.Add(new UserIdentity(
                         new ExternalUserId(user.Id),
                         user.DisplayName,
-                        new EmailAddress(user.Mail),
-                        new PhoneNumber(user.MobilePhone),
+                        string.IsNullOrWhiteSpace(user.Mail) ? null : new EmailAddress(user.Mail),
+                        string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
                         user.CreatedDateTime!.Value,
                         user.AccountEnabled == true));
 
