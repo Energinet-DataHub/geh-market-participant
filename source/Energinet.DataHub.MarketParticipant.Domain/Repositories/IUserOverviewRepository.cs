@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
 /// Repository for presenting an overview of users paged.
@@ -27,12 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 public interface IUserOverviewRepository
 {
     /// <summary>
-    /// Calculates total page count.
+    /// Calculates total number of users.
     /// </summary>
-    /// <param name="pageSize">Page size.</param>
     /// <param name="actorId">The id of the actor.</param>
-    /// <returns>A list of users.</returns>
-    Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId);
+    /// <returns>The number of users.</returns>
+    Task<int> GetTotalUserCountAsync(Guid? actorId);
 
     /// <summary>
     /// Retrieve users paged.
@@ -52,7 +51,7 @@ public interface IUserOverviewRepository
     /// <param name="searchText">A text to search for, can be empty</param>
     /// <param name="eicFunctions">The list of Eic functions to search for</param>
     /// <returns>A List of users matching the criteria supplied</returns>
-    Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
+    Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
         Guid? actorId,
