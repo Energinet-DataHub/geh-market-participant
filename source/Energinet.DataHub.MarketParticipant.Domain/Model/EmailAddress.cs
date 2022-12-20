@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
@@ -19,19 +20,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record EmailAddress
     {
-        private readonly MailAddress _mailAddress;
-
         public EmailAddress(string address)
         {
-            _mailAddress = ValidateAddress(address);
+            Address = ValidateAddress(address);
         }
 
-        public string Address => _mailAddress.Address;
+        public string Address { get; }
 
-        private static MailAddress ValidateAddress(string address)
+        private static string ValidateAddress(string address)
         {
-            return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out var parsedAddress)
-                ? parsedAddress
+            return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out _)
+                ? address
                 : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
         }
     }
