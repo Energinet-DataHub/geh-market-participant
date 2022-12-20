@@ -20,7 +20,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
@@ -40,21 +39,22 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         _userIdentityRepository = userIdentityRepository;
     }
 
-    public async Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
+    public Task<int> GetTotalUserCountAsync(Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null, string.Empty);
-        var totalCount = await query.CountAsync().ConfigureAwait(false);
-        return (totalCount / pageSize) + 1;
+        var query = BuildUsersSearchQuery(actorId, null, null);
+        return query.CountAsync();
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, null);
         var users = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .Select(x => new { x.Id, x.ExternalId, x.Email })
-            .Skip((pageNumber - 1) * pageSize).Take(pageSize)
             .ToListAsync()
             .ConfigureAwait(false);
+
         var userLookup = users.ToDictionary(
             x => new ExternalUserId(x.ExternalId),
             y => new
@@ -85,7 +85,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return test;
     }
 
-    public async Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
+    public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
         Guid? actorId,
@@ -130,22 +130,28 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .OrderBy(x => x.Email?.Address);
 
         // Filter User Identities to only be from our user pool
-        return allIdentities.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
-        {
-            var user = userLookup[userIdentity.Id.Value];
-            return new UserOverviewItem(
-                new UserId(user.Id),
-                userIdentity.Email ?? user.Email,
-                userIdentity.Name,
-                userIdentity.PhoneNumber,
-                userIdentity.CreatedDate,
-                userIdentity.Enabled);
-        });
+        var items = allIdentities
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(userIdentity =>
+            {
+                var user = userLookup[userIdentity.Id.Value];
+                return new UserOverviewItem(
+                    new UserId(user.Id),
+                    userIdentity.Email ?? user.Email,
+                    userIdentity.Name,
+                    userIdentity.PhoneNumber,
+                    userIdentity.CreatedDate,
+                    userIdentity.Enabled);
+            });
+
+        return (items, userLookup.Count);
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
     {
-        var query = from u in _marketParticipantDbContext.Users
+        var query =
+            from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
             from urr in urj.DefaultIfEmpty()
             join ur in _marketParticipantDbContext.UserRoles on urr.UserRoleId equals ur.Id into urt
@@ -163,7 +169,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     private IQueryable<UserEntity> BuildUserLookupQuery(Guid? actorId, IEnumerable<ExternalUserId> externalUserIds)
     {
         var guids = externalUserIds.Select(x => x.Value);
-        var query = from u in _marketParticipantDbContext.Users
+        var query =
+            from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
             from urr in urj.DefaultIfEmpty()
             where

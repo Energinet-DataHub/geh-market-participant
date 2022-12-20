@@ -13,19 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Models;
 
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    /// <summary>
-    /// Manages users.
-    /// </summary>
-    public interface IMarketParticipantUserOverviewClient
-    {
-        /// <summary>
-        /// Gets users by actor and page state, and optional search string.
-        /// </summary>
-        Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText);
-    }
+    public sealed record UserOverviewResultDto(IEnumerable<UserOverviewItemDto> Users, int TotalUserCount);
 }

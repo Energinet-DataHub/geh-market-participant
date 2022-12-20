@@ -110,5 +110,6 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         // assert
         Assert.NotEmpty(actual.Users);
         Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.Equal(1, actual.TotalUserCount);
     }
 }
