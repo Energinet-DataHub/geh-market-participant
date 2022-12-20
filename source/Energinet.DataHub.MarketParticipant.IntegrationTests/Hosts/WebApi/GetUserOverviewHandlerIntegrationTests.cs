@@ -85,7 +85,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
         var userIdsToReturn = new List<ExternalUserId>()
         {
-           new ExternalUserId(externalUserId)
+           new(externalUserId)
         };
         mock
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>()))
