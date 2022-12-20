@@ -68,7 +68,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .GetUserIdentitiesAsync(userLookup.Keys)
             .ConfigureAwait(false);
 
-        return userIdentities.Where(x => userLookup.ContainsKey(x.Id)).Select(userIdentity =>
+        return userIdentities.Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id];
             return new UserOverviewItem(
@@ -120,12 +120,11 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         //Combine results and create final search result
         var allIdentities = searchUserIdentities.Union(localUserIdentitiesLookup);
         var userLookup = searchQuery
-            .Select(x => x)
-            .Union(knownLocalUsers.Select(x => x))
+            .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
 
         // Filter User Identities to only be from our user pool
-        return allIdentities.Where(x => userLookup.ContainsKey(x.Id.Value)).Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
+        return allIdentities.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
         {
             var user = userLookup[userIdentity.Id.Value];
             return new UserOverviewItem(

@@ -114,11 +114,11 @@ public sealed class UserOverviewRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var (userId, externalId, actorId) = await CreateUserAndActor(context, false);
-        var (otherUserId, otherExternalId, _) = await CreateUserAndActor(context, false);
+        var (otherUserId, _, _) = await CreateUserAndActor(context, false);
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -142,12 +142,12 @@ public sealed class UserOverviewRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var (userId, externalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
-        var (otherUserId, otherExternalId, _) =
+        var (otherUserId, _, _) =
             await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -171,12 +171,12 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, externalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
-        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
+        var (userId, _, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
+        var (otherUserId, _, otherActorId) = await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>()).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -202,11 +202,11 @@ public sealed class UserOverviewRepositoryTests
 
         var (userId, externalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
         var (user2Id, external2Id, _) = await CreateUserWithEicFunction(context, false, EicFunction.BillingAgent);
-        var (otherUserId, otherExternalId, _) = await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
+        var (otherUserId, _, _) = await CreateUserWithEicFunction(context, false, EicFunction.CapacityTrader);
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId, external2Id }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, external2Id }).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -232,11 +232,11 @@ public sealed class UserOverviewRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
-        var (otherUserId, otherExternalId, _) = await CreateUserWithActorName(context, false, "Bahamut");
+        var (otherUserId, _, _) = await CreateUserWithActorName(context, false, "Bahamut");
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -260,12 +260,12 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
-        var (otherUserId, otherExternalId, otherActorId) = await CreateUserWithActorName(context, false, "Bahamut");
+        var (userId, _, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (otherUserId, _, otherActorId) = await CreateUserWithActorName(context, false, "Bahamut");
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>()).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -289,13 +289,13 @@ public sealed class UserOverviewRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+        var (userId, _, _) = await CreateUserWithActorName(context, false, "Axolotl");
         var (otherUserId, otherExternalId, _) = await CreateUserWithEmailActorName(context, false, "Bahamut", "alexander@example.com");
-        var (otherUser2Id, otherExternal2Id, _) = await CreateUserWithEmailActorName(context, false, "Shiva", "shiva@example.com");
+        var (otherUser2Id, _, _) = await CreateUserWithEmailActorName(context, false, "Shiva", "shiva@example.com");
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { otherExternalId, externalId, otherExternal2Id }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { otherExternalId }).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
@@ -322,11 +322,11 @@ public sealed class UserOverviewRepositoryTests
 
         var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
         var (otherUserId, otherExternalId, _) = await CreateUserWithEmailActorName(context, false, "Bahamut", "axol@example.com");
-        var (otherUser2Id, otherExternal2Id, _) = await CreateUserWithEmailActorName(context, false, "Shiva", "shiva@example.com");
+        var (otherUser2Id, _, _) = await CreateUserWithEmailActorName(context, false, "Shiva", "shiva@example.com");
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId, otherExternal2Id }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
 
         // Act
         var actual = (await target.SearchUsersAsync(
