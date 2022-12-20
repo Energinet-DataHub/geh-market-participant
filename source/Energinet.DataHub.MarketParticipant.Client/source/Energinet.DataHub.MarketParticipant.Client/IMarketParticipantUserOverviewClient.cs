@@ -24,8 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
     public interface IMarketParticipantUserOverviewClient
     {
         /// <summary>
-        /// Gets users by actor and page state.
+        /// Gets users by actor and page state, and optional search string.
         /// </summary>
-        Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<UserOverviewItemDto>> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText);
     }
 }

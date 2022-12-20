@@ -865,7 +865,7 @@ public sealed class MarketParticipantClientTests
         var pageSize = 50;
 
         // Act
-        var actual = await target.GetUserOverviewAsync(pageNumber, pageSize).ConfigureAwait(false);
+        var actual = await target.GetUserOverviewAsync(pageNumber, pageSize, null).ConfigureAwait(false);
 
         // Assert
         var actualUsers = actual.ToList();
