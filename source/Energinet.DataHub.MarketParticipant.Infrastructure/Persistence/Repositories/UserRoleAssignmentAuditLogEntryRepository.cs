@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Select(log => new UserRoleAssignmentAuditLogEntry(
                     new UserId(log.UserId),
                     log.ActorId,
-                    new UserRoleId(log.UserRoleTemplateId),
+                    new UserRoleId(log.UserRoleId),
                     new ExternalUserId(log.ChangedByUserId),
                     log.Timestamp,
                     (UserRoleAssignmentTypeAuditLog)log.AssignmentType));
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             {
                 UserId = logEntry.UserId.Value,
                 ActorId = logEntry.ActorId,
-                UserRoleTemplateId = logEntry.UserRoleId.Value,
+                UserRoleId = logEntry.UserRoleId.Value,
                 Timestamp = logEntry.Timestamp,
                 ChangedByUserId = logEntry.ChangedByUserId.Value,
                 AssignmentType = (int)logEntry.AssignmentType

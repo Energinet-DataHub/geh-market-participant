@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("UserRoleAssignmentAuditLogEntry");
             builder.HasKey(x => x.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
-            builder.Property(x => x.UserRoleTemplateId).HasColumnName("UserRoleTemplateId");
+            builder.Property(x => x.UserRoleId);
         }
     }
 }
