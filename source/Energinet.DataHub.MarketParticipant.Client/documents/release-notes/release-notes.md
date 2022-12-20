@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.12.1
+
+- Added optional searchText param to user overview
+
 ## Version 2.12.0
 
 - Simplify call to assignment of user roles.
