@@ -16,11 +16,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using FluentAssertions;
 using MediatR;
+using Moq;
+using SimpleInjector;
 using Xunit;
 using Xunit.Categories;
 
@@ -40,9 +46,19 @@ public sealed class UpdateUserRolesIntegrationTests
     [Fact]
     public async Task UpdateUserRoleAssignments_AddNewRoleToEmptyCollection_ReturnsNewRole()
     {
+        // Create context user
+        var (actorIdContext, userIdContext, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
+
+        var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
+        var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+        userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
+        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture
@@ -70,9 +86,19 @@ public sealed class UpdateUserRolesIntegrationTests
     [Fact]
     public async Task UpdateUserRoleAssignments_AddToExistingRoles_ReturnsBoth()
     {
+        // Create context user
+        var (actorIdContext, userIdContext, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
+
+        var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
+        var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+        userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
+        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture
@@ -106,9 +132,19 @@ public sealed class UpdateUserRolesIntegrationTests
     [Fact]
     public async Task UpdateUserRoleAssignments_AddToUserWithMultipleActorsAndExistingRoles_ReturnsCorrectForBothActors()
     {
+        // Create context user
+        var (actorIdContext, userIdContext, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
+
+        var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
+        var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+        userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
+        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, actor2Id, userId) = await _fixture
@@ -145,5 +181,87 @@ public sealed class UpdateUserRolesIntegrationTests
         Assert.Contains(response.Roles, x => x.Id == userRoleId1);
         Assert.Contains(response.Roles, x => x.Id == userRoleIdNew.Value);
         Assert.Contains(response2.Roles, x => x.Id == userRoleId2);
+    }
+
+    [Fact]
+    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_TwoAuditLogsAdded()
+    {
+        // Create context user
+        var (actorIdContext, userIdContext, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
+        var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+        userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
+        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        var mediator = scope.GetInstance<IMediator>();
+
+        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var updates = new List<Guid> { templateId1.Value, templateId2.Value };
+
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates);
+        var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand.UserId, updateCommand.ActorId);
+
+        // Act
+        await mediator.Send(updateCommand);
+        var response = await mediator.Send(getCommand);
+
+        // Assert
+        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        responseLogs.Should().HaveCount(2);
+        responseLogs.TrueForAll(e => e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_ThreeAuditLogsAdded_OneRemoved()
+    {
+        // Create context user
+        var (actorIdContext, userIdContext, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
+        var userIdProvider = new Mock<IUserContext<FrontendUser>>();
+        userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
+        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        var mediator = scope.GetInstance<IMediator>();
+
+        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var updates1 = new List<Guid> { templateId1.Value, templateId2.Value };
+
+        var templateId3 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
+        var updates2 = new List<Guid> { templateId2.Value, templateId3.Value };
+
+        var updateCommand1 = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates1);
+        var updateCommand2 = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates2);
+        var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand1.UserId, updateCommand2.ActorId);
+
+        // Act
+        await mediator.Send(updateCommand1);
+        await mediator.Send(updateCommand2);
+
+        var response = await mediator.Send(getCommand);
+
+        // Assert
+        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        responseLogs.Should().HaveCount(4);
+
+        var addedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Added);
+        var removedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed);
+        addedLogs.Should().HaveCount(3);
+        removedLogs.Should().HaveCount(1);
     }
 }

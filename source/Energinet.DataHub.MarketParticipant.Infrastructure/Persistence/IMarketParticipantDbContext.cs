@@ -95,6 +95,11 @@ public interface IMarketParticipantDbContext
     DbSet<UserRoleEntity> UserRoles { get; }
 
     /// <summary>
+    ///     Represent access to the UserRoleAssignmentAuditLogEntry database table
+    /// </summary>
+    DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();
