@@ -18,48 +18,20 @@ using System.Net.Mail;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record EmailAddress : IComparable<EmailAddress>
+    public sealed record EmailAddress
     {
-        private readonly MailAddress _mailAddress;
-
         public EmailAddress(string address)
         {
-            _mailAddress = ValidateAddress(address);
+            Address = ValidateAddress(address);
         }
 
-        public string Address => _mailAddress.Address;
+        public string Address { get; }
 
-        public static bool operator <(EmailAddress left, EmailAddress right)
+        private static string ValidateAddress(string address)
         {
-            return ReferenceEquals(left, null) ? !ReferenceEquals(right, null) : left.CompareTo(right) < 0;
-        }
-
-        public static bool operator <=(EmailAddress left, EmailAddress right)
-        {
-            return ReferenceEquals(left, null) || left.CompareTo(right) <= 0;
-        }
-
-        public static bool operator >(EmailAddress left, EmailAddress right)
-        {
-            return !ReferenceEquals(left, null) && left.CompareTo(right) > 0;
-        }
-
-        public static bool operator >=(EmailAddress left, EmailAddress right)
-        {
-            return ReferenceEquals(left, null) ? ReferenceEquals(right, null) : left.CompareTo(right) >= 0;
-        }
-
-        private static MailAddress ValidateAddress(string address)
-        {
-            return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out var parsedAddress)
-                ? parsedAddress
+            return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out _)
+                ? address
                 : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
-        }
-
-        public int CompareTo(EmailAddress? other)
-        {
-            ArgumentNullException.ThrowIfNull(other);
-            return string.Compare(other?._mailAddress.Address, _mailAddress.Address, StringComparison.Ordinal);
         }
     }
 }

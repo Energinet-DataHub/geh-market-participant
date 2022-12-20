@@ -68,7 +68,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .GetUserIdentitiesAsync(userLookup.Keys)
             .ConfigureAwait(false);
 
-        return userIdentities
+        var test = userIdentities
             .Select(userIdentity =>
                 {
                     var user = userLookup[userIdentity.Id];
@@ -80,7 +80,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                         userIdentity.CreatedDate,
                         userIdentity.Enabled);
                 })
-            .OrderBy(x => x.Email);
+            .OrderBy(x => x.Email.Address);
+
+        return test;
     }
 
     public async Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
@@ -125,7 +127,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ToDictionary(x => x.ExternalId);
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
-            .OrderBy(x => x.Email);
+            .OrderBy(x => x.Email?.Address);
 
         // Filter User Identities to only be from our user pool
         return allIdentities.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
