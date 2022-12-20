@@ -126,16 +126,16 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
+        var actual = await target.SearchUsersAsync(
             1,
             1000,
             actorId,
             null,
-            null)).ToList();
+            null);
 
         // Assert
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
     }
 
     [Fact]
@@ -155,17 +155,16 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                null,
-                null,
-                new Collection<EicFunction>() { EicFunction.BillingAgent }))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            null,
+            new Collection<EicFunction>() { EicFunction.BillingAgent });
 
         // Assert
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
     }
 
     [Fact]
@@ -184,17 +183,16 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>()).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                otherActorId,
-                null,
-                new Collection<EicFunction>() { EicFunction.BillingAgent }))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            otherActorId,
+            null,
+            new Collection<EicFunction>() { EicFunction.BillingAgent });
 
         // Assert
-        Assert.Null(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
     }
 
     [Fact]
@@ -214,18 +212,17 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, external2Id }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                null,
-                null,
-                new Collection<EicFunction>() { EicFunction.BillingAgent }))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            null,
+            new Collection<EicFunction>() { EicFunction.BillingAgent });
 
         // Assert
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == user2Id));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == user2Id));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
     }
 
     [Fact]
@@ -244,17 +241,16 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                null,
-                "Axolotl",
-                null))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            "Axolotl",
+            null);
 
         // Assert
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
     }
 
     [Fact]
@@ -273,17 +269,16 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>()).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                otherActorId,
-                "Axolotl",
-                null))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            otherActorId,
+            "Axolotl",
+            null);
 
         // Assert
-        Assert.Null(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
     }
 
     [Fact]
@@ -303,18 +298,17 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { otherExternalId }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                null,
-                "Alex",
-                null))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            "Alex",
+            null);
 
         // Assert
-        Assert.Null(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == otherUserId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUser2Id));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUser2Id));
     }
 
     [Fact]
@@ -334,18 +328,17 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId, otherExternalId }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                null,
-                "axol",
-                null))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            "axol",
+            null);
 
         // Assert
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == otherUserId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUser2Id));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUser2Id));
     }
 
     [Fact]
@@ -365,20 +358,18 @@ public sealed class UserOverviewRepositoryTests
             CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId> { externalId, otherExternal2Id }, new Collection<ExternalUserId> { otherExternalId }).Object);
 
         // Act
-        var actual = (await target.SearchUsersAsync(
-                1,
-                1000,
-                otherActorId,
-                "axol",
-                null))
-            .ToList();
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            otherActorId,
+            "axol",
+            null);
 
         // Assert
-        Assert.Null(actual.SingleOrDefault(x => x.Id == userId));
-        Assert.NotNull(actual.SingleOrDefault(x => x.Id == otherUserId));
-        Assert.Null(actual.SingleOrDefault(x => x.Id == otherUser2Id));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
+        Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
+        Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUser2Id));
     }
-
 
     [Fact]
     public async Task SearchUsers_PagesResults()
@@ -395,9 +386,9 @@ public sealed class UserOverviewRepositoryTests
 
         // Act
         var actual = new List<UserOverviewItem>();
-        actual.AddRange(await target.SearchUsersAsync(1, 8, actorId, "Name",  null));
-        actual.AddRange(await target.SearchUsersAsync(2, 8, actorId, "Name",  null));
-        actual.AddRange(await target.SearchUsersAsync(3, 8, actorId, "Name",  null));
+        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", null)).Items);
+        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", null)).Items);
+        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", null)).Items);
 
         // Assert
         Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x.Value), actual.Select(x => x.Id).OrderBy(x => x.Value));
@@ -494,7 +485,7 @@ public sealed class UserOverviewRepositoryTests
     {
         var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
         var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
-        return (new UserId(userEntity.Id),  new ExternalUserId(userEntity.ExternalId), actorEntity.Id);
+        return (new UserId(userEntity.Id), new ExternalUserId(userEntity.ExternalId), actorEntity.Id);
     }
 
     private static async Task<(UserId UserId, ExternalUserId ExternalId, Guid ActorId)> CreateUserWithEicFunction(
@@ -621,7 +612,9 @@ public sealed class UserOverviewRepositoryTests
 
         var userEntity = new UserEntity
         {
-            ExternalId = Guid.NewGuid(), Email = email, RoleAssignments = { roleAssignment }
+            ExternalId = Guid.NewGuid(),
+            Email = email,
+            RoleAssignments = { roleAssignment }
         };
 
         await context.Users.AddAsync(userEntity);
@@ -632,9 +625,10 @@ public sealed class UserOverviewRepositoryTests
     private static async Task<UserEntity> CreateUserWithMultipleRolesAsync(MarketParticipantDbContext context, ActorEntity actorEntity, List<UserRoleEntity> userRoles)
     {
         var assignments = userRoles.Select(userRole => new UserRoleAssignmentEntity
-            {
-                ActorId = actorEntity.Id, UserRoleId = userRole.Id
-            })
+        {
+            ActorId = actorEntity.Id,
+            UserRoleId = userRole.Id
+        })
             .ToList();
 
         var userEntity = new UserEntity

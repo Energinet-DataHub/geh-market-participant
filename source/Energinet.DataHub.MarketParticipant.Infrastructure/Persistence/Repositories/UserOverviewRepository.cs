@@ -41,7 +41,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetTotalUserCountAsync(Guid? actorId)
     {
-        var query = BuildUsersQuery(actorId);
+        var query = BuildUsersSearchQuery(actorId, null, null);
         return query.CountAsync();
     }
 
@@ -54,6 +54,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .Select(x => new { x.Id, x.ExternalId, x.Email })
             .ToListAsync()
             .ConfigureAwait(false);
+
         var userLookup = users.ToDictionary(
             x => new ExternalUserId(x.ExternalId),
             y => new
@@ -80,7 +81,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         });
     }
 
-    public async Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
+    public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
         Guid? actorId,
@@ -117,23 +118,30 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ConfigureAwait(false);
 
         //Combine results and create final search result
-        var allIdentities = searchUserIdentities.Union(localUserIdentitiesLookup);
+        var allIdentities = searchUserIdentities
+            .Union(localUserIdentitiesLookup);
+
         var userLookup = searchQuery
             .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
 
         // Filter User Identities to only be from our user pool
-        return allIdentities.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
-        {
-            var user = userLookup[userIdentity.Id.Value];
-            return new UserOverviewItem(
-                new UserId(user.Id),
-                userIdentity.Email ?? new EmailAddress(user.Email),
-                userIdentity.Name,
-                userIdentity.PhoneNumber,
-                userIdentity.CreatedDate,
-                userIdentity.Enabled);
-        });
+        var items = allIdentities
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(userIdentity =>
+            {
+                var user = userLookup[userIdentity.Id.Value];
+                return new UserOverviewItem(
+                    new UserId(user.Id),
+                    userIdentity.Email ?? new EmailAddress(user.Email),
+                    userIdentity.Name,
+                    userIdentity.PhoneNumber,
+                    userIdentity.CreatedDate,
+                    userIdentity.Enabled);
+            });
+
+        return (items, userLookup.Count);
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)

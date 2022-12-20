@@ -51,7 +51,7 @@ public interface IUserOverviewRepository
     /// <param name="searchText">A text to search for, can be empty</param>
     /// <param name="eicFunctions">The list of Eic functions to search for</param>
     /// <returns>A List of users matching the criteria supplied</returns>
-    Task<IEnumerable<UserOverviewItem>> SearchUsersAsync(
+    Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
         Guid? actorId,

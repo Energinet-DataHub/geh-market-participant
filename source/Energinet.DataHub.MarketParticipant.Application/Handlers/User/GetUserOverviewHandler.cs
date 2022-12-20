@@ -36,17 +36,22 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
     public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
         IEnumerable<UserOverviewItem> users;
+        int userCount;
 
         // The GetUsers function is kept, as it is more performant if no search criteria are used
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            users = await _repository.SearchUsersAsync(
-                request.PageNumber,
-                request.PageSize,
-                request.ActorId,
-                request.SearchText,
-                null).ConfigureAwait(false);
+            var (items, totalCount) = await _repository.SearchUsersAsync(
+                 request.PageNumber,
+                 request.PageSize,
+                 request.ActorId,
+                 request.SearchText,
+                 null).ConfigureAwait(false);
+
+            users = items;
+            userCount = totalCount;
         }
         else
         {
@@ -54,11 +59,11 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 request.PageNumber,
                 request.PageSize,
                 request.ActorId).ConfigureAwait(false);
-        }
 
-        var userCount = await _repository
-            .GetTotalUserCountAsync(request.ActorId)
-            .ConfigureAwait(false);
+            userCount = await _repository
+                .GetTotalUserCountAsync(request.ActorId)
+                .ConfigureAwait(false);
+        }
 
         var mappedUsers = users.Select(x => new UserOverviewItemDto(
             x.Id.Value,
