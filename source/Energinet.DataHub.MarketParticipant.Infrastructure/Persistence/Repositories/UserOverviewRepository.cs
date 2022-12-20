@@ -98,7 +98,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ToList();
 
         var knownLocalUsers = await BuildUserLookupQuery(actorId, searchUserIdentities.Select(x => x.Id))
-            .Select(y => new { y.Id, y.ExternalId, y.Email })
+            .Select(y => new { y.Id, y.ExternalId, Email = new EmailAddress(y.Email) })
             .ToListAsync()
             .ConfigureAwait(false);
         var knownLocalIds = knownLocalUsers.Select(x => x.ExternalId);
@@ -108,7 +108,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
         var searchQuery = await BuildUsersSearchQuery(actorId, eicFunctions, searchText)
-            .Select(x => new { x.Id, x.ExternalId, x.Email })
+            .Select(x => new { x.Id, x.ExternalId, Email = new EmailAddress(x.Email) })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -125,7 +125,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ToDictionary(x => x.ExternalId);
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
-            .OrderBy(x => x.Email ?? new EmailAddress(userLookup[x.Id.Value].Email));
+            .OrderBy(x => x.Email);
 
         // Filter User Identities to only be from our user pool
         return allIdentities.Skip((pageNumber - 1) * pageSize).Take(pageSize).Select(userIdentity =>
@@ -133,7 +133,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             var user = userLookup[userIdentity.Id.Value];
             return new UserOverviewItem(
                 new UserId(user.Id),
-                userIdentity.Email ?? new EmailAddress(user.Email),
+                userIdentity.Email ?? user.Email,
                 userIdentity.Name,
                 userIdentity.PhoneNumber,
                 userIdentity.CreatedDate,

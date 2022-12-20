@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record EmailAddress
+    public sealed record EmailAddress : IComparable<EmailAddress>
     {
         private readonly MailAddress _mailAddress;
 
@@ -28,11 +29,37 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public string Address => _mailAddress.Address;
 
+        public static bool operator <(EmailAddress left, EmailAddress right)
+        {
+            return ReferenceEquals(left, null) ? !ReferenceEquals(right, null) : left.CompareTo(right) < 0;
+        }
+
+        public static bool operator <=(EmailAddress left, EmailAddress right)
+        {
+            return ReferenceEquals(left, null) || left.CompareTo(right) <= 0;
+        }
+
+        public static bool operator >(EmailAddress left, EmailAddress right)
+        {
+            return !ReferenceEquals(left, null) && left.CompareTo(right) > 0;
+        }
+
+        public static bool operator >=(EmailAddress left, EmailAddress right)
+        {
+            return ReferenceEquals(left, null) ? ReferenceEquals(right, null) : left.CompareTo(right) >= 0;
+        }
+
         private static MailAddress ValidateAddress(string address)
         {
             return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out var parsedAddress)
                 ? parsedAddress
                 : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
+        }
+
+        public int CompareTo(EmailAddress? other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+            return string.Compare(other?._mailAddress.Address, _mailAddress.Address, StringComparison.Ordinal);
         }
     }
 }
