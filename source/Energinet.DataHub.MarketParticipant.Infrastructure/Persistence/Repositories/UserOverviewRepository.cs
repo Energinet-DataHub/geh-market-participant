@@ -40,18 +40,17 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         _userIdentityRepository = userIdentityRepository;
     }
 
-    public Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
+    public async Task<int> GetUsersPageCountAsync(int pageSize, Guid? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, string.Empty);
-        return query.CountAsync();
+        var totalCount = await query.CountAsync().ConfigureAwait(false);
+        return (totalCount / pageSize) + 1;
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, null);
         var users = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
             .Select(x => new { x.Id, x.ExternalId, x.Email })
             .ToListAsync()
             .ConfigureAwait(false);
