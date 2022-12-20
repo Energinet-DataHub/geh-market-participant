@@ -28,14 +28,6 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Scripts\B-002\Model\202212201300 Add UserRoleAssignmentAuditLog Table.sql" />
-    <None Remove="Scripts\LocalDB\202212201300 Add UserRoleAssignmentAuditLog Table.sql" />
-    <None Remove="Scripts\T-001\Model\202212201300 Add UserRoleAssignmentAuditLog Table.sql" />
-    <None Remove="Scripts\U-001\Model\202212201300 Add UserRoleAssignmentAuditLog Table.sql" />
-    <None Remove="Scripts\U-002\Model\202212201300 Add UserRoleAssignmentAuditLog Table.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="DbUp.Reboot.SqlServer" Version="1.4.0" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
   </ItemGroup>
