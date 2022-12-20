@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[UserRoleAssignmentAuditLogEntry](
     [Id] [INT] NOT NULL IDENTITY(1, 1),
     [UserId] [uniqueidentifier] NOT NULL,
     [ActorId] [uniqueidentifier] NOT NULL,
-    [UserRoleTemplateId] [uniqueidentifier] NOT NULL,
+    [UserRoleId] [uniqueidentifier] NOT NULL,
     [ChangedByUserId] [uniqueidentifier] NOT NULL,
     [Timestamp] [DATETIMEOFFSET] NOT NULL,
     [AssignmentType] [INT] NOT NULL,
@@ -18,6 +18,6 @@ CREATE TABLE [dbo].[UserRoleAssignmentAuditLogEntry](
 
     CONSTRAINT FK_UserId_User FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]),
     CONSTRAINT FK_ChangedByUserId_User FOREIGN KEY ([ChangedByUserId]) REFERENCES [dbo].[User]([Id]),
-    CONSTRAINT FK_UserRoleTemplateId_MarketRoleGridArea FOREIGN KEY ([UserRoleTemplateId]) REFERENCES [dbo].[UserRoleTemplate]([Id])
+    CONSTRAINT FK_UserRoleId_MarketRoleGridArea FOREIGN KEY ([UserRoleId]) REFERENCES [dbo].[UserRole]([Id])
 )
 GO

@@ -21,7 +21,7 @@ public class UserRoleAssignmentAuditLogEntryEntity
     public int Id { get; set; }
     public Guid UserId { get; set; }
     public Guid ActorId { get; set; }
-    public Guid UserRoleTemplateId { get; set; }
+    public Guid UserRoleId { get; set; }
     public Guid ChangedByUserId { get; set; }
     public DateTimeOffset Timestamp { get; set; }
     public int AssignmentType { get; set; }
