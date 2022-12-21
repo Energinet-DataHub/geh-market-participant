@@ -60,6 +60,9 @@ public sealed class UpdateUserRolesHandler
         foreach (var addRequest in request.Assignments.Added)
         {
             var userRoleAssignment = new UserRoleAssignment(request.ActorId, new UserRoleId(addRequest));
+            if (user.RoleAssignments.Contains(userRoleAssignment))
+                continue;
+
             user.RoleAssignments.Add(userRoleAssignment);
 
             await AuditRoleAssignmentAsync(user, userRoleAssignment, UserRoleAssignmentTypeAuditLog.Added)
