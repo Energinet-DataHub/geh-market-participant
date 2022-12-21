@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Client
 {
@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="actorId">The id of the actor.</param>
         /// <param name="userId">The id of the user.</param>
-        /// <param name="userRoleAssignments">The new user roles.</param>
-        Task UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, IEnumerable<Guid> userRoleAssignments);
+        /// <param name="assignments">The changes to the user roles.</param>
+        Task UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, UpdateUserRoleAssignmentsDto assignments);
     }
 }

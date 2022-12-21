@@ -71,7 +71,7 @@ public sealed class UpdateUserRolesIntegrationTests
 
         var updates = new List<Guid> { userRoleId.Value };
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
         var getCommand = new GetUserRolesCommand(actorId, userId);
 
         // Act
@@ -115,7 +115,7 @@ public sealed class UpdateUserRolesIntegrationTests
 
         var updates = new List<Guid> { userRoleB.Value, userRoleA };
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
         var getCommand = new GetUserRolesCommand(actorId, userId);
 
         // Act
@@ -165,7 +165,7 @@ public sealed class UpdateUserRolesIntegrationTests
 
         var updates = new List<Guid> { userRoleIdNew.Value, userRoleId1 };
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
         var getCommand = new GetUserRolesCommand(actorId, userId);
         var getCommand2 = new GetUserRolesCommand(actor2Id, userId);
 
@@ -206,7 +206,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
         var updates = new List<Guid> { templateId1.Value, templateId2.Value };
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
         var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand.UserId, updateCommand.ActorId);
 
         // Act
@@ -243,10 +243,11 @@ public sealed class UpdateUserRolesIntegrationTests
         var updates1 = new List<Guid> { templateId1.Value, templateId2.Value };
 
         var templateId3 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
-        var updates2 = new List<Guid> { templateId2.Value, templateId3.Value };
+        var updates2a = new List<Guid> { templateId1.Value };
+        var updates2b = new List<Guid> { templateId3.Value };
 
-        var updateCommand1 = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates1);
-        var updateCommand2 = new UpdateUserRoleAssignmentsCommand(actorId, userId, updates2);
+        var updateCommand1 = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates1, Array.Empty<Guid>()));
+        var updateCommand2 = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates2b, updates2a));
         var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand1.UserId, updateCommand2.ActorId);
 
         // Act

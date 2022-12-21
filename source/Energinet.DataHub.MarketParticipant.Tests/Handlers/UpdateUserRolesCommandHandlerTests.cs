@@ -41,8 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actorId = Guid.NewGuid();
             var userRoleAssignments = new List<UserRoleAssignment>()
             {
-                new(new UserId(userId), Guid.NewGuid(), new UserRoleId(Guid.NewGuid())),
-                new(new UserId(userId), actorId, new UserRoleId(Guid.NewGuid())),
+                new(Guid.NewGuid(), new UserRoleId(Guid.NewGuid())),
+                new(actorId, new UserRoleId(Guid.NewGuid())),
             };
             var user = new User(
                 new UserId(userId),
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var auditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
-            var target = new UpdateUserRolesCommandHandler(
+            var target = new UpdateUserRolesHandler(
                 userRepositoryMock.Object,
                 auditLogEntryRepository.Object,
                 userContextMock);
@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateUserRoleAssignmentsCommand(
                 actorId,
                 userId,
-                updatedRoleAssignments);
+                new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
 
             // act
             await target.Handle(command, CancellationToken.None);
@@ -82,62 +82,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 x => x.InsertAuditLogEntryAsync(
                     It.Is<UserRoleAssignmentAuditLogEntry>(a => a.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed)),
                 Times.Exactly(1));
-        }
-
-        [Fact]
-        public async Task Handle_UserRoleAssignment_NoChanges()
-        {
-            // arrange
-            var externalUserId = Guid.NewGuid();
-            var userId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
-            var userRoleId1 = Guid.NewGuid();
-            var userRoleId2 = Guid.NewGuid();
-
-            var userRoleAssignments = new List<UserRoleAssignment>
-            {
-                new(new UserId(userId), Guid.NewGuid(), new UserRoleId(Guid.NewGuid())),
-                new(new UserId(userId), actorId, new UserRoleId(userRoleId1)),
-                new(new UserId(userId), actorId, new UserRoleId(userRoleId2))
-            };
-            var user = new User(
-                new UserId(userId),
-                new ExternalUserId(externalUserId),
-                userRoleAssignments,
-                new EmailAddress("test@test.dk"));
-
-            var userContextMock = CreateMockedUser();
-            var userRepositoryMock = new Mock<IUserRepository>();
-            userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))
-                .ReturnsAsync(user);
-
-            var auditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
-
-            var target = new UpdateUserRolesCommandHandler(
-                userRepositoryMock.Object,
-                auditLogEntryRepository.Object,
-                userContextMock);
-
-            var updatedRoleAssignments = new List<Guid> { userRoleId1, userRoleId2 };
-
-            var command = new UpdateUserRoleAssignmentsCommand(
-                actorId,
-                userId,
-                updatedRoleAssignments);
-
-            // act
-            await target.Handle(command, CancellationToken.None);
-
-            // assert
-            auditLogEntryRepository.Verify(
-                x => x.InsertAuditLogEntryAsync(
-                    It.Is<UserRoleAssignmentAuditLogEntry>(a => a.AssignmentType == UserRoleAssignmentTypeAuditLog.Added)),
-                Times.Never);
-
-            auditLogEntryRepository.Verify(
-                x => x.InsertAuditLogEntryAsync(
-                    It.Is<UserRoleAssignmentAuditLogEntry>(a => a.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed)),
-                Times.Never);
         }
 
         private static UserContext<FrontendUser> CreateMockedUser()
