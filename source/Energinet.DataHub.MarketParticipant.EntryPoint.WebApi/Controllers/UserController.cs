@@ -22,7 +22,6 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
@@ -113,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{userId:guid}/auditlogentry")]
         [AuthorizeUser(Permission.UsersManage)]
-        public async Task<IActionResult> GetAsync(Guid userId)
+        public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
         {
             return await this.ProcessAsync(
                 async () =>
@@ -124,9 +123,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(command)
                         .ConfigureAwait(false);
 
-                    var filtered = response
-                        .UserRoleAssignmentAuditLogs
-                        .Where(log => log.ActorId == _userContext.CurrentUser.ActorId || _userContext.CurrentUser.IsFas);
+                    var filtered = _userContext.CurrentUser.IsFas
+                        ? response.UserRoleAssignmentAuditLogs
+                        : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
                     return Ok(new GetUserAuditLogResponse(filtered));
                 },
