@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -207,7 +208,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var updates = new List<Guid> { templateId1.Value, templateId2.Value };
 
         var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
-        var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand.UserId, updateCommand.ActorId);
+        var getCommand = new GetUserAuditLogsCommand(updateCommand.UserId);
 
         // Act
         await mediator.Send(updateCommand);
@@ -248,7 +249,7 @@ public sealed class UpdateUserRolesIntegrationTests
 
         var updateCommand1 = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates1, Array.Empty<Guid>()));
         var updateCommand2 = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates2b, updates2a));
-        var getCommand = new GetUserRoleAssignmentAuditLogsCommand(updateCommand1.UserId, updateCommand2.ActorId);
+        var getCommand = new GetUserAuditLogsCommand(updateCommand1.UserId);
 
         // Act
         await mediator.Send(updateCommand1);

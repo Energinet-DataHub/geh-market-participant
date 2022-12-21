@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.1
+
+- Add user audit log API.
+
 ## Version 2.14.0
 
 - Split update roles API into two added and removed collections.

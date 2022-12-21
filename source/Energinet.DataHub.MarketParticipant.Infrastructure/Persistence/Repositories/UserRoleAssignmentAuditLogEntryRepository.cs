@@ -32,12 +32,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context = context;
         }
 
-        public async Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId, Guid actorId)
+        public async Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId)
         {
             var userRoleAssignmentLogs = _context.UserRoleAssignmentAuditLogEntries
-                .Where(e => e.UserId == userId.Value && e.ActorId == actorId)
+                .Where(e => e.UserId == userId.Value)
                 .Select(log => new UserRoleAssignmentAuditLogEntry(
-                    new UserId(log.UserId),
                     log.ActorId,
                     new UserRoleId(log.UserRoleId),
                     new ExternalUserId(log.ChangedByUserId),
@@ -47,13 +46,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
         }
 
-        public Task InsertAuditLogEntryAsync(UserRoleAssignmentAuditLogEntry logEntry)
+        public Task InsertAuditLogEntryAsync(UserId userId, UserRoleAssignmentAuditLogEntry logEntry)
         {
+            ArgumentNullException.ThrowIfNull(userId);
             ArgumentNullException.ThrowIfNull(logEntry);
 
-            var entity = new UserRoleAssignmentAuditLogEntryEntity()
+            var entity = new UserRoleAssignmentAuditLogEntryEntity
             {
-                UserId = logEntry.UserId.Value,
+                UserId = userId.Value,
                 ActorId = logEntry.ActorId,
                 UserRoleId = logEntry.UserRoleId.Value,
                 Timestamp = logEntry.Timestamp,

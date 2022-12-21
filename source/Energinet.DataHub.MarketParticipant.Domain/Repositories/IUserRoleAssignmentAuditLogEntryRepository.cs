@@ -12,30 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+/// <summary>
+/// Repository for inserting and querying user roles audit logs
+/// </summary>
+public interface IUserRoleAssignmentAuditLogEntryRepository
 {
     /// <summary>
-    /// Repository for inserting and querying user roles audit logs
+    /// Inserts a <see cref="UserRoleAssignmentAuditLogEntry"/>
     /// </summary>
-    public interface IUserRoleAssignmentAuditLogEntryRepository
-    {
-        /// <summary>
-        /// Inserts a <see cref="UserRoleAssignmentAuditLogEntry"/>
-        /// </summary>
-        /// <param name="logEntry"></param>
-        Task InsertAuditLogEntryAsync(UserRoleAssignmentAuditLogEntry logEntry);
+    /// <param name="userId">The user id to insert the log for.</param>
+    /// <param name="logEntry">The audit log.</param>
+    Task InsertAuditLogEntryAsync(UserId userId, UserRoleAssignmentAuditLogEntry logEntry);
 
-        /// <summary>
-        /// Retrieves all log entries for a given user
-        /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="actorId"></param>
-        /// <returns>UserAssignment log entries for the given user</returns>
-        Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId, Guid actorId);
-    }
+    /// <summary>
+    /// Retrieves all log entries for a given user.
+    /// </summary>
+    /// <param name="userId">The user id to insert the logs for.</param>
+    /// <returns><see cref="UserRoleAssignmentAuditLogEntry"/> log entries for the given user</returns>
+    Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId);
 }

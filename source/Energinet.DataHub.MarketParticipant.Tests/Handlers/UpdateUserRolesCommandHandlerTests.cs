@@ -75,11 +75,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // assert
             auditLogEntryRepository.Verify(
                 x => x.InsertAuditLogEntryAsync(
+                    user.Id,
                     It.Is<UserRoleAssignmentAuditLogEntry>(a => a.AssignmentType == UserRoleAssignmentTypeAuditLog.Added)),
                 Times.Exactly(2));
 
             auditLogEntryRepository.Verify(
                 x => x.InsertAuditLogEntryAsync(
+                    user.Id,
                     It.Is<UserRoleAssignmentAuditLogEntry>(a => a.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed)),
                 Times.Exactly(1));
         }
