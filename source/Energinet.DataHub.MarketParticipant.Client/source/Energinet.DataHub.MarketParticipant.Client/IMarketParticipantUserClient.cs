@@ -32,5 +32,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Gets actors assigned to the userId specified
         /// </summary>
         Task<GetAssociatedUserActorsResponseDto> GetUserActorsAsync(Guid userId);
+
+        /// <summary>
+        /// Gets audit logs for the specified user.
+        /// </summary>
+        Task<UserAuditLogsDto> GetUserAuditLogsAsync(Guid userId);
     }
 }

@@ -110,6 +110,28 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
+        [HttpGet("{userId:guid}/auditlogentry")]
+        [AuthorizeUser(Permission.UsersManage)]
+        public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var command = new GetUserAuditLogsCommand(userId);
+
+                    var response = await _mediator
+                        .Send(command)
+                        .ConfigureAwait(false);
+
+                    var filtered = _userContext.CurrentUser.IsFas
+                        ? response.UserRoleAssignmentAuditLogs
+                        : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
+
+                    return Ok(new GetUserAuditLogResponse(filtered));
+                },
+                _logger).ConfigureAwait(false);
+        }
+
         private static Guid GetUserId(IEnumerable<Claim> claims)
         {
             var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);

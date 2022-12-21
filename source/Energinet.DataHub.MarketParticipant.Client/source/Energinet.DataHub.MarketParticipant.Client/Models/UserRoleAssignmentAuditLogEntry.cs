@@ -13,8 +13,13 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-
-public sealed record GetUserRoleAssignmentAuditLogsCommand(Guid UserId, Guid ActorId) : IRequest<GetUserRoleAssignmentsAuditLogResponse>;
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public sealed record UserRoleAssignmentAuditLogEntry(
+        Guid ActorId,
+        Guid UserRoleId,
+        Guid ChangedByUserId,
+        DateTimeOffset Timestamp,
+        UserRoleAssignmentTypeAuditLog AssignmentType);
+}
