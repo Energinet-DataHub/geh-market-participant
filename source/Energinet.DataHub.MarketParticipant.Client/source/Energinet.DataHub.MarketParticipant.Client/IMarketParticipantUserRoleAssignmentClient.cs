@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="actorId">The id of the actor.</param>
         /// <param name="userId">The id of the user.</param>
-        /// <param name="assignments">The changed to the user roles.</param>
+        /// <param name="assignments">The changes to the user roles.</param>
         Task UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, UpdateUserRoleAssignmentsDto assignments);
     }
 }
