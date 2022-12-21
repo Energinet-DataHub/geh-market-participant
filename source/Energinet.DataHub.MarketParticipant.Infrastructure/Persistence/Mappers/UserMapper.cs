@@ -17,47 +17,56 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
+
+internal sealed class UserMapper
 {
-    internal sealed class UserMapper
+    public static void MapToEntity(User from, UserEntity to)
     {
-        public static void MapToEntity(User from, UserEntity to)
-        {
-            to.Email = from.Email.Address;
-            to.Id = from.Id.Value;
-            to.ExternalId = from.ExternalId.Value;
-            to.RoleAssignments.Clear();
-            foreach (var fromRoleAssignment in from.RoleAssignments)
+        to.Email = from.Email.Address;
+        to.Id = from.Id.Value;
+        to.ExternalId = from.ExternalId.Value;
+
+        var newAssignments = from
+            .RoleAssignments
+            .Select(newRa =>
             {
-                to.RoleAssignments.Add(MapToEntity(fromRoleAssignment, from.Id));
-            }
-        }
+                var existing = to.RoleAssignments
+                    .FirstOrDefault(oldRa => oldRa.ActorId == newRa.ActorId && oldRa.UserRoleId == newRa.UserRoleId.Value);
 
-        public static User MapFromEntity(UserEntity from)
-        {
-            return new User(
-                new UserId(from.Id),
-                new ExternalUserId(from.ExternalId),
-                from.RoleAssignments.Select(MapFromEntity).ToList(),
-                new EmailAddress(from.Email));
-        }
+                return existing ?? MapToEntity(newRa, from.Id);
+            })
+            .ToList();
 
-        private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)
-        {
-            return new UserRoleAssignmentEntity
-            {
-                ActorId = fromRoleAssignment.ActorId,
-                UserId = fromId.Value,
-                UserRoleId = fromRoleAssignment.UserRoleId.Value,
-            };
-        }
+        to.RoleAssignments.Clear();
 
-        private static UserRoleAssignment MapFromEntity(UserRoleAssignmentEntity from)
+        foreach (var userRoleAssignment in newAssignments)
         {
-            return new UserRoleAssignment(
-                new UserId(from.UserId),
-                from.ActorId,
-                new UserRoleId(from.UserRoleId));
+            to.RoleAssignments.Add(userRoleAssignment);
         }
+    }
+
+    public static User MapFromEntity(UserEntity from)
+    {
+        return new User(
+            new UserId(from.Id),
+            new ExternalUserId(from.ExternalId),
+            from.RoleAssignments.Select(MapFromEntity).ToList(),
+            new EmailAddress(from.Email));
+    }
+
+    private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)
+    {
+        return new UserRoleAssignmentEntity
+        {
+            ActorId = fromRoleAssignment.ActorId,
+            UserId = fromId.Value,
+            UserRoleId = fromRoleAssignment.UserRoleId.Value,
+        };
+    }
+
+    private static UserRoleAssignment MapFromEntity(UserRoleAssignmentEntity from)
+    {
+        return new UserRoleAssignment(from.ActorId, new UserRoleId(from.UserRoleId));
     }
 }

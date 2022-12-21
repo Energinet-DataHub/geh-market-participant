@@ -25,13 +25,13 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class GetUserRolesCommandHandler
+public sealed class GetUserRolesHandler
     : IRequestHandler<GetUserRolesCommand, GetUserRolesResponse>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetUserRolesCommandHandler(
+    public GetUserRolesHandler(
         IUserRepository userRepository,
         IUserRoleRepository userRoleRepository)
     {
