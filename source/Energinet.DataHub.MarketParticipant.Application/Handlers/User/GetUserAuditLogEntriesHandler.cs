@@ -15,33 +15,33 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetUserRoleAssignmentAuditLogEntriesHandler
-    : IRequestHandler<GetUserRoleAssignmentAuditLogsCommand, GetUserRoleAssignmentsAuditLogResponse>
+public sealed class GetUserAuditLogEntriesHandler
+    : IRequestHandler<GetUserAuditLogsCommand, GetUserAuditLogResponse>
 {
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
 
-    public GetUserRoleAssignmentAuditLogEntriesHandler(IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
+    public GetUserAuditLogEntriesHandler(IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
     {
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
     }
 
-    public async Task<GetUserRoleAssignmentsAuditLogResponse> Handle(
-        GetUserRoleAssignmentAuditLogsCommand request,
+    public async Task<GetUserAuditLogResponse> Handle(
+        GetUserAuditLogsCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var auditLogs = await _userRoleAssignmentAuditLogEntryRepository
-            .GetAsync(new UserId(request.UserId), request.ActorId)
+            .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        return new GetUserRoleAssignmentsAuditLogResponse(auditLogs);
+        return new GetUserAuditLogResponse(auditLogs);
     }
 }

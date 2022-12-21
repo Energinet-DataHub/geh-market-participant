@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetUserRoleAssignmentsAuditLogResponse(IEnumerable<UserRoleAssignmentAuditLogEntry> UserRoleAssignmentAuditLogs);
+public sealed record GetUserAuditLogsCommand(Guid UserId) : IRequest<GetUserAuditLogResponse>;

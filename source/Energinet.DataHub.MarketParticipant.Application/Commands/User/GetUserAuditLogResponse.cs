@@ -12,20 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using FluentValidation;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class GetUserRoleAssignmentAuditLogEntriesCommandRuleSet : AbstractValidator<GetUserRoleAssignmentAuditLogsCommand>
-    {
-        public GetUserRoleAssignmentAuditLogEntriesCommandRuleSet()
-        {
-            RuleFor(command => command.UserId)
-                .NotEmpty();
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-            RuleFor(command => command.ActorId)
-                .NotEmpty();
-        }
-    }
-}
+public sealed record GetUserAuditLogResponse(IEnumerable<UserRoleAssignmentAuditLogEntry> UserRoleAssignmentAuditLogs);
