@@ -22,12 +22,12 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetUserPermissionsCommandHandler
+public sealed class GetUserPermissionsHandler
     : IRequestHandler<GetUserPermissionsCommand, GetUserPermissionsResponse>
 {
     private readonly IUserQueryRepository _userQueryRepository;
 
-    public GetUserPermissionsCommandHandler(IUserQueryRepository userQueryRepository)
+    public GetUserPermissionsHandler(IUserQueryRepository userQueryRepository)
     {
         _userQueryRepository = userQueryRepository;
     }

@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.0
+
+- Split update roles API into two added and removed collections.
+
 ## Version 2.13.0
 
 - Add total number of users to help with paging.

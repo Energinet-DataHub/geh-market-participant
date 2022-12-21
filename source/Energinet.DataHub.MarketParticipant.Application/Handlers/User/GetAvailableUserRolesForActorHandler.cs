@@ -24,14 +24,14 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetAvailableUserRolesForActorCommandHandler
+public sealed class GetAvailableUserRolesForActorHandler
     : IRequestHandler<GetAvailableUserRolesForActorCommand, GetUserRolesResponse>
 {
     private readonly IActorQueryRepository _actorQueryRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetAvailableUserRolesForActorCommandHandler(
+    public GetAvailableUserRolesForActorHandler(
         IActorQueryRepository actorQueryRepository,
         IOrganizationRepository organizationRepository,
         IUserRoleRepository userRoleRepository)

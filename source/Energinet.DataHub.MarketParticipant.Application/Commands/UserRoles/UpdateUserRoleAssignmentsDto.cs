@@ -11,8 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UserRoleAssignment(Guid ActorId, UserRoleId UserRoleId);
+public sealed record UpdateUserRoleAssignmentsDto(IEnumerable<Guid> Added, IEnumerable<Guid> Removed);

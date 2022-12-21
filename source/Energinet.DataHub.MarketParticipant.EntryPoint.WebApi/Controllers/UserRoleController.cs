@@ -88,7 +88,10 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(Guid actorId, Guid userId, IEnumerable<Guid> userRoleAssignments)
+    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(
+        Guid actorId,
+        Guid userId,
+        UpdateUserRoleAssignmentsDto assignments)
     {
         return await this.ProcessAsync(
             async () =>
@@ -97,7 +100,7 @@ public sealed class UserRoleController : ControllerBase
                     return Unauthorized();
 
                 var result = await _mediator
-                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, userRoleAssignments))
+                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, assignments))
                     .ConfigureAwait(false);
 
                 return Ok(result);
