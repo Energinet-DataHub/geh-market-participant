@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -38,10 +39,20 @@ public sealed class GetUserAuditLogEntriesHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var auditLogs = await _userRoleAssignmentAuditLogEntryRepository
+        var roleAssignmentAuditLogs = await _userRoleAssignmentAuditLogEntryRepository
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        return new GetUserAuditLogResponse(auditLogs);
+        return new GetUserAuditLogResponse(roleAssignmentAuditLogs.Select(Map));
+    }
+
+    private static UserRoleAssignmentAuditLogEntryDto Map(UserRoleAssignmentAuditLogEntry auditLogEntry)
+    {
+        return new UserRoleAssignmentAuditLogEntryDto(
+            auditLogEntry.ActorId,
+            auditLogEntry.UserRoleId.Value,
+            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.Timestamp,
+            auditLogEntry.AssignmentType);
     }
 }

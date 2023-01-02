@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetUserAuditLogResponse(IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs);
+public sealed record UserRoleAssignmentAuditLogEntryDto(
+    Guid ActorId,
+    Guid UserRoleId,
+    Guid ChangedByUserId,
+    DateTimeOffset Timestamp,
+    UserRoleAssignmentTypeAuditLog AssignmentType);
