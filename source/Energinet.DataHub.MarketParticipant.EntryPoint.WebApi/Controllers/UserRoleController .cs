@@ -51,9 +51,6 @@ public sealed class UserRoleController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFas)
-                    return Unauthorized();
-
                 var command = new GetAllUserRolesCommand();
 
                 var response = await _mediator
