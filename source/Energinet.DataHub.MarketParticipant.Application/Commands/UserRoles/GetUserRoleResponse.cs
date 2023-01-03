@@ -12,19 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using FluentValidation;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
-
-public sealed class GetUserPermissionsCommandRuleSet : AbstractValidator<GetUserPermissionsCommand>
-{
-    public GetUserPermissionsCommandRuleSet()
-    {
-        RuleFor(command => command.ActorId)
-            .NotEmpty();
-
-        RuleFor(command => command.ExternalUserId)
-            .NotEmpty();
-    }
-}
+public sealed record GetUserRoleResponse(UserRoleDto Role);

@@ -27,24 +27,24 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Client</PackageId>
-    <PackageVersion>2.14.2$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.14.3$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Client library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
     <RepositoryUrl>https://github.com/Energinet-DataHub/geh-market-participant</RepositoryUrl>
     <PackageReleaseNotes>
-Release Notes
-https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/release-notes/release-notes.md
+      Release Notes
+      https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/release-notes/release-notes.md
 
-Documentation
-https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/documentation.md
+      Documentation
+      https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/documentation.md
     </PackageReleaseNotes>
     <PackageDescription>
-Release Notes
-https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/release-notes/release-notes.md
+      Release Notes
+      https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/release-notes/release-notes.md
 
-Documentation
-https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/documentation.md
+      Documentation
+      https://github.com/Energinet-DataHub/geh-market-participant/blob/master/source/Energinet.DataHub.MarketParticipant.Client/documents/documentation.md
     </PackageDescription>
     <Description>BFF integration library for Energinet.DataHub.MarketParticipant</Description>
     <PackageTags>geh;library</PackageTags>

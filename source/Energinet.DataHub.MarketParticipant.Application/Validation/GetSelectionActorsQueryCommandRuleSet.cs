@@ -19,4 +19,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
 public sealed class GetSelectionActorsQueryCommandRuleSet : AbstractValidator<GetSelectionActorsQueryCommand>
 {
+    public GetSelectionActorsQueryCommandRuleSet()
+    {
+        RuleFor(command => command.ExternalUserId)
+            .NotEmpty();
+    }
 }
