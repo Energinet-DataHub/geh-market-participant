@@ -57,16 +57,17 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
-            container.Register<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
             container.Register<IValidator<GetGridAreaAuditLogEntriesCommand>, GetGridAreaAuditLogEntriesCommandRuleSet>();
-            container.Register<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
+            container.Register<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
+            container.Register<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
+            container.Register<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
+            container.Register<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
             container.Register<IValidator<GetAssociatedUserActorsCommand>, GetAssociatedUserActorsCommandRuleSet>();
-            container.Register<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
             container.Register<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
             container.Register<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
             container.Register<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
-            container.Register<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
+            container.Register<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
