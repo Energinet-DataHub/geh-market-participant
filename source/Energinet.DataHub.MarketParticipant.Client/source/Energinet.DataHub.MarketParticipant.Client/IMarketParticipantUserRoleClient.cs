@@ -25,6 +25,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
     public interface IMarketParticipantUserRoleClient
     {
         /// <summary>
+        /// Gets the specified user role.
+        /// </summary>
+        /// <param name="userRoleId">The id of the user role.</param>
+        /// <returns>The specified user role.</returns>
+        Task<UserRoleDto> GetAsync(Guid userRoleId);
+
+        /// <summary>
         /// Gets user roles assigned to the specified user and actor.
         /// </summary>
         /// <param name="actorId">The id of the actor.</param>

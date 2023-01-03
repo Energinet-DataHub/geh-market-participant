@@ -14,11 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,82 +25,34 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
+[Route("user-roles")]
 public sealed class UserRoleController : ControllerBase
 {
     private readonly ILogger<UserRoleController> _logger;
-    private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
     public UserRoleController(
         ILogger<UserRoleController> logger,
-        IUserContext<FrontendUser> userContext,
         IMediator mediator)
     {
         _logger = logger;
-        _userContext = userContext;
         _mediator = mediator;
     }
 
-    [HttpGet("actors/{actorId:guid}/users/{userId:guid}/roles")]
+    [HttpGet("{userRoleId:guid}")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetAsync(Guid actorId, Guid userId)
+    public async Task<IActionResult> GetAsync(Guid userRoleId)
     {
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                    return Unauthorized();
-
-                var command = new GetUserRolesCommand(actorId, userId);
+                var command = new GetUserRoleCommand(userRoleId);
 
                 var response = await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
-                return Ok(response.Roles);
-            },
-            _logger).ConfigureAwait(false);
-    }
-
-    [HttpGet("actors/{actorId:guid}/roles")]
-    [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetAssignableAsync(Guid actorId)
-    {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                    return Unauthorized();
-
-                var command = new GetAvailableUserRolesForActorCommand(actorId);
-
-                var response = await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
-
-                return Ok(response.Roles);
-            },
-            _logger).ConfigureAwait(false);
-    }
-
-    [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
-    [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(
-        Guid actorId,
-        Guid userId,
-        UpdateUserRoleAssignmentsDto assignments)
-    {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                    return Unauthorized();
-
-                var result = await _mediator
-                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, assignments))
-                    .ConfigureAwait(false);
-
-                return Ok(result);
+                return Ok(response.Role);
             },
             _logger).ConfigureAwait(false);
     }

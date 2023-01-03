@@ -15,9 +15,13 @@
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetGridAreaAuditLogEntriesCommandRuleSet : AbstractValidator<GetGridAreaAuditLogEntriesCommand>
 {
-    public sealed class GetGridAreaAuditLogEntriesCommandRuleSet : AbstractValidator<GetGridAreaAuditLogEntriesCommand>
+    public GetGridAreaAuditLogEntriesCommandRuleSet()
     {
+        RuleFor(command => command.GridAreaId)
+            .NotEmpty();
     }
 }
