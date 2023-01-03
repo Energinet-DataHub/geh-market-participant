@@ -13,44 +13,37 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class GetUserRoleHandler
-    : IRequestHandler<GetUserRoleCommand, GetUserRoleResponse>
+public sealed class GetAllUserRolesHandler
+    : IRequestHandler<GetAllUserRolesCommand, GetAllUserRolesResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetUserRoleHandler(IUserRoleRepository userRoleRepository)
+    public GetAllUserRolesHandler(IUserRoleRepository userRoleRepository)
     {
         _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<GetUserRoleResponse> Handle(
-        GetUserRoleCommand request,
+    public async Task<GetAllUserRolesResponse> Handle(
+        GetAllUserRolesCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var userRole = await _userRoleRepository
-            .GetAsync(new UserRoleId(request.UserRoleId))
+        var userRoles = await _userRoleRepository
+            .GetAllAsync()
             .ConfigureAwait(false);
 
-        if (userRole == null)
-            throw new NotFoundValidationException(request.UserRoleId);
+        var userRolesList = userRoles.Select(role => new UserRoleDto(role.Id.Value, role.Name, role.Description, role.EicFunction, role.Status));
 
-        return new GetUserRoleResponse(new UserRoleDto(
-            userRole.Id.Value,
-            userRole.Name,
-            userRole.Description,
-            userRole.EicFunction,
-            userRole.Status));
+        return new GetAllUserRolesResponse(userRolesList);
     }
 }

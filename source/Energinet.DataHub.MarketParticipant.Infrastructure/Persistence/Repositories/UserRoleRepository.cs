@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -30,6 +31,26 @@ public sealed class UserRoleRepository : IUserRoleRepository
     public UserRoleRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+    }
+
+    public async Task<IEnumerable<UserRole>> GetAllAsync()
+    {
+        var queryable = BuildUserRoleQuery();
+
+        var selectedUserRoleFunctions = queryable.SelectMany(e => e.EicFunctions.Select(r => new { r.EicFunction, r.UserRoleId, e.Id, e.Name }));
+
+        var userRoles = selectedUserRoleFunctions
+            .Select(r => new UserRole(
+                new UserRoleId(r.Id),
+                r.Name,
+                new List<EicFunction>(),
+                new List<Permission>(),
+                string.Empty,
+                r.EicFunction,
+                0));
+
+        var list = await userRoles.ToListAsync().ConfigureAwait(false);
+        return list;
     }
 
     public async Task<UserRole?> GetAsync(UserRoleId userRoleId)
@@ -62,7 +83,10 @@ public sealed class UserRoleRepository : IUserRoleRepository
             new UserRoleId(userRole.Id),
             userRole.Name,
             userRole.EicFunctions.Select(f => f.EicFunction),
-            userRole.Permissions.Select(p => p.Permission));
+            userRole.Permissions.Select(p => p.Permission),
+            string.Empty,
+            EicFunction.Agent,
+            0);
     }
 
     private IQueryable<UserRoleEntity> BuildUserRoleQuery()

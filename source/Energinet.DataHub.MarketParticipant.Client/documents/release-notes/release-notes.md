@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.4
+
+- Add get all user roles API.
+
 ## Version 2.14.3
 
 - Add get user role API.
