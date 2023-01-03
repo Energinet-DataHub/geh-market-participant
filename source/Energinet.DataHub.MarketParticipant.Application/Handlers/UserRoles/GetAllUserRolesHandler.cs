@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,7 +42,7 @@ public sealed class GetAllUserRolesHandler
             .GetAllAsync()
             .ConfigureAwait(false);
 
-        var userRolesList = userRoles.Select(role => new UserRoleInfoDto(role.Id.Value, role.Name, role.Description, role.EicFunction, role.Status));
+        var userRolesList = userRoles.Select(role => new UserRoleDto(role.Id.Value, role.Name, role.Description, role.EicFunction, role.Status));
 
         return new GetAllUserRolesResponse(userRolesList);
     }

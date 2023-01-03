@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UserRoleDto(Guid Id, string Name);
+public sealed record UserRoleDto(Guid Id, string Name, string Description, EicFunction EicFunction, int Status);

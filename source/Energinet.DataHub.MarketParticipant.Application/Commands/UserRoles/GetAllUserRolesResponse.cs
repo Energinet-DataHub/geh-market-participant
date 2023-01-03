@@ -16,4 +16,4 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record GetAllUserRolesResponse(IEnumerable<UserRoleInfoDto> Roles);
+public sealed record GetAllUserRolesResponse(IEnumerable<UserRoleDto> Roles);

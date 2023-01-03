@@ -48,6 +48,9 @@ public sealed class GetUserRoleHandler
 
         return new GetUserRoleResponse(new UserRoleDto(
             userRole.Id.Value,
-            userRole.Name));
+            userRole.Name,
+            userRole.Description,
+            userRole.EicFunction,
+            userRole.Status));
     }
 }

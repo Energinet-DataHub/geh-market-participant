@@ -28,7 +28,7 @@ public interface IUserRoleRepository
     /// Returns all existing user roles
     /// </summary>
     /// <returns>The all existing user roles</returns>
-    Task<IEnumerable<UserRoleInfo>> GetAllAsync();
+    Task<IEnumerable<UserRole>> GetAllAsync();
 
     /// <summary>
     /// Gets the user role having the specified external id.
