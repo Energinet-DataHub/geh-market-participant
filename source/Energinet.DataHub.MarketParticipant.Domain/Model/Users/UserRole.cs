@@ -22,6 +22,8 @@ public sealed class UserRole
     public UserRole(
         UserRoleId id,
         string name,
+        string description,
+        UserRoleStatus status,
         IEnumerable<EicFunction> allowedMarkedRoles,
         IEnumerable<Permission> permissions)
     {
@@ -29,10 +31,14 @@ public sealed class UserRole
         Name = name;
         AllowedMarkedRoles = allowedMarkedRoles;
         Permissions = permissions;
+        Description = description;
+        Status = status;
     }
 
     public UserRoleId Id { get; }
     public string Name { get; set; }
+    public string Description { get; set; }
+    public UserRoleStatus Status { get; set; }
     public IEnumerable<EicFunction> AllowedMarkedRoles { get; }
     public IEnumerable<Permission> Permissions { get; }
 }

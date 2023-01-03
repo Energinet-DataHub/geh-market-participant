@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,11 +57,23 @@ public sealed class UserRoleRepository : IUserRoleRepository
         return userRoles.Select(MapUserRole);
     }
 
+    public async Task<UserRole> CreateAsync(string name, string description, UserRoleStatus status, EicFunction eicFunction)
+    {
+        ArgumentNullException.ThrowIfNull(eicFunction);
+        var role = new UserRoleEntity() { Name = name, Description = description, Status = status };
+        role.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = eicFunction });
+        _marketParticipantDbContext.UserRoles.Add(role);
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+        return MapUserRole(role);
+    }
+
     private static UserRole MapUserRole(UserRoleEntity userRole)
     {
         return new UserRole(
             new UserRoleId(userRole.Id),
             userRole.Name,
+            userRole.Description,
+            userRole.Status,
             userRole.EicFunctions.Select(f => f.EicFunction),
             userRole.Permissions.Select(p => p.Permission));
     }

@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -40,14 +41,13 @@ public sealed class CreateUserRoleHandler
         ArgumentNullException.ThrowIfNull(request);
 
         var userRole = await _userRoleRepository
-            .GetAsync(new UserRoleId(request.UserRoleId))
+            .CreateAsync(
+                request.UserRoleDto.Name,
+                request.UserRoleDto.Description,
+                Enum.Parse<UserRoleStatus>(request.UserRoleDto.Status),
+                Enum.Parse<EicFunction>(request.UserRoleDto.EicFunction))
             .ConfigureAwait(false);
 
-        if (userRole == null)
-            throw new NotFoundValidationException(request.UserRoleId);
-
-        return new GetUserRoleResponse(new UserRoleDto(
-            userRole.Id.Value,
-            userRole.Name));
+        return new CreateUserRoleResponse(userRole.Id);
     }
 }

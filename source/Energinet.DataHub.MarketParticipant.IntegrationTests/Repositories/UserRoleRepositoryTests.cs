@@ -217,4 +217,30 @@ public sealed class UserRoleRepositoryTests
         // Assert
         Assert.DoesNotContain(userRoleTemplates, t => t.Id.Value == userRoleTemplateEntity.Id);
     }
+
+    [Fact]
+    public async Task CreateAsync_AllValid_ReturnsUser()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleTemplateRepository2 = new UserRoleRepository(context);
+
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRole = await userRoleTemplateRepository.CreateAsync("fake_value", "Fake_Description", UserRoleStatus.InActive, EicFunction.Consumer);
+        var roleFetched = await userRoleTemplateRepository2.GetAsync(userRole.Id);
+
+        // Assert
+        Assert.NotNull(roleFetched);
+        Assert.Equal(userRole.Id, roleFetched.Id);
+        Assert.Equal(userRole.Name, roleFetched.Name);
+        Assert.Equal(userRole.Description, roleFetched.Description);
+        Assert.Equal(userRole.Status, roleFetched.Status);
+        Assert.Equal(userRole.AllowedMarkedRoles, roleFetched.AllowedMarkedRoles);
+    }
 }

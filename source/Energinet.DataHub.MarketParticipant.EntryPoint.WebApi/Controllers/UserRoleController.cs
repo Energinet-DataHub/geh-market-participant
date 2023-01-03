@@ -56,4 +56,22 @@ public sealed class UserRoleController : ControllerBase
             },
             _logger).ConfigureAwait(false);
     }
+
+    [HttpPost]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> CreateAsync(CreateUserRoleDto userRole)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new CreateUserRoleCommand(userRole);
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response.UserRoleId);
+            },
+            _logger).ConfigureAwait(false);
+    }
 }

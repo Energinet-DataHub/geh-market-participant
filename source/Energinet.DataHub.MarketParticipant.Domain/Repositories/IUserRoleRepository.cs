@@ -46,7 +46,7 @@ public interface IUserRoleRepository
     /// <param name="status">The status of the role <see cref="UserRoleStatus"/></param>
     /// <param name="eicFunction">The eic function <see cref="EicFunction"/> that this user role belongs to</param>
     /// <returns>The role if it exists; otherwise null.</returns>
-    Task<UserRole?> CreateAsync(
+    Task<UserRole> CreateAsync(
         string name,
         string description,
         UserRoleStatus status,

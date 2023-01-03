@@ -17,4 +17,4 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record CreateUserRoleDto(string Name, string Description, UserRoleStatus Status, EicFunction EicFunction);
+public sealed record CreateUserRoleDto(string Name, string Description, string Status, string EicFunction);
