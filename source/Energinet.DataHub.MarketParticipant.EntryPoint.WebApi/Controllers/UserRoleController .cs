@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -60,6 +61,24 @@ public sealed class UserRoleController : ControllerBase
                     .ConfigureAwait(false);
 
                 return Ok(response.Roles);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpGet("{userRoleId:guid}")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetAsync(Guid userRoleId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetUserRoleCommand(userRoleId);
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response.Role);
             },
             _logger).ConfigureAwait(false);
     }
