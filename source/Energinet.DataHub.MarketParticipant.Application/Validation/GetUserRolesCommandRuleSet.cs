@@ -19,4 +19,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
 public sealed class GetUserRolesCommandRuleSet : AbstractValidator<GetUserRolesCommand>
 {
+    public GetUserRolesCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+
+        RuleFor(command => command.UserId)
+            .NotEmpty();
+    }
 }
