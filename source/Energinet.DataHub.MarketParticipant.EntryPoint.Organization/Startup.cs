@@ -39,7 +39,6 @@ internal sealed class Startup : StartupBase
 
     protected override void Configure(IConfiguration configuration, Container container)
     {
-        Container.Register<DispatchEventsTimerTrigger>();
         Container.Register<SynchronizeActorsTimerTrigger>();
 
         // Health check
