@@ -71,7 +71,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         KeyValuePair<string, string>[] keyValuePairs =
         {
             new(Settings.SqlDbConnectionString.Key, dbConnectionString),
-            new(Settings.ServiceBusHealthCheckConnectionString.Key, "fake_value"),
             new(Settings.ServiceBusTopicName.Key, "fake_value"),
             new(Settings.ExternalOpenIdUrl.Key, "fake_value"),
             new(Settings.BackendAppId.Key, "fake_value"),
