@@ -104,7 +104,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     users,
                     user =>
                     {
-                        result.Add(new Domain.Model.UserIdentity(
+                        result.Add(new UserIdentity(
                             new ExternalUserId(user.Id),
                             user.DisplayName,
                             string.IsNullOrWhiteSpace(user.Mail) ? null : new EmailAddress(user.Mail),
