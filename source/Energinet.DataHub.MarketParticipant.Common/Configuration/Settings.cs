@@ -46,9 +46,6 @@ public static class Settings
     public static Setting<string> BackendAppId { get; }
         = new("BACKEND_SERVICE_APP_ID");
 
-    public static Setting<string> ServiceBusHealthCheckConnectionString { get; }
-        = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
-
     public static Setting<bool> AllowAllTokens { get; }
         = new("ALLOW_ALL_TOKENS", false);
 

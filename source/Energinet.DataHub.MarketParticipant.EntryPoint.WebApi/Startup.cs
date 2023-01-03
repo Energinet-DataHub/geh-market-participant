@@ -117,15 +117,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             services.AddPermissionAuthorization();
 
-            var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
-            var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
-
             // Health check
             services
                 .AddHealthChecks()
                 .AddLiveCheck()
-                .AddDbContextCheck<MarketParticipantDbContext>()
-                .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
+                .AddDbContextCheck<MarketParticipantDbContext>();
 
             services.AddSwaggerGen(c =>
             {

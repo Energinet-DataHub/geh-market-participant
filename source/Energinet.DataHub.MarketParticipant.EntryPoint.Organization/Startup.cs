@@ -30,15 +30,11 @@ internal sealed class Startup : StartupBase
 {
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
-        var serviceBusConnectionString = configuration.GetSetting(Settings.ServiceBusHealthCheckConnectionString);
-        var serviceBusTopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
-
         // Health check
         services
             .AddHealthChecks()
             .AddLiveCheck()
-            .AddDbContextCheck<MarketParticipantDbContext>()
-            .AddAzureServiceBusTopic(serviceBusConnectionString, serviceBusTopicName);
+            .AddDbContextCheck<MarketParticipantDbContext>();
     }
 
     protected override void Configure(IConfiguration configuration, Container container)
