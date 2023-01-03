@@ -59,6 +59,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
         }
 
+        public async Task<UserDto> GetUserAsync(Guid userId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user", userId)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<UserDto>()
+                .ConfigureAwait(false);
+        }
+
         public async Task<UserAuditLogsDto> GetUserAuditLogsAsync(Guid userId)
         {
             var response = await ValidationExceptionHandler

@@ -30,112 +30,128 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
+
+[ApiController]
+[Route("user")]
+public class UserController : ControllerBase
 {
-    [ApiController]
-    [Route("user")]
-    public class UserController : ControllerBase
+    private readonly ILogger<UserController> _logger;
+    private readonly IExternalTokenValidator _externalTokenValidator;
+    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IMediator _mediator;
+
+    public UserController(
+        ILogger<UserController> logger,
+        IExternalTokenValidator externalTokenValidator,
+        IUserContext<FrontendUser> userContext,
+        IMediator mediator)
     {
-        private readonly ILogger<UserController> _logger;
-        private readonly IExternalTokenValidator _externalTokenValidator;
-        private readonly IUserContext<FrontendUser> _userContext;
-        private readonly IMediator _mediator;
+        _logger = logger;
+        _externalTokenValidator = externalTokenValidator;
+        _userContext = userContext;
+        _mediator = mediator;
+    }
 
-        public UserController(
-            ILogger<UserController> logger,
-            IExternalTokenValidator externalTokenValidator,
-            IUserContext<FrontendUser> userContext,
-            IMediator mediator)
-        {
-            _logger = logger;
-            _externalTokenValidator = externalTokenValidator;
-            _userContext = userContext;
-            _mediator = mediator;
-        }
+    [HttpGet("actors")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAssociatedUserActorsAsync(string externalToken)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                if (string.IsNullOrWhiteSpace(externalToken))
+                    return BadRequest();
 
-        [HttpGet("actors")]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAssociatedUserActorsAsync(string externalToken)
-        {
-            return await this.ProcessAsync(
-                async () =>
+                var externalJwt = new JwtSecurityToken(externalToken);
+
+                if (!await _externalTokenValidator
+                        .ValidateTokenAsync(externalToken)
+                        .ConfigureAwait(false))
                 {
-                    if (string.IsNullOrWhiteSpace(externalToken))
-                        return BadRequest();
+                    return Unauthorized();
+                }
 
-                    var externalJwt = new JwtSecurityToken(externalToken);
+                var externalUserId = GetUserId(externalJwt.Claims);
 
-                    if (!await _externalTokenValidator
-                            .ValidateTokenAsync(externalToken)
-                            .ConfigureAwait(false))
-                    {
-                        return Unauthorized();
-                    }
+                var associatedActors = await _mediator
+                    .Send(new GetAssociatedUserActorsCommand(externalUserId))
+                    .ConfigureAwait(false);
 
-                    var externalUserId = GetUserId(externalJwt.Claims);
+                return Ok(associatedActors);
+            },
+            _logger).ConfigureAwait(false);
+    }
 
-                    var associatedActors = await _mediator
-                        .Send(new GetAssociatedUserActorsCommand(externalUserId))
-                        .ConfigureAwait(false);
+    [HttpGet("{userId:guid}")]
+    public async Task<IActionResult> GetAsync(Guid userId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetUserCommand(userId);
 
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpGet("{userId:guid}/actors")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetUserActorsAsync(Guid userId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var associatedActors = await _mediator
+                    .Send(new GetAssociatedUserActorsCommand(userId))
+                    .ConfigureAwait(false);
+
+                if (_userContext.CurrentUser.IsFas)
                     return Ok(associatedActors);
-                },
-                _logger).ConfigureAwait(false);
-        }
 
-        [HttpGet("{userId:guid}/actors")]
-        [AuthorizeUser(Permission.UsersManage)]
-        public async Task<IActionResult> GetUserActorsAsync(Guid userId)
-        {
-            return await this.ProcessAsync(
-                async () =>
+                var allowedActors = new List<Guid>();
+
+                foreach (var actorId in associatedActors.ActorIds)
                 {
-                    var associatedActors = await _mediator
-                        .Send(new GetAssociatedUserActorsCommand(userId))
-                        .ConfigureAwait(false);
+                    if (_userContext.CurrentUser.IsAssignedToActor(actorId))
+                        allowedActors.Add(actorId);
+                }
 
-                    if (_userContext.CurrentUser.IsFas)
-                        return Ok(associatedActors);
+                return Ok(new GetAssociatedUserActorsResponse(allowedActors));
+            },
+            _logger).ConfigureAwait(false);
+    }
 
-                    var allowedActors = new List<Guid>();
+    [HttpGet("{userId:guid}/auditlogentry")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetUserAuditLogsCommand(userId);
 
-                    foreach (var actorId in associatedActors.ActorIds)
-                    {
-                        if (_userContext.CurrentUser.IsAssignedToActor(actorId))
-                            allowedActors.Add(actorId);
-                    }
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
 
-                    return Ok(new GetAssociatedUserActorsResponse(allowedActors));
-                },
-                _logger).ConfigureAwait(false);
-        }
+                var filtered = _userContext.CurrentUser.IsFas
+                    ? response.UserRoleAssignmentAuditLogs
+                    : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
-        [HttpGet("{userId:guid}/auditlogentry")]
-        [AuthorizeUser(Permission.UsersManage)]
-        public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
-        {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetUserAuditLogsCommand(userId);
+                return Ok(new GetUserAuditLogResponse(filtered));
+            },
+            _logger).ConfigureAwait(false);
+    }
 
-                    var response = await _mediator
-                        .Send(command)
-                        .ConfigureAwait(false);
-
-                    var filtered = _userContext.CurrentUser.IsFas
-                        ? response.UserRoleAssignmentAuditLogs
-                        : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
-
-                    return Ok(new GetUserAuditLogResponse(filtered));
-                },
-                _logger).ConfigureAwait(false);
-        }
-
-        private static Guid GetUserId(IEnumerable<Claim> claims)
-        {
-            var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
-            return Guid.Parse(userIdClaim.Value);
-        }
+    private static Guid GetUserId(IEnumerable<Claim> claims)
+    {
+        var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
+        return Guid.Parse(userIdClaim.Value);
     }
 }
