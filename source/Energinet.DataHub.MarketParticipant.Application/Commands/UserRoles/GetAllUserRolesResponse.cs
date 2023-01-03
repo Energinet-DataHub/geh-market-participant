@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record GetAllUserRolesCommand : IRequest<GetAllUserRolesResponse>;
+public sealed record GetAllUserRolesResponse(IEnumerable<UserRoleInfoDto> Roles);

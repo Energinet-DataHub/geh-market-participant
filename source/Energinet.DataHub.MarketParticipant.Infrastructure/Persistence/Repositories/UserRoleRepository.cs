@@ -32,6 +32,19 @@ public sealed class UserRoleRepository : IUserRoleRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
+    public async Task<IEnumerable<UserRoleInfo>> GetAllAsync()
+    {
+        var queryable = _marketParticipantDbContext
+            .UserRoles
+            .Include(x => x.EicFunctions);
+
+        var selectedUserRoleFunctions = queryable.SelectMany(e => e.EicFunctions.Select(r => new { r.EicFunction, r.UserRoleId, e.Id, e.Name }));
+
+        var userRoles = selectedUserRoleFunctions.Select(r => new UserRoleInfo(new UserRoleId(r.Id), r.Name, string.Empty, r.EicFunction, 0));
+        var list = await userRoles.ToListAsync().ConfigureAwait(false);
+        return list;
+    }
+
     public async Task<UserRole?> GetAsync(UserRoleId userRoleId)
     {
         var userRole = await BuildUserRoleQuery()

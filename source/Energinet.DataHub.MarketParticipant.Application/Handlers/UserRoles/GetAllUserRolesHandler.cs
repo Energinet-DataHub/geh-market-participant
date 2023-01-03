@@ -18,15 +18,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
 public sealed class GetAllUserRolesHandler
-    : IRequestHandler<GetAllUserRolesCommand, GetUserRolesResponse>
+    : IRequestHandler<GetAllUserRolesCommand, GetAllUserRolesResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
 
@@ -35,7 +33,7 @@ public sealed class GetAllUserRolesHandler
         _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<GetUserRolesResponse> Handle(
+    public async Task<GetAllUserRolesResponse> Handle(
         GetAllUserRolesCommand request,
         CancellationToken cancellationToken)
     {
@@ -45,8 +43,8 @@ public sealed class GetAllUserRolesHandler
             .GetAllAsync()
             .ConfigureAwait(false);
 
-        var userRolesList = userRoles.Select(role => new UserRoleDto(role.Id.Value, role.Name));
+        var userRolesList = userRoles.Select(role => new UserRoleInfoDto(role.Id.Value, role.Name, role.Description, role.EicFunction, role.Status));
 
-        return new GetUserRolesResponse(userRolesList);
+        return new GetAllUserRolesResponse(userRolesList);
     }
 }

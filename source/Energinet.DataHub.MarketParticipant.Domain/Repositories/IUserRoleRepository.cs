@@ -25,6 +25,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserRoleRepository
 {
     /// <summary>
+    /// Returns all existing user roles
+    /// </summary>
+    /// <returns>The all existing user roles</returns>
+    Task<IEnumerable<UserRoleInfo>> GetAllAsync();
+
+    /// <summary>
     /// Gets the user role having the specified external id.
     /// </summary>
     /// <param name="userRoleId">The id of the user role.</param>
