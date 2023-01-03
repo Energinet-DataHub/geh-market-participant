@@ -23,16 +23,25 @@ public sealed class UserRole
         UserRoleId id,
         string name,
         IEnumerable<EicFunction> allowedMarkedRoles,
-        IEnumerable<Permission> permissions)
+        IEnumerable<Permission> permissions,
+        string description,
+        EicFunction eicFunction,
+        int status)
     {
         Id = id;
         Name = name;
         AllowedMarkedRoles = allowedMarkedRoles;
         Permissions = permissions;
+        Description = description;
+        EicFunction = eicFunction;
+        Status = status;
     }
 
     public UserRoleId Id { get; }
     public string Name { get; set; }
     public IEnumerable<EicFunction> AllowedMarkedRoles { get; }
     public IEnumerable<Permission> Permissions { get; }
+    public string Description { get; set; }
+    public EicFunction EicFunction { get; }
+    public int Status { get; set; }
 }

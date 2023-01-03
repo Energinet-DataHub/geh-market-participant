@@ -70,7 +70,7 @@ public sealed class GetUserRolesHandler
 
             if (userRole != null)
             {
-                var role = new UserRoleDto(userRole.Id.Value, userRole.Name);
+                var role = new UserRoleDto(userRole.Id.Value, userRole.Name, userRole.Description, userRole.EicFunction, userRole.Status);
                 userRoles.Add(role);
             }
         }
