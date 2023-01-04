@@ -59,7 +59,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        scope.Container!.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture
@@ -99,7 +99,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        scope.Container!.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture
@@ -145,7 +145,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        scope.Container!.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, actor2Id, userId) = await _fixture
@@ -199,7 +199,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        scope.Container!.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
@@ -235,7 +235,7 @@ public sealed class UpdateUserRolesIntegrationTests
         var mockUser = new FrontendUser(userIdContext, Guid.NewGuid(), actorIdContext, true);
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        scope.Container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        scope.Container!.Register(() => userIdProvider.Object, Lifestyle.Singleton);
         var mediator = scope.GetInstance<IMediator>();
 
         var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);

@@ -60,11 +60,12 @@ public sealed class ActorQueryRepository : IActorQueryRepository
                     {
                         ActorId = a.Id,
                         a.ActorNumber,
+                        ActorName = a.Name,
                         OrganizationName = o.Name
                     };
 
         var actors = await query.ToListAsync().ConfigureAwait(false);
 
-        return actors.Select(x => new SelectionActor(x.ActorId, x.ActorNumber, x.OrganizationName));
+        return actors.Select(x => new SelectionActor(x.ActorId, x.ActorNumber, x.ActorName, x.OrganizationName));
     }
 }
