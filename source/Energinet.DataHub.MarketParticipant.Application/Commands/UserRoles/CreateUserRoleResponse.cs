@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles
 {
-    public sealed record CreateUserRoleResponse(UserRoleId UserRoleId);
+    public sealed record CreateUserRoleResponse(Guid UserRoleId);
 }

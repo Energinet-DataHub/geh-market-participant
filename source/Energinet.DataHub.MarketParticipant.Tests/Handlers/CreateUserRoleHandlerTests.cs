@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            Assert.Equal(userRole.Id, response.UserRoleId);
+            Assert.Equal(userRole.Id.Value, response.UserRoleId);
         }
     }
 }

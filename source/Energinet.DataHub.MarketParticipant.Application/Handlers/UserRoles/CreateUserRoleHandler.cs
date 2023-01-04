@@ -40,7 +40,7 @@ public sealed class CreateUserRoleHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var userRole = await _userRoleRepository
+        var result = await _userRoleRepository
             .CreateAsync(
                 request.UserRoleDto.Name,
                 request.UserRoleDto.Description,
@@ -48,6 +48,6 @@ public sealed class CreateUserRoleHandler
                 Enum.Parse<EicFunction>(request.UserRoleDto.EicFunction))
             .ConfigureAwait(false);
 
-        return new CreateUserRoleResponse(userRole.Id);
+        return new CreateUserRoleResponse(result.Id.Value);
     }
 }

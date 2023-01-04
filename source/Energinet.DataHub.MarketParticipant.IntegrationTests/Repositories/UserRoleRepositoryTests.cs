@@ -227,12 +227,12 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var userRoleTemplateRepository = new UserRoleRepository(context);
-        var userRoleTemplateRepository2 = new UserRoleRepository(context);
+        var userRoleTemplateRepository2 = new UserRoleRepository(context2);
 
         await context2.SaveChangesAsync();
 
         // Act
-        var userRole = await userRoleTemplateRepository.CreateAsync("fake_value", "Fake_Description", UserRoleStatus.InActive, EicFunction.Consumer);
+        var userRole = await userRoleTemplateRepository.CreateAsync("fake_value", "Fake_Description", UserRoleStatus.Inactive, EicFunction.Consumer);
         var roleFetched = await userRoleTemplateRepository2.GetAsync(userRole.Id);
 
         // Assert

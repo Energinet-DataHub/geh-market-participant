@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
             EicFunctions = new Collection<UserRoleEicFunctionEntity>();
             Permissions = new Collection<UserRolePermissionEntity>();
             Description = string.Empty;
-            Status = UserRoleStatus.InActive;
+            Status = UserRoleStatus.Inactive;
         }
 
         public Guid Id { get; set; }
