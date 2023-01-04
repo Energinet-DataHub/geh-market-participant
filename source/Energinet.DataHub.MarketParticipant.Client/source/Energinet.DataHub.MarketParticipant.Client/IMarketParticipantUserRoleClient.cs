@@ -32,6 +32,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         Task<UserRoleDto> GetAsync(Guid userRoleId);
 
         /// <summary>
+        /// Returns all user roles with basic information
+        /// </summary>
+        /// <returns>User roles</returns>
+        Task<IEnumerable<UserRoleInfoDto>> GetAllAsync();
+
+        /// <summary>
         /// Gets user roles assigned to the specified user and actor.
         /// </summary>
         /// <param name="actorId">The id of the actor.</param>

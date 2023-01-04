@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record SelectionActor(Guid Id, string Gln, string ActorName, string OrganizationName);
+public sealed class GetAllUserRolesCommandRuleSet : AbstractValidator<GetAllUserRolesCommand>
+{
+}

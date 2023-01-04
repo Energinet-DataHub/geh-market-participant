@@ -14,6 +14,7 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
-
-public sealed record SelectionActor(Guid Id, string Gln, string ActorName, string OrganizationName);
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public sealed record UserRoleInfoDto(Guid Id, string Name, string Description, EicFunction EicFunction, int Status);
+}

@@ -72,7 +72,7 @@ public sealed class GetAvailableUserRolesForActorHandler
 
         return new GetUserRolesResponse(userRoles.Select(t =>
         {
-            return new UserRoleDto(t.Id.Value, t.Name);
+            return new UserRoleDto(t.Id.Value, t.Name, t.Description, t.EicFunction, t.Status);
         }));
     }
 }

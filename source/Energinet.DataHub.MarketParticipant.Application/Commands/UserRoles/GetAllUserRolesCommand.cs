@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record SelectionActor(Guid Id, string Gln, string ActorName, string OrganizationName);
+public sealed record GetAllUserRolesCommand : IRequest<GetAllUserRolesResponse>;

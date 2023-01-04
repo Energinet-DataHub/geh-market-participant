@@ -80,7 +80,7 @@ public sealed class UserRoleRepositoryTests
         // Assert
         Assert.NotNull(userRoleTemplate);
         Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
-        Assert.Single(userRoleTemplate.AllowedMarkedRoles, EicFunction.Agent);
+        Assert.Equal(userRoleTemplate.EicFunction, EicFunction.Agent);
         Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
     }
 
@@ -241,6 +241,6 @@ public sealed class UserRoleRepositoryTests
         Assert.Equal(userRole.Name, roleFetched.Name);
         Assert.Equal(userRole.Description, roleFetched.Description);
         Assert.Equal(userRole.Status, roleFetched.Status);
-        Assert.Equal(userRole.AllowedMarkedRoles, roleFetched.AllowedMarkedRoles);
+        Assert.Equal(userRole.EicFunction, roleFetched.EicFunction);
     }
 }

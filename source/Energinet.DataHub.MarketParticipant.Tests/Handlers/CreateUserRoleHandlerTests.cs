@@ -62,8 +62,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
-                new List<EicFunction>() { EicFunction.Consumer },
-                new List<Permission>());
+                new List<Permission>(),
+                EicFunction.Consumer);
 
             repositoryMock
                 .Setup(x => x.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleStatus>(), It.IsAny<EicFunction>()))
