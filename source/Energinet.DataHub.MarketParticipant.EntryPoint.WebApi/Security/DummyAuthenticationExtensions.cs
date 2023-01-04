@@ -36,6 +36,7 @@ public static class DummyAuthenticationExtensions
     {
         return new TokenValidationParameters
         {
+#pragma warning disable CA5404
             ValidateAudience = false,
             ValidateIssuer = false,
             ValidateIssuerSigningKey = false,
@@ -43,6 +44,7 @@ public static class DummyAuthenticationExtensions
             RequireExpirationTime = false,
             RequireSignedTokens = false,
             SignatureValidator = (t, p) => new JwtSecurityToken(t)
+#pragma warning restore CA5404
         };
     }
 }
