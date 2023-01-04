@@ -12,13 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Xunit;
 using Xunit.Categories;
 
@@ -31,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidDescription = "This is the support role";
         private const string ValidStatus = "Active";
         private const string ValidEicFunction = "EnergySupplier";
+        private const string ValidPermission = nameof(Core.App.Common.Security.Permission.ActorManage);
 
         [Fact]
         public async Task Validate_UserRole_ValidatesProperty()
@@ -65,7 +65,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 value,
                 ValidDescription,
                 ValidStatus,
-                ValidEicFunction);
+                ValidEicFunction,
+                new Collection<string> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(createGridAreaDto);
@@ -101,7 +102,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidName,
                 ValidDescription,
                 value,
-                ValidEicFunction);
+                ValidEicFunction,
+                new Collection<string> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(createGridAreaDto);
@@ -137,7 +139,45 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidName,
                 ValidDescription,
                 ValidStatus,
-                value);
+                value,
+                new Collection<string> { ValidPermission });
+
+            var target = new CreateUserRoleCommandRuleSet();
+            var command = new CreateUserRoleCommand(createGridAreaDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        [InlineData("  ", false)]
+        [InlineData(ValidPermission, true)]
+        [InlineData("fake_value", false)]
+        public async Task Validate_Permissions_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Permissions)}[0]";
+
+            var createGridAreaDto = new CreateUserRoleDto(
+                ValidName,
+                ValidDescription,
+                ValidStatus,
+                ValidEicFunction,
+                new Collection<string>() { value });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(createGridAreaDto);

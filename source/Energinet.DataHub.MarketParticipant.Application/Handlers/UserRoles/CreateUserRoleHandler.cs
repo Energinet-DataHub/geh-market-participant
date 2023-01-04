@@ -13,8 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -40,14 +43,18 @@ public sealed class CreateUserRoleHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var userRole = new UserRole(
+            new UserRoleId(Guid.Empty),
+            request.UserRoleDto.Name,
+            request.UserRoleDto.Description,
+            Enum.Parse<UserRoleStatus>(request.UserRoleDto.Status),
+            request.UserRoleDto.Permissions.Select(Enum.Parse<Permission>),
+            Enum.Parse<EicFunction>(request.UserRoleDto.EicFunction));
+
         var result = await _userRoleRepository
-            .CreateAsync(
-                request.UserRoleDto.Name,
-                request.UserRoleDto.Description,
-                Enum.Parse<UserRoleStatus>(request.UserRoleDto.Status),
-                Enum.Parse<EicFunction>(request.UserRoleDto.EicFunction))
+            .AddAsync(userRole)
             .ConfigureAwait(false);
 
-        return new CreateUserRoleResponse(result.Id.Value);
+        return new CreateUserRoleResponse(result.Value);
     }
 }

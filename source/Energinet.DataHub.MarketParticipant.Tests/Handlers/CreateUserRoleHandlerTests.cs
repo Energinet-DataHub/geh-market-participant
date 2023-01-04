@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,6 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class CreateUserRoleHandlerTests
     {
+        private const string ValidPermission = nameof(Core.App.Common.Security.Permission.ActorManage);
+
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
@@ -66,14 +69,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 EicFunction.Consumer);
 
             repositoryMock
-                .Setup(x => x.CreateAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UserRoleStatus>(), It.IsAny<EicFunction>()))
-                .ReturnsAsync(userRole);
+                .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
+                .ReturnsAsync(userRole.Id);
 
             var command = new CreateUserRoleCommand(new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
                 nameof(UserRoleStatus.Active),
-                nameof(EicFunction.Consumer)));
+                nameof(EicFunction.Consumer),
+                new Collection<string> { ValidPermission }));
 
             // Act
             var response = await target

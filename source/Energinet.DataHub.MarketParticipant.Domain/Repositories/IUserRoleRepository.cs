@@ -47,14 +47,8 @@ public interface IUserRoleRepository
     /// <summary>
     /// Create a new user role
     /// </summary>
-    /// <param name="name">The name of the user role</param>
-    /// <param name="description">The description for this role</param>
-    /// <param name="status">The status of the role <see cref="UserRoleStatus"/></param>
-    /// <param name="eicFunction">The eic function <see cref="EicFunction"/> that this user role belongs to</param>
-    /// <returns>The role if it exists; otherwise null.</returns>
-    Task<UserRole> CreateAsync(
-        string name,
-        string description,
-        UserRoleStatus status,
-        EicFunction eicFunction);
+    /// <param name="userRole">The user role to Create</param>
+    /// <returns>The id of the created role</returns>
+    Task<UserRoleId> AddAsync(
+       UserRole userRole);
 }

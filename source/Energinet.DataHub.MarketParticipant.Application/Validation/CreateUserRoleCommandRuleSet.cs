@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -43,6 +44,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(role => role.Status)
                         .NotEmpty()
                         .IsEnumName(typeof(UserRoleStatus), false);
+
+                    validator
+                        .RuleForEach(role => role.Permissions)
+                        .NotEmpty()
+                        .IsEnumName(typeof(Permission), false);
                 });
         }
     }
