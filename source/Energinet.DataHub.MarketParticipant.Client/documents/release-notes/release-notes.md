@@ -2,7 +2,7 @@
 
 ## Version 2.14.5
 
-- Get all user roles return type update. 
+- Get all user roles return type update.
 
 ## Version 2.14.4
 
