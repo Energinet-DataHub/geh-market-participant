@@ -18,6 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 public sealed record UserRoleAssignmentAuditLogEntry(
     Guid ActorId,
     UserRoleId UserRoleId,
-    ExternalUserId ChangedByUserId,
+    UserId ChangedByUserId,
     DateTimeOffset Timestamp,
     UserRoleAssignmentTypeAuditLog AssignmentType);
