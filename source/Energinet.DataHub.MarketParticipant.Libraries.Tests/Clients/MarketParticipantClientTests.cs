@@ -843,7 +843,7 @@ public sealed class MarketParticipantClientTests
         // arrange
         var id = Guid.Parse("8CC33D1F-2E3D-4752-A231-851A2C0589D9");
         const string gln = "9326018586901";
-        const string actorName= "actorName";
+        const string actorName = "actorName";
         const string organizationName = "Organization name";
 
         var incomingJson = $@"
