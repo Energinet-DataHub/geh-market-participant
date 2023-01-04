@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Client</PackageId>
-    <PackageVersion>2.14.6$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.14.7$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Client library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
@@ -64,7 +64,7 @@ limitations under the License.
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flurl" Version="3.0.6" />
+    <PackageReference Include="Flurl" Version="3.0.7" />
     <PackageReference Include="Flurl.Http" Version="3.2.4" />
     <PackageReference Include="Flurl.Serialization.TextJson" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
