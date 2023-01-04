@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.7
+
+- Updated packages.
+
 ## Version 2.14.6
 
 - Actor name in actor selection API.
