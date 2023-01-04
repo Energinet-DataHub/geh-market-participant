@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = factory;
         }
 
-        public async Task<UserRoleInfoDto> GetAllAsync()
+        public async Task<IEnumerable<UserRoleInfoDto>> GetAllAsync()
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<UserRoleInfoDto>()
+                .GetJsonAsync<IEnumerable<UserRoleInfoDto>>()
                 .ConfigureAwait(false);
         }
 
