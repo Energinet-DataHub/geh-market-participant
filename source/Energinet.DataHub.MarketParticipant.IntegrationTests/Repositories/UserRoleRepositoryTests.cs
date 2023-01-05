@@ -80,8 +80,8 @@ public sealed class UserRoleRepositoryTests
 
         // Assert
         Assert.NotNull(userRoleTemplate);
-        Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
-        Assert.Equal(userRoleTemplate.EicFunction, EicFunction.Agent);
+        Assert.Equal(userRoleTemplate.Name, userRoleTemplateEntity.Name);
+        Assert.Equal(EicFunction.Agent, userRoleTemplate.EicFunction);
         Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
     }
 

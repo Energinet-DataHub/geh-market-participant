@@ -63,8 +63,8 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (_, frontendUserId, frontendExternalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
-        scope.Container.MockFrontendUser(frontendExternalUserId);
+        var (_, frontendUserId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+        scope.Container.MockFrontendUser(frontendUserId);
 
         var userRoleId = await _fixture.DatabaseManager.CreateRoleTemplateAsync();
         var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();

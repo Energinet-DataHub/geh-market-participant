@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 
-public sealed record GetSelectionActorsQueryCommand(Guid ExternalUserId) : IRequest<GetSelectionActorsQueryResponse>;
+public sealed record GetSelectionActorsQueryCommand(Guid UserId) : IRequest<GetSelectionActorsQueryResponse>;

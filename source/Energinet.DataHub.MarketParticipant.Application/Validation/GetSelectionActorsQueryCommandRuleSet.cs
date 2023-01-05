@@ -21,7 +21,7 @@ public sealed class GetSelectionActorsQueryCommandRuleSet : AbstractValidator<Ge
 {
     public GetSelectionActorsQueryCommandRuleSet()
     {
-        RuleFor(command => command.ExternalUserId)
+        RuleFor(command => command.UserId)
             .NotEmpty();
     }
 }

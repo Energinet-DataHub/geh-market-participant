@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
@@ -72,7 +73,7 @@ public class UserController : ControllerBase
                     return Unauthorized();
                 }
 
-                var externalUserId = GetUserId(externalJwt.Claims);
+                var externalUserId = GetExternalUserId(externalJwt.Claims);
 
                 var associatedActors = await _mediator
                     .Send(new GetAssociatedUserActorsCommand(externalUserId))
@@ -108,15 +109,17 @@ public class UserController : ControllerBase
             async () =>
             {
                 var associatedActors = await _mediator
-                    .Send(new GetAssociatedUserActorsCommand(userId))
+                    .Send(new GetSelectionActorsQueryCommand(userId))
                     .ConfigureAwait(false);
 
+                var associatedActorIds = associatedActors.Actors.Select(actor => actor.Id);
+
                 if (_userContext.CurrentUser.IsFas)
-                    return Ok(associatedActors);
+                    return Ok(new GetAssociatedUserActorsResponse(associatedActorIds));
 
                 var allowedActors = new List<Guid>();
 
-                foreach (var actorId in associatedActors.ActorIds)
+                foreach (var actorId in associatedActorIds)
                 {
                     if (_userContext.CurrentUser.IsAssignedToActor(actorId))
                         allowedActors.Add(actorId);
@@ -149,7 +152,7 @@ public class UserController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
-    private static Guid GetUserId(IEnumerable<Claim> claims)
+    private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
         return Guid.Parse(userIdClaim.Value);

@@ -47,21 +47,21 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridAreaRepo = new GridAreaRepository(context);
             var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
 
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
+            var userId = new UserId(Guid.NewGuid());
 
             var target = new GridAreaAuditLogEntryRepository(context);
-            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, externalUserId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId);
+            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId);
 
             // act
             await target.InsertAsync(entry);
 
             var actual = await (from l in context.GridAreaAuditLogEntries.AsQueryable()
-                                where l.UserId == externalUserId.Value
+                                where l.UserId == userId.Value
                                 select l).SingleAsync();
 
             // assert
             Assert.Equal(entry.Timestamp, actual.Timestamp);
-            Assert.Equal(entry.ExternalUserId.Value, actual.UserId);
+            Assert.Equal(entry.UserId.Value, actual.UserId);
             Assert.Equal(entry.Field, actual.Field);
             Assert.Equal(entry.OldValue, actual.OldValue);
             Assert.Equal(entry.NewValue, actual.NewValue);
@@ -79,10 +79,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridAreaRepo = new GridAreaRepository(context);
             var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
 
-            var externalUserId = new ExternalUserId(Guid.NewGuid());
+            var userId = new UserId(Guid.NewGuid());
 
             var target = new GridAreaAuditLogEntryRepository(context);
-            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, externalUserId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId);
+            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId);
 
             await target.InsertAsync(entry);
 

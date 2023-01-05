@@ -12,12 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public class User
 {
+    public User(
+        ExternalUserId externalId,
+        ICollection<UserRoleAssignment> roleAssignments,
+        EmailAddress email)
+    {
+        Id = new UserId(Guid.Empty);
+        ExternalId = externalId;
+        RoleAssignments = roleAssignments;
+        Email = email;
+    }
+
     public User(
         UserId id,
         ExternalUserId externalId,

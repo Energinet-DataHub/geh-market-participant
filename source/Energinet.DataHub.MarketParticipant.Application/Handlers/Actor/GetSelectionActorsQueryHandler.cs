@@ -17,21 +17,27 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 
-public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectionActorsQueryCommand, GetSelectionActorsQueryResponse>
+public sealed class GetSelectionActorsQueryHandler
+    : IRequestHandler<GetSelectionActorsQueryCommand, GetSelectionActorsQueryResponse>
 {
+    private readonly IUserRepository _userRepository;
     private readonly IUserQueryRepository _userQueryRepository;
     private readonly IActorQueryRepository _actorQueryRepository;
 
     public GetSelectionActorsQueryHandler(
+        IUserRepository userRepository,
         IUserQueryRepository userQueryRepository,
         IActorQueryRepository actorQueryRepository)
     {
+        _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
         _actorQueryRepository = actorQueryRepository;
     }
@@ -42,8 +48,15 @@ public sealed class GetSelectionActorsQueryHandler : IRequestHandler<GetSelectio
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
+        var user = await _userRepository
+            .GetAsync(new UserId(request.UserId))
+            .ConfigureAwait(false);
+
+        if (user == null)
+            throw new NotFoundValidationException(request.UserId);
+
         var actorIds = await _userQueryRepository
-            .GetActorsAsync(new ExternalUserId(request.ExternalUserId))
+            .GetActorsAsync(user.ExternalId)
             .ConfigureAwait(false);
 
         var actors = await _actorQueryRepository

@@ -120,19 +120,19 @@ public class TokenController : ControllerBase
             return Unauthorized();
         }
 
-        var userId = GetUserId(externalJwt.Claims);
+        var externalUserId = GetExternalUserId(externalJwt.Claims);
         var actorId = tokenRequest.ActorId;
         var issuedAt = EpochTime.GetIntDate(DateTime.UtcNow);
 
         var grantedPermissions = await _mediator
-            .Send(new GetUserPermissionsCommand(userId, actorId))
+            .Send(new GetUserPermissionsCommand(externalUserId, actorId))
             .ConfigureAwait(false);
 
         var roleClaims = grantedPermissions.Permissions
             .Select(p => new Claim(RoleClaim, PermissionsAsClaims.Lookup[p]));
 
         var dataHubTokenClaims = roleClaims
-            .Append(new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()))
+            .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
 
@@ -154,7 +154,7 @@ public class TokenController : ControllerBase
         return Ok(new TokenResponse(finalToken));
     }
 
-    private static Guid GetUserId(IEnumerable<Claim> claims)
+    private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
         return Guid.Parse(userIdClaim.Value);

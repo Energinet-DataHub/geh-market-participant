@@ -55,7 +55,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             users = await _graphClient.Users
                 .Request(queryOptions)
                 .Filter($"startswith(displayName, '{searchText}')")
-                .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+                .Select(x => new { x.Id, x.DisplayName, x.UserPrincipalName, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
                 .GetAsync()
                 .ConfigureAwait(false);
         }
@@ -69,7 +69,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     result.Add(new UserIdentity(
                         new ExternalUserId(user.Id),
                         user.DisplayName,
-                        string.IsNullOrWhiteSpace(user.Mail) ? null : new EmailAddress(user.Mail),
+                        new EmailAddress(user.UserPrincipalName),
                         string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
                         user.CreatedDateTime!.Value,
                         user.AccountEnabled == true));
@@ -94,7 +94,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             var users = await _graphClient.Users
                 .Request()
                 .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x}'"))})")
-                .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+                .Select(x => new { x.Id, x.DisplayName, x.UserPrincipalName, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
                 .GetAsync()
                 .ConfigureAwait(false);
 
@@ -107,7 +107,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                         result.Add(new UserIdentity(
                             new ExternalUserId(user.Id),
                             user.DisplayName,
-                            string.IsNullOrWhiteSpace(user.Mail) ? null : new EmailAddress(user.Mail),
+                            new EmailAddress(user.UserPrincipalName),
                             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
                             user.CreatedDateTime!.Value,
                             user.AccountEnabled == true));

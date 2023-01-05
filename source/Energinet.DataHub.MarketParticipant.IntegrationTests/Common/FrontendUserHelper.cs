@@ -22,10 +22,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class FrontendUserHelper
 {
-    public static void MockFrontendUser(this Container? container, Guid frontendExternalUserId)
+    public static void MockFrontendUser(this Container? container, Guid frontendUserId)
     {
         var frontendUser = new FrontendUser(
-            frontendExternalUserId,
+            frontendUserId,
             Guid.NewGuid(),
             Guid.NewGuid(),
             false);
