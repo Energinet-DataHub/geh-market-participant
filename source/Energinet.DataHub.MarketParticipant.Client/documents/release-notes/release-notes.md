@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.8
+
+- Add create user role API
+
 ## Version 2.14.7
 
 - Updated packages.
