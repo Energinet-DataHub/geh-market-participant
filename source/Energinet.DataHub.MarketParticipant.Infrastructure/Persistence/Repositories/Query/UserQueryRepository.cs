@@ -85,7 +85,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
         var query = from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
-            where u.ExternalId == externalUserId.Value
+            where u.ExternalId == externalUserId.Value && a.Id == actorId
             select a.IsFas;
 
         return query.FirstOrDefaultAsync();
