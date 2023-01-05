@@ -59,3 +59,4 @@ frontend
 backend
 searchText
 param
+enum
