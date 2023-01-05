@@ -90,7 +90,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
         return new UserRole(
             new UserRoleId(userRole.Id),
             userRole.Name,
-            userRole.Description,
+            userRole.Description ?? string.Empty,
             userRole.Status,
             userRole.Permissions.Select(p => p.Permission),
             userRole.EicFunctions.First().EicFunction);

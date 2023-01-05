@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.8
+
+- Add create user role API
+- Change response types in Get all user roles to return user role status enum instead of integer
+
 ## Version 2.14.7
 
 - Updated packages.

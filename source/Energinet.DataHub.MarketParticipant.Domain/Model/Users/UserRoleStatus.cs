@@ -16,7 +16,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users
 {
     public enum UserRoleStatus
     {
-        Active = 0,
-        Inactive = 1,
+        Active = 1,
+        Inactive = 2,
     }
 }
