@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
 public sealed record CreateUserRoleDto(
     string Name,
     string Description,
-    string Status,
-    string EicFunction,
+    UserRoleStatus Status,
+    EicFunction EicFunction,
     Collection<string> Permissions);

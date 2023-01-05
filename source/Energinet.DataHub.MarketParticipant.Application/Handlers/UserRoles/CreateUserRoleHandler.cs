@@ -46,9 +46,9 @@ public sealed class CreateUserRoleHandler
         var userRole = new UserRole(
             request.UserRoleDto.Name,
             request.UserRoleDto.Description,
-            Enum.Parse<UserRoleStatus>(request.UserRoleDto.Status),
+            request.UserRoleDto.Status,
             request.UserRoleDto.Permissions.Select(Enum.Parse<Permission>),
-            Enum.Parse<EicFunction>(request.UserRoleDto.EicFunction));
+            request.UserRoleDto.EicFunction);
 
         var result = await _userRoleRepository
             .AddAsync(userRole)

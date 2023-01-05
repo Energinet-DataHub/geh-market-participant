@@ -88,5 +88,22 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<UserRoleDto>>()
                 .ConfigureAwait(false);
         }
+
+        public async Task<Guid> CreateAsync(CreateUserRoleDto userRoleDto)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request($"user-roles")
+                        .PostJsonAsync(userRoleDto))
+                .ConfigureAwait(false);
+
+            var roleId = await response
+                .GetStringAsync()
+                .ConfigureAwait(false);
+
+            return Guid.Parse(roleId);
+        }
     }
 }

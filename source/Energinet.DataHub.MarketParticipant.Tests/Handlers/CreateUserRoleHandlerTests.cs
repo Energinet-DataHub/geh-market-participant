@@ -75,8 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateUserRoleCommand(new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
-                nameof(UserRoleStatus.Active),
-                nameof(EicFunction.Consumer),
+                UserRoleStatus.Active,
+                EicFunction.Consumer,
                 new Collection<string> { ValidPermission }));
 
             // Act
