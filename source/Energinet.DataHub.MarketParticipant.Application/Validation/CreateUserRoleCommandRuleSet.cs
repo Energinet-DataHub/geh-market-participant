@@ -45,6 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleForEach(role => role.Permissions)
+                        .NotEmpty()
                         .IsEnumName(typeof(Permission), false);
                 });
         }
