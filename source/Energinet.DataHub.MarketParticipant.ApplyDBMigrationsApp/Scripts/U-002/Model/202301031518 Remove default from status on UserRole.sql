@@ -1,0 +1,3 @@
+ALTER TABLE [dbo].[UserRole]
+ALTER COLUMN [Status] [INT] NOT NULL
+GO

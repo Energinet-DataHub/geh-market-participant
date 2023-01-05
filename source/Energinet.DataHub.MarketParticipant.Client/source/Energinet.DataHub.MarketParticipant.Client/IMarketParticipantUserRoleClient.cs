@@ -51,5 +51,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="actorId">The id of the actor.</param>
         /// <returns>The list of assignable user roles.</returns>
         Task<IEnumerable<UserRoleDto>> GetAssignableAsync(Guid actorId);
+
+        /// <summary>
+        /// Creates a new user role
+        /// </summary>
+        /// <param name="userRoleDto">Details for the user role that is to be created</param>
+        /// <returns>The id <see cref="Guid"/> of the user role created</returns>
+        Task<Guid> CreateAsync(CreateUserRoleDto userRoleDto);
     }
 }
