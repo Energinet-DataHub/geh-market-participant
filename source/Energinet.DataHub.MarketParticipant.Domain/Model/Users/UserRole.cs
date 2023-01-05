@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Energinet.DataHub.Core.App.Common.Security;
 
@@ -19,6 +20,21 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class UserRole
 {
+    public UserRole(
+        string name,
+        string description,
+        UserRoleStatus status,
+        IEnumerable<Permission> permissions,
+        EicFunction eicFunction)
+    {
+        Id = new UserRoleId(Guid.Empty);
+        Name = name;
+        Permissions = permissions;
+        Description = description;
+        Status = status;
+        EicFunction = eicFunction;
+    }
+
     public UserRole(
         UserRoleId id,
         string name,

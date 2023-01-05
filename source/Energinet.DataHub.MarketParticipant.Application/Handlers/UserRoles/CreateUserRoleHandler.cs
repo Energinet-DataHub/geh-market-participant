@@ -44,7 +44,6 @@ public sealed class CreateUserRoleHandler
         ArgumentNullException.ThrowIfNull(request);
 
         var userRole = new UserRole(
-            new UserRoleId(Guid.Empty),
             request.UserRoleDto.Name,
             request.UserRoleDto.Description,
             Enum.Parse<UserRoleStatus>(request.UserRoleDto.Status),
