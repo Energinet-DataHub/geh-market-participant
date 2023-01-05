@@ -43,4 +43,12 @@ public interface IUserRoleRepository
     /// <param name="eicFunctions">The list of EIC-functions the user role must support.</param>
     /// <returns>A list of user roles.</returns>
     Task<IEnumerable<UserRole>> GetAsync(IEnumerable<EicFunction> eicFunctions);
+
+    /// <summary>
+    /// Create a new user role
+    /// </summary>
+    /// <param name="userRole">The user role to Create</param>
+    /// <returns>The id of the created role</returns>
+    Task<UserRoleId> AddAsync(
+       UserRole userRole);
 }
