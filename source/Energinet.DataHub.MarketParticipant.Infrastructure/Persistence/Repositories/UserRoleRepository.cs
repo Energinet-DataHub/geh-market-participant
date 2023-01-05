@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -35,22 +37,8 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
     public async Task<IEnumerable<UserRole>> GetAllAsync()
     {
-        var queryable = BuildUserRoleQuery();
-
-        var selectedUserRoleFunctions = queryable.SelectMany(e => e.EicFunctions.Select(r => new { r.EicFunction, r.UserRoleId, e.Id, e.Name }));
-
-        var userRoles = selectedUserRoleFunctions
-            .Select(r => new UserRole(
-                new UserRoleId(r.Id),
-                r.Name,
-                new List<EicFunction>(),
-                new List<Permission>(),
-                string.Empty,
-                r.EicFunction,
-                0));
-
-        var list = await userRoles.ToListAsync().ConfigureAwait(false);
-        return list;
+        var userRoles = await BuildUserRoleQuery().ToListAsync().ConfigureAwait(false);
+        return userRoles.Select(MapUserRole);
     }
 
     public async Task<UserRole?> GetAsync(UserRoleId userRoleId)
@@ -77,16 +65,35 @@ public sealed class UserRoleRepository : IUserRoleRepository
         return userRoles.Select(MapUserRole);
     }
 
+    public async Task<UserRoleId> AddAsync(UserRole userRole)
+    {
+        ArgumentNullException.ThrowIfNull(userRole);
+        var role = new UserRoleEntity()
+        {
+            Name = userRole.Name,
+            Description = userRole.Description,
+            Status = userRole.Status,
+        };
+        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity() { Permission = x }))
+        {
+            role.Permissions.Add(permissionEntity);
+        }
+
+        role.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = userRole.EicFunction });
+        _marketParticipantDbContext.UserRoles.Add(role);
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+        return new UserRoleId(role.Id);
+    }
+
     private static UserRole MapUserRole(UserRoleEntity userRole)
     {
         return new UserRole(
             new UserRoleId(userRole.Id),
             userRole.Name,
-            userRole.EicFunctions.Select(f => f.EicFunction),
+            userRole.Description,
+            userRole.Status,
             userRole.Permissions.Select(p => p.Permission),
-            string.Empty,
-            EicFunction.Agent,
-            0);
+            userRole.EicFunctions.First().EicFunction);
     }
 
     private IQueryable<UserRoleEntity> BuildUserRoleQuery()

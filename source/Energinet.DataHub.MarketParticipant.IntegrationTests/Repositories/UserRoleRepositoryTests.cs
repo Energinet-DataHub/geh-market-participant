@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -80,7 +81,7 @@ public sealed class UserRoleRepositoryTests
         // Assert
         Assert.NotNull(userRoleTemplate);
         Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
-        Assert.Single(userRoleTemplate.AllowedMarkedRoles, EicFunction.Agent);
+        Assert.Equal(userRoleTemplate.EicFunction, EicFunction.Agent);
         Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
     }
 
@@ -216,5 +217,37 @@ public sealed class UserRoleRepositoryTests
 
         // Assert
         Assert.DoesNotContain(userRoleTemplates, t => t.Id.Value == userRoleTemplateEntity.Id);
+    }
+
+    [Fact]
+    public async Task CreateAsync_AllValid_ReturnsUser()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleTemplateRepository2 = new UserRoleRepository(context2);
+        var userRole = new UserRole(
+            new UserRoleId(Guid.Empty),
+            "fake_value",
+            "fake_value",
+            UserRoleStatus.Active,
+            new List<Permission>(),
+            EicFunction.Consumer);
+        await context2.SaveChangesAsync();
+
+        // Act
+        var userRoleId = await userRoleTemplateRepository.AddAsync(userRole);
+        var roleFetched = await userRoleTemplateRepository2.GetAsync(userRoleId);
+
+        // Assert
+        Assert.NotNull(roleFetched);
+        Assert.NotEqual(Guid.Empty, roleFetched?.Id.Value);
+        Assert.Equal(userRole.Name, roleFetched?.Name);
+        Assert.Equal(userRole.Description, roleFetched?.Description);
+        Assert.Equal(userRole.Status, roleFetched?.Status);
+        Assert.Equal(userRole.EicFunction, roleFetched?.EicFunction);
     }
 }

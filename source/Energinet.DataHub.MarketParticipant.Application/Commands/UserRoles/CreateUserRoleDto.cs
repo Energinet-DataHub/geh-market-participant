@@ -12,10 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UserRoleDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status);
+public sealed record CreateUserRoleDto(
+    string Name,
+    string Description,
+    string Status,
+    string EicFunction,
+    Collection<string> Permissions);
