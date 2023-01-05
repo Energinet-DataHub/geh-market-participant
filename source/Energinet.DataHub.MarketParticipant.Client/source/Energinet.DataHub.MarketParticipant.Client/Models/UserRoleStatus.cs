@@ -11,14 +11,11 @@
 // // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // // See the License for the specific language governing permissions and
 // // limitations under the License.
-using System.Collections.ObjectModel;
-
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record CreateUserRoleDto(
-        string Name,
-        string Description,
-        UserRoleStatus Status,
-        EicFunction EicFunction,
-        Collection<string> Permissions);
+    public enum UserRoleStatus
+    {
+        Active = 0,
+        Inactive = 1
+    }
 }

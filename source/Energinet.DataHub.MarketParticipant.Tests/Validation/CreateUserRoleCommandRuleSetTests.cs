@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Xunit;
 using Xunit.Categories;
 
@@ -28,8 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     {
         private const string ValidName = "Support";
         private const string ValidDescription = "This is the support role";
-        private const string ValidStatus = "Active";
-        private const string ValidEicFunction = "EnergySupplier";
+        private const UserRoleStatus ValidStatus = UserRoleStatus.Active;
+        private const EicFunction ValidEicFunction = EicFunction.EnergySupplier;
         private const string ValidPermission = nameof(Core.App.Common.Security.Permission.ActorManage);
 
         [Fact]
@@ -88,12 +90,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
-        [InlineData(ValidStatus, true)]
-        [InlineData("fake_value", false)]
-        public async Task Validate_Status_ValidatesProperty(string value, bool isValid)
+        [InlineData((int)UserRoleStatus.Active, true)]
+        [InlineData(12, false)]
+        public async Task Validate_Status_ValidatesProperty(int value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Status)}";
@@ -101,7 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var createGridAreaDto = new CreateUserRoleDto(
                 ValidName,
                 ValidDescription,
-                value,
+                (UserRoleStatus)value,
                 ValidEicFunction,
                 new Collection<string> { ValidPermission });
 
@@ -125,12 +124,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
-        [InlineData(ValidEicFunction, true)]
-        [InlineData("fake_value", false)]
-        public async Task Validate_EicFunction_ValidatesProperty(string value, bool isValid)
+        [InlineData((int)EicFunction.EnergySupplier, true)]
+        [InlineData(2550, false)]
+        public async Task Validate_EicFunction_ValidatesProperty(int value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.EicFunction)}";
@@ -139,7 +135,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidName,
                 ValidDescription,
                 ValidStatus,
-                value,
+                (EicFunction)value,
                 new Collection<string> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();

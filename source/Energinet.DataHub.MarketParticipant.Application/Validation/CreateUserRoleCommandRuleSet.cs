@@ -37,17 +37,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(role => role.EicFunction)
-                        .NotEmpty()
-                        .IsEnumName(typeof(EicFunction), false);
+                        .IsInEnum();
 
                     validator
                         .RuleFor(role => role.Status)
-                        .NotEmpty()
-                        .IsEnumName(typeof(UserRoleStatus), false);
+                        .IsInEnum();
 
                     validator
                         .RuleForEach(role => role.Permissions)
-                        .NotEmpty()
                         .IsEnumName(typeof(Permission), false);
                 });
         }
