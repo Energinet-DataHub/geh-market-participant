@@ -46,7 +46,8 @@ public sealed class UserQueryRepository : IUserQueryRepository
             .ToListAsync()
             .ConfigureAwait(false);
 
-        if (roleAssignmentsQuery.Any()) return roleAssignmentsQuery;
+        if (roleAssignmentsQuery.Any())
+            return roleAssignmentsQuery;
 
         var fasActorQuery = await _marketParticipantDbContext
             .Actors
@@ -71,18 +72,25 @@ public sealed class UserQueryRepository : IUserQueryRepository
             .SelectMany(a => a.MarketRoles)
             .Select(r => r.Function);
 
-        var query = from u in _marketParticipantDbContext.Users
+        var query =
+            from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
-            where u.ExternalId == externalUserId.Value && r.ActorId == actorId && ur.EicFunctions.All(q => actorEicFunctions.Contains(q.EicFunction))
+            where u.ExternalId == externalUserId.Value &&
+                  r.ActorId == actorId &&
+                  ur.EicFunctions.All(q => actorEicFunctions.Contains(q.EicFunction))
             select ur.Permissions;
 
-        return await query.SelectMany(x => x.Select(y => y.Permission)).ToListAsync().ConfigureAwait(false);
+        return await query
+            .SelectMany(x => x.Select(y => y.Permission))
+            .ToListAsync()
+            .ConfigureAwait(false);
     }
 
     public Task<bool> IsFasAsync(Guid actorId, ExternalUserId externalUserId)
     {
-        var query = from u in _marketParticipantDbContext.Users
+        var query =
+            from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
             where u.ExternalId == externalUserId.Value && a.Id == actorId

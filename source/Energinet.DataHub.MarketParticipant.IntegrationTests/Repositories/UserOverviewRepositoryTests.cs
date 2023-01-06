@@ -442,7 +442,7 @@ public sealed class UserOverviewRepositoryTests
             .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
                     x.Select(y =>
-                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
         return userIdentityRepository;
     }
 
@@ -454,14 +454,14 @@ public sealed class UserOverviewRepositoryTests
             .Returns<string?>((_) =>
                 Task.FromResult(
                     userIdsToReturnFromSearch.Select(y =>
-                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
 
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .Returns<IEnumerable<ExternalUserId>>((_) =>
                 Task.FromResult(
                     userIdsToReturnFromGet.Select(y =>
-                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
         return userIdentityRepository;
     }
 

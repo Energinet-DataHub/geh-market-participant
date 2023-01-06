@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Application.Commands.GridArea.GridAreaAuditLogEntryField;
 
@@ -29,32 +29,57 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
         : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
     {
         private readonly IGridAreaAuditLogEntryRepository _repository;
-        private readonly IUserDisplayNameProvider _userDisplayNameProvider;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserIdentityRepository _userIdentityRepository;
 
-        public GetGridAreaAuditLogEntriesHandler(IGridAreaAuditLogEntryRepository repository, IUserDisplayNameProvider userDisplayNameProvider)
+        public GetGridAreaAuditLogEntriesHandler(
+            IGridAreaAuditLogEntryRepository repository,
+            IUserRepository userRepository,
+            IUserIdentityRepository userIdentityRepository)
         {
             _repository = repository;
-            _userDisplayNameProvider = userDisplayNameProvider;
+            _userRepository = userRepository;
+            _userIdentityRepository = userIdentityRepository;
         }
 
         public async Task<GetGridAreaAuditLogEntriesResponse> Handle(GetGridAreaAuditLogEntriesCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var entries = (await _repository.GetAsync(new GridAreaId(request.GridAreaId)).ConfigureAwait(false)).ToList();
+            var entries = await _repository
+                .GetAsync(new GridAreaId(request.GridAreaId))
+                .ConfigureAwait(false);
 
-            var users = (await _userDisplayNameProvider.GetUserDisplayNamesAsync(entries.Select(x => x.ExternalUserId)).ConfigureAwait(false))
-                .ToDictionary(x => x.Id, x => x.Value);
+            var entriesDto = new List<GridAreaAuditLogEntryDto>();
+            var userNameLookup = new Dictionary<UserId, string?>();
 
-            return new GetGridAreaAuditLogEntriesResponse(
-                entries.Select(
-                    x => new GridAreaAuditLogEntryDto(
-                        x.Timestamp,
-                        users.TryGetValue(x.ExternalUserId, out var userDisplayName) ? userDisplayName : null,
-                        (GridAreaAuditLogEntryField)x.Field,
-                        x.OldValue,
-                        x.NewValue,
-                        x.GridAreaId.Value)));
+            foreach (var entry in entries)
+            {
+                if (!userNameLookup.TryGetValue(entry.UserId, out var userName))
+                {
+                    var user = await _userRepository.GetAsync(entry.UserId).ConfigureAwait(false);
+                    if (user != null)
+                    {
+                        var userIdentity = await _userIdentityRepository
+                            .GetUserIdentityAsync(user.ExternalId)
+                            .ConfigureAwait(false);
+
+                        userName = userIdentity.Name;
+                    }
+
+                    userNameLookup[entry.UserId] = userName;
+                }
+
+                entriesDto.Add(new GridAreaAuditLogEntryDto(
+                    entry.Timestamp,
+                    userName,
+                    (GridAreaAuditLogEntryField)entry.Field,
+                    entry.OldValue,
+                    entry.NewValue,
+                    entry.GridAreaId.Value));
+            }
+
+            return new GetGridAreaAuditLogEntriesResponse(entriesDto);
         }
     }
 }

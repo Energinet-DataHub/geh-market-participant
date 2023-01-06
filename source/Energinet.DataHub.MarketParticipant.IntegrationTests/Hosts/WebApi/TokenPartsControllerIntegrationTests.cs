@@ -80,17 +80,17 @@ public sealed class TokenPartsControllerIntegrationTests :
     }
 
     [Fact]
-    public async Task Token_UserId_IsKnown()
+    public async Task Token_UserId_IsPresent()
     {
         // Arrange
-        var userId = Guid.NewGuid().ToString();
-        var externalToken = CreateExternalTestToken(userId: userId);
+        var externalUserId = Guid.NewGuid().ToString();
+        var externalToken = CreateExternalTestToken(externalUserId: externalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
 
         // Assert
-        Assert.Equal(userId, internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Sub).Value);
+        Assert.Single(internalToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub);
     }
 
     [Fact]
@@ -118,7 +118,7 @@ public sealed class TokenPartsControllerIntegrationTests :
             .DatabaseManager
             .CreateUserAsync(new[] { organizationView });
 
-        var externalToken = CreateExternalTestToken(userId: externalUserId.ToString());
+        var externalToken = CreateExternalTestToken(externalUserId: externalUserId.ToString());
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken, externalActorId);
@@ -195,7 +195,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     }
 
     private static string CreateExternalTestToken(
-        string userId = "8539CCC6-F098-426D-8ED6-13A2442B0F76",
+        string externalUserId = "8539CCC6-F098-426D-8ED6-13A2442B0F76",
         DateTime? notBefore = null,
         DateTime? expires = null)
     {
@@ -204,7 +204,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         var externalToken = new JwtSecurityToken(
             "https://example.com",
             "audience",
-            new[] { new Claim(JwtRegisteredClaimNames.Sub, userId) },
+            new[] { new Claim(JwtRegisteredClaimNames.Sub, externalUserId) },
             notBefore ?? DateTime.UtcNow.AddDays(-1),
             expires ?? DateTime.UtcNow.AddDays(1),
             new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));

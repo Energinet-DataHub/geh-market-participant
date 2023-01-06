@@ -57,13 +57,6 @@ public sealed class UpdateUserRolesHandler
             throw new NotFoundValidationException(request.UserId);
         }
 
-        var frontendUser = await _userRepository
-            .GetAsync(new ExternalUserId(_userContext.CurrentUser.ExternalUserId))
-            .ConfigureAwait(false);
-
-        if (frontendUser == null)
-            throw new InvalidOperationException($"Frontend user '{_userContext.CurrentUser.ExternalUserId}' was not found.");
-
         foreach (var addRequest in request.Assignments.Added)
         {
             var userRoleAssignment = new UserRoleAssignment(request.ActorId, new UserRoleId(addRequest));
@@ -74,7 +67,6 @@ public sealed class UpdateUserRolesHandler
 
             await AuditRoleAssignmentAsync(
                     user,
-                    frontendUser,
                     userRoleAssignment,
                     UserRoleAssignmentTypeAuditLog.Added)
                 .ConfigureAwait(false);
@@ -87,7 +79,6 @@ public sealed class UpdateUserRolesHandler
             {
                 await AuditRoleAssignmentAsync(
                         user,
-                        frontendUser,
                         userRoleAssignment,
                         UserRoleAssignmentTypeAuditLog.Removed)
                     .ConfigureAwait(false);
@@ -101,7 +92,6 @@ public sealed class UpdateUserRolesHandler
 
     private async Task AuditRoleAssignmentAsync(
         Domain.Model.Users.User user,
-        Domain.Model.Users.User frontendUser,
         UserRoleAssignment userRoleAssignment,
         UserRoleAssignmentTypeAuditLog userRoleAssignmentTypeAuditLog)
     {
@@ -110,7 +100,7 @@ public sealed class UpdateUserRolesHandler
             new UserRoleAssignmentAuditLogEntry(
                 userRoleAssignment.ActorId,
                 userRoleAssignment.UserRoleId,
-                frontendUser.Id,
+                new UserId(_userContext.CurrentUser.UserId),
                 DateTimeOffset.UtcNow,
                 userRoleAssignmentTypeAuditLog)).ConfigureAwait(false);
     }
