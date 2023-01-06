@@ -33,8 +33,14 @@ public interface IUserIdentityRepository
     Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText);
 
     /// <summary>
+    /// Retrieves user identity for the provided external id.
+    /// </summary>
+    /// <param name="externalId">The external id of the user identity.</param>
+    Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId);
+
+    /// <summary>
     /// Retrieves user identities for the provided set of external ids.
     /// </summary>
-    /// <param name="externalIds"></param>
+    /// <param name="externalIds">A set of external ids.</param>
     Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
 }

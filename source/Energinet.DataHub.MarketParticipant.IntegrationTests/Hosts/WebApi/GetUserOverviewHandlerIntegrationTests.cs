@@ -52,7 +52,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         mock.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
-                x.Select(y => new UserIdentity(y, y.ToString(), null, null, DateTimeOffset.UtcNow, true)));
+                x.Select(y => new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTimeOffset.UtcNow, true)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -92,7 +92,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .Returns<string?>((searchText) =>
                 Task.FromResult(
                     userIdsToReturn.Select(y =>
-                        new UserIdentity(y, y.ToString(), null, null, DateTime.UtcNow, false))));
+                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
 
         scope.Container!.Register(() => mock.Object);
 

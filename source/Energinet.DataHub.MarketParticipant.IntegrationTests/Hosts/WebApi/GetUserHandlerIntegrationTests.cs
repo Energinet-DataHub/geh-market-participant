@@ -52,7 +52,7 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentity = new UserIdentity(
             new ExternalUserId(externalUserId),
             "expected_name",
-            null,
+            new EmailAddress("fake@value"),
             null,
             DateTimeOffset.UtcNow,
             true);
@@ -103,7 +103,7 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentity = new UserIdentity(
             new ExternalUserId(externalUserId),
             "expected_name",
-            null,
+            new EmailAddress("fake@value"),
             null,
             DateTimeOffset.UtcNow,
             true);

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -35,7 +35,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // arrange
-            var target = new GetGridAreaAuditLogEntriesHandler(new Mock<IGridAreaAuditLogEntryRepository>().Object, new Mock<IUserDisplayNameProvider>().Object);
+            var target = new GetGridAreaAuditLogEntriesHandler(
+                new Mock<IGridAreaAuditLogEntryRepository>().Object,
+                new Mock<IUserRepository>().Object,
+                new Mock<IUserIdentityRepository>().Object);
 
             // act assert
             await Assert
@@ -47,6 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_Command_CallsRepository()
         {
             // arrange
+            var userId = new UserId(Guid.NewGuid());
             var externalUserId = new ExternalUserId(Guid.NewGuid());
 
             var repositoryMock = new Mock<IGridAreaAuditLogEntryRepository>();
@@ -54,13 +58,29 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
                 .ReturnsAsync(new[]
                     {
-                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, externalUserId, Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", new GridAreaId(Guid.NewGuid()))
+                        new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, Domain.Model.GridAreaAuditLogEntryField.Name, "oldVal", "newVal", new GridAreaId(Guid.NewGuid()))
                     });
 
-            var userDisplayNameProviderMock = new Mock<IUserDisplayNameProvider>();
-            userDisplayNameProviderMock.Setup(x => x.GetUserDisplayNamesAsync(new[] { externalUserId })).ReturnsAsync(new[] { new UserDisplayName(externalUserId, "name") });
+            var userRepositoryMock = new Mock<IUserRepository>();
+            userRepositoryMock
+                .Setup(userRepository => userRepository.GetAsync(userId))
+                .ReturnsAsync(new User(userId, externalUserId, new List<UserRoleAssignment>(), new EmailAddress("fake@value")));
 
-            var target = new GetGridAreaAuditLogEntriesHandler(repositoryMock.Object, userDisplayNameProviderMock.Object);
+            var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+            userIdentityRepositoryMock
+                .Setup(x => x.GetUserIdentityAsync(externalUserId))
+                .ReturnsAsync(new UserIdentity(
+                    externalUserId,
+                    "name",
+                    new EmailAddress("fake@value"),
+                    null,
+                    DateTimeOffset.UtcNow,
+                    true));
+
+            var target = new GetGridAreaAuditLogEntriesHandler(
+                repositoryMock.Object,
+                userRepositoryMock.Object,
+                userIdentityRepositoryMock.Object);
 
             // act
             var actual = await target.Handle(new GetGridAreaAuditLogEntriesCommand(Guid.NewGuid()), CancellationToken.None).ConfigureAwait(false);

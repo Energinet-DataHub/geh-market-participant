@@ -18,15 +18,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Security;
 
 public sealed class FrontendUser
 {
-    public FrontendUser(Guid externalUserId, Guid organizationId, Guid actorId, bool isFas)
+    public FrontendUser(Guid userId, Guid organizationId, Guid actorId, bool isFas)
     {
-        ExternalUserId = externalUserId;
+        UserId = userId;
         OrganizationId = organizationId;
         ActorId = actorId;
         IsFas = isFas;
     }
 
-    public Guid ExternalUserId { get; }
+    public Guid UserId { get; }
     public Guid OrganizationId { get; }
     public Guid ActorId { get; }
     public bool IsFas { get; }

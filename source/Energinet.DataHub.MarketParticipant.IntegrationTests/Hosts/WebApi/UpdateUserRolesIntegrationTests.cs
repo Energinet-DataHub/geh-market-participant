@@ -44,7 +44,7 @@ public sealed class UpdateUserRolesIntegrationTests
     public async Task UpdateUserRoleAssignments_AddNewRoleToEmptyCollection_ReturnsNewRole()
     {
         // Create context user
-        var (_, _, frontendExternalUserId) = await _fixture
+        var (_, frontendUserId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -52,7 +52,7 @@ public sealed class UpdateUserRolesIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendExternalUserId);
+        scope.Container.MockFrontendUser(frontendUserId);
 
         var mediator = scope.GetInstance<IMediator>();
 
@@ -82,7 +82,7 @@ public sealed class UpdateUserRolesIntegrationTests
     public async Task UpdateUserRoleAssignments_AddToExistingRoles_ReturnsBoth()
     {
         // Create context user
-        var (_, _, frontendExternalUserId) = await _fixture
+        var (_, frontendUserId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -90,7 +90,7 @@ public sealed class UpdateUserRolesIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendExternalUserId);
+        scope.Container.MockFrontendUser(frontendUserId);
 
         var mediator = scope.GetInstance<IMediator>();
 
@@ -126,7 +126,7 @@ public sealed class UpdateUserRolesIntegrationTests
     public async Task UpdateUserRoleAssignments_AddToUserWithMultipleActorsAndExistingRoles_ReturnsCorrectForBothActors()
     {
         // Create context user
-        var (_, _, frontendExternalUserId) = await _fixture
+        var (_, frontendUserId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -134,7 +134,7 @@ public sealed class UpdateUserRolesIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendExternalUserId);
+        scope.Container.MockFrontendUser(frontendUserId);
 
         var mediator = scope.GetInstance<IMediator>();
 
@@ -178,7 +178,7 @@ public sealed class UpdateUserRolesIntegrationTests
     public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_TwoAuditLogsAdded()
     {
         // Create context user
-        var (_, _, frontendExternalUserId) = await _fixture
+        var (_, frontendUserId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -186,7 +186,7 @@ public sealed class UpdateUserRolesIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendExternalUserId);
+        scope.Container.MockFrontendUser(frontendUserId);
 
         var mediator = scope.GetInstance<IMediator>();
 
@@ -212,7 +212,7 @@ public sealed class UpdateUserRolesIntegrationTests
     public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_ThreeAuditLogsAdded_OneRemoved()
     {
         // Create context user
-        var (_, _, frontendExternalUserId) = await _fixture
+        var (_, frontendUserId, _) = await _fixture
             .DatabaseManager
             .CreateUserAsync();
 
@@ -220,7 +220,7 @@ public sealed class UpdateUserRolesIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendExternalUserId);
+        scope.Container.MockFrontendUser(frontendUserId);
 
         var mediator = scope.GetInstance<IMediator>();
 

@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -43,13 +45,13 @@ public sealed class GetSelectionActorsQueryHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
 
-        var roleTemplateId = await _fixture
+        await _fixture
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var command = new GetSelectionActorsQueryCommand(externalUserId);
+        var command = new GetSelectionActorsQueryCommand(userId);
 
         // act
         var actual = await mediator.Send(command);
@@ -57,5 +59,19 @@ public sealed class GetSelectionActorsQueryHandlerIntegrationTests
         // assert
         Assert.Single(actual.Actors);
         Assert.Equal(actorId, actual.Actors.Single().Id);
+    }
+
+    [Fact]
+    public async Task GetSelectionActors_NoUserId_ThrowsNotFoundValidationException()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.GetInstance<IMediator>();
+
+        var command = new GetSelectionActorsQueryCommand(Guid.NewGuid());
+
+        // Act + Assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => mediator.Send(command));
     }
 }

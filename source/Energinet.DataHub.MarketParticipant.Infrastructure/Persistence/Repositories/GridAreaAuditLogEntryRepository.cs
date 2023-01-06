@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var entity = new GridAreaAuditLogEntryEntity
             {
-                UserId = logEntry.ExternalUserId.Value,
+                UserId = logEntry.UserId.Value,
                 Timestamp = logEntry.Timestamp,
                 Field = logEntry.Field,
                 OldValue = logEntry.OldValue,
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Select(x =>
                     new GridAreaAuditLogEntry(
                         x.Timestamp,
-                        new ExternalUserId(x.UserId),
+                        new UserId(x.UserId),
                         x.Field,
                         x.OldValue,
                         x.NewValue,

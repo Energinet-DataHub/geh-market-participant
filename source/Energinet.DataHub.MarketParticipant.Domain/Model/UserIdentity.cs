@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 public sealed record UserIdentity(
     ExternalUserId Id,
     string Name,
-    EmailAddress? Email,
+    EmailAddress Email,
     PhoneNumber? PhoneNumber,
     DateTimeOffset CreatedDate,
     bool Enabled);

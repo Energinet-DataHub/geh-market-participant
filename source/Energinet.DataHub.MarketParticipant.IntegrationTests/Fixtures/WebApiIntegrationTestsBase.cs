@@ -13,7 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -27,6 +33,8 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
     protected WebApiIntegrationTestsBase(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
+
+        GetUserPermissionsHandler.TestWorkaround = TestWorkaroundAsync;
     }
 
     public static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
@@ -42,5 +50,20 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         builder.UseSetting(Settings.BackendAppId.Key, TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
+
+        builder.UseSetting(Settings.B2CTenant.Key, Guid.NewGuid().ToString());
+        builder.UseSetting(Settings.B2CServicePrincipalNameId.Key, Guid.NewGuid().ToString());
+        builder.UseSetting(Settings.B2CServicePrincipalNameSecret.Key, "fake_value");
+    }
+
+    private static Task<IEnumerable<UserIdentity>> TestWorkaroundAsync(IEnumerable<ExternalUserId> arg)
+    {
+        return Task.FromResult(arg.Select(externalUserId => new UserIdentity(
+            externalUserId,
+            "fake_value",
+            new EmailAddress("fake@value"),
+            null,
+            DateTimeOffset.Now,
+            true)));
     }
 }

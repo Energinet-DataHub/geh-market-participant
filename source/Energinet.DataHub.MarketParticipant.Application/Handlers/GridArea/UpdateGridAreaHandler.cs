@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
             await _gridAreaAuditLogEntryRepository.InsertAsync(
                 new GridAreaAuditLogEntry(
                     DateTimeOffset.UtcNow,
-                    new ExternalUserId(_userContext.CurrentUser.ExternalUserId),
+                    new UserId(_userContext.CurrentUser.UserId),
                     field,
                     oldValue,
                     newValue,
