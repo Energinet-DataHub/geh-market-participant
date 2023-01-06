@@ -14,14 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Application.Commands.GridArea.GridAreaAuditLogEntryField;
 
@@ -32,16 +30,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
     {
         private readonly IGridAreaAuditLogEntryRepository _repository;
         private readonly IUserRepository _userRepository;
-        private readonly IUserDisplayNameProvider _userDisplayNameProvider;
+        private readonly IUserIdentityRepository _userIdentityRepository;
 
         public GetGridAreaAuditLogEntriesHandler(
             IGridAreaAuditLogEntryRepository repository,
             IUserRepository userRepository,
-            IUserDisplayNameProvider userDisplayNameProvider)
+            IUserIdentityRepository userIdentityRepository)
         {
             _repository = repository;
             _userRepository = userRepository;
-            _userDisplayNameProvider = userDisplayNameProvider;
+            _userIdentityRepository = userIdentityRepository;
         }
 
         public async Task<GetGridAreaAuditLogEntriesResponse> Handle(GetGridAreaAuditLogEntriesCommand request, CancellationToken cancellationToken)
@@ -62,11 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                     var user = await _userRepository.GetAsync(entry.UserId).ConfigureAwait(false);
                     if (user != null)
                     {
-                        var userNames = await _userDisplayNameProvider
-                            .GetUserDisplayNamesAsync(new[] { user.ExternalId })
+                        var userIdentity = await _userIdentityRepository
+                            .GetUserIdentityAsync(user.ExternalId)
                             .ConfigureAwait(false);
 
-                        userName = userNames.SingleOrDefault()?.Value;
+                        userName = userIdentity.Name;
                     }
 
                     userNameLookup[entry.UserId] = userName;

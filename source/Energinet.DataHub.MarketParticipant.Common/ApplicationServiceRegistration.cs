@@ -99,7 +99,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IMarketRoleRemovedFromActorIntegrationEventParser, MarketRoleRemovedFromActorIntegrationEventParser>();
             container.Register<IContactRemovedFromActorIntegrationEventParser, ContactRemovedFromActorIntegrationEventParser>();
             container.Register<IContactAddedToActorIntegrationEventParser, ContactAddedToActorIntegrationEventParser>();
-            container.Register<IUserDisplayNameProvider, UserDisplayNameProvider>();
             container.Register<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>(Lifestyle.Scoped);
 
             container.Collection.Register(typeof(IIntegrationEventDispatcher), typeof(ActorUpdatedEventDispatcher).Assembly);

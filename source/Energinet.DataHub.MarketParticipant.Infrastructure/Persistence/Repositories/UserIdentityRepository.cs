@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,7 +56,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             users = await _graphClient.Users
                 .Request(queryOptions)
                 .Filter($"startswith(displayName, '{searchText}')")
-                .Select(x => new { x.Id, x.DisplayName, x.UserPrincipalName, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+                .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
                 .GetAsync()
                 .ConfigureAwait(false);
         }
@@ -66,14 +67,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 users,
                 (user) =>
                 {
-                    result.Add(new UserIdentity(
-                        new ExternalUserId(user.Id),
-                        user.DisplayName,
-                        new EmailAddress(user.UserPrincipalName),
-                        string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
-                        user.CreatedDateTime!.Value,
-                        user.AccountEnabled == true));
-
+                    result.Add(Map(user));
                     return true;
                 });
 
@@ -85,6 +79,20 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return result;
     }
 
+    public async Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId)
+    {
+        ArgumentNullException.ThrowIfNull(externalId);
+
+        var user = await _graphClient
+            .Users[externalId.Value.ToString()]
+            .Request()
+            .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        return Map(user);
+    }
+
     public async Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds)
     {
         var ids = externalIds.Distinct();
@@ -94,7 +102,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             var users = await _graphClient.Users
                 .Request()
                 .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x}'"))})")
-                .Select(x => new { x.Id, x.DisplayName, x.UserPrincipalName, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+                .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
                 .GetAsync()
                 .ConfigureAwait(false);
 
@@ -104,14 +112,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     users,
                     user =>
                     {
-                        result.Add(new UserIdentity(
-                            new ExternalUserId(user.Id),
-                            user.DisplayName,
-                            new EmailAddress(user.UserPrincipalName),
-                            string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
-                            user.CreatedDateTime!.Value,
-                            user.AccountEnabled == true));
-
+                        result.Add(Map(user));
                         return true;
                     });
 
@@ -122,5 +123,22 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         }
 
         return result;
+    }
+
+    private static UserIdentity Map(User user)
+    {
+        var userEmailAddress = user
+            .Identities
+            .Where(ident => ident.SignInType == "emailAddress")
+            .Select(ident => ident.IssuerAssignedId)
+            .First();
+
+        return new UserIdentity(
+            new ExternalUserId(user.Id),
+            user.DisplayName,
+            new EmailAddress(userEmailAddress),
+            string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
+            user.CreatedDateTime!.Value,
+            user.AccountEnabled == true);
     }
 }
