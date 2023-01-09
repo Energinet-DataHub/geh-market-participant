@@ -188,6 +188,33 @@ internal static class DbTestHelper
         return new UserRoleId(userRoleTemplate.Id);
     }
 
+    public static async Task<UserRoleId> CreateUserRoleAsync(
+        this MarketParticipantDatabaseManager manager,
+        string name,
+        EicFunction eicFunction,
+        Permission[] permissions)
+    {
+        await using var context = manager.CreateDbContext();
+        var userRoleEntity = new UserRoleEntity { Name = name };
+
+        foreach (var permission in permissions)
+        {
+            userRoleEntity.Permissions.Add(new UserRolePermissionEntity
+            {
+                Permission = permission
+            });
+        }
+
+        userRoleEntity.EicFunctions.Add(new UserRoleEicFunctionEntity
+        {
+            EicFunction = eicFunction
+        });
+
+        context.UserRoles.Add(userRoleEntity);
+        await context.SaveChangesAsync();
+        return new UserRoleId(userRoleEntity.Id);
+    }
+
     public static async Task<Guid> AddUserPermissionsAsync(
         this MarketParticipantDatabaseManager manager,
         Guid actorId,
