@@ -120,6 +120,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Select(x => new ExternalUserId(x)))
             .ConfigureAwait(false);
 
+        if (active.HasValue)
+        {
+            localUserIdentitiesLookup = localUserIdentitiesLookup
+                .Where(ident => ident.Enabled == active.Value);
+        }
+
         //Combine results and create final search result
         var userLookup = searchQuery
             .Union(knownLocalUsers)
