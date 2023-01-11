@@ -47,7 +47,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         if (active.HasValue)
         {
             var formattedValue = active.Value ? "true" : "false";
-            filters.Add($"accountEnabled eq '{formattedValue}'");
+            filters.Add($"accountEnabled eq {formattedValue}");
         }
 
         var queryOptions = new List<Option>
