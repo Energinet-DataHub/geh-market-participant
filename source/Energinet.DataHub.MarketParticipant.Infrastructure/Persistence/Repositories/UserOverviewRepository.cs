@@ -130,9 +130,11 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         var userLookup = searchQuery
             .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
+
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
-            .OrderBy(x => x.Email.Address);
+            .OrderBy(x => x.Email.Address)
+            .ToList();
 
         // Filter User Identities to only be from our user pool
         var items = allIdentities
@@ -150,7 +152,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     userIdentity.Enabled);
             });
 
-        return (items, userLookup.Count);
+        return (items, allIdentities.Count);
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
