@@ -17,4 +17,9 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-public sealed record GetUserOverviewCommand(int PageNumber, int PageSize, Guid? ActorId, string? SearchText) : IRequest<GetUserOverviewResponse>;
+public sealed record GetUserOverviewCommand(
+    int PageNumber,
+    int PageSize,
+    Guid? ActorId,
+    string? SearchText,
+    bool? Active) : IRequest<GetUserOverviewResponse>;

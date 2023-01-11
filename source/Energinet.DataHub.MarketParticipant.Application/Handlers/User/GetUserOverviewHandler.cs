@@ -41,13 +41,14 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
         int userCount;
 
         // The GetUsers function is kept, as it is more performant if no search criteria are used
-        if (!string.IsNullOrEmpty(request.SearchText))
+        if (!string.IsNullOrEmpty(request.SearchText) || request.Active.HasValue)
         {
             var (items, totalCount) = await _repository.SearchUsersAsync(
                  request.PageNumber,
                  request.PageSize,
                  request.ActorId,
                  request.SearchText,
+                 request.Active,
                  null).ConfigureAwait(false);
 
             users = items;

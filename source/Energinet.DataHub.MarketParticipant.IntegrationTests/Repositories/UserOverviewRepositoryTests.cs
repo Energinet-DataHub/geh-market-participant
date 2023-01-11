@@ -131,6 +131,7 @@ public sealed class UserOverviewRepositoryTests
             1000,
             actorId,
             null,
+            null,
             null);
 
         // Assert
@@ -158,6 +159,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
+            null,
             null,
             null,
             new Collection<EicFunction>() { EicFunction.BillingAgent });
@@ -188,6 +190,7 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             null,
+            null,
             new Collection<EicFunction>() { EicFunction.BillingAgent });
 
         // Assert
@@ -215,6 +218,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
+            null,
             null,
             null,
             new Collection<EicFunction>() { EicFunction.BillingAgent });
@@ -246,6 +250,7 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "Axolotl",
+            null,
             null);
 
         // Assert
@@ -274,6 +279,7 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             "Axolotl",
+            null,
             null);
 
         // Assert
@@ -303,6 +309,7 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "Alex",
+            null,
             null);
 
         // Assert
@@ -333,6 +340,7 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "axol",
+            null,
             null);
 
         // Assert
@@ -363,12 +371,48 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             "axol",
+            null,
             null);
 
         // Assert
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == otherUserId));
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == otherUser2Id));
+    }
+
+    [Fact]
+    public async Task SearchUsers_OnlyActiveUsers_ReturnsExpectedUser()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, _) = await CreateUserWithActorName(context, false, "Axolotl");
+
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        userIdentityRepositoryMock
+            .Setup(x => x.SearchUserIdentitiesAsync(null, true))
+            .ReturnsAsync(new[]
+            {
+                new UserIdentity(externalId, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow, true)
+            });
+
+        var target = new UserOverviewRepository(
+            context,
+            userIdentityRepositoryMock.Object);
+
+        // Act
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            null,
+            true,
+            null);
+
+        // Assert
+        Assert.Single(actual.Items, user => user.Id == userId);
     }
 
     [Fact]
@@ -386,9 +430,9 @@ public sealed class UserOverviewRepositoryTests
 
         // Act
         var actual = new List<UserOverviewItem>();
-        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", null)).Items);
-        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", null)).Items);
-        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", null)).Items);
+        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", null, null)).Items);
+        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", null, null)).Items);
+        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", null, null)).Items);
 
         // Assert
         Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x.Value), actual.Select(x => x.Id).OrderBy(x => x.Value));
@@ -450,11 +494,9 @@ public sealed class UserOverviewRepositoryTests
     {
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
-            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>()))
-            .Returns<string?>((_) =>
-                Task.FromResult(
-                    userIdsToReturnFromSearch.Select(y =>
-                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
+            .ReturnsAsync(userIdsToReturnFromSearch.Select(y =>
+                new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false)));
 
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
