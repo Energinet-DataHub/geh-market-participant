@@ -120,13 +120,21 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Select(x => new ExternalUserId(x)))
             .ConfigureAwait(false);
 
+        if (active.HasValue)
+        {
+            localUserIdentitiesLookup = localUserIdentitiesLookup
+                .Where(ident => ident.Enabled == active.Value);
+        }
+
         //Combine results and create final search result
         var userLookup = searchQuery
             .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
+
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
-            .OrderBy(x => x.Email.Address);
+            .OrderBy(x => x.Email.Address)
+            .ToList();
 
         // Filter User Identities to only be from our user pool
         var items = allIdentities
@@ -144,22 +152,20 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     userIdentity.Enabled);
             });
 
-        return (items, userLookup.Count);
+        return (items, allIdentities.Count);
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
     {
         var query =
             from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
-            from urr in urj.DefaultIfEmpty()
-            join ur in _marketParticipantDbContext.UserRoles on urr.UserRoleId equals ur.Id into urt
-            from urtj in urt.DefaultIfEmpty()
-            join actor in _marketParticipantDbContext.Actors on urr.ActorId equals actor.Id
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+            join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
+            join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
-                (actorId == null || urr.ActorId == actorId)
-                && (eicFunctions == null || !eicFunctions.Any() || urtj.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
-                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || urtj.Name.Contains(searchText) || u.Email.Contains(searchText))
+                (actorId == null || r.ActorId == actorId)
+                && (eicFunctions == null || !eicFunctions.Any() || ur.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
+                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText) || u.Email.Contains(searchText))
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();
@@ -170,10 +176,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         var guids = externalUserIds.Select(x => x.Value);
         var query =
             from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
-            from urr in urj.DefaultIfEmpty()
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             where
-                (actorId == null || urr.ActorId == actorId)
+                (actorId == null || r.ActorId == actorId)
                 && guids.Contains(u.ExternalId)
             select u;
 
