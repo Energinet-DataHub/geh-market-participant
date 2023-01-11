@@ -88,12 +88,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
+        bool? active,
         Collection<EicFunction>? eicFunctions)
     {
         // We need to do two searches and two lookup, since the queries in either our data or AD can return results not in the other, and we need AD data for both
         // Search and then Filter only users from the AD search that have an ID in our local data
         var searchUserIdentities = (await _userIdentityRepository
-            .SearchUserIdentitiesAsync(searchText)
+            .SearchUserIdentitiesAsync(searchText, active)
             .ConfigureAwait(false))
             .ToList();
 

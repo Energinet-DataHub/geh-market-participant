@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.14.9
+
+- Extend user overview with active filter.
+
 ## Version 2.14.8
 
 - Add create user role API

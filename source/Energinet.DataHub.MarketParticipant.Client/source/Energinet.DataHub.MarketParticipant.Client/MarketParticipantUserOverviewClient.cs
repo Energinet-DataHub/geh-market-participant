@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText)
+        public async Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, bool? active)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -37,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .SetQueryParam("pageNumber", pageNumber)
                         .SetQueryParam("pageSize", pageSize)
                         .SetQueryParam("searchText", searchText)
+                        .SetQueryParam("active", active)
                         .GetAsync())
                 .ConfigureAwait(false);
 

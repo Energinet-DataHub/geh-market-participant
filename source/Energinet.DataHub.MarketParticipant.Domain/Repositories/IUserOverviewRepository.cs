@@ -49,6 +49,7 @@ public interface IUserOverviewRepository
     /// <param name="pageSize">Page size.</param>
     /// <param name="actorId">The id of the actor.</param>
     /// <param name="searchText">A text to search for, can be empty</param>
+    /// <param name="active">Specifies whether only active, inactive or all users should be returned.</param>
     /// <param name="eicFunctions">The list of Eic functions to search for</param>
     /// <returns>A List of users matching the criteria supplied</returns>
     Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
@@ -56,5 +57,6 @@ public interface IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
+        bool? active,
         Collection<EicFunction>? eicFunctions);
 }
