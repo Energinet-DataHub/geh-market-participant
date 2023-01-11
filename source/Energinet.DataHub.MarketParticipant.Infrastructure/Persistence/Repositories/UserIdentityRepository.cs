@@ -37,6 +37,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? active)
     {
+        var filters = new List<string>();
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            filters.Add($"startswith(displayName, '{searchText}')");
+        }
+
+        if (active.HasValue)
+        {
+            filters.Add($"accountEnabled eq '{active.Value}'");
+        }
+
         var queryOptions = new List<Option>
         {
             new HeaderOption("ConsistencyLevel", "eventual"),
@@ -45,14 +57,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         var request = _graphClient.Users.Request(queryOptions);
 
-        if (!string.IsNullOrEmpty(searchText))
+        if (filters.Any())
         {
-            request = request.Filter($"startswith(displayName, '{searchText}')");
-        }
-
-        if (active.HasValue)
-        {
-            request = request.Filter($"accountEnabled eq '{active.Value}'");
+            request = request.Filter(string.Join(" and ", filters));
         }
 
         var users = await request

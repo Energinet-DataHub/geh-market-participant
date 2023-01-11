@@ -151,15 +151,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var query =
             from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
-            from urr in urj.DefaultIfEmpty()
-            join ur in _marketParticipantDbContext.UserRoles on urr.UserRoleId equals ur.Id into urt
-            from urtj in urt.DefaultIfEmpty()
-            join actor in _marketParticipantDbContext.Actors on urr.ActorId equals actor.Id
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+            join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
+            join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
-                (actorId == null || urr.ActorId == actorId)
-                && (eicFunctions == null || !eicFunctions.Any() || urtj.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
-                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || urtj.Name.Contains(searchText) || u.Email.Contains(searchText))
+                (actorId == null || r.ActorId == actorId)
+                && (eicFunctions == null || !eicFunctions.Any() || ur.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
+                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText) || u.Email.Contains(searchText))
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();
@@ -170,10 +168,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         var guids = externalUserIds.Select(x => x.Value);
         var query =
             from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId into urj
-            from urr in urj.DefaultIfEmpty()
+            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             where
-                (actorId == null || urr.ActorId == actorId)
+                (actorId == null || r.ActorId == actorId)
                 && guids.Contains(u.ExternalId)
             select u;
 
