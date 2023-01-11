@@ -89,10 +89,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         };
         mock
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
-            .Returns<string?>((searchText) =>
-                Task.FromResult(
-                    userIdsToReturn.Select(y =>
-                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
+            .ReturnsAsync(userIdsToReturn.Select(y =>
+                new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false)));
 
         scope.Container!.Register(() => mock.Object);
 
