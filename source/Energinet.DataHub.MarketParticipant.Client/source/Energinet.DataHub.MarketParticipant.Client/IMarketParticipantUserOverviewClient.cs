@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 
@@ -26,6 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// Gets users by actor and page state, and optional search string.
         /// </summary>
-        Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText);
+        Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, bool? active);
     }
 }

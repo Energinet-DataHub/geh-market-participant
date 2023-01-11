@@ -35,48 +35,32 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         _graphClient = graphClient;
     }
 
-    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText)
+    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? active)
     {
-        var result = new List<UserIdentity>();
-        var queryOptions = new List<Option>()
+        var queryOptions = new List<Option>
         {
             new HeaderOption("ConsistencyLevel", "eventual"),
             new QueryOption("$count", "true"),
         };
 
-        var users = await _graphClient.Users
-            .Request(queryOptions)
-            .Select(x => new { x.Id, x.DisplayName, x.Mail, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
-            .GetAsync()
-            .ConfigureAwait(false);
+        var request = _graphClient.Users.Request(queryOptions);
 
         if (!string.IsNullOrEmpty(searchText))
         {
-            // TODO: Add MobilePhone once we are switched to Azure AD, since currently we are running on Azure B2C where it is not supported.
-            users = await _graphClient.Users
-                .Request(queryOptions)
-                .Filter($"startswith(displayName, '{searchText}')")
-                .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
-                .GetAsync()
-                .ConfigureAwait(false);
+            request = request.Filter($"startswith(displayName, '{searchText}')");
         }
 
-        var pageIterator = PageIterator<User>
-            .CreatePageIterator(
-                _graphClient,
-                users,
-                (user) =>
-                {
-                    result.Add(Map(user));
-                    return true;
-                });
-
-        while (pageIterator.State != PagingState.Complete)
+        if (active.HasValue)
         {
-            await pageIterator.IterateAsync().ConfigureAwait(false);
+            request = request.Filter($"accountEnabled eq '{active.Value}'");
         }
 
-        return result;
+        var users = await request
+            .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        return await IterateUsersAsync(users).ConfigureAwait(false);
     }
 
     public async Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId)
@@ -97,6 +81,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         var ids = externalIds.Distinct();
         var result = new List<UserIdentity>();
+
         foreach (var segment in ids.Chunk(15))
         {
             var users = await _graphClient.Users
@@ -106,20 +91,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 .GetAsync()
                 .ConfigureAwait(false);
 
-            var pageIterator = PageIterator<User>
-                .CreatePageIterator(
-                    _graphClient,
-                    users,
-                    user =>
-                    {
-                        result.Add(Map(user));
-                        return true;
-                    });
-
-            while (pageIterator.State != PagingState.Complete)
-            {
-                await pageIterator.IterateAsync().ConfigureAwait(false);
-            }
+            result.AddRange(await IterateUsersAsync(users).ConfigureAwait(false));
         }
 
         return result;
@@ -140,5 +112,39 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
             user.CreatedDateTime!.Value,
             user.AccountEnabled == true);
+    }
+
+    private async Task<IEnumerable<UserIdentity>> IterateUsersAsync(IGraphServiceUsersCollectionPage users)
+    {
+        var results = new List<UserIdentity>();
+        var pageIterator = PageIterator<User>
+            .CreatePageIterator(
+                _graphClient,
+                users,
+                user =>
+                {
+                    var userEmailAddress = user
+                        .Identities
+                        .Where(ident => ident.SignInType == "emailAddress")
+                        .Select(ident => ident.IssuerAssignedId)
+                        .FirstOrDefault();
+
+                    // Because of missing invite flow, we do not currently know whether
+                    // the found user can sign-in or is created for other purposes (like administration of B2C).
+                    // For now, we skip everything that is not emailAddress.
+                    if (userEmailAddress != null)
+                    {
+                        results.Add(Map(user));
+                    }
+
+                    return true;
+                });
+
+        while (pageIterator.State != PagingState.Complete)
+        {
+            await pageIterator.IterateAsync().ConfigureAwait(false);
+        }
+
+        return results;
     }
 }

@@ -64,7 +64,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var command = new GetUserOverviewCommand(1, 100, actorId, null);
+        var command = new GetUserOverviewCommand(1, 100, actorId, null, null);
 
         // act
         var actual = await mediator.Send(command);
@@ -88,11 +88,9 @@ public sealed class GetUserOverviewHandlerIntegrationTests
            new(externalUserId)
         };
         mock
-            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>()))
-            .Returns<string?>((searchText) =>
-                Task.FromResult(
-                    userIdsToReturn.Select(y =>
-                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
+            .ReturnsAsync(userIdsToReturn.Select(y =>
+                new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -102,7 +100,49 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var command = new GetUserOverviewCommand(1, 100, actorId, "test");
+        var command = new GetUserOverviewCommand(1, 100, actorId, "test", null);
+
+        // act
+        var actual = await mediator.Send(command);
+
+        // assert
+        Assert.NotEmpty(actual.Users);
+        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.Equal(1, actual.TotalUserCount);
+    }
+
+    [Fact]
+    public async Task GetUserOverview_GivenActiveFilter_ReturnsFilteredUserOverview()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), true))
+            .ReturnsAsync(new[]
+            {
+                new UserIdentity(
+                    new ExternalUserId(externalUserId),
+                    "fake_value",
+                    new EmailAddress("fake@value"),
+                    null,
+                    DateTime.UtcNow,
+                    false)
+            });
+
+        scope.Container!.Register(() => userIdentityRepository.Object);
+
+        var mediator = scope.GetInstance<IMediator>();
+
+        await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+
+        var command = new GetUserOverviewCommand(1, 100, actorId, "test", true);
 
         // act
         var actual = await mediator.Send(command);
