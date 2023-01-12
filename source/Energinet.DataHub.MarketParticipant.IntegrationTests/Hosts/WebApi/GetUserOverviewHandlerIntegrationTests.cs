@@ -52,7 +52,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         mock.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
-                x.Select(y => new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTimeOffset.UtcNow, true)));
+                x.Select(y => new UserIdentity(y, UserStatus.Active, y.ToString(), new EmailAddress("fake@value"), null, DateTimeOffset.UtcNow)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -64,7 +64,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var command = new GetUserOverviewCommand(1, 100, actorId, null, null);
+        var filter = new UserOverviewFilterDto(actorId, null, Array.Empty<UserStatus>());
+        var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
         var actual = await mediator.Send(command);
@@ -90,7 +91,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         mock
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(userIdsToReturn.Select(y =>
-                new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false)));
+                new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -100,7 +101,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var command = new GetUserOverviewCommand(1, 100, actorId, "test", null);
+        var filter = new UserOverviewFilterDto(actorId, "test", Array.Empty<UserStatus>());
+        var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
         var actual = await mediator.Send(command);
@@ -127,11 +129,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             {
                 new UserIdentity(
                     new ExternalUserId(externalUserId),
+                    UserStatus.Inactive,
                     "fake_value",
                     new EmailAddress("fake@value"),
                     null,
-                    DateTime.UtcNow,
-                    false)
+                    DateTime.UtcNow)
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);
@@ -142,7 +144,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var command = new GetUserOverviewCommand(1, 100, actorId, "test", true);
+        var filter = new UserOverviewFilterDto(actorId, "test", new[] { UserStatus.Active });
+        var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
         var actual = await mediator.Send(command);

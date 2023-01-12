@@ -18,9 +18,9 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record UserOverviewItemDto(
             Guid Id,
-            string Email,
+            UserStatus Status,
             string Name,
+            string Email,
             string? PhoneNumber,
-            DateTimeOffset CreatedDate,
-            bool Active);
+            DateTimeOffset CreatedDate);
 }

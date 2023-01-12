@@ -29,7 +29,7 @@ using Moq;
 using Xunit;
 using Xunit.Categories;
 using Permission = Energinet.DataHub.Core.App.Common.Security.Permission;
-using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.UserIdentity;
+using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
@@ -131,8 +131,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             actorId,
             null,
-            null,
-            null);
+            Array.Empty<UserStatus>(),
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -161,8 +161,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             null,
-            null,
-            new Collection<EicFunction>() { EicFunction.BillingAgent });
+            Array.Empty<UserStatus>(),
+            new[] { EicFunction.BillingAgent });
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -190,8 +190,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             null,
-            null,
-            new Collection<EicFunction>() { EicFunction.BillingAgent });
+            Array.Empty<UserStatus>(),
+            new[] { EicFunction.BillingAgent });
 
         // Assert
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -220,8 +220,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             null,
-            null,
-            new Collection<EicFunction>() { EicFunction.BillingAgent });
+            Array.Empty<UserStatus>(),
+            new[] { EicFunction.BillingAgent });
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -250,8 +250,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "Axolotl",
-            null,
-            null);
+            Array.Empty<UserStatus>(),
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -279,8 +279,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             "Axolotl",
-            null,
-            null);
+            Array.Empty<UserStatus>(),
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -309,8 +309,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "Alex",
-            null,
-            null);
+            Array.Empty<UserStatus>(),
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -340,8 +340,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "axol",
-            null,
-            null);
+            Array.Empty<UserStatus>(),
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -371,8 +371,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             "axol",
-            null,
-            null);
+            Array.Empty<UserStatus>(),
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -395,7 +395,7 @@ public sealed class UserOverviewRepositoryTests
             .Setup(x => x.SearchUserIdentitiesAsync(null, true))
             .ReturnsAsync(new[]
             {
-                new UserIdentity(externalId, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow, true)
+                new UserIdentity(externalId, UserStatus.Active, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow)
             });
 
         var target = new UserOverviewRepository(
@@ -408,8 +408,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             null,
-            true,
-            null);
+            new[] { UserStatus.Active },
+            Array.Empty<EicFunction>());
 
         // Assert
         Assert.Single(actual.Items, user => user.Id == userId);
@@ -430,9 +430,9 @@ public sealed class UserOverviewRepositoryTests
 
         // Act
         var actual = new List<UserOverviewItem>();
-        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", null, null)).Items);
-        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", null, null)).Items);
-        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", null, null)).Items);
+        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", Array.Empty<UserStatus>(), Array.Empty<EicFunction>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", Array.Empty<UserStatus>(), Array.Empty<EicFunction>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", Array.Empty<UserStatus>(), Array.Empty<EicFunction>())).Items);
 
         // Assert
         Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x.Value), actual.Select(x => x.Id).OrderBy(x => x.Value));
@@ -486,7 +486,7 @@ public sealed class UserOverviewRepositoryTests
             .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
                     x.Select(y =>
-                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
+                        new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow))));
         return userIdentityRepository;
     }
 
@@ -496,14 +496,14 @@ public sealed class UserOverviewRepositoryTests
         userIdentityRepository
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(userIdsToReturnFromSearch.Select(y =>
-                new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false)));
+                new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow)));
 
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .Returns<IEnumerable<ExternalUserId>>((_) =>
                 Task.FromResult(
                     userIdsToReturnFromGet.Select(y =>
-                        new UserIdentity(y, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow, false))));
+                        new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow))));
         return userIdentityRepository;
     }
 

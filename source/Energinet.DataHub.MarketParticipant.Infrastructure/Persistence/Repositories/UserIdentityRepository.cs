@@ -22,7 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Graph;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 using User = Microsoft.Graph.User;
-using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.UserIdentity;
+using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -35,7 +35,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         _graphClient = graphClient;
     }
 
-    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? active)
+    public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled)
     {
         var filters = new List<string>();
 
@@ -44,9 +44,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             filters.Add($"startswith(displayName, '{searchText}')");
         }
 
-        if (active.HasValue)
+        if (accountEnabled.HasValue)
         {
-            var formattedValue = active.Value ? "true" : "false";
+            var formattedValue = accountEnabled.Value ? "true" : "false";
             filters.Add($"accountEnabled eq {formattedValue}");
         }
 
@@ -115,11 +115,11 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         return new UserIdentity(
             new ExternalUserId(user.Id),
+            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
             user.DisplayName,
             new EmailAddress(userEmailAddress),
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
-            user.CreatedDateTime!.Value,
-            user.AccountEnabled == true);
+            user.CreatedDateTime!.Value);
     }
 
     private async Task<IEnumerable<UserIdentity>> IterateUsersAsync(IGraphServiceUsersCollectionPage users)

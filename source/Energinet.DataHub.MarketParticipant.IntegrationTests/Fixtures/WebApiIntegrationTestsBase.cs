@@ -60,10 +60,10 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
     {
         return Task.FromResult(arg.Select(externalUserId => new UserIdentity(
             externalUserId,
+            UserStatus.Active,
             "fake_value",
             new EmailAddress("fake@value"),
             null,
-            DateTimeOffset.Now,
-            true)));
+            DateTimeOffset.Now)));
     }
 }

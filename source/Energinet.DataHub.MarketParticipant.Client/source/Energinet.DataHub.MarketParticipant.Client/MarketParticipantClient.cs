@@ -144,9 +144,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantUserClient.GetUserAuditLogsAsync(userId);
         }
 
-        public Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, bool? active)
+        public Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, IEnumerable<UserStatus> userStatus)
         {
-            return _marketParticipantUserOverviewClient.GetUserOverviewAsync(pageNumber, pageSize, searchText, active);
+            return _marketParticipantUserOverviewClient.GetUserOverviewAsync(pageNumber, pageSize, searchText, userStatus);
         }
 
         public Task<IEnumerable<SelectionActorDto>> GetSelectionActorsAsync()

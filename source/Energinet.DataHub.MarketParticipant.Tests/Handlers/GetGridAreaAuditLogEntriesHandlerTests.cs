@@ -71,11 +71,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetUserIdentityAsync(externalUserId))
                 .ReturnsAsync(new UserIdentity(
                     externalUserId,
+                    UserStatus.Active,
                     "name",
                     new EmailAddress("fake@value"),
                     null,
-                    DateTimeOffset.UtcNow,
-                    true));
+                    DateTimeOffset.UtcNow));
 
             var target = new GetGridAreaAuditLogEntriesHandler(
                 repositoryMock.Object,

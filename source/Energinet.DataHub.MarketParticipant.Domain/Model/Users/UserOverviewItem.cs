@@ -18,8 +18,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed record UserOverviewItem(
     UserId Id,
-    EmailAddress Email,
+    UserStatus Status,
     string Name,
+    EmailAddress Email,
     PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate,
-    bool Active);
+    DateTimeOffset CreatedDate);
