@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="userRoleId">The id of the user role.</param>
         /// <returns>The specified user role.</returns>
-        Task<UserRoleDto> GetAsync(Guid userRoleId);
+        Task<UserRoleWithPermissionsDto> GetAsync(Guid userRoleId);
 
         /// <summary>
         /// Returns all user roles with basic information
