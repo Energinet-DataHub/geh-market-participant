@@ -45,7 +45,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, UserStatus[]? userStatus)
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, [FromQuery] IEnumerable<UserStatus> userStatus)
     {
         return await this.ProcessAsync(
             async () =>
@@ -57,7 +57,7 @@ public sealed class UserOverviewController : ControllerBase
                 var filter = new UserOverviewFilterDto(
                     actorId,
                     searchText,
-                    userStatus ?? Array.Empty<UserStatus>());
+                    userStatus);
 
                 var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
