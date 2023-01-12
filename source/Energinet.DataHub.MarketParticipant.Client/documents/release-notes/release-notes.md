@@ -2,7 +2,7 @@
 
 ## Version 2.15.1
 
-- Update user role dto endpoint with response including permissions.
+- Update user role endpoint with response including permissions.
 
 ## Version 2.15.0
 
