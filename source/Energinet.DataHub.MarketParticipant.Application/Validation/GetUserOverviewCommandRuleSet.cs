@@ -21,6 +21,9 @@ public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOve
 {
     public GetUserOverviewCommandRuleSet()
     {
+        RuleFor(command => command.Filter)
+            .NotNull();
+
         RuleFor(command => command.PageNumber)
             .GreaterThan(0);
 

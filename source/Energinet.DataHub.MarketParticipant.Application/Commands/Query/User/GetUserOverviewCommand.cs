@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-public sealed record GetUserOverviewCommand(
-    int PageNumber,
-    int PageSize,
-    Guid? ActorId,
-    string? SearchText,
-    bool? Active) : IRequest<GetUserOverviewResponse>;
+public sealed record GetUserOverviewCommand(UserOverviewFilterDto Filter, int PageNumber, int PageSize)
+    : IRequest<GetUserOverviewResponse>;

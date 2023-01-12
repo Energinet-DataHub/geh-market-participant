@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -37,19 +38,21 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var filter = request.Filter;
+
         IEnumerable<UserOverviewItem> users;
         int userCount;
 
         // The GetUsers function is kept, as it is more performant if no search criteria are used
-        if (!string.IsNullOrEmpty(request.SearchText) || request.Active.HasValue)
+        if (!string.IsNullOrEmpty(filter.SearchText) || filter.Status.Any())
         {
             var (items, totalCount) = await _repository.SearchUsersAsync(
                  request.PageNumber,
                  request.PageSize,
-                 request.ActorId,
-                 request.SearchText,
-                 request.Active,
-                 null).ConfigureAwait(false);
+                 filter.ActorId,
+                 filter.SearchText,
+                 filter.Status,
+                 Array.Empty<EicFunction>()).ConfigureAwait(false);
 
             users = items;
             userCount = totalCount;
@@ -59,20 +62,20 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             users = await _repository.GetUsersAsync(
                 request.PageNumber,
                 request.PageSize,
-                request.ActorId).ConfigureAwait(false);
+                filter.ActorId).ConfigureAwait(false);
 
             userCount = await _repository
-                .GetTotalUserCountAsync(request.ActorId)
+                .GetTotalUserCountAsync(filter.ActorId)
                 .ConfigureAwait(false);
         }
 
         var mappedUsers = users.Select(x => new UserOverviewItemDto(
             x.Id.Value,
-            x.Email.Address,
+            x.Status,
             x.Name,
+            x.Email.Address,
             x.PhoneNumber?.Number,
-            x.CreatedDate,
-            x.Active));
+            x.CreatedDate));
 
         return new GetUserOverviewResponse(mappedUsers, userCount);
     }

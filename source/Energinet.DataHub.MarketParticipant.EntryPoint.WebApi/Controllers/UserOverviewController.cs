@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +45,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, bool? active)
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, IEnumerable<UserStatus> userStatus)
     {
         return await this.ProcessAsync(
             async () =>
@@ -52,7 +54,12 @@ public sealed class UserOverviewController : ControllerBase
                     ? _userContext.CurrentUser.ActorId
                     : (Guid?)null;
 
-                var command = new GetUserOverviewCommand(pageNumber, pageSize, actorId, searchText, active);
+                var filter = new UserOverviewFilterDto(
+                    actorId,
+                    searchText,
+                    userStatus);
+
+                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
                 return Ok(response);
             },

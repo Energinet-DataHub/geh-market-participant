@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -40,13 +39,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetTotalUserCountAsync(Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null, null);
+        var query = BuildUsersSearchQuery(actorId, Array.Empty<EicFunction>(), null);
         return query.CountAsync();
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null, null);
+        var query = BuildUsersSearchQuery(actorId, Array.Empty<EicFunction>(), null);
         var users = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -72,11 +71,11 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     var user = userLookup[userIdentity.Id];
                     return new UserOverviewItem(
                         user.Id,
-                        userIdentity.Email,
+                        userIdentity.Status,
                         userIdentity.Name,
+                        userIdentity.Email,
                         userIdentity.PhoneNumber,
-                        userIdentity.CreatedDate,
-                        userIdentity.Enabled);
+                        userIdentity.CreatedDate);
                 })
             .OrderBy(x => x.Email.Address);
 
@@ -88,13 +87,18 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
-        bool? active,
-        Collection<EicFunction>? eicFunctions)
+        IEnumerable<UserStatus> status,
+        IEnumerable<EicFunction> eicFunctions)
     {
+        var statusFilter = status.ToHashSet();
+        bool? accountEnabledFilter = statusFilter.Count is 0 or 2
+            ? null
+            : statusFilter.First() == UserStatus.Active;
+
         // We need to do two searches and two lookup, since the queries in either our data or AD can return results not in the other, and we need AD data for both
         // Search and then Filter only users from the AD search that have an ID in our local data
         var searchUserIdentities = (await _userIdentityRepository
-            .SearchUserIdentitiesAsync(searchText, active)
+            .SearchUserIdentitiesAsync(searchText, accountEnabledFilter)
             .ConfigureAwait(false))
             .ToList();
 
@@ -108,7 +112,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ToList();
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
-        var searchQuery = await BuildUsersSearchQuery(actorId, eicFunctions, searchText)
+        var searchQuery = await BuildUsersSearchQuery(actorId, eicFunctions.ToList(), searchText)
             .Select(x => new { x.Id, x.ExternalId })
             .ToListAsync()
             .ConfigureAwait(false);
@@ -120,10 +124,10 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Select(x => new ExternalUserId(x)))
             .ConfigureAwait(false);
 
-        if (active.HasValue)
+        if (accountEnabledFilter.HasValue)
         {
             localUserIdentitiesLookup = localUserIdentitiesLookup
-                .Where(ident => ident.Enabled == active.Value);
+                .Where(ident => statusFilter.Contains(ident.Status));
         }
 
         //Combine results and create final search result
@@ -145,17 +149,17 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 var user = userLookup[userIdentity.Id.Value];
                 return new UserOverviewItem(
                     new UserId(user.Id),
-                    userIdentity.Email,
+                    userIdentity.Status,
                     userIdentity.Name,
+                    userIdentity.Email,
                     userIdentity.PhoneNumber,
-                    userIdentity.CreatedDate,
-                    userIdentity.Enabled);
+                    userIdentity.CreatedDate);
             });
 
         return (items, allIdentities.Count);
     }
 
-    private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, Collection<EicFunction>? eicFunctions, string? searchText)
+    private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, IReadOnlyCollection<EicFunction> eicFunctions, string? searchText)
     {
         var query =
             from u in _marketParticipantDbContext.Users
@@ -164,7 +168,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
                 (actorId == null || r.ActorId == actorId)
-                && (eicFunctions == null || !eicFunctions.Any() || ur.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
+                && (!eicFunctions.Any() || ur.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText) || u.Email.Contains(searchText))
             select u;
 
