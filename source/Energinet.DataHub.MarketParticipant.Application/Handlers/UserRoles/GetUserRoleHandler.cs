@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
@@ -46,11 +47,12 @@ public sealed class GetUserRoleHandler
         if (userRole == null)
             throw new NotFoundValidationException(request.UserRoleId);
 
-        return new GetUserRoleResponse(new UserRoleDto(
+        return new GetUserRoleResponse(new UserRoleWithPermissionsDto(
             userRole.Id.Value,
             userRole.Name,
             userRole.Description,
             userRole.EicFunction,
-            userRole.Status));
+            userRole.Status,
+            userRole.Permissions.Select(e => e.ToString())));
     }
 }
