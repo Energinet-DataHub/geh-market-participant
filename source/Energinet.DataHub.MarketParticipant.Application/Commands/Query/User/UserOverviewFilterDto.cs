@@ -21,4 +21,4 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 public sealed record UserOverviewFilterDto(
     Guid? ActorId,
     string? SearchText,
-    IEnumerable<UserStatus> Status);
+    IEnumerable<UserStatus> UserStatus);

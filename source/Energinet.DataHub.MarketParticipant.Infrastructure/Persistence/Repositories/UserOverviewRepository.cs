@@ -87,10 +87,10 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
-        IEnumerable<UserStatus> status,
+        IEnumerable<UserStatus> userStatus,
         IEnumerable<EicFunction> eicFunctions)
     {
-        var statusFilter = status.ToHashSet();
+        var statusFilter = userStatus.ToHashSet();
         bool? accountEnabledFilter = statusFilter.Count is 0 or 2
             ? null
             : statusFilter.First() == UserStatus.Active;

@@ -16,5 +16,5 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserRoleDto(Guid Id, string Name);
+    public sealed record UserRoleDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status);
 }
