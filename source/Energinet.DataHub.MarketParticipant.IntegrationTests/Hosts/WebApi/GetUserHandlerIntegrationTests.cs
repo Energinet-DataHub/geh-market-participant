@@ -51,11 +51,11 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(externalUserId),
+            UserStatus.Active,
             "expected_name",
             new EmailAddress("fake@value"),
             null,
-            DateTimeOffset.UtcNow,
-            true);
+            DateTimeOffset.UtcNow);
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
@@ -102,11 +102,11 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(externalUserId),
+            UserStatus.Active,
             "expected_name",
             new EmailAddress("fake@value"),
             null,
-            DateTimeOffset.UtcNow,
-            true);
+            DateTimeOffset.UtcNow);
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))

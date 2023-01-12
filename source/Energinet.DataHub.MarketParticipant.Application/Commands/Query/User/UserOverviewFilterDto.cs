@@ -13,14 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-public sealed record UserOverviewItemDto(
-    Guid Id,
-    UserStatus Status,
-    string Name,
-    string Email,
-    string? PhoneNumber,
-    DateTimeOffset CreatedDate);
+public sealed record UserOverviewFilterDto(
+    Guid? ActorId,
+    string? SearchText,
+    IEnumerable<UserStatus> UserStatus);

@@ -14,7 +14,6 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,10 +27,10 @@ public interface IUserIdentityRepository
     /// Searches for users using a search text
     /// </summary>
     /// <param name="searchText">The text to search for</param>
-    /// <param name="active">Specifies whether the returned users should be active, inactive or both.</param>
+    /// <param name="accountEnabled">Specifies whether the returned users should be active, inactive or both.</param>
     /// <returns>A List of users matching the search text</returns>
     /// <remarks>Currently searches Name, Phone and Email</remarks>
-    Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? active);
+    Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled);
 
     /// <summary>
     /// Retrieves user identity for the provided external id.

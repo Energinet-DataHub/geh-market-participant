@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -27,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, bool? active)
+        public async Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, IEnumerable<UserStatus> userStatus)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -37,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .SetQueryParam("pageNumber", pageNumber)
                         .SetQueryParam("pageSize", pageSize)
                         .SetQueryParam("searchText", searchText)
-                        .SetQueryParam("active", active)
+                        .SetQueryParam("userStatus", userStatus)
                         .GetAsync())
                 .ConfigureAwait(false);
 

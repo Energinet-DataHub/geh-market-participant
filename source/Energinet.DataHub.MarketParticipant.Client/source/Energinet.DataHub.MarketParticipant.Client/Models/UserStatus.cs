@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserRoleInfoDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status);
+    public enum UserStatus
+    {
+        Active = 1,
+        Inactive = 2,
+    }
 }

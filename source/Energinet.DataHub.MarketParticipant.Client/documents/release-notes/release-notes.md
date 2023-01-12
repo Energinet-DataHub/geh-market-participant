@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.0
+
+- Update user overview API with user status.
+
 ## Version 2.14.9
 
 - Extend user overview with active filter.
