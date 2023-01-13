@@ -91,7 +91,10 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         IEnumerable<EicFunction> eicFunctions)
     {
         var statusFilter = userStatus.ToHashSet();
-        bool? accountEnabledFilter = statusFilter.Count is 0 or 2
+        if (statusFilter.Count == 0)
+            return (Array.Empty<UserOverviewItem>(), 0);
+
+        bool? accountEnabledFilter = statusFilter.Count == 2
             ? null
             : statusFilter.First() == UserStatus.Active;
 

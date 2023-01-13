@@ -89,7 +89,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
            new(externalUserId)
         };
         mock
-            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), false))
             .ReturnsAsync(userIdsToReturn.Select(y =>
                 new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow)));
 
@@ -101,7 +101,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actorId, "test", new[] { UserStatus.Inactive });
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
