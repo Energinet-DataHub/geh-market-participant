@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.1
+
+- Update user role endpoint with response including permissions.
+
 ## Version 2.15.0
 
 - Update user overview API with user status.

@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
         }
 
-        public async Task<UserRoleDto> GetAsync(Guid userRoleId)
+        public async Task<UserRoleWithPermissionsDto> GetAsync(Guid userRoleId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<UserRoleDto>()
+                .GetJsonAsync<UserRoleWithPermissionsDto>()
                 .ConfigureAwait(false);
         }
 
