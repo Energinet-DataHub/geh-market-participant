@@ -12,14 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public enum UserRoleChangeType
+public class UserRoleAuditLogSerialized
 {
-    Created = 1,
-    NameChange = 2,
-    DescriptionChange = 3,
-    EicFunctionChange = 4,
-    StatusChange = 5,
-    PermissionsChange = 6
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EicFunction? EicFunction { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public UserRoleStatus? Status { get; set; }
+    public IEnumerable<string>? Permissions { get; set; }
 }
