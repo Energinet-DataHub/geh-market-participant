@@ -97,4 +97,22 @@ public sealed class UserRoleController : ControllerBase
             },
             _logger).ConfigureAwait(false);
     }
+
+    [HttpGet("{userRoleId:guid}/auditlogentry")]
+    //[AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetUserRoleAuditLogsAsync(Guid userRoleId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetUserRoleAuditLogsCommand(userRoleId);
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response.UserRoleAuditLogs);
+            },
+            _logger).ConfigureAwait(false);
+    }
 }
