@@ -26,8 +26,8 @@ public interface IUserRoleAuditLogEntryRepository
     /// <summary>
     /// Inserts a <see cref="UserRoleAuditLogEntry"/>
     /// </summary>
-    /// <param name="logEntry">The audit log.</param>
-    Task InsertAuditLogEntryAsync(UserRoleAuditLogEntry logEntry);
+    /// <param name="logEntries">The audit log entries.</param>
+    Task InsertAuditLogEntriesAsync(IEnumerable<UserRoleAuditLogEntry> logEntries);
 
     /// <summary>
     /// Retrieves all log entries for a given user.

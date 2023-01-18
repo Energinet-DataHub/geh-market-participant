@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record CreateUserRoleCommand(CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+public sealed record CreateUserRoleCommand(Guid UserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;

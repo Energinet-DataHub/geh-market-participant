@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
@@ -24,14 +23,26 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 public interface IUserRoleAuditLogService
 {
     /// <summary>
+    /// Creates audit log for user role created
+    /// </summary>
+    /// <param name="currentUserId">current user id</param>
+    /// <param name="userRoleId">current user role id</param>
+    /// <param name="userRoleUpdate">new user role state with permissions</param>
+    /// <returns>User role audit log for saving</returns>
+    IEnumerable<UserRoleAuditLogEntry> BuildAuditLogsForUserRoleCreated(
+        UserId currentUserId,
+        UserRoleId userRoleId,
+        UserRole userRoleUpdate);
+
+    /// <summary>
     /// Finds user role changes and builds audit logs
     /// </summary>
     /// <param name="currentUserId">current user id</param>
-    /// <param name="userRoleDb">current user role state with permissions</param>
+    /// <param name="userRole">current user role state with permissions</param>
     /// <param name="userRoleUpdate">new user role state with permissions</param>
     /// <returns>User role audit logs for saving</returns>
-    IEnumerable<UserRoleAuditLogEntry> DetermineUserRoleChangesAndBuildAuditLogs(
+    IEnumerable<UserRoleAuditLogEntry> BuildAuditLogsForUserRoleChanged(
         UserId currentUserId,
-        UserRoleWithPermissionsDto userRoleDb,
-        UserRoleWithPermissionsDto userRoleUpdate);
+        UserRole userRole,
+        UserRole userRoleUpdate);
 }

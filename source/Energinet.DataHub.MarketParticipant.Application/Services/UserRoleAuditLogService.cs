@@ -17,52 +17,58 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     public class UserRoleAuditLogService : IUserRoleAuditLogService
     {
-        public IEnumerable<UserRoleAuditLogEntry> DetermineUserRoleChangesAndBuildAuditLogs(
+        public IEnumerable<UserRoleAuditLogEntry> BuildAuditLogsForUserRoleCreated(
             UserId currentUserId,
-            UserRoleWithPermissionsDto userRoleDb,
-            UserRoleWithPermissionsDto userRoleUpdate)
+            UserRoleId userRoleId,
+            UserRole userRoleUpdate)
         {
             ArgumentNullException.ThrowIfNull(currentUserId, nameof(currentUserId));
-            ArgumentNullException.ThrowIfNull(userRoleDb, nameof(userRoleDb));
+            ArgumentNullException.ThrowIfNull(userRoleId, nameof(userRoleId));
             ArgumentNullException.ThrowIfNull(userRoleUpdate, nameof(userRoleUpdate));
 
-            if (string.IsNullOrEmpty(userRoleDb.Name))
-            {
-                return new[] { UserRoleAuditLogEntry(currentUserId, userRoleDb, userRoleUpdate, UserRoleChangeType.Created) };
-            }
+            return new[] { UserRoleAuditLogEntry(currentUserId, userRoleId, userRoleUpdate, UserRoleChangeType.Created) };
+        }
+
+        public IEnumerable<UserRoleAuditLogEntry> BuildAuditLogsForUserRoleChanged(
+            UserId currentUserId,
+            UserRole userRole,
+            UserRole userRoleUpdate)
+        {
+            ArgumentNullException.ThrowIfNull(currentUserId, nameof(currentUserId));
+            ArgumentNullException.ThrowIfNull(userRole, nameof(userRole));
+            ArgumentNullException.ThrowIfNull(userRoleUpdate, nameof(userRoleUpdate));
 
             var logs = new List<UserRoleAuditLogEntry>();
 
-            if (userRoleDb.Name != userRoleUpdate.Name)
+            if (userRole.Name != userRoleUpdate.Name)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRoleDb, userRoleUpdate, UserRoleChangeType.NameChange));
+                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.NameChange));
             }
 
-            if (userRoleDb.Description != userRoleUpdate.Description)
+            if (userRole.Description != userRoleUpdate.Description)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRoleDb, userRoleUpdate, UserRoleChangeType.DescriptionChange));
+                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.DescriptionChange));
             }
 
-            if (userRoleDb.EicFunction != userRoleUpdate.EicFunction)
+            if (userRole.EicFunction != userRoleUpdate.EicFunction)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRoleDb, userRoleUpdate, UserRoleChangeType.EicFunctionChange));
+                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.EicFunctionChange));
             }
 
-            if (userRoleDb.Status != userRoleUpdate.Status)
+            if (userRole.Status != userRoleUpdate.Status)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRoleDb, userRoleUpdate, UserRoleChangeType.StatusChange));
+                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.StatusChange));
             }
 
-            if (!userRoleDb.Permissions.ToList().SequenceEqual(userRoleUpdate.Permissions.ToList()))
+            if (!userRole.Permissions.Select(e => e.ToString()).ToList().SequenceEqual(userRoleUpdate.Permissions.Select(e => e.ToString()).ToList()))
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRoleDb, userRoleUpdate, UserRoleChangeType.PermissionsChange));
+                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.PermissionsChange));
             }
 
             return logs;
@@ -70,12 +76,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
         private static UserRoleAuditLogEntry UserRoleAuditLogEntry(
             UserId currentUserId,
-            UserRoleWithPermissionsDto userRoleDb,
-            UserRoleWithPermissionsDto userRoleUpdate,
+            UserRoleId userRoleId,
+            UserRole userRoleUpdate,
             UserRoleChangeType changeType)
         {
             return new UserRoleAuditLogEntry(
-                new UserRoleId(userRoleDb.Id),
+                userRoleId,
                 currentUserId,
                 DateTimeOffset.UtcNow,
                 changeType,
@@ -86,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
         private static string BuildChangeDescriptionJson(
             UserRoleChangeType userRoleChangeType,
-            UserRoleWithPermissionsDto userRoleUpdate)
+            UserRole userRoleUpdate)
         {
             return userRoleChangeType switch
             {
@@ -95,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 UserRoleChangeType.DescriptionChange => SerializeObject(new UserRoleAuditLogSerialized { Description = userRoleUpdate.Description }),
                 UserRoleChangeType.EicFunctionChange => SerializeObject(new UserRoleAuditLogSerialized { EicFunction = userRoleUpdate.EicFunction }),
                 UserRoleChangeType.StatusChange => SerializeObject(new UserRoleAuditLogSerialized { Status = userRoleUpdate.Status }),
-                UserRoleChangeType.PermissionsChange => SerializeObject(new UserRoleAuditLogSerialized { Permissions = userRoleUpdate.Permissions }),
+                UserRoleChangeType.PermissionsChange => SerializeObject(new UserRoleAuditLogSerialized { Permissions = userRoleUpdate.Permissions.Select(e => e.ToString()) }),
                 _ => string.Empty
             };
         }
@@ -110,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 });
         }
 
-        private static UserRoleAuditLogSerialized MapToUserRoleAuditLogSerialized(UserRoleWithPermissionsDto from)
+        private static UserRoleAuditLogSerialized MapToUserRoleAuditLogSerialized(UserRole from)
         {
             return new UserRoleAuditLogSerialized()
             {
@@ -118,7 +124,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 Description = from.Description,
                 EicFunction = from.EicFunction,
                 Status = from.Status,
-                Permissions = from.Permissions
+                Permissions = from.Permissions.Select(e => e.ToString())
             };
         }
     }

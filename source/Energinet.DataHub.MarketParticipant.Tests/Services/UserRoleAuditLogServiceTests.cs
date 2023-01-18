@@ -16,7 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -33,14 +33,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var permissions = new[] { "permission1", "permission2" };
+            var permissions = new[] { Permission.ActorManage, Permission.OrganizationManage };
             var userRoleDb = BuildUserRoleWithPermissionsDto(name: string.Empty);
             var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: permissions);
 
             // act
-            var auditLogs = userRoleAuditLogService.DetermineUserRoleChangesAndBuildAuditLogs(
+            var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(
                 new UserId(Guid.Empty),
-                userRoleDb,
+                userRoleDb.Id,
                 userRoleUpdateSut).ToList();
 
             // assert
@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal(userRoleUpdateSut.Description, deserializedCreatedAuditLog.Description);
             Assert.Equal(userRoleUpdateSut.Status, deserializedCreatedAuditLog.Status);
             Assert.Equal(userRoleUpdateSut.EicFunction, deserializedCreatedAuditLog.EicFunction);
-            Assert.Equal(userRoleUpdateSut.Permissions, deserializedCreatedAuditLog.Permissions);
+            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => e.ToString()), deserializedCreatedAuditLog.Permissions);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(name: "NewName");
 
             // act
-            var auditLogs = userRoleAuditLogService.DetermineUserRoleChangesAndBuildAuditLogs(
+            var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
                 new UserId(Guid.Empty),
                 userRoleDb,
                 userRoleUpdateSut).ToList();
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(name: "NewName", status: UserRoleStatus.Inactive);
 
             // act
-            var auditLogs = userRoleAuditLogService.DetermineUserRoleChangesAndBuildAuditLogs(
+            var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
                 new UserId(Guid.Empty),
                 userRoleDb,
                 userRoleUpdateSut).ToList();
@@ -127,34 +127,34 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
         private static void DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(
             UserId currentUserId,
-            UserRoleWithPermissionsDto userRoleDb,
-            UserRoleWithPermissionsDto userRoleUpdate)
+            UserRole userRoleDb,
+            UserRole userRoleUpdate)
         {
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
             // act + assert
             Assert.Throws<ArgumentNullException>(() =>
-                userRoleAuditLogService.DetermineUserRoleChangesAndBuildAuditLogs(
+                userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
                     currentUserId,
                     userRoleDb,
                     userRoleUpdate));
         }
 
-        private static UserRoleWithPermissionsDto BuildUserRoleWithPermissionsDto(
+        private static UserRole BuildUserRoleWithPermissionsDto(
             string name = "UserRoleName",
             string description = "UserRoleDescription",
             EicFunction eicFunction = EicFunction.Agent,
             UserRoleStatus status = UserRoleStatus.Active,
-            IEnumerable<string>? permissions = null)
+            IEnumerable<Permission>? permissions = null)
         {
-            return new UserRoleWithPermissionsDto(
-                Guid.NewGuid(),
+            return new UserRole(
+                new UserRoleId(Guid.NewGuid()),
                 name,
                 description,
-                eicFunction,
                 status,
-                permissions ?? Enumerable.Empty<string>());
+                permissions ?? Enumerable.Empty<Permission>(),
+                eicFunction);
         }
     }
 }

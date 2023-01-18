@@ -15,21 +15,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -39,13 +33,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class CreateUserRoleHandlerTests
     {
-        private const string ValidPermission = nameof(Core.App.Common.Security.Permission.ActorManage);
+        private const string ValidPermission = nameof(Permission.ActorManage);
 
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateUserRoleHandler(new Mock<IUserRoleRepository>().Object);
+            var target = new CreateUserRoleHandler(new Mock<IUserRoleRepository>().Object, new Mock<IUserRoleAuditLogService>().Object, new Mock<IUserRoleAuditLogEntryRepository>().Object);
 
             // Act + Assert
             await Assert
@@ -57,8 +51,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewUserRole_UserRoleIdReturned()
         {
             // Arrange
-            var repositoryMock = new Mock<IUserRoleRepository>();
-            var target = new CreateUserRoleHandler(repositoryMock.Object);
+            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
+            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
+            var target = new CreateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
             var roleId = Guid.NewGuid();
             var userRole = new UserRole(
                 new UserRoleId(roleId),
@@ -68,11 +64,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new List<Permission>(),
                 EicFunction.Consumer);
 
-            repositoryMock
+            userRoleRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
                 .ReturnsAsync(userRole.Id);
 
-            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
+            var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,

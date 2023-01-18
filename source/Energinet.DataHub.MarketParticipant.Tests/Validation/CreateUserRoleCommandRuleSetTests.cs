@@ -35,13 +35,30 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidPermission = nameof(Core.App.Common.Security.Permission.ActorManage);
 
         [Fact]
+        public async Task Validate_UserRole_ValidatesProperty_UserId()
+        {
+            // Arrange
+            const string propertyName = nameof(CreateUserRoleCommand.UserId);
+
+            var target = new CreateUserRoleCommandRuleSet();
+            var command = new CreateUserRoleCommand(Guid.Empty, null!);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+
+        [Fact]
         public async Task Validate_UserRole_ValidatesProperty()
         {
             // Arrange
             const string propertyName = nameof(CreateUserRoleCommand.UserRoleDto);
 
             var target = new CreateUserRoleCommandRuleSet();
-            var command = new CreateUserRoleCommand(null!);
+            var command = new CreateUserRoleCommand(Guid.NewGuid(), null!);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -71,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 new Collection<string> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
-            var command = new CreateUserRoleCommand(createGridAreaDto);
+            var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -105,7 +122,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 new Collection<string> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
-            var command = new CreateUserRoleCommand(createGridAreaDto);
+            var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -139,7 +156,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 new Collection<string> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
-            var command = new CreateUserRoleCommand(createGridAreaDto);
+            var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -176,7 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 new Collection<string>() { value });
 
             var target = new CreateUserRoleCommandRuleSet();
-            var command = new CreateUserRoleCommand(createGridAreaDto);
+            var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

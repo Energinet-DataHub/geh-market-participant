@@ -46,20 +46,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
         }
 
-        public Task InsertAuditLogEntryAsync(UserRoleAuditLogEntry logEntry)
+        public Task InsertAuditLogEntriesAsync(IEnumerable<UserRoleAuditLogEntry> logEntries)
         {
-            ArgumentNullException.ThrowIfNull(logEntry);
+            ArgumentNullException.ThrowIfNull(logEntries);
 
-            var entity = new UserRoleAuditLogEntryEntity
+            foreach (var logEntry in logEntries)
             {
-                UserRoleId = logEntry.UserRoleId.Value,
-                Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
-                UserRoleChangeType = (int)logEntry.UserRoleChangeType,
-                ChangeDescriptionJson = logEntry.ChangeDescriptionJson
-            };
+                var entity = new UserRoleAuditLogEntryEntity
+                {
+                    UserRoleId = logEntry.UserRoleId.Value,
+                    Timestamp = logEntry.Timestamp,
+                    ChangedByUserId = logEntry.ChangedByUserId.Value,
+                    UserRoleChangeType = (int)logEntry.UserRoleChangeType,
+                    ChangeDescriptionJson = logEntry.ChangeDescriptionJson
+                };
 
-            _context.UserRoleAuditLogEntries.Add(entity);
+                _context.UserRoleAuditLogEntries.Add(entity);
+            }
 
             return _context.SaveChangesAsync();
         }
