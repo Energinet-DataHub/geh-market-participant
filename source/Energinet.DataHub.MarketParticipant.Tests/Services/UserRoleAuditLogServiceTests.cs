@@ -80,6 +80,77 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         }
 
         [Fact]
+        public void DetermineUserRoleChangesAndBuildAuditLogs_DescriptionChangeAuditLog()
+        {
+            // arrange
+            var userRoleAuditLogService = new UserRoleAuditLogService();
+
+            var userRoleDb = BuildUserRoleWithPermissionsDto(description: "CurrentDescription");
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(description: "NewDescription");
+
+            // act
+            var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
+                new UserId(Guid.Empty),
+                userRoleDb,
+                userRoleUpdateSut).ToList();
+
+            // assert
+            var createdAuditLog = auditLogs.First();
+            var deserializedCAuditLog = JsonSerializer.Deserialize<UserRoleAuditLogSerialized>(createdAuditLog.ChangeDescriptionJson);
+            Assert.True(auditLogs.Count == 1);
+            Assert.NotNull(deserializedCAuditLog);
+            Assert.Equal(userRoleUpdateSut.Description, deserializedCAuditLog.Description);
+        }
+
+        [Fact]
+        public void DetermineUserRoleChangesAndBuildAuditLogs_EicFunctionChangeAuditLog()
+        {
+            // arrange
+            var userRoleAuditLogService = new UserRoleAuditLogService();
+
+            var userRoleDb = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.Agent);
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.Consumer);
+
+            // act
+            var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
+                new UserId(Guid.Empty),
+                userRoleDb,
+                userRoleUpdateSut).ToList();
+
+            // assert
+            var createdAuditLog = auditLogs.First();
+            var deserializedCAuditLog = JsonSerializer.Deserialize<UserRoleAuditLogSerialized>(createdAuditLog.ChangeDescriptionJson);
+            Assert.True(auditLogs.Count == 1);
+            Assert.NotNull(deserializedCAuditLog);
+            Assert.Equal(userRoleUpdateSut.EicFunction, deserializedCAuditLog.EicFunction);
+        }
+
+        [Fact]
+        public void DetermineUserRoleChangesAndBuildAuditLogs_PermissionsChangeAuditLog()
+        {
+            // arrange
+            var userRoleAuditLogService = new UserRoleAuditLogService();
+
+            var userRoleDb = BuildUserRoleWithPermissionsDto(permissions: new[] { Permission.ActorManage });
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: new[] { Permission.OrganizationManage });
+
+            // act
+            var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
+                new UserId(Guid.Empty),
+                userRoleDb,
+                userRoleUpdateSut).ToList();
+
+            // assert
+            var createdAuditLog = auditLogs.First();
+            var deserializedCAuditLog = JsonSerializer.Deserialize<UserRoleAuditLogSerialized>(createdAuditLog.ChangeDescriptionJson);
+            Assert.True(auditLogs.Count == 1);
+            Assert.NotNull(deserializedCAuditLog);
+            var userRoleUpdateSutPermissionsStrings = userRoleUpdateSut.Permissions.Select(e => e.ToString()).ToList();
+            var deserializedCAuditLogPermissions = deserializedCAuditLog.Permissions?.ToList();
+            Assert.True(userRoleUpdateSutPermissionsStrings.SequenceEqual(deserializedCAuditLogPermissions ?? new List<string>()));
+        }
+
+        [Fact]
         public void DetermineUserRoleChangesAndBuildAuditLogs_NameChange_StatusChange_AuditLog()
         {
             // arrange
