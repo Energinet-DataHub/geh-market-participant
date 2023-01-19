@@ -209,7 +209,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
                     currentUserId,
                     userRoleDb,
-                    userRoleUpdate));
+                    userRoleUpdate).ToList());
         }
 
         private static UserRole BuildUserRoleWithPermissionsDto(
