@@ -13,8 +13,15 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed record CreateUserRoleCommand(Guid EditingUserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+public class UserRoleAuditLogEntryEntity
+{
+    public int Id { get; set; }
+    public Guid UserRoleId { get; set; }
+    public Guid ChangedByUserId { get; set; }
+    public int UserRoleChangeType { get; set; }
+    public string ChangeDescriptionJson { get; set; } = null!;
+    public DateTimeOffset Timestamp { get; set; }
+}

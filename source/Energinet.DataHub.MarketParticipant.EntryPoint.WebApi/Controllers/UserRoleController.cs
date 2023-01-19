@@ -14,9 +14,11 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -29,13 +31,16 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 public sealed class UserRoleController : ControllerBase
 {
     private readonly ILogger<UserRoleController> _logger;
+    private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
     public UserRoleController(
         ILogger<UserRoleController> logger,
+        IUserContext<FrontendUser> userContext,
         IMediator mediator)
     {
         _logger = logger;
+        _userContext = userContext;
         _mediator = mediator;
     }
 
@@ -82,13 +87,31 @@ public sealed class UserRoleController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                var command = new CreateUserRoleCommand(userRole);
+                var command = new CreateUserRoleCommand(_userContext.CurrentUser.UserId, userRole);
 
                 var response = await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
                 return Ok(response.UserRoleId);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpGet("{userRoleId:guid}/auditlogentry")]
+    //[AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetUserRoleAuditLogsAsync(Guid userRoleId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetUserRoleAuditLogsCommand(userRoleId);
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response.UserRoleAuditLogs);
             },
             _logger).ConfigureAwait(false);
     }

@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record CreateUserRoleCommand(Guid EditingUserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+public class UserRoleAuditLogSerialized
+{
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public EicFunction? EicFunction { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public UserRoleStatus? Status { get; set; }
+    public IEnumerable<string>? Permissions { get; set; }
+}
