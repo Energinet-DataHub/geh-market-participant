@@ -2,7 +2,7 @@
 
 ## Version 2.15.2
 
-- Added api endpoint for returning user role audit logs
+- Added endpoint for returning user role audit logs
 
 ## Version 2.15.1
 
