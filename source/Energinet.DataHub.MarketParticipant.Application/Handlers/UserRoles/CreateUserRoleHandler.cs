@@ -59,7 +59,7 @@ public sealed class CreateUserRoleHandler
             .AddAsync(userRole)
             .ConfigureAwait(false);
 
-        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(new UserId(request.UserId), createdUserRoleId, userRole);
+        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(new UserId(request.EditingUserId), createdUserRoleId, userRole);
         await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
 
         return new CreateUserRoleResponse(createdUserRoleId.Value);

@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             ArgumentNullException.ThrowIfNull(userRoleId, nameof(userRoleId));
             ArgumentNullException.ThrowIfNull(userRoleUpdate, nameof(userRoleUpdate));
 
-            return new[] { UserRoleAuditLogEntry(currentUserId, userRoleId, userRoleUpdate, UserRoleChangeType.Created) };
+            yield return UserRoleAuditLogEntry(currentUserId, userRoleId, userRoleUpdate, UserRoleChangeType.Created);
         }
 
         public IEnumerable<UserRoleAuditLogEntry> BuildAuditLogsForUserRoleChanged(
@@ -44,34 +44,30 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             ArgumentNullException.ThrowIfNull(userRole, nameof(userRole));
             ArgumentNullException.ThrowIfNull(userRoleUpdate, nameof(userRoleUpdate));
 
-            var logs = new List<UserRoleAuditLogEntry>();
-
             if (userRole.Name != userRoleUpdate.Name)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.NameChange));
+                yield return UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.NameChange);
             }
 
             if (userRole.Description != userRoleUpdate.Description)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.DescriptionChange));
+                yield return UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.DescriptionChange);
             }
 
             if (userRole.EicFunction != userRoleUpdate.EicFunction)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.EicFunctionChange));
+                yield return UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.EicFunctionChange);
             }
 
             if (userRole.Status != userRoleUpdate.Status)
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.StatusChange));
+                yield return UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.StatusChange);
             }
 
             if (!userRole.Permissions.Select(e => e.ToString()).ToList().SequenceEqual(userRoleUpdate.Permissions.Select(e => e.ToString()).ToList()))
             {
-                logs.Add(UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.PermissionsChange));
+                yield return UserRoleAuditLogEntry(currentUserId, userRole.Id, userRoleUpdate, UserRoleChangeType.PermissionsChange);
             }
-
-            return logs;
         }
 
         private static UserRoleAuditLogEntry UserRoleAuditLogEntry(
@@ -102,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 UserRoleChangeType.EicFunctionChange => SerializeObject(new UserRoleAuditLogSerialized { EicFunction = userRoleUpdate.EicFunction }),
                 UserRoleChangeType.StatusChange => SerializeObject(new UserRoleAuditLogSerialized { Status = userRoleUpdate.Status }),
                 UserRoleChangeType.PermissionsChange => SerializeObject(new UserRoleAuditLogSerialized { Permissions = userRoleUpdate.Permissions.Select(e => e.ToString()) }),
-                _ => string.Empty
+                _ => throw new ArgumentOutOfRangeException(nameof(userRoleChangeType))
             };
         }
 

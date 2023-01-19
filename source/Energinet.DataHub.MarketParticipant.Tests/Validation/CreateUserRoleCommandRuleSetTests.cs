@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_UserRole_ValidatesProperty_UserId()
         {
             // Arrange
-            const string propertyName = nameof(CreateUserRoleCommand.UserId);
+            const string propertyName = nameof(CreateUserRoleCommand.EditingUserId);
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(Guid.Empty, null!);
