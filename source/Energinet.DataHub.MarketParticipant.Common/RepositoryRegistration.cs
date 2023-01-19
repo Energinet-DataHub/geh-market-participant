@@ -38,6 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>(Lifestyle.Scoped);
             container.Register<IUserIdentityRepository, UserIdentityRepository>(Lifestyle.Scoped);
             container.Register<IUserRoleAssignmentAuditLogEntryRepository, UserRoleAssignmentAuditLogEntryRepository>(Lifestyle.Scoped);
+            container.Register<IUserRoleAuditLogEntryRepository, UserRoleAuditLogEntryRepository>(Lifestyle.Scoped);
         }
     }
 }

@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -26,6 +22,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public CreateUserRoleCommandRuleSet()
         {
+            RuleFor(command => command.EditingUserId)
+                .NotNull()
+                .NotEmpty();
+
             RuleFor(command => command.UserRoleDto)
                 .NotNull()
                 .ChildRules(validator =>

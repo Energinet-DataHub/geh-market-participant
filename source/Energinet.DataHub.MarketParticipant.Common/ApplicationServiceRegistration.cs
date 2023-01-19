@@ -62,6 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
             container.Register<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
             container.Register<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
+            container.Register<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
             container.Register<IValidator<GetAssociatedUserActorsCommand>, GetAssociatedUserActorsCommandRuleSet>();
             container.Register<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
@@ -74,6 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
+            container.Register<IUserRoleAuditLogService, UserRoleAuditLogService>(Lifestyle.Scoped);
             container.Register<IOrganizationIntegrationEventsHelperService, OrganizationIntegrationEventsHelperService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IActorCreatedIntegrationEventParser, ActorCreatedIntegrationEventParser>(Lifestyle.Scoped);

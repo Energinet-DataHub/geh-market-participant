@@ -12,9 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-
-public sealed record CreateUserRoleCommand(Guid EditingUserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public enum UserRoleChangeType
+    {
+        Created = 1,
+        NameChange = 2,
+        DescriptionChange = 3,
+        EicFunctionChange = 4,
+        StatusChange = 5,
+        PermissionsChange = 6
+    }
+}

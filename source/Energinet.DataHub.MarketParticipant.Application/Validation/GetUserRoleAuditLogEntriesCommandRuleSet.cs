@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record CreateUserRoleCommand(Guid EditingUserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+public sealed class GetUserRoleAuditLogEntriesCommandRuleSet : AbstractValidator<GetUserRoleAuditLogsCommand>
+{
+    public GetUserRoleAuditLogEntriesCommandRuleSet()
+    {
+        RuleFor(command => command.UserRoleId)
+            .NotEmpty();
+    }
+}

@@ -11,10 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 using System;
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record CreateUserRoleCommand(Guid EditingUserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+public sealed record UserRoleAuditLogEntryDto(
+    Guid UserRoleId,
+    Guid ChangedByUserId,
+    DateTimeOffset Timestamp,
+    UserRoleChangeType UserRoleChangeType,
+    string ChangeDescriptionJson);

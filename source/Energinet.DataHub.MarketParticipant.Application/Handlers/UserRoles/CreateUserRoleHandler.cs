@@ -13,14 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -31,10 +29,17 @@ public sealed class CreateUserRoleHandler
     : IRequestHandler<CreateUserRoleCommand, CreateUserRoleResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IUserRoleAuditLogService _userRoleAuditLogService;
+    private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
 
-    public CreateUserRoleHandler(IUserRoleRepository userRoleRepository)
+    public CreateUserRoleHandler(
+        IUserRoleRepository userRoleRepository,
+        IUserRoleAuditLogService userRoleAuditLogService,
+        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository)
     {
         _userRoleRepository = userRoleRepository;
+        _userRoleAuditLogService = userRoleAuditLogService;
+        _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
     public async Task<CreateUserRoleResponse> Handle(
@@ -50,10 +55,13 @@ public sealed class CreateUserRoleHandler
             request.UserRoleDto.Permissions.Select(Enum.Parse<Permission>),
             request.UserRoleDto.EicFunction);
 
-        var result = await _userRoleRepository
+        var createdUserRoleId = await _userRoleRepository
             .AddAsync(userRole)
             .ConfigureAwait(false);
 
-        return new CreateUserRoleResponse(result.Value);
+        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(new UserId(request.EditingUserId), createdUserRoleId, userRole);
+        await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
+
+        return new CreateUserRoleResponse(createdUserRoleId.Value);
     }
 }
