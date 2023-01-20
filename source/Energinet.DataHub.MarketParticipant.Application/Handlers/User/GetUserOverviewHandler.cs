@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -51,8 +50,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                  request.PageSize,
                  filter.ActorId,
                  filter.SearchText,
-                 filter.UserStatus,
-                 Array.Empty<EicFunction>()).ConfigureAwait(false);
+                 filter.UserStatus).ConfigureAwait(false);
 
             users = items;
             userCount = totalCount;
