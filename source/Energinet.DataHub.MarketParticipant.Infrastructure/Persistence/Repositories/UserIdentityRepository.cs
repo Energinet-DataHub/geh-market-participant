@@ -39,11 +39,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         var filters = new List<string>();
 
-        if (!string.IsNullOrEmpty(searchText))
-        {
-            filters.Add($"startswith(displayName, '{searchText}')");
-        }
-
         if (accountEnabled.HasValue)
         {
             var formattedValue = accountEnabled.Value ? "true" : "false";
@@ -63,12 +58,24 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             request = request.Filter(string.Join(" and ", filters));
         }
 
-        var users = await request
+        var graphPage = await request
             .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
             .GetAsync()
             .ConfigureAwait(false);
 
-        return await IterateUsersAsync(users).ConfigureAwait(false);
+        var users = await IterateUsersAsync(graphPage).ConfigureAwait(false);
+
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            users = users
+                .Where(x =>
+                    (x.PhoneNumber != null &&
+                    x.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    x.Email.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    x.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return users;
     }
 
     public async Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId)

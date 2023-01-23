@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -39,13 +38,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetTotalUserCountAsync(Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, Array.Empty<EicFunction>(), null);
+        var query = BuildUsersSearchQuery(actorId, null);
         return query.CountAsync();
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, Array.Empty<EicFunction>(), null);
+        var query = BuildUsersSearchQuery(actorId, null);
         var users = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -87,8 +86,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
-        IEnumerable<UserStatus> userStatus,
-        IEnumerable<EicFunction> eicFunctions)
+        IEnumerable<UserStatus> userStatus)
     {
         var statusFilter = userStatus.ToHashSet();
         bool? accountEnabledFilter = statusFilter.Count is 0 or 2
@@ -112,7 +110,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ToList();
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
-        var searchQuery = await BuildUsersSearchQuery(actorId, eicFunctions.ToList(), searchText)
+        var searchQuery = await BuildUsersSearchQuery(actorId, searchText)
             .Select(x => new { x.Id, x.ExternalId })
             .ToListAsync()
             .ConfigureAwait(false);
@@ -159,7 +157,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return (items, allIdentities.Count);
     }
 
-    private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, IReadOnlyCollection<EicFunction> eicFunctions, string? searchText)
+    private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, string? searchText)
     {
         var query =
             from u in _marketParticipantDbContext.Users
@@ -168,8 +166,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
                 (actorId == null || r.ActorId == actorId)
-                && (!eicFunctions.Any() || ur.EicFunctions.All(q => eicFunctions.Contains(q.EicFunction)))
-                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText) || u.Email.Contains(searchText))
+                && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();
