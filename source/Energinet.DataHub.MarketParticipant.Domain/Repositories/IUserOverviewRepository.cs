@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -49,13 +48,11 @@ public interface IUserOverviewRepository
     /// <param name="actorId">The id of the actor.</param>
     /// <param name="searchText">A text to search for, can be empty</param>
     /// <param name="userStatus">Specifies which user status the search should filter on.</param>
-    /// <param name="eicFunctions">The list of Eic functions to search for</param>
     /// <returns>A List of users matching the criteria supplied</returns>
     Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
         Guid? actorId,
         string? searchText,
-        IEnumerable<UserStatus> userStatus,
-        IEnumerable<EicFunction> eicFunctions);
+        IEnumerable<UserStatus> userStatus);
 }
