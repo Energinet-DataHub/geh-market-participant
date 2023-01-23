@@ -26,7 +26,7 @@ jobs:
   #
 
   ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
 
   #
   # Detect changes to start relevant jobs
@@ -43,7 +43,7 @@ jobs:
   dotnet_ci_build:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
       SOLUTION_FILE_PATH: 'source/Energinet.DataHub.MarketParticipant.sln'
 
@@ -51,7 +51,7 @@ jobs:
   unit_test:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.Tests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -61,7 +61,7 @@ jobs:
   integration_test:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v9
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       TESTS_DLL_FILE_PATH: '\source\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll'
       DOWNLOAD_ATTEMPT_LIMIT: 12
@@ -73,7 +73,6 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
       AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
-      AZURE_SECRETS_KEYVAULT_URL: ${{ secrets.AZURE_SECRETS_KEYVAULT_URL }}
 
   #
   # Branch policy status check
