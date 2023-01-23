@@ -120,5 +120,20 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<UserRoleAuditLogEntryDto>>()
                 .ConfigureAwait(false);
         }
+
+        public async Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync()
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user-roles", "getselectablepermissions")
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<IEnumerable<SelectablePermissionsDto>>()
+                .ConfigureAwait(false);
+        }
     }
 }

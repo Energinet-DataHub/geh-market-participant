@@ -65,5 +65,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="userRoleId">user role id for audit logs to return</param>
         /// <returns>Collections of user role audit logs</returns>
         Task<IEnumerable<UserRoleAuditLogEntryDto>> GetUserRoleAuditLogsAsync(Guid userRoleId);
+
+        /// <summary>
+        /// Returns all the permissions in the system that can be selected when creating a user role
+        /// </summary>
+        /// <returns>Collection of permission</returns>
+        Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync();
     }
 }
