@@ -56,12 +56,19 @@ public sealed class UpdateUserRoleHandler
             throw new NotFoundValidationException(request.UserRoleId);
         }
 
+        var userRoleWithSameName = await _userRoleRepository.GetByNameAsync(request.UserRoleUpdateDto.Name).ConfigureAwait(false);
+
+        if (userRoleWithSameName != null)
+        {
+            throw new ArgumentException($"User role with name {request.UserRoleUpdateDto.Name} already exists");
+        }
+
         var updatedUserRole = new UserRole(
             new UserRoleId(request.UserRoleId),
-            request.UserRoleDto.Name,
-            request.UserRoleDto.Description,
-            request.UserRoleDto.Status,
-            request.UserRoleDto.Permissions.Select(Enum.Parse<Permission>),
+            request.UserRoleUpdateDto.Name,
+            request.UserRoleUpdateDto.Description,
+            request.UserRoleUpdateDto.Status,
+            request.UserRoleUpdateDto.Permissions.Select(Enum.Parse<Permission>),
             userRole.EicFunction);
 
         var updatedUserRoleId = await _userRoleRepository

@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 .NotNull()
                 .NotEmpty();
 
-            RuleFor(command => command.UserRoleDto)
+            RuleFor(command => command.UserRoleUpdateDto)
                 .NotNull()
                 .ChildRules(validator =>
                 {
