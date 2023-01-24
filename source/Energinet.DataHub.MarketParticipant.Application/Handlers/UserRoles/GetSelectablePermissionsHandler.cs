@@ -35,7 +35,7 @@ public sealed class GetSelectablePermissionsHandler
         ArgumentNullException.ThrowIfNull(request);
         return Task.FromResult(new GetSelectablePermissionsResponse(Enum.GetValues<Permission>().Select(permission =>
             new SelectablePermissionDto(
-                permission.ToString(),
+                (int)permission,
                 permission.ToString(),
                 permission.ToString()))));
     }

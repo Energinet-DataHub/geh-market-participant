@@ -117,7 +117,7 @@ public sealed class UserRoleController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
-    [HttpGet]
+    [HttpGet("getselectablepermissions")]
     [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetSelectablePermissionsAsync()
     {
