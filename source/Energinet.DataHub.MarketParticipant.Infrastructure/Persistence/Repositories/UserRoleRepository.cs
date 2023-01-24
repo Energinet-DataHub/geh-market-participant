@@ -85,20 +85,23 @@ public sealed class UserRoleRepository : IUserRoleRepository
         return new UserRoleId(role.Id);
     }
 
-    public async Task<UserRoleId> UpdateAsync(UserRole userRole)
+    public async Task<UserRoleId> UpdateAsync(UserRole userRoleUpdate)
     {
-        ArgumentNullException.ThrowIfNull(userRole);
+        ArgumentNullException.ThrowIfNull(userRoleUpdate);
 
-        var userRoleEntity = await _marketParticipantDbContext.UserRoles.FindAsync(userRole.Id.Value).ConfigureAwait(false);
+        var userRoleEntity = await BuildUserRoleQuery()
+            .SingleOrDefaultAsync(t => t.Id == userRoleUpdate.Id.Value)
+            .ConfigureAwait(false);
 
         if (userRoleEntity != null)
         {
-            userRoleEntity.Name = userRole.Name;
-            userRoleEntity.Description = userRole.Description;
-            userRoleEntity.Status = userRole.Status;
+            userRoleEntity.Name = userRoleUpdate.Name;
+            userRoleEntity.Description = userRoleUpdate.Description;
+            userRoleEntity.Status = userRoleUpdate.Status;
 
             userRoleEntity.Permissions.Clear();
-            foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity() { Permission = x }))
+            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }).ToList();
+            foreach (var permissionEntity in permissionsToAdd)
             {
                 userRoleEntity.Permissions.Add(permissionEntity);
             }
@@ -117,7 +120,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRole.Name,
             userRole.Description ?? string.Empty,
             userRole.Status,
-            userRole.Permissions.Select(p => p.Permission),
+            userRole.Permissions.Select(p => p.Permission).ToList(),
             userRole.EicFunctions.First().EicFunction);
     }
 

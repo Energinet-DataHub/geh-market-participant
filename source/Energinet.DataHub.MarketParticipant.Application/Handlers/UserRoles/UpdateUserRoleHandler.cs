@@ -64,13 +64,13 @@ public sealed class UpdateUserRoleHandler
             request.UserRoleDto.Permissions.Select(Enum.Parse<Permission>),
             userRole.EicFunction);
 
-        var createdUserRoleId = await _userRoleRepository
+        var updatedUserRoleId = await _userRoleRepository
             .UpdateAsync(updatedUserRole)
             .ConfigureAwait(false);
 
         var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.EditingUserId), userRole, updatedUserRole);
         await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
 
-        return new UpdateUserRoleResponse(createdUserRoleId.Value);
+        return new UpdateUserRoleResponse(updatedUserRoleId.Value);
     }
 }
