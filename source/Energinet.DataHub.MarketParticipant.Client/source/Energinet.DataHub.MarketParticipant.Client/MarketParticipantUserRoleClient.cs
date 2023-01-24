@@ -127,7 +127,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request("user-roles", "getselectablepermissions")
+                        .Request("user-roles", "permissions")
                         .GetAsync())
                 .ConfigureAwait(false);
 
