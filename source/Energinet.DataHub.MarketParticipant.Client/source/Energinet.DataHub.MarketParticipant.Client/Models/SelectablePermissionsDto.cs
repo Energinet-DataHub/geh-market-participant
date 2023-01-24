@@ -17,5 +17,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record SelectablePermissionsDto(string Id, string Name, string Description);
+    public sealed record SelectablePermissionsDto(int Id, string Name, string Description);
 }
