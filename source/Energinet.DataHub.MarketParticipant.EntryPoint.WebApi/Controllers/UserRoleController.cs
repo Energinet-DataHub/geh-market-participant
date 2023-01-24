@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -112,6 +113,24 @@ public sealed class UserRoleController : ControllerBase
                     .ConfigureAwait(false);
 
                 return Ok(response.UserRoleAuditLogs);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpGet("permissions")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> GetSelectablePermissionsAsync()
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetSelectablePermissionsCommand();
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response.Permissions);
             },
             _logger).ConfigureAwait(false);
     }
