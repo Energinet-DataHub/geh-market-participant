@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.4
+
+- Added endpoint for updating a user role
+
 ## Version 2.15.3
 
 - Added endpoint for return a list of available permissions in the system

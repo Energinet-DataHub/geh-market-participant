@@ -60,6 +60,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
         Task<Guid> CreateAsync(CreateUserRoleDto userRoleDto);
 
         /// <summary>
+        /// Update a user role
+        /// </summary>
+        /// <param name="userRoleId">user role id for the entity to update</param>
+        /// <param name="userRoleUpdateDto">Details for the user role to update</param>
+        /// <returns>The id <see cref="Guid"/> of the user role updated</returns>
+        Task<Guid> UpdateAsync(Guid userRoleId, UpdateUserRoleDto userRoleUpdateDto);
+
+        /// <summary>
         /// Returns user role audit logs
         /// </summary>
         /// <param name="userRoleId">user role id for audit logs to return</param>

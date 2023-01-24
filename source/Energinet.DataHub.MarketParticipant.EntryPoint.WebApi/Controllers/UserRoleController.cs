@@ -101,7 +101,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("{userRoleId:guid}")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> CreateAsync(
+    public async Task<IActionResult> UpdateAsync(
         Guid userRoleId,
         UpdateUserRoleDto userRole)
     {
