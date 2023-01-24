@@ -49,6 +49,12 @@ public interface IUserRoleRepository
     /// </summary>
     /// <param name="userRole">The user role to Create</param>
     /// <returns>The id of the created role</returns>
-    Task<UserRoleId> AddAsync(
-       UserRole userRole);
+    Task<UserRoleId> AddAsync(UserRole userRole);
+
+    /// <summary>
+    /// Updates an existing user role
+    /// </summary>
+    /// <param name="userRole">The user role to update</param>
+    /// <returns>The id of the updated role</returns>
+    Task<UserRoleId> UpdateAsync(UserRole userRole);
 }

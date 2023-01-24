@@ -85,6 +85,31 @@ public sealed class UserRoleRepository : IUserRoleRepository
         return new UserRoleId(role.Id);
     }
 
+    public async Task<UserRoleId> UpdateAsync(UserRole userRole)
+    {
+        ArgumentNullException.ThrowIfNull(userRole);
+
+        var userRoleEntity = await _marketParticipantDbContext.UserRoles.FindAsync(userRole.Id.Value).ConfigureAwait(false);
+
+        if (userRoleEntity != null)
+        {
+            userRoleEntity.Name = userRole.Name;
+            userRoleEntity.Description = userRole.Description;
+            userRoleEntity.Status = userRole.Status;
+
+            userRoleEntity.Permissions.Clear();
+            foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity() { Permission = x }))
+            {
+                userRoleEntity.Permissions.Add(permissionEntity);
+            }
+
+            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            return new UserRoleId(userRoleEntity.Id);
+        }
+
+        throw new ArgumentException("User role not found");
+    }
+
     private static UserRole MapUserRole(UserRoleEntity userRole)
     {
         return new UserRole(
