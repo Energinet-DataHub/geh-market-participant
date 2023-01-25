@@ -20,5 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         string Description,
         UserRoleStatus Status,
         EicFunction EicFunction,
-        Collection<string> Permissions);
+        Collection<int> Permissions);
 }

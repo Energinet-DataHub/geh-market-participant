@@ -60,3 +60,4 @@ backend
 searchText
 param
 enum
+Ints

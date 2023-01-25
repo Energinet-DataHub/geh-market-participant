@@ -64,7 +64,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             "description",
             UserRoleStatus.Active,
             EicFunction.Agent,
-            new Collection<string>() { Permission.ActorManage.ToString() });
+            new Collection<int>() { (int)Permission.ActorManage });
 
         var createUserRoleCommand = new CreateUserRoleCommand(userId, createUserRoleDto);
         var expectedResult = GenerateLogEntries(createUserRoleDto, Guid.NewGuid(), Guid.NewGuid()).First();
@@ -172,7 +172,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             "description",
             UserRoleStatus.Active,
             EicFunction.Agent,
-            new Collection<string>() { Permission.ActorManage.ToString() });
+            new Collection<int>() { (int)Permission.ActorManage });
     }
 
     private static IEnumerable<UserRoleAuditLogEntry> GenerateLogEntries(CreateUserRoleDto createUserRoleDto, Guid? userId, Guid? userRoleId)
@@ -183,7 +183,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             createUserRoleDto.Name,
             createUserRoleDto.Description,
             createUserRoleDto.Status,
-            createUserRoleDto.Permissions.Select(Enum.Parse<Permission>),
+            createUserRoleDto.Permissions.Select(x => (Permission)x),
             createUserRoleDto.EicFunction);
 
         return userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(
