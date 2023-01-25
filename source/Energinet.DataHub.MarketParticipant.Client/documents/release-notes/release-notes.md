@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.15.4
+## Version 2.15.5
 
 - Added endpoint for updating a user role
+
+## Version 2.15.4
+
+- Bump version as part of pipeline change.
 
 ## Version 2.15.3
 
