@@ -20,17 +20,31 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
 {
+    private readonly IActorQueryRepository _actorQueryRepository;
+    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IUserOverviewRepository _repository;
+    private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetUserOverviewHandler(IUserOverviewRepository repository)
+    public GetUserOverviewHandler(
+        IActorQueryRepository actorQueryRepository,
+        IOrganizationRepository organizationRepository,
+        IUserRepository userRepository,
+        IUserOverviewRepository repository,
+        IUserRoleRepository userRoleRepository)
     {
+        _actorQueryRepository = actorQueryRepository;
+        _organizationRepository = organizationRepository;
+        _userRepository = userRepository;
         _repository = repository;
+        _userRoleRepository = userRoleRepository;
     }
 
     public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
@@ -67,14 +81,65 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 .ConfigureAwait(false);
         }
 
-        var mappedUsers = users.Select(x => new UserOverviewItemDto(
-            x.Id.Value,
-            x.Status,
-            x.Name,
-            x.Email.Address,
-            x.PhoneNumber?.Number,
-            x.CreatedDate));
+        var mappedUsers = await PopulateUsersWithUserRolesAsync(users).ConfigureAwait(false);
 
         return new GetUserOverviewResponse(mappedUsers, userCount);
+    }
+
+    private async Task<List<UserOverviewItemDto>> PopulateUsersWithUserRolesAsync(IEnumerable<UserOverviewItem> users)
+    {
+        var mappedUsers = new List<UserOverviewItemDto>();
+
+        foreach (var user in users)
+        {
+            var userWithAssignments = await _userRepository
+                .GetAsync(user.Id)
+                .ConfigureAwait(false);
+
+            var assignedUserRoles = new List<AssignedActorDto>();
+
+            foreach (var assignmentsForActor in userWithAssignments!.RoleAssignments.GroupBy(assignment =>
+                         assignment.ActorId))
+            {
+                var queryActor = await _actorQueryRepository
+                    .GetActorAsync(assignmentsForActor.Key)
+                    .ConfigureAwait(false);
+
+                var organization = await _organizationRepository
+                    .GetAsync(queryActor!.OrganizationId)
+                    .ConfigureAwait(false);
+
+                var actor = organization!.Actors.Single(a => a.Id == assignmentsForActor.Key);
+
+                var userRoleNames = new List<string>();
+
+                foreach (var userRoleId in assignmentsForActor.Select(x => x.UserRoleId).Distinct())
+                {
+                    var userRole = await _userRoleRepository
+                        .GetAsync(userRoleId)
+                        .ConfigureAwait(false);
+
+                    userRoleNames.Add(userRole!.Name);
+                }
+
+                assignedUserRoles.Add(new AssignedActorDto(
+                    new ActorDto(
+                        actor.ActorNumber.Value,
+                        actor.Name.Value,
+                        organization.Name),
+                    userRoleNames));
+            }
+
+            mappedUsers.Add(new UserOverviewItemDto(
+                user.Id.Value,
+                user.Status,
+                user.Name,
+                user.Email.Address,
+                user.PhoneNumber?.Number,
+                user.CreatedDate,
+                assignedUserRoles));
+        }
+
+        return mappedUsers;
     }
 }
