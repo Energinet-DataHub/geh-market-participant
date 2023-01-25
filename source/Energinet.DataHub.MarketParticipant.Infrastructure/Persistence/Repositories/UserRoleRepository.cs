@@ -117,8 +117,10 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
-
-        throw new ArgumentException("User role not found");
+        else
+        {
+            throw new ArgumentException("User role not found");
+        }
     }
 
     private static UserRole MapUserRole(UserRoleEntity userRole)
