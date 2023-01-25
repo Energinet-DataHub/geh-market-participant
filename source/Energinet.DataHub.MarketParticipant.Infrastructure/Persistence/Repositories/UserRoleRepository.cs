@@ -94,7 +94,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
         return new UserRoleId(role.Id);
     }
 
-    public async Task<UserRoleId> UpdateAsync(UserRole userRoleUpdate)
+    public async Task UpdateAsync(UserRole userRoleUpdate)
     {
         ArgumentNullException.ThrowIfNull(userRoleUpdate);
 
@@ -116,7 +116,6 @@ public sealed class UserRoleRepository : IUserRoleRepository
             }
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new UserRoleId(userRoleEntity.Id);
         }
 
         throw new ArgumentException("User role not found");

@@ -113,9 +113,9 @@ public sealed class UserRoleController : ControllerBase
 
                 var command = new UpdateUserRoleCommand(_userContext.CurrentUser.UserId, userRoleId, userRole);
 
-                var response = await _mediator.Send(command).ConfigureAwait(false);
+                await _mediator.Send(command).ConfigureAwait(false);
 
-                return Ok(response);
+                return Ok();
             },
             _logger).ConfigureAwait(false);
     }

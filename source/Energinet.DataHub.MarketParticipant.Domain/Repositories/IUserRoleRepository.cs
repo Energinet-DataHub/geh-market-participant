@@ -62,6 +62,5 @@ public interface IUserRoleRepository
     /// Updates an existing user role
     /// </summary>
     /// <param name="userRoleUpdate">The user role to update</param>
-    /// <returns>The id of the updated role</returns>
-    Task<UserRoleId> UpdateAsync(UserRole userRoleUpdate);
+    Task UpdateAsync(UserRole userRoleUpdate);
 }
