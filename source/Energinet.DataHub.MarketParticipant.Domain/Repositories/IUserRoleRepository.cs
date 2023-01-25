@@ -38,6 +38,13 @@ public interface IUserRoleRepository
     Task<UserRole?> GetAsync(UserRoleId userRoleId);
 
     /// <summary>
+    /// Gets the user role by name.
+    /// </summary>
+    /// <param name="userRoleName">The user role name.</param>
+    /// <returns>The role if it exists; otherwise null.</returns>
+    Task<UserRole?> GetByNameAsync(string userRoleName);
+
+    /// <summary>
     /// Gets user roles that support the specified EIC-functions.
     /// </summary>
     /// <param name="eicFunctions">The list of EIC-functions the user role must support.</param>
@@ -49,6 +56,11 @@ public interface IUserRoleRepository
     /// </summary>
     /// <param name="userRole">The user role to Create</param>
     /// <returns>The id of the created role</returns>
-    Task<UserRoleId> AddAsync(
-       UserRole userRole);
+    Task<UserRoleId> AddAsync(UserRole userRole);
+
+    /// <summary>
+    /// Updates an existing user role
+    /// </summary>
+    /// <param name="userRoleUpdate">The user role to update</param>
+    Task UpdateAsync(UserRole userRoleUpdate);
 }
