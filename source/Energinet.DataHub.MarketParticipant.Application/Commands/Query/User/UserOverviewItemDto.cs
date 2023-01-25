@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
@@ -23,4 +24,5 @@ public sealed record UserOverviewItemDto(
     string Name,
     string Email,
     string? PhoneNumber,
-    DateTimeOffset CreatedDate);
+    DateTimeOffset CreatedDate,
+    IEnumerable<AssignedActorDto> AssignedActors);

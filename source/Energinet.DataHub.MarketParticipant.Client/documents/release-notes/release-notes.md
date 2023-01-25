@@ -1,12 +1,20 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.15.5
+## Version 2.15.8
 
-- Added endpoint for updating a user role
+- Created separate actor model to avoid conflict.
+
+## Version 2.15.7
+
+- Extend user overview with user role information.
 
 ## Version 2.15.6
 
 - Changed type of variable for permissions to be Ints
+
+## Version 2.15.5
+
+- Added endpoint for updating a user role
 
 ## Version 2.15.4
 
