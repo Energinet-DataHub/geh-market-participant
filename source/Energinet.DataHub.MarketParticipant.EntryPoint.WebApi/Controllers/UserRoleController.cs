@@ -100,7 +100,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("{userRoleId:guid}/auditlogentry")]
-    //[AuthorizeUser(Permission.UsersManage)]
+    [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetUserRoleAuditLogsAsync(Guid userRoleId)
     {
         return await this.ProcessAsync(
