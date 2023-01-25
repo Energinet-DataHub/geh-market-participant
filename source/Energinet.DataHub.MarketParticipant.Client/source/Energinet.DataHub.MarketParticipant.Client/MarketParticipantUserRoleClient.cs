@@ -106,6 +106,16 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return Guid.Parse(roleId);
         }
 
+        public Task UpdateAsync(Guid userRoleId, UpdateUserRoleDto userRoleUpdateDto)
+        {
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request($"user-roles/{userRoleId}")
+                        .PutJsonAsync(userRoleUpdateDto));
+        }
+
         public async Task<IEnumerable<UserRoleAuditLogEntryDto>> GetUserRoleAuditLogsAsync(Guid userRoleId)
         {
             var response = await ValidationExceptionHandler

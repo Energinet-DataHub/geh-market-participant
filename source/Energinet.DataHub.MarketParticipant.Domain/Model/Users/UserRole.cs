@@ -55,6 +55,6 @@ public sealed class UserRole
     public string Name { get; set; }
     public string Description { get; set; }
     public UserRoleStatus Status { get; set; }
-    public IEnumerable<Permission> Permissions { get; }
+    public IEnumerable<Permission> Permissions { get; set; }
     public EicFunction EicFunction { get; }
 }
