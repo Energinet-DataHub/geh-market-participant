@@ -23,4 +23,4 @@ public sealed record CreateUserRoleDto(
     string Description,
     UserRoleStatus Status,
     EicFunction EicFunction,
-    Collection<string> Permissions);
+    Collection<int> Permissions);

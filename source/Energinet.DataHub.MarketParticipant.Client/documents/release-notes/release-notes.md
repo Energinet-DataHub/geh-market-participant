@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.5
+
+- Changed type of variable for permissions to be Ints
+
 ## Version 2.15.4
 
 - Bump version as part of pipeline change.

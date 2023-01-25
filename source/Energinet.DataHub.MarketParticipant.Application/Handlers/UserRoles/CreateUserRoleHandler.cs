@@ -52,7 +52,7 @@ public sealed class CreateUserRoleHandler
             request.UserRoleDto.Name,
             request.UserRoleDto.Description,
             request.UserRoleDto.Status,
-            request.UserRoleDto.Permissions.Select(Enum.Parse<Permission>),
+            request.UserRoleDto.Permissions.Select(x => (Permission)x),
             request.UserRoleDto.EicFunction);
 
         var createdUserRoleId = await _userRoleRepository

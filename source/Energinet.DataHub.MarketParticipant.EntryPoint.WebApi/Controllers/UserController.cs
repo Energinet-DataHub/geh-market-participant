@@ -102,7 +102,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/actors")]
-    [AuthorizeUser(Permission.UsersManage)]
+    //[AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetUserActorsAsync(Guid userId)
     {
         return await this.ProcessAsync(

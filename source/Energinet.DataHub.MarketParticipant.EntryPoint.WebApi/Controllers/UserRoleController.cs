@@ -94,7 +94,7 @@ public sealed class UserRoleController : ControllerBase
                     .Send(command)
                     .ConfigureAwait(false);
 
-                return Ok(response.UserRoleId);
+                return Ok(response.UserRoleId.ToString());
             },
             _logger).ConfigureAwait(false);
     }
