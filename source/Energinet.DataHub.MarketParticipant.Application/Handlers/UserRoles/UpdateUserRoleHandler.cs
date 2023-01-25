@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,8 +27,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class UpdateUserRoleHandler
-    : IRequestHandler<UpdateUserRoleCommand, UpdateUserRoleResponse>
+public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand>
 {
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserRoleAuditLogService _userRoleAuditLogService;
@@ -43,41 +43,51 @@ public sealed class UpdateUserRoleHandler
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<UpdateUserRoleResponse> Handle(
+    public async Task<Unit> Handle(
         UpdateUserRoleCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var userRole = await _userRoleRepository.GetAsync(new UserRoleId(request.UserRoleId)).ConfigureAwait(false);
+        var userRoleToUpdate = await _userRoleRepository.GetAsync(new UserRoleId(request.UserRoleId)).ConfigureAwait(false);
 
-        if (userRole == null)
+        if (userRoleToUpdate == null)
         {
             throw new NotFoundValidationException(request.UserRoleId);
         }
 
         var userRoleWithSameName = await _userRoleRepository.GetByNameAsync(request.UserRoleUpdateDto.Name).ConfigureAwait(false);
 
-        if (userRoleWithSameName != null)
+        if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
         {
-            throw new ArgumentException($"User role with name {request.UserRoleUpdateDto.Name} already exists");
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists");
         }
 
-        var updatedUserRole = new UserRole(
-            new UserRoleId(request.UserRoleId),
-            request.UserRoleUpdateDto.Name,
-            request.UserRoleUpdateDto.Description,
-            request.UserRoleUpdateDto.Status,
-            request.UserRoleUpdateDto.Permissions.Select(Enum.Parse<Permission>),
-            userRole.EicFunction);
+        var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRoleToUpdate);
 
-        var updatedUserRoleId = await _userRoleRepository
-            .UpdateAsync(updatedUserRole)
+        userRoleToUpdate.Name = request.UserRoleUpdateDto.Name;
+        userRoleToUpdate.Description = request.UserRoleUpdateDto.Description;
+        userRoleToUpdate.Status = request.UserRoleUpdateDto.Status;
+        userRoleToUpdate.Permissions = request.UserRoleUpdateDto.Permissions.Select(p => (Permission)p);
+
+        await _userRoleRepository
+            .UpdateAsync(userRoleToUpdate)
             .ConfigureAwait(false);
 
-        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.EditingUserId), userRole, updatedUserRole);
+        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.ChangedByUserId), userRoleInitStateForAuditLog, userRoleToUpdate);
         await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
 
-        return new UpdateUserRoleResponse(updatedUserRoleId.Value);
+        return Unit.Value;
+    }
+
+    private static UserRole CopyUserRoleForAuditLog(UserRole userRole)
+    {
+        return new UserRole(
+            userRole.Id,
+            userRole.Name,
+            userRole.Description,
+            userRole.Status,
+            userRole.Permissions.Select(p => p),
+            userRole.EicFunction);
     }
 }

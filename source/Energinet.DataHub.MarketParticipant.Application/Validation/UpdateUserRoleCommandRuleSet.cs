@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using FluentValidation;
@@ -22,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public UpdateUserRoleCommandRuleSet()
         {
-            RuleFor(command => command.EditingUserId)
+            RuleFor(command => command.ChangedByUserId)
                 .NotNull()
                 .NotEmpty();
 
@@ -44,9 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .IsInEnum();
 
                     validator
-                        .RuleForEach(role => role.Permissions)
-                        .NotEmpty()
-                        .IsEnumName(typeof(Permission), false);
+                        .RuleForEach(e => e.Permissions).Must(p => Enum.IsDefined(typeof(Permission), p));
                 });
         }
     }

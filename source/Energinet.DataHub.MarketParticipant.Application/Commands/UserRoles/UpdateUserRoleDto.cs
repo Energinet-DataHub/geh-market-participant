@@ -21,4 +21,4 @@ public sealed record UpdateUserRoleDto(
     string Name,
     string Description,
     UserRoleStatus Status,
-    Collection<string> Permissions);
+    Collection<int> Permissions);

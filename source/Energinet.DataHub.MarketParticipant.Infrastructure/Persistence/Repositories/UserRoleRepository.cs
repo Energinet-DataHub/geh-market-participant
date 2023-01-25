@@ -14,10 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -54,7 +52,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
     public async Task<UserRole?> GetByNameAsync(string userRoleName)
     {
-        var userRole = await _marketParticipantDbContext.UserRoles
+        var userRole = await BuildUserRoleQuery()
             .SingleOrDefaultAsync(r => r.Name == userRoleName)
             .ConfigureAwait(false);
 
@@ -111,7 +109,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRoleEntity.Status = userRoleUpdate.Status;
 
             userRoleEntity.Permissions.Clear();
-            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }).ToList();
+            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity { Permission = x });
             foreach (var permissionEntity in permissionsToAdd)
             {
                 userRoleEntity.Permissions.Add(permissionEntity);
