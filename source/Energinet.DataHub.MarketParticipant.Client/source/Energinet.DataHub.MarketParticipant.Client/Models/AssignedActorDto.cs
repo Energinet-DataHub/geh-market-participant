@@ -16,5 +16,5 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record AssignedActorDto(Query.ActorDto Actor, IEnumerable<string> UserRoleNames);
+    public sealed record AssignedActorDto(UserOverviewItemActorDto Actor, IEnumerable<string> UserRoleNames);
 }
