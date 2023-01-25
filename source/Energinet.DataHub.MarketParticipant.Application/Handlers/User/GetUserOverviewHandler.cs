@@ -86,7 +86,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
         return new GetUserOverviewResponse(mappedUsers, userCount);
     }
 
-    private async Task<List<UserOverviewItemDto>> PopulateUsersWithUserRolesAsync(IEnumerable<UserOverviewItem> users)
+    private async Task<IEnumerable<UserOverviewItemDto>> PopulateUsersWithUserRolesAsync(IEnumerable<UserOverviewItem> users)
     {
         var mappedUsers = new List<UserOverviewItemDto>();
 
@@ -113,7 +113,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
 
                 var userRoleNames = new List<string>();
 
-                foreach (var userRoleId in assignmentsForActor.Select(x => x.UserRoleId).Distinct())
+                foreach (var userRoleId in assignmentsForActor.Select(x => x.UserRoleId))
                 {
                     var userRole = await _userRoleRepository
                         .GetAsync(userRoleId)
