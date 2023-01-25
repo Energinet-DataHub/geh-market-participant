@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class CreateUserRoleHandlerTests
     {
-        private const string ValidPermission = nameof(Permission.ActorManage);
+        private const int ValidPermission = (int)Permission.ActorManage;
 
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 EicFunction.Consumer,
-                new Collection<string> { ValidPermission }));
+                new Collection<int> { ValidPermission }));
 
             // Act
             var response = await target

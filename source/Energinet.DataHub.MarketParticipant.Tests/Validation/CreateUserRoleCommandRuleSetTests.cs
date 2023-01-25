@@ -16,6 +16,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -32,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidDescription = "This is the support role";
         private const UserRoleStatus ValidStatus = UserRoleStatus.Active;
         private const EicFunction ValidEicFunction = EicFunction.EnergySupplier;
-        private const string ValidPermission = nameof(Core.App.Common.Security.Permission.ActorManage);
+        private const int ValidPermission = (int)Permission.ActorManage;
 
         [Fact]
         public async Task Validate_UserRole_ValidatesProperty_UserId()
@@ -85,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidDescription,
                 ValidStatus,
                 ValidEicFunction,
-                new Collection<string> { ValidPermission });
+                new Collection<int> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
@@ -119,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidDescription,
                 (UserRoleStatus)value,
                 ValidEicFunction,
-                new Collection<string> { ValidPermission });
+                new Collection<int> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
@@ -153,7 +154,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidDescription,
                 ValidStatus,
                 (EicFunction)value,
-                new Collection<string> { ValidPermission });
+                new Collection<int> { ValidPermission });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
@@ -175,12 +176,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Theory]
-        [InlineData("", false)]
-        [InlineData(null, false)]
-        [InlineData("  ", false)]
+        [InlineData(-1, false)]
+        [InlineData(0, false)]
+        [InlineData(int.MinValue, false)]
         [InlineData(ValidPermission, true)]
-        [InlineData("fake_value", false)]
-        public async Task Validate_Permissions_ValidatesProperty(string value, bool isValid)
+        [InlineData(int.MaxValue, false)]
+        public async Task Validate_Permissions_ValidatesProperty(int value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Permissions)}[0]";
@@ -190,7 +191,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidDescription,
                 ValidStatus,
                 ValidEicFunction,
-                new Collection<string>() { value });
+                new Collection<int>() { value });
 
             var target = new CreateUserRoleCommandRuleSet();
             var command = new CreateUserRoleCommand(Guid.NewGuid(), createGridAreaDto);
