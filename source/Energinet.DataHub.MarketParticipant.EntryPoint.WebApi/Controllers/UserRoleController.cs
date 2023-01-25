@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -95,6 +94,27 @@ public sealed class UserRoleController : ControllerBase
                     .ConfigureAwait(false);
 
                 return Ok(response.UserRoleId.ToString());
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpPut("{userRoleId:guid}")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> UpdateAsync(
+        Guid userRoleId,
+        UpdateUserRoleDto userRole)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                if (!_userContext.CurrentUser.IsFas)
+                    return Unauthorized();
+
+                var command = new UpdateUserRoleCommand(_userContext.CurrentUser.UserId, userRoleId, userRole);
+
+                await _mediator.Send(command).ConfigureAwait(false);
+
+                return Ok();
             },
             _logger).ConfigureAwait(false);
     }

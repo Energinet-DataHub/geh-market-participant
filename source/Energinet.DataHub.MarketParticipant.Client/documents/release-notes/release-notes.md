@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.5
+
+- Added endpoint for updating a user role
+
 ## Version 2.15.6
 
 - Changed type of variable for permissions to be Ints
