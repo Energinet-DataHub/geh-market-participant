@@ -59,14 +59,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
             var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
             var roleId = Guid.NewGuid();
-            /*var userRole = new UserRole(
-                new UserRoleId(roleId),
-                "fake_value",
-                "fake_value",
-                UserRoleStatus.Active,
-                new List<Permission>(),
-                EicFunction.Consumer);*/
-
             userRoleRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
                 .ReturnsAsync((UserRole?)null);
