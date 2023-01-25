@@ -81,6 +81,53 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
     }
 
     [Fact]
+    public async Task UpdateUserRole_AllChanges()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
+
+        var mediator = scope.GetInstance<IMediator>();
+
+        var (_, userId, _) = await _fixture
+            .DatabaseManager
+            .CreateUserAsync();
+
+        var userRoleId = await _fixture
+            .DatabaseManager
+            .CreateUserRoleAsync("UpdateUserRole_NameChangedAuditLog_InitName", string.Empty, UserRoleStatus.Active, EicFunction.Agent, new[] { Permission.UsersView });
+
+        const string nameUpdate = "UpdateUserRole_NameChangedAuditLog_Updated";
+        const string descriptionUpdate = "UpdateUserRole_DescriptionChangedAuditLog_Updated";
+        const UserRoleStatus userRoleStatusUpdate = UserRoleStatus.Inactive;
+        var userRolePermissionsUpdate = new Collection<int>() { (int)Permission.UsersView, (int)Permission.UsersManage };
+
+        var updateUSerRoleDto = new UpdateUserRoleDto(
+            nameUpdate,
+            descriptionUpdate,
+            userRoleStatusUpdate,
+            userRolePermissionsUpdate);
+
+        var updateUserRoleCommand = new UpdateUserRoleCommand(userId, userRoleId.Value, updateUSerRoleDto);
+        var expectedResult = GenerateLogEntries(updateUSerRoleDto, Guid.NewGuid(), Guid.NewGuid()).ToList();
+
+        // Act
+        await mediator.Send(updateUserRoleCommand);
+        var result = await userRoleAuditLogEntryRepository.GetAsync(userRoleId);
+
+        // Assert
+        var resultList = result.ToList();
+        Assert.Equal(4, resultList.Count);
+        Assert.Single(resultList, e => e.UserRoleChangeType == UserRoleChangeType.NameChange);
+        Assert.Single(resultList, e => e.UserRoleChangeType == UserRoleChangeType.DescriptionChange);
+        Assert.Single(resultList, e => e.UserRoleChangeType == UserRoleChangeType.StatusChange);
+        Assert.Single(resultList, e => e.UserRoleChangeType == UserRoleChangeType.PermissionsChange);
+        Assert.DoesNotContain(resultList, e => e.UserRoleChangeType == UserRoleChangeType.EicFunctionChange);
+    }
+
+    [Fact]
     public async Task Get_UserRoleAuditLogs()
     {
         // Arrange
@@ -185,6 +232,23 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             createUserRoleDto.Status,
             createUserRoleDto.Permissions.Select(x => (Permission)x),
             createUserRoleDto.EicFunction);
+
+        return userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(
+            new UserId(userId ?? Guid.NewGuid()),
+            new UserRoleId(userRoleId ?? Guid.NewGuid()),
+            userRole);
+    }
+
+    private static IEnumerable<UserRoleAuditLogEntry> GenerateLogEntries(UpdateUserRoleDto updateUserRoleDto, Guid? userId, Guid? userRoleId)
+    {
+        var userRoleAuditLogService = new UserRoleAuditLogService();
+
+        var userRole = new UserRole(
+            updateUserRoleDto.Name,
+            updateUserRoleDto.Description,
+            updateUserRoleDto.Status,
+            updateUserRoleDto.Permissions.Select(x => (Permission)x),
+            EicFunction.Agent);
 
         return userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(
             new UserId(userId ?? Guid.NewGuid()),

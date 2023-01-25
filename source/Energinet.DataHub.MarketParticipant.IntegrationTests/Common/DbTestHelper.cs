@@ -191,11 +191,13 @@ internal static class DbTestHelper
     public static async Task<UserRoleId> CreateUserRoleAsync(
         this MarketParticipantDatabaseManager manager,
         string name,
+        string description,
+        UserRoleStatus status,
         EicFunction eicFunction,
         Permission[] permissions)
     {
         await using var context = manager.CreateDbContext();
-        var userRoleEntity = new UserRoleEntity { Name = name };
+        var userRoleEntity = new UserRoleEntity { Name = name, Description = description, Status = status };
 
         foreach (var permission in permissions)
         {

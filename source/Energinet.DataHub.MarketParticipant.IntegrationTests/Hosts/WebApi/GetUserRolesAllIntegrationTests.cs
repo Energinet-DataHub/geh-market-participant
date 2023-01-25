@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -45,15 +46,15 @@ public sealed class GetUserRolesAllIntegrationTests
 
         var userRoleId1 = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("Role1", EicFunction.Consumer, System.Array.Empty<Permission>());
+            .CreateUserRoleAsync("Role1", "Description", UserRoleStatus.Active, EicFunction.Consumer, System.Array.Empty<Permission>());
 
         var userRoleId2 = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("Role2", EicFunction.Producer, System.Array.Empty<Permission>());
+            .CreateUserRoleAsync("Role2", "Description", UserRoleStatus.Active, EicFunction.Producer, System.Array.Empty<Permission>());
 
         var userRoleId3 = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("Role3", EicFunction.BillingAgent, System.Array.Empty<Permission>());
+            .CreateUserRoleAsync("Role3", "Description", UserRoleStatus.Active, EicFunction.BillingAgent, System.Array.Empty<Permission>());
 
         var command1 = new GetAllUserRolesCommand();
 
