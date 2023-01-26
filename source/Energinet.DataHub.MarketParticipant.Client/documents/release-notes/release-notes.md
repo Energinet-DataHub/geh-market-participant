@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.9
+
+- New market roles.
+
 ## Version 2.15.8
 
 - Created separate actor model to avoid conflict.
