@@ -62,6 +62,11 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         SchedulingAreaResponsible = 44,
         SystemOperator = 45,
         TradeResponsibleParty = 46,
-        TransmissionCapacityAllocator = 47
+        TransmissionCapacityAllocator = 47,
+        DanishEnergyAgency = 48,
+        ElOverblik = 49,
+        DataHubAdministrator = 50,
+        IndependentAggregator = 51,
+        SerialEnergyTrader = 52
     }
 }

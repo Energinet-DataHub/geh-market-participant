@@ -63,6 +63,10 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         SystemOperator = 45,
         TradeResponsibleParty = 46,
         TransmissionCapacityAllocator = 47,
-        DanishEnergyAgency = 48
+        DanishEnergyAgency = 48,
+        ElOverblik = 49,
+        DataHubAdministrator = 50,
+        IndependentAggregator = 51,
+        SerialEnergyTrader = 52
     }
 }

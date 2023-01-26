@@ -27,7 +27,7 @@ limitations under the License.
 
   <PropertyGroup>
     <PackageId>Energinet.DataHub.MarketParticipant.Integration.Model</PackageId>
-    <PackageVersion>2.7.5$(VersionSuffix)</PackageVersion>
+    <PackageVersion>2.7.6$(VersionSuffix)</PackageVersion>
     <Title>Energinet.DataHub.MarketParticipant.Integration.Model library</Title>
     <Company>Energinet-DataHub</Company>
     <Authors>Energinet-DataHub</Authors>
