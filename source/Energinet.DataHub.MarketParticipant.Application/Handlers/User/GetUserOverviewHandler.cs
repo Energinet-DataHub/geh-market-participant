@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -62,6 +63,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             var (items, totalCount) = await _repository.SearchUsersAsync(
                  request.PageNumber,
                  request.PageSize,
+                 new Sort("Email", SortDirection.Asc),
                  filter.ActorId,
                  filter.SearchText,
                  filter.UserStatus).ConfigureAwait(false);

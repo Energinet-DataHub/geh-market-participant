@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -84,10 +85,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
+        Sort sort,
         Guid? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus)
     {
+        ArgumentNullException.ThrowIfNull(sort);
+
         var statusFilter = userStatus.ToHashSet();
         bool? accountEnabledFilter = statusFilter.Count is 0 or 2
             ? null
@@ -135,11 +139,27 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
-            .OrderBy(x => x.Email.Address)
-            .ToList();
+            .Select(x => new
+            {
+                x.Id,
+                x.Status,
+                x.Name,
+                Email = x.Email.Address,
+                PhoneNumber = x.PhoneNumber?.Number,
+                x.CreatedDate
+            });
+
+        var propertyInfo = allIdentities.GetType().GetGenericArguments()[0].GetType().GetProperty(sort.Property);
+
+        allIdentities =
+            sort.Direction == SortDirection.Asc
+                ? allIdentities.OrderBy(x => propertyInfo!.GetValue(x))
+                : allIdentities.OrderByDescending(x => propertyInfo!.GetValue(x));
+
+        var allIdentitiesEnumerated = allIdentities.ToList();
 
         // Filter User Identities to only be from our user pool
-        var items = allIdentities
+        var items = allIdentitiesEnumerated
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(userIdentity =>
@@ -149,12 +169,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     new UserId(user.Id),
                     userIdentity.Status,
                     userIdentity.Name,
-                    userIdentity.Email,
-                    userIdentity.PhoneNumber,
+                    new EmailAddress(userIdentity.Email),
+                    userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
                     userIdentity.CreatedDate);
             });
 
-        return (items, allIdentities.Count);
+        return (items, allIdentitiesEnumerated.Count);
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, string? searchText)

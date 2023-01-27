@@ -129,6 +129,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
+            new Sort("Email", SortDirection.Asc),
             actorId,
             null,
             Array.Empty<UserStatus>());
@@ -157,6 +158,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
+            new Sort("Email", SortDirection.Asc),
             null,
             "Axolotl",
             Array.Empty<UserStatus>());
@@ -185,6 +187,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
+            new Sort("Email", SortDirection.Asc),
             otherActorId,
             "Axolotl",
             Array.Empty<UserStatus>());
@@ -220,6 +223,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
+            new Sort("Email", SortDirection.Asc),
             null,
             null,
             new[] { UserStatus.Active });
@@ -243,9 +247,9 @@ public sealed class UserOverviewRepositoryTests
 
         // Act
         var actual = new List<UserOverviewItem>();
-        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", Array.Empty<UserStatus>())).Items);
-        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", Array.Empty<UserStatus>())).Items);
-        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(1, 8, new Sort("Email", SortDirection.Asc), actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(2, 8, new Sort("Email", SortDirection.Asc), actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(3, 8, new Sort("Email", SortDirection.Asc), actorId, "Name", Array.Empty<UserStatus>())).Items);
 
         // Assert
         Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x.Value), actual.Select(x => x.Id).OrderBy(x => x.Value));
