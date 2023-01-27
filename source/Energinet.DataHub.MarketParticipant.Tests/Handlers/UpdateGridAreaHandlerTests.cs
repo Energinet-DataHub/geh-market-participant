@@ -54,7 +54,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // arrange
             var gridAreaId = Guid.NewGuid();
-            var gridArea = new GridArea(new GridAreaName("name"), new GridAreaCode("101"), PriceAreaCode.Dk1);
+            var gridArea = new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("101"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var gridAreaRepository = new Mock<IGridAreaRepository>();
             gridAreaRepository.Setup(x => x.GetAsync(new GridAreaId(gridAreaId)))
@@ -79,7 +84,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // arrange
             var gridAreaId = Guid.NewGuid();
-            var gridArea = new GridArea(new GridAreaName("name"), new GridAreaCode("101"), PriceAreaCode.Dk1);
+            var gridArea = new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("101"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var gridAreaRepository = new Mock<IGridAreaRepository>();
             gridAreaRepository.Setup(x => x.GetAsync(new GridAreaId(gridAreaId)))
@@ -106,7 +116,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // arrange
             var gridAreaId = Guid.NewGuid();
-            var gridArea = new GridArea(new GridAreaName("name"), new GridAreaCode("101"), PriceAreaCode.Dk1);
+            var gridArea = new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("101"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var gridAreaRepository = new Mock<IGridAreaRepository>();
             gridAreaRepository.Setup(x => x.GetAsync(new GridAreaId(gridAreaId)))

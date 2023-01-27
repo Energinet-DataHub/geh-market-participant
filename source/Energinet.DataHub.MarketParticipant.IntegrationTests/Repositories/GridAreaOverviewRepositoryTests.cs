@@ -169,7 +169,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var marketRoleGridAreaId = Guid.NewGuid();
 
             var gridAreaRepo = new GridAreaRepository(context);
-            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
+            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("1234"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null));
 
             if (marketRoles.Length > 0)
             {
