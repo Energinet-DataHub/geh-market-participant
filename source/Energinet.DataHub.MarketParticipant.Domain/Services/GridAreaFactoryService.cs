@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _gridAreaIntegrationEventsQueueService = gridAreaIntegrationEventsQueueService;
         }
 
-        public async Task<GridArea> CreateAsync(GridAreaCode code, GridAreaName name, PriceAreaCode priceAreaCode)
+        public async Task<GridArea> CreateAsync(GridAreaCode code, GridAreaName name, PriceAreaCode priceAreaCode, DateTimeOffset validFrom, DateTimeOffset? validTo)
         {
             ArgumentNullException.ThrowIfNull(code, nameof(code));
             ArgumentNullException.ThrowIfNull(name, nameof(name));
@@ -47,7 +47,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             var newGridArea = new GridArea(
                 name,
                 code,
-                priceAreaCode);
+                priceAreaCode,
+                validFrom,
+                validTo);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

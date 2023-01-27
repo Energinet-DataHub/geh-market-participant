@@ -18,22 +18,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed class GridArea
     {
-        public GridArea(GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode)
+        public GridArea(GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode, DateTimeOffset validFrom, DateTimeOffset? validTo)
         {
             Id = new GridAreaId(Guid.Empty);
             Name = name;
             Code = code;
             PriceAreaCode = priceAreaCode;
-            ValidFrom = DateTimeOffset.MinValue;
+            ValidFrom = validFrom;
+            ValidTo = validTo;
         }
 
-        public GridArea(GridAreaId id, GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode)
+        public GridArea(GridAreaId id, GridAreaName name, GridAreaCode code, PriceAreaCode priceAreaCode, DateTimeOffset validFrom, DateTimeOffset? validTo)
         {
             Id = id;
             Name = name;
             Code = code;
             PriceAreaCode = priceAreaCode;
-            ValidFrom = DateTimeOffset.MinValue;
+            ValidFrom = validFrom;
+            ValidTo = validTo;
         }
 
         public GridAreaId Id { get; init; }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -28,10 +29,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="code">The code for the Grid Area</param>
         /// <param name="name">The name of the new Grid Area.</param>
         /// <param name="priceAreaCode">The PriceAreaCode <see cref="PriceAreaCode"/> of the new Grid Area.</param>
+        /// <param name="validFrom">The date from which this Grid Area is valid</param>
+        /// <param name="validTo">The date where this Grid area is no longer valid</param>
         /// <returns>The created actor.</returns>
         Task<GridArea> CreateAsync(
             GridAreaCode code,
             GridAreaName name,
-            PriceAreaCode priceAreaCode);
+            PriceAreaCode priceAreaCode,
+            DateTimeOffset validFrom,
+            DateTimeOffset? validTo);
     }
 }

@@ -46,7 +46,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var repositoryMock = new Mock<IGridAreaRepository>();
             repositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<GridAreaId>()))
-                .ReturnsAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("code"), PriceAreaCode.Dk1));
+                .ReturnsAsync(new GridArea(
+                    new GridAreaName("name"),
+                    new GridAreaCode("101"),
+                    PriceAreaCode.Dk1,
+                    DateTimeOffset.MinValue,
+                    null));
 
             var target = new GetGridAreaHandler(repositoryMock.Object);
 

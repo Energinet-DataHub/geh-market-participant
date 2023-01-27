@@ -37,7 +37,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 gridAreaId,
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
-                PriceAreaCode.Dk1);
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
             var gridAreaLink = new GridAreaLink(gridAreaId);
 
             // Act
@@ -75,7 +77,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 gridAreaId,
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),
-                PriceAreaCode.Dk1);
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             // Act + Assert
             await Assert
