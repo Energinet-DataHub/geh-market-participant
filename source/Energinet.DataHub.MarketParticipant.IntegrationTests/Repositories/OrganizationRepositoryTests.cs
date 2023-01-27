@@ -207,7 +207,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var gridAreaRepository = new GridAreaRepository(context);
 
-            var gridArea = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+            var gridArea = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var expected = await gridAreaRepository
                 .AddOrUpdateAsync(gridArea)
@@ -281,7 +286,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var gridAreaRepository = new GridAreaRepository(context);
 
-            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+            var gridAreaToInsert = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var gridAreaToInsert_Id = await gridAreaRepository
                 .AddOrUpdateAsync(gridAreaToInsert)
@@ -369,7 +379,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepositoryRead = new OrganizationRepository(contextRead);
             var gridAreaRepository = new GridAreaRepository(context);
 
-            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+            var gridAreaToInsert = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var gridAreaToInsert_Id = await gridAreaRepository
                 .AddOrUpdateAsync(gridAreaToInsert)
@@ -410,7 +425,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepositoryRead = new OrganizationRepository(contextRead);
             var gridAreaRepository = new GridAreaRepository(context);
 
-            var gridAreaToInsert = new GridArea(new GridAreaName("fake_value"), new GridAreaCode("123"), PriceAreaCode.Dk1);
+            var gridAreaToInsert = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var gridAreaToInsert_Id = await gridAreaRepository
                 .AddOrUpdateAsync(gridAreaToInsert)

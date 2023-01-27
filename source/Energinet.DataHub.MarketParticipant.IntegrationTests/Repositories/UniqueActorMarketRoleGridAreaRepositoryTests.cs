@@ -118,7 +118,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         private static async Task<GridArea> CreateGridAreaAsync(MarketParticipantDbContext context)
         {
             var name = Guid.NewGuid().ToString();
-            var domain = new GridArea(new GridAreaName(name), new GridAreaCode("001"), PriceAreaCode.Dk1);
+            var domain = new GridArea(
+                new GridAreaName("fake_value"),
+                new GridAreaCode("123"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             var repository = new GridAreaRepository(context);
             var id = await repository.AddOrUpdateAsync(domain);

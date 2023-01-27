@@ -45,7 +45,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var gridAreaRepo = new GridAreaRepository(context);
-            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
+            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("1234"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null));
 
             var userId = new UserId(Guid.NewGuid());
 
@@ -77,7 +82,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var gridAreaRepo = new GridAreaRepository(context);
-            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(new GridAreaName("name"), new GridAreaCode("1234"), PriceAreaCode.Dk1));
+            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
+                new GridAreaName("name"),
+                new GridAreaCode("1234"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null));
 
             var userId = new UserId(Guid.NewGuid());
 

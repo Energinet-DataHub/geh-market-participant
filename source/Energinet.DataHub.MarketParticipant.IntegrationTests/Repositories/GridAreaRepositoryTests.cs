@@ -58,10 +58,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
+            var validFrom = DateTimeOffset.Now;
+            var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.Dk1);
+                PriceAreaCode.Dk1,
+                validFrom,
+                validTo);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
@@ -73,6 +77,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(testGrid.Name.Value, newGrid?.Name.Value);
             Assert.Equal(testGrid.Code, newGrid?.Code);
             Assert.Equal(testGrid.PriceAreaCode, newGrid?.PriceAreaCode);
+            Assert.Equal(validFrom, newGrid?.ValidFrom);
+            Assert.Equal(validTo, newGrid?.ValidTo);
         }
 
         [Fact]
@@ -83,10 +89,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
+            var validFrom = DateTimeOffset.Now;
+            var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.Dk1);
+                PriceAreaCode.Dk1,
+                validFrom,
+                validTo);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
@@ -94,7 +104,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 gridId,
                 new GridAreaName("NewName"),
                 new GridAreaCode("234"),
-                PriceAreaCode.Dk2);
+                PriceAreaCode.Dk2,
+                validFrom.AddYears(2),
+                validTo.AddYears(2));
 
             await gridRepository.AddOrUpdateAsync(newGrid);
             newGrid = await gridRepository.GetAsync(gridId);
@@ -106,6 +118,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal("234", newGrid?.Code.Value);
             Assert.Equal("NewName", newGrid?.Name.Value);
             Assert.Equal(PriceAreaCode.Dk2, newGrid?.PriceAreaCode);
+            Assert.Equal(validFrom.AddYears(2), newGrid?.ValidFrom);
+            Assert.Equal(validTo.AddYears(2), newGrid?.ValidTo);
         }
 
         [Fact]
@@ -118,10 +132,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var gridRepository = new GridAreaRepository(context);
             var gridRepository2 = new GridAreaRepository(context2);
+            var validFrom = DateTimeOffset.Now;
+            var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.Dk1);
+                PriceAreaCode.Dk1,
+                validFrom,
+                validTo);
 
             // Act
             var gridId = await gridRepository.AddOrUpdateAsync(testGrid);
@@ -129,7 +147,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 gridId,
                 new GridAreaName("NewName"),
                 new GridAreaCode("234"),
-                PriceAreaCode.Dk2);
+                PriceAreaCode.Dk2,
+                validFrom.AddYears(2),
+                validTo.AddYears(2));
+
             await gridRepository.AddOrUpdateAsync(newGrid);
             newGrid = await gridRepository2.GetAsync(gridId);
 
@@ -140,6 +161,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal("234", newGrid?.Code.Value);
             Assert.Equal("NewName", newGrid?.Name.Value);
             Assert.Equal(PriceAreaCode.Dk2, newGrid?.PriceAreaCode);
+            Assert.Equal(validFrom.AddYears(2), newGrid?.ValidFrom);
+            Assert.Equal(validTo.AddYears(2), newGrid?.ValidTo);
         }
 
         [Fact]
@@ -150,12 +173,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var repository = new GridAreaRepository(context);
-            var gridArea = new GridArea(
+            var validFrom = DateTimeOffset.Now;
+            var validTo = validFrom.AddYears(15);
+            var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),
-                PriceAreaCode.Dk1);
+                PriceAreaCode.Dk1,
+                validFrom,
+                validTo);
 
-            await repository.AddOrUpdateAsync(gridArea);
+            await repository.AddOrUpdateAsync(testGrid);
 
             // Act
             var actual = await repository.GetAsync();

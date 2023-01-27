@@ -47,22 +47,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var gridAreaFactoryService = new Mock<IGridAreaFactoryService>();
             var gridId = Guid.NewGuid();
             var gridArea = new GridArea(
-                new GridAreaId(gridId),
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1);
+                new GridAreaName("name"),
+                new GridAreaCode("101"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
 
             gridAreaFactoryService
                 .Setup(x => x.CreateAsync(
-                    It.Is<GridAreaCode>(y => y.Value == "123"),
-                    It.Is<GridAreaName>(y => y.Value == "fake_value"),
-                    It.IsAny<PriceAreaCode>()))
+                    It.Is<GridAreaCode>(y => y.Value == "101"),
+                    It.Is<GridAreaName>(y => y.Value == "name"),
+                    It.IsAny<PriceAreaCode>(),
+                    It.IsAny<DateTimeOffset>(),
+                    It.IsAny<DateTimeOffset?>()))
                 .ReturnsAsync(gridArea);
 
             var target = new CreateGridAreaHandler(gridAreaFactoryService.Object);
             var command = new CreateGridAreaCommand(new CreateGridAreaDto(
-                "fake_value",
-                "123",
+                "name",
+                "101",
                 "Dk1"));
 
             // Act
