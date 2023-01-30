@@ -188,7 +188,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         static PropertyInfo GetPropertyInfo<T>(IEnumerable<T> source, string property)
         {
-            var props = source.GetType().GetGenericArguments()[0].GetProperty(property);
+            var types = source.GetType().GetGenericArguments();
+            var props = types.Last().GetProperty(property);
 
             if (props == null)
             {
