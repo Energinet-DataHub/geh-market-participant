@@ -69,7 +69,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                 // update and send events
                 if (nameChanged)
                 {
-                    var updatedGridArea = new Domain.Model.GridArea(gridArea.Id, new GridAreaName(request.GridAreaDto.Name), gridArea.Code, gridArea.PriceAreaCode);
+                    var updatedGridArea = new Domain.Model.GridArea(
+                        gridArea.Id,
+                        new GridAreaName(request.GridAreaDto.Name),
+                        gridArea.Code,
+                        gridArea.PriceAreaCode,
+                        gridArea.ValidFrom,
+                        gridArea.ValidTo);
 
                     await _gridAreaRepository.AddOrUpdateAsync(updatedGridArea).ConfigureAwait(false);
                     await CreateLogEntryAsync(gridArea.Id, GridAreaAuditLogEntryField.Name, gridArea.Name.Value, updatedGridArea.Name.Value).ConfigureAwait(false);

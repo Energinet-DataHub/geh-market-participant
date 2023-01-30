@@ -39,7 +39,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                 .CreateAsync(
                     new GridAreaCode(request.GridArea.Code),
                     new GridAreaName(request.GridArea.Name),
-                    Enum.Parse<PriceAreaCode>(request.GridArea.PriceAreaCode, true))
+                    Enum.Parse<PriceAreaCode>(request.GridArea.PriceAreaCode, true),
+                    DateTimeOffset.MinValue,
+                    null)
                 .ConfigureAwait(false);
 
             return new CreateGridAreaResponse(gridArea.Id);
