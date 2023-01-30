@@ -64,7 +64,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, null, Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actorId, null, "Email", Application.Commands.SortDirection.Asc, Array.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
@@ -101,7 +101,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actorId, "test", "Email", Application.Commands.SortDirection.Asc, Array.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
@@ -144,7 +144,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", new[] { UserStatus.Active });
+        var filter = new UserOverviewFilterDto(actorId, "test", "Email", Application.Commands.SortDirection.Asc, new[] { UserStatus.Active });
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act

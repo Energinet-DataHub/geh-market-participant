@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -85,13 +86,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
-        Sort sort,
+        string sortProperty,
+        SortDirection sortDirection,
         Guid? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus)
     {
-        ArgumentNullException.ThrowIfNull(sort);
-
         var statusFilter = userStatus.ToHashSet();
         bool? accountEnabledFilter = statusFilter.Count is 0 or 2
             ? null
@@ -149,12 +149,10 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 x.CreatedDate
             });
 
-        var propertyInfo = allIdentities.GetType().GetGenericArguments()[0].GetType().GetProperty(sort.Property);
-
         allIdentities =
-            sort.Direction == SortDirection.Asc
-                ? allIdentities.OrderBy(x => propertyInfo!.GetValue(x))
-                : allIdentities.OrderByDescending(x => propertyInfo!.GetValue(x));
+            sortDirection == SortDirection.Asc
+                ? OrderBy(allIdentities, sortProperty)
+                : OrderByDescending(allIdentities, sortProperty);
 
         var allIdentitiesEnumerated = allIdentities.ToList();
 
@@ -175,6 +173,30 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             });
 
         return (items, allIdentitiesEnumerated.Count);
+
+        static IOrderedEnumerable<T> OrderBy<T>(IEnumerable<T> source, string property)
+        {
+            var propertyInfo = GetPropertyInfo(source, property);
+            return source.OrderBy(x => propertyInfo.GetValue(x));
+        }
+
+        static IOrderedEnumerable<T> OrderByDescending<T>(IEnumerable<T> source, string property)
+        {
+            var propertyInfo = GetPropertyInfo(source, property);
+            return source.OrderByDescending(x => propertyInfo.GetValue(x));
+        }
+
+        static PropertyInfo GetPropertyInfo<T>(IEnumerable<T> source, string property)
+        {
+            var props = source.GetType().GetGenericArguments()[0].GetProperty(property);
+
+            if (props == null)
+            {
+                throw new ArgumentException($"Property not found. Available properties are: {string.Join(", ", source.GetType().GetGenericArguments()[0].GetProperties().Select(x => x.Name))}");
+            }
+
+            return props;
+        }
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, string? searchText)

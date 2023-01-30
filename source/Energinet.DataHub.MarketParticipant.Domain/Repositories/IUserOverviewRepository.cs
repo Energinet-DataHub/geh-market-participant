@@ -46,7 +46,8 @@ public interface IUserOverviewRepository
     /// </summary>
     /// <param name="pageNumber">Page number.</param>
     /// <param name="pageSize">Page size.</param>
-    /// <param name="sort">Sort parameters.</param>
+    /// <param name="sortProperty">The property to sort by.</param>
+    /// <param name="sortDirection">Sort direction ASC/DESC.</param>
     /// <param name="actorId">The id of the actor.</param>
     /// <param name="searchText">A text to search for, can be empty</param>
     /// <param name="userStatus">Specifies which user status the search should filter on.</param>
@@ -54,7 +55,8 @@ public interface IUserOverviewRepository
     Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
-        Sort sort,
+        string sortProperty,
+        SortDirection sortDirection,
         Guid? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus);

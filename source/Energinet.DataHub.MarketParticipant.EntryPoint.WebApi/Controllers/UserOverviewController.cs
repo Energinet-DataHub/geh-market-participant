@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -45,7 +46,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, [FromQuery] IEnumerable<UserStatus> userStatus)
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, string sortProperty, SortDirection sortDirection, [FromQuery] IEnumerable<UserStatus> userStatus)
     {
         return await this.ProcessAsync(
             async () =>
@@ -57,6 +58,8 @@ public sealed class UserOverviewController : ControllerBase
                 var filter = new UserOverviewFilterDto(
                     actorId,
                     searchText,
+                    sortProperty,
+                    sortDirection,
                     userStatus);
 
                 var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);

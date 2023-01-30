@@ -63,7 +63,8 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             var (items, totalCount) = await _repository.SearchUsersAsync(
                  request.PageNumber,
                  request.PageSize,
-                 new Sort("Email", SortDirection.Asc),
+                 filter.SortProperty,
+                 (SortDirection)filter.SortDirection,
                  filter.ActorId,
                  filter.SearchText,
                  filter.UserStatus).ConfigureAwait(false);

@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
-
-public sealed record UserOverviewFilterDto(
-    Guid? ActorId,
-    string? SearchText,
-    string SortProperty,
-    SortDirection SortDirection,
-    IEnumerable<UserStatus> UserStatus);
+public enum SortDirection
+{
+    Asc,
+    Desc
+}

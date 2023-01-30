@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public record Sort(string Property, SortDirection Direction);
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public enum SortDirection
+    {
+        Asc,
+        Desc
+    }
+}
