@@ -23,4 +23,5 @@ public sealed record UserOverviewFilterDto(
     string? SearchText,
     UserOverviewSortProperty SortProperty,
     SortDirection SortDirection,
+    IEnumerable<Guid> UserRoleIds,
     IEnumerable<UserStatus> UserStatus);

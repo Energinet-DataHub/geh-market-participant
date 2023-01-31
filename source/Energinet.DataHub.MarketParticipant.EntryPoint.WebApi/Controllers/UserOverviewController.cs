@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -44,6 +45,7 @@ public sealed class UserOverviewController : ControllerBase
         _userContext = userContext;
     }
 
+    [Obsolete("Changed to SearchUsersAsync.")]
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
     public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, Application.Commands.Query.User.UserOverviewSortProperty sortProperty, SortDirection sortDirection, [FromQuery] IEnumerable<UserStatus> userStatus)
@@ -60,7 +62,32 @@ public sealed class UserOverviewController : ControllerBase
                     searchText,
                     sortProperty,
                     sortDirection,
+                    Enumerable.Empty<Guid>(),
                     userStatus);
+
+                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
+                var response = await _mediator.Send(command).ConfigureAwait(false);
+                return Ok(response);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpPost("users/search")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> SearchUsersAsync(int pageNumber, int pageSize, Application.Commands.Query.User.UserOverviewSortProperty sortProperty, SortDirection sortDirection, [FromBody] UserOverviewFilterDto filter)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                if (!_userContext.CurrentUser.IsFas)
+                {
+                    if (filter.ActorId.HasValue && !_userContext.CurrentUser.IsAssignedToActor(filter.ActorId.Value))
+                    {
+                        return Unauthorized();
+                    }
+
+                    filter = filter with { ActorId = _userContext.CurrentUser.ActorId };
+                }
 
                 var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
                 var response = await _mediator.Send(command).ConfigureAwait(false);

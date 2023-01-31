@@ -13,23 +13,13 @@
 // limitations under the License.
 
 using System;
-using FluentValidation;
-using FluentValidation.Validators;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation.Rules
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed class GuidValidationRule<T> : PropertyValidator<T, string>
-    {
-        public override string Name => "GuidValidation";
-
-        public override bool IsValid(ValidationContext<T> context, string value)
-        {
-            return Guid.TryParse(value, out _);
-        }
-
-        protected override string GetDefaultMessageTemplate(string errorCode)
-        {
-            return "'{PropertyName}' must have a valid guid.";
-        }
-    }
+    public sealed record UserOverviewFilterDto(
+        Guid? ActorId,
+        string? SearchText,
+        IEnumerable<Guid> UserRoleIds,
+        IEnumerable<UserStatus> UserStatus);
 }

@@ -4,6 +4,14 @@
 
 - Sort properties for user overview.
 
+## Version 2.15.11
+
+- Fix missing query parameters to user overview.
+
+## Version 2.15.10
+
+- Added filter by user roles to users overview.
+
 ## Version 2.15.9
 
 - New market roles.

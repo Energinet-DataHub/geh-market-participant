@@ -33,5 +33,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
             SortDirection sortDirection,
             string? searchText,
             IEnumerable<UserStatus> userStatus);
+
+        /// <summary>
+        /// Returns a list of users based on the specified filter.
+        /// </summary>
+        Task<UserOverviewResultDto> SearchUsersAsync(int pageNumber, int pageSize, UserOverviewFilterDto filter);
     }
 }
