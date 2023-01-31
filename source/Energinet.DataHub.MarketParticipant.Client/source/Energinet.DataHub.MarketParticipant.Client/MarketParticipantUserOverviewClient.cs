@@ -28,7 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<UserOverviewResultDto> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, IEnumerable<UserStatus> userStatus)
+        public async Task<UserOverviewResultDto> GetUserOverviewAsync(
+            int pageNumber,
+            int pageSize,
+            UserOverviewSortProperty sortProperty,
+            SortDirection sortDirection,
+            string? searchText,
+            IEnumerable<UserStatus> userStatus)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -37,6 +43,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .Request("useroverview/users")
                         .SetQueryParam("pageNumber", pageNumber)
                         .SetQueryParam("pageSize", pageSize)
+                        .SetQueryParam("sortProperty", sortProperty)
+                        .SetQueryParam("sortDirection", sortDirection)
                         .SetQueryParam("searchText", searchText)
                         .SetQueryParam("userStatus", userStatus)
                         .GetAsync())

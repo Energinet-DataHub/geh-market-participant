@@ -29,6 +29,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         Task<UserOverviewResultDto> GetUserOverviewAsync(
             int pageNumber,
             int pageSize,
+            UserOverviewSortProperty sortProperty,
+            SortDirection sortDirection,
             string? searchText,
             IEnumerable<UserStatus> userStatus);
     }

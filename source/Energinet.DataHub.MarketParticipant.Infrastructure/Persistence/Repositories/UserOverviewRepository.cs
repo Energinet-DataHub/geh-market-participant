@@ -96,7 +96,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 new EmailAddress(x.Email),
                 x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
                 x.CreatedDate));
-
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
