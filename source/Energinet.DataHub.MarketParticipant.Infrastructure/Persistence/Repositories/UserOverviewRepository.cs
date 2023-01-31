@@ -203,7 +203,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
             select u;
 
-        return query.OrderBy(x => x.Email).Distinct();
+        return query.Distinct();
     }
 
     private IQueryable<UserEntity> BuildUserLookupQuery(Guid? actorId, IEnumerable<ExternalUserId> externalUserIds)
@@ -217,6 +217,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 && guids.Contains(u.ExternalId)
             select u;
 
-        return query.OrderBy(x => x.Email).Distinct();
+        return query.Distinct();
     }
 }
