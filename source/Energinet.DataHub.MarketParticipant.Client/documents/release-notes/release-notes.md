@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.16.0
+
+- Removed unused API for getting users.
+
 ## Version 2.15.11
 
 - Fix missing query parameters to user overview.
