@@ -37,6 +37,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// Returns a list of users based on the specified filter.
         /// </summary>
-        Task<UserOverviewResultDto> SearchUsersAsync(int pageNumber, int pageSize, UserOverviewFilterDto filter);
+        Task<UserOverviewResultDto> SearchUsersAsync(
+            int pageNumber,
+            int pageSize,
+            UserOverviewSortProperty sortProperty,
+            SortDirection sortDirection,
+            UserOverviewFilterDto filter);
     }
 }

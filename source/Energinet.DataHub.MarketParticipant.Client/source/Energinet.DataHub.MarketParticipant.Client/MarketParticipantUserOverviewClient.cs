@@ -55,7 +55,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
         }
 
-        public async Task<UserOverviewResultDto> SearchUsersAsync(int pageNumber, int pageSize, UserOverviewFilterDto filter)
+        public async Task<UserOverviewResultDto> SearchUsersAsync(
+            int pageNumber,
+            int pageSize,
+            UserOverviewSortProperty sortProperty,
+            SortDirection sortDirection,
+            UserOverviewFilterDto filter)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -64,6 +69,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .Request("useroverview", "users", "search")
                         .SetQueryParam("pageNumber", pageNumber)
                         .SetQueryParam("pageSize", pageSize)
+                        .SetQueryParam("sortProperty", sortProperty)
+                        .SetQueryParam("sortDirection", sortDirection)
                         .PostJsonAsync(filter))
                 .ConfigureAwait(false);
 
