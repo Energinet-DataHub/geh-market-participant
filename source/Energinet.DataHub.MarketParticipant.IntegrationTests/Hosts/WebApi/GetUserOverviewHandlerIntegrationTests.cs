@@ -172,7 +172,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
-            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), true))
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(new[]
             {
                 new UserIdentity(

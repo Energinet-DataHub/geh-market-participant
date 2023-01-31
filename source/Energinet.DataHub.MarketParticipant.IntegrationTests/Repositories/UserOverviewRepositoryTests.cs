@@ -249,7 +249,7 @@ public sealed class UserOverviewRepositoryTests
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         userIdentityRepositoryMock
-            .Setup(x => x.SearchUserIdentitiesAsync(null, true))
+            .Setup(x => x.SearchUserIdentitiesAsync(null, null))
             .ReturnsAsync(new[]
             {
                 new UserIdentity(externalId, UserStatus.Active, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow)
