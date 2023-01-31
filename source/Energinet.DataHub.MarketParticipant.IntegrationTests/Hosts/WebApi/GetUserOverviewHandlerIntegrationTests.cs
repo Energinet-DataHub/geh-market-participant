@@ -144,7 +144,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
+        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
