@@ -46,7 +46,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, string sortProperty, SortDirection sortDirection, [FromQuery] IEnumerable<UserStatus> userStatus)
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, Application.Commands.Query.User.UserOverviewSortProperty sortProperty, SortDirection sortDirection, [FromQuery] IEnumerable<UserStatus> userStatus)
     {
         return await this.ProcessAsync(
             async () =>

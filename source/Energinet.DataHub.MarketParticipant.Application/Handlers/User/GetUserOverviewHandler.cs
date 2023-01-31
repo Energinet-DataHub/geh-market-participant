@@ -57,14 +57,17 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
         IEnumerable<UserOverviewItem> users;
         int userCount;
 
+        var sortProperty = (Domain.Model.Users.UserOverviewSortProperty)filter.SortProperty;
+        var sortDirection = (SortDirection)filter.SortDirection;
+
         // The GetUsers function is kept, as it is more performant if no search criteria are used
         if (!string.IsNullOrEmpty(filter.SearchText) || filter.UserStatus.Any())
         {
             var (items, totalCount) = await _repository.SearchUsersAsync(
                  request.PageNumber,
                  request.PageSize,
-                 filter.SortProperty,
-                 (SortDirection)filter.SortDirection,
+                 sortProperty,
+                 sortDirection,
                  filter.ActorId,
                  filter.SearchText,
                  filter.UserStatus).ConfigureAwait(false);
@@ -77,6 +80,8 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             users = await _repository.GetUsersAsync(
                 request.PageNumber,
                 request.PageSize,
+                sortProperty,
+                sortDirection,
                 filter.ActorId).ConfigureAwait(false);
 
             userCount = await _repository

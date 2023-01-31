@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -44,7 +43,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return query.CountAsync();
     }
 
-    public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
+    public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(
+        int pageNumber,
+        int pageSize,
+        UserOverviewSortProperty sortProperty,
+        SortDirection sortDirection,
+        Guid? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null);
         var users = await query
@@ -62,31 +66,43 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 ExternalId = new ExternalUserId(y.ExternalId),
             });
 
-        var userIdentities = await _userIdentityRepository
+        var userIdentities = (await _userIdentityRepository
             .GetUserIdentitiesAsync(userLookup.Keys)
-            .ConfigureAwait(false);
-
-        var test = userIdentities
+            .ConfigureAwait(false))
             .Select(userIdentity =>
                 {
                     var user = userLookup[userIdentity.Id];
-                    return new UserOverviewItem(
+                    return new
+                    {
                         user.Id,
                         userIdentity.Status,
                         userIdentity.Name,
-                        userIdentity.Email,
-                        userIdentity.PhoneNumber,
-                        userIdentity.CreatedDate);
-                })
-            .OrderBy(x => x.Email.Address);
+                        Email = userIdentity.Email.Address,
+                        PhoneNumber = userIdentity.PhoneNumber?.Number,
+                        userIdentity.CreatedDate
+                    };
+                });
 
-        return test;
+        userIdentities =
+            sortDirection == SortDirection.Asc
+                ? userIdentities.OrderBy(sortProperty.ToString())
+                : userIdentities.OrderByDescending(sortProperty.ToString());
+
+        return userIdentities.Select(x =>
+            new UserOverviewItem(
+                x.Id,
+                x.Status,
+                x.Name,
+                new EmailAddress(x.Email),
+                x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
+                x.CreatedDate));
+
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
-        string sortProperty,
+        UserOverviewSortProperty sortProperty,
         SortDirection sortDirection,
         Guid? actorId,
         string? searchText,
@@ -151,8 +167,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         allIdentities =
             sortDirection == SortDirection.Asc
-                ? OrderBy(allIdentities, sortProperty)
-                : OrderByDescending(allIdentities, sortProperty);
+                ? allIdentities.OrderBy(sortProperty.ToString())
+                : allIdentities.OrderByDescending(sortProperty.ToString());
 
         var allIdentitiesEnumerated = allIdentities.ToList();
 
@@ -173,31 +189,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             });
 
         return (items, allIdentitiesEnumerated.Count);
-
-        static IOrderedEnumerable<T> OrderBy<T>(IEnumerable<T> source, string property)
-        {
-            var propertyInfo = GetPropertyInfo(source, property);
-            return source.OrderBy(x => propertyInfo.GetValue(x));
-        }
-
-        static IOrderedEnumerable<T> OrderByDescending<T>(IEnumerable<T> source, string property)
-        {
-            var propertyInfo = GetPropertyInfo(source, property);
-            return source.OrderByDescending(x => propertyInfo.GetValue(x));
-        }
-
-        static PropertyInfo GetPropertyInfo<T>(IEnumerable<T> source, string property)
-        {
-            var types = source.GetType().GetGenericArguments();
-            var props = types.Last().GetProperty(property);
-
-            if (props == null)
-            {
-                throw new ArgumentException($"Property not found. Available properties are: {string.Join(", ", source.GetType().GetGenericArguments()[0].GetProperties().Select(x => x.Name))}");
-            }
-
-            return props;
-        }
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, string? searchText)

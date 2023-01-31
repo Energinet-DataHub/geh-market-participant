@@ -57,7 +57,7 @@ public sealed class UserOverviewRepositoryTests
         var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var actual = (await target.GetUsersAsync(1, 1000, null)).ToList();
+        var actual = (await target.GetUsersAsync(1, 1000, UserOverviewSortProperty.Email, SortDirection.Asc, null)).ToList();
 
         // Assert
         Assert.NotNull(actual.FirstOrDefault(x => x.Id == userId));
@@ -78,7 +78,7 @@ public sealed class UserOverviewRepositoryTests
         var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
 
         // Act
-        var actual = (await target.GetUsersAsync(1, 1000, actorId)).ToList();
+        var actual = (await target.GetUsersAsync(1, 1000, UserOverviewSortProperty.Email, SortDirection.Asc, actorId)).ToList();
 
         // Assert
         Assert.NotNull(actual.FirstOrDefault(x => x.Id == userId));
@@ -103,7 +103,7 @@ public sealed class UserOverviewRepositoryTests
 
         for (var i = 0; i < Math.Ceiling(userCount / 7.0); ++i)
         {
-            actual.AddRange(await target.GetUsersAsync(i + 1, 7, actorId));
+            actual.AddRange(await target.GetUsersAsync(i + 1, 7, UserOverviewSortProperty.Email, SortDirection.Asc, actorId));
         }
 
         // Assert
@@ -129,7 +129,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
-            "Email",
+            UserOverviewSortProperty.Email,
             SortDirection.Asc,
             actorId,
             null,
@@ -159,7 +159,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
-            "Email",
+            UserOverviewSortProperty.Email,
             SortDirection.Asc,
             null,
             "Axolotl",
@@ -189,7 +189,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
-            "Email",
+            UserOverviewSortProperty.Email,
             SortDirection.Asc,
             otherActorId,
             "Axolotl",
@@ -226,7 +226,7 @@ public sealed class UserOverviewRepositoryTests
         var actual = await target.SearchUsersAsync(
             1,
             1000,
-            "Email",
+            UserOverviewSortProperty.Email,
             SortDirection.Asc,
             null,
             null,
@@ -251,9 +251,9 @@ public sealed class UserOverviewRepositoryTests
 
         // Act
         var actual = new List<UserOverviewItem>();
-        actual.AddRange((await target.SearchUsersAsync(1, 8, "Email", SortDirection.Asc, actorId, "Name", Array.Empty<UserStatus>())).Items);
-        actual.AddRange((await target.SearchUsersAsync(2, 8, "Email", SortDirection.Asc, actorId, "Name", Array.Empty<UserStatus>())).Items);
-        actual.AddRange((await target.SearchUsersAsync(3, 8, "Email", SortDirection.Asc, actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(1, 8, UserOverviewSortProperty.Email, SortDirection.Asc, actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(2, 8, UserOverviewSortProperty.Email, SortDirection.Asc, actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(3, 8, UserOverviewSortProperty.Email, SortDirection.Asc, actorId, "Name", Array.Empty<UserStatus>())).Items);
 
         // Assert
         Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x.Value), actual.Select(x => x.Id).OrderBy(x => x.Value));
