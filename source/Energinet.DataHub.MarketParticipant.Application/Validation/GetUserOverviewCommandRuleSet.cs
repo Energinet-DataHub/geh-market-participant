@@ -24,6 +24,23 @@ public sealed class GetUserOverviewCommandRuleSet : AbstractValidator<GetUserOve
         RuleFor(command => command.Filter)
             .NotNull();
 
+        RuleFor(command => command.Filter)
+            .ChildRules(filterDtoRules =>
+            {
+                filterDtoRules
+                    .RuleFor(filterDto => filterDto.ActorId)
+                    .NotEmpty()
+                    .When(filterDto => filterDto.ActorId.HasValue);
+
+                filterDtoRules
+                    .RuleForEach(x => x.UserStatus)
+                    .IsInEnum();
+
+                filterDtoRules
+                    .RuleForEach(x => x.UserRoleIds)
+                    .NotEmpty();
+            });
+
         RuleFor(command => command.PageNumber)
             .GreaterThan(0);
 

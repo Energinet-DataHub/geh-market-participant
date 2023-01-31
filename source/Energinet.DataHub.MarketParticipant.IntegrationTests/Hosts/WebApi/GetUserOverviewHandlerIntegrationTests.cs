@@ -64,7 +64,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, null, Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actorId, null, Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
@@ -101,7 +101,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
@@ -129,6 +129,54 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             {
                 new UserIdentity(
                     new ExternalUserId(externalUserId),
+                    UserStatus.Active,
+                    "fake_value",
+                    new EmailAddress("fake@value"),
+                    null,
+                    DateTime.UtcNow)
+            });
+
+        scope.Container!.Register(() => userIdentityRepository.Object);
+
+        var mediator = scope.GetInstance<IMediator>();
+
+        await _fixture
+            .DatabaseManager
+            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+
+        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
+        var command = new GetUserOverviewCommand(filter, 1, 100);
+
+        // act
+        var actual = await mediator.Send(command);
+
+        // assert
+        Assert.NotEmpty(actual.Users);
+        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.Equal(1, actual.TotalUserCount);
+    }
+
+    [Fact]
+    public async Task GetUserOverview_GivenUserRoleFilter_ReturnsFilteredUserOverview()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+
+        var userRoleId = await _fixture.DatabaseManager.AddUserPermissionsAsync(actorId, userId, new[]
+        {
+            Permission.ActorManage
+        });
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
+            .ReturnsAsync(new[]
+            {
+                new UserIdentity(
+                    new ExternalUserId(externalUserId),
                     UserStatus.Inactive,
                     "fake_value",
                     new EmailAddress("fake@value"),
@@ -144,7 +192,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", new[] { UserStatus.Active });
+        var filter = new UserOverviewFilterDto(actorId, "test", new[] { userRoleId }, Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100);
 
         // act
