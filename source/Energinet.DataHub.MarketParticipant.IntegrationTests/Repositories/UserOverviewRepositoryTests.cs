@@ -131,7 +131,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             actorId,
             null,
-            Array.Empty<UserStatus>());
+            Array.Empty<UserStatus>(),
+            Array.Empty<UserRoleId>());
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -159,7 +160,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             "Axolotl",
-            Array.Empty<UserStatus>());
+            Array.Empty<UserStatus>(),
+            Array.Empty<UserRoleId>());
 
         // Assert
         Assert.NotNull(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -187,7 +189,8 @@ public sealed class UserOverviewRepositoryTests
             1000,
             otherActorId,
             "Axolotl",
-            Array.Empty<UserStatus>());
+            Array.Empty<UserStatus>(),
+            Array.Empty<UserRoleId>());
 
         // Assert
         Assert.Null(actual.Items.SingleOrDefault(x => x.Id == userId));
@@ -222,7 +225,48 @@ public sealed class UserOverviewRepositoryTests
             1000,
             null,
             null,
-            new[] { UserStatus.Active });
+            new[] { UserStatus.Active },
+            Array.Empty<UserRoleId>());
+
+        // Assert
+        Assert.Single(actual.Items, user => user.Id == userId);
+    }
+
+    [Fact]
+    public async Task SearchUsers_OnlyUsersForGivenRole_ReturnsExpectedUser()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var (userId, externalId, actorId) = await CreateUserWithActorName(context, false, "Axolotl");
+
+        var userRoleId = await _fixture.DatabaseManager.AddUserPermissionsAsync(
+            actorId,
+            userId.Value,
+            new[] { Permission.ActorManage });
+
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        userIdentityRepositoryMock
+            .Setup(x => x.SearchUserIdentitiesAsync(null, true))
+            .ReturnsAsync(new[]
+            {
+                new UserIdentity(externalId, UserStatus.Active, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow)
+            });
+
+        var target = new UserOverviewRepository(
+            context,
+            userIdentityRepositoryMock.Object);
+
+        // Act
+        var actual = await target.SearchUsersAsync(
+            1,
+            1000,
+            null,
+            null,
+            Enumerable.Empty<UserStatus>(),
+            new[] { new UserRoleId(userRoleId) });
 
         // Assert
         Assert.Single(actual.Items, user => user.Id == userId);
@@ -243,9 +287,9 @@ public sealed class UserOverviewRepositoryTests
 
         // Act
         var actual = new List<UserOverviewItem>();
-        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", Array.Empty<UserStatus>())).Items);
-        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", Array.Empty<UserStatus>())).Items);
-        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", Array.Empty<UserStatus>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(1, 8, actorId, "Name", Enumerable.Empty<UserStatus>(), Enumerable.Empty<UserRoleId>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(2, 8, actorId, "Name", Enumerable.Empty<UserStatus>(), Enumerable.Empty<UserRoleId>())).Items);
+        actual.AddRange((await target.SearchUsersAsync(3, 8, actorId, "Name", Enumerable.Empty<UserStatus>(), Enumerable.Empty<UserRoleId>())).Items);
 
         // Assert
         Assert.Equal(userIdList.Select(x => x.UserId).OrderBy(x => x.Value), actual.Select(x => x.Id).OrderBy(x => x.Value));
@@ -390,57 +434,6 @@ public sealed class UserOverviewRepositoryTests
         return (orgEntity, actorEntity, userRoleTemplate);
     }
 
-    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, List<UserRoleEntity> UserRoles)> CreateActorAndTwoTemplates(
-        MarketParticipantDbContext context,
-        bool isFas,
-        string actorName = "Actor name",
-        EicFunction eicFunction = EicFunction.TransmissionCapacityAllocator)
-    {
-        var actorEntity = new ActorEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = actorName,
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            IsFas = isFas
-        };
-
-        var orgEntity = new OrganizationEntity
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity { Country = "DK" },
-            Name = "Organization name",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
-        };
-
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-
-        var userRoleTemplate = new UserRoleEntity
-        {
-            Name = "Template name",
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
-        };
-        var userRoleTemplate2 = new UserRoleEntity
-        {
-            Name = "Template name 2",
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
-        };
-        await context.UserRoles.AddAsync(userRoleTemplate);
-        await context.UserRoles.AddAsync(userRoleTemplate2);
-
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        var roles = new List<UserRoleEntity>()
-        {
-            userRoleTemplate, userRoleTemplate2
-        };
-        return (orgEntity, actorEntity, roles);
-    }
-
     private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole, string email = "test@example.com")
     {
         var roleAssignment = new UserRoleAssignmentEntity
@@ -454,27 +447,6 @@ public sealed class UserOverviewRepositoryTests
             ExternalId = Guid.NewGuid(),
             Email = email,
             RoleAssignments = { roleAssignment }
-        };
-
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
-        return userEntity;
-    }
-
-    private static async Task<UserEntity> CreateUserWithMultipleRolesAsync(MarketParticipantDbContext context, ActorEntity actorEntity, List<UserRoleEntity> userRoles)
-    {
-        var assignments = userRoles.Select(userRole => new UserRoleAssignmentEntity
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRole.Id
-        })
-            .ToList();
-
-        var userEntity = new UserEntity
-        {
-            ExternalId = Guid.NewGuid(),
-            Email = "test@example.com",
-            RoleAssignments = new Collection<UserRoleAssignmentEntity>(assignments)
         };
 
         await context.Users.AddAsync(userEntity);
