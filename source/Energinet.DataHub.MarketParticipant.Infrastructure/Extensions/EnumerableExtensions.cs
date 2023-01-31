@@ -24,13 +24,15 @@ public static class EnumerableExtensions
     public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source, string property)
     {
         ArgumentNullException.ThrowIfNull(source);
-        return source.OrderBy(x => GetPropertyInfo(source, property).GetValue(x));
+        var propertyInfo = GetPropertyInfo(source, property);
+        return source.OrderBy(x => propertyInfo.GetValue(x));
     }
 
     public static IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> source, string property)
     {
         ArgumentNullException.ThrowIfNull(source);
-        return source.OrderByDescending(x => GetPropertyInfo(source, property).GetValue(x));
+        var propertyInfo = GetPropertyInfo(source, property);
+        return source.OrderByDescending(x => propertyInfo.GetValue(x));
     }
 
     private static PropertyInfo GetPropertyInfo<T>(IEnumerable<T> source, string property)
