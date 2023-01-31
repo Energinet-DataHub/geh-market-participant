@@ -57,8 +57,8 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
         IEnumerable<UserOverviewItem> users;
         int userCount;
 
-        var sortProperty = (Domain.Model.Users.UserOverviewSortProperty)filter.SortProperty;
-        var sortDirection = (SortDirection)filter.SortDirection;
+        var sortProperty = (Domain.Model.Users.UserOverviewSortProperty)request.SortProperty;
+        var sortDirection = (SortDirection)request.SortDirection;
 
         // The GetUsers function is kept, as it is more performant if no search criteria are used
         if (!string.IsNullOrEmpty(filter.SearchText) || filter.UserStatus.Any() || filter.UserRoleIds.Any())

@@ -60,12 +60,10 @@ public sealed class UserOverviewController : ControllerBase
                 var filter = new UserOverviewFilterDto(
                     actorId,
                     searchText,
-                    sortProperty,
-                    sortDirection,
                     Enumerable.Empty<Guid>(),
                     userStatus);
 
-                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
+                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize, sortProperty, sortDirection);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
                 return Ok(response);
             },
@@ -89,7 +87,7 @@ public sealed class UserOverviewController : ControllerBase
                     filter = filter with { ActorId = _userContext.CurrentUser.ActorId };
                 }
 
-                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
+                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize, sortProperty, sortDirection);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
                 return Ok(response);
             },

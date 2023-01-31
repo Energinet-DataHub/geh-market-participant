@@ -21,7 +21,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 public sealed record UserOverviewFilterDto(
     Guid? ActorId,
     string? SearchText,
-    UserOverviewSortProperty SortProperty,
-    SortDirection SortDirection,
     IEnumerable<Guid> UserRoleIds,
     IEnumerable<UserStatus> UserStatus);
