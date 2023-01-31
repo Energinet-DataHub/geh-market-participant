@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -56,7 +57,20 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(getActorsCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response.Actors);
+                    var filteredActors = response.Actors;
+
+                    if (!_userContext.CurrentUser.IsFas)
+                    {
+                        filteredActors = filteredActors.Select(actor =>
+                        {
+                            if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
+                                return actor;
+
+                            return actor with { Name = new ActorNameDto(string.Empty) };
+                        });
+                    }
+
+                    return Ok(filteredActors);
                 },
                 _logger).ConfigureAwait(false);
         }
