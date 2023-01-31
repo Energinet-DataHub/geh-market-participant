@@ -54,6 +54,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
                     () => _clientFactory
                         .CreateClient()
                         .Request("useroverview", "users", "search")
+                        .SetQueryParam("pageNumber", pageNumber)
+                        .SetQueryParam("pageSize", pageSize)
                         .PostJsonAsync(filter))
                 .ConfigureAwait(false);
 
