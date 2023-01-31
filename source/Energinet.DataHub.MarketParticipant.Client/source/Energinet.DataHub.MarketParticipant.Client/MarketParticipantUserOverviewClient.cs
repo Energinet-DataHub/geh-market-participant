@@ -46,5 +46,20 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<UserOverviewResultDto>()
                 .ConfigureAwait(false);
         }
+
+        public async Task<UserOverviewResultDto> SearchUsersAsync(int pageNumber, int pageSize, UserOverviewFilterDto filter)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("useroverview", "users", "search")
+                        .PostJsonAsync(filter))
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<UserOverviewResultDto>()
+                .ConfigureAwait(false);
+        }
     }
 }

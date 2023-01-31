@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.10
+
+- Added filter by user roles to users overview.
+
 ## Version 2.15.9
 
 - New market roles.

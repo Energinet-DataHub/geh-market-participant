@@ -38,13 +38,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
     public Task<int> GetTotalUserCountAsync(Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null);
+        var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         return query.CountAsync();
     }
 
     public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
     {
-        var query = BuildUsersSearchQuery(actorId, null);
+        var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         var users = await query
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -86,8 +86,10 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         Guid? actorId,
         string? searchText,
-        IEnumerable<UserStatus> userStatus)
+        IEnumerable<UserStatus> userStatus,
+        IEnumerable<UserRoleId> userRoles)
     {
+        var userRolesFilter = userRoles.ToList();
         var statusFilter = userStatus.ToHashSet();
         bool? accountEnabledFilter = statusFilter.Count is 0 or 2
             ? null
@@ -100,17 +102,21 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .ConfigureAwait(false))
             .ToList();
 
-        var knownLocalUsers = await BuildUserLookupQuery(actorId, searchUserIdentities.Select(x => x.Id))
+        var knownLocalUsers = await BuildUserLookupQuery(
+                actorId,
+                searchUserIdentities.Select(x => x.Id),
+                userRolesFilter)
             .Select(y => new { y.Id, y.ExternalId })
             .ToListAsync()
             .ConfigureAwait(false);
+
         var knownLocalIds = knownLocalUsers.Select(x => x.ExternalId);
         searchUserIdentities = searchUserIdentities
             .Where(x => knownLocalIds.Contains(x.Id.Value))
             .ToList();
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
-        var searchQuery = await BuildUsersSearchQuery(actorId, searchText)
+        var searchQuery = await BuildUsersSearchQuery(actorId, searchText, userRolesFilter)
             .Select(x => new { x.Id, x.ExternalId })
             .ToListAsync()
             .ConfigureAwait(false);
@@ -157,11 +163,17 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return (items, allIdentities.Count);
     }
 
-    private IQueryable<UserEntity> BuildUsersSearchQuery(Guid? actorId, string? searchText)
+    private IQueryable<UserEntity> BuildUsersSearchQuery(
+        Guid? actorId,
+        string? searchText,
+        IEnumerable<UserRoleId> userRoleIds)
     {
+        var userRoles = userRoleIds.Select(x => x.Value).ToList();
+
         var query =
             from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+            where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
             join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
             join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
@@ -172,15 +184,21 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return query.OrderBy(x => x.Email).Distinct();
     }
 
-    private IQueryable<UserEntity> BuildUserLookupQuery(Guid? actorId, IEnumerable<ExternalUserId> externalUserIds)
+    private IQueryable<UserEntity> BuildUserLookupQuery(
+        Guid? actorId,
+        IEnumerable<ExternalUserId> externalUserIds,
+        IEnumerable<UserRoleId> userRoleIds)
     {
-        var guids = externalUserIds.Select(x => x.Value);
+        var userRoles = userRoleIds.Select(x => x.Value).ToList();
+        var externalUsers = externalUserIds.Select(x => x.Value);
+
         var query =
             from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
+            where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
             where
                 (actorId == null || r.ActorId == actorId)
-                && guids.Contains(u.ExternalId)
+                && externalUsers.Contains(u.ExternalId)
             select u;
 
         return query.OrderBy(x => x.Email).Distinct();
