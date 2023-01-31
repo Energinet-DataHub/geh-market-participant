@@ -52,8 +52,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var query = BuildUsersSearchQuery(actorId, null);
         var users = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
             .Select(x => new { x.Id, x.ExternalId })
             .ToListAsync()
             .ConfigureAwait(false);
@@ -88,14 +86,17 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 ? userIdentities.OrderBy(sortProperty.ToString())
                 : userIdentities.OrderByDescending(sortProperty.ToString());
 
-        return userIdentities.Select(x =>
-            new UserOverviewItem(
-                x.Id,
-                x.Status,
-                x.Name,
-                new EmailAddress(x.Email),
-                x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
-                x.CreatedDate));
+        return userIdentities
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x =>
+                new UserOverviewItem(
+                    x.Id,
+                    x.Status,
+                    x.Name,
+                    new EmailAddress(x.Email),
+                    x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
+                    x.CreatedDate));
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
