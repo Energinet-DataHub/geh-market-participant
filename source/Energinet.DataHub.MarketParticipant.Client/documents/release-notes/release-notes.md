@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.17.0
+
+- Fix pipeline.
+
 ## Version 2.16.0
 
 - Sort properties for user overview.
