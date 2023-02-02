@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.16.0
+## Version 2.17.0
 
 - Removed unused API for getting users.
+
+## Version 2.16.0
+
+- Sort properties for user overview.
 
 ## Version 2.15.11
 

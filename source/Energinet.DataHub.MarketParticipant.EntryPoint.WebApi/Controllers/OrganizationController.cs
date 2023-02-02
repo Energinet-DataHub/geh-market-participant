@@ -13,10 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
@@ -54,7 +56,23 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                             .Send(getOrganizationsCommand)
                             .ConfigureAwait(false);
 
-                        return Ok(response.Organizations);
+                        var filteredOrganizations = response.Organizations;
+
+                        if (!_userContext.CurrentUser.IsFas)
+                        {
+                            filteredOrganizations = filteredOrganizations.Select(org => org with
+                            {
+                                Actors = org.Actors.Select(actor =>
+                                {
+                                    if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
+                                        return actor;
+
+                                    return actor with { Name = new ActorNameDto(string.Empty) };
+                                })
+                            });
+                        }
+
+                        return Ok(filteredOrganizations);
                     },
                 _logger).ConfigureAwait(false);
         }
@@ -74,7 +92,23 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(getSingleOrganizationCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response.Organization);
+                    var organization = response.Organization;
+
+                    if (!_userContext.CurrentUser.IsFas)
+                    {
+                        organization = organization with
+                        {
+                            Actors = organization.Actors.Select(actor =>
+                            {
+                                if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
+                                    return actor;
+
+                                return actor with { Name = new ActorNameDto(string.Empty) };
+                            })
+                        };
+                    }
+
+                    return Ok(organization);
                 },
                 _logger).ConfigureAwait(false);
         }
