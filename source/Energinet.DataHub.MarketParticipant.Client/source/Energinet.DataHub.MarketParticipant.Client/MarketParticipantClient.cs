@@ -144,23 +144,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantUserClient.GetUserAuditLogsAsync(userId);
         }
 
-        public Task<UserOverviewResultDto> GetUserOverviewAsync(
-            int pageNumber,
-            int pageSize,
-            UserOverviewSortProperty sortProperty,
-            SortDirection sortDirection,
-            string? searchText,
-            IEnumerable<UserStatus> userStatus)
-        {
-            return _marketParticipantUserOverviewClient.GetUserOverviewAsync(
-                pageNumber,
-                pageSize,
-                sortProperty,
-                sortDirection,
-                searchText,
-                userStatus);
-        }
-
         public Task<UserOverviewResultDto> SearchUsersAsync(
             int pageNumber,
             int pageSize,
@@ -168,7 +151,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
             SortDirection sortDirection,
             UserOverviewFilterDto filter)
         {
-            return _marketParticipantUserOverviewClient.SearchUsersAsync(pageNumber, pageSize, sortProperty, sortDirection, filter);
+            return _marketParticipantUserOverviewClient.SearchUsersAsync(
+                pageNumber,
+                pageSize,
+                sortProperty,
+                sortDirection,
+                filter);
         }
 
         public Task<IEnumerable<SelectionActorDto>> GetSelectionActorsAsync()
