@@ -8,8 +8,6 @@ on:
     ]
     types:
       - completed
-    branches:
-      - djorgensen/fix-allow-merge
 
 jobs:
   on-success:
