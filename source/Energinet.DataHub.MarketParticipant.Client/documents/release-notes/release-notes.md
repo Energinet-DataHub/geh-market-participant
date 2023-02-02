@@ -2,7 +2,7 @@
 
 ## Version 2.17.1
 
-- User role with permission dto to return permissions as ints.
+- User role with permissions changed to return numbers.
 
 ## Version 2.17.0
 
