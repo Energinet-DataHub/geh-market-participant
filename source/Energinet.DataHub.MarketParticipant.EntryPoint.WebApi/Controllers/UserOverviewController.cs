@@ -34,7 +34,10 @@ public sealed class UserOverviewController : ControllerBase
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;
 
-    public UserOverviewController(ILogger<UserOverviewController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
+    public UserOverviewController(
+        ILogger<UserOverviewController> logger,
+        IMediator mediator,
+        IUserContext<FrontendUser> userContext)
     {
         _logger = logger;
         _mediator = mediator;
@@ -43,7 +46,12 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpPost("users/search")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> SearchUsersAsync(int pageNumber, int pageSize, Application.Commands.Query.User.UserOverviewSortProperty sortProperty, SortDirection sortDirection, [FromBody] UserOverviewFilterDto filter)
+    public async Task<IActionResult> SearchUsersAsync(
+        int pageNumber,
+        int pageSize,
+        UserOverviewSortProperty sortProperty,
+        SortDirection sortDirection,
+        [FromBody] UserOverviewFilterDto filter)
     {
         return await this.ProcessAsync(
             async () =>

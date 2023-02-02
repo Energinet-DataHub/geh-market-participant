@@ -148,10 +148,15 @@ namespace Energinet.DataHub.MarketParticipant.Client
             int pageNumber,
             int pageSize,
             UserOverviewSortProperty sortProperty,
-            SortDirection sortDirection, 
+            SortDirection sortDirection,
             UserOverviewFilterDto filter)
         {
-            return _marketParticipantUserOverviewClient.SearchUsersAsync(pageNumber, pageSize, sortProperty, sortDirection, filter);
+            return _marketParticipantUserOverviewClient.SearchUsersAsync(
+                pageNumber,
+                pageSize,
+                sortProperty,
+                sortDirection,
+                filter);
         }
 
         public Task<IEnumerable<SelectionActorDto>> GetSelectionActorsAsync()
