@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.17.1
+
+- User role with permissions changed to return numbers.
+
 ## Version 2.17.0
 
 - Removed unused API for getting users.
