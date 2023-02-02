@@ -74,7 +74,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction },
-            Description = "Test description"
+            Description = "fake_test_value"
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -87,7 +87,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.NotEmpty(permissions);
         Assert.Single(permissions);
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "Test description", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(permissions, p => p.EicFunctions.Count() == 1);
         Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
     }
@@ -114,7 +114,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
-            Description = "Test description"
+            Description = "fake_test_value"
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -127,7 +127,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.NotEmpty(permissions);
         Assert.Single(permissions);
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "Test description", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(permissions, p => p.EicFunctions.Count() == 2);
         Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
         Assert.Equal(EicFunction.Scheduling, permissions.First().EicFunctions.Skip(1).First());
@@ -164,14 +164,14 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
-            Description = "Test description"
+            Description = "fake_test_value"
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
-            Description = "Test description 2"
+            Description = "fake_test_value2"
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -186,8 +186,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Equal(2, permissions.Count);
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
         Assert.Contains(permissions, p => p.Permission == Permission.ActorManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "Test description", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(permissions, p => string.Equals(p.Description, "Test description 2", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value2", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(2, permissions.First().EicFunctions.Count());
         Assert.Equal(2, permissions.Skip(1).First().EicFunctions.Count());
         Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
@@ -227,14 +227,14 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
-            Description = "Test description"
+            Description = "fake_test_value"
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
-            Description = "Test description 2"
+            Description = "fake_test_value2"
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -249,7 +249,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.NotEmpty(permissions);
         Assert.Single(permissions);
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "Test description", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(2, permissions.First().EicFunctions.Count());
         Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
         Assert.Equal(EicFunction.Scheduling, permissions.First().EicFunctions.Skip(1).First());
@@ -257,10 +257,30 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.NotEmpty(permissions2);
         Assert.Single(permissions2);
         Assert.Contains(permissions2, p => p.Permission == Permission.ActorManage);
-        Assert.Contains(permissions2, p => string.Equals(p.Description, "Test description 2", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(permissions2, p => string.Equals(p.Description, "fake_test_value2", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(2, permissions2.First().EicFunctions.Count());
         Assert.Equal(EicFunction.GridAccessProvider, permissions2.First().EicFunctions.First());
         Assert.Equal(EicFunction.Scheduling, permissions2.First().EicFunctions.Skip(1).First());
+    }
+
+    [Fact]
+    public async Task Ensure_All_Permissions_Has_Description_And_EicFunction_Assigned()
+    {
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var permissionRepository = new PermissionRepository(context);
+
+        // Act
+        var allPermissions = (await permissionRepository.GetAllAsync())
+            .Where(x =>
+                x.Description != null &&
+                !x.Description.Contains("fake_test_value", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        // Assert
+        Assert.Equal(allPermissions.Select(x => x.Permission), Enum.GetValues<Permission>());
+        Assert.All(allPermissions, x => x.EicFunctions.Any());
     }
 
     public Task InitializeAsync()
@@ -271,7 +291,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var allPermissions = await context.Permissions.ToListAsync();
+        var allPermissions = await context.Permissions.Where(x => x.Description.Contains("fake_test_value")).ToListAsync();
         context.Permissions.RemoveRange(allPermissions);
         await context.SaveChangesAsync();
     }
