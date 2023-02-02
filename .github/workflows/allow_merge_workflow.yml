@@ -1,3 +1,5 @@
+name: Allow_merge workflow
+
 on:
   workflow_run:
     workflows: [CI, "Publish Energinet.DataHub.MarketParticipant.Client nuget package"]
