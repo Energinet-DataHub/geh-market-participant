@@ -1,0 +1,54 @@
+name: Orchestrator for workflows in CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  #
+  # Detect changes to start relevant workflows
+  #
+
+  changes_workflow_level:
+    uses: ./.github/workflows/detect-changes-workflow-level.yml
+
+  ci:
+    needs: changes_workflow_level
+    if: ${{ needs.changes_workflow_level.outputs.ci == 'true' }}
+    uses: ./.github/workflows/ci.yml
+    secrets: inherit
+
+  client_package:
+    needs: changes_workflow_level
+    if: ${{ needs.changes_workflow_level.outputs.client_package == 'true' }}
+    uses: ./.github/workflows/publish-marketparticipant-client.yml
+    secrets: inherit
+
+  model_package:
+    needs: changes_workflow_level
+    if: ${{ needs.changes_workflow_level.outputs.model_package == 'true' }}
+    uses: ./.github/workflows/publish-marketparticipant-model.yml
+    secrets: inherit
+
+  #
+  # Branch policy status check
+  #
+
+  allow_merge_orchestrator:
+    runs-on: ubuntu-latest
+    needs: [
+      ci,
+      client_package,
+      model_package,
+    ]
+    if: |
+      always()
+    steps:
+      - name: Verify if merge is allowed
+        run: |
+          echo "${{ toJSON(needs) }}"
+
+          if [[ ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }} = true ]]; then
+              echo "Failed"
+              exit 1
+          fi
