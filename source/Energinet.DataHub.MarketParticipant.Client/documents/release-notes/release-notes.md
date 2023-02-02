@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.15.12
+
+- User role with permission dto to return permissions as ints
+
 ## Version 2.15.11
 
 - Fix missing query parameters to user overview.
