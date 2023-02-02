@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
-
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
-
-public sealed record GetUserOverviewCommand(UserOverviewFilterDto Filter, int PageNumber, int PageSize, UserOverviewSortProperty SortProperty, SortDirection SortDirection)
-    : IRequest<GetUserOverviewResponse>;
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public enum UserOverviewSortProperty
+    {
+        Name,
+        Email,
+        PhoneNumber,
+        CreatedDate,
+        Status
+    }
+}

@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -36,15 +37,24 @@ public interface IUserOverviewRepository
     /// </summary>
     /// <param name="pageNumber">Page number.</param>
     /// <param name="pageSize">Page size.</param>
+    /// <param name="sortProperty">Property to sort by.</param>
+    /// <param name="sortDirection">Direction to sort in ASC/DESC.</param>
     /// <param name="actorId">The id of the actor.</param>
     /// <returns>A list of users.</returns>
-    Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId);
+    Task<IEnumerable<UserOverviewItem>> GetUsersAsync(
+        int pageNumber,
+        int pageSize,
+        UserOverviewSortProperty sortProperty,
+        SortDirection sortDirection,
+        Guid? actorId);
 
     /// <summary>
     /// Searches users paged
     /// </summary>
     /// <param name="pageNumber">Page number.</param>
     /// <param name="pageSize">Page size.</param>
+    /// <param name="sortProperty">Property to sort by.</param>
+    /// <param name="sortDirection">Direction to sort in ASC/DESC.</param>
     /// <param name="actorId">The id of the actor.</param>
     /// <param name="searchText">A text to search for, can be empty</param>
     /// <param name="userStatus">Specifies which user status the search should filter on.</param>
@@ -53,6 +63,8 @@ public interface IUserOverviewRepository
     Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
+        UserOverviewSortProperty sortProperty,
+        SortDirection sortDirection,
         Guid? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus,

@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.16.0
+
+- Sort properties for user overview.
+
 ## Version 2.15.11
 
 - Fix missing query parameters to user overview.

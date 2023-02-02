@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -42,12 +43,15 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         return query.CountAsync();
     }
 
-    public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(int pageNumber, int pageSize, Guid? actorId)
+    public async Task<IEnumerable<UserOverviewItem>> GetUsersAsync(
+        int pageNumber,
+        int pageSize,
+        UserOverviewSortProperty sortProperty,
+        SortDirection sortDirection,
+        Guid? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         var users = await query
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
             .Select(x => new { x.Id, x.ExternalId })
             .ToListAsync()
             .ConfigureAwait(false);
@@ -60,30 +64,46 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 ExternalId = new ExternalUserId(y.ExternalId),
             });
 
-        var userIdentities = await _userIdentityRepository
+        var userIdentities = (await _userIdentityRepository
             .GetUserIdentitiesAsync(userLookup.Keys)
-            .ConfigureAwait(false);
-
-        var test = userIdentities
+            .ConfigureAwait(false))
             .Select(userIdentity =>
                 {
                     var user = userLookup[userIdentity.Id];
-                    return new UserOverviewItem(
+                    return new
+                    {
                         user.Id,
                         userIdentity.Status,
                         userIdentity.Name,
-                        userIdentity.Email,
-                        userIdentity.PhoneNumber,
-                        userIdentity.CreatedDate);
-                })
-            .OrderBy(x => x.Email.Address);
+                        Email = userIdentity.Email.Address,
+                        PhoneNumber = userIdentity.PhoneNumber?.Number,
+                        userIdentity.CreatedDate
+                    };
+                });
 
-        return test;
+        userIdentities =
+            sortDirection == SortDirection.Asc
+                ? userIdentities.OrderBy(sortProperty.ToString())
+                : userIdentities.OrderByDescending(sortProperty.ToString());
+
+        return userIdentities
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .Select(x =>
+                new UserOverviewItem(
+                    x.Id,
+                    x.Status,
+                    x.Name,
+                    new EmailAddress(x.Email),
+                    x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
+                    x.CreatedDate));
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
         int pageNumber,
         int pageSize,
+        UserOverviewSortProperty sortProperty,
+        SortDirection sortDirection,
         Guid? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus,
@@ -141,11 +161,25 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
-            .OrderBy(x => x.Email.Address)
-            .ToList();
+            .Select(x => new
+            {
+                x.Id,
+                x.Status,
+                x.Name,
+                Email = x.Email.Address,
+                PhoneNumber = x.PhoneNumber?.Number,
+                x.CreatedDate
+            });
+
+        allIdentities =
+            sortDirection == SortDirection.Asc
+                ? allIdentities.OrderBy(sortProperty.ToString())
+                : allIdentities.OrderByDescending(sortProperty.ToString());
+
+        var allIdentitiesEnumerated = allIdentities.ToList();
 
         // Filter User Identities to only be from our user pool
-        var items = allIdentities
+        var items = allIdentitiesEnumerated
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .Select(userIdentity =>
@@ -155,12 +189,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     new UserId(user.Id),
                     userIdentity.Status,
                     userIdentity.Name,
-                    userIdentity.Email,
-                    userIdentity.PhoneNumber,
+                    new EmailAddress(userIdentity.Email),
+                    userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
                     userIdentity.CreatedDate);
             });
 
-        return (items, allIdentities.Count);
+        return (items, allIdentitiesEnumerated.Count);
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(
@@ -181,7 +215,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
             select u;
 
-        return query.OrderBy(x => x.Email).Distinct();
+        return query.Distinct();
     }
 
     private IQueryable<UserEntity> BuildUserLookupQuery(
@@ -201,6 +235,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 && externalUsers.Contains(u.ExternalId)
             select u;
 
-        return query.OrderBy(x => x.Email).Distinct();
+        return query.Distinct();
     }
 }

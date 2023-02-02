@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -44,10 +45,10 @@ public sealed class UserOverviewController : ControllerBase
         _userContext = userContext;
     }
 
+    [Obsolete("Changed to SearchUsersAsync.")]
     [HttpGet("users")]
     [AuthorizeUser(Permission.UsersManage)]
-    [Obsolete("Changed to SearchUsersAsync.")]
-    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, [FromQuery] IEnumerable<UserStatus> userStatus)
+    public async Task<IActionResult> GetUserOverviewAsync(int pageNumber, int pageSize, string? searchText, Application.Commands.Query.User.UserOverviewSortProperty sortProperty, SortDirection sortDirection, [FromQuery] IEnumerable<UserStatus> userStatus)
     {
         return await this.ProcessAsync(
             async () =>
@@ -62,7 +63,7 @@ public sealed class UserOverviewController : ControllerBase
                     Enumerable.Empty<Guid>(),
                     userStatus);
 
-                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
+                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize, sortProperty, sortDirection);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
                 return Ok(response);
             },
@@ -71,7 +72,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpPost("users/search")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> SearchUsersAsync(int pageNumber, int pageSize, [FromBody] UserOverviewFilterDto filter)
+    public async Task<IActionResult> SearchUsersAsync(int pageNumber, int pageSize, Application.Commands.Query.User.UserOverviewSortProperty sortProperty, SortDirection sortDirection, [FromBody] UserOverviewFilterDto filter)
     {
         return await this.ProcessAsync(
             async () =>
@@ -86,7 +87,7 @@ public sealed class UserOverviewController : ControllerBase
                     filter = filter with { ActorId = _userContext.CurrentUser.ActorId };
                 }
 
-                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize);
+                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize, sortProperty, sortDirection);
                 var response = await _mediator.Send(command).ConfigureAwait(false);
                 return Ok(response);
             },
