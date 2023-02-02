@@ -36,10 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
-                        .GetAsync())
+                        () => _clientFactory
+                            .CreateClient()
+                            .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
+                            .GetAsync())
                 .ConfigureAwait(false);
 
             var actors = await response
