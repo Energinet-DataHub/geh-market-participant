@@ -1,9 +1,5 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.18.0
-
-- Fix pipeline.
-
 ## Version 2.17.0
 
 - Removed unused API for getting users.

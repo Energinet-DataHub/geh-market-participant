@@ -36,14 +36,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                        () => _clientFactory
-                            .CreateClient()
-                            .Request("useroverview", "users", "search")
-                            .SetQueryParam("pageNumber", pageNumber)
-                            .SetQueryParam("pageSize", pageSize)
-                            .SetQueryParam("sortProperty", sortProperty)
-                            .SetQueryParam("sortDirection", sortDirection)
-                            .PostJsonAsync(filter))
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("useroverview", "users", "search")
+                        .SetQueryParam("pageNumber", pageNumber)
+                        .SetQueryParam("pageSize", pageSize)
+                        .SetQueryParam("sortProperty", sortProperty)
+                        .SetQueryParam("sortDirection", sortDirection)
+                        .PostJsonAsync(filter))
                 .ConfigureAwait(false);
 
             return await response
