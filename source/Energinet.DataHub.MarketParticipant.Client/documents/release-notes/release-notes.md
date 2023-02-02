@@ -1,5 +1,13 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.17.1
+
+- User role with permissions changed to return numbers.
+
+## Version 2.17.0
+
+- Removed unused API for getting users.
+
 ## Version 2.16.0
 
 - Sort properties for user overview.

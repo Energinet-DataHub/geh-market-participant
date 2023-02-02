@@ -53,6 +53,6 @@ public sealed class GetUserRoleHandler
             userRole.Description,
             userRole.EicFunction,
             userRole.Status,
-            userRole.Permissions.Select(e => e.ToString())));
+            userRole.Permissions.Select(e => (int)e)));
     }
 }

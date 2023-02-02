@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -26,33 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public MarketParticipantUserOverviewClient(IMarketParticipantClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
-        }
-
-        public async Task<UserOverviewResultDto> GetUserOverviewAsync(
-            int pageNumber,
-            int pageSize,
-            UserOverviewSortProperty sortProperty,
-            SortDirection sortDirection,
-            string? searchText,
-            IEnumerable<UserStatus> userStatus)
-        {
-            var response = await ValidationExceptionHandler
-                .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request("useroverview/users")
-                        .SetQueryParam("pageNumber", pageNumber)
-                        .SetQueryParam("pageSize", pageSize)
-                        .SetQueryParam("sortProperty", sortProperty)
-                        .SetQueryParam("sortDirection", sortDirection)
-                        .SetQueryParam("searchText", searchText)
-                        .SetQueryParam("userStatus", userStatus)
-                        .GetAsync())
-                .ConfigureAwait(false);
-
-            return await response
-                .GetJsonAsync<UserOverviewResultDto>()
-                .ConfigureAwait(false);
         }
 
         public async Task<UserOverviewResultDto> SearchUsersAsync(
