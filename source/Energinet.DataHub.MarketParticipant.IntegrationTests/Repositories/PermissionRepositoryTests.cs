@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -30,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class PermissionRepositoryTests
+public sealed class PermissionRepositoryTests : IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -260,5 +261,18 @@ public sealed class PermissionRepositoryTests
         Assert.Equal(2, permissions2.First().EicFunctions.Count());
         Assert.Equal(EicFunction.GridAccessProvider, permissions2.First().EicFunctions.First());
         Assert.Equal(EicFunction.Scheduling, permissions2.First().EicFunctions.Skip(1).First());
+    }
+
+    public Task InitializeAsync()
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task DisposeAsync()
+    {
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var allPermissions = await context.Permissions.ToListAsync();
+        context.Permissions.RemoveRange(allPermissions);
+        await context.SaveChangesAsync();
     }
 }
