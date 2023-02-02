@@ -64,8 +64,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, null, Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100);
+        var filter = new UserOverviewFilterDto(actorId, null, Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -101,8 +101,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .DatabaseManager
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
-        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100);
+        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -145,7 +145,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
         var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
-        var command = new GetUserOverviewCommand(filter, 1, 100);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);
@@ -193,7 +193,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
 
         var filter = new UserOverviewFilterDto(actorId, "test", new[] { userRoleId }, Enumerable.Empty<UserStatus>());
-        var command = new GetUserOverviewCommand(filter, 1, 100);
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
         var actual = await mediator.Send(command);

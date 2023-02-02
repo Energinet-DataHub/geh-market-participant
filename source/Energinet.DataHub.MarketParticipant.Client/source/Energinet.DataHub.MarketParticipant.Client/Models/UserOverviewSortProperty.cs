@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Client.Models;
-
-namespace Energinet.DataHub.MarketParticipant.Client
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    /// <summary>
-    /// Manages users.
-    /// </summary>
-    public interface IMarketParticipantUserOverviewClient
+    public enum UserOverviewSortProperty
     {
-        /// <summary>
-        /// Returns a list of users based on the specified filter.
-        /// </summary>
-        Task<UserOverviewResultDto> SearchUsersAsync(
-            int pageNumber,
-            int pageSize,
-            UserOverviewSortProperty sortProperty,
-            SortDirection sortDirection,
-            UserOverviewFilterDto filter);
+        Name,
+        Email,
+        PhoneNumber,
+        CreatedDate,
+        Status
     }
 }
