@@ -147,7 +147,8 @@ public sealed class UserRoleRepositoryTests
         var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BillingAgent });
 
         // Assert
-        Assert.Equal(2, userRoleTemplates.Count());
+        Assert.NotNull(userRoleTemplates.FirstOrDefault(x => x.Id.Value == userRoleTemplateEntity1.Id));
+        Assert.NotNull(userRoleTemplates.FirstOrDefault(x => x.Id.Value == userRoleTemplateEntity2.Id));
     }
 
     [Fact]

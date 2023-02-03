@@ -46,7 +46,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.BillingAgent });
+            .CreateActorAsync(new[] { EicFunction.IndependentAggregator });
 
         var command = new GetAvailableUserRolesForActorCommand(actorId);
 
@@ -120,8 +120,8 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
                 new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
                 new UserRoleEicFunctionEntity { EicFunction = EicFunction.GridAccessProvider },
             }
         };
