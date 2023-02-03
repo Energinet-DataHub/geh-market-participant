@@ -5,19 +5,15 @@ on:
     branches:
       - main
 
-  #
-  # Detect changes to start relevant workflows
-  #
 jobs:
   #
   # License and Markdown Check
   #
-
   ci_base:
     uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
   
   #
-  # Detect changes made in pull request, to determine the workflows to run
+  # Detect changes to start relevant workflows
   #
   changes:
     uses: ./.github/workflows/detect-changes.yml
