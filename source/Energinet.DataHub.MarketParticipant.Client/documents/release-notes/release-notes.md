@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.18.0
+
+- Pipeline change.
+
 ## Version 2.17.1
 
 - User role with permissions changed to return numbers.
@@ -250,15 +254,15 @@
 ### Added methods for the following endpoints
 
 - For actors
-    - GetActorsAsync
-    - GetActorAsync
-    - CreateActorAsync
-    - UpdateActorAsync
+  - GetActorsAsync
+  - GetActorAsync
+  - CreateActorAsync
+  - UpdateActorAsync
 - For Organizations
-    - GetOrganizationsAsync
-    - GetOrganizationAsync
-    - CreateOrganizationAsync
-    - UpdateOrganizationAsync
+  - GetOrganizationsAsync
+  - GetOrganizationAsync
+  - CreateOrganizationAsync
+  - UpdateOrganizationAsync
 
 ## Version 0.2.1
 

@@ -40,6 +40,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _marketParticipantActorContactClient = new MarketParticipantActorContactClient(clientFactory);
             _marketParticipantGridAreaOverviewClient = new MarketParticipantGridAreaOverviewClient(clientFactory);
             _tokenClient = new TokenClient(clientFactory);
+            _marketParticipantUserOverviewClient = new MarketParticipantUserOverviewClient(clientFactory);
+            _marketParticipantActorQueryClient = new MarketParticipantActorQueryClient(clientFactory);
         }
 
         public Task<IEnumerable<OrganizationDto>> GetOrganizationsAsync()

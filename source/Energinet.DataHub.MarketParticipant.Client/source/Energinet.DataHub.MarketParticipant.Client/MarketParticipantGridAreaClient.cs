@@ -35,10 +35,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request(GridAreasBaseUrl)
-                        .GetAsync())
+                        () => _clientFactory
+                            .CreateClient()
+                            .Request(GridAreasBaseUrl)
+                            .GetAsync())
                 .ConfigureAwait(false);
 
             var gridAreas = await response
