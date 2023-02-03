@@ -1,9 +1,5 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
-## Version 2.7.7
-
-- Dummy change.
-
 ## Version 2.7.6
 
 - New market roles.
