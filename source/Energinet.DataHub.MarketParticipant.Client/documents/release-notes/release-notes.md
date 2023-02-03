@@ -249,16 +249,8 @@
 
 ### Added methods for the following endpoints
 
-- For actors
-  - GetActorsAsync
-  - GetActorAsync
-  - CreateActorAsync
-  - UpdateActorAsync
-- For Organizations
-  - GetOrganizationsAsync
-  - GetOrganizationAsync
-  - CreateOrganizationAsync
-  - UpdateOrganizationAsync
+- For actors: GetActorsAsync, GetActorAsync, CreateActorAsync, UpdateActorAsync
+- For Organizations: GetOrganizationsAsync, GetOrganizationAsync, CreateOrganizationAsync, UpdateOrganizationAsync
 
 ## Version 0.2.1
 
