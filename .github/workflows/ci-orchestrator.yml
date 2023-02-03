@@ -10,7 +10,7 @@ on:
   #
 jobs:
   changes_workflow_level:
-    uses: ./.github/workflows/detect-changes-workflow-level.yml
+    uses: ./.github/workflows/detect-changes.yml
 
   ci_dotnet:
     needs: changes_workflow_level
