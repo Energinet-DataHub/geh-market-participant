@@ -19,17 +19,6 @@ on:
   workflow_call: {}
 
 jobs:
-  #
-  # License and Markdown Check
-  #
-
-  ci_base:
-    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
-
-  #
-  # CI .NET
-  #
-
   # Build all projects within solution
   dotnet_ci_build:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10

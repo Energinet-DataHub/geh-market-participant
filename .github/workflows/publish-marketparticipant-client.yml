@@ -21,12 +21,6 @@ on:
     paths:
       - source/Energinet.DataHub.MarketParticipant.Client/**
       - .github/workflows/publish-marketparticipant-client.yml
-  # pull_request:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - source/Energinet.DataHub.MarketParticipant.Client/**
-  #     - .github/workflows/publish-marketparticipant-client.yml
   workflow_call: {}
   workflow_dispatch: {}
 
