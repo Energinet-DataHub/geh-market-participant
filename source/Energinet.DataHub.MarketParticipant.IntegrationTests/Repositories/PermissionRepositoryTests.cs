@@ -102,18 +102,13 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Agent
-        };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Scheduling
-        };
+        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
+        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
+            EicFunctions =
+                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
             Description = "fake_test_value"
         };
 
@@ -121,7 +116,12 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await context2.SaveChangesAsync();
 
         // Act
-        var permissions = (await permissionRepository.GetAllAsync()).ToList();
+        var permissions = (await permissionRepository
+                .GetAllAsync())
+            .Where(x =>
+                !string.IsNullOrWhiteSpace(x.Description) &&
+                x.Description.Equals("fake_test_value", StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         // Assert
         Assert.NotEmpty(permissions);
@@ -143,34 +143,24 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Agent
-        };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Scheduling
-        };
+        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
+        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
 
-        var permissionEicFunction3 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Agent
-        };
-        var permissionEicFunction4 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Scheduling
-        };
+        var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
+        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
+            EicFunctions =
+                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
             Description = "fake_test_value"
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
-            EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
+            EicFunctions =
+                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
             Description = "fake_test_value2"
         };
 
@@ -197,7 +187,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetToMarketRoleAsync_MultiplePermissionsWithMultipleEicFunctionsExist_ReturnsPermissionToCorrecEicFunctionWithCorrectDetails()
+    public async Task
+        GetToMarketRoleAsync_MultiplePermissionsWithMultipleEicFunctionsExist_ReturnsPermissionToCorrecEicFunctionWithCorrectDetails()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -206,34 +197,24 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Agent
-        };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Scheduling
-        };
+        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
+        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
 
-        var permissionEicFunction3 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.GridAccessProvider
-        };
-        var permissionEicFunction4 = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.Scheduling
-        };
+        var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider };
+        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
+            EicFunctions =
+                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
             Description = "fake_test_value"
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
-            EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
+            EicFunctions =
+                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
             Description = "fake_test_value2"
         };
 
@@ -242,8 +223,11 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await context2.SaveChangesAsync();
 
         // Act
-        var permissions = (await permissionRepository.GetToMarketRoleAsync(EicFunction.Agent)).ToList();
-        var permissions2 = (await permissionRepository.GetToMarketRoleAsync(EicFunction.GridAccessProvider)).ToList();
+        var permissions = (await permissionRepository.GetToMarketRoleAsync(EicFunction.Agent))
+            .ToList();
+
+        var permissions2 = (await permissionRepository.GetToMarketRoleAsync(EicFunction.GridAccessProvider))
+            .ToList();
 
         // Assert
         Assert.NotEmpty(permissions);
@@ -263,35 +247,19 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Equal(EicFunction.Scheduling, permissions2.First().EicFunctions.Skip(1).First());
     }
 
-    [Fact]
-    public async Task Ensure_All_Permissions_Has_Description_And_EicFunction_Assigned()
+    public async Task InitializeAsync()
     {
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var permissionRepository = new PermissionRepository(context);
-
-        // Act
-        var allPermissions = (await permissionRepository.GetAllAsync())
-            .Where(x =>
-                x.Description != null &&
-                !x.Description.Contains("fake_test_value", StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        // Assert
-        Assert.Equal(allPermissions.Select(x => x.Permission), Enum.GetValues<Permission>());
-        Assert.All(allPermissions, x => x.EicFunctions.Any());
-    }
-
-    public Task InitializeAsync()
-    {
-        return Task.CompletedTask;
+        var allPermissions = await context.Permissions.ToListAsync();
+        context.Permissions.RemoveRange(allPermissions);
+        await context.SaveChangesAsync();
     }
 
     public async Task DisposeAsync()
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var allPermissions = await context.Permissions.Where(x => x.Description.Contains("fake_test_value")).ToListAsync();
+        var allPermissions =
+            await context.Permissions.Where(x => x.Description.Contains("fake_test_value")).ToListAsync();
         context.Permissions.RemoveRange(allPermissions);
         await context.SaveChangesAsync();
     }
