@@ -12,27 +12,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Detect changes
+name: Detect changes - workflow level
 
 # DESCRIPTION:
-# This workflow will determine which categories of jobs should be executed,
-# based on detected changes.
-# It should be used by the 'ci.yml' and 'cd.yml' to ensure they both use
-# the same path's to detect changes.
+# This workflow will determine which workflows should be executed 
+# when a pull is opened, based on detected changes.
 
 on:
   workflow_call:
     outputs:
       dotnet:
-        value: ${{ jobs.changes.outputs.dotnet }}
+        value: ${{ jobs.changes_workflow_level.outputs.dotnet }}
+      client_package:
+        value: ${{ jobs.changes_workflow_level.outputs.client_package }}
+      model_package:
+        value: ${{ jobs.changes_workflow_level.outputs.model_package }}
 
 jobs:
-  changes:
+  changes_workflow_level:
     name: Determine relevant jobs
     runs-on: ubuntu-latest
     # Set job outputs to values from filter step
     outputs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
+      client_package: ${{ steps.filter.outputs.client_package }}
+      model_package: ${{ steps.filter.outputs.model_package }}
     steps:
     # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
     - name: Checkout repository
@@ -47,6 +51,9 @@ jobs:
           dotnet:
             - '.github/workflows/cd.yml'
             - '.github/workflows/ci.yml'
-            - '.github/workflows/detect-changes.yml'
+            - '.github/workflows/detect-changes-workflow-level.yml'
             - '.github/actions/dotnet-*/**'
-            - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+          client_package:
+            - 'source/((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+          model_package:
+            - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
