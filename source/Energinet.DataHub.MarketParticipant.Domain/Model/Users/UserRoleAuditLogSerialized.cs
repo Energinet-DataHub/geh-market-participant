@@ -25,5 +25,5 @@ public class UserRoleAuditLogSerialized
     public EicFunction? EicFunction { get; set; }
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public UserRoleStatus? Status { get; set; }
-    public IEnumerable<string>? Permissions { get; set; }
+    public IEnumerable<int>? Permissions { get; set; }
 }
