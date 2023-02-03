@@ -275,7 +275,7 @@ internal static class DbTestHelper
             Name = string.Empty,
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.ConsentAdministrator } }
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.IndependentAggregator } }
         };
 
         var organizationEntity = new OrganizationEntity
@@ -303,7 +303,7 @@ internal static class DbTestHelper
             });
         }
 
-        foreach (var eicFunction in new[] { EicFunction.ConsentAdministrator })
+        foreach (var eicFunction in new[] { EicFunction.IndependentAggregator })
         {
             userRoleTemplate.EicFunctions.Add(new UserRoleEicFunctionEntity
             {

@@ -108,8 +108,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var userRoleDb = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.Agent);
-            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.Consumer);
+            var userRoleDb = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.BillingAgent);
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.BalanceResponsibleParty);
 
             // act
             var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
@@ -215,7 +215,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         private static UserRole BuildUserRoleWithPermissionsDto(
             string name = "UserRoleName",
             string description = "UserRoleDescription",
-            EicFunction eicFunction = EicFunction.Agent,
+            EicFunction eicFunction = EicFunction.BillingAgent,
             UserRoleStatus status = UserRoleStatus.Active,
             IEnumerable<Permission>? permissions = null)
         {

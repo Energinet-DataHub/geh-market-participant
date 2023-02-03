@@ -25,10 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         private static readonly EicFunction[] _rolesAllowingSingleGridAreaOnly =
         {
             EicFunction.GridAccessProvider,
-            EicFunction.MeterAdministrator,
-            EicFunction.MeterOperator,
-            EicFunction.MeteredDataCollector,
-            EicFunction.PartyConnectedToTheGrid
         };
 
         public void ValidateGridAreas(IEnumerable<ActorMarketRole> marketRoles)
