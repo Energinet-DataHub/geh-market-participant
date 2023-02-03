@@ -25,6 +25,10 @@ on:
     outputs:
       dotnet:
         value: ${{ jobs.changes.outputs.dotnet }}
+      client_package:
+        value: ${{ jobs.changes.outputs.client_package }}
+      model_package:
+        value: ${{ jobs.changes.outputs.model_package }}
 
 jobs:
   changes:
@@ -33,6 +37,8 @@ jobs:
     # Set job outputs to values from filter step
     outputs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
+      client_package: ${{ steps.filter.outputs.client_package }}
+      model_package: ${{ steps.filter.outputs.model_package }}
     steps:
     # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
     - name: Checkout repository
@@ -46,7 +52,15 @@ jobs:
         filters: |
           dotnet:
             - '.github/workflows/cd.yml'
-            - '.github/workflows/ci.yml'
+            - '.github/workflows/ci-dotnet.yml'
             - '.github/workflows/detect-changes.yml'
             - '.github/actions/dotnet-*/**'
             - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+          client_package:
+            - '.github/workflows/detect-changes.yml'
+            - '.github/workflows/publish-marketparticipant-client.yml'
+            - 'source/((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+          model_package:
+            - '.github/workflows/detect-changes.yml'
+            - '.github/workflows/publish-marketparticipant-model.yml'
+            - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'

@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
-## Version 2.7.7
+## Version 2.7.8
 
 - Removed unused market roles.
+
+## Version 2.7.7
+
+- Bump version as part of pipeline change.
 
 ## Version 2.7.6
 

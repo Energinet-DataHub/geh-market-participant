@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.17.2
+## Version 2.17.3
 
 - Removed unused market roles.
+
+## Version 2.17.2
+
+- Bump version as part of pipeline change.
 
 ## Version 2.17.1
 
@@ -253,16 +257,8 @@
 
 ### Added methods for the following endpoints
 
-- For actors
-    - GetActorsAsync
-    - GetActorAsync
-    - CreateActorAsync
-    - UpdateActorAsync
-- For Organizations
-    - GetOrganizationsAsync
-    - GetOrganizationAsync
-    - CreateOrganizationAsync
-    - UpdateOrganizationAsync
+- For actors: GetActorsAsync, GetActorAsync, CreateActorAsync, UpdateActorAsync
+- For Organizations: GetOrganizationsAsync, GetOrganizationAsync, CreateOrganizationAsync, UpdateOrganizationAsync
 
 ## Version 0.2.1
 
