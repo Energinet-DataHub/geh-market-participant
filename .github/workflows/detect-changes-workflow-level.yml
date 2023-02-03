@@ -21,8 +21,12 @@ name: Detect changes - workflow level
 on:
   workflow_call:
     outputs:
-      dotnet:
-        value: ${{ jobs.changes_workflow_level.outputs.dotnet }}
+      ci:
+        value: ${{ jobs.changes_workflow_level.outputs.ci }}
+      client_package:
+        value: ${{ jobs.changes_workflow_level.outputs.client_package }}
+      model_package:
+        value: ${{ jobs.changes_workflow_level.outputs.model_package }}
 
 jobs:
   changes_workflow_level:
