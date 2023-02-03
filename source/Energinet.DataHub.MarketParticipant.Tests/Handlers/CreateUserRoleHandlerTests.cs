@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<Permission>(),
-                EicFunction.Consumer);
+                EicFunction.BillingAgent);
 
             userRoleRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
-                EicFunction.Consumer,
+                EicFunction.BillingAgent,
                 new Collection<int> { ValidPermission }));
 
             // Act

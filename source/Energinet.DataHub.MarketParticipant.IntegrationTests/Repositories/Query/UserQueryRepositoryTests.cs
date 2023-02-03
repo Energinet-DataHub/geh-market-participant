@@ -281,7 +281,7 @@ public sealed class UserQueryRepositoryTests
             Name = "Test Actor",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.Agent } }
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } }
         };
 
         var orgEntity = new OrganizationEntity()
@@ -350,7 +350,7 @@ public sealed class UserQueryRepositoryTests
             Name = "Test Actor",
             ActorNumber = new MockedGln(),
             Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.Agent } }
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } }
         };
 
         var doNotReturnActorEntity = new ActorEntity()

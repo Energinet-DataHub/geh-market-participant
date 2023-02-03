@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var markedRoles = new[]
             {
-                EicFunction.EnergyTrader,
+                EicFunction.BillingAgent,
                 EicFunction.EnergySupplier
             };
 

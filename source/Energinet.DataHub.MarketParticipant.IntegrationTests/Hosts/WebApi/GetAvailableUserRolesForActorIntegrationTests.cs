@@ -46,7 +46,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.CoordinatedCapacityCalculator });
+            .CreateActorAsync(new[] { EicFunction.BillingAgent });
 
         var command = new GetAvailableUserRolesForActorCommand(actorId);
 
@@ -68,14 +68,14 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.Agent, EicFunction.CapacityTrader });
+            .CreateActorAsync(new[] { EicFunction.BalanceResponsibleParty, EicFunction.BillingAgent });
 
         var userRoleTemplate1 = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent }
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty }
             }
         };
 
@@ -84,7 +84,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.CapacityTrader }
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent }
             }
         };
 
@@ -113,16 +113,16 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.Agent, EicFunction.CapacityTrader });
+            .CreateActorAsync(new[] { EicFunction.BalanceResponsibleParty, EicFunction.BillingAgent });
 
         var userRoleTemplate = new UserRoleEntity
         {
             Id = Guid.NewGuid(),
             EicFunctions =
             {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent },
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.CapacityTrader },
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Consumer },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.GridAccessProvider },
             }
         };
 

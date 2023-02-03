@@ -131,7 +131,7 @@ public class ChangesToActorHelperTests
                     }),
                 new ActorMarketRole(
                     Guid.Parse("8bd18c6e-c971-4be8-93cf-e3d4345a2d14"),
-                    EicFunction.Producer,
+                    EicFunction.BillingAgent,
                     new List<ActorGridArea>
                     {
                         new ActorGridArea(
