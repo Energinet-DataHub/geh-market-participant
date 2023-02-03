@@ -8,7 +8,7 @@ on:
   #
   # Detect changes to start relevant workflows
   #
-
+jobs:
   changes_workflow_level:
     uses: ./.github/workflows/detect-changes-workflow-level.yml
 
