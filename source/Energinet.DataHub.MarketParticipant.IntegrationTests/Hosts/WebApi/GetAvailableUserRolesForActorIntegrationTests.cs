@@ -46,7 +46,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
 
         var actorId = await _fixture
             .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.IndependentAggregator });
+            .CreateActorAsync(new[] { EicFunction.ElOverblik });
 
         var command = new GetAvailableUserRolesForActorCommand(actorId);
 
