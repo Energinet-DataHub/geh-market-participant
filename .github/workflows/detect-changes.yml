@@ -52,10 +52,15 @@ jobs:
         filters: |
           dotnet:
             - '.github/workflows/cd.yml'
-            - '.github/workflows/ci.yml'
-            - '.github/workflows/detect-changes-workflow-level.yml'
+            - '.github/workflows/ci-dotnet.yml'
+            - '.github/workflows/detect-changes.yml'
             - '.github/actions/dotnet-*/**'
+            - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
           client_package:
+            - '.github/workflows/detect-changes.yml'
+            - '.github/workflows/publish-marketparticipant-client.yml'
             - 'source/((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
           model_package:
+            - '.github/workflows/detect-changes.yml'
+            - '.github/workflows/publish-marketparticipant-model.yml'
             - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
