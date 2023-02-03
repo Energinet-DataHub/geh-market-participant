@@ -17,6 +17,7 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
     public enum PriceAreaCode
     {
         DK1 = 1,
-        DK2 = 2
+        DK2 = 2,
+        DK3 = 3
     }
 }

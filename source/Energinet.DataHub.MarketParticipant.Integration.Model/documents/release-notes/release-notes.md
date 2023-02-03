@@ -2,7 +2,7 @@
 
 ## Version 2.7.7
 
-- Change casing.
+- Dummy change.
 
 ## Version 2.7.6
 

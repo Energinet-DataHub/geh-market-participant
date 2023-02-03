@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
 {
-    public record ActorContact(string Name, string Email, ContactCategory Category, string? phone);
+    public record ActorContact(string Name, string Email, ContactCategory Category, string? Phone);
 }
