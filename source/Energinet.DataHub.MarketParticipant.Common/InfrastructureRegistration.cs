@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using SimpleInjector;
 
-// TODO: Incorrect list now.
-public enum UserOverviewSortProperty
+namespace Energinet.DataHub.MarketParticipant.Common;
+
+internal static class InfrastructureRegistration
 {
-    Name,
-    Email,
-    PhoneNumber,
-    CreatedDate,
-    Status
+    public static void AddInfrastructureServices(this Container container)
+    {
+        container.Register<IUserIdentityAuthenticationService, UserIdentityAuthenticationService>(Lifestyle.Scoped);
+    }
 }

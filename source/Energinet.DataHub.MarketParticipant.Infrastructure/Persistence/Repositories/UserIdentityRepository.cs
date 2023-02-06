@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Graph;
+using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 using User = Microsoft.Graph.User;
 using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.UserIdentity;
@@ -29,10 +30,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserIdentityRepository : IUserIdentityRepository
 {
     private readonly GraphServiceClient _graphClient;
+    private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
 
-    public UserIdentityRepository(GraphServiceClient graphClient)
+    public UserIdentityRepository(
+        GraphServiceClient graphClient,
+        IUserIdentityAuthenticationService userIdentityAuthenticationService)
     {
         _graphClient = graphClient;
+        _userIdentityAuthenticationService = userIdentityAuthenticationService;
     }
 
     public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled)
@@ -59,7 +64,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         }
 
         var graphPage = await request
-            .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+            .Select(x => new { x.Id, x.GivenName, x.Surname, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
             .GetAsync()
             .ConfigureAwait(false);
 
@@ -72,7 +77,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     (x.PhoneNumber != null &&
                     x.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
                     x.Email.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                    x.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+                    x.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    x.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
         }
 
         return users;
@@ -112,21 +118,62 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return result;
     }
 
+    // TODO: Maybe move into separate file.
+    public async Task<ExternalUserId> CreateAsync(UserIdentity userIdentity)
+    {
+        ArgumentNullException.ThrowIfNull(userIdentity);
+        ArgumentNullException.ThrowIfNull(userIdentity.PhoneNumber);
+
+        var newUser = new User
+        {
+            AccountEnabled = true,
+            DisplayName = userIdentity.FullName,
+            GivenName = userIdentity.FirstName,
+            Surname = userIdentity.LastName,
+            MobilePhone = userIdentity.PhoneNumber.Number,
+            PasswordProfile = new PasswordProfile
+            {
+                ForceChangePasswordNextSignIn = true,
+                Password = Guid.NewGuid().ToString() // TODO: Does not work with password policy.
+            },
+            Identities = new[]
+            {
+                new ObjectIdentity
+                {
+                    SignInType = "emailAddress",
+                    Issuer = "devDataHubB2C.onmicrosoft.com", // TODO: Must come from config somewhere, or maybe client?
+                    IssuerAssignedId = userIdentity.Email.Address
+                }
+            }
+        };
+
+        _userIdentityAuthenticationService.AddAuthentication(newUser, userIdentity.Authentication);
+
+        var createdUser = await _graphClient.Users
+            .Request()
+            .AddAsync(newUser)
+            .ConfigureAwait(false);
+
+        return new ExternalUserId(createdUser.Id);
+    }
+
     private static UserIdentity Map(User user)
     {
         var userEmailAddress = user
             .Identities
-            .Where(ident => ident.SignInType == "emailAddress")
+            .Where(ident => ident.SignInType == "emailAddress") // TODO: Is this bullshit?
             .Select(ident => ident.IssuerAssignedId)
             .First();
 
         return new UserIdentity(
             new ExternalUserId(user.Id),
-            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
-            user.DisplayName,
             new EmailAddress(userEmailAddress),
+            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
+            user.GivenName,
+            user.Surname,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
-            user.CreatedDateTime!.Value);
+            user.CreatedDateTime!.Value,
+            AuthenticationMethod.Undetermined);
     }
 
     private async Task<IEnumerable<UserIdentity>> IterateUsersAsync(IGraphServiceUsersCollectionPage users)
@@ -138,15 +185,13 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 users,
                 user =>
                 {
+                    // TODO: How to identify.
                     var userEmailAddress = user
                         .Identities
                         .Where(ident => ident.SignInType == "emailAddress")
                         .Select(ident => ident.IssuerAssignedId)
                         .FirstOrDefault();
 
-                    // Because of missing invite flow, we do not currently know whether
-                    // the found user can sign-in or is created for other purposes (like administration of B2C).
-                    // For now, we skip everything that is not emailAddress.
                     if (userEmailAddress != null)
                     {
                         results.Add(Map(user));

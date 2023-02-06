@@ -74,7 +74,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     {
                         user.Id,
                         userIdentity.Status,
-                        userIdentity.Name,
+                        userIdentity.FirstName,
+                        userIdentity.LastName,
                         Email = userIdentity.Email.Address,
                         PhoneNumber = userIdentity.PhoneNumber?.Number,
                         userIdentity.CreatedDate
@@ -93,7 +94,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 new UserOverviewItem(
                     x.Id,
                     x.Status,
-                    x.Name,
+                    $"{x.FirstName} {x.LastName}",
                     new EmailAddress(x.Email),
                     x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
                     x.CreatedDate));
@@ -165,7 +166,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             {
                 x.Id,
                 x.Status,
-                x.Name,
+                x.FirstName,
+                x.LastName,
                 Email = x.Email.Address,
                 PhoneNumber = x.PhoneNumber?.Number,
                 x.CreatedDate
@@ -188,7 +190,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 return new UserOverviewItem(
                     new UserId(user.Id),
                     userIdentity.Status,
-                    userIdentity.Name,
+                    $"{userIdentity.FirstName} {userIdentity.LastName}",
                     new EmailAddress(userIdentity.Email),
                     userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
                     userIdentity.CreatedDate);

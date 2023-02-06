@@ -18,43 +18,43 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.Common
+namespace Energinet.DataHub.MarketParticipant.Common;
+
+internal static class DomainServiceRegistration
 {
-    internal static class DomainServiceRegistration
+    public static void AddDomainServices(this Container container)
     {
-        public static void AddServices(this Container container)
-        {
-            container.Register<IActorIntegrationEventsQueueService, ActorIntegrationEventsQueueService>(Lifestyle.Scoped);
-            container.Register<IGridAreaIntegrationEventsQueueService, GridAreaIntegrationEventsQueueService>(Lifestyle.Scoped);
-            container.Register<IOrganizationIntegrationEventsQueueService, OrganizationIntegrationEventsQueueService>(Lifestyle.Scoped);
+        container.Register<IActorIntegrationEventsQueueService, ActorIntegrationEventsQueueService>(Lifestyle.Scoped);
+        container.Register<IGridAreaIntegrationEventsQueueService, GridAreaIntegrationEventsQueueService>(Lifestyle.Scoped);
+        container.Register<IOrganizationIntegrationEventsQueueService, OrganizationIntegrationEventsQueueService>(Lifestyle.Scoped);
 
-            container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
-            container.Register<IOverlappingBusinessRolesRuleService, OverlappingBusinessRolesRuleService>(Lifestyle.Scoped);
-            container.Register<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>(Lifestyle.Scoped);
-            container.Register<ICombinationOfBusinessRolesRuleService, CombinationOfBusinessRolesRuleService>(Lifestyle.Scoped);
-            container.Register<IAllowedGridAreasRuleService, AllowedGridAreasRuleService>(Lifestyle.Scoped);
+        container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
+        container.Register<IOverlappingBusinessRolesRuleService, OverlappingBusinessRolesRuleService>(Lifestyle.Scoped);
+        container.Register<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>(Lifestyle.Scoped);
+        container.Register<ICombinationOfBusinessRolesRuleService, CombinationOfBusinessRolesRuleService>(Lifestyle.Scoped);
+        container.Register<IAllowedGridAreasRuleService, AllowedGridAreasRuleService>(Lifestyle.Scoped);
+        container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
 
-            container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
-            container.Register<IUniqueMarketRoleGridAreaService, UniqueMarketRoleGridAreaService>(Lifestyle.Scoped);
-            container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
+        container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
+        container.Register<IUniqueMarketRoleGridAreaService, UniqueMarketRoleGridAreaService>(Lifestyle.Scoped);
+        container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
 
-            container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
-            container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
-            container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
-            container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
-            container.Collection.Register<IBusinessRole>(
-                new ElectricalSupplierRole(),
-                new BalanceResponsiblePartyRole(),
-                new DanishEnergyAgencyRole(),
-                new GridOperatorRole(),
-                new ImbalanceSettlementResponsibleRole(),
-                new MeteredDataAdministratorRole(),
-                new MeteredDataResponsibleRole(),
-                new MeteringPointAdministratorRole(),
-                new SystemOperatorRole(),
-                new TransmissionSystemOperatorRole());
+        container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
+        container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
+        container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
+        container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
+        container.Collection.Register<IBusinessRole>(
+            new ElectricalSupplierRole(),
+            new BalanceResponsiblePartyRole(),
+            new DanishEnergyAgencyRole(),
+            new GridOperatorRole(),
+            new ImbalanceSettlementResponsibleRole(),
+            new MeteredDataAdministratorRole(),
+            new MeteredDataResponsibleRole(),
+            new MeteringPointAdministratorRole(),
+            new SystemOperatorRole(),
+            new TransmissionSystemOperatorRole());
 
-            container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
-        }
+        container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
     }
 }

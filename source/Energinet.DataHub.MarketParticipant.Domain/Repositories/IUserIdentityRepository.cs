@@ -43,4 +43,11 @@ public interface IUserIdentityRepository
     /// </summary>
     /// <param name="externalIds">A set of external ids.</param>
     Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
+
+    /// <summary>
+    /// Creates a new external user identity.
+    /// </summary>
+    /// <param name="userIdentity">The user identity to create.</param>
+    /// <returns>The id of the external user identity.</returns>
+    Task<ExternalUserId> CreateAsync(UserIdentity userIdentity);
 }

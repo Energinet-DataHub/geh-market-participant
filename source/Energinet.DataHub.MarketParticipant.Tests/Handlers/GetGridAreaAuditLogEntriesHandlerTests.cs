@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
@@ -64,18 +64,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRepositoryMock = new Mock<IUserRepository>();
             userRepositoryMock
                 .Setup(userRepository => userRepository.GetAsync(userId))
-                .ReturnsAsync(new User(userId, externalUserId, new List<UserRoleAssignment>(), new EmailAddress("fake@value")));
+                .ReturnsAsync(new User(userId, externalUserId, new EmailAddress("fake@value"), Enumerable.Empty<UserRoleAssignment>()));
 
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock
                 .Setup(x => x.GetUserIdentityAsync(externalUserId))
                 .ReturnsAsync(new UserIdentity(
                     externalUserId,
+                    new EmailAddress("fake@value"),
                     UserStatus.Active,
                     "name",
-                    new EmailAddress("fake@value"),
+                    "name",
                     null,
-                    DateTimeOffset.UtcNow));
+                    DateTimeOffset.UtcNow,
+                    AuthenticationMethod.None));
 
             var target = new GetGridAreaAuditLogEntriesHandler(
                 repositoryMock.Object,

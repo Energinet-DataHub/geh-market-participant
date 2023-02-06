@@ -12,14 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-// TODO: Incorrect list now.
-public enum UserOverviewSortProperty
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+
+/// <summary>
+/// Invites new or existing users into DataHub.
+/// </summary>
+public interface IUserInvitationService
 {
-    Name,
-    Email,
-    PhoneNumber,
-    CreatedDate,
-    Status
+    /// <summary>
+    /// Invites the user specified in the invitation into DataHub.
+    /// </summary>
+    /// <param name="invitation">An invitation of a new or existing user.</param>
+    Task InviteUserAsync(UserInvitation invitation);
 }

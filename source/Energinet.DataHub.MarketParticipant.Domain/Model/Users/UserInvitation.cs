@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-// TODO: Incorrect list now.
-public enum UserOverviewSortProperty
-{
-    Name,
-    Email,
-    PhoneNumber,
-    CreatedDate,
-    Status
-}
+public sealed record UserInvitation(
+    EmailAddress Email,
+    string FirstName,
+    string LastName,
+    PhoneNumber PhoneNumber,
+    AuthenticationMethod RequiredAuthentication,
+    Guid AssignedActor,
+    IReadOnlyCollection<UserRoleId> AssignedRoles);

@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -68,6 +69,17 @@ public sealed class UserRepository : IUserRepository
     {
         var userEntity = await BuildUserQuery()
             .SingleOrDefaultAsync(x => x.Id == userId.Value)
+            .ConfigureAwait(false);
+
+        return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
+    }
+
+    // TODO: UTs
+    public async Task<User?> GetAsync(EmailAddress email)
+    {
+        // TODO: Is this correct? Should I look up in AD?
+        var userEntity = await BuildUserQuery()
+            .SingleOrDefaultAsync(x => x.Email == email.Address)
             .ConfigureAwait(false);
 
         return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);

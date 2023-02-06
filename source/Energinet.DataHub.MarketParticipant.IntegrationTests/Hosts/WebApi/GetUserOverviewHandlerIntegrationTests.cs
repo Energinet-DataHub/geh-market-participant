@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -52,7 +53,15 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         mock.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
-                x.Select(y => new UserIdentity(y, UserStatus.Active, y.ToString(), new EmailAddress("fake@value"), null, DateTimeOffset.UtcNow)));
+                x.Select(y => new UserIdentity(
+                    y,
+                    new EmailAddress("fake@value"),
+                    UserStatus.Active,
+                    y.ToString(),
+                    y.ToString(),
+                    null,
+                    DateTimeOffset.UtcNow,
+                    AuthenticationMethod.None)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -91,7 +100,15 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         mock
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(userIdsToReturn.Select(y =>
-                new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow)));
+                new UserIdentity(
+                    y,
+                    new EmailAddress("fake@value"),
+                    UserStatus.Inactive,
+                    y.ToString(),
+                    y.ToString(),
+                    null,
+                    DateTime.UtcNow,
+                    AuthenticationMethod.None)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -129,11 +146,13 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             {
                 new UserIdentity(
                     new ExternalUserId(externalUserId),
+                    new EmailAddress("fake@value"),
                     UserStatus.Active,
                     "fake_value",
-                    new EmailAddress("fake@value"),
+                    "fake_value",
                     null,
-                    DateTime.UtcNow)
+                    DateTime.UtcNow,
+                    AuthenticationMethod.None)
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);
@@ -177,11 +196,13 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             {
                 new UserIdentity(
                     new ExternalUserId(externalUserId),
+                    new EmailAddress("fake@value"),
                     UserStatus.Inactive,
                     "fake_value",
-                    new EmailAddress("fake@value"),
+                    "fake_value",
                     null,
-                    DateTime.UtcNow)
+                    DateTime.UtcNow,
+                    AuthenticationMethod.None)
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);

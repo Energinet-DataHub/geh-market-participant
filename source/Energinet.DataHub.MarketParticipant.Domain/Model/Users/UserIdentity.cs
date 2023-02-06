@@ -13,13 +13,56 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserIdentity(
-    ExternalUserId Id,
-    UserStatus Status,
-    string Name,
-    EmailAddress Email,
-    PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate);
+public sealed class UserIdentity
+{
+    public UserIdentity(
+        ExternalUserId id,
+        EmailAddress email,
+        UserStatus status,
+        string firstName,
+        string lastName,
+        PhoneNumber? phoneNumber,
+        DateTimeOffset createdDate,
+        AuthenticationMethod authentication)
+    {
+        Id = id;
+        Email = email;
+        Status = status;
+        FirstName = firstName;
+        LastName = lastName;
+        PhoneNumber = phoneNumber;
+        CreatedDate = createdDate;
+        Authentication = authentication;
+    }
+
+    public UserIdentity(
+        EmailAddress email,
+        string firstName,
+        string lastName,
+        PhoneNumber phoneNumber,
+        AuthenticationMethod authentication)
+    {
+        Id = new ExternalUserId(Guid.Empty);
+        Email = email;
+        Status = UserStatus.Active;
+        FirstName = firstName;
+        LastName = lastName;
+        PhoneNumber = phoneNumber;
+        CreatedDate = DateTimeOffset.UtcNow;
+        Authentication = authentication;
+    }
+
+    public ExternalUserId Id { get; }
+    public EmailAddress Email { get; }
+    public UserStatus Status { get; }
+    public string FirstName { get; }
+    public string LastName { get; }
+    public string FullName => $"{FirstName} {LastName}";
+    public PhoneNumber? PhoneNumber { get; }
+    public DateTimeOffset CreatedDate { get; }
+    public AuthenticationMethod Authentication { get; }
+}

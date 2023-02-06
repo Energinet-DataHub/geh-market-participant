@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
-// TODO: Incorrect list now.
-public enum UserOverviewSortProperty
+public sealed class SmsAuthenticationMethod : AuthenticationMethod
 {
-    Name,
-    Email,
-    PhoneNumber,
-    CreatedDate,
-    Status
+    public SmsAuthenticationMethod(PhoneNumber phoneNumber)
+    {
+        // TODO: Different requirements for SMS phone numbers.
+        PhoneNumber = phoneNumber;
+    }
+
+    public PhoneNumber PhoneNumber { get; }
 }

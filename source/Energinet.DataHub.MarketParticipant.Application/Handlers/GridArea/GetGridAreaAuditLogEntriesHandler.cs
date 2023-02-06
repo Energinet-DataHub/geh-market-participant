@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                             .GetUserIdentityAsync(user.ExternalId)
                             .ConfigureAwait(false);
 
-                        userName = userIdentity.Name;
+                        userName = userIdentity.FullName;
                     }
 
                     userNameLookup[entry.UserId] = userName;
