@@ -39,7 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NullArgument_ThrowsException()
         {
             // Arrange
-            var target = new CreateUserRoleHandler(new Mock<IUserRoleRepository>().Object, new Mock<IUserRoleAuditLogService>().Object, new Mock<IUserRoleAuditLogEntryRepository>().Object);
+            var target = new CreateUserRoleHandler(
+                new Mock<IUserRoleRepository>().Object,
+                new Mock<IUserRoleAuditLogService>().Object,
+                new Mock<IUserRoleAuditLogEntryRepository>().Object,
+                new Mock<IUserRoleHelperService>().Object);
 
             // Act + Assert
             await Assert
@@ -54,7 +58,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
             var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
             var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
-            var target = new CreateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
+            var userRoleHelperServiceMock = new Mock<IUserRoleHelperService>();
+            var target = new CreateUserRoleHandler(
+                userRoleRepositoryMock.Object,
+                userRoleAuditLogServiceMock.Object,
+                userRoleAuditLogEntryRepositoryMock.Object,
+                userRoleHelperServiceMock.Object);
+
             var roleId = Guid.NewGuid();
             var userRole = new UserRole(
                 new UserRoleId(roleId),
