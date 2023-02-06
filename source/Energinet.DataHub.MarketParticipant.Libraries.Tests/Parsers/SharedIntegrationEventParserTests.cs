@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 new ActorNumber("0123456789012", ActorNumberType.Gln),
                 ActorStatus.Active,
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { new ActorMarketRole(EicFunction.Agent, new[] { new ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) });
+                new[] { new ActorMarketRole(EicFunction.BillingAgent, new[] { new ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) });
 
             // act
             var actualBytes = input.ParseToSharedIntegrationEvent(@event);
@@ -72,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 new ActorNumber("0123456789012", ActorNumberType.Gln),
                 "ActorName",
                 new[] { BusinessRoleCode.Ddk, BusinessRoleCode.Ddm },
-                new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.Agent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
+                new[] { new Integration.Model.Dtos.ActorMarketRole(EicFunction.BillingAgent, new[] { new Integration.Model.Dtos.ActorGridArea(Guid.NewGuid(), new[] { "t1" }) }) },
                 DateTime.UtcNow);
 
             // act
@@ -396,7 +396,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                EicFunction.Agent,
+                EicFunction.BillingAgent,
                 Guid.NewGuid(),
                 DateTime.UtcNow,
                 "123");
@@ -420,7 +420,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                EicFunction.Agent,
+                EicFunction.BillingAgent,
                 Guid.NewGuid(),
                 "123",
                 DateTime.UtcNow);
@@ -445,7 +445,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 DateTime.UtcNow,
-                EicFunction.Agent,
+                EicFunction.BillingAgent,
                 Guid.NewGuid(),
                 Guid.NewGuid());
 
@@ -469,7 +469,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 DateTime.UtcNow,
-                EicFunction.Agent,
+                EicFunction.BillingAgent,
                 Guid.NewGuid(),
                 Guid.NewGuid());
 
@@ -493,7 +493,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 BusinessRoleCode.Ddk,
-                EicFunction.Agent,
+                EicFunction.BillingAgent,
                 DateTime.UtcNow);
 
             // Act
@@ -516,7 +516,7 @@ namespace Energinet.DataHub.MarketParticipant.Libraries.Tests.Parsers
                 Guid.NewGuid(),
                 Guid.NewGuid(),
                 BusinessRoleCode.Ddk,
-                EicFunction.Agent,
+                EicFunction.BillingAgent,
                 DateTime.UtcNow);
 
             // Act

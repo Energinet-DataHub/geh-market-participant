@@ -27,10 +27,6 @@ public sealed class AllowedGridAreasRuleServiceTests
 {
     [Theory]
     [InlineData(EicFunction.GridAccessProvider)]
-    [InlineData(EicFunction.MeterAdministrator)]
-    [InlineData(EicFunction.MeterOperator)]
-    [InlineData(EicFunction.MeteredDataCollector)]
-    [InlineData(EicFunction.PartyConnectedToTheGrid)]
     public void ValidateGridAreas_LimitGridAreas_ThrowException(EicFunction eicFunction)
     {
         // Arrange
@@ -49,10 +45,6 @@ public sealed class AllowedGridAreasRuleServiceTests
 
     [Theory]
     [InlineData(EicFunction.GridAccessProvider)]
-    [InlineData(EicFunction.MeterAdministrator)]
-    [InlineData(EicFunction.MeterOperator)]
-    [InlineData(EicFunction.MeteredDataCollector)]
-    [InlineData(EicFunction.PartyConnectedToTheGrid)]
     public void ValidateGridAreas_OneGridArea_DoesNothing(EicFunction eicFunction)
     {
         // Arrange
@@ -68,7 +60,7 @@ public sealed class AllowedGridAreasRuleServiceTests
     }
 
     [Theory]
-    [InlineData(EicFunction.Agent)]
+    [InlineData(EicFunction.BillingAgent)]
     public void ValidateGridAreas_NoLimitGridAreas_DoesNothing(EicFunction eicFunction)
     {
         // Arrange

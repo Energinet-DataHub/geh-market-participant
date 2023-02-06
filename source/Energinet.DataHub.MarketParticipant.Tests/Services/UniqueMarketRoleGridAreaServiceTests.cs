@@ -109,10 +109,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new[]
                 {
                     EicFunction.GridAccessProvider,
-                    EicFunction.MeterAdministrator,
-                    EicFunction.MeterOperator,
-                    EicFunction.MeteredDataCollector,
-                    EicFunction.PartyConnectedToTheGrid
                 }))
             {
                 // arrange

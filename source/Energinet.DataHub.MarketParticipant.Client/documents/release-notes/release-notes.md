@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.17.3
+
+- Removed unused market roles.
+
 ## Version 2.17.2
 
 - Bump version as part of pipeline change.

@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var meteringPointType = MeteringPointType.D03NotUsed;
             var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.ToString() });
-            var marketRole = new ActorMarketRoleEventData(EicFunction.Consumer, new List<ActorGridAreaEventData> { actorGridArea });
+            var marketRole = new ActorMarketRoleEventData(EicFunction.BillingAgent, new List<ActorGridAreaEventData> { actorGridArea });
             integrationEvent.ActorMarketRoles.Add(marketRole);
 
             // act

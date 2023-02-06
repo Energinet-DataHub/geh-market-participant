@@ -76,8 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationId = new OrganizationId(Guid.NewGuid());
             var actor = new Actor(new MockedGln());
 
-            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.Agent, Enumerable.Empty<ActorGridArea>()));
-            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.Consumer, Enumerable.Empty<ActorGridArea>()));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, Enumerable.Empty<ActorGridArea>()));
+            actor.MarketRoles.Add(new ActorMarketRole(EicFunction.IndependentAggregator, Enumerable.Empty<ActorGridArea>()));
 
             // Act
             await target.EnqueueActorUpdatedEventAsync(organizationId, actor).ConfigureAwait(false);
