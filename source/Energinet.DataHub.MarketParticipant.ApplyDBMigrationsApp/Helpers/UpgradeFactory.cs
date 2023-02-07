@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading.Tasks;
 using DbUp.Reboot;

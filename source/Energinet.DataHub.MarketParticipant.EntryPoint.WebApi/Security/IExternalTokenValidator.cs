@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;

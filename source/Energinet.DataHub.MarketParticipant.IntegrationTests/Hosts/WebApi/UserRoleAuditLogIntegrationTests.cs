@@ -229,7 +229,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             Id = (int)Permission.ActorManage,
             EicFunctions = new Collection<PermissionEicFunctionEntity>()
             {
-                new PermissionEicFunctionEntity()
+                new()
                 {
                     EicFunction = EicFunction.BillingAgent, PermissionId = (int)Permission.ActorManage
                 }
