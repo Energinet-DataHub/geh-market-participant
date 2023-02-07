@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new GetSelectablePermissionsHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetSelectablePermissionsCommand(EicFunction.Agent), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetSelectablePermissionsCommand(EicFunction.BillingAgent), CancellationToken.None).ConfigureAwait(false);
 
             // assert
             Assert.NotNull(actual.Permissions);

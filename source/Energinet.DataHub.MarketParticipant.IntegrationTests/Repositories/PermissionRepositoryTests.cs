@@ -68,7 +68,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
 
         var permissionEicFunction = new PermissionEicFunctionEntity()
         {
-            EicFunction = EicFunction.Agent, PermissionId = (int)Permission.UsersManage
+            EicFunction = EicFunction.BillingAgent, PermissionId = (int)Permission.UsersManage
         };
         var permission = new PermissionEntity()
         {
@@ -89,7 +89,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
         Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(permissions, p => p.EicFunctions.Count() == 1);
-        Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
+        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
     }
 
     [Fact]
@@ -102,8 +102,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
+        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
+        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
@@ -129,8 +129,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
         Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(permissions, p => p.EicFunctions.Count() == 2);
-        Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
-        Assert.Equal(EicFunction.Scheduling, permissions.First().EicFunctions.Skip(1).First());
+        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
+        Assert.Equal(EicFunction.ElOverblik, permissions.First().EicFunctions.Skip(1).First());
     }
 
     [Fact]
@@ -143,11 +143,11 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
+        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
+        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
 
-        var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
-        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
+        var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
+        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
@@ -180,10 +180,10 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value2", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(2, permissions.First().EicFunctions.Count());
         Assert.Equal(2, permissions.Skip(1).First().EicFunctions.Count());
-        Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
-        Assert.Equal(EicFunction.Scheduling, permissions.First().EicFunctions.Skip(1).First());
-        Assert.Equal(EicFunction.Agent, permissions.Skip(1).First().EicFunctions.First());
-        Assert.Equal(EicFunction.Scheduling, permissions.Skip(1).First().EicFunctions.Skip(1).First());
+        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
+        Assert.Equal(EicFunction.ElOverblik, permissions.First().EicFunctions.Skip(1).First());
+        Assert.Equal(EicFunction.BillingAgent, permissions.Skip(1).First().EicFunctions.First());
+        Assert.Equal(EicFunction.ElOverblik, permissions.Skip(1).First().EicFunctions.Skip(1).First());
     }
 
     [Fact]
@@ -197,11 +197,11 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Agent };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
+        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
+        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
 
         var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider };
-        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.Scheduling };
+        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
@@ -223,7 +223,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         await context2.SaveChangesAsync();
 
         // Act
-        var permissions = (await permissionRepository.GetToMarketRoleAsync(EicFunction.Agent))
+        var permissions = (await permissionRepository.GetToMarketRoleAsync(EicFunction.BillingAgent))
             .ToList();
 
         var permissions2 = (await permissionRepository.GetToMarketRoleAsync(EicFunction.GridAccessProvider))
@@ -235,8 +235,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
         Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(2, permissions.First().EicFunctions.Count());
-        Assert.Equal(EicFunction.Agent, permissions.First().EicFunctions.First());
-        Assert.Equal(EicFunction.Scheduling, permissions.First().EicFunctions.Skip(1).First());
+        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
+        Assert.Equal(EicFunction.ElOverblik, permissions.First().EicFunctions.Skip(1).First());
 
         Assert.NotEmpty(permissions2);
         Assert.Single(permissions2);
@@ -244,7 +244,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Contains(permissions2, p => string.Equals(p.Description, "fake_test_value2", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(2, permissions2.First().EicFunctions.Count());
         Assert.Equal(EicFunction.GridAccessProvider, permissions2.First().EicFunctions.First());
-        Assert.Equal(EicFunction.Scheduling, permissions2.First().EicFunctions.Skip(1).First());
+        Assert.Equal(EicFunction.ElOverblik, permissions2.First().EicFunctions.Skip(1).First());
     }
 
     public async Task InitializeAsync()
