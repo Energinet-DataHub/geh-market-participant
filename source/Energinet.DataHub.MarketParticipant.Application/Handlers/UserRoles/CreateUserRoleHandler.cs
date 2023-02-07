@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,15 +32,18 @@ public sealed class CreateUserRoleHandler
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserRoleAuditLogService _userRoleAuditLogService;
     private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
+    private readonly IUserRoleHelperService _userRoleHelperService;
 
     public CreateUserRoleHandler(
         IUserRoleRepository userRoleRepository,
         IUserRoleAuditLogService userRoleAuditLogService,
-        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository)
+        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository,
+        IUserRoleHelperService userRoleHelperService)
     {
         _userRoleRepository = userRoleRepository;
         _userRoleAuditLogService = userRoleAuditLogService;
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
+        _userRoleHelperService = userRoleHelperService;
     }
 
     public async Task<CreateUserRoleResponse> Handle(
@@ -47,6 +51,15 @@ public sealed class CreateUserRoleHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        var valid = await _userRoleHelperService
+            .EnsurePermissionsSelectedAreValidForMarketRoleAsync(
+                request.UserRoleDto.Permissions.Select(x => (Permission)x),
+                request.UserRoleDto.EicFunction)
+            .ConfigureAwait(false);
+
+        if (!valid)
+            throw new ValidationException($"User role with name {request.UserRoleDto.Name} has permissions which are not valid for the market role selected {request.UserRoleDto.EicFunction}");
 
         var userRole = new UserRole(
             request.UserRoleDto.Name,
