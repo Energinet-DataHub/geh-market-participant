@@ -15,22 +15,26 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record EmailAddress
 {
-    public sealed record EmailAddress
+    public EmailAddress(string address)
     {
-        public EmailAddress(string address)
-        {
-            Address = ValidateAddress(address);
-        }
+        Address = ValidateAddress(address);
+    }
 
-        public string Address { get; }
+    public string Address { get; }
 
-        private static string ValidateAddress(string address)
-        {
-            return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out _)
-                ? address
-                : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
-        }
+    private static string ValidateAddress(string address)
+    {
+        return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out _)
+            ? address
+            : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
+    }
+
+    public override string ToString()
+    {
+        return Address;
     }
 }

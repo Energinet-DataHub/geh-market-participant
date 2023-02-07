@@ -227,7 +227,7 @@ public sealed class UserOverviewRepositoryTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.None)
+                    AuthenticationMethod.Undetermined)
             });
 
         var target = new UserOverviewRepository(
@@ -277,7 +277,7 @@ public sealed class UserOverviewRepositoryTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.None)
+                    AuthenticationMethod.Undetermined)
             });
 
         var target = new UserOverviewRepository(
@@ -378,7 +378,7 @@ public sealed class UserOverviewRepositoryTests
                             y.ToString(),
                             null,
                             DateTime.UtcNow,
-                            AuthenticationMethod.None))));
+                            AuthenticationMethod.Undetermined))));
 
         return userIdentityRepository;
     }
@@ -397,7 +397,7 @@ public sealed class UserOverviewRepositoryTests
                     y.ToString(),
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.None)));
+                    AuthenticationMethod.Undetermined)));
 
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
@@ -412,7 +412,7 @@ public sealed class UserOverviewRepositoryTests
                             y.ToString(),
                             null,
                             DateTime.UtcNow,
-                            AuthenticationMethod.None))));
+                            AuthenticationMethod.Undetermined))));
 
         return userIdentityRepository;
     }

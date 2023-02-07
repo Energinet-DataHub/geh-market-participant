@@ -15,10 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Graph;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
@@ -32,12 +35,62 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private readonly GraphServiceClient _graphClient;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
 
+    private readonly Expression<Func<User, object>> _selectForMapping = user => new
+    {
+        user.Id,
+        user.UserType,
+        user.GivenName,
+        user.Surname,
+        user.Identities,
+        user.MobilePhone,
+        user.CreatedDateTime,
+        user.AccountEnabled
+    };
+
     public UserIdentityRepository(
         GraphServiceClient graphClient,
         IUserIdentityAuthenticationService userIdentityAuthenticationService)
     {
         _graphClient = graphClient;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
+    }
+
+    public async Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId)
+    {
+        ArgumentNullException.ThrowIfNull(externalId);
+
+        var user = await _graphClient
+            .Users[externalId.Value.ToString()]
+            .Request()
+            .Select(_selectForMapping)
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        return Map(user);
+    }
+
+    public async Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds)
+    {
+        var ids = externalIds.Distinct();
+        var result = new List<UserIdentity>();
+
+        foreach (var segment in ids.Chunk(15))
+        {
+            var usersRequest = await _graphClient.Users
+                .Request()
+                .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x}'"))})")
+                .Select(_selectForMapping)
+                .GetAsync()
+                .ConfigureAwait(false);
+
+            var users = await usersRequest
+                .IteratePagesAsync(_graphClient)
+                .ConfigureAwait(false);
+
+            result.AddRange(users.Where(IsMember).Select(Map));
+        }
+
+        return result;
     }
 
     public async Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled)
@@ -63,59 +116,29 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             request = request.Filter(string.Join(" and ", filters));
         }
 
-        var graphPage = await request
-            .Select(x => new { x.Id, x.GivenName, x.Surname, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
+        var collection = await request
+            .Select(_selectForMapping)
             .GetAsync()
             .ConfigureAwait(false);
 
-        var users = await IterateUsersAsync(graphPage).ConfigureAwait(false);
+        var users = await collection
+            .IteratePagesAsync(_graphClient)
+            .ConfigureAwait(false);
+
+        var userIdentities = users.Where(IsMember).Select(Map);
 
         if (!string.IsNullOrEmpty(searchText))
         {
-            users = users
-                .Where(x =>
-                    (x.PhoneNumber != null &&
-                    x.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
-                    x.Email.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                    x.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                    x.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
+            userIdentities = userIdentities
+                .Where(userIdentity =>
+                    (userIdentity.PhoneNumber != null &&
+                    userIdentity.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    userIdentity.Email.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    userIdentity.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                    userIdentity.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
         }
 
-        return users;
-    }
-
-    public async Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId)
-    {
-        ArgumentNullException.ThrowIfNull(externalId);
-
-        var user = await _graphClient
-            .Users[externalId.Value.ToString()]
-            .Request()
-            .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
-            .GetAsync()
-            .ConfigureAwait(false);
-
-        return Map(user);
-    }
-
-    public async Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds)
-    {
-        var ids = externalIds.Distinct();
-        var result = new List<UserIdentity>();
-
-        foreach (var segment in ids.Chunk(15))
-        {
-            var users = await _graphClient.Users
-                .Request()
-                .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x}'"))})")
-                .Select(x => new { x.Id, x.DisplayName, x.Identities, x.MobilePhone, x.CreatedDateTime, x.AccountEnabled })
-                .GetAsync()
-                .ConfigureAwait(false);
-
-            result.AddRange(await IterateUsersAsync(users).ConfigureAwait(false));
-        }
-
-        return result;
+        return userIdentities;
     }
 
     // TODO: Maybe move into separate file.
@@ -124,46 +147,65 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         ArgumentNullException.ThrowIfNull(userIdentity);
         ArgumentNullException.ThrowIfNull(userIdentity.PhoneNumber);
 
-        var newUser = new User
+        // It is not possible to create a user and specify the Authentication property.
+        // The code is therefore forced to create a user first, then update the property.
+        // If the second call fails, we end up with a user that is created without MFA, which is very bad.
+        // Therefore, the initial create operation must have the account disabled.
+        var createdUser = await CheckCreatedUserAsync(userIdentity.Email).ConfigureAwait(false);
+        if (createdUser == null)
         {
-            AccountEnabled = true,
-            DisplayName = userIdentity.FullName,
-            GivenName = userIdentity.FirstName,
-            Surname = userIdentity.LastName,
-            MobilePhone = userIdentity.PhoneNumber.Number,
-            PasswordProfile = new PasswordProfile
+            var newUser = new User
             {
-                ForceChangePasswordNextSignIn = true,
-                Password = Guid.NewGuid().ToString() // TODO: Does not work with password policy.
-            },
-            Identities = new[]
-            {
-                new ObjectIdentity
+                AccountEnabled = false,
+                DisplayName = userIdentity.FullName,
+                GivenName = userIdentity.FirstName,
+                Surname = userIdentity.LastName,
+                MobilePhone = userIdentity.PhoneNumber.Number,
+                PasswordProfile = new PasswordProfile
                 {
-                    SignInType = "emailAddress",
-                    Issuer = "devDataHubB2C.onmicrosoft.com", // TODO: Must come from config somewhere, or maybe client?
-                    IssuerAssignedId = userIdentity.Email.Address
+                    ForceChangePasswordNextSignIn = true,
+                    Password = Guid.NewGuid().ToString() // TODO: Does not work with password policy.
+                },
+                Identities = new[]
+                {
+                    new ObjectIdentity
+                    {
+                        SignInType = "emailAddress",
+                        Issuer = "devDataHubB2C.onmicrosoft.com", // TODO: Must come from config somewhere, or maybe client?
+                        IssuerAssignedId = userIdentity.Email.Address
+                    }
                 }
-            }
-        };
+            };
 
-        _userIdentityAuthenticationService.AddAuthentication(newUser, userIdentity.Authentication);
+            createdUser = await _graphClient.Users
+                .Request()
+                .AddAsync(newUser)
+                .ConfigureAwait(false);
+        }
 
-        var createdUser = await _graphClient.Users
-            .Request()
-            .AddAsync(newUser)
+        var externalUserId = new ExternalUserId(createdUser.Id);
+
+        // TODO: Does this replace existing?
+        await _userIdentityAuthenticationService
+            .AddAuthenticationAsync(externalUserId, userIdentity.Authentication)
             .ConfigureAwait(false);
 
-        return new ExternalUserId(createdUser.Id);
+        await _graphClient
+            .Users[createdUser.Id]
+            .Request()
+            .UpdateAsync(new User { AccountEnabled = true })
+            .ConfigureAwait(false);
+
+        return externalUserId;
     }
 
     private static UserIdentity Map(User user)
     {
         var userEmailAddress = user
             .Identities
-            .Where(ident => ident.SignInType == "emailAddress") // TODO: Is this bullshit?
+            .Where(ident => ident.SignInType == "emailAddress")
             .Select(ident => ident.IssuerAssignedId)
-            .First();
+            .Single();
 
         return new UserIdentity(
             new ExternalUserId(user.Id),
@@ -176,35 +218,35 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             AuthenticationMethod.Undetermined);
     }
 
-    private async Task<IEnumerable<UserIdentity>> IterateUsersAsync(IGraphServiceUsersCollectionPage users)
+    private static bool IsMember(User user)
     {
-        var results = new List<UserIdentity>();
-        var pageIterator = PageIterator<User>
-            .CreatePageIterator(
-                _graphClient,
-                users,
-                user =>
-                {
-                    // TODO: How to identify.
-                    var userEmailAddress = user
-                        .Identities
-                        .Where(ident => ident.SignInType == "emailAddress")
-                        .Select(ident => ident.IssuerAssignedId)
-                        .FirstOrDefault();
+        return user.UserType == "Member";
+    }
 
-                    if (userEmailAddress != null)
-                    {
-                        results.Add(Map(user));
-                    }
+    private async Task<User?> CheckCreatedUserAsync(EmailAddress email)
+    {
+        var usersRequest = await _graphClient
+            .Users
+            .Request()
+            .Filter($"identities/any(id:id/issuer eq 'devDataHubB2C.onmicrosoft.com' and id/issuerAssignedId eq '{email.Address}')")
+            .Select(x => new { x.Id, x.UserType, x.AccountEnabled })
+            .GetAsync()
+            .ConfigureAwait(false);
 
-                    return true;
-                });
+        var users = await usersRequest
+            .IteratePagesAsync(_graphClient)
+            .ConfigureAwait(false);
 
-        while (pageIterator.State != PagingState.Complete)
-        {
-            await pageIterator.IterateAsync().ConfigureAwait(false);
-        }
+        var user = users.SingleOrDefault();
+        if (user == null)
+            return null;
 
-        return results;
+        if (!IsMember(user))
+            throw new NotSupportedException($"Found existing user for '{email}', but UserType is incorrect.");
+
+        if (user.AccountEnabled == true)
+            throw new NotSupportedException($"Found existing user for '{email}', but account is already enabled.");
+
+        return user;
     }
 }

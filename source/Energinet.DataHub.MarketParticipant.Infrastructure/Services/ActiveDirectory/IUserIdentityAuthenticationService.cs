@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Microsoft.Graph;
-using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 
 /// <summary>
 /// Manages authentication methods for the specified user.
@@ -25,7 +26,7 @@ public interface IUserIdentityAuthenticationService
     /// <summary>
     /// Adds the specified authentication method to the given user.
     /// </summary>
-    /// <param name="user">The user to add authentication method to.</param>
+    /// <param name="userId">The external id of the user to add authentication method to.</param>
     /// <param name="authenticationMethod">The authentication method to add.</param>
-    void AddAuthentication(User user, AuthenticationMethod authenticationMethod);
+    Task AddAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod);
 }

@@ -17,19 +17,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 public abstract class AuthenticationMethod
 {
     /// <summary>
-    /// Signifies that no authentication method is active for external user.
-    /// </summary>
-    public static AuthenticationMethod None { get; } = new NoAuthenticationMethod();
-
-    /// <summary>
     /// Signifies that the authentication method is unknown for external user.
     /// This is required because of API limitations for the external user provider.
     /// </summary>
     public static AuthenticationMethod Undetermined { get; } = new UndeterminedAuthenticationMethod();
-
-    private sealed class NoAuthenticationMethod : AuthenticationMethod
-    {
-    }
 
     private sealed class UndeterminedAuthenticationMethod : AuthenticationMethod
     {

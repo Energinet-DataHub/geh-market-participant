@@ -14,24 +14,28 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record PhoneNumber
 {
-    public sealed record PhoneNumber
+    private static readonly PhoneAttribute _validator = new();
+
+    public PhoneNumber(string number)
     {
-        private static readonly PhoneAttribute _validator = new();
+        Number = ValidateNumber(number);
+    }
 
-        public PhoneNumber(string number)
-        {
-            Number = ValidateNumber(number);
-        }
+    public string Number { get; }
 
-        public string Number { get; }
+    private static string ValidateNumber(string number)
+    {
+        return !string.IsNullOrWhiteSpace(number) && _validator.IsValid(number)
+            ? number
+            : throw new ValidationException($"The provided phone number '{number}' is not valid.");
+    }
 
-        private static string ValidateNumber(string number)
-        {
-            return !string.IsNullOrWhiteSpace(number) && _validator.IsValid(number)
-                ? number
-                : throw new ValidationException($"The provided phone number '{number}' is not valid.");
-        }
+    public override string ToString()
+    {
+        return Number;
     }
 }

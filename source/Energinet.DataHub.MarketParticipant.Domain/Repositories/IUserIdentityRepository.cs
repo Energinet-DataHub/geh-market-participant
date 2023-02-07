@@ -24,15 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserIdentityRepository
 {
     /// <summary>
-    /// Searches for users using a search text
-    /// </summary>
-    /// <param name="searchText">The text to search for</param>
-    /// <param name="accountEnabled">Specifies whether the returned users should be active, inactive or both.</param>
-    /// <returns>A List of users matching the search text</returns>
-    /// <remarks>Currently searches Name, Phone and Email</remarks>
-    Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled);
-
-    /// <summary>
     /// Retrieves user identity for the provided external id.
     /// </summary>
     /// <param name="externalId">The external id of the user identity.</param>
@@ -45,7 +36,16 @@ public interface IUserIdentityRepository
     Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
 
     /// <summary>
-    /// Creates a new external user identity.
+    /// Searches for users using a search text
+    /// </summary>
+    /// <param name="searchText">The text to search for</param>
+    /// <param name="accountEnabled">Specifies whether the returned users should be active, inactive or both.</param>
+    /// <returns>A List of users matching the search text</returns>
+    /// <remarks>Currently searches Name, Phone and Email</remarks>
+    Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled);
+
+    /// <summary>
+    /// Creates a new external user identity .
     /// </summary>
     /// <param name="userIdentity">The user identity to create.</param>
     /// <returns>The id of the external user identity.</returns>

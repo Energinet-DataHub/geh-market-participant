@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     "name",
                     null,
                     DateTimeOffset.UtcNow,
-                    AuthenticationMethod.None));
+                    AuthenticationMethod.Undetermined));
 
             var target = new GetGridAreaAuditLogEntriesHandler(
                 repositoryMock.Object,

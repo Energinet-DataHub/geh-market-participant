@@ -61,7 +61,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     y.ToString(),
                     null,
                     DateTimeOffset.UtcNow,
-                    AuthenticationMethod.None)));
+                    AuthenticationMethod.Undetermined)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -108,7 +108,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     y.ToString(),
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.None)));
+                    AuthenticationMethod.Undetermined)));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -152,7 +152,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.None)
+                    AuthenticationMethod.Undetermined)
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);
@@ -202,7 +202,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.None)
+                    AuthenticationMethod.Undetermined)
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);

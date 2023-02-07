@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -46,6 +47,9 @@ public sealed class UserIdentity
         PhoneNumber phoneNumber,
         AuthenticationMethod authentication)
     {
+        if (authentication == AuthenticationMethod.Undetermined)
+            throw new ValidationException("Cannot create a user without an authentication method.");
+
         Id = new ExternalUserId(Guid.Empty);
         Email = email;
         Status = UserStatus.Active;

@@ -58,7 +58,7 @@ public sealed class GetUserHandlerIntegrationTests
             "expected_name",
             null,
             DateTimeOffset.UtcNow,
-            AuthenticationMethod.None);
+            AuthenticationMethod.Undetermined);
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
@@ -111,7 +111,7 @@ public sealed class GetUserHandlerIntegrationTests
             "expected_name",
             null,
             DateTimeOffset.UtcNow,
-            AuthenticationMethod.None);
+            AuthenticationMethod.Undetermined);
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
