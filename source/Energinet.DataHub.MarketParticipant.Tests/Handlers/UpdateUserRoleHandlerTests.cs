@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<Permission>(),
-                EicFunction.Consumer);
+                EicFunction.BillingAgent);
 
             userRoleRepositoryMock
                 .Setup(x => x.GetByNameAsync(It.IsAny<string>()))
@@ -101,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<Permission>(),
-                EicFunction.Consumer);
+                EicFunction.BillingAgent);
 
             var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
                 "UserRoleNameNew",

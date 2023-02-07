@@ -68,7 +68,7 @@ public sealed class UserRoleRepositoryTests
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
             Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
@@ -81,7 +81,7 @@ public sealed class UserRoleRepositoryTests
         // Assert
         Assert.NotNull(userRoleTemplate);
         Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
-        Assert.Equal(EicFunction.Agent, userRoleTemplate.EicFunction);
+        Assert.Equal(EicFunction.BillingAgent, userRoleTemplate.EicFunction);
         Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
     }
 
@@ -99,7 +99,7 @@ public sealed class UserRoleRepositoryTests
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
             Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
@@ -127,7 +127,7 @@ public sealed class UserRoleRepositoryTests
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
             Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
@@ -135,7 +135,7 @@ public sealed class UserRoleRepositoryTests
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
             Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
@@ -144,10 +144,11 @@ public sealed class UserRoleRepositoryTests
         await context2.SaveChangesAsync();
 
         // Act
-        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.Agent });
+        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BillingAgent });
 
         // Assert
-        Assert.Equal(2, userRoleTemplates.Count());
+        Assert.NotNull(userRoleTemplates.FirstOrDefault(x => x.Id.Value == userRoleTemplateEntity1.Id));
+        Assert.NotNull(userRoleTemplates.FirstOrDefault(x => x.Id.Value == userRoleTemplateEntity2.Id));
     }
 
     [Fact]
@@ -164,7 +165,7 @@ public sealed class UserRoleRepositoryTests
         {
             Id = Guid.NewGuid(),
             Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
             Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
         };
 
@@ -203,7 +204,7 @@ public sealed class UserRoleRepositoryTests
             Name = "fake_value",
             EicFunctions =
             {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.Agent },
+                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty },
                 new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
             },
             Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
@@ -235,7 +236,7 @@ public sealed class UserRoleRepositoryTests
             "fake_value",
             UserRoleStatus.Active,
             new List<Permission>(),
-            EicFunction.Consumer);
+            EicFunction.IndependentAggregator);
         await context2.SaveChangesAsync();
 
         // Act
