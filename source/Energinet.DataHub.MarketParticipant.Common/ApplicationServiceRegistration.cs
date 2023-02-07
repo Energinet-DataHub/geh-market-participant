@@ -74,10 +74,12 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
             container.Register<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
             container.Register<IValidator<GetSelectablePermissionsCommand>, GetSelectablePermissionsCommandRuleSet>();
+            container.Register<IValidator<SendUserInviteEmailCommand>, SendUserInviteEmailCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
             container.Register<IUserRoleAuditLogService, UserRoleAuditLogService>(Lifestyle.Scoped);
+            container.Register<IEmailSender, SendGridEmailSender>(Lifestyle.Scoped);
             container.Register<IOrganizationIntegrationEventsHelperService, OrganizationIntegrationEventsHelperService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IActorCreatedIntegrationEventParser, ActorCreatedIntegrationEventParser>(Lifestyle.Scoped);
