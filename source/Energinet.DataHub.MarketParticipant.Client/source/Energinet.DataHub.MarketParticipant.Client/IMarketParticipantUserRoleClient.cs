@@ -76,7 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// Returns all the permissions in the system that can be selected when creating a user role
         /// </summary>
+        /// <param name="eicFunction">The Eic Function to get permissions for</param>
         /// <returns>Collection of permission</returns>
-        Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync();
+        Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync(EicFunction eicFunction);
     }
 }
