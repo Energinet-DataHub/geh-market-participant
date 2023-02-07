@@ -22,10 +22,12 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -33,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
+public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase, IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -210,6 +212,39 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         Assert.Single(resultList.Where(e => e.UserRoleChangeType == UserRoleChangeType.DescriptionChange));
         Assert.Single(expectedUpdateResult, e => e.UserRoleChangeType == UserRoleChangeType.NameChange && e.ChangeDescriptionJson.Equals(nameChange!.ChangeDescriptionJson, StringComparison.Ordinal));
         Assert.Single(expectedUpdateResult, e => e.UserRoleChangeType == UserRoleChangeType.DescriptionChange && e.ChangeDescriptionJson.Equals(descriptionChangeChange!.ChangeDescriptionJson, StringComparison.Ordinal));
+    }
+
+    public async Task InitializeAsync()
+    {
+        // Add needed permissions with Eic functions for tests
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var allPermissions = await context.Permissions.ToListAsync();
+        context.Permissions.RemoveRange(allPermissions);
+        await context.SaveChangesAsync();
+
+        var permissionToUseForTest = new PermissionEntity()
+        {
+            Description = "Permission for test",
+            Id = (int)Permission.ActorManage,
+            EicFunctions = new Collection<PermissionEicFunctionEntity>()
+            {
+                new PermissionEicFunctionEntity()
+                {
+                    EicFunction = EicFunction.BillingAgent, PermissionId = (int)Permission.ActorManage
+                }
+            }
+        };
+        context.Permissions.Add(permissionToUseForTest);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var allPermissions = await context.Permissions.ToListAsync();
+        context.Permissions.RemoveRange(allPermissions);
+        await context.SaveChangesAsync();
     }
 
     private static CreateUserRoleDto CreateUserRoleToSave(string name)
