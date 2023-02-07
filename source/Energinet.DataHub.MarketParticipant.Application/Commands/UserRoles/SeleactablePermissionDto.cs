@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public record SelectablePermissionDto(int Id, string Name, string Description);
+public record SelectablePermissionDto(int Id, string Name, string? Description);

@@ -4,12 +4,12 @@
 
 --Permission.OrganizationView
 INSERT INTO [dbo].[Permission]
-           ([Id]
-           ,[Description])
-     VALUES
-           (1
-           ,'Description for OrganizationView')
-GO
+([Id]
+    ,[Description])
+VALUES
+    (1
+        ,'Description for OrganizationView')
+    GO
 
 INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
@@ -18,11 +18,8 @@ INSERT INTO [dbo].[PermissionEicFunction]
 VALUES
     ('c91d0c7c-ebd2-4adf-ab3a-be7cbb91e3e5'
         ,1
-        ,12),
-    ('9a413f66-cab4-4938-97bc-dc83fff16b29'
-        ,1
-        ,43)
-GO
+        ,12)
+    GO
 
 --Permission.OrganizationManage
 INSERT INTO [dbo].[Permission]
@@ -43,10 +40,7 @@ VALUES
         ,3),
     ('1a274e0f-53ef-46bb-a9e2-6aa473070892'
         ,2
-        ,12),
-    ('a1f27e0b-4164-48a4-9a1e-cc8b093edba5'
-        ,2
-        ,43)
+        ,12)
     GO
 
 --Permission.GridAreasManage
@@ -68,10 +62,7 @@ VALUES
         ,2),
     ('59d74756-c490-45e5-b9e3-7cd7d9fb995a'
         ,3
-        ,12),
-    ('51936b9f-2994-4bf6-a7a9-e94ae3e97b5b'
-        ,3
-        ,43)
+        ,12)
     GO
 
 --Permission.ActorManage
@@ -88,18 +79,12 @@ INSERT INTO [dbo].[PermissionEicFunction]
     ,[PermissionId]
     ,[EicFunction])
 VALUES
-    ('d16ec7ff-3954-4488-8c90-72f0219a4192'
-        ,4
-        ,2),
     ('e3acf7f0-6e1b-41eb-830b-f821e1c6b5b5'
         ,4
         ,3),
     ('78be652d-b488-43d6-9c27-db7cefb9d3de'
         ,4
-        ,12),
-    ('75f22178-39d9-47e4-9b52-00a03ade67aa'
-        ,4
-        ,43)
+        ,12)
     GO
 
 --Permission.UsersManage
