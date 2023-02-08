@@ -22,6 +22,39 @@ public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserComma
 {
     public InviteUserCommandRuleSet()
     {
-        // TODO: Add rules.
+        RuleFor(command => command.Invitation)
+            .NotNull()
+            .ChildRules(invitationRules =>
+            {
+                invitationRules
+                    .RuleFor(invitation => invitation.FirstName)
+                    .NotEmpty()
+                    .MaximumLength(64);
+
+                invitationRules
+                    .RuleFor(invitation => invitation.LastName)
+                    .NotEmpty()
+                    .MaximumLength(64);
+
+                invitationRules
+                    .RuleFor(invitation => invitation.Email)
+                    .NotEmpty()
+                    .EmailAddress();
+
+                invitationRules
+                    .RuleFor(invitation => invitation.PhoneNumber)
+                    .NotEmpty()
+                    .MaximumLength(30)
+                    .Matches("\\+[0-9]+ [0-9]+");
+
+                invitationRules
+                    .RuleFor(invitation => invitation.AssignedActor)
+                    .NotEmpty();
+
+                invitationRules
+                    .RuleFor(invitation => invitation.AssignedRoles)
+                    .NotEmpty()
+                    .ForEach(userRoleId => userRoleId.NotEmpty());
+            });
     }
 }

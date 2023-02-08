@@ -12,13 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
+// TODO: UTs
 public sealed class SmsAuthenticationMethod : AuthenticationMethod
 {
     public SmsAuthenticationMethod(PhoneNumber phoneNumber)
     {
-        // TODO: Different requirements for SMS phone numbers.
+        ArgumentNullException.ThrowIfNull(phoneNumber);
+
+        if (!Regex.IsMatch(phoneNumber.Number, "\\+[0-9]+ [0-9]+"))
+        {
+            throw new ValidationException("SMS authentication requires the phone number to be formatted as '+{country} {number}', e.g. +1 5555551234.");
+        }
+
         PhoneNumber = phoneNumber;
     }
 

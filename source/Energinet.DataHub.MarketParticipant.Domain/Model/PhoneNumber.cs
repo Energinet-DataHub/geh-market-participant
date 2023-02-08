@@ -29,7 +29,7 @@ public sealed record PhoneNumber
 
     private static string ValidateNumber(string number)
     {
-        return !string.IsNullOrWhiteSpace(number) && _validator.IsValid(number)
+        return !string.IsNullOrWhiteSpace(number) && number.Length <= 30 && _validator.IsValid(number)
             ? number
             : throw new ValidationException($"The provided phone number '{number}' is not valid.");
     }
