@@ -37,6 +37,7 @@ public sealed class MarketParticipantClientTests
         "Testland");
 
     private readonly string _validBusinessRegisterIdentifier = "87654321";
+    private readonly string _validDomain = "energinet.dk";
 
     [Theory]
     [InlineData(HttpStatusCode.Forbidden)]
@@ -385,7 +386,7 @@ public sealed class MarketParticipantClientTests
 
         // Act
         var orgId = await target
-            .CreateOrganizationAsync(new CreateOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, "energinet.dk", "Test Comment"))
+            .CreateOrganizationAsync(new CreateOrganizationDto("Created", _validBusinessRegisterIdentifier, _validAddress, _validDomain, "Test Comment"))
             .ConfigureAwait(false);
 
         var createdOrg = await target
@@ -403,7 +404,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(_validAddress.Number, createdOrg.Address.Number);
         Assert.Equal(_validAddress.StreetName, createdOrg.Address.StreetName);
         Assert.Equal(_validAddress.ZipCode, createdOrg.Address.ZipCode);
-        Assert.Equal("energinet.dk", createdOrg.Domain);
+        Assert.Equal(_validDomain, createdOrg.Domain);
         Assert.Equal("Test Comment", createdOrg.Comment);
 
         var actualActor = createdOrg.Actors.Single();
