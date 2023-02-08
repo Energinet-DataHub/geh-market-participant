@@ -239,7 +239,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .Request()
             // TODO: Must come from config somewhere, or maybe client?
             .Filter($"identities/any(id:id/issuer eq 'devDataHubB2C.onmicrosoft.com' and id/issuerAssignedId eq '{email.Address}')")
-            .Select(x => new { x.Id, x.UserType, x.AccountEnabled })
+            .Select(_selectForMapping)
             .GetAsync()
             .ConfigureAwait(false);
 
