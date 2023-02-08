@@ -36,6 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("same_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                new OrganizationDomain("energinet.dk"),
                 string.Empty,
                 OrganizationStatus.Active);
 
@@ -45,6 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("same_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                new OrganizationDomain("energinet.dk"),
                 string.Empty,
                 OrganizationStatus.Active);
 
@@ -68,6 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("fake_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                new OrganizationDomain("energinet.dk"),
                 string.Empty,
                 OrganizationStatus.Active);
 
@@ -80,6 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("unique"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
+                new OrganizationDomain("energinet.dk"),
                 string.Empty,
                 OrganizationStatus.Active);
 

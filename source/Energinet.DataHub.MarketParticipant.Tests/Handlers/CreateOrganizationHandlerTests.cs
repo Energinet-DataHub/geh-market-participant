@@ -70,6 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 

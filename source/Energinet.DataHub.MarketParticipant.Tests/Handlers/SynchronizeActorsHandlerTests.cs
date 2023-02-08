@@ -70,6 +70,7 @@ public sealed class SynchronizeActorsHandlerTests
             new[] { actor },
             new BusinessRegisterIdentifier("fake_value"),
             new Address(null, null, null, null, "DK"),
+            new OrganizationDomain("energinet.dk"),
             null,
             OrganizationStatus.New);
 
@@ -121,6 +122,7 @@ public sealed class SynchronizeActorsHandlerTests
             new[] { actor },
             new BusinessRegisterIdentifier("fake_value"),
             new Address(null, null, null, null, "DK"),
+            new OrganizationDomain("energinet.dk"),
             null,
             OrganizationStatus.New);
 

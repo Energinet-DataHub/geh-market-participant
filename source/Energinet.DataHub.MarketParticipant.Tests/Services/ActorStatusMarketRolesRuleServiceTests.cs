@@ -49,7 +49,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     [Fact]
     public async Task Validate_ActorIsNotFound_Throws()
     {
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
 
         var repository = new Mock<IOrganizationRepository>();
         repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
@@ -73,7 +73,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorHasIdenticalMarketRoles_DoesNotThrow(ActorStatus status)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
 
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
@@ -97,7 +97,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorHasNewMarketRoleAdded_DoesNotThrow(ActorStatus status)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
 
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
@@ -122,7 +122,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_GridAreaForMarketRoleIsRemoved_ThrowsIfStatusIsNotNew(ActorStatus status, bool throws)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
 
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
@@ -148,7 +148,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorHasUpdatedMeteringPointForMarketRoleGridArea_Throws(ActorStatus status, bool throws)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
 
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);
@@ -174,7 +174,7 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorWithNoMarketRoles_Throws(ActorStatus status, bool throws)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"));
+        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
 
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         organization.Actors.Add(existingActor);

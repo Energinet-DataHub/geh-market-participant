@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             ArgumentNullException.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
             ArgumentNullException.ThrowIfNull(address, nameof(address));
 
-            var newOrganization = new Organization(name, businessRegisterIdentifier, address, comment);
+            var newOrganization = new Organization(name, businessRegisterIdentifier, address, new OrganizationDomain("energinet.dk"), comment);
 
             await _uniqueOrganizationBusinessRegisterIdentifierService
                 .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization).ConfigureAwait(false);

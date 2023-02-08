@@ -118,6 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -168,6 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 

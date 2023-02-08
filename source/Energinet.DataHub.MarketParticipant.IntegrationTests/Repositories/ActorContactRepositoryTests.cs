@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var organizationRepository = new OrganizationRepository(context);
 
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, new OrganizationDomain("energinet.dk"), null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -116,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, new OrganizationDomain("energinet.dk"), null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -158,7 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, new OrganizationDomain("energinet.dk"), null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -218,7 +218,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress);
+            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, new OrganizationDomain("energinet.dk"), null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 

@@ -55,6 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 MapEntitiesToActors(from.Actors),
                 new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
                 MapAddress(from.Address),
+                new OrganizationDomain(from.Domain),
                 from.Comment,
                 (OrganizationStatus)from.Status);
         }

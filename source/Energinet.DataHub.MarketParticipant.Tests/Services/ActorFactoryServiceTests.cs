@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
-                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
+                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null),
                 null!,
                 new ActorName("fake_value"),
                 Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
@@ -97,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
-                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
+                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null),
                 new MockedGln(),
                 new ActorName("fake_value"),
                 null!)).ConfigureAwait(false);
@@ -116,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
             organizationRepository
@@ -165,6 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Array.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment 2",
                 OrganizationStatus.Active);
 
@@ -207,7 +208,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
             var globalLocationNumber = new MockedGln();
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
@@ -244,7 +245,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
             var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
@@ -283,7 +284,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 allowedGridAreasRuleService.Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
             var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };
