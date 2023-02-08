@@ -12,17 +12,70 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserInvitation(
-    EmailAddress Email,
-    string FirstName,
-    string LastName,
-    PhoneNumber PhoneNumber,
-    AuthenticationMethod RequiredAuthentication,
-    Guid AssignedActor,
-    IReadOnlyCollection<UserRoleId> AssignedRoles);
+// TODO: UTs
+public sealed class UserInvitation
+{
+    public UserInvitation(
+        EmailAddress email,
+        string firstName,
+        string lastName,
+        PhoneNumber phoneNumber,
+        AuthenticationMethod requiredAuthentication,
+        Actor assignedActor,
+        IReadOnlyCollection<UserRole> assignedRoles)
+    {
+        Email = email;
+        FirstName = firstName;
+        LastName = lastName;
+        PhoneNumber = phoneNumber;
+        RequiredAuthentication = requiredAuthentication;
+        AssignedActor = assignedActor;
+        AssignedRoles = assignedRoles;
+
+        ValidateName();
+        ValidateActor();
+        ValidateUserRoles();
+    }
+
+    public EmailAddress Email { get; }
+    public string FirstName { get; }
+    public string LastName { get; }
+    public PhoneNumber PhoneNumber { get; }
+    public AuthenticationMethod RequiredAuthentication { get; }
+    public Actor AssignedActor { get; }
+    public IReadOnlyCollection<UserRole> AssignedRoles { get; }
+
+    private void ValidateName()
+    {
+        if (string.IsNullOrWhiteSpace(FirstName))
+            throw new ValidationException("First name must not be empty.");
+
+        if (string.IsNullOrWhiteSpace(LastName))
+            throw new ValidationException("Last name must not be empty.");
+    }
+
+    private void ValidateActor()
+    {
+        if (AssignedActor.Status is not ActorStatus.Active)
+            throw new ValidationException($"The actor {AssignedActor.Id} has an incorrect state.");
+    }
+
+    private void ValidateUserRoles()
+    {
+        foreach (var userRole in AssignedRoles)
+        {
+            if (userRole.Status is not UserRoleStatus.Active)
+                throw new ValidationException($"The user role {userRole.Id} has an incorrect state.");
+
+            if (AssignedActor.MarketRoles.All(mr => mr.Function != userRole.EicFunction))
+                throw new ValidationException($"The user role {userRole.Id} cannot be used with the actor {AssignedActor.Id}.");
+        }
+    }
+}
