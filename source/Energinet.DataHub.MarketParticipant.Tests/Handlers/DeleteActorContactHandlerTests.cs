@@ -39,6 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             "Test City",
             "Test Country");
 
+        private readonly OrganizationDomain _validDomain = new("energinet.dk");
+
         private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
 
         [Fact]
@@ -84,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                new OrganizationDomain("energinet.dk"),
+                _validDomain,
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -132,7 +134,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                new OrganizationDomain("energinet.dk"),
+                _validDomain,
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -178,7 +180,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { actor },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                new OrganizationDomain("energinet.dk"),
+                _validDomain,
                 "Test Comment",
                 OrganizationStatus.Active);
 
