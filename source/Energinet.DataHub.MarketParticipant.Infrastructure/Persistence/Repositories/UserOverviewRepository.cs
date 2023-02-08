@@ -75,8 +75,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     {
                         user.Id,
                         userIdentity.Status,
-                        userIdentity.FirstName,
-                        userIdentity.LastName,
+                        Name = userIdentity.FullName,
                         Email = userIdentity.Email.Address,
                         PhoneNumber = userIdentity.PhoneNumber?.Number,
                         userIdentity.CreatedDate
@@ -95,7 +94,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 new UserOverviewItem(
                     x.Id,
                     x.Status,
-                    $"{x.FirstName} {x.LastName}",
+                    x.Name,
                     new EmailAddress(x.Email),
                     x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
                     x.CreatedDate));
@@ -156,7 +155,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Where(ident => statusFilter.Contains(ident.Status));
         }
 
-        //Combine results and create final search result
+        // Combine results and create final search result
         var userLookup = searchQuery
             .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
@@ -167,8 +166,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             {
                 x.Id,
                 x.Status,
-                x.FirstName,
-                x.LastName,
+                Name = x.FullName,
                 Email = x.Email.Address,
                 PhoneNumber = x.PhoneNumber?.Number,
                 x.CreatedDate
@@ -191,7 +189,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 return new UserOverviewItem(
                     new UserId(user.Id),
                     userIdentity.Status,
-                    $"{userIdentity.FirstName} {userIdentity.LastName}",
+                    userIdentity.Name,
                     new EmailAddress(userIdentity.Email),
                     userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
                     userIdentity.CreatedDate);
