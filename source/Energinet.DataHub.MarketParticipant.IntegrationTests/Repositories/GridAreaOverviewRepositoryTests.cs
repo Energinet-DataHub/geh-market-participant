@@ -123,7 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var gridAreaId = await CreateGridArea(EicFunction.GridAccessProvider, EicFunction.Agent);
+            var gridAreaId = await CreateGridArea(EicFunction.GridAccessProvider, EicFunction.BillingAgent);
 
             var target = new GridAreaOverviewRepository(context);
 
@@ -144,7 +144,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var gridAreaId = await CreateGridArea(EicFunction.BalanceResponsibleParty, EicFunction.Agent);
+            var gridAreaId = await CreateGridArea(EicFunction.BalanceResponsibleParty, EicFunction.BillingAgent);
 
             var target = new GridAreaOverviewRepository(context);
 

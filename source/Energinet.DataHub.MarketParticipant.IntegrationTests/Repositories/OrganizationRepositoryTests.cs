@@ -221,7 +221,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
             var initalActor = new Actor(new MockedGln());
-            initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.DataProvider, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) }));
+            initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) }));
             organization.Actors.Add(initalActor);
 
             // Act
@@ -251,7 +251,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
             var balancePowerSupplierActor = new Actor(new MockedGln());
-            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalancingServiceProvider, new List<ActorGridArea>()));
+            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, new List<ActorGridArea>()));
             organization.Actors.Add(balancePowerSupplierActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
@@ -270,7 +270,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.Equal(2, organization!.Actors.Count);
             Assert.Contains(
                 organization.Actors,
-                x => x.MarketRoles.All(y => y.Function == EicFunction.BalancingServiceProvider));
+                x => x.MarketRoles.All(y => y.Function == EicFunction.BillingAgent));
             Assert.Contains(
                 organization.Actors,
                 x => x.MarketRoles.All(y => y.Function == EicFunction.MeteringPointAdministrator));
@@ -441,7 +441,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress);
 
             var actorWithMeteringTypes = new Actor(new MockedGln());
-            actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.Producer, new List<ActorGridArea> { new(gridAreaToInsert_Id.Value, meteringPointTypesToAdd) }));
+            actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, new List<ActorGridArea> { new(gridAreaToInsert_Id.Value, meteringPointTypesToAdd) }));
             organization.Actors.Add(actorWithMeteringTypes);
 
             // Act

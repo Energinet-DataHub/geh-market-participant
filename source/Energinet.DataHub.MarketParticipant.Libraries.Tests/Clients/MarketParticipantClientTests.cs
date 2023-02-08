@@ -75,7 +75,7 @@ public sealed class MarketParticipantClientTests
                     ""Status"": ""Active"",
                     ""MarketRoles"": [
                         {
-                            ""EicFunction"": ""Consumer"",
+                            ""EicFunction"": ""IndependentAggregator"",
                             ""GridAreas"": [
                                 {
                                     ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -126,7 +126,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal("Test Comment", actualOrganization.Comment);
 
         var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
+        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public sealed class MarketParticipantClientTests
                                 ""Status"": ""Active"",
                                 ""MarketRoles"": [
                                     {
-                                        ""EicFunction"": ""Consumer"",
+                                        ""EicFunction"": ""IndependentAggregator"",
                                         ""GridAreas"": [
                                             {
                                                 ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -184,7 +184,7 @@ public sealed class MarketParticipantClientTests
                                 ""Status"": ""New"",
                                 ""MarketRoles"": [
                                     {
-                                        ""EicFunction"": ""Producer"",
+                                        ""EicFunction"": ""BillingAgent"",
                                         ""GridAreas"": [
                                             {
                                                 ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -239,7 +239,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(ActorStatus.Active, firstActor.Status);
 
         var firstMarketRole = firstActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.Consumer, firstMarketRole.EicFunction);
+        Assert.Equal(EicFunction.IndependentAggregator, firstMarketRole.EicFunction);
 
         var secondOrganization = actual.Skip(1).First();
         Assert.Equal(Guid.Parse("c4d950f7-0acf-439b-9bb6-610255218c6e"), secondOrganization.OrganizationId);
@@ -259,7 +259,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(ActorStatus.New, secondActor.Status);
 
         var secondMarketRole = secondActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.Producer, secondMarketRole.EicFunction);
+        Assert.Equal(EicFunction.BillingAgent, secondMarketRole.EicFunction);
     }
 
     [Fact]
@@ -280,7 +280,7 @@ public sealed class MarketParticipantClientTests
 			                ""Status"": ""Active"",
                             ""MarketRoles"": [
                                 {
-                                    ""EicFunction"": ""Consumer"",
+                                    ""EicFunction"": ""IndependentAggregator"",
                                     ""GridAreas"": [
                                         {
                                             ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -331,7 +331,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(ActorStatus.Active, actualActor.Status);
 
         var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
+        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -352,7 +352,7 @@ public sealed class MarketParticipantClientTests
 			                ""Status"": ""Active"",
                             ""MarketRoles"": [
                                 {
-                                    ""EicFunction"": ""Consumer"",
+                                    ""EicFunction"": ""IndependentAggregator"",
                                     ""GridAreas"": [
                                         {
                                             ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -411,7 +411,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(ActorStatus.Active, actualActor.Status);
 
         var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
+        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -432,7 +432,7 @@ public sealed class MarketParticipantClientTests
 			                ""Status"": ""Active"",
                             ""MarketRoles"": [
                                 {
-                                    ""EicFunction"": ""Consumer"",
+                                    ""EicFunction"": ""IndependentAggregator"",
                                     ""GridAreas"": [
                                         {
                                             ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -494,7 +494,7 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(ActorStatus.Active, actualActor.Status);
 
         var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.Consumer, actualMarketRole.EicFunction);
+        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -554,7 +554,7 @@ public sealed class MarketParticipantClientTests
                         ""status"": ""New"",
                         ""MarketRoles"": [
                             {
-                                ""EicFunction"": ""MarketOperator"",
+                                ""EicFunction"": ""IndependentAggregator"",
                                 ""GridAreas"": [
                                     {
                                         ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
@@ -615,7 +615,7 @@ public sealed class MarketParticipantClientTests
         Assert.True(firstActor.MarketRoles.Count == 1);
 
         var firstMarketRole = firstActor.MarketRoles[0];
-        Assert.Equal(EicFunction.MarketOperator, firstMarketRole.EicFunction);
+        Assert.Equal(EicFunction.IndependentAggregator, firstMarketRole.EicFunction);
 
         var secondActor = actual.Skip(1).First();
         Assert.Equal(Guid.Parse("02f0d6c9-96f5-4078-a754-fcc589b04937"), secondActor.ActorId);

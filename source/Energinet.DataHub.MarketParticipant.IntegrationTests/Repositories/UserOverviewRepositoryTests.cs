@@ -452,7 +452,7 @@ public sealed class UserOverviewRepositoryTests
             MarketParticipantDbContext context,
             bool isFas,
             string actorName = "Actor name",
-            EicFunction eicFunction = EicFunction.TransmissionCapacityAllocator)
+            EicFunction eicFunction = EicFunction.BillingAgent)
     {
         var actorEntity = new ActorEntity
         {
