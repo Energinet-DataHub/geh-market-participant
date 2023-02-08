@@ -57,4 +57,17 @@ public sealed class OrganizationDomainTests
         // arrange, act, assert
         Assert.Throws<ValidationException>(() => new OrganizationDomain(domain));
     }
+
+    [Fact]
+    public void Ctor_ValidDomain_CreatesValidDomainObject()
+    {
+        // arrange
+        const string expected = "energinet.dk";
+
+        // act
+        var actual = new OrganizationDomain(expected);
+
+        // assert
+        Assert.Equal(expected, actual.Value);
+    }
 }
