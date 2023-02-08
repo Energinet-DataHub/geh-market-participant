@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -27,7 +28,13 @@ public interface IUserIdentityRepository
     /// Retrieves user identity for the provided external id.
     /// </summary>
     /// <param name="externalId">The external id of the user identity.</param>
-    Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId);
+    Task<UserIdentity?> GetAsync(ExternalUserId externalId);
+
+    /// <summary>
+    /// Retrieves user identity for the given sign-in email address.
+    /// </summary>
+    /// <param name="email">The sign-in email address of the user identity.</param>
+    Task<UserIdentity?> GetAsync(EmailAddress email);
 
     /// <summary>
     /// Retrieves user identities for the provided set of external ids.

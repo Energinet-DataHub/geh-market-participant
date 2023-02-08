@@ -55,7 +55,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
     }
 
-    public async Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId)
+    public async Task<UserIdentity?> GetAsync(ExternalUserId externalId)
     {
         ArgumentNullException.ThrowIfNull(externalId);
 
@@ -66,7 +66,15 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .GetAsync()
             .ConfigureAwait(false);
 
-        return Map(user);
+        return IsMember(user) ? Map(user) : null;
+    }
+
+    public async Task<UserIdentity?> GetAsync(EmailAddress email)
+    {
+        ArgumentNullException.ThrowIfNull(email);
+
+        var user = await GetBySignInEmailAsync(email).ConfigureAwait(false);
+        return user != null && IsMember(user) ? Map(user) : null;
     }
 
     public async Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds)
@@ -185,7 +193,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         var externalUserId = new ExternalUserId(createdUser.Id);
 
-        // TODO: Does this replace existing?
         await _userIdentityAuthenticationService
             .AddAuthenticationAsync(externalUserId, userIdentity.Authentication)
             .ConfigureAwait(false);
@@ -223,11 +230,14 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return user.UserType == "Member";
     }
 
-    private async Task<User?> CheckCreatedUserAsync(EmailAddress email)
+    private async Task<User?> GetBySignInEmailAsync(EmailAddress email)
     {
+        ArgumentNullException.ThrowIfNull(email);
+
         var usersRequest = await _graphClient
             .Users
             .Request()
+            // TODO: Must come from config somewhere, or maybe client?
             .Filter($"identities/any(id:id/issuer eq 'devDataHubB2C.onmicrosoft.com' and id/issuerAssignedId eq '{email.Address}')")
             .Select(x => new { x.Id, x.UserType, x.AccountEnabled })
             .GetAsync()
@@ -237,7 +247,12 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .IteratePagesAsync(_graphClient)
             .ConfigureAwait(false);
 
-        var user = users.SingleOrDefault();
+        return users.SingleOrDefault();
+    }
+
+    private async Task<User?> CheckCreatedUserAsync(EmailAddress email)
+    {
+        var user = await GetBySignInEmailAsync(email).ConfigureAwait(false);
         if (user == null)
             return null;
 

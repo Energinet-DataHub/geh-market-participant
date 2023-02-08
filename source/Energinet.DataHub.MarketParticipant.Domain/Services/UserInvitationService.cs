@@ -37,10 +37,13 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
-        // TODO: Is this correct? Should I look up in AD to get external id?
-        var invitedUser = await _userRepository
+        var invitedIdentity = await _userIdentityRepository
             .GetAsync(invitation.Email)
             .ConfigureAwait(false);
+
+        var invitedUser = invitedIdentity != null
+            ? await _userRepository.GetAsync(invitedIdentity.Id).ConfigureAwait(false)
+            : null;
 
         if (invitedUser == null)
         {
@@ -59,8 +62,7 @@ public sealed class UserInvitationService : IUserInvitationService
         }
 
         // TODO: Audit log user.
-
-        // TODO: Audit log this.
+        // TODO: Audit log user roles.
         foreach (var assignedRole in invitation.AssignedRoles)
         {
             var assignment = new UserRoleAssignment(invitation.AssignedActor.Id, assignedRole.Id);
