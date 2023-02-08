@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -43,11 +42,4 @@ public interface IUserRepository
     /// <param name="userId">The id of the user.</param>
     /// <returns>The user if it exists; otherwise null.</returns>
     Task<User?> GetAsync(UserId userId);
-
-    /// <summary>
-    /// Gets the user having the specified e-mail address.
-    /// </summary>
-    /// <param name="email">The e-mail of the user.</param>
-    /// <returns>The user if it exists; otherwise null.</returns>
-    Task<User?> GetAsync(EmailAddress email);
 }

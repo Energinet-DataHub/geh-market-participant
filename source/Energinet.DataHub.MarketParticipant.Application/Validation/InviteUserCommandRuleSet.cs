@@ -17,6 +17,7 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
+// TODO: UTs
 public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserCommand>
 {
     public InviteUserCommandRuleSet()
