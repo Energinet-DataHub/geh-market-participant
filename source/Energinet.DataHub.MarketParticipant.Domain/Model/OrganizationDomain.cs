@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
@@ -33,11 +32,15 @@ public sealed class OrganizationDomain
 
     public static bool IsValid(string value)
     {
-        ArgumentNullException.ThrowIfNull(value);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return false;
+        }
 
         var topLevelDomainSeparatorIndex = value.LastIndexOf('.');
 
         return
+            value.Length < 65 &&
             topLevelDomainSeparatorIndex > 0 &&
             topLevelDomainSeparatorIndex < value.Length - 2 &&
             Regex.IsMatch(value, "^[A-Za-z0-9]{1}[A-Za-z0-9\\-.]+$") &&

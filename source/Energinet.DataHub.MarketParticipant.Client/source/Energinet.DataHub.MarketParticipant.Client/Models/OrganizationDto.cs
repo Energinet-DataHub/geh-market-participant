@@ -21,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Guid OrganizationId,
         string Name,
         string BusinessRegisterIdentifier,
+        string Domain,
         string Comment,
         OrganizationStatus Status,
         AddressDto Address,

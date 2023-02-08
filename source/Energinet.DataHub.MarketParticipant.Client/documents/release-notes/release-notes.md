@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.18.0
+
+- Required domain name when creating organization.
+
 ## Version 2.17.3
 
 - Removed unused market roles.

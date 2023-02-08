@@ -33,6 +33,8 @@ public sealed class OrganizationDomainTests
     [InlineData("/energinet.dk", false)]
     [InlineData("-energinet.dk", false)]
     [InlineData("https://energinet.dk", false)]
+    [InlineData(null, false)]
+    [InlineData("", false)]
     public void IsValid_InvalidOrValidDomain_MatchesExpected(string domain, bool expected)
     {
         // arrange
@@ -52,6 +54,8 @@ public sealed class OrganizationDomainTests
     [InlineData("/energinet.dk")]
     [InlineData("-energinet.dk")]
     [InlineData("https://energinet.dk")]
+    [InlineData(null)]
+    [InlineData("")]
     public void Ctor_InvalidDomain_Throws(string domain)
     {
         // arrange, act, assert
