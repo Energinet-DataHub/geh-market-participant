@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -37,14 +38,7 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
-        var invitedIdentity = await _userIdentityRepository
-            .GetAsync(invitation.Email)
-            .ConfigureAwait(false);
-
-        var invitedUser = invitedIdentity != null
-            ? await _userRepository.GetAsync(invitedIdentity.Id).ConfigureAwait(false)
-            : null;
-
+        var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
         if (invitedUser == null)
         {
             var userIdentity = new UserIdentity(
@@ -72,5 +66,16 @@ public sealed class UserInvitationService : IUserInvitationService
         await _userRepository
             .AddOrUpdateAsync(invitedUser)
             .ConfigureAwait(false);
+    }
+
+    public async Task<User?> GetUserAsync(EmailAddress email)
+    {
+        var invitedIdentity = await _userIdentityRepository
+            .GetAsync(email)
+            .ConfigureAwait(false);
+
+        return invitedIdentity != null
+            ? await _userRepository.GetAsync(invitedIdentity.Id).ConfigureAwait(false)
+            : null;
     }
 }
