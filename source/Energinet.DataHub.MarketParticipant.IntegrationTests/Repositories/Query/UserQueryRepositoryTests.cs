@@ -114,6 +114,7 @@ public sealed class UserQueryRepositoryTests
                 StreetName = "Teststreet",
                 ZipCode = "1234"
             },
+            Domain = "energinet.dk",
             Name = "Test Org",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
@@ -226,6 +227,7 @@ public sealed class UserQueryRepositoryTests
                 StreetName = "Teststreet",
                 ZipCode = "1234"
             },
+            Domain = "energinet.dk",
             Name = "Test Org",
             BusinessRegisterIdentifier = "11111111"
         };
@@ -295,6 +297,7 @@ public sealed class UserQueryRepositoryTests
                 StreetName = "Teststreet",
                 ZipCode = "1234"
             },
+            Domain = "energinet.dk",
             Name = "Test Org",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
         };
@@ -373,6 +376,7 @@ public sealed class UserQueryRepositoryTests
                 StreetName = "Teststreet",
                 ZipCode = "1234"
             },
+            Domain = "energinet.dk",
             Name = "Test Org",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
         };
@@ -457,6 +461,7 @@ public sealed class UserQueryRepositoryTests
                 ZipCode = "1234"
             },
             Name = "Test Org",
+            Domain = "energinet.dk",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
         await context.Organizations.AddAsync(orgEntity);
@@ -549,6 +554,7 @@ public sealed class UserQueryRepositoryTests
                 StreetName = "Teststreet",
                 ZipCode = "1234"
             },
+            Domain = "energinet.dk",
             Name = "Test Org",
             BusinessRegisterIdentifier = "33333333"
         };
@@ -631,6 +637,7 @@ public sealed class UserQueryRepositoryTests
             {
                 Country = "DK",
             },
+            Domain = "energinet.dk",
             Name = "Name",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
