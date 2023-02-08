@@ -63,8 +63,8 @@ public sealed class UserInvitation
 
     private void ValidateActor()
     {
-        if (AssignedActor.Status is not ActorStatus.Active)
-            throw new ValidationException($"The actor {AssignedActor.Id} has an incorrect state.");
+        if (AssignedActor.Status is ActorStatus.Inactive)
+            throw new ValidationException($"The actor {AssignedActor.Id} is inactive.");
     }
 
     private void ValidateUserRoles()

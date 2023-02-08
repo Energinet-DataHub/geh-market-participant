@@ -73,8 +73,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     externalUserId,
                     new EmailAddress("fake@value"),
                     UserStatus.Active,
-                    "name",
-                    "name",
+                    "first",
+                    "last",
                     null,
                     DateTimeOffset.UtcNow,
                     AuthenticationMethod.Undetermined));
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // assert
             Assert.Single(actual.GridAreaAuditLogEntries);
-            Assert.Equal("name", actual.GridAreaAuditLogEntries.Single().UserDisplayName);
+            Assert.Equal("first last", actual.GridAreaAuditLogEntries.Single().UserDisplayName);
         }
     }
 }

@@ -60,6 +60,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
         return fasActorQuery;
     }
 
+    // TODO: Add UT for inactive actor.
     public async Task<IEnumerable<Permission>> GetPermissionsAsync(Guid actorId, ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(actorId);
@@ -87,6 +88,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
             .ConfigureAwait(false);
     }
 
+    // TODO: Add UT for inactive actor.
     public Task<bool> IsFasAsync(Guid actorId, ExternalUserId externalUserId)
     {
         var query =

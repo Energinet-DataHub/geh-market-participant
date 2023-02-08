@@ -90,9 +90,9 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             .GetAsync(actor.OrganizationId)
             .ConfigureAwait(false);
 
-        return organization is { Status: OrganizationStatus.Active }
+        return organization != null && organization.Status != OrganizationStatus.Deleted
             ? organization.Actors.First(a => a.Id == actor.ActorId)
-            : throw new ValidationException("The organization of the actor has an incorrect state.");
+            : throw new ValidationException("The organization of the actor has been deleted.");
     }
 
     private async Task<List<UserRole>> GetUserRolesAsync(InviteUserCommand request)
