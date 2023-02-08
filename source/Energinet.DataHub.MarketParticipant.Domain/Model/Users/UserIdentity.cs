@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
+// TODO: UTs
 public sealed class UserIdentity
 {
     public UserIdentity(
@@ -48,7 +49,7 @@ public sealed class UserIdentity
         AuthenticationMethod authentication)
     {
         if (authentication == AuthenticationMethod.Undetermined)
-            throw new ValidationException("Cannot create a user without an authentication method.");
+            throw new NotSupportedException("Cannot create a user without an authentication method.");
 
         Id = new ExternalUserId(Guid.Empty);
         Email = email;
@@ -58,6 +59,8 @@ public sealed class UserIdentity
         PhoneNumber = phoneNumber;
         CreatedDate = DateTimeOffset.UtcNow;
         Authentication = authentication;
+
+        ValidateName();
     }
 
     public ExternalUserId Id { get; }
@@ -69,4 +72,19 @@ public sealed class UserIdentity
     public PhoneNumber? PhoneNumber { get; }
     public DateTimeOffset CreatedDate { get; }
     public AuthenticationMethod Authentication { get; }
+
+    private void ValidateName()
+    {
+        if (string.IsNullOrWhiteSpace(FirstName))
+            throw new ValidationException("First name must not be empty.");
+
+        if (FirstName.Length > 64)
+            throw new ValidationException("First name can be at most 64 characters long.");
+
+        if (string.IsNullOrWhiteSpace(LastName))
+            throw new ValidationException("Last name must not be empty.");
+
+        if (LastName.Length > 64)
+            throw new ValidationException("Last name can be at most 64 characters long.");
+    }
 }

@@ -39,7 +39,6 @@ public sealed class UserInvitation
         AssignedActor = assignedActor;
         AssignedRoles = assignedRoles;
 
-        ValidateName();
         ValidateActor();
         ValidateUserRoles();
     }
@@ -51,15 +50,6 @@ public sealed class UserInvitation
     public AuthenticationMethod RequiredAuthentication { get; }
     public Actor AssignedActor { get; }
     public IReadOnlyCollection<UserRole> AssignedRoles { get; }
-
-    private void ValidateName()
-    {
-        if (string.IsNullOrWhiteSpace(FirstName))
-            throw new ValidationException("First name must not be empty.");
-
-        if (string.IsNullOrWhiteSpace(LastName))
-            throw new ValidationException("Last name must not be empty.");
-    }
 
     private void ValidateActor()
     {
