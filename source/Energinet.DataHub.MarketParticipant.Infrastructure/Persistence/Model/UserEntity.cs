@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public Guid Id { get; set; }
         public Guid ExternalId { get; set; }
         public string Email { get; set; }
+        public int? InviteStatus { get; set; }
         public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; }
     }
 }

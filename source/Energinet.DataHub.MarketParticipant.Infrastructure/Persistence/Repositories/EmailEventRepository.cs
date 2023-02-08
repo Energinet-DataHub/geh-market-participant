@@ -18,6 +18,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Errors.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -32,30 +35,57 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public Task InsertAsync(EmailEvent emailEvent)
         {
-            throw new NotImplementedException();
-        }
+            ArgumentNullException.ThrowIfNull(emailEvent);
 
-        public Task UpdateAsync(EmailEvent emailEvent)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(EmailEventType emailEventType)
-        {
-            var emailEvents = new List<EmailEvent>
+            var emailEventEntity = new EmailEventEntity
             {
-                new EmailEvent()
-                {
-                    Id = 1,
-                    Timestamp = DateTimeOffset.Now,
-                    ActorId = Guid.NewGuid(),
-                    UserId = Guid.Parse("85E5E1D2E151"),
-                    IsSent = false,
-                    EmailEventType = EmailEventType.UserInvite
-                }
+                UserId = emailEvent.UserId,
+                ActorId = emailEvent.ActorId,
+                Created = DateTimeOffset.UtcNow,
+                EmailEventType = (int)emailEvent.EmailEventType
             };
 
-            return Task.FromResult(emailEvents.AsEnumerable());
+            _context.EmailEventEntries.Add(emailEventEntity);
+
+            return _context.SaveChangesAsync();
+        }
+
+        public Task MarkAsSentAsync(EmailEvent emailEvent)
+        {
+            ArgumentNullException.ThrowIfNull(emailEvent);
+
+            var emailEventToUpdate = _context.EmailEventEntries.FirstOrDefault(e => e.Id == emailEvent.Id);
+
+            if (emailEventToUpdate != null)
+            {
+                emailEventToUpdate.Sent = DateTimeOffset.UtcNow;
+                return _context.SaveChangesAsync();
+            }
+
+            throw new NotFoundException($"Email event with id {emailEvent.Id} was not found");
+        }
+
+        public async Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(EmailEventType emailEventType)
+        {
+            var emailToBeSent = await _context.EmailEventEntries
+                .Where(e => e.Sent == null && e.EmailEventType == (int)emailEventType)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return emailToBeSent.Select(MapTo);
+        }
+
+        private static EmailEvent MapTo(EmailEventEntity emailEventEntities)
+        {
+            return new EmailEvent
+            {
+                Id = emailEventEntities.Id,
+                Created = emailEventEntities.Created,
+                Sent = emailEventEntities.Sent,
+                ActorId = emailEventEntities.ActorId,
+                UserId = emailEventEntities.UserId,
+                EmailEventType = EmailEventType.UserInvite
+            };
         }
     }
 }

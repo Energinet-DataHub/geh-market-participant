@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRepositoryMock = new Mock<IUserRepository>();
             userRepositoryMock
                 .Setup(userRepository => userRepository.GetAsync(userId))
-                .ReturnsAsync(new User(userId, externalUserId, new List<UserRoleAssignment>(), new EmailAddress("fake@value")));
+                .ReturnsAsync(new User(userId, externalUserId, new List<UserRoleAssignment>(), new EmailAddress("fake@value"), null));
 
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock

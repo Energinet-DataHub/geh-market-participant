@@ -34,16 +34,19 @@ public class User
         UserId id,
         ExternalUserId externalId,
         ICollection<UserRoleAssignment> roleAssignments,
-        EmailAddress email)
+        EmailAddress email,
+        UserInviteStatus? inviteStatus)
     {
         Id = id;
         ExternalId = externalId;
         RoleAssignments = roleAssignments;
         Email = email;
+        InviteStatus = inviteStatus;
     }
 
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; set; }
     public EmailAddress Email { get; }
+    public UserInviteStatus? InviteStatus { get; set; }
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
 }

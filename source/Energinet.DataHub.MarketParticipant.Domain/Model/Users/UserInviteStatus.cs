@@ -12,22 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
-
-/// <summary>
-/// Send email interface
-/// </summary>
-public interface IEmailSender
+public enum UserInviteStatus
 {
-    /// <summary>
-    /// Send email to user by email event type
-    /// </summary>
-    /// <param name="user">user with email</param>
-    /// <param name="emailEvent">email event type</param>
-    /// <returns>email send task</returns>
-    Task<bool> SendEmailAsync(User user, EmailEvent emailEvent);
+    Unknown = 0,
+    NoInviteSent = 1,
+    InviteSent = 2,
 }

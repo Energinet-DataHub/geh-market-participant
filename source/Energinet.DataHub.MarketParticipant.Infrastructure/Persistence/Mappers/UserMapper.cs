@@ -26,6 +26,7 @@ internal sealed class UserMapper
         to.Email = from.Email.Address;
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
+        to.InviteStatus = (int?)from.InviteStatus;
 
         var newAssignments = from
             .RoleAssignments
@@ -52,7 +53,8 @@ internal sealed class UserMapper
             new UserId(from.Id),
             new ExternalUserId(from.ExternalId),
             from.RoleAssignments.Select(MapFromEntity).ToList(),
-            new EmailAddress(from.Email));
+            new EmailAddress(from.Email),
+            (UserInviteStatus?)from.InviteStatus);
     }
 
     private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)

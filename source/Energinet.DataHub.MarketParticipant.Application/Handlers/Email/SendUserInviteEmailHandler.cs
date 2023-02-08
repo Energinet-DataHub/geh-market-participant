@@ -16,11 +16,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
 {
@@ -28,16 +28,22 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
     {
         private readonly IUserRepository _userRepository;
         private readonly IEmailEventRepository _emailEventRepository;
-        private readonly IEmailSender _gridEmailSenderSender;
+        private readonly IEmailSender _emailSender;
+        private readonly IUserIdentityRepository _userIdentityRepository;
+        private readonly ILogger<SendUserInviteEmailHandler> _logger;
 
         public SendUserInviteEmailHandler(
             IUserRepository userRepository,
             IEmailEventRepository emailEventRepository,
-            IEmailSender gridEmailSenderSender)
+            IEmailSender emailSender,
+            IUserIdentityRepository userIdentityRepository,
+            ILogger<SendUserInviteEmailHandler> logger)
         {
             _userRepository = userRepository;
             _emailEventRepository = emailEventRepository;
-            _gridEmailSenderSender = gridEmailSenderSender;
+            _emailSender = emailSender;
+            _userIdentityRepository = userIdentityRepository;
+            _logger = logger;
         }
 
         public async Task<Unit> Handle(SendUserInviteEmailCommand request, CancellationToken cancellationToken)
@@ -52,14 +58,32 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
                 var user = await _userRepository.GetAsync(new UserId(emailInvite.UserId)).ConfigureAwait(false);
 
                 if (user is null)
-                    throw new NotFoundValidationException(emailInvite.UserId);
+                {
+                    _logger.LogError($"User with internal id {emailInvite.UserId} was not found");
+                    // Remove entry so we dont fail again
+                    continue;
+                }
 
-                // Send emails
-                await _gridEmailSenderSender.SendEmailAsync(user, emailInvite).ConfigureAwait(false);
+#if DEBUG == FALSE
+                // find user in azure, if user = InActive log and continue
+                var userIdentity = await _userIdentityRepository
+                    .GetUserIdentityAsync(user.ExternalId)
+                    .ConfigureAwait(false);
 
-                // Update email event isSent = true
-                emailInvite.IsSent = true;
-                await _emailEventRepository.UpdateAsync(emailInvite).ConfigureAwait(false);
+                if (userIdentity.Status == UserStatus.Inactive)
+                {
+                    _logger.LogWarning($"User identity with externalId {userIdentity.Id} is inactive and no invite will be sent");
+                    // Remove entry so we dont fail again
+                    continue;
+                }
+#endif
+                // Send email and update event state.
+                await _emailSender.SendEmailAsync(user, emailInvite).ConfigureAwait(false);
+                await _emailEventRepository.MarkAsSentAsync(emailInvite).ConfigureAwait(false);
+
+                // update user status
+                user.InviteStatus = UserInviteStatus.InviteSent;
+                await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
                 // Log ?
             }

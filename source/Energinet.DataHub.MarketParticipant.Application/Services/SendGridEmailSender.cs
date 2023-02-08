@@ -37,26 +37,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             _client = sendGridClient;
         }
 
-        public async Task SendEmailAsync(User user, EmailEvent emailEvent)
+        public Task<bool> SendEmailAsync(User user, EmailEvent emailEvent)
         {
             ArgumentNullException.ThrowIfNull(user, nameof(user));
 
-            switch (emailEvent?.EmailEventType)
+            return emailEvent?.EmailEventType switch
             {
-                case EmailEventType.UserInvite:
-                    await SendUserInviteAsync(user.Email).ConfigureAwait(false);
-                    break;
-                default:
-                    throw new NotFoundException("EmailEventType not recognized");
-            }
+                EmailEventType.UserInvite => SendUserInviteAsync(user.Email),
+                _ => throw new NotFoundException("EmailEventType not recognized")
+            };
         }
 
-        private async Task SendUserInviteAsync(EmailAddress userEmailAddress)
+        private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
         {
-            var from = new SendGrid.Helpers.Mail.EmailAddress(string.Empty);
-            const string subject = "I";
+            var from = new SendGrid.Helpers.Mail.EmailAddress("info@test.dk");
+            const string subject = "Invitation til DataHub";
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
-            var htmlContent = string.Empty;
+            var htmlContent = "Invitation til DatHub<br /><br />Bliv oprettet her: https://www.energinet.dk";
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
 
@@ -68,6 +65,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             {
                 _logger.LogError("User invite email return error response code:  " + response.StatusCode);
             }
+
+            return response.IsSuccessStatusCode;
         }
     }
 }

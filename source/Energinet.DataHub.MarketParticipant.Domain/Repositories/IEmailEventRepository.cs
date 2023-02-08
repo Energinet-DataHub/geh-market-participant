@@ -31,7 +31,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Saves changes to the given <see cref="EmailEvent"/>
         /// </summary>
-        Task UpdateAsync(EmailEvent emailEvent);
+        Task MarkAsSentAsync(EmailEvent emailEvent);
 
         /// <summary>
         /// Get all email events to be sent by type

@@ -21,8 +21,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public int Id { get; set; }
         public Guid UserId { get; set; }
         public Guid ActorId { get; set; }
-        public bool IsSent { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Sent { get; set; }
         public int EmailEventType { get; set; }
     }
 }
