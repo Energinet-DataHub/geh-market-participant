@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             "1111",
             "Test City",
             "Test Country");
-        private readonly OrganizationDomain _validDomain = new ("energinet.dk");
+        private readonly OrganizationDomain _validDomain = new("energinet.dk");
 
         public OrganizationRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
