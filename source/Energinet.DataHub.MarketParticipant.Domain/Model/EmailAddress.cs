@@ -28,7 +28,7 @@ public sealed record EmailAddress
 
     private static string ValidateAddress(string address)
     {
-        return !string.IsNullOrWhiteSpace(address) && MailAddress.TryCreate(address, out _)
+        return !string.IsNullOrWhiteSpace(address) && address.Length <= 64 && MailAddress.TryCreate(address, out _)
             ? address
             : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
     }

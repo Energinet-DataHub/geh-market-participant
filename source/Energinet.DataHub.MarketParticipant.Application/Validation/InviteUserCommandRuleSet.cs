@@ -39,7 +39,8 @@ public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserComma
                 invitationRules
                     .RuleFor(invitation => invitation.Email)
                     .NotEmpty()
-                    .EmailAddress();
+                    .EmailAddress()
+                    .MaximumLength(64);
 
                 invitationRules
                     .RuleFor(invitation => invitation.PhoneNumber)
