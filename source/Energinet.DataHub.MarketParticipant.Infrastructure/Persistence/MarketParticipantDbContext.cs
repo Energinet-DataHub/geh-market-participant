@@ -77,7 +77,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
-        //modelBuilder.ApplyConfiguration(new PermissionEicFunctionEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }
