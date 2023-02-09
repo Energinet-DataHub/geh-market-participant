@@ -39,6 +39,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         user.Id,
         user.UserType,
+        user.DisplayName,
         user.GivenName,
         user.Surname,
         user.Identities,
@@ -218,8 +219,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             new ExternalUserId(user.Id),
             new EmailAddress(userEmailAddress),
             user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
-            user.GivenName,
-            user.Surname,
+            user.GivenName ?? user.DisplayName,
+            user.Surname ?? string.Empty,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
             user.CreatedDateTime!.Value,
             AuthenticationMethod.Undetermined);
@@ -227,7 +228,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     private static bool IsMember(User user)
     {
-        return user.UserType == "Member";
+        return user.UserType == "Member" &&
+               user.Identities.Any(ident => ident.SignInType == "emailAddress");
     }
 
     private async Task<User?> GetBySignInEmailAsync(EmailAddress email)
