@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Microsoft.Extensions.Logging;
 using SendGrid;
 using SendGrid.Helpers.Errors.Model;
@@ -27,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
     public class SendGridEmailSender : IEmailSender
     {
         private readonly ILogger<SendGridEmailSender> _logger;
-        private ISendGridClient _client;
+        private readonly ISendGridClient _client;
 
         public SendGridEmailSender(
             ISendGridClient sendGridClient,
@@ -37,20 +36,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             _client = sendGridClient;
         }
 
-        public Task<bool> SendEmailAsync(User user, EmailEvent emailEvent)
+        public Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
         {
-            ArgumentNullException.ThrowIfNull(user, nameof(user));
+            ArgumentNullException.ThrowIfNull(emailAddress, nameof(emailAddress));
 
             return emailEvent?.EmailEventType switch
             {
-                EmailEventType.UserInvite => SendUserInviteAsync(user.Email),
+                EmailEventType.UserInvite => SendUserInviteAsync(emailAddress),
                 _ => throw new NotFoundException("EmailEventType not recognized")
             };
         }
 
         private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
         {
-            var from = new SendGrid.Helpers.Mail.EmailAddress("info@test.dk");
+            var from = new SendGrid.Helpers.Mail.EmailAddress("info@info.dk");
             const string subject = "Invitation til DataHub";
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
             var htmlContent = "Invitation til DatHub<br /><br />Bliv oprettet her: https://www.energinet.dk";
@@ -63,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             }
             else
             {
-                _logger.LogError("User invite email return error response code:  " + response.StatusCode);
+                throw new NotSupportedException("User invite email return error response code:  " + response.StatusCode);
             }
 
             return response.IsSuccessStatusCode;

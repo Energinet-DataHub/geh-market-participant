@@ -14,7 +14,6 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -26,8 +25,8 @@ public interface IEmailSender
     /// <summary>
     /// Send email to user by email event type
     /// </summary>
-    /// <param name="user">user with email</param>
+    /// <param name="emailAddress">email address for recipient</param>
     /// <param name="emailEvent">email event type</param>
     /// <returns>email send task</returns>
-    Task<bool> SendEmailAsync(User user, EmailEvent emailEvent);
+    Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent);
 }

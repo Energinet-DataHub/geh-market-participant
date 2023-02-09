@@ -39,8 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var emailEventEntity = new EmailEventEntity
             {
-                UserId = emailEvent.UserId,
-                ActorId = emailEvent.ActorId,
+                Email = emailEvent.Email.Address,
                 Created = DateTimeOffset.UtcNow,
                 EmailEventType = (int)emailEvent.EmailEventType
             };
@@ -82,8 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 Id = emailEventEntities.Id,
                 Created = emailEventEntities.Created,
                 Sent = emailEventEntities.Sent,
-                ActorId = emailEventEntities.ActorId,
-                UserId = emailEventEntities.UserId,
+                Email = new EmailAddress(emailEventEntities.Email),
                 EmailEventType = EmailEventType.UserInvite
             };
         }

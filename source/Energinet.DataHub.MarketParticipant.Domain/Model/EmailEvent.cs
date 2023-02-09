@@ -19,8 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     public sealed class EmailEvent
     {
         public int Id { get; set; }
-        public Guid UserId { get; set; }
-        public Guid ActorId { get; set; }
+        public EmailAddress Email { get; set; } = new(string.Empty);
         public DateTimeOffset Created { get; set; }
         public DateTimeOffset? Sent { get; set; }
         public EmailEventType EmailEventType { get; set; }
