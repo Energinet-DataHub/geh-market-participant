@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -55,6 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
                 new TransmissionSystemOperatorRole());
 
             container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
+            container.Register<IEnsureUserRolePermissionsService, EnsureUserRolePermissionsService>();
         }
     }
 }

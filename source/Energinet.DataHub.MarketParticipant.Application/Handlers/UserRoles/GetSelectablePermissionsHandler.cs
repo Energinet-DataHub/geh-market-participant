@@ -16,8 +16,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
@@ -25,15 +25,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 public sealed class GetSelectablePermissionsHandler
     : IRequestHandler<GetSelectablePermissionsCommand, GetSelectablePermissionsResponse>
 {
-    public Task<GetSelectablePermissionsResponse> Handle(
+    private readonly IPermissionRepository _permissionRepository;
+
+    public GetSelectablePermissionsHandler(IPermissionRepository permissionRepository)
+    {
+        _permissionRepository = permissionRepository;
+    }
+
+    public async Task<GetSelectablePermissionsResponse> Handle(
         GetSelectablePermissionsCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        return Task.FromResult(new GetSelectablePermissionsResponse(Enum.GetValues<Permission>().Select(permission =>
+        var permissions = await _permissionRepository.GetToMarketRoleAsync(request.EicFunction).ConfigureAwait(false);
+        return new GetSelectablePermissionsResponse(permissions.Select(permission =>
             new SelectablePermissionDto(
-                (int)permission,
-                permission.ToString(),
-                permission.ToString()))));
+                (int)permission.Permission,
+                permission.Permission.ToString(),
+                permission.Description)));
     }
 }
