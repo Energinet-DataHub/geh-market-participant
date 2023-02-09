@@ -5,6 +5,10 @@
 - Add API for inviting users.
 - Package update.
 
+## Version 2.17.4
+
+- Added EicFunction parameter to GetSelectablePermission Endpoint
+
 ## Version 2.17.3
 
 - Removed unused market roles.

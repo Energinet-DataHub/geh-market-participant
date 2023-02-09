@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -34,10 +35,11 @@ internal static class DomainServiceRegistration
         container.Register<ICombinationOfBusinessRolesRuleService, CombinationOfBusinessRolesRuleService>(Lifestyle.Scoped);
         container.Register<IAllowedGridAreasRuleService, AllowedGridAreasRuleService>(Lifestyle.Scoped);
         container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
-
+ 
         container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
         container.Register<IUniqueMarketRoleGridAreaService, UniqueMarketRoleGridAreaService>(Lifestyle.Scoped);
         container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
+        container.Register<IEnsureUserRolePermissionsService, EnsureUserRolePermissionsService>();
 
         container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
         container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
@@ -55,6 +57,8 @@ internal static class DomainServiceRegistration
             new SystemOperatorRole(),
             new TransmissionSystemOperatorRole());
 
-        container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
+
+         container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
+        }
     }
 }

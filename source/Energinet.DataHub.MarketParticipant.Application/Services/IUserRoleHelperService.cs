@@ -12,18 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 /// <summary>
-/// Validates external token
+/// Service for user role audit logs
 /// </summary>
-public interface IExternalTokenValidator
+public interface IEnsureUserRolePermissionsService
 {
     /// <summary>
-    /// Validates external token
+    /// Creates audit log for user role created
     /// </summary>
-    /// <param name="token"></param>
-    Task<bool> ValidateTokenAsync(string token);
+    /// <param name="permissions">current user id</param>
+    /// <param name="eicFunction">current user role id</param>
+    /// <returns>User role audit log for saving</returns>
+    Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(
+        IEnumerable<Permission> permissions,
+        EicFunction eicFunction);
 }

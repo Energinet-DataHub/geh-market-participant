@@ -13,17 +13,27 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
-
-/// <summary>
-/// Validates external token
-/// </summary>
-public interface IExternalTokenValidator
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
-    /// <summary>
-    /// Validates external token
-    /// </summary>
-    /// <param name="token"></param>
-    Task<bool> ValidateTokenAsync(string token);
+    public sealed class MarketParticipantPermissionDatabaseFixture : IAsyncLifetime
+    {
+        public MarketParticipantPermissionDatabaseFixture()
+        {
+            DatabaseManager = new MarketParticipantDatabaseManager();
+        }
+
+        public MarketParticipantDatabaseManager DatabaseManager { get; }
+
+        public Task InitializeAsync()
+        {
+            return DatabaseManager.CreateDatabaseAsync();
+        }
+
+        public Task DisposeAsync()
+        {
+            return DatabaseManager.DeleteDatabaseAsync();
+        }
+    }
 }
