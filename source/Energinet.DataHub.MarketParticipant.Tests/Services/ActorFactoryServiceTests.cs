@@ -39,6 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "Test Country");
 
         private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
+        private readonly OrganizationDomain _validDomain = new("energinet.dk");
 
         [Fact]
         public async Task CreateAsync_NullOrganization_ThrowsException()
@@ -76,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
-                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
+                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null),
                 null!,
                 new ActorName("fake_value"),
                 Array.Empty<ActorMarketRole>())).ConfigureAwait(false);
@@ -97,7 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
-                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress),
+                new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null),
                 new MockedGln(),
                 new ActorName("fake_value"),
                 null!)).ConfigureAwait(false);
@@ -116,7 +117,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
             organizationRepository
@@ -165,6 +166,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Array.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
+                _validDomain,
                 "Test Comment 2",
                 OrganizationStatus.Active);
 
@@ -207,7 +209,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var globalLocationNumber = new MockedGln();
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
@@ -244,7 +246,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
@@ -283,7 +285,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 allowedGridAreasRuleService.Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(Guid.NewGuid(), meteringPointTypes) };

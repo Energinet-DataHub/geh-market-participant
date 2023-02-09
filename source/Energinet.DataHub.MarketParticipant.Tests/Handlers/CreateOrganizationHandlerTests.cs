@@ -70,6 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -78,10 +79,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     It.IsAny<string>(),
                     It.Is<BusinessRegisterIdentifier>(y => y.Identifier == validCvr),
                     It.IsAny<Address>(),
+                    It.IsAny<OrganizationDomain>(),
                     It.IsAny<string>()))
                 .ReturnsAsync(organization);
 
-            var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "Test Comment"));
+            var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "energinet.dk", "Test Comment"));
 
             // Act
             var response = await target

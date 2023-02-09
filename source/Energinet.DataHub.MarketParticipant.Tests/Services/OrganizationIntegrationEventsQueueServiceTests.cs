@@ -45,6 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -87,6 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     "fake_value",
                     "fake_value"),
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 

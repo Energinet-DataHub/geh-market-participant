@@ -41,10 +41,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 request.Organization.Address.ZipCode,
                 request.Organization.Address.City,
                 request.Organization.Address.Country);
+            var domain = new OrganizationDomain(request.Organization.Domain);
             var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
 
             var organization = await _organizationFactoryService
-                .CreateAsync(request.Organization.Name, cvr, address, request.Organization.Comment)
+                .CreateAsync(request.Organization.Name, cvr, address, domain, request.Organization.Comment)
                 .ConfigureAwait(false);
 
             return new CreateOrganizationResponse(organization.Id.Value);

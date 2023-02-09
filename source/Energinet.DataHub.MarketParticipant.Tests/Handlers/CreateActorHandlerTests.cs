@@ -78,6 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -137,6 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 validBusinessRegisterIdentifier,
                 validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -190,6 +192,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("123"),
                 new Address(null, null, null, null, "DK"),
+                new OrganizationDomain("energinet.dk"),
                 null,
                 OrganizationStatus.Active);
 

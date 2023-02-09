@@ -47,6 +47,7 @@ public sealed class CreateOrganizationIntegrationTests
             blankValue,
             blankValue,
             new AddressDto(null, null, null, null, "DK"),
+            "energinet.dk",
             blankValue);
 
         var command = new CreateOrganizationCommand(organizationDto);
