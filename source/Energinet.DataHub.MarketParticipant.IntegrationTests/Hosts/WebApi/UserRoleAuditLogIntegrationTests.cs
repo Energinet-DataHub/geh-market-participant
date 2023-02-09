@@ -22,10 +22,12 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -33,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
+public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase, IAsyncLifetime
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -63,7 +65,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             name,
             "description",
             UserRoleStatus.Active,
-            EicFunction.Agent,
+            EicFunction.BillingAgent,
             new Collection<int>() { (int)Permission.ActorManage });
 
         var createUserRoleCommand = new CreateUserRoleCommand(userId, createUserRoleDto);
@@ -97,7 +99,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
 
         var userRoleId = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserRole_NameChangedAuditLog_InitName", string.Empty, UserRoleStatus.Active, EicFunction.Agent, new[] { Permission.UsersView });
+            .CreateUserRoleAsync("UpdateUserRole_NameChangedAuditLog_InitName", string.Empty, UserRoleStatus.Active, EicFunction.BillingAgent, new[] { Permission.UsersView });
 
         const string nameUpdate = "UpdateUserRole_NameChangedAuditLog_Updated";
         const string descriptionUpdate = "UpdateUserRole_DescriptionChangedAuditLog_Updated";
@@ -212,13 +214,46 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         Assert.Single(expectedUpdateResult, e => e.UserRoleChangeType == UserRoleChangeType.DescriptionChange && e.ChangeDescriptionJson.Equals(descriptionChangeChange!.ChangeDescriptionJson, StringComparison.Ordinal));
     }
 
+    public async Task InitializeAsync()
+    {
+        // Add needed permissions with Eic functions for tests
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var allPermissions = await context.Permissions.ToListAsync();
+        context.Permissions.RemoveRange(allPermissions);
+        await context.SaveChangesAsync();
+
+        var permissionToUseForTest = new PermissionEntity()
+        {
+            Description = "Permission for test",
+            Id = (int)Permission.ActorManage,
+            EicFunctions = new Collection<PermissionEicFunctionEntity>()
+            {
+                new()
+                {
+                    EicFunction = EicFunction.BillingAgent, PermissionId = (int)Permission.ActorManage
+                }
+            }
+        };
+        context.Permissions.Add(permissionToUseForTest);
+        await context.SaveChangesAsync();
+    }
+
+    public async Task DisposeAsync()
+    {
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var allPermissions = await context.Permissions.ToListAsync();
+        context.Permissions.RemoveRange(allPermissions);
+        await context.SaveChangesAsync();
+    }
+
     private static CreateUserRoleDto CreateUserRoleToSave(string name)
     {
         return new CreateUserRoleDto(
             name,
             "description",
             UserRoleStatus.Active,
-            EicFunction.Agent,
+            EicFunction.BillingAgent,
             new Collection<int>() { (int)Permission.ActorManage });
     }
 
@@ -248,7 +283,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             updateUserRoleDto.Description,
             updateUserRoleDto.Status,
             updateUserRoleDto.Permissions.Select(x => (Permission)x),
-            EicFunction.Agent);
+            EicFunction.BillingAgent);
 
         return userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(
             new UserId(userId ?? Guid.NewGuid()),

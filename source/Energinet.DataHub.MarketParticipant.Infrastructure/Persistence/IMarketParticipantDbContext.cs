@@ -105,6 +105,11 @@ public interface IMarketParticipantDbContext
     DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; }
 
     /// <summary>
+    ///     Represent access to the Permission database table
+    /// </summary>
+    DbSet<PermissionEntity> Permissions { get; }
+
+    /// <summary>
     ///     Represent access to the EmailEventEntry database table
     /// </summary>
     DbSet<EmailEventEntity> EmailEventEntries { get; }

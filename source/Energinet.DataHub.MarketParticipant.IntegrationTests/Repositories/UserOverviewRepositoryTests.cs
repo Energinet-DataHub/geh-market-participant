@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -218,7 +219,15 @@ public sealed class UserOverviewRepositoryTests
             .Setup(x => x.SearchUserIdentitiesAsync(null, true))
             .ReturnsAsync(new[]
             {
-                new UserIdentity(externalId, UserStatus.Active, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow)
+                new UserIdentity(
+                    externalId,
+                    new EmailAddress("fake@value"),
+                    UserStatus.Active,
+                    "fake_value",
+                    "fake_value",
+                    null,
+                    DateTime.UtcNow,
+                    AuthenticationMethod.Undetermined)
             });
 
         var target = new UserOverviewRepository(
@@ -260,7 +269,15 @@ public sealed class UserOverviewRepositoryTests
             .Setup(x => x.SearchUserIdentitiesAsync(null, null))
             .ReturnsAsync(new[]
             {
-                new UserIdentity(externalId, UserStatus.Active, "fake_value", new EmailAddress("fake@value"), null, DateTime.UtcNow)
+                new UserIdentity(
+                    externalId,
+                    new EmailAddress("fake@value"),
+                    UserStatus.Active,
+                    "fake_value",
+                    "fake_value",
+                    null,
+                    DateTime.UtcNow,
+                    AuthenticationMethod.Undetermined)
             });
 
         var target = new UserOverviewRepository(
@@ -353,7 +370,16 @@ public sealed class UserOverviewRepositoryTests
             .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
                     x.Select(y =>
-                        new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow))));
+                        new UserIdentity(
+                            y,
+                            new EmailAddress("fake@value"),
+                            UserStatus.Inactive,
+                            y.ToString(),
+                            y.ToString(),
+                            null,
+                            DateTime.UtcNow,
+                            AuthenticationMethod.Undetermined))));
+
         return userIdentityRepository;
     }
 
@@ -363,14 +389,31 @@ public sealed class UserOverviewRepositoryTests
         userIdentityRepository
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(userIdsToReturnFromSearch.Select(y =>
-                new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow)));
+                new UserIdentity(
+                    y,
+                    new EmailAddress("fake@value"),
+                    UserStatus.Inactive,
+                    y.ToString(),
+                    y.ToString(),
+                    null,
+                    DateTime.UtcNow,
+                    AuthenticationMethod.Undetermined)));
 
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .Returns<IEnumerable<ExternalUserId>>((_) =>
                 Task.FromResult(
                     userIdsToReturnFromGet.Select(y =>
-                        new UserIdentity(y, UserStatus.Inactive, y.ToString(), new EmailAddress("fake@value"), null, DateTime.UtcNow))));
+                        new UserIdentity(
+                            y,
+                            new EmailAddress("fake@value"),
+                            UserStatus.Inactive,
+                            y.ToString(),
+                            y.ToString(),
+                            null,
+                            DateTime.UtcNow,
+                            AuthenticationMethod.Undetermined))));
+
         return userIdentityRepository;
     }
 
@@ -409,7 +452,7 @@ public sealed class UserOverviewRepositoryTests
             MarketParticipantDbContext context,
             bool isFas,
             string actorName = "Actor name",
-            EicFunction eicFunction = EicFunction.TransmissionCapacityAllocator)
+            EicFunction eicFunction = EicFunction.BillingAgent)
     {
         var actorEntity = new ActorEntity
         {

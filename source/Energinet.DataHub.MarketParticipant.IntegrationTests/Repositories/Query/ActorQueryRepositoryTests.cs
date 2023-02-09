@@ -42,7 +42,7 @@ public sealed class ActorQueryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var actorId = await _fixture.DatabaseManager.CreateActorAsync(new[] { EicFunction.Agent });
+        var actorId = await _fixture.DatabaseManager.CreateActorAsync(new[] { EicFunction.BillingAgent });
 
         var target = new ActorQueryRepository(context);
 

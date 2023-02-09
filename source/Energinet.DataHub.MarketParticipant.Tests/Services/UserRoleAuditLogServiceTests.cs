@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal(userRoleUpdateSut.Description, deserializedCreatedAuditLog.Description);
             Assert.Equal(userRoleUpdateSut.Status, deserializedCreatedAuditLog.Status);
             Assert.Equal(userRoleUpdateSut.EicFunction, deserializedCreatedAuditLog.EicFunction);
-            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => e.ToString()), deserializedCreatedAuditLog.Permissions);
+            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => (int)e), deserializedCreatedAuditLog.Permissions);
         }
 
         [Fact]
@@ -108,8 +108,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var userRoleDb = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.Agent);
-            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.Consumer);
+            var userRoleDb = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.BillingAgent);
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(eicFunction: EicFunction.BalanceResponsibleParty);
 
             // act
             var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
@@ -145,9 +145,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var deserializedCAuditLog = JsonSerializer.Deserialize<UserRoleAuditLogSerialized>(createdAuditLog.ChangeDescriptionJson);
             Assert.True(auditLogs.Count == 1);
             Assert.NotNull(deserializedCAuditLog);
-            var userRoleUpdateSutPermissionsStrings = userRoleUpdateSut.Permissions.Select(e => e.ToString()).ToList();
+            var userRoleUpdateSutPermissionsInts = userRoleUpdateSut.Permissions.Select(e => (int)e).ToList();
             var deserializedCAuditLogPermissions = deserializedCAuditLog.Permissions?.ToList();
-            Assert.True(userRoleUpdateSutPermissionsStrings.SequenceEqual(deserializedCAuditLogPermissions ?? new List<string>()));
+            Assert.True(userRoleUpdateSutPermissionsInts.SequenceEqual(deserializedCAuditLogPermissions ?? new List<int>()));
         }
 
         [Fact]
@@ -215,7 +215,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         private static UserRole BuildUserRoleWithPermissionsDto(
             string name = "UserRoleName",
             string description = "UserRoleDescription",
-            EicFunction eicFunction = EicFunction.Agent,
+            EicFunction eicFunction = EicFunction.BillingAgent,
             UserRoleStatus status = UserRoleStatus.Active,
             IEnumerable<Permission>? permissions = null)
         {

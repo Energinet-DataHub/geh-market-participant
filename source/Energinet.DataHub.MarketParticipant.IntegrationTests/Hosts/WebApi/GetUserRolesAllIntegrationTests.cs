@@ -46,11 +46,11 @@ public sealed class GetUserRolesAllIntegrationTests
 
         var userRoleId1 = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("Role1", "Description", UserRoleStatus.Active, EicFunction.Consumer, System.Array.Empty<Permission>());
+            .CreateUserRoleAsync("Role1", "Description", UserRoleStatus.Active, EicFunction.BillingAgent, System.Array.Empty<Permission>());
 
         var userRoleId2 = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("Role2", "Description", UserRoleStatus.Active, EicFunction.Producer, System.Array.Empty<Permission>());
+            .CreateUserRoleAsync("Role2", "Description", UserRoleStatus.Active, EicFunction.IndependentAggregator, System.Array.Empty<Permission>());
 
         var userRoleId3 = await _fixture
             .DatabaseManager

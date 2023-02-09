@@ -33,11 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         private static HashSet<EicFunction> MarketRoleSet => new HashSet<EicFunction>
         {
-            EicFunction.GridAccessProvider,
-            EicFunction.MeterAdministrator,
-            EicFunction.MeterOperator,
-            EicFunction.MeteredDataCollector,
-            EicFunction.PartyConnectedToTheGrid
+            EicFunction.GridAccessProvider
         };
 
         public async Task EnsureUniqueMarketRolesPerGridAreaAsync(Actor actor)

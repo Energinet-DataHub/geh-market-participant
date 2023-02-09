@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -64,7 +63,7 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var userRoleId = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync(userRoleNameToUpdate, "Description", UserRoleStatus.Active, EicFunction.Agent, new[] { Permission.UsersView });
+            .CreateUserRoleAsync(userRoleNameToUpdate, "Description", UserRoleStatus.Active, EicFunction.BillingAgent, new[] { Permission.UsersView });
 
         var updateCommand = new UpdateUserRoleCommand(
             userId,
@@ -106,7 +105,7 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var userRoleId = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserRoleDescription", userRoleDescriptionToUpdate, UserRoleStatus.Active, EicFunction.Agent, new[] { Permission.UsersView });
+            .CreateUserRoleAsync("UpdateUserRoleDescription", userRoleDescriptionToUpdate, UserRoleStatus.Active, EicFunction.BillingAgent, new[] { Permission.UsersView });
 
         var updateCommand = new UpdateUserRoleCommand(
             userId,
@@ -148,7 +147,7 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var userRoleId = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserRoleStatus", string.Empty, userRoleStatusToUpdate, EicFunction.Agent, new[] { Permission.UsersView });
+            .CreateUserRoleAsync("UpdateUserRoleStatus", string.Empty, userRoleStatusToUpdate, EicFunction.BillingAgent, new[] { Permission.UsersView });
 
         var updateCommand = new UpdateUserRoleCommand(
             userId,
@@ -190,7 +189,7 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var userRoleId = await _fixture
             .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, EicFunction.Agent, userRolePermissionsToUpdate);
+            .CreateUserRoleAsync("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, EicFunction.BillingAgent, userRolePermissionsToUpdate);
 
         var updateCommand = new UpdateUserRoleCommand(
             userId,

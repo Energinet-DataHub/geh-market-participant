@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -139,12 +140,12 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("permissions")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetSelectablePermissionsAsync()
+    public async Task<IActionResult> GetSelectablePermissionsAsync(EicFunction eicFunction)
     {
         return await this.ProcessAsync(
             async () =>
             {
-                var command = new GetSelectablePermissionsCommand();
+                var command = new GetSelectablePermissionsCommand(eicFunction);
 
                 var response = await _mediator
                     .Send(command)

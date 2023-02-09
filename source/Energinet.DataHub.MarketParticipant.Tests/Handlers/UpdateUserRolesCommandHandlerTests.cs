@@ -47,8 +47,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var user = new User(
                 new UserId(userId),
                 new ExternalUserId(externalUserId),
-                userRoleAssignments,
                 new EmailAddress("test@test.dk"),
+                userRoleAssignments,
                 null);
 
             var userContextMock = CreateMockedUser();

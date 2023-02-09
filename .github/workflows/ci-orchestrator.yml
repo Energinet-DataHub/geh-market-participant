@@ -1,0 +1,61 @@
+name: CI orchestrator
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  #
+  # License and Markdown Check
+  #
+  ci_base:
+    uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
+  
+  #
+  # Detect changes to start relevant workflows
+  #
+  changes:
+    uses: ./.github/workflows/detect-changes.yml
+
+  ci_dotnet:
+    needs: changes
+    if: ${{ needs.changes.outputs.dotnet == 'true' }}
+    uses: ./.github/workflows/ci-dotnet.yml
+    secrets: inherit
+
+  ci_client_package:
+    needs: changes
+    if: ${{ needs.changes.outputs.client_package == 'true' }}
+    uses: ./.github/workflows/publish-marketparticipant-client.yml
+    secrets: inherit
+
+  ci_model_package:
+    needs: changes
+    if: ${{ needs.changes.outputs.model_package == 'true' }}
+    uses: ./.github/workflows/publish-marketparticipant-model.yml
+    secrets: inherit
+
+  #
+  # Branch policy status check
+  #
+
+  allow_merge_ci_orchestrator:
+    runs-on: ubuntu-latest
+    needs: [
+      ci_base,
+      ci_dotnet,
+      ci_client_package,
+      ci_model_package,
+    ]
+    if: |
+      always()
+    steps:
+      - name: Verify if merge is allowed
+        run: |
+          echo "${{ toJSON(needs) }}"
+
+          if [[ ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }} = true ]]; then
+              echo "Failed"
+              exit 1
+          fi

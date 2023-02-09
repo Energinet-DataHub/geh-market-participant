@@ -14,39 +14,47 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public class User
+// TODO: User
+public sealed class User
 {
     public User(
         ExternalUserId externalId,
-        ICollection<UserRoleAssignment> roleAssignments,
         EmailAddress email)
     {
         Id = new UserId(Guid.Empty);
         ExternalId = externalId;
-        RoleAssignments = roleAssignments;
+#pragma warning disable CS0618 // Type or member is obsolete
         Email = email;
+#pragma warning restore CS0618 // Type or member is obsolete
+        RoleAssignments = new HashSet<UserRoleAssignment>();
     }
 
     public User(
         UserId id,
         ExternalUserId externalId,
-        ICollection<UserRoleAssignment> roleAssignments,
         EmailAddress email,
+        IEnumerable<UserRoleAssignment> roleAssignments,
         UserInviteStatus? inviteStatus)
     {
         Id = id;
         ExternalId = externalId;
-        RoleAssignments = roleAssignments;
+#pragma warning disable CS0618 // Type or member is obsolete
         Email = email;
+#pragma warning restore CS0618 // Type or member is obsolete
+        RoleAssignments = roleAssignments.ToHashSet();
         InviteStatus = inviteStatus;
     }
 
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; set; }
+
+    [Obsolete("TODO: Use email from UserIdentity")]
     public EmailAddress Email { get; }
+
     public UserInviteStatus? InviteStatus { get; set; }
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
 }
