@@ -35,7 +35,7 @@ internal static class DomainServiceRegistration
         container.Register<ICombinationOfBusinessRolesRuleService, CombinationOfBusinessRolesRuleService>(Lifestyle.Scoped);
         container.Register<IAllowedGridAreasRuleService, AllowedGridAreasRuleService>(Lifestyle.Scoped);
         container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
- 
+
         container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
         container.Register<IUniqueMarketRoleGridAreaService, UniqueMarketRoleGridAreaService>(Lifestyle.Scoped);
         container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
@@ -57,8 +57,6 @@ internal static class DomainServiceRegistration
             new SystemOperatorRole(),
             new TransmissionSystemOperatorRole());
 
-
-         container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
-        }
+        container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
     }
 }
