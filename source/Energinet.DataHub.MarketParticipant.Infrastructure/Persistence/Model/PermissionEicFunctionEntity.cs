@@ -13,8 +13,16 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+{
+    public sealed class PermissionEicFunctionEntity
+    {
+        public PermissionEicFunctionEntity()
+        {
+        }
 
-public sealed record GetSelectablePermissionsCommand(EicFunction EicFunction) : IRequest<GetSelectablePermissionsResponse>;
+        public int PermissionId { get; set; }
+        public EicFunction EicFunction { get; set; }
+    }
+}

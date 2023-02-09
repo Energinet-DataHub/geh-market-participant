@@ -12,9 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using MediatR;
+using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-
-public sealed record GetSelectablePermissionsCommand(EicFunction EicFunction) : IRequest<GetSelectablePermissionsResponse>;
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
+{
+    [CollectionDefinition("IntegrationPermissionTest")]
+    public sealed class IntegrationsPermissionTestsFixtureConfiguration :
+        ICollectionFixture<MarketParticipantPermissionDatabaseFixture>
+    {
+        // This class has no code, and is never created. Its purpose is simply
+        // to be the place to apply [CollectionDefinition] and all the
+        // ICollectionFixture<> interfaces.
+    }
+}
