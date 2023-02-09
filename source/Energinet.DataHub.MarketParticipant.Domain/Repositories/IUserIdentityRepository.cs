@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -24,6 +25,24 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserIdentityRepository
 {
     /// <summary>
+    /// Retrieves user identity for the provided external id.
+    /// </summary>
+    /// <param name="externalId">The external id of the user identity.</param>
+    Task<UserIdentity?> GetAsync(ExternalUserId externalId);
+
+    /// <summary>
+    /// Retrieves user identity for the given sign-in email address.
+    /// </summary>
+    /// <param name="email">The sign-in email address of the user identity.</param>
+    Task<UserIdentity?> GetAsync(EmailAddress email);
+
+    /// <summary>
+    /// Retrieves user identities for the provided set of external ids.
+    /// </summary>
+    /// <param name="externalIds">A set of external ids.</param>
+    Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
+
+    /// <summary>
     /// Searches for users using a search text
     /// </summary>
     /// <param name="searchText">The text to search for</param>
@@ -33,14 +52,9 @@ public interface IUserIdentityRepository
     Task<IEnumerable<UserIdentity>> SearchUserIdentitiesAsync(string? searchText, bool? accountEnabled);
 
     /// <summary>
-    /// Retrieves user identity for the provided external id.
+    /// Creates a new external user identity .
     /// </summary>
-    /// <param name="externalId">The external id of the user identity.</param>
-    Task<UserIdentity> GetUserIdentityAsync(ExternalUserId externalId);
-
-    /// <summary>
-    /// Retrieves user identities for the provided set of external ids.
-    /// </summary>
-    /// <param name="externalIds">A set of external ids.</param>
-    Task<IEnumerable<UserIdentity>> GetUserIdentitiesAsync(IEnumerable<ExternalUserId> externalIds);
+    /// <param name="userIdentity">The user identity to create.</param>
+    /// <returns>The id of the external user identity.</returns>
+    Task<ExternalUserId> CreateAsync(UserIdentity userIdentity);
 }

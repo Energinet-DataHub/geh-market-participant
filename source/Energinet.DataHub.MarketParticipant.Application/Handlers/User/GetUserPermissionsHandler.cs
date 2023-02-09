@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -29,22 +28,15 @@ public sealed class GetUserPermissionsHandler
     : IRequestHandler<GetUserPermissionsCommand, GetUserPermissionsResponse>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserQueryRepository _userQueryRepository;
 
     public GetUserPermissionsHandler(
         IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository,
         IUserQueryRepository userQueryRepository)
     {
         _userRepository = userRepository;
-        _userIdentityRepository = userIdentityRepository;
         _userQueryRepository = userQueryRepository;
     }
-
-    // This is a temporary workaround that creates users from AD/B2C in our own database.
-    // TODO: Remove once invite flow has been implemented.
-    public static Func<IEnumerable<ExternalUserId>, Task<IEnumerable<UserIdentity>>>? TestWorkaround { get; set; }
 
     public async Task<GetUserPermissionsResponse> Handle(
         GetUserPermissionsCommand request,
@@ -56,12 +48,9 @@ public sealed class GetUserPermissionsHandler
             .GetAsync(new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
-        // This is a temporary workaround that creates users from AD/B2C in our own database.
-        // TODO: Remove once invite flow has been implemented.
+        // TODO: UT
         if (user == null)
-        {
-            user = await CreateFallbackUserAsync(new ExternalUserId(request.ExternalUserId)).ConfigureAwait(false);
-        }
+            throw new NotFoundValidationException(request.ExternalUserId);
 
         var permissions = await _userQueryRepository
             .GetPermissionsAsync(request.ActorId, user.ExternalId)
@@ -72,37 +61,5 @@ public sealed class GetUserPermissionsHandler
             .ConfigureAwait(false);
 
         return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions);
-    }
-
-    private async Task<Domain.Model.Users.User> CreateFallbackUserAsync(ExternalUserId externalUserId)
-    {
-        UserIdentity userIdentity;
-
-        if (TestWorkaround != null)
-        {
-            var userIdentities = await TestWorkaround(new[] { externalUserId }).ConfigureAwait(false);
-            userIdentity = userIdentities.Single();
-        }
-        else
-        {
-            var userIdentities = await _userIdentityRepository
-                .GetUserIdentitiesAsync(new[] { externalUserId })
-                .ConfigureAwait(false);
-
-            userIdentity = userIdentities.Single();
-        }
-
-        var user = new Domain.Model.Users.User(
-            externalUserId,
-            new List<UserRoleAssignment>(),
-            userIdentity.Email);
-
-        await _userRepository
-            .AddOrUpdateAsync(user)
-            .ConfigureAwait(false);
-
-        return (await _userRepository
-            .GetAsync(externalUserId)
-            .ConfigureAwait(false))!;
     }
 }

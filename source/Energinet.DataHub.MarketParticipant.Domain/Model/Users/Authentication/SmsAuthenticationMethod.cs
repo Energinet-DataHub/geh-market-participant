@@ -12,30 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
-public sealed record PhoneNumber
+// TODO: UTs
+public sealed class SmsAuthenticationMethod : AuthenticationMethod
 {
-    private static readonly PhoneAttribute _validator = new();
-
-    public PhoneNumber(string number)
+    public SmsAuthenticationMethod(PhoneNumber phoneNumber)
     {
-        Number = ValidateNumber(number);
+        ArgumentNullException.ThrowIfNull(phoneNumber);
+
+        if (!Regex.IsMatch(phoneNumber.Number, "\\+[0-9]+ [0-9]+"))
+        {
+            throw new ValidationException("SMS authentication requires the phone number to be formatted as '+{country} {number}', e.g. +1 5555551234.");
+        }
+
+        PhoneNumber = phoneNumber;
     }
 
-    public string Number { get; }
-
-    private static string ValidateNumber(string number)
-    {
-        return !string.IsNullOrWhiteSpace(number) && number.Length <= 30 && _validator.IsValid(number)
-            ? number
-            : throw new ValidationException($"The provided phone number '{number}' is not valid.");
-    }
-
-    public override string ToString()
-    {
-        return Number;
-    }
+    public PhoneNumber PhoneNumber { get; }
 }
