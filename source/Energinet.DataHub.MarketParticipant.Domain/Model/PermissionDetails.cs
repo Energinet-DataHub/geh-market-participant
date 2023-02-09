@@ -19,6 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public record PermissionDetails(
         Permission Permission,
-        string? Description,
+        string Description,
         IEnumerable<EicFunction> EicFunctions);
 }

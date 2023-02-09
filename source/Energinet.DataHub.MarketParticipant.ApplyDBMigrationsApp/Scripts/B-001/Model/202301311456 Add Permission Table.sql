@@ -6,7 +6,7 @@ GO
 
 CREATE TABLE [dbo].[Permission](
     [Id] [INT] NOT NULL,
-    [Description] [nvarchar](250) NULL,
+    [Description] [nvarchar](250) NOT NULL,
     CONSTRAINT [PK_AccessPermission] PRIMARY KEY CLUSTERED
 (
 [Id] ASC

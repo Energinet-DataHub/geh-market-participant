@@ -21,11 +21,11 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
-    public class UserRoleHelperService : IUserRoleHelperService
+    public class EnsurePermissionsHelperService : IEnsurePermissionsHelperService
     {
         private readonly IPermissionRepository _permissionRepository;
 
-        public UserRoleHelperService(IPermissionRepository permissionRepository)
+        public EnsurePermissionsHelperService(IPermissionRepository permissionRepository)
         {
             _permissionRepository = permissionRepository;
         }

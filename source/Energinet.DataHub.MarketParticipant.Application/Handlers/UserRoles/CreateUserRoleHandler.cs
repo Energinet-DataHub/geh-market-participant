@@ -32,13 +32,13 @@ public sealed class CreateUserRoleHandler
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserRoleAuditLogService _userRoleAuditLogService;
     private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
-    private readonly IUserRoleHelperService _userRoleHelperService;
+    private readonly IEnsurePermissionsHelperService _userRoleHelperService;
 
     public CreateUserRoleHandler(
         IUserRoleRepository userRoleRepository,
         IUserRoleAuditLogService userRoleAuditLogService,
         IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository,
-        IUserRoleHelperService userRoleHelperService)
+        IEnsurePermissionsHelperService userRoleHelperService)
     {
         _userRoleRepository = userRoleRepository;
         _userRoleAuditLogService = userRoleAuditLogService;

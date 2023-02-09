@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IUserRoleRepository>().Object,
                 new Mock<IUserRoleAuditLogService>().Object,
                 new Mock<IUserRoleAuditLogEntryRepository>().Object,
-                new Mock<IUserRoleHelperService>().Object);
+                new Mock<IEnsurePermissionsHelperService>().Object);
 
             // Act + Assert
             await Assert
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
             var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
             var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
-            var userRoleHelperServiceMock = new Mock<IUserRoleHelperService>();
+            var userRoleHelperServiceMock = new Mock<IEnsurePermissionsHelperService>();
             var target = new CreateUserRoleHandler(
                 userRoleRepositoryMock.Object,
                 userRoleAuditLogServiceMock.Object,
@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
             var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
             var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
-            var userRoleHelperServiceMock = new Mock<IUserRoleHelperService>();
+            var userRoleHelperServiceMock = new Mock<IEnsurePermissionsHelperService>();
             var target = new CreateUserRoleHandler(
                 userRoleRepositoryMock.Object,
                 userRoleAuditLogServiceMock.Object,
