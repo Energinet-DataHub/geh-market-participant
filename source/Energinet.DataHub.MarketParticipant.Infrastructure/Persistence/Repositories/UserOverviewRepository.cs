@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -74,7 +75,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     {
                         user.Id,
                         userIdentity.Status,
-                        userIdentity.Name,
+                        Name = userIdentity.FullName,
                         Email = userIdentity.Email.Address,
                         PhoneNumber = userIdentity.PhoneNumber?.Number,
                         userIdentity.CreatedDate
@@ -154,7 +155,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Where(ident => statusFilter.Contains(ident.Status));
         }
 
-        //Combine results and create final search result
+        // Combine results and create final search result
         var userLookup = searchQuery
             .Union(knownLocalUsers)
             .ToDictionary(x => x.ExternalId);
@@ -165,7 +166,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             {
                 x.Id,
                 x.Status,
-                x.Name,
+                Name = x.FullName,
                 Email = x.Email.Address,
                 PhoneNumber = x.PhoneNumber?.Number,
                 x.CreatedDate

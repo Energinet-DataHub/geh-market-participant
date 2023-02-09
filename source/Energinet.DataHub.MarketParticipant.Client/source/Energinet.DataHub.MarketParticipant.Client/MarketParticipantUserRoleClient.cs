@@ -131,13 +131,14 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync()
+        public async Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync(EicFunction eicFunction)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
                         .Request("user-roles", "permissions")
+                        .SetQueryParam("eicFunction", eicFunction)
                         .GetAsync())
                 .ConfigureAwait(false);
 

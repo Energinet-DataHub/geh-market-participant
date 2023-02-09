@@ -16,34 +16,51 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using Microsoft.Graph;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 
 public static class EnumerableExtensions
 {
+    public static async Task<IEnumerable<T>> IteratePagesAsync<T>(this ICollectionPage<T> collection, IBaseClient graphClient)
+    {
+        var results = new List<T>();
+        var pageIterator = PageIterator<T>
+            .CreatePageIterator(
+                graphClient,
+                collection,
+                item =>
+                {
+                    results.Add(item);
+                    return true;
+                });
+
+        while (pageIterator.State != PagingState.Complete)
+        {
+            await pageIterator.IterateAsync().ConfigureAwait(false);
+        }
+
+        return results;
+    }
+
     public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source, string property)
     {
         ArgumentNullException.ThrowIfNull(source);
-        var propertyInfo = GetPropertyInfo(source, property);
+        var propertyInfo = GetPropertyInfo<T>(property);
         return source.OrderBy(x => propertyInfo.GetValue(x));
     }
 
     public static IOrderedEnumerable<T> OrderByDescending<T>(this IEnumerable<T> source, string property)
     {
         ArgumentNullException.ThrowIfNull(source);
-        var propertyInfo = GetPropertyInfo(source, property);
+        var propertyInfo = GetPropertyInfo<T>(property);
         return source.OrderByDescending(x => propertyInfo.GetValue(x));
     }
 
-    private static PropertyInfo GetPropertyInfo<T>(IEnumerable<T> source, string property)
+    private static PropertyInfo GetPropertyInfo<T>(string property)
     {
-        var propertyInfo = typeof(T).GetProperty(property);
-
-        if (propertyInfo == null)
-        {
-            throw new ArgumentException($"Property not found. Available properties are: {string.Join(", ", typeof(T).GetProperties().Select(x => x.Name))}");
-        }
-
-        return propertyInfo;
+        return typeof(T).GetProperty(property) ??
+               throw new ArgumentException($"Property not found. Available properties are: {string.Join(", ", typeof(T).GetProperties().Select(x => x.Name))}");
     }
 }

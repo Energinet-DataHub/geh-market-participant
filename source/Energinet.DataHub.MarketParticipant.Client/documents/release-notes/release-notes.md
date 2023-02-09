@@ -1,8 +1,17 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.18.0
+## Version 2.19.0
 
 - Required domain name when creating organization.
+
+## Version 2.18.0
+
+- Add API for inviting users.
+- Package update.
+
+## Version 2.17.4
+
+- Added EicFunction parameter to GetSelectablePermission Endpoint
 
 ## Version 2.17.3
 

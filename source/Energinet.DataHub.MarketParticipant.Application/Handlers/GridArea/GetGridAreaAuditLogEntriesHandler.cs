@@ -61,10 +61,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                     if (user != null)
                     {
                         var userIdentity = await _userIdentityRepository
-                            .GetUserIdentityAsync(user.ExternalId)
+                            .GetAsync(user.ExternalId)
                             .ConfigureAwait(false);
 
-                        userName = userIdentity.Name;
+                        // TODO: Correct error message?
+                        if (userIdentity == null)
+                        {
+                            userName = "[NOT FOUND IN AD]";
+                        }
+                        else
+                        {
+                            userName = userIdentity.FullName;
+                        }
                     }
 
                     userNameLookup[entry.UserId] = userName;

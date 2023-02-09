@@ -50,10 +50,11 @@ namespace Energinet.DataHub.MarketParticipant.Common
             ConfigureSimpleInjector(services);
 
             Container.AddApplicationServices();
+            Container.AddInfrastructureServices();
             Container.AddDbContextInterfaces();
             Container.AddRepositories();
             Container.AddServiceBus();
-            Container.AddServices();
+            Container.AddDomainServices();
             Container.AddUnitOfWorkProvider();
             Container.AddAzureAdConfiguration();
             Container.AddGraphServiceClient();

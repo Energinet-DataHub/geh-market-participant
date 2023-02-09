@@ -61,3 +61,5 @@ searchText
 param
 enum
 Ints
+EicFunction
+GetSelectablePermission
