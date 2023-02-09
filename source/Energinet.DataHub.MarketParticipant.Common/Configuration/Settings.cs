@@ -56,4 +56,7 @@ public static class Settings
 
     public static Setting<string> SendGridApiKey { get; }
         = new("SEND_GRID_APIKEY");
+
+    public static Setting<string> UserInviteFromEmail { get; }
+        = new("USER_INVITE_FROM_EMAIL");
 }

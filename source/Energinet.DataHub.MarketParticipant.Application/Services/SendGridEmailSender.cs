@@ -25,13 +25,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     public class SendGridEmailSender : IEmailSender
     {
+        private readonly string _fromEmail;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
 
         public SendGridEmailSender(
+            string fromEmail,
             ISendGridClient sendGridClient,
             ILogger<SendGridEmailSender> logger)
         {
+            _fromEmail = fromEmail;
             _logger = logger;
             _client = sendGridClient;
         }
@@ -49,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
         private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
         {
-            var from = new SendGrid.Helpers.Mail.EmailAddress("info@info.dk");
+            var from = new SendGrid.Helpers.Mail.EmailAddress(_fromEmail);
             const string subject = "Invitation til DataHub";
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
             var htmlContent = "Invitation til DatHub<br /><br />Bliv oprettet her: https://www.energinet.dk";

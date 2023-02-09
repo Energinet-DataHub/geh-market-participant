@@ -31,32 +31,27 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
         private readonly IEmailEventRepository _emailEventRepository;
         private readonly IEmailSender _emailSender;
         private readonly IUserIdentityRepository _userIdentityRepository;
-        private readonly ILogger<SendUserInviteEmailHandler> _logger;
 
         public SendUserInviteEmailHandler(
             IUserRepository userRepository,
             IEmailEventRepository emailEventRepository,
             IEmailSender emailSender,
-            IUserIdentityRepository userIdentityRepository,
-            ILogger<SendUserInviteEmailHandler> logger)
+            IUserIdentityRepository userIdentityRepository)
         {
             _userRepository = userRepository;
             _emailEventRepository = emailEventRepository;
             _emailSender = emailSender;
             _userIdentityRepository = userIdentityRepository;
-            _logger = logger;
         }
 
         public async Task<Unit> Handle(SendUserInviteEmailCommand request, CancellationToken cancellationToken)
         {
-            // Find email event to be sent
             var invitesToBeSent = await _emailEventRepository
                 .GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)
                 .ConfigureAwait(false);
 
             foreach (var emailInvite in invitesToBeSent)
             {
-                // find user in azure, if user = InActive log and continue
                 var userIdentity = await _userIdentityRepository
                     .GetAsync(emailInvite.Email)
                     .ConfigureAwait(false);
@@ -73,15 +68,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
                     throw new NotSupportedException($"User with external id {userIdentity.Id.Value} was not found");
                 }
 
-                // Send email and update event state.
                 await _emailSender.SendEmailAsync(userIdentity.Email, emailInvite).ConfigureAwait(false);
                 await _emailEventRepository.MarkAsSentAsync(emailInvite).ConfigureAwait(false);
 
-                // update user status
                 user.InviteStatus = UserInviteStatus.InviteSent;
                 await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
-
-                // Log ?
             }
 
             return Unit.Value;
