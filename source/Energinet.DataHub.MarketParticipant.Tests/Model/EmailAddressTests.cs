@@ -43,5 +43,29 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 Assert.Throws<ValidationException>(() => new EmailAddress(value));
             }
         }
+
+        [Fact]
+        public void Ctor_EmailTooLong_Fails()
+        {
+            // Arrange
+            const int maxLength = 64;
+            const string suffix = "@a.b";
+            var value = new string('a', maxLength - suffix.Length + 1) + suffix;
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => new EmailAddress(value));
+        }
+
+        [Fact]
+        public void Ctor_EmailMaxLength_Accepted()
+        {
+            // Arrange
+            const int maxLength = 64;
+            const string suffix = "@a.b";
+            var value = new string('a', maxLength - suffix.Length) + suffix;
+
+            // Act + Assert
+            Assert.Equal(value, new EmailAddress(value).Address);
+        }
     }
 }

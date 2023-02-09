@@ -57,7 +57,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Issuer_IsKnown()
     {
         // Arrange
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -70,7 +71,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Audience_IsKnown()
     {
         // Arrange
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -83,14 +85,14 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_UserId_IsPresent()
     {
         // Arrange
-        var externalUserId = Guid.NewGuid().ToString();
-        var externalToken = CreateExternalTestToken(externalUserId: externalUserId);
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
 
         // Assert
-        Assert.Single(internalToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub);
+        Assert.Single(internalToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && Guid.Parse(c.Value) == testUser.UserId);
     }
 
     [Fact]
@@ -98,13 +100,15 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var actorId = Guid.NewGuid();
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken, actorId);
 
         // Assert
         Assert.Equal(actorId.ToString(), internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Azp).Value);
+        Assert.Empty(internalToken.Claims.Where(c => c.Type == "role"));
     }
 
     [Fact]
@@ -118,7 +122,7 @@ public sealed class TokenPartsControllerIntegrationTests :
             .DatabaseManager
             .CreateUserAsync(new[] { organizationView });
 
-        var externalToken = CreateExternalTestToken(externalUserId: externalUserId.ToString());
+        var externalToken = CreateExternalTestToken(externalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken, externalActorId);
@@ -132,7 +136,9 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var notBefore = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
         var externalToken = CreateExternalTestToken(
+            testUser.ExternalUserId,
             notBefore: notBefore,
             expires: notBefore.AddDays(1));
 
@@ -148,7 +154,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var expires = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
-        var externalToken = CreateExternalTestToken(expires: expires);
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId, expires: expires);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -161,7 +168,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Type_IsValid()
     {
         // Arrange
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -174,7 +182,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Algorithm_IsValid()
     {
         // Arrange
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -195,7 +204,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     }
 
     private static string CreateExternalTestToken(
-        string externalUserId = "8539CCC6-F098-426D-8ED6-13A2442B0F76",
+        Guid externalUserId,
         DateTime? notBefore = null,
         DateTime? expires = null)
     {
@@ -204,7 +213,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         var externalToken = new JwtSecurityToken(
             "https://example.com",
             "audience",
-            new[] { new Claim(JwtRegisteredClaimNames.Sub, externalUserId) },
+            new[] { new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()) },
             notBefore ?? DateTime.UtcNow.AddDays(-1),
             expires ?? DateTime.UtcNow.AddDays(1),
             new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));

@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -51,11 +52,13 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(externalUserId),
+            new EmailAddress("fake@value"),
             UserStatus.Active,
             "expected_name",
-            new EmailAddress("fake@value"),
+            "expected_name",
             null,
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            AuthenticationMethod.Undetermined);
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
@@ -70,7 +73,7 @@ public sealed class GetUserHandlerIntegrationTests
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Equal(userIdentity.Name, actual.Name);
+        Assert.Equal(userIdentity.FullName, actual.Name);
     }
 
     [Fact]
@@ -102,11 +105,13 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
             new ExternalUserId(externalUserId),
+            new EmailAddress("fake@value"),
             UserStatus.Active,
             "expected_name",
-            new EmailAddress("fake@value"),
+            "expected_name",
             null,
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            AuthenticationMethod.Undetermined);
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))

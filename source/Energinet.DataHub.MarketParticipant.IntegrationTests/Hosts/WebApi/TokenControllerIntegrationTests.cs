@@ -25,6 +25,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.IdentityModel.Protocols;
@@ -42,6 +43,7 @@ public sealed class TokenControllerIntegrationTests :
     IClassFixture<KeyClientFixture>
 {
     private readonly KeyClientFixture _keyClientFixture;
+    private readonly MarketParticipantDatabaseFixture _fixture;
 
     public TokenControllerIntegrationTests(
         KeyClientFixture keyClientFixture,
@@ -49,6 +51,7 @@ public sealed class TokenControllerIntegrationTests :
         : base(fixture)
     {
         _keyClientFixture = keyClientFixture;
+        _fixture = fixture;
     }
 
     [Fact]
@@ -116,7 +119,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         var actorId = Guid.NewGuid();
         var request = new TokenRequest(actorId, externalToken);
@@ -143,7 +147,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         var actorId = Guid.NewGuid();
         var request = new TokenRequest(actorId, externalToken);
@@ -174,7 +179,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var externalToken = CreateExternalTestToken();
+        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
 
         var actorId = Guid.NewGuid();
         var request = new TokenRequest(actorId, externalToken);
@@ -231,7 +237,7 @@ public sealed class TokenControllerIntegrationTests :
     }
 
     private static string CreateExternalTestToken(
-        string userId = "8539CCC6-F098-426D-8ED6-13A2442B0F76",
+        Guid externalUserId,
         DateTime? notBefore = null,
         DateTime? expires = null)
     {
@@ -240,7 +246,7 @@ public sealed class TokenControllerIntegrationTests :
         var externalToken = new JwtSecurityToken(
             "https://example.com",
             "audience",
-            new[] { new Claim(JwtRegisteredClaimNames.Sub, userId) },
+            new[] { new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()) },
             notBefore ?? DateTime.UtcNow.AddDays(-1),
             expires ?? DateTime.UtcNow.AddDays(1),
             new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256));

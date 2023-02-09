@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.18.0
+
+- Add API for inviting users.
+- Package update.
+
 ## Version 2.17.4
 
 - Added EicFunction parameter to GetSelectablePermission Endpoint
