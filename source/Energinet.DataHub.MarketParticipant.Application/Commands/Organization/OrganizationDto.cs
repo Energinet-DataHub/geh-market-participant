@@ -21,6 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
         string OrganizationId,
         string Name,
         string BusinessRegisterIdentifier,
+        string Domain,
         string? Comment,
         string Status,
         IEnumerable<ActorDto> Actors,
