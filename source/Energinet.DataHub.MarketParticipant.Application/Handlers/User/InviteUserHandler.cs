@@ -55,7 +55,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
         ArgumentNullException.ThrowIfNull(request);
 
         var assignedActor = await GetActorAsync(request.Invitation.AssignedActor).ConfigureAwait(false);
-        var assignedRoles = await GetUserRolesAsync(request).ConfigureAwait(false);
+        var assignedRoles = await GetUserRolesAsync(request.Invitation.AssignedRoles).ConfigureAwait(false);
 
         var phoneNumber = new PhoneNumber(request.Invitation.PhoneNumber);
 
@@ -95,11 +95,11 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             : throw new ValidationException("The organization of the actor has been deleted.");
     }
 
-    private async Task<List<UserRole>> GetUserRolesAsync(InviteUserCommand request)
+    private async Task<List<UserRole>> GetUserRolesAsync(IEnumerable<Guid> userRoleIds)
     {
         var assignedRoles = new List<UserRole>();
 
-        foreach (var userRoleId in request.Invitation.AssignedRoles)
+        foreach (var userRoleId in userRoleIds)
         {
             var userRole = await _userRoleRepository
                 .GetAsync(new UserRoleId(userRoleId))
