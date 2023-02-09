@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 /// <summary>
 /// Service for user role audit logs
 /// </summary>
-public interface IEnsurePermissionsHelperService
+public interface IEnsureUserRolePermissionsService
 {
     /// <summary>
     /// Creates audit log for user role created

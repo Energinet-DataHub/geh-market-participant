@@ -32,18 +32,18 @@ public sealed class CreateUserRoleHandler
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserRoleAuditLogService _userRoleAuditLogService;
     private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
-    private readonly IEnsurePermissionsHelperService _userRoleHelperService;
+    private readonly IEnsureUserRolePermissionsService _ensureUserRolePermissionsService;
 
     public CreateUserRoleHandler(
         IUserRoleRepository userRoleRepository,
         IUserRoleAuditLogService userRoleAuditLogService,
         IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository,
-        IEnsurePermissionsHelperService userRoleHelperService)
+        IEnsureUserRolePermissionsService userRoleHelperService)
     {
         _userRoleRepository = userRoleRepository;
         _userRoleAuditLogService = userRoleAuditLogService;
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
-        _userRoleHelperService = userRoleHelperService;
+        _ensureUserRolePermissionsService = userRoleHelperService;
     }
 
     public async Task<CreateUserRoleResponse> Handle(
@@ -52,7 +52,7 @@ public sealed class CreateUserRoleHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var valid = await _userRoleHelperService
+        var valid = await _ensureUserRolePermissionsService
             .EnsurePermissionsSelectedAreValidForMarketRoleAsync(
                 request.UserRoleDto.Permissions.Select(x => (Permission)x),
                 request.UserRoleDto.EicFunction)
