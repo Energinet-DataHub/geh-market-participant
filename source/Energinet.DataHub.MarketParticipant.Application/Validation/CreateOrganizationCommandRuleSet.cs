@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -68,6 +69,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 .Length(1, 15)
                                 .When(address => !string.IsNullOrEmpty(address.ZipCode));
                         });
+
+                    validator
+                        .RuleFor(organization => organization.Domain)
+                        .Must(OrganizationDomain.IsValid);
                 });
         }
     }

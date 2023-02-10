@@ -38,6 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             "Test City",
             "Test Country");
 
+        private readonly OrganizationDomain _validDomain = new("energinet.dk");
+
         private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
 
         [Fact]
@@ -56,6 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 null!,
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
+                _validDomain,
                 "Test Comment"))
                 .ConfigureAwait(false);
         }
@@ -76,6 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     null!,
                     _validAddress,
+                    _validDomain,
                     "Test Comment"))
                 .ConfigureAwait(false);
         }
@@ -96,6 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
                     null!,
+                    _validDomain,
                     "Test Comment"))
                 .ConfigureAwait(false);
         }
@@ -118,6 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
+                _validDomain,
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -135,6 +141,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
                     _validAddress,
+                    _validDomain,
                     "Test Comment")
                 .ConfigureAwait(false);
 
@@ -168,6 +175,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
+                _validDomain,
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -185,6 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
                     _validAddress,
+                    _validDomain,
                     "Test Comment")
                 .ConfigureAwait(false);
 

@@ -467,6 +467,7 @@ public sealed class UserOverviewRepositoryTests
         {
             Actors = { actorEntity },
             Address = new AddressEntity { Country = "DK" },
+            Domain = "energinet.dk",
             Name = "Organization name",
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };

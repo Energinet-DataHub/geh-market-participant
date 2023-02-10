@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new MockedGln();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new MockedGln();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
             organization.Actors.Add(new Actor(gln));
 
             organizationRepository
@@ -102,6 +102,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
+                new OrganizationDomain("energinet.dk"),
                 "Test Comment",
                 OrganizationStatus.Active);
 
@@ -111,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert
-                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress), gln))
+                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null), gln))
                 .ConfigureAwait(false);
         }
     }

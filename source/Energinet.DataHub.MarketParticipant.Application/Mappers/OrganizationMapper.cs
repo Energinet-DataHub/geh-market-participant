@@ -29,6 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Id.ToString(),
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
+                organization.Domain.Value,
                 organization.Comment,
                 organization.Status.ToString(),
                 organization.Actors.Select(Map).ToList(),

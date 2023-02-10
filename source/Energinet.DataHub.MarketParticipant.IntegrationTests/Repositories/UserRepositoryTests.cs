@@ -112,6 +112,7 @@ public sealed class UserRepositoryTests
                 StreetName = "Teststreet",
                 ZipCode = "1234"
             },
+            Domain = "energinet.dk",
             Name = "Test Org",
             BusinessRegisterIdentifier = "44444444"
         };
