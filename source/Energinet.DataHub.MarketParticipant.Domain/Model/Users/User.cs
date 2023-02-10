@@ -18,40 +18,26 @@ using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-// TODO: User
 public sealed class User
 {
-    public User(
-        ExternalUserId externalId,
-        EmailAddress email)
+    public User(ExternalUserId externalId)
     {
         Id = new UserId(Guid.Empty);
         ExternalId = externalId;
-#pragma warning disable CS0618 // Type or member is obsolete
-        Email = email;
-#pragma warning restore CS0618 // Type or member is obsolete
         RoleAssignments = new HashSet<UserRoleAssignment>();
     }
 
     public User(
         UserId id,
         ExternalUserId externalId,
-        EmailAddress email,
         IEnumerable<UserRoleAssignment> roleAssignments)
     {
         Id = id;
         ExternalId = externalId;
-#pragma warning disable CS0618 // Type or member is obsolete
-        Email = email;
-#pragma warning restore CS0618 // Type or member is obsolete
         RoleAssignments = roleAssignments.ToHashSet();
     }
 
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; set; }
-
-    [Obsolete("TODO: Use email from UserIdentity")]
-    public EmailAddress Email { get; }
-
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
 }

@@ -123,7 +123,6 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                _validInvitation.Email,
                 Array.Empty<UserRoleAssignment>()));
 
         userIdentityRepositoryMock
@@ -169,7 +168,6 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                _validInvitation.Email,
                 new[] { new UserRoleAssignment(Guid.NewGuid(), new UserRoleId(Guid.NewGuid())) }));
 
         userIdentityRepositoryMock
