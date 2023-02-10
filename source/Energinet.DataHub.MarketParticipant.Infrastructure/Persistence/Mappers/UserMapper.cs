@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Linq;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -23,9 +22,6 @@ internal sealed class UserMapper
 {
     public static void MapToEntity(User from, UserEntity to)
     {
-#pragma warning disable CS0618 // Type or member is obsolete
-        to.Email = from.Email.Address;
-#pragma warning restore CS0618 // Type or member is obsolete
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
 
@@ -53,7 +49,6 @@ internal sealed class UserMapper
         return new User(
             new UserId(from.Id),
             new ExternalUserId(from.ExternalId),
-            new EmailAddress(from.Email),
             from.RoleAssignments.Select(MapFromEntity));
     }
 
