@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
@@ -21,6 +22,8 @@ public sealed class SmsAuthenticationMethod : AuthenticationMethod
 {
     public SmsAuthenticationMethod(PhoneNumber phoneNumber)
     {
+        ArgumentNullException.ThrowIfNull(phoneNumber);
+
         PhoneNumber = phoneNumber;
 
         ValidatePhoneNumber();
