@@ -42,6 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             "Test City",
             "Test Country");
 
+        private readonly OrganizationDomain _validDomain = new("energinet.dk");
+
         private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
 
         [Fact]
@@ -86,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
@@ -124,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -175,7 +177,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -218,7 +220,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 
@@ -263,7 +265,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var actor = new Actor(new MockedGln());
             organization.Actors.Add(actor);
 

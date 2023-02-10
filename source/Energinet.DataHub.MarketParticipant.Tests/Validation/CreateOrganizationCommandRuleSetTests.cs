@@ -67,6 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 value,
                 validCvr,
                 validAddress,
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -108,6 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     "Denmark"),
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -149,6 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     "Denmark"),
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -190,6 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     value,
                     "Denmark"),
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -231,6 +235,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     value),
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -272,6 +277,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     "Denmark"),
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -313,6 +319,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     value,
                     string.Empty,
                     "Denmark"),
+                "energinet.dk",
                 "Test Comment");
 
             var target = new CreateOrganizationCommandRuleSet();

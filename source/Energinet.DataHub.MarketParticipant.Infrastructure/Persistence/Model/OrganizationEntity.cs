@@ -26,6 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
             BusinessRegisterIdentifier = string.Empty;
             Address = new AddressEntity();
             Status = 1;
+            Domain = string.Empty;
         }
 
         public Guid Id { get; set; }
@@ -34,6 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
         public string? Comment { get; set; }
         public int Status { get; set; }
         public AddressEntity Address { get; set; }
+        public string Domain { get; set; }
 
         public Collection<ActorEntity> Actors { get; }
     }

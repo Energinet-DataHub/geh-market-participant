@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
         private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDbContext context)
         {
-            var organization = new Organization(Guid.NewGuid().ToString(), MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"));
+            var organization = new Organization(Guid.NewGuid().ToString(), MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
             organization.Actors.Add(new Actor(new MockedGln()));
 
             var repository = new OrganizationRepository(context);
@@ -117,7 +117,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
         private static async Task<GridArea> CreateGridAreaAsync(MarketParticipantDbContext context)
         {
-            var name = Guid.NewGuid().ToString();
             var domain = new GridArea(
                 new GridAreaName("fake_value"),
                 new GridAreaCode("123"),

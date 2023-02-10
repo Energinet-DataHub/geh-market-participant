@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.19.0
+
+- Required domain name when creating organization.
+
 ## Version 2.18.0
 
 - Add API for inviting users.

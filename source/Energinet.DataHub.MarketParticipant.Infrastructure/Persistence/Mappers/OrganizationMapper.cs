@@ -28,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
             to.Comment = from.Comment;
             to.Status = (int)from.Status;
+            to.Domain = from.Domain.Value;
             MapAddressToEntity(from.Address, to.Address);
 
             var actorEntities = to.Actors.ToDictionary(x => x.Id);
@@ -55,6 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 MapEntitiesToActors(from.Actors),
                 new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
                 MapAddress(from.Address),
+                new OrganizationDomain(from.Domain),
                 from.Comment,
                 (OrganizationStatus)from.Status);
         }

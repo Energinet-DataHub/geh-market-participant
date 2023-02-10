@@ -163,10 +163,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationId = Guid.NewGuid();
-            var actorId = Guid.NewGuid();
             var marketRoleId = Guid.NewGuid();
-            var marketRoleGridAreaId = Guid.NewGuid();
 
             var gridAreaRepo = new GridAreaRepository(context);
             var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
@@ -179,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             if (marketRoles.Length > 0)
             {
                 var orgRepo = new OrganizationRepository(context);
-                var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"));
+                var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
                 var actor = new Actor(new MockedGln());
 
                 foreach (var marketRole in marketRoles)
