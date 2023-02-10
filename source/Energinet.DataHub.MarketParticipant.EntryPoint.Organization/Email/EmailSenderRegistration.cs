@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
 
 internal static class EmailSenderRegistration
 {
-    public static void AddSendGridServiceClient(this Container container)
+    public static void AddSendGridEmailSenderClient(this Container container)
     {
         container.Register<IEmailSender>(
             () =>

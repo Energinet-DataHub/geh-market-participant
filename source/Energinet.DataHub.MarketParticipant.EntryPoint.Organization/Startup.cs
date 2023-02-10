@@ -48,7 +48,7 @@ internal sealed class Startup : StartupBase
     {
         Container.Register<SynchronizeActorsTimerTrigger>();
         Container.Register<EmailEventTimerTrigger>();
-        Container.AddSendGridServiceClient();
+        Container.AddSendGridEmailSenderClient();
 
         // Health check
         container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
