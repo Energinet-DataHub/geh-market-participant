@@ -48,7 +48,6 @@ public sealed class GetUserPermissionsHandler
             .GetAsync(new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
-        // TODO: UT
         if (user == null)
             throw new NotFoundValidationException(request.ExternalUserId);
 

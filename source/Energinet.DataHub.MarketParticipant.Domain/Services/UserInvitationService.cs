@@ -55,8 +55,6 @@ public sealed class UserInvitationService : IUserInvitationService
             invitedUser = new User(userIdentityId, invitation.Email);
         }
 
-        // TODO: Audit log user.
-        // TODO: Audit log user roles.
         foreach (var assignedRole in invitation.AssignedRoles)
         {
             var assignment = new UserRoleAssignment(invitation.AssignedActor.Id, assignedRole.Id);
