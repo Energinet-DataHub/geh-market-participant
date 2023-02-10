@@ -174,6 +174,31 @@ public sealed class TokenControllerIntegrationTests :
     }
 
     [Fact]
+    public async Task Token_ValidExternalTokenButUsersDoesNotExist_Returns401()
+    {
+        // Arrange
+        const string target = "token";
+
+        var externalToken = CreateExternalTestToken(Guid.NewGuid());
+
+        var actorId = Guid.NewGuid();
+        var request = new TokenRequest(actorId, externalToken);
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        using var client = CreateClient();
+
+        // Act
+        using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Token_ValidExternalToken_ReturnsValidToken()
     {
         // Arrange
