@@ -18,10 +18,12 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -45,7 +47,8 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
 
         // Act
         var user = await userRepository.GetAsync(new ExternalUserId(Guid.NewGuid()));
@@ -62,7 +65,8 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context2);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context2, userIdentityRepository);
 
         var email = "fake@mail.com";
         var userExternalId = Guid.NewGuid();
@@ -77,7 +81,6 @@ public sealed class UserRepositoryTests
         Assert.NotNull(user);
         Assert.Equal(userExternalId, user.ExternalId.Value);
         Assert.NotEqual(Guid.Empty, user.Id.Value);
-        Assert.Equal(email, user.Email.Address);
     }
 
     [Fact]
@@ -88,7 +91,8 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context2);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context2, userIdentityRepository);
 
         var email = "fake@mail.com";
         var userExternalId = Guid.NewGuid();
@@ -150,7 +154,6 @@ public sealed class UserRepositoryTests
         Assert.NotNull(user);
         Assert.Equal(userExternalId, user.ExternalId.Value);
         Assert.NotEqual(Guid.Empty, user.Id.Value);
-        Assert.Equal(email, user.Email.Address);
         Assert.Single(user.RoleAssignments);
         Assert.Equal(userRoleTemplate.Id, user.RoleAssignments.First().UserRoleId.Value);
     }
@@ -162,7 +165,8 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
 
         // Act
         var user = await userRepository.GetAsync(new UserId(Guid.NewGuid()));
@@ -179,7 +183,8 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context2);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context2, userIdentityRepository);
 
         var email = "fake@mail.com";
         var userEntity = new UserEntity
@@ -196,7 +201,6 @@ public sealed class UserRepositoryTests
         // Assert
         Assert.NotNull(user);
         Assert.NotEqual(Guid.Empty, user.Id.Value);
-        Assert.Equal(email, user.Email.Address);
     }
 
     [Fact]
@@ -206,7 +210,8 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserRepository(context);
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
 
         var (_, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
 

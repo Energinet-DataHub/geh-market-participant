@@ -52,7 +52,7 @@ public sealed class UserInvitationService : IUserInvitationService
                 .CreateAsync(userIdentity)
                 .ConfigureAwait(false);
 
-            invitedUser = new User(userIdentityId, invitation.Email);
+            invitedUser = new User(userIdentityId);
         }
 
         foreach (var assignedRole in invitation.AssignedRoles)
