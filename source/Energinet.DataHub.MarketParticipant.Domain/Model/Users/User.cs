@@ -37,8 +37,7 @@ public sealed class User
         UserId id,
         ExternalUserId externalId,
         EmailAddress email,
-        IEnumerable<UserRoleAssignment> roleAssignments,
-        UserInviteStatus? inviteStatus)
+        IEnumerable<UserRoleAssignment> roleAssignments)
     {
         Id = id;
         ExternalId = externalId;
@@ -46,7 +45,6 @@ public sealed class User
         Email = email;
 #pragma warning restore CS0618 // Type or member is obsolete
         RoleAssignments = roleAssignments.ToHashSet();
-        InviteStatus = inviteStatus;
     }
 
     public UserId Id { get; }
@@ -55,6 +53,5 @@ public sealed class User
     [Obsolete("TODO: Use email from UserIdentity")]
     public EmailAddress Email { get; }
 
-    public UserInviteStatus? InviteStatus { get; set; }
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
 }

@@ -28,7 +28,6 @@ internal sealed class UserMapper
 #pragma warning restore CS0618 // Type or member is obsolete
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
-        to.InviteStatus = (int?)from.InviteStatus;
 
         var newAssignments = from
             .RoleAssignments
@@ -55,8 +54,7 @@ internal sealed class UserMapper
             new UserId(from.Id),
             new ExternalUserId(from.ExternalId),
             new EmailAddress(from.Email),
-            from.RoleAssignments.Select(MapFromEntity),
-            (UserInviteStatus?)from.InviteStatus);
+            from.RoleAssignments.Select(MapFromEntity));
     }
 
     private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)

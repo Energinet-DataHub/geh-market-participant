@@ -18,10 +18,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
 {
@@ -70,9 +68,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
 
                 await _emailSender.SendEmailAsync(userIdentity.Email, emailInvite).ConfigureAwait(false);
                 await _emailEventRepository.MarkAsSentAsync(emailInvite).ConfigureAwait(false);
-
-                user.InviteStatus = UserInviteStatus.InviteSent;
-                await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
             return Unit.Value;
