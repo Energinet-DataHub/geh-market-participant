@@ -17,7 +17,6 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-// TODO: UTs
 public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserCommand>
 {
     public InviteUserCommandRuleSet()
@@ -46,7 +45,7 @@ public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserComma
                     .RuleFor(invitation => invitation.PhoneNumber)
                     .NotEmpty()
                     .MaximumLength(30)
-                    .Matches("\\+[0-9]+ [0-9]+");
+                    .Matches("^\\+[0-9]+ [0-9]+$");
 
                 invitationRules
                     .RuleFor(invitation => invitation.AssignedActor)

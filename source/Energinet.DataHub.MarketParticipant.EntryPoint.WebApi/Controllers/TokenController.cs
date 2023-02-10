@@ -25,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -124,9 +125,18 @@ public class TokenController : ControllerBase
         var actorId = tokenRequest.ActorId;
         var issuedAt = EpochTime.GetIntDate(DateTime.UtcNow);
 
-        var grantedPermissions = await _mediator
-            .Send(new GetUserPermissionsCommand(externalUserId, actorId))
-            .ConfigureAwait(false);
+        GetUserPermissionsResponse grantedPermissions;
+
+        try
+        {
+            grantedPermissions = await _mediator
+                .Send(new GetUserPermissionsCommand(externalUserId, actorId))
+                .ConfigureAwait(false);
+        }
+        catch (NotFoundValidationException)
+        {
+            return Unauthorized();
+        }
 
         var roleClaims = grantedPermissions.Permissions
             .Select(p => new Claim(RoleClaim, PermissionsAsClaims.Lookup[p]));
