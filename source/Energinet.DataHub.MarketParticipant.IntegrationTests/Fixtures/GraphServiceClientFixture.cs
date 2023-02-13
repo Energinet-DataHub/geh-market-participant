@@ -29,9 +29,9 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 {
     private readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
     private readonly List<ExternalUserId> _createdUsers = new();
-    private GraphServiceClient? _graphClient;
 
-    public GraphServiceClient Client => _graphClient ?? throw CreateNotReadyException();
+    private GraphServiceClient? _graphClient;
+    public GraphServiceClient Client => _graphClient ?? throw NewIncorrectStateException();
 
     public Task InitializeAsync()
     {
@@ -88,7 +88,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
     public async Task<ExternalUserId> CreateUserAsync()
     {
         if (_graphClient == null)
-            throw CreateNotReadyException();
+            throw NewIncorrectStateException();
 
         var newUser = new User
         {
@@ -123,8 +123,8 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         return externalUserId;
     }
 
-    private static InvalidOperationException CreateNotReadyException()
+    private static InvalidOperationException NewIncorrectStateException()
     {
-        return new InvalidOperationException("GraphServiceClientFixture is not initialized or has already been disposed.");
+        return new InvalidOperationException($"{nameof(GraphServiceClientFixture)} is not initialized or has already been disposed.");
     }
 }
