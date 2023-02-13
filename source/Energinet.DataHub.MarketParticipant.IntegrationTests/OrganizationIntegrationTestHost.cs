@@ -101,7 +101,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
                 new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
                 new(Settings.B2CServicePrincipalNameId.Key, "fake_value"),
-                new(Settings.B2CServicePrincipalNameSecret.Key, "fake_value")
+                new(Settings.B2CServicePrincipalNameSecret.Key, "fake_value"),
+                new(Settings.SendGridApiKey.Key, "fake_value"),
+                new(Settings.UserInviteFromEmail.Key, "fake_value")
             };
 
             return new ConfigurationBuilder()
