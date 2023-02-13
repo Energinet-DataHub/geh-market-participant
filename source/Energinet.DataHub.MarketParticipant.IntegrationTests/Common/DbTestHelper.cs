@@ -56,7 +56,7 @@ internal static class DbTestHelper
             {
                 Country = "Denmark"
             },
-            Domain = "energinet.dk",
+            Domain = new MockedDomain(),
             Name = string.Empty,
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
@@ -88,7 +88,7 @@ internal static class DbTestHelper
             {
                 Country = "Denmark"
             },
-            Domain = "energinet.dk",
+            Domain = new MockedDomain(),
             Name = string.Empty,
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
@@ -137,7 +137,7 @@ internal static class DbTestHelper
             {
                 Country = "Denmark"
             },
-            Domain = "energinet.dk",
+            Domain = new MockedDomain(),
             Name = string.Empty,
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };
@@ -289,7 +289,7 @@ internal static class DbTestHelper
             {
                 Country = "Denmark"
             },
-            Domain = "energinet.dk",
+            Domain = new MockedDomain(),
             Name = string.Empty,
             BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
         };

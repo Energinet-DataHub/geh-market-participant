@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using FluentValidation;
 using MediatR;
@@ -47,7 +48,7 @@ public sealed class CreateOrganizationIntegrationTests
             blankValue,
             blankValue,
             new AddressDto(null, null, null, null, "DK"),
-            "energinet.dk",
+            new MockedDomain(),
             blankValue);
 
         var command = new CreateOrganizationCommand(organizationDto);

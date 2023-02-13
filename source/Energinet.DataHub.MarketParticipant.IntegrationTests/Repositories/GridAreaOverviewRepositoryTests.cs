@@ -176,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             if (marketRoles.Length > 0)
             {
                 var orgRepo = new OrganizationRepository(context);
-                var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
+                var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain(new MockedDomain()), null);
                 var actor = new Actor(new MockedGln());
 
                 foreach (var marketRole in marketRoles)
