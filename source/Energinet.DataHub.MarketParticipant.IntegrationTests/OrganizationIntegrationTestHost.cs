@@ -97,8 +97,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
                 new(Settings.ServiceBusTopicName.Key, "fake_value"),
                 new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
-                new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
-                new(Settings.B2CBackendId.Key, Guid.Empty.ToString())
+                new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
+                new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString())
             };
 
             return new ConfigurationBuilder()
