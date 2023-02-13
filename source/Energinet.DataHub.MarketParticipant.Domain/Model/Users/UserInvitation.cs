@@ -19,7 +19,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-// TODO: UTs
 public sealed class UserInvitation
 {
     public UserInvitation(

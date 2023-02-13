@@ -20,7 +20,6 @@ using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -47,7 +46,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var user = new User(
                 new UserId(userId),
                 new ExternalUserId(externalUserId),
-                new EmailAddress("test@test.dk"),
                 userRoleAssignments);
 
             var userContextMock = CreateMockedUser();

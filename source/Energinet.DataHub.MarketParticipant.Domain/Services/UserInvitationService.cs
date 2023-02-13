@@ -20,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-// TODO: UTs
 public sealed class UserInvitationService : IUserInvitationService
 {
     private readonly IUserRepository _userRepository;
@@ -52,11 +51,9 @@ public sealed class UserInvitationService : IUserInvitationService
                 .CreateAsync(userIdentity)
                 .ConfigureAwait(false);
 
-            invitedUser = new User(userIdentityId, invitation.Email);
+            invitedUser = new User(userIdentityId);
         }
 
-        // TODO: Audit log user.
-        // TODO: Audit log user roles.
         foreach (var assignedRole in invitation.AssignedRoles)
         {
             var assignment = new UserRoleAssignment(invitation.AssignedActor.Id, assignedRole.Id);

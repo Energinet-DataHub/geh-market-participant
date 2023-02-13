@@ -26,10 +26,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserRepository : IUserRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IUserIdentityRepository _userIdentityRepository;
 
-    public UserRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public UserRepository(
+        IMarketParticipantDbContext marketParticipantDbContext,
+        IUserIdentityRepository userIdentityRepository)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+        _userIdentityRepository = userIdentityRepository;
     }
 
     public async Task<UserId> AddOrUpdateAsync(User user)
@@ -40,7 +44,11 @@ public sealed class UserRepository : IUserRepository
 
         if (user.Id.Value == default)
         {
-            destination = new UserEntity();
+            var identity = await _userIdentityRepository
+                .GetAsync(user.ExternalId)
+                .ConfigureAwait(false);
+
+            destination = new UserEntity { Email = identity!.Email.Address };
         }
         else
         {
