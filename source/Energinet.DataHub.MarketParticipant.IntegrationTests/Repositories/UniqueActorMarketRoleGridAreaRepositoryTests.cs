@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
         private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDbContext context)
         {
-            var organization = new Organization(Guid.NewGuid().ToString(), MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
+            var organization = new Organization(Guid.NewGuid().ToString(), MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain(new MockedDomain()), null);
             organization.Actors.Add(new Actor(new MockedGln()));
 
             var repository = new OrganizationRepository(context);
