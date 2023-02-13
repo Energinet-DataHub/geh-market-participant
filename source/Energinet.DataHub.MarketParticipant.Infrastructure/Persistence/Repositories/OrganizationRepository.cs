@@ -14,12 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -72,7 +74,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 actor.New = false;
             }
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            try
+            {
+                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException ex) when (
+                ex.InnerException is SqlException inner &&
+                inner.Message.Contains("UQ_OrganizationInfo_Domain", StringComparison.InvariantCultureIgnoreCase))
+            {
+                throw new ValidationException($"An organization already exists with domain {destination.Domain}");
+            }
+
             return new OrganizationId(destination.Id);
         }
 
