@@ -74,6 +74,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return emailToBeSent.Select(MapTo);
         }
 
+        public async Task<IEnumerable<EmailEvent>> GetAllEmailEventByTypeAsync(EmailEventType emailEventType)
+        {
+            var emailToBeSent = await _context.EmailEventEntries
+                .Where(e => e.EmailEventType == (int)emailEventType)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            return emailToBeSent.Select(MapTo);
+        }
+
         private static EmailEvent MapTo(EmailEventEntity emailEventEntities)
         {
             return new EmailEvent(
