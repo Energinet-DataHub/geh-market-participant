@@ -33,6 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserIdentityRepository : IUserIdentityRepository
 {
     private readonly GraphServiceClient _graphClient;
+    private readonly AzureIdentityConfig _azureIdentityConfig;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
 
     private readonly Expression<Func<User, object>> _selectForMapping = user => new
@@ -50,9 +51,11 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     public UserIdentityRepository(
         GraphServiceClient graphClient,
+        AzureIdentityConfig azureIdentityConfig,
         IUserIdentityAuthenticationService userIdentityAuthenticationService)
     {
         _graphClient = graphClient;
+        _azureIdentityConfig = azureIdentityConfig;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
     }
 
@@ -180,7 +183,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     new ObjectIdentity
                     {
                         SignInType = "emailAddress",
-                        Issuer = "devDataHubB2C.onmicrosoft.com", // TODO: Must come from config somewhere, or maybe client?
+                        Issuer = _azureIdentityConfig.Issuer,
                         IssuerAssignedId = userIdentity.Email.Address
                     }
                 }
@@ -239,8 +242,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         var usersRequest = await _graphClient
             .Users
             .Request()
-            // TODO: Must come from config somewhere, or maybe client?
-            .Filter($"identities/any(id:id/issuer eq 'devDataHubB2C.onmicrosoft.com' and id/issuerAssignedId eq '{email.Address}')")
+            .Filter($"identities/any(id:id/issuer eq '{_azureIdentityConfig.Issuer}' and id/issuerAssignedId eq '{email.Address}')")
             .Select(_selectForMapping)
             .GetAsync()
             .ConfigureAwait(false);

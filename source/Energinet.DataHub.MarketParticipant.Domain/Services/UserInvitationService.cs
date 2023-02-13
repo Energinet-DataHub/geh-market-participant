@@ -20,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-// TODO: UTs
 public sealed class UserInvitationService : IUserInvitationService
 {
     private readonly IUserRepository _userRepository;
