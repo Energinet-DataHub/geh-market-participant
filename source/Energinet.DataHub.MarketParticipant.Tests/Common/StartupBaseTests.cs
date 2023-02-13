@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain;
@@ -113,6 +114,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
 
                 container.Register(() => new Mock<IUnitOfWorkProvider>().Object);
                 container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
+                container.Register(() => new Mock<IEmailSender>().Object);
                 container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
                 container.RegisterSingleton(() => new GraphServiceClient(new HttpClient()));
             }
