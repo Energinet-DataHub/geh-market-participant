@@ -23,7 +23,6 @@ using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Us
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 
-// TODO: UTs
 public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticationService
 {
     private readonly GraphServiceClient _graphClient;

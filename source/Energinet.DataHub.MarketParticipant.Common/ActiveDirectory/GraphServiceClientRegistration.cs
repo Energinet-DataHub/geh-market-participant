@@ -32,8 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
                     var configuration = container.GetService<IConfiguration>();
 
                     var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
-                    var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalNameId);
-                    var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalNameSecret);
+                    var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
+                    var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
 
                     var clientSecretCredential = new ClientSecretCredential(
                         azureB2CTenant,

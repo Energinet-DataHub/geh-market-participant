@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Xunit;
+using System;
+using System.Net;
+using Microsoft.Graph;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+
+public static class GraphServiceClientExtensions
 {
-    [CollectionDefinition("IntegrationTest")]
-    public sealed class IntegrationTestFixtureConfiguration :
-        ICollectionFixture<MarketParticipantDatabaseFixture>,
-        ICollectionFixture<GraphServiceClientFixture>
+    public static TRequest WithRetryOnNotFound<TRequest>(this TRequest request)
+        where TRequest : IBaseRequest
     {
-        // This class has no code, and is never created. Its purpose is simply
-        // to be the place to apply [CollectionDefinition] and all the
-        // ICollectionFixture<> interfaces.
+        ArgumentNullException.ThrowIfNull(request);
+        return request.WithShouldRetry((_, _, message) => message.StatusCode == HttpStatusCode.NotFound);
     }
 }
