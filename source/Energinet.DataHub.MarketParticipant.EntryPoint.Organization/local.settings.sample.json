@@ -6,7 +6,7 @@
     "SQL_MP_DB_CONNECTION_STRING": "Connection string to the database containing market participants.",
     "SERVICE_BUS_CONNECTION_STRING": "Connection string to the storage account for the integration events.",
     "SBT_MARKET_PARTICIPANT_CHANGED_NAME": "The name of the topic where the integration events are published.",
-    "SEND_GRID_APIKEY": "send grin api key",
+    "SEND_GRID_APIKEY": "send grid api key",
     "USER_INVITE_FROM_EMAIL": "from email for user invites"
   }
 }

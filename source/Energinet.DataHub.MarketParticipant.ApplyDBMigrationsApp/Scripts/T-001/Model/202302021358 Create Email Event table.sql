@@ -7,7 +7,7 @@ GO
 CREATE TABLE [dbo].[EmailEvent]
 (
     [Id]             [int] IDENTITY(1, 1)   NOT NULL,
-    [Email]          [nvarchar](255)        NOT NULL DEFAULT(''),
+    [Email]          [nvarchar](255)        NOT NULL,
     [Created]        [datetimeoffset]       NOT NULL,
     [Sent]           [datetimeoffset]       NULL,
     [EmailEventType] [int]                  NOT NULL
