@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Graph;
@@ -114,16 +115,17 @@ public sealed class UserIdentityAuthenticationServiceTests
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         await _graphServiceClientFixture
-             .Client
-             .Users[externalUserId.ToString()]
-             .Authentication
-             .PhoneMethods
-             .Request()
-             .AddAsync(new PhoneAuthenticationMethod
-             {
-                 PhoneNumber = _validPhoneNumber.Number,
-                 PhoneType = AuthenticationPhoneType.Mobile
-             });
+            .Client
+            .Users[externalUserId.ToString()]
+            .Authentication
+            .PhoneMethods
+            .Request()
+            .WithRetryOnNotFound()
+            .AddAsync(new PhoneAuthenticationMethod
+            {
+                PhoneNumber = _validPhoneNumber.Number,
+                PhoneType = AuthenticationPhoneType.Mobile
+            });
 
         // Act + Assert
         await target.AddAuthenticationAsync(externalUserId, smsAuthMethod);
