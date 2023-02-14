@@ -34,9 +34,9 @@ public static class Settings
         = new("AZURE_B2C_BACKEND_ID");
     public static Setting<string> B2CTenant { get; }
         = new("AZURE_B2C_TENANT");
-    public static Setting<string> B2CServicePrincipalNameId { get; }
+    public static Setting<string> B2CServicePrincipalId { get; }
         = new("AZURE_B2C_SPN_ID");
-    public static Setting<string> B2CServicePrincipalNameSecret { get; }
+    public static Setting<string> B2CServicePrincipalSecret { get; }
         = new("AZURE_B2C_SPN_SECRET");
 
     public static Setting<string> ExternalOpenIdUrl { get; }

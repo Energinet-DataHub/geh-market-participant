@@ -153,7 +153,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return userIdentities;
     }
 
-    // TODO: Maybe move into separate file.
     public async Task<ExternalUserId> CreateAsync(UserIdentity userIdentity)
     {
         ArgumentNullException.ThrowIfNull(userIdentity);
