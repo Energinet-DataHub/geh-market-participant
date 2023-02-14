@@ -239,7 +239,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await context.SaveChangesAsync();
     }
 
-    public async Task DisposeAsync()
+    public new async Task DisposeAsync()
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var allPermissions = await context.Permissions.ToListAsync();

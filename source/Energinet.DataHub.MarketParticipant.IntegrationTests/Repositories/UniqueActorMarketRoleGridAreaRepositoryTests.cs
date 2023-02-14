@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var repository = new OrganizationRepository(context);
             var id = await repository.AddOrUpdateAsync(organization);
-            organization = (await repository.GetAsync(id))!;
+            organization = (await repository.GetAsync(id.Value))!;
             return organization.Actors.First();
         }
 
