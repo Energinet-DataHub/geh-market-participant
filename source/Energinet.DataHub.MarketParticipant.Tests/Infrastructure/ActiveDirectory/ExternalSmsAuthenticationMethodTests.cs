@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
@@ -33,6 +34,9 @@ public sealed class ExternalSmsAuthenticationMethodTests
     {
         // Arrange
         var phoneMethodsRequestMock = new Mock<IAuthenticationPhoneMethodsCollectionRequest>();
+        phoneMethodsRequestMock
+            .Setup(phoneMethodsRequest => phoneMethodsRequest.MiddlewareOptions)
+            .Returns(new Dictionary<string, IMiddlewareOption>());
 
         var phoneMethodsMock = new Mock<IAuthenticationPhoneMethodsCollectionRequestBuilder>();
         phoneMethodsMock
@@ -70,6 +74,9 @@ public sealed class ExternalSmsAuthenticationMethodTests
         var phoneMethodsPage = new AuthenticationPhoneMethodsCollectionPage { CurrentPage = { expected } };
 
         var phoneMethodsRequestMock = new Mock<IAuthenticationPhoneMethodsCollectionRequest>();
+        phoneMethodsRequestMock
+            .Setup(phoneMethodsRequest => phoneMethodsRequest.MiddlewareOptions)
+            .Returns(new Dictionary<string, IMiddlewareOption>());
         phoneMethodsRequestMock
             .Setup(phoneMethodsRequest => phoneMethodsRequest.GetAsync(default))
             .ReturnsAsync(phoneMethodsPage);
@@ -110,6 +117,9 @@ public sealed class ExternalSmsAuthenticationMethodTests
         var phoneMethodsPage = new AuthenticationPhoneMethodsCollectionPage { CurrentPage = { notExpected } };
 
         var phoneMethodsRequestMock = new Mock<IAuthenticationPhoneMethodsCollectionRequest>();
+        phoneMethodsRequestMock
+            .Setup(phoneMethodsRequest => phoneMethodsRequest.MiddlewareOptions)
+            .Returns(new Dictionary<string, IMiddlewareOption>());
         phoneMethodsRequestMock
             .Setup(phoneMethodsRequest => phoneMethodsRequest.GetAsync(default))
             .ReturnsAsync(phoneMethodsPage);
