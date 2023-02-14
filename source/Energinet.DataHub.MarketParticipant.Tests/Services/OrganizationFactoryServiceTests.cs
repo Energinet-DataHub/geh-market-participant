@@ -129,7 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(organization.Id);
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(organization.Id));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))
@@ -181,7 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(organization.Id);
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(organization.Id));
 
             organizationRepository
                 .Setup(x => x.GetAsync(organization.Id))

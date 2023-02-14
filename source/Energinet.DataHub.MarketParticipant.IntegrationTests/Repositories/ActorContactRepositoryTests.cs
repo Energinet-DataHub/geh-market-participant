@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization);
 
-            organization = await organizationRepository.GetAsync(organizationId);
+            organization = await organizationRepository.GetAsync(organizationId.Value);
             actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
@@ -124,7 +124,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization);
 
-            organization = await organizationRepository.GetAsync(organizationId);
+            organization = await organizationRepository.GetAsync(organizationId.Value);
             actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
@@ -166,7 +166,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization);
 
-            organization = await organizationRepository.GetAsync(organizationId);
+            organization = await organizationRepository.GetAsync(organizationId.Value);
             actor = organization!.Actors.First();
 
             var contactRepository = new ActorContactRepository(context);
@@ -226,7 +226,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var organizationId = await organizationRepository
                 .AddOrUpdateAsync(organization);
 
-            organization = await organizationRepository.GetAsync(organizationId);
+            organization = await organizationRepository.GetAsync(organizationId.Value);
             actor = organization!.Actors.First();
 
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();

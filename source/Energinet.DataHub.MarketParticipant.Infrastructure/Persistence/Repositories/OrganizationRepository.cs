@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -35,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _marketParticipantDbContext = marketParticipantDbContext;
         }
 
-        public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
+        public async Task<Result<OrganizationId, OrganizationError>> AddOrUpdateAsync(Organization organization)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
 
@@ -82,10 +81,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 ex.InnerException is SqlException inner &&
                 inner.Message.Contains("UQ_OrganizationInfo_Domain", StringComparison.InvariantCultureIgnoreCase))
             {
-                throw new ValidationException($"An organization already exists with domain {destination.Domain}");
+                return new(OrganizationError.DomainConflict);
             }
 
-            return new OrganizationId(destination.Id);
+            return new(new OrganizationId(destination.Id));
         }
 
         public async Task<Organization?> GetAsync(OrganizationId id)

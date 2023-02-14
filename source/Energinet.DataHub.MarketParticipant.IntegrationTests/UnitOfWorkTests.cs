@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             // act
             await ExecuteInUnitOfWork(uowProvider, commitUnitOfWork, async () =>
             {
-                id = await repository.AddOrUpdateAsync(entity);
+                id = (await repository.AddOrUpdateAsync(entity)).Value;
             });
 
             // assert

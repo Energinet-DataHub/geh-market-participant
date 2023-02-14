@@ -176,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .Setup(x => x.GetAsync(organization.Id))
                 .ReturnsAsync(organization);
 
-            organizationRepository.Setup(x => x.AddOrUpdateAsync(organization)).ReturnsAsync(organization.Id);
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(organization)).ReturnsAsync(new Result<OrganizationId, OrganizationError>(organization.Id));
 
             // Act
             await target
