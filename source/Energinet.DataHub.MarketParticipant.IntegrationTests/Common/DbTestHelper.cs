@@ -336,4 +336,24 @@ internal static class DbTestHelper
 
         return (externalUserId, actorEntity.Id);
     }
+
+    public static async Task<int> CreateEmailEventAsync(
+        this MarketParticipantDatabaseManager manager,
+        EmailAddress emailAddress,
+        EmailEventType emailEventType)
+    {
+        await using var context = manager.CreateDbContext();
+
+        var emailEventEntity = new EmailEventEntity()
+        {
+            Created = DateTimeOffset.UtcNow,
+            Email = emailAddress.Address,
+            EmailEventType = (int)emailEventType
+        };
+
+        await context.EmailEventEntries.AddAsync(emailEventEntity).ConfigureAwait(false);
+        await context.SaveChangesAsync().ConfigureAwait(false);
+
+        return emailEventEntity.Id;
+    }
 }
