@@ -95,12 +95,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         private async Task<Organization> SaveOrganizationAsync(Organization organization)
         {
-            var orgId = await _organizationRepository
+            var result = await _organizationRepository
                 .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
+            result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
+
             var savedOrganization = await _organizationRepository
-                .GetAsync(orgId)
+                .GetAsync(result.Value)
                 .ConfigureAwait(false);
 
             return savedOrganization!;

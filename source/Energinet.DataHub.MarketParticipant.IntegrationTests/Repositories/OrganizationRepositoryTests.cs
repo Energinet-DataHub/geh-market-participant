@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
-            var newOrg = await orgRepository2.GetAsync(orgId);
+            var newOrg = await orgRepository2.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(newOrg);
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
-            var newOrg = await orgRepository2.GetAsync(orgId);
+            var newOrg = await orgRepository2.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(newOrg);
@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
-            var newOrg = await orgRepository2.GetAsync(orgId);
+            var newOrg = await orgRepository2.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(newOrg);
@@ -145,7 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
-            var newOrg = await orgRepository.GetAsync(orgId);
+            var newOrg = await orgRepository.GetAsync(orgId.Value);
 
             newOrg = new Organization(
                 newOrg!.Id,
@@ -158,7 +158,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 OrganizationStatus.New);
 
             await orgRepository.AddOrUpdateAsync(newOrg);
-            newOrg = await orgRepository.GetAsync(orgId);
+            newOrg = await orgRepository.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(newOrg);
@@ -183,14 +183,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(initialActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Act
             var newActor = new Actor(new MockedGln());
             organization!.Actors.Add(newActor);
 
             await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(organization);
@@ -229,7 +229,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
 
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
             var actualGridArea = organization!
                 .Actors
                 .Single()
@@ -257,7 +257,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(balancePowerSupplierActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Act
             var meteringPointAdministratorActor = new Actor(new MockedGln());
@@ -265,7 +265,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization!.Actors.Add(meteringPointAdministratorActor);
 
             await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(organization);
@@ -312,7 +312,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(someActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Act
             foreach (var organizationActor in organization!.Actors)
@@ -327,7 +327,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             }
 
             await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             var actorMeteringPointTypes =
                 organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
@@ -361,7 +361,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Act
             organization.Actors.Add(new Actor(gln));
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository2.GetAsync(orgId);
+            organization = await orgRepository2.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(organization);
@@ -403,7 +403,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepositoryRead.GetAsync(orgId);
+            organization = await orgRepositoryRead.GetAsync(orgId.Value);
 
             var actorMeteringPointTypes =
                 organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
@@ -448,7 +448,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepositoryRead.GetAsync(orgId);
+            organization = await orgRepositoryRead.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(organization);
@@ -531,14 +531,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             organization.Actors.Add(initialActor);
 
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Act
             var newActor = new Actor(new MockedGln()) { Name = new ActorName("fake_value") };
             organization!.Actors.Add(newActor);
 
             await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId);
+            organization = await orgRepository.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(organization);
