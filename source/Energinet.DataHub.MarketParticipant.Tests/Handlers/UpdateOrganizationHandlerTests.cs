@@ -112,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(new OrganizationId(orgId));
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
             var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
 
@@ -187,7 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             organizationRepository
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(new OrganizationId(orgId));
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
             var changeOrganizationDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
 

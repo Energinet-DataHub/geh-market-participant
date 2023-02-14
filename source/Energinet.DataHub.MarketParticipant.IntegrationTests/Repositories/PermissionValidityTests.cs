@@ -45,12 +45,13 @@ public sealed class PermissionValidityTests
         // Act
         var allPermissions = (await permissionRepository.GetAllAsync())
             .Where(x =>
-                x.Description != null &&
                 !x.Description.Contains("fake_test_value", StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         // Assert
         Assert.Equal(allPermissions.Select(x => x.Permission), Enum.GetValues<Permission>());
+#pragma warning disable CA1806
         Assert.All(allPermissions, x => x.EicFunctions.Any());
+#pragma warning restore CA1806
     }
 }

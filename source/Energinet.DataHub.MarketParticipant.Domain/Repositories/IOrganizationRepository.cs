@@ -27,8 +27,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// Adds the given organization to the repository, or updates it, if it already exists.
         /// </summary>
         /// <param name="organization">The organization to add or update.</param>
-        /// <returns>The id of the added organization.</returns>
-        Task<OrganizationId> AddOrUpdateAsync(Organization organization);
+        /// <returns>An error if the operation failed; else the id of the added/updated organization.</returns>
+        Task<Result<OrganizationId, OrganizationError>> AddOrUpdateAsync(Organization organization);
 
         /// <summary>
         /// Gets an organization with the specified id.
