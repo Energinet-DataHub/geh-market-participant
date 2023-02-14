@@ -46,11 +46,11 @@ VALUES
         ,52)
 
 --Permission.OrganizationManage
-DELETE * FROM 
+DELETE FROM
     [dbo].[PermissionEicFunction]
 WHERE
     [PermissionId] = 2
-    
+
 INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
     ,[PermissionId]
@@ -61,11 +61,11 @@ VALUES
         ,50)
 
 --Permission.GridAreasManage
-    DELETE * FROM 
+DELETE FROM
     [dbo].[PermissionEicFunction]
 WHERE
     [PermissionId] = 3
-    
+
 INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
     ,[PermissionId]
@@ -74,13 +74,13 @@ VALUES
     ('a1fc2559-2ba0-4482-b3eb-9947c9bc3309'
         ,3
         ,50)
-        
+
 --Permission.ActorManage
-DELETE * FROM 
+DELETE FROM
     [dbo].[PermissionEicFunction]
 WHERE
     [PermissionId] = 4
-    
+
 INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
     ,[PermissionId]
@@ -89,8 +89,8 @@ VALUES
     ('2f86cea8-654c-4796-8d2d-cd1cf0055148'
         ,4
         ,50)
-    
-    
+
+
 --Permission.UsersManage
 INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
@@ -133,9 +133,9 @@ VALUES
     ('dec621e7-23f5-4a73-9d6d-93cae2e8e0f2'
         ,5
         ,52)
-    
+
 --Permission.UsersView
-    INSERT INTO [dbo].[PermissionEicFunction]
+INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
     ,[PermissionId]
     ,[EicFunction])
@@ -176,13 +176,13 @@ VALUES
     ('7330a27b-19de-433e-b500-3b08edb59c4a'
         ,6
         ,52)
-    
+
 --Permission.UserRoleManage
-DELETE * FROM 
+DELETE FROM
     [dbo].[PermissionEicFunction]
 WHERE
     [PermissionId] = 7
-    
+
 INSERT INTO [dbo].[PermissionEicFunction]
 ([Id]
     ,[PermissionId]
@@ -191,4 +191,4 @@ VALUES
     ('7a904316-b52b-4e6f-8502-39b07642e5c8'
         ,7
         ,50)
-GO
+    GO
