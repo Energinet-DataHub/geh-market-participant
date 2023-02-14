@@ -16,8 +16,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -28,10 +30,12 @@ public sealed class GetUserRoleHandler
     : IRequestHandler<GetUserRoleCommand, GetUserRoleResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IPermissionRepository _permissionRepository;
 
-    public GetUserRoleHandler(IUserRoleRepository userRoleRepository)
+    public GetUserRoleHandler(IUserRoleRepository userRoleRepository, IPermissionRepository permissionRepository)
     {
         _userRoleRepository = userRoleRepository;
+        _permissionRepository = permissionRepository;
     }
 
     public async Task<GetUserRoleResponse> Handle(
@@ -47,12 +51,28 @@ public sealed class GetUserRoleHandler
         if (userRole == null)
             throw new NotFoundValidationException(request.UserRoleId);
 
+        var permissionDetailsLookup = (await _permissionRepository
+            .GetToMarketRoleAsync(userRole.EicFunction)
+            .ConfigureAwait(false))
+            .ToDictionary(x => x.Permission);
+
+        if (!userRole.Permissions.All(x => permissionDetailsLookup.ContainsKey(x)))
+            throw new NotFoundValidationException($"User role with permission without details found, Userrole was: {userRole.Id}");
+
         return new GetUserRoleResponse(new UserRoleWithPermissionsDto(
             userRole.Id.Value,
             userRole.Name,
             userRole.Description,
             userRole.EicFunction,
             userRole.Status,
-            userRole.Permissions.Select(e => (int)e)));
+            userRole.Permissions.Select(x => MapPermission(permissionDetailsLookup[x]))));
+    }
+
+    private static SelectablePermissionDto MapPermission(PermissionDetails permissionDetails)
+    {
+        return new SelectablePermissionDto(
+            (int)permissionDetails.Permission,
+            permissionDetails.Permission.ToString(),
+            permissionDetails.Description);
     }
 }

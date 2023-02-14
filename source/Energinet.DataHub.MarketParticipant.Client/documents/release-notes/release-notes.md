@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.20.0
+
+- UserRoleWithPermissionsDto updated to contain list of selectable permissions
+
 ## Version 2.19.0
 
 - Required domain name when creating organization.
