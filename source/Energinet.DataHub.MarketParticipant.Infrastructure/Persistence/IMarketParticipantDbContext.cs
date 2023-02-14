@@ -110,6 +110,11 @@ public interface IMarketParticipantDbContext
     DbSet<PermissionEntity> Permissions { get; }
 
     /// <summary>
+    ///     Represent access to the EmailEventEntry database table
+    /// </summary>
+    DbSet<EmailEventEntity> EmailEventEntries { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

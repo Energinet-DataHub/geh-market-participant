@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -56,6 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             host._startup.Container.Options.AllowOverridingRegistrations = true;
             InitTestServiceBus(host._startup.Container);
             InitUserIdProvider(host._startup.Container);
+            InitEmailSender(host._startup.Container);
             return Task.FromResult(host);
         }
 
@@ -76,6 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             host._startup.Container.Options.AllowOverridingRegistrations = true;
             InitTestServiceBus(host._startup.Container);
             InitUserIdProvider(host._startup.Container);
+            InitEmailSender(host._startup.Container);
             return Task.FromResult(host);
         }
 
@@ -98,7 +101,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.ServiceBusTopicName.Key, "fake_value"),
                 new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
                 new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
-                new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString())
+                new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
+                new(Settings.SendGridApiKey.Key, "fake_value"),
+                new(Settings.UserInviteFromEmail.Key, "fake_value")
             };
 
             return new ConfigurationBuilder()
@@ -125,6 +130,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             var userIdProvider = new Mock<IUserContext<FrontendUser>>();
             userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
             container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        }
+
+        private static void InitEmailSender(Container container)
+        {
+            var emailSender = new Mock<IEmailSender>();
+            container.Register(() => emailSender.Object, Lifestyle.Scoped);
         }
     }
 }
