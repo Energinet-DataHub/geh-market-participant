@@ -49,6 +49,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; private set; } = null!;
     public DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; private set; } = null!;
     public DbSet<PermissionEntity> Permissions { get; private set; } = null!;
+    public DbSet<EmailEventEntity> EmailEventEntries { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
     {
@@ -77,6 +78,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 }

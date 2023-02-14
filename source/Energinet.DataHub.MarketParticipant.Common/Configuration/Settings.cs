@@ -53,4 +53,10 @@ public static class Settings
         = new("TOKEN_KEY_VAULT");
     public static Setting<string> TokenKeyName { get; }
         = new("TOKEN_KEY_NAME");
+
+    public static Setting<string> SendGridApiKey { get; }
+        = new("SEND_GRID_APIKEY");
+
+    public static Setting<string> UserInviteFromEmail { get; }
+        = new("USER_INVITE_FROM_EMAIL");
 }

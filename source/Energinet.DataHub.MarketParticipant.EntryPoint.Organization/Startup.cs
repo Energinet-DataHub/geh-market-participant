@@ -15,11 +15,15 @@
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.MarketParticipant.Common;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SendGrid.Extensions.DependencyInjection;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
@@ -33,11 +37,18 @@ internal sealed class Startup : StartupBase
             .AddHealthChecks()
             .AddLiveCheck()
             .AddDbContextCheck<MarketParticipantDbContext>();
+
+        services.AddSendGrid(options =>
+        {
+            options.ApiKey = configuration.GetOptionalSetting(Settings.SendGridApiKey);
+        });
     }
 
     protected override void Configure(IConfiguration configuration, Container container)
     {
         Container.Register<SynchronizeActorsTimerTrigger>();
+        Container.Register<EmailEventTimerTrigger>();
+        Container.AddSendGridEmailSenderClient();
 
         // Health check
         container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
