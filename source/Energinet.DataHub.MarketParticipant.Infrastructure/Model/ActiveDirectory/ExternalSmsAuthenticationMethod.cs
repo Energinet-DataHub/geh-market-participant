@@ -37,6 +37,7 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
         return authenticationBuilder
             .PhoneMethods
             .Request()
+            .WithRetryOnNotFound()
             .AddAsync(new PhoneAuthenticationMethod
             {
                 PhoneNumber = _smsAuthenticationMethod.PhoneNumber.Number,
@@ -51,6 +52,7 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
         var collection = await authenticationBuilder
             .PhoneMethods
             .Request()
+            .WithRetryOnNotFound()
             .GetAsync()
             .ConfigureAwait(false);
 

@@ -42,9 +42,5 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         builder.UseSetting(Settings.BackendAppId.Key, TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
-
-        builder.UseSetting(Settings.B2CTenant.Key, Guid.NewGuid().ToString());
-        builder.UseSetting(Settings.B2CServicePrincipalNameId.Key, Guid.NewGuid().ToString());
-        builder.UseSetting(Settings.B2CServicePrincipalNameSecret.Key, "fake_value");
     }
 }
