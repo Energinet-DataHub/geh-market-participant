@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -33,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _marketParticipantDbContext = marketParticipantDbContext;
         }
 
-        public async Task<OrganizationId> AddOrUpdateAsync(Organization organization)
+        public async Task<Result<OrganizationId, OrganizationError>> AddOrUpdateAsync(Organization organization)
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
 
@@ -72,8 +73,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 actor.New = false;
             }
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new OrganizationId(destination.Id);
+            try
+            {
+                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch (DbUpdateException ex) when (
+                ex.InnerException is SqlException inner &&
+                inner.Message.Contains("UQ_OrganizationInfo_Domain", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return new(OrganizationError.DomainConflict);
+            }
+
+            return new(new OrganizationId(destination.Id));
         }
 
         public async Task<Organization?> GetAsync(OrganizationId id)

@@ -93,9 +93,11 @@ public sealed class ActorFactoryService : IActorFactoryService
 
     private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
     {
-        await _organizationRepository
+        var result = await _organizationRepository
             .AddOrUpdateAsync(organization)
             .ConfigureAwait(false);
+
+        result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
 
         var savedOrganization = await _organizationRepository
             .GetAsync(organization.Id)
