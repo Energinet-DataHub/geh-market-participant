@@ -109,6 +109,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(Guid.NewGuid())));
+
             var target = new ActorFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
@@ -200,6 +203,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(Guid.NewGuid())));
+
             var globalLocationNumberUniquenessService = new Mock<IUniqueGlobalLocationNumberRuleService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
@@ -237,6 +243,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(Guid.NewGuid())));
+
             var overlappingBusinessRolesService = new Mock<IOverlappingBusinessRolesRuleService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
@@ -276,6 +285,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
+            organizationRepository.Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
+                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(Guid.NewGuid())));
+
             var allowedGridAreasRuleService = new Mock<IAllowedGridAreasRuleService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
