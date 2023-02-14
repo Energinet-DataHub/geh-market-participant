@@ -31,7 +31,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
     private readonly List<ExternalUserId> _createdUsers = new();
 
     private GraphServiceClient? _graphClient;
-    public GraphServiceClient Client => _graphClient ?? throw NewIncorrectStateException();
+    public GraphServiceClient Client => _graphClient ?? throw new InvalidOperationException($"{nameof(GraphServiceClientFixture)} is not initialized or has already been disposed.");
 
     public Task InitializeAsync()
     {
@@ -87,9 +87,6 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
     public async Task<ExternalUserId> CreateUserAsync()
     {
-        if (_graphClient == null)
-            throw NewIncorrectStateException();
-
         var newUser = new User
         {
             AccountEnabled = false,
@@ -112,7 +109,8 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             }
         };
 
-        var createdUser = await _graphClient.Users
+        var createdUser = await Client
+            .Users
             .Request()
             .AddAsync(newUser)
             .ConfigureAwait(false);
@@ -121,10 +119,5 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         _createdUsers.Add(externalUserId);
 
         return externalUserId;
-    }
-
-    private static InvalidOperationException NewIncorrectStateException()
-    {
-        return new InvalidOperationException($"{nameof(GraphServiceClientFixture)} is not initialized or has already been disposed.");
     }
 }
