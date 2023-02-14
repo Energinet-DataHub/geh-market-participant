@@ -51,6 +51,7 @@ public sealed class EmailEventIntegrationTests
 
         var userIdentityMock = GetUserIdentityForTest(new ExternalUserId(user.ExternalUserId));
 
+        await _fixture.DatabaseManager.EmailEventsClearNotSentAsync().ConfigureAwait(false);
         await _fixture.DatabaseManager.CreateEmailEventAsync(userIdentityMock.Email, EmailEventType.UserInvite).ConfigureAwait(false);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();

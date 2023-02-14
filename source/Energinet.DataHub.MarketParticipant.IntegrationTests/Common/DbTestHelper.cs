@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
@@ -355,5 +357,17 @@ internal static class DbTestHelper
         await context.SaveChangesAsync().ConfigureAwait(false);
 
         return emailEventEntity.Id;
+    }
+
+    public static async Task EmailEventsClearNotSentAsync(this MarketParticipantDatabaseManager manager)
+    {
+        await using var context = manager.CreateDbContext();
+
+        await context.EmailEventEntries
+            .Where(e => e.Sent == null)
+            .ExecuteUpdateAsync(e => e.SetProperty(x => x.Sent, x => DateTimeOffset.UtcNow))
+            .ConfigureAwait(false);
+
+        await context.SaveChangesAsync().ConfigureAwait(false);
     }
 }
