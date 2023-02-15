@@ -81,6 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
             container.Register<IUserRoleAuditLogService, UserRoleAuditLogService>(Lifestyle.Scoped);
+            container.Register<IOrganizationDomainValidationService, OrganizationDomainValidationService>(Lifestyle.Scoped);
             container.Register<IOrganizationIntegrationEventsHelperService, OrganizationIntegrationEventsHelperService>(Lifestyle.Scoped);
             container.Register<IActorUpdatedIntegrationEventParser, ActorUpdatedIntegrationEventParser>(Lifestyle.Scoped);
             container.Register<IActorCreatedIntegrationEventParser, ActorCreatedIntegrationEventParser>(Lifestyle.Scoped);
