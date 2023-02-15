@@ -65,3 +65,4 @@ EicFunction
 GetSelectablePermission
 UserRoleWithPermissionsDto
 selectable
+PermissionDetails
