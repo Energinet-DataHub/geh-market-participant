@@ -30,7 +30,6 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-// TODO: UTs
 public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
 {
     private readonly IUserInvitationService _userInvitationService;

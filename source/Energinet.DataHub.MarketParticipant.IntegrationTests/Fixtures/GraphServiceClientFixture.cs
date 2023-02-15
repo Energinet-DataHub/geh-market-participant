@@ -29,9 +29,11 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 {
     private readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
     private readonly List<ExternalUserId> _createdUsers = new();
-
     private GraphServiceClient? _graphClient;
+
     public GraphServiceClient Client => _graphClient ?? throw new InvalidOperationException($"{nameof(GraphServiceClientFixture)} is not initialized or has already been disposed.");
+
+    public string Issuer => _integrationTestConfiguration.B2CSettings.Tenant;
 
     public Task InitializeAsync()
     {
@@ -103,7 +105,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 new ObjectIdentity
                 {
                     SignInType = "emailAddress",
-                    Issuer = _integrationTestConfiguration.B2CSettings.Tenant,
+                    Issuer = Issuer,
                     IssuerAssignedId = $"{Guid.NewGuid()}@test.datahub.dk"
                 }
             }

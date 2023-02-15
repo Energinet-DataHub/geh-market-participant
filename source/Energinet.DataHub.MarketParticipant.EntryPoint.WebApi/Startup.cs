@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Text.Json.Serialization;
 using Azure.Identity;

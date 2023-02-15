@@ -12,22 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
