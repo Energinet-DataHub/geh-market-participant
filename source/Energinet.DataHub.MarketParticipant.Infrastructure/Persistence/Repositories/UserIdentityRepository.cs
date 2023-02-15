@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Graph;
@@ -35,7 +36,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private readonly GraphServiceClient _graphClient;
     private readonly AzureIdentityConfig _azureIdentityConfig;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
-
+    private readonly IUserPasswordGenerator _passwordGenerator;
     private readonly Expression<Func<User, object>> _selectForMapping = user => new
     {
         user.Id,
@@ -52,11 +53,13 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     public UserIdentityRepository(
         GraphServiceClient graphClient,
         AzureIdentityConfig azureIdentityConfig,
-        IUserIdentityAuthenticationService userIdentityAuthenticationService)
+        IUserIdentityAuthenticationService userIdentityAuthenticationService,
+        IUserPasswordGenerator passwordGenerator)
     {
         _graphClient = graphClient;
         _azureIdentityConfig = azureIdentityConfig;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
+        _passwordGenerator = passwordGenerator;
     }
 
     public async Task<UserIdentity?> GetAsync(ExternalUserId externalId)
@@ -175,7 +178,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 PasswordProfile = new PasswordProfile
                 {
                     ForceChangePasswordNextSignIn = true,
-                    Password = Guid.NewGuid().ToString() // TODO: Does not work with password policy.
+                    Password = _passwordGenerator.GenerateRandomPassword()
                 },
                 Identities = new[]
                 {
