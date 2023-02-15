@@ -65,7 +65,7 @@ public sealed class PasswordCheckerTests
     }
 
     [Fact]
-    public void PasswordSatisfiesComplexity_NonAsciiChars_Throws()
+    public void PasswordSatisfiesComplexity_NonAsciiChars_NotAllowed()
     {
         // arrange
         var target = new PasswordChecker();
