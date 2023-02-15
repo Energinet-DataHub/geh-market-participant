@@ -22,15 +22,10 @@ public sealed class PasswordChecker : IPasswordChecker
 {
     private Dictionary<CharacterSet, HashSet<char>> _sets = new()
     {
-        { CharacterSet.Numbers, Enumerable.Range(48, 10).Select(x => (char)x).ToHashSet() },
-        { CharacterSet.Lower, Enumerable.Range(97, 26).Select(x => (char)x).ToHashSet() },
-        { CharacterSet.Upper, Enumerable.Range(65, 26).Select(x => (char)x).ToHashSet() },
-        {
-            CharacterSet.Special, Enumerable.Range(32, 16)
-                .Concat(Enumerable.Range(58, 7)
-                    .Concat(Enumerable.Range(91, 6)
-                        .Concat(Enumerable.Range(123, 4)))).Select(x => (char)x).ToHashSet()
-        },
+        { CharacterSet.Numbers, "0123456789".ToHashSet() },
+        { CharacterSet.Lower, "abcdefghijklmnopqrstuvwxyz".ToHashSet() },
+        { CharacterSet.Upper, "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToHashSet() },
+        { CharacterSet.Special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~".ToHashSet() },
     };
 
     public bool PasswordSatisfiesComplexity(string password, int minLength, CharacterSet characterSets, int minNumberOfSetsToHit)
@@ -58,13 +53,20 @@ public sealed class PasswordChecker : IPasswordChecker
 
         foreach (var c in password)
         {
+            var hit = false;
+
             for (var i = 0; i < charSets.Length; ++i)
             {
                 if (charSets[i].Contains(c))
                 {
-                    hits[i] = true;
+                    hits[i] = hit = true;
                     break;
                 }
+            }
+
+            if (!hit && _sets.All(x => !x.Value.Contains(c)))
+            {
+                throw new ArgumentException("Invalid character", nameof(password));
             }
         }
 

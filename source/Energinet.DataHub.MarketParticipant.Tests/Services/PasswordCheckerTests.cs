@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Xunit;
 using Xunit.Categories;
 
@@ -20,41 +21,58 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 [UnitTest]
 public sealed class PasswordCheckerTests
 {
+    private const string AllVisibleAsciiChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+
     [Theory]
-    [InlineData("5", CharacterSet.Lower, 1, false)]
-    [InlineData("U", CharacterSet.Lower, 1, false)]
-    [InlineData("L", CharacterSet.Lower, 1, false)]
-    [InlineData("l", CharacterSet.Lower | CharacterSet.Upper, 1, true)]
-    [InlineData("L", CharacterSet.Lower | CharacterSet.Upper, 1, true)]
-    [InlineData("lL", CharacterSet.Lower | CharacterSet.Upper, 1, true)]
-    [InlineData("lL", CharacterSet.Lower | CharacterSet.Upper, 2, true)]
-    [InlineData("lL", CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 3, false)]
-    [InlineData("lL@", CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 3, true)]
-    public void PasswordSatisfiesComplexity_UsingSpecifiedCharacterSets_MatchesExpectedResult(string password, CharacterSet sets, int numberOfSetHitsRequired, bool expected)
+
+    // matches all conditions
+    [InlineData("G00dLongPassw!", 14, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4, true)]
+
+    // no special chars
+    [InlineData("G00dLongPassw0", 14, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4, false)]
+
+    // no numbers
+    [InlineData("GoodLongPassw!", 14, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4, false)]
+
+    // no upper case
+    [InlineData("g00dlongpassw!", 14, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4, false)]
+
+    // not long enough
+    [InlineData("G00dLngPassw!", 14, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4, false)]
+    public void PasswordSatisfiesComplexity_PasswordMustSatisfyAllCondition(string password, int minLenght, CharacterSet sets, int numberOfSetHitsRequired, bool expected)
     {
         // arrange
         var target = new PasswordChecker();
 
         // act
-        var actual = target.PasswordSatisfiesComplexity(password, 1, sets, numberOfSetHitsRequired);
+        var actual = target.PasswordSatisfiesComplexity(password, minLenght, sets, numberOfSetHitsRequired);
 
         // assert
         Assert.Equal(expected, actual);
     }
 
-    [Theory]
-    [InlineData("longerthan8chars_!!@", 8, true)]
-    [InlineData("exactly!", 8, true)]
-    [InlineData("less!@7", 8, false)]
-    public void PasswordSatisfiesComplexity_UsingSpecificedLengthParam_MatchesExpectedResult(string password, int minLenght, bool expected)
+    [Fact]
+    public void PasswordSatisfiesComplexity_AllVisibleAsciiChars_Allowed()
     {
         // arrange
         var target = new PasswordChecker();
 
         // act
-        var actual = target.PasswordSatisfiesComplexity(password, minLenght, CharacterSet.Lower, 1);
+        var actual = target.PasswordSatisfiesComplexity(AllVisibleAsciiChars, 1, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4);
 
         // assert
-        Assert.Equal(expected, actual);
+        Assert.True(actual);
+    }
+
+    [Fact]
+    public void PasswordSatisfiesComplexity_NonAsciiChars_Throws()
+    {
+        // arrange
+        var target = new PasswordChecker();
+
+        // act, assert
+        Assert.Equal(
+            "Invalid character (Parameter 'password')",
+            Assert.Throws<ArgumentException>(() => target.PasswordSatisfiesComplexity(AllVisibleAsciiChars + "ø", 1, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4)).Message);
     }
 }
