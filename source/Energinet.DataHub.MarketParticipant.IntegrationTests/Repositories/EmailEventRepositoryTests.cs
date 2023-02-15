@@ -50,7 +50,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var emailEventRepository = new EmailEventRepository(context);
 
+            #pragma warning disable CA5394
             var emailRandom = new EmailAddress(Random.Shared.Next(444444) + "fakeemail@fake.dk");
+            #pragma warning restore CA5394
             var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
 
             // act
@@ -74,7 +76,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var emailEventRepository1 = new EmailEventRepository(context1);
 
+            #pragma warning disable CA5394
             var emailRandom = new EmailAddress(Random.Shared.Next(444444) + "fakeemail@fake.dk");
+            #pragma warning restore CA5394
             var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
 
             // act

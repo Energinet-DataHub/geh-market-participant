@@ -66,7 +66,7 @@ public sealed class EmailEventIntegrationTests
         await mediator.Send(command);
     }
 
-    private UserIdentity GetUserIdentityForTest(ExternalUserId externalUserId)
+    private static UserIdentity GetUserIdentityForTest(ExternalUserId externalUserId)
     {
         return new UserIdentity(
             externalUserId,
