@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -178,6 +179,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                        {
+                            new()
+                            {
+                                EicFunction = EicFunction.BillingAgent,
+                                PermissionId = (int)permission
+                            }
+                        },
+                    Id = (int)permission
+                });
+            }
         }
 
         foreach (var eicFunction in new[] { EicFunction.BillingAgent })
@@ -210,6 +228,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                    {
+                        new()
+                        {
+                            EicFunction = eicFunction,
+                            PermissionId = (int)permission
+                        }
+                    },
+                    Id = (int)permission
+                });
+            }
         }
 
         userRoleEntity.EicFunctions.Add(new UserRoleEicFunctionEntity
@@ -238,6 +273,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                    {
+                        new()
+                        {
+                            EicFunction = EicFunction.BillingAgent,
+                            PermissionId = (int)permission
+                        }
+                    },
+                    Id = (int)permission
+                });
+            }
         }
 
         foreach (var eicFunction in new[] { EicFunction.BillingAgent })
@@ -307,6 +359,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                    {
+                        new()
+                        {
+                            EicFunction = EicFunction.IndependentAggregator,
+                            PermissionId = (int)permission
+                        }
+                    },
+                    Id = (int)permission
+                });
+            }
         }
 
         foreach (var eicFunction in new[] { EicFunction.IndependentAggregator })

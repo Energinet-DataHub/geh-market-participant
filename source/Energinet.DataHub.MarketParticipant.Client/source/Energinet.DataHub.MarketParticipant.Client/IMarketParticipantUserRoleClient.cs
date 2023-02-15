@@ -78,6 +78,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="eicFunction">The Eic Function to get permissions for</param>
         /// <returns>Collection of permission</returns>
-        Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync(EicFunction eicFunction);
+        Task<IEnumerable<PermissionDetailsDto>> GetPermissionDetailsAsync(EicFunction eicFunction);
     }
 }

@@ -16,4 +16,4 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record GetSelectablePermissionsResponse(IEnumerable<SelectablePermissionDto> Permissions);
+public sealed record GetPermissionDetailsResponse(IEnumerable<PermissionDetailsDto> Permissions);

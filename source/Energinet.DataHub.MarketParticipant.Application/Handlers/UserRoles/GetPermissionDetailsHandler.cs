@@ -22,24 +22,24 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class GetSelectablePermissionsHandler
-    : IRequestHandler<GetSelectablePermissionsCommand, GetSelectablePermissionsResponse>
+public sealed class GetPermissionDetailsHandler
+    : IRequestHandler<GetPermissionDetailsCommand, GetPermissionDetailsResponse>
 {
     private readonly IPermissionRepository _permissionRepository;
 
-    public GetSelectablePermissionsHandler(IPermissionRepository permissionRepository)
+    public GetPermissionDetailsHandler(IPermissionRepository permissionRepository)
     {
         _permissionRepository = permissionRepository;
     }
 
-    public async Task<GetSelectablePermissionsResponse> Handle(
-        GetSelectablePermissionsCommand request,
+    public async Task<GetPermissionDetailsResponse> Handle(
+        GetPermissionDetailsCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var permissions = await _permissionRepository.GetToMarketRoleAsync(request.EicFunction).ConfigureAwait(false);
-        return new GetSelectablePermissionsResponse(permissions.Select(permission =>
-            new SelectablePermissionDto(
+        return new GetPermissionDetailsResponse(permissions.Select(permission =>
+            new PermissionDetailsDto(
                 (int)permission.Permission,
                 permission.Permission.ToString(),
                 permission.Description)));
