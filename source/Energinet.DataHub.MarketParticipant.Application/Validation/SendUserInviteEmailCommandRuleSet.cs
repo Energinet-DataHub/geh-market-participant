@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
-
-public sealed class GetSelectablePermissionsCommandRuleSet : AbstractValidator<GetSelectablePermissionsCommand>
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
+    public sealed class SendUserInviteEmailCommandRuleSet : AbstractValidator<SendUserInviteEmailCommand>
+    {
+    }
 }

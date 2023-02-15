@@ -13,9 +13,21 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public sealed record UserRoleWithPermissionsDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status, IEnumerable<PermissionDetailsDto> Permissions);
+    public sealed class EmailEvent
+    {
+        public EmailEvent(EmailAddress emailAddress, EmailEventType emailEventType)
+        {
+            Email = emailAddress;
+            EmailEventType = emailEventType;
+        }
+
+        public int Id { get; set; }
+        public EmailAddress Email { get; } = null!;
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Sent { get; set; }
+        public EmailEventType EmailEventType { get; }
+    }
 }

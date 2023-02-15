@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record UserRoleWithPermissionsDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status, IEnumerable<PermissionDetailsDto> Permissions);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+
+public sealed record GetPermissionDetailsCommand(EicFunction EicFunction) : IRequest<GetPermissionDetailsResponse>;

@@ -203,7 +203,7 @@ public sealed class UpdateUserRoleIntegrationTests
         var response = await mediator.Send(getUserRoleCommand);
 
         // Assert
-        var actualPermissionListAsInts = response.Role.Permissions.ToList();
+        var actualPermissionListAsInts = response.Role.Permissions.Select(x => x.Id).ToList();
         Assert.Equal(2, actualPermissionListAsInts.Count);
         Assert.Equivalent(newUserRolePermissions, actualPermissionListAsInts);
     }

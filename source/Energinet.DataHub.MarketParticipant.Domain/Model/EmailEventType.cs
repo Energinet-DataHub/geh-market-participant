@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-
-public record SelectablePermissionDto(int Id, string Name, string Description);
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
+{
+    public enum EmailEventType
+    {
+        UserInvite = 1
+    }
+}

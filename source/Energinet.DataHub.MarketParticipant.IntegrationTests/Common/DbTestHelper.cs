@@ -13,12 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
@@ -176,6 +179,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                        {
+                            new()
+                            {
+                                EicFunction = EicFunction.BillingAgent,
+                                PermissionId = (int)permission
+                            }
+                        },
+                    Id = (int)permission
+                });
+            }
         }
 
         foreach (var eicFunction in new[] { EicFunction.BillingAgent })
@@ -208,6 +228,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                    {
+                        new()
+                        {
+                            EicFunction = eicFunction,
+                            PermissionId = (int)permission
+                        }
+                    },
+                    Id = (int)permission
+                });
+            }
         }
 
         userRoleEntity.EicFunctions.Add(new UserRoleEicFunctionEntity
@@ -236,6 +273,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                    {
+                        new()
+                        {
+                            EicFunction = EicFunction.BillingAgent,
+                            PermissionId = (int)permission
+                        }
+                    },
+                    Id = (int)permission
+                });
+            }
         }
 
         foreach (var eicFunction in new[] { EicFunction.BillingAgent })
@@ -305,6 +359,23 @@ internal static class DbTestHelper
             {
                 Permission = permission
             });
+
+            if (await context.Permissions.FindAsync((int)permission) == null)
+            {
+                context.Permissions.Add(new PermissionEntity()
+                {
+                    Description = "fake_value",
+                    EicFunctions = new Collection<PermissionEicFunctionEntity>()
+                    {
+                        new()
+                        {
+                            EicFunction = EicFunction.IndependentAggregator,
+                            PermissionId = (int)permission
+                        }
+                    },
+                    Id = (int)permission
+                });
+            }
         }
 
         foreach (var eicFunction in new[] { EicFunction.IndependentAggregator })
@@ -335,5 +406,37 @@ internal static class DbTestHelper
         await context.SaveChangesAsync();
 
         return (externalUserId, actorEntity.Id);
+    }
+
+    public static async Task<int> CreateEmailEventAsync(
+        this MarketParticipantDatabaseManager manager,
+        EmailAddress emailAddress,
+        EmailEventType emailEventType)
+    {
+        await using var context = manager.CreateDbContext();
+
+        var emailEventEntity = new EmailEventEntity()
+        {
+            Created = DateTimeOffset.UtcNow,
+            Email = emailAddress.Address,
+            EmailEventType = (int)emailEventType
+        };
+
+        await context.EmailEventEntries.AddAsync(emailEventEntity).ConfigureAwait(false);
+        await context.SaveChangesAsync().ConfigureAwait(false);
+
+        return emailEventEntity.Id;
+    }
+
+    public static async Task EmailEventsClearNotSentAsync(this MarketParticipantDatabaseManager manager)
+    {
+        await using var context = manager.CreateDbContext();
+
+        await context.EmailEventEntries
+            .Where(e => e.Sent == null)
+            .ExecuteUpdateAsync(e => e.SetProperty(x => x.Sent, x => DateTimeOffset.UtcNow))
+            .ConfigureAwait(false);
+
+        await context.SaveChangesAsync().ConfigureAwait(false);
     }
 }

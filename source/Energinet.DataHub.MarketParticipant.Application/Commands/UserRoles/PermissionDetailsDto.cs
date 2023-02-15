@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record UserRoleWithPermissionsDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status, IEnumerable<PermissionDetailsDto> Permissions);
-}
+public record PermissionDetailsDto(int Id, string Name, string Description);

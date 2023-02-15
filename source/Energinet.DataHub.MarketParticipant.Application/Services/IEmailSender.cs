@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-public sealed record GetSelectablePermissionsCommand(EicFunction EicFunction) : IRequest<GetSelectablePermissionsResponse>;
+/// <summary>
+/// Send email interface
+/// </summary>
+public interface IEmailSender
+{
+    /// <summary>
+    /// Send email to user by email event type
+    /// </summary>
+    /// <param name="emailAddress">email address for recipient</param>
+    /// <param name="emailEvent">email event type</param>
+    /// <returns>email send task</returns>
+    Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent);
+}

@@ -13,9 +13,15 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
 {
-    public sealed record SelectablePermissionsDto(int Id, string Name, string Description);
+    public sealed class EmailEventEntity
+    {
+        public int Id { get; set; }
+        public string Email { get; set; } = null!;
+        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset? Sent { get; set; }
+        public int EmailEventType { get; set; }
+    }
 }

@@ -36,17 +36,20 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IActorQueryRepository _actorQueryRepository;
     private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IEmailEventRepository _emailEventRepository;
 
     public InviteUserHandler(
         IUserInvitationService userInvitationService,
         IOrganizationRepository organizationRepository,
         IActorQueryRepository actorQueryRepository,
-        IUserRoleRepository userRoleRepository)
+        IUserRoleRepository userRoleRepository,
+        IEmailEventRepository emailEventRepository)
     {
         _userInvitationService = userInvitationService;
         _organizationRepository = organizationRepository;
         _actorQueryRepository = actorQueryRepository;
         _userRoleRepository = userRoleRepository;
+        _emailEventRepository = emailEventRepository;
     }
 
     public async Task<Unit> Handle(InviteUserCommand request, CancellationToken cancellationToken)
@@ -69,6 +72,10 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
 
         await _userInvitationService
             .InviteUserAsync(invitation)
+            .ConfigureAwait(false);
+
+        await _emailEventRepository
+            .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
             .ConfigureAwait(false);
 
         return Unit.Value;

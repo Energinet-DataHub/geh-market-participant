@@ -131,7 +131,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<SelectablePermissionsDto>> GetSelectablePermissionsAsync(EicFunction eicFunction)
+        public async Task<IEnumerable<PermissionDetailsDto>> GetPermissionDetailsAsync(EicFunction eicFunction)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -143,7 +143,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<IEnumerable<SelectablePermissionsDto>>()
+                .GetJsonAsync<IEnumerable<PermissionDetailsDto>>()
                 .ConfigureAwait(false);
         }
     }
