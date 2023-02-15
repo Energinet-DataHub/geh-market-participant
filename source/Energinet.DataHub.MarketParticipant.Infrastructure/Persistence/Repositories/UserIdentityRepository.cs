@@ -36,7 +36,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private readonly GraphServiceClient _graphClient;
     private readonly AzureIdentityConfig _azureIdentityConfig;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
-    private readonly IPasswordGenerator _passwordGenerator;
+    private readonly IUserPasswordGenerator _passwordGenerator;
     private readonly Expression<Func<User, object>> _selectForMapping = user => new
     {
         user.Id,
@@ -54,7 +54,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         GraphServiceClient graphClient,
         AzureIdentityConfig azureIdentityConfig,
         IUserIdentityAuthenticationService userIdentityAuthenticationService,
-        IPasswordGenerator passwordGenerator)
+        IUserPasswordGenerator passwordGenerator)
     {
         _graphClient = graphClient;
         _azureIdentityConfig = azureIdentityConfig;
@@ -178,7 +178,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 PasswordProfile = new PasswordProfile
                 {
                     ForceChangePasswordNextSignIn = true,
-                    Password = _passwordGenerator.GenerateRandomPassword(14, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 3)
+                    Password = _passwordGenerator.GenerateRandomPassword()
                 },
                 Identities = new[]
                 {

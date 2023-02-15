@@ -19,10 +19,10 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
 [UnitTest]
-public sealed class PasswordGeneratorTests
+public sealed class UserPasswordGeneratorTests
 {
     [Fact]
-    public void Generate_GeneratedPassword_MustMatchComplexityParams()
+    public void Generate_Called_GeneratesPassword()
     {
         // arrange
         const int length = 14;
@@ -30,10 +30,10 @@ public sealed class PasswordGeneratorTests
         const int setsToHit = 4;
 
         var passwordChecker = new PasswordChecker();
-        var target = new PasswordGenerator(passwordChecker);
+        var target = new UserPasswordGenerator(new PasswordGenerator(passwordChecker));
 
         // act
-        var actualPassword = target.GenerateRandomPassword(length, sets, setsToHit);
+        var actualPassword = target.GenerateRandomPassword();
         var actualComplexity = passwordChecker.PasswordSatisfiesComplexity(actualPassword, length, sets, setsToHit);
 
         // assert

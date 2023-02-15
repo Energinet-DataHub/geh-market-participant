@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Xunit;
 using Xunit.Categories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 
 [UnitTest]
 public sealed class PasswordCheckerTests
@@ -70,9 +70,10 @@ public sealed class PasswordCheckerTests
         // arrange
         var target = new PasswordChecker();
 
-        // act, assert
-        Assert.Equal(
-            "Invalid character (Parameter 'password')",
-            Assert.Throws<ArgumentException>(() => target.PasswordSatisfiesComplexity(AllVisibleAsciiChars + "ø", 1, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4)).Message);
+        // act
+        var actual = target.PasswordSatisfiesComplexity(AllVisibleAsciiChars + "ø", 1, CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special, 4);
+
+        // assert
+        Assert.False(actual);
     }
 }

@@ -66,7 +66,7 @@ public sealed class PasswordChecker : IPasswordChecker
 
             if (!hit && _sets.All(x => !x.Value.Contains(c)))
             {
-                throw new ArgumentException("Invalid character", nameof(password));
+                return false;
             }
         }
 
