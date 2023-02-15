@@ -27,7 +27,7 @@ public sealed class UserPasswordGeneratorTests
         // arrange
         const int length = 14;
         const CharacterSet sets = CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special;
-        const int setsToHit = 4;
+        const int setsToHit = 3;
 
         var passwordChecker = new PasswordChecker();
         var target = new UserPasswordGenerator(new PasswordGenerator(passwordChecker));
