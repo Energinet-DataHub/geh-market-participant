@@ -56,9 +56,7 @@ public class OrganizationDomainValidationService : IOrganizationDomainValidation
             throw new NotFoundValidationException($"The specified organization {actor.OrganizationId} was not found.");
         }
 
-        var atIndex = userInviteEmail.IndexOf('@', StringComparison.Ordinal);
-        var userEmailDomain = userInviteEmail.Substring(atIndex + 1, userInviteEmail.Length - (atIndex + 1));
-        if (!userEmailDomain.Equals(organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
+        if (!userInviteEmail.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
         {
             throw new ValidationException("User email not valid, should match organization domain");
         }
