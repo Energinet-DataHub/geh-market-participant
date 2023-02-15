@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Xunit;
 using Xunit.Categories;
@@ -21,6 +23,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 [UnitTest]
 public sealed class PasswordGeneratorTests
 {
+    private const string Num = "0123456789";
+    private const string Low = "abcdefghijklmnopqrstuvwxyz";
+    private const string Upp = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private const string Spe = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+
     [Fact]
     public void Generate_GeneratedPassword_MustMatchComplexityParams()
     {
@@ -38,5 +45,11 @@ public sealed class PasswordGeneratorTests
 
         // assert
         Assert.True(actualComplexity);
+        Assert.Equal(length, actualPassword.Length);
+        Assert.True(
+            Num.Any(x => actualPassword.Contains(x, StringComparison.InvariantCulture)) &&
+            Low.Any(x => actualPassword.Contains(x, StringComparison.InvariantCulture)) &&
+            Upp.Any(x => actualPassword.Contains(x, StringComparison.InvariantCulture)) &&
+            Spe.Any(x => actualPassword.Contains(x, StringComparison.InvariantCulture)));
     }
 }
