@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record GetSelectablePermissionsCommand(EicFunction EicFunction) : IRequest<GetSelectablePermissionsResponse>;
+public sealed class GetPermissionDetailsCommandRuleSet : AbstractValidator<GetPermissionDetailsCommand>
+{
+}
