@@ -2,7 +2,8 @@
 
 ## Version 2.20.0
 
-- UserRoleWithPermissionsDto updated to contain list of selectable permissions
+- UserRoleWithPermissionsDto updated to contain list of permission details
+- Renamed SeleactablePermission to PermissionDetails
 
 ## Version 2.19.0
 

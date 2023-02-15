@@ -56,21 +56,18 @@ public sealed class GetUserRoleHandler
             .ConfigureAwait(false))
             .ToDictionary(x => x.Permission);
 
-        if (!userRole.Permissions.All(x => permissionDetailsLookup.ContainsKey(x)))
-            throw new NotFoundValidationException($"User role with permission without details found, Userrole was: {userRole.Id}");
-
         return new GetUserRoleResponse(new UserRoleWithPermissionsDto(
             userRole.Id.Value,
             userRole.Name,
             userRole.Description,
             userRole.EicFunction,
             userRole.Status,
-            userRole.Permissions.Select(x => MapPermission(permissionDetailsLookup[x]))));
+            userRole.Permissions.Where(x => permissionDetailsLookup.ContainsKey(x)).Select(x => MapPermission(permissionDetailsLookup[x]))));
     }
 
-    private static SelectablePermissionDto MapPermission(PermissionDetails permissionDetails)
+    private static PermissionDetailsDto MapPermission(PermissionDetails permissionDetails)
     {
-        return new SelectablePermissionDto(
+        return new PermissionDetailsDto(
             (int)permissionDetails.Permission,
             permissionDetails.Permission.ToString(),
             permissionDetails.Description);

@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using FluentValidation;
+using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
-
-public sealed class GetSelectablePermissionsCommandRuleSet : AbstractValidator<GetSelectablePermissionsCommand>
+namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
+    public sealed record PermissionDetailsDto(int Id, string Name, string Description);
 }
