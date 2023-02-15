@@ -24,14 +24,14 @@ public sealed class PasswordGeneratorTests
     public void Generate_GeneratedPassword_MustMatchComplexityParams()
     {
         // arrange
-        var passwordChecker = new PasswordChecker();
-        var target = new PasswordGenerator(passwordChecker);
-
-        // act
         const int Length = 14;
         const CharacterSet Sets = CharacterSet.Numbers | CharacterSet.Lower | CharacterSet.Upper | CharacterSet.Special;
         const int SetsTohit = 4;
 
+        var passwordChecker = new PasswordChecker();
+        var target = new PasswordGenerator(passwordChecker);
+
+        // act
         var actualPassword = target.GenerateRandomPassword(Length, Sets, SetsTohit);
         var actualComplexity = passwordChecker.PasswordSatisfiesComplexity(actualPassword, Length, Sets, SetsTohit);
 
