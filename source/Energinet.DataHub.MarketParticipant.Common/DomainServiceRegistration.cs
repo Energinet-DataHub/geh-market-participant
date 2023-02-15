@@ -58,5 +58,7 @@ internal static class DomainServiceRegistration
             new TransmissionSystemOperatorRole());
 
         container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
+        container.Register<IPasswordChecker, PasswordChecker>(Lifestyle.Scoped);
+        container.Register<IPasswordGenerator, PasswordGenerator>(Lifestyle.Scoped);
     }
 }
