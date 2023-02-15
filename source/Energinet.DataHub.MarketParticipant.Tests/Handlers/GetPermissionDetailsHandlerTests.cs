@@ -27,13 +27,13 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
     [UnitTest]
-    public sealed class GetSelectablePermissionsHandlerTests
+    public sealed class GetPermissionDetailsHandlerTests
     {
         [Fact]
         public async Task Handle_NullArgument_ThrowsException()
         {
             // arrange
-            var target = new GetSelectablePermissionsHandler(new Mock<IPermissionRepository>().Object);
+            var target = new GetPermissionDetailsHandler(new Mock<IPermissionRepository>().Object);
 
             // act assert
             await Assert
@@ -50,10 +50,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetToMarketRoleAsync(It.IsAny<EicFunction>()))
                 .ReturnsAsync(Array.Empty<PermissionDetails>());
 
-            var target = new GetSelectablePermissionsHandler(repositoryMock.Object);
+            var target = new GetPermissionDetailsHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetSelectablePermissionsCommand(EicFunction.BillingAgent), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetPermissionDetailsCommand(EicFunction.BillingAgent), CancellationToken.None).ConfigureAwait(false);
 
             // assert
             Assert.NotNull(actual.Permissions);

@@ -63,3 +63,7 @@ enum
 Ints
 EicFunction
 GetSelectablePermission
+UserRoleWithPermissionsDto
+selectable
+PermissionDetails
+SelectablePermission
