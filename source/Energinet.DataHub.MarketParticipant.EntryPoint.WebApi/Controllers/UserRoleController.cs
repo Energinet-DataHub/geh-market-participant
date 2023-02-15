@@ -140,12 +140,12 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("permissions")]
     [AuthorizeUser(Permission.UsersManage)]
-    public async Task<IActionResult> GetSelectablePermissionsAsync(EicFunction eicFunction)
+    public async Task<IActionResult> GetPermissionDetailsAsync(EicFunction eicFunction)
     {
         return await this.ProcessAsync(
             async () =>
             {
-                var command = new GetSelectablePermissionsCommand(eicFunction);
+                var command = new GetPermissionDetailsCommand(eicFunction);
 
                 var response = await _mediator
                     .Send(command)
