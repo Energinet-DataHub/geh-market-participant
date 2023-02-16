@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -149,6 +150,10 @@ public sealed class UpdateUserRoleIntegrationTests
         scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
+        var permissionRepository = scope.GetInstance<IPermissionRepository>();
+
+        var result = await permissionRepository.GetToMarketRoleAsync(EicFunction.BillingAgent);
+        Assert.NotEmpty(result);
 
         var userRole = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersView }, EicFunction.BillingAgent);
         var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };

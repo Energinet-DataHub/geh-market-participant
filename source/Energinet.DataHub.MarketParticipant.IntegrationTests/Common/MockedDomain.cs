@@ -38,4 +38,5 @@ public sealed class MockedDomain
         return _value;
     }
 }
+
 #pragma warning restore
