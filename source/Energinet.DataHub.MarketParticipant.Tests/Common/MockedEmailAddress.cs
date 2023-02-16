@@ -15,10 +15,28 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
-public sealed class UserRoleEicFunctionEntity
+#pragma warning disable CA1062, CA2225
+
+public sealed class MockedEmailAddress
 {
-    public Guid UserRoleId { get; set; }
-    public EicFunction EicFunction { get; set; }
+    private readonly string _value = $"{Guid.NewGuid()}@test.datahub.dk";
+
+    public static implicit operator string(MockedEmailAddress mock)
+    {
+        return mock._value;
+    }
+
+    public static implicit operator EmailAddress(MockedEmailAddress mock)
+    {
+        return new EmailAddress(mock._value);
+    }
+
+    public override string ToString()
+    {
+        return _value;
+    }
 }
+
+#pragma warning restore

@@ -42,18 +42,18 @@ public sealed class GetUserRoleIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var userRoleId = await _fixture.DatabaseManager.CreateRoleTemplateAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var command = new GetUserRoleCommand(userRoleId.Value);
+        var command = new GetUserRoleCommand(userRole.Id);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
         Assert.NotEmpty(response.Role.Name);
-        Assert.Equal(userRoleId.Value, response.Role.Id);
+        Assert.Equal(userRole.Id, response.Role.Id);
     }
 
     [Fact]

@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public class AddressEntity
-    {
-        public AddressEntity()
-        {
-            StreetName = string.Empty;
-            ZipCode = string.Empty;
-            City = string.Empty;
-            Country = string.Empty;
-            Number = string.Empty;
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public string? StreetName { get; set; }
-        public string? ZipCode { get; set; }
-        public string? City { get; set; }
-        public string Country { get; set; }
-        public string? Number { get; set; }
-    }
+public sealed class AddressEntity
+{
+    public string? StreetName { get; set; }
+    public string? ZipCode { get; set; }
+    public string? City { get; set; }
+    public string Country { get; set; } = null!;
+    public string? Number { get; set; }
 }

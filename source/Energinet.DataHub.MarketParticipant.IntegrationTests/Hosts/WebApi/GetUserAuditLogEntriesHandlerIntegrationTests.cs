@@ -44,10 +44,10 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (_, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+        var user = await _fixture.PrepareUserAsync();
 
         var mediator = scope.GetInstance<IMediator>();
-        var command = new GetUserAuditLogsCommand(userId);
+        var command = new GetUserAuditLogsCommand(user.Id);
 
         // Act
         var actual = await mediator.Send(command);
@@ -63,30 +63,31 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (_, frontendUserId, _) = await _fixture.DatabaseManager.CreateUserAsync();
-        scope.Container.MockFrontendUser(frontendUserId);
+        var frontendUser = await _fixture.PrepareUserAsync();
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
-        var userRoleId = await _fixture.DatabaseManager.CreateRoleTemplateAsync();
-        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
 
         var mediator = scope.GetInstance<IMediator>();
 
         // Add some entries to the audit log.
         {
             await mediator.Send(new UpdateUserRoleAssignmentsCommand(
-                actorId,
-                userId,
-                new UpdateUserRoleAssignmentsDto(new[] { userRoleId.Value }, Array.Empty<Guid>())));
+                actor.Id,
+                user.Id,
+                new UpdateUserRoleAssignmentsDto(new[] { userRole.Id }, Array.Empty<Guid>())));
 
             await Task.Delay(1500); // Wait a bit for the timestamp to change.
 
             await mediator.Send(new UpdateUserRoleAssignmentsCommand(
-                actorId,
-                userId,
-                new UpdateUserRoleAssignmentsDto(Array.Empty<Guid>(), new[] { userRoleId.Value })));
+                actor.Id,
+                user.Id,
+                new UpdateUserRoleAssignmentsDto(Array.Empty<Guid>(), new[] { userRole.Id })));
         }
 
-        var command = new GetUserAuditLogsCommand(userId);
+        var command = new GetUserAuditLogsCommand(user.Id);
 
         // Act
         var actual = await mediator.Send(command);
@@ -101,13 +102,13 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
         Assert.True(assignmentAuditLogs[0].Timestamp < assignmentAuditLogs[1].Timestamp);
 
         Assert.Equal(UserRoleAssignmentTypeAuditLog.Added, assignmentAuditLogs[0].AssignmentType);
-        Assert.Equal(actorId, assignmentAuditLogs[0].ActorId);
-        Assert.Equal(userRoleId.Value, assignmentAuditLogs[0].UserRoleId);
-        Assert.Equal(frontendUserId, assignmentAuditLogs[0].ChangedByUserId);
+        Assert.Equal(actor.Id, assignmentAuditLogs[0].ActorId);
+        Assert.Equal(userRole.Id, assignmentAuditLogs[0].UserRoleId);
+        Assert.Equal(frontendUser.Id, assignmentAuditLogs[0].ChangedByUserId);
 
         Assert.Equal(UserRoleAssignmentTypeAuditLog.Removed, assignmentAuditLogs[1].AssignmentType);
-        Assert.Equal(actorId, assignmentAuditLogs[1].ActorId);
-        Assert.Equal(userRoleId.Value, assignmentAuditLogs[1].UserRoleId);
-        Assert.Equal(frontendUserId, assignmentAuditLogs[1].ChangedByUserId);
+        Assert.Equal(actor.Id, assignmentAuditLogs[1].ActorId);
+        Assert.Equal(userRole.Id, assignmentAuditLogs[1].UserRoleId);
+        Assert.Equal(frontendUser.Id, assignmentAuditLogs[1].ChangedByUserId);
     }
 }

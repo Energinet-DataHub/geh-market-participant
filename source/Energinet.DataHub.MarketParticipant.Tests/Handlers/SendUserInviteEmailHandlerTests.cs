@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -37,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new EmailAddress("EmailSent1@test.dk"), EmailEventType.UserInvite),
+                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite),
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
@@ -83,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new EmailAddress("EmailSent1@test.dk"), EmailEventType.UserInvite),
+                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite),
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
@@ -113,7 +114,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new EmailAddress("EmailSent1@test.dk"), EmailEventType.UserInvite),
+                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite),
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();

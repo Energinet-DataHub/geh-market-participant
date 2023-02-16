@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIn
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers;
 using Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -64,7 +65,7 @@ public sealed class ContactRemovedFromActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ContactCategory.Notification, new PhoneNumber("32323232"))
+            Contact = new ActorContactEventData("fake_name", new MockedEmailAddress(), ContactCategory.Notification, new PhoneNumber("32323232"))
         };
 
         // Act
@@ -77,7 +78,7 @@ public sealed class ContactRemovedFromActorEventDispatcherTests
         // Assert
         Assert.True(result);
         Assert.NotNull(actualEvent);
-        Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+        Assert.Equal(integrationEvent.Id, actualEvent.Id);
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.Contact.Name, actualEvent.Contact.Name);
@@ -103,7 +104,7 @@ public sealed class ContactRemovedFromActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            Contact = new ActorContactEventData("fake_name", new EmailAddress("test_email@test.dk"), ContactCategory.Notification, new PhoneNumber("32323232"))
+            Contact = new ActorContactEventData("fake_name", new MockedEmailAddress(), ContactCategory.Notification, new PhoneNumber("32323232"))
         };
 
         // Act

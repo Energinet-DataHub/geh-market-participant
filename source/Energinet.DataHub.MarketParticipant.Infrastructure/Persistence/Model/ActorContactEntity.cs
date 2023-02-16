@@ -15,22 +15,14 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class ActorContactEntity
-    {
-        public ActorContactEntity()
-        {
-            Category = ContactCategory.Default;
-            Name = string.Empty;
-            Email = string.Empty;
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public Guid Id { get; set; }
-        public Guid ActorId { get; set; }
-        public ContactCategory Category { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public string? Phone { get; set; }
-    }
+public sealed class ActorContactEntity
+{
+    public Guid Id { get; set; }
+    public Guid ActorId { get; set; }
+    public ContactCategory Category { get; set; }
+    public string Name { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string? Phone { get; set; }
 }

@@ -14,13 +14,12 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class UniqueActorMarketRoleGridAreaEntity
 {
-    public sealed class UniqueActorMarketRoleGridAreaEntity
-    {
-        public Guid Id { get; set; }
-        public Guid ActorId { get; set; }
-        public int MarketRoleFunction { get; set; }
-        public Guid GridAreaId { get; set; }
-    }
+    public Guid Id { get; set; }
+    public Guid ActorId { get; set; }
+    public int MarketRoleFunction { get; set; }
+    public Guid GridAreaId { get; set; }
 }

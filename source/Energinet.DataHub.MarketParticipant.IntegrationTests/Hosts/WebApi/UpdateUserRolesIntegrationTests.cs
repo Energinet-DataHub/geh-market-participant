@@ -44,30 +44,24 @@ public sealed class UpdateUserRolesIntegrationTests
     public async Task UpdateUserRoleAssignments_AddNewRoleToEmptyCollection_ReturnsNewRole()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
 
-        var userRoleId = await _fixture
-            .DatabaseManager
-            .CreateRoleTemplateAsync();
+        var updates = new List<Guid> { userRole.Id };
 
-        var updates = new List<Guid> { userRoleId.Value };
-
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
-        var getCommand = new GetUserRolesCommand(actorId, userId);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actor.Id, user.Id, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
+        var getCommand = new GetUserRolesCommand(actor.Id, user.Id);
 
         // Act
         await mediator.Send(updateCommand);
@@ -75,41 +69,34 @@ public sealed class UpdateUserRolesIntegrationTests
 
         // Assert
         Assert.NotEmpty(response.Roles);
-        Assert.Contains(response.Roles, x => x.Id == userRoleId.Value);
+        Assert.Contains(response.Roles, x => x.Id == userRole.Id);
     }
 
     [Fact]
     public async Task UpdateUserRoleAssignments_AddToExistingRoles_ReturnsBoth()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
 
-        var userRoleA = await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
 
-        var userRoleB = await _fixture
-            .DatabaseManager
-            .CreateRoleTemplateAsync(new[] { Permission.ActorManage });
+        var updates = new List<Guid> { userRoleB.Id, userRoleA.Id };
 
-        var updates = new List<Guid> { userRoleB.Value, userRoleA };
-
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
-        var getCommand = new GetUserRolesCommand(actorId, userId);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actor.Id, user.Id, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
+        var getCommand = new GetUserRolesCommand(actor.Id, user.Id);
 
         // Act
         await mediator.Send(updateCommand);
@@ -118,47 +105,40 @@ public sealed class UpdateUserRolesIntegrationTests
         // Assert
         Assert.NotEmpty(response.Roles);
         Assert.Equal(2, response.Roles.Count());
-        Assert.Contains(response.Roles, x => x.Id == userRoleB.Value);
-        Assert.Contains(response.Roles, x => x.Id == userRoleA);
+        Assert.Contains(response.Roles, x => x.Id == userRoleB.Id);
+        Assert.Contains(response.Roles, x => x.Id == userRoleA.Id);
     }
 
     [Fact]
     public async Task UpdateUserRoleAssignments_AddToUserWithMultipleActorsAndExistingRoles_ReturnsCorrectForBothActors()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, actor2Id, userId) = await _fixture
-            .DatabaseManager
-            .CreateUserWithTwoActorsAsync();
+        var actor1 = await _fixture.PrepareActorAsync();
+        var actor2 = await _fixture.PrepareActorAsync();
 
-        var userRoleId1 = await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.OrganizationManage);
+        var userRoleNew = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
 
-        var userRoleId2 = await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actor2Id, userId, new[] { Permission.OrganizationManage });
+        var user = await _fixture.PrepareUserAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRoleA.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor2.Id, userRoleB.Id);
 
-        var userRoleIdNew = await _fixture
-            .DatabaseManager
-            .CreateRoleTemplateAsync(new[] { Permission.ActorManage });
+        var updates = new List<Guid> { userRoleNew.Id, userRoleA.Id };
 
-        var updates = new List<Guid> { userRoleIdNew.Value, userRoleId1 };
-
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
-        var getCommand = new GetUserRolesCommand(actorId, userId);
-        var getCommand2 = new GetUserRolesCommand(actor2Id, userId);
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actor1.Id, user.Id, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
+        var getCommand = new GetUserRolesCommand(actor1.Id, user.Id);
+        var getCommand2 = new GetUserRolesCommand(actor2.Id, user.Id);
 
         // Act
         await mediator.Send(updateCommand);
@@ -169,33 +149,33 @@ public sealed class UpdateUserRolesIntegrationTests
         Assert.NotEmpty(response.Roles);
         Assert.Equal(2, response.Roles.Count());
         Assert.Single(response2.Roles);
-        Assert.Contains(response.Roles, x => x.Id == userRoleId1);
-        Assert.Contains(response.Roles, x => x.Id == userRoleIdNew.Value);
-        Assert.Contains(response2.Roles, x => x.Id == userRoleId2);
+        Assert.Contains(response.Roles, x => x.Id == userRoleA.Id);
+        Assert.Contains(response.Roles, x => x.Id == userRoleNew.Id);
+        Assert.Contains(response2.Roles, x => x.Id == userRoleB.Id);
     }
 
     [Fact]
-    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_TwoAuditLogsAdded()
+    public async Task UpdateUserRoleAssignments_AddNewUserRoleToEmptyCollection_TwoAuditLogsAdded()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
-        var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
-        var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
-        var updates = new List<Guid> { templateId1.Value, templateId2.Value };
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole1 = await _fixture.PrepareUserRoleAsync();
+        var userRole2 = await _fixture.PrepareUserRoleAsync();
 
-        var updateCommand = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
+        var updates = new List<Guid> { userRole1.Id, userRole2.Id };
+
+        var updateCommand = new UpdateUserRoleAssignmentsCommand(actor.Id, user.Id, new UpdateUserRoleAssignmentsDto(updates, Array.Empty<Guid>()));
         var getCommand = new GetUserAuditLogsCommand(updateCommand.UserId);
 
         // Act
@@ -209,32 +189,31 @@ public sealed class UpdateUserRolesIntegrationTests
     }
 
     [Fact]
-    public async Task UpdateUserRoleTemplateAssignments_AddNewTemplateToEmptyCollection_ThreeAuditLogsAdded_OneRemoved()
+    public async Task UpdateUserRoleAssignments_AddNewUserRoleToEmptyCollection_ThreeAuditLogsAdded_OneRemoved()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
-        var templateId1 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
-        var templateId2 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
-        var updates1 = new List<Guid> { templateId1.Value, templateId2.Value };
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole1 = await _fixture.PrepareUserRoleAsync();
+        var userRole2 = await _fixture.PrepareUserRoleAsync();
+        var updates1 = new List<Guid> { userRole1.Id, userRole2.Id };
 
-        var templateId3 = await _fixture.DatabaseManager.CreateRoleTemplateAsync().ConfigureAwait(false);
-        var updates2a = new List<Guid> { templateId1.Value };
-        var updates2b = new List<Guid> { templateId3.Value };
+        var userRole3 = await _fixture.PrepareUserRoleAsync();
+        var updates2A = new List<Guid> { userRole1.Id };
+        var updates2B = new List<Guid> { userRole3.Id };
 
-        var updateCommand1 = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates1, Array.Empty<Guid>()));
-        var updateCommand2 = new UpdateUserRoleAssignmentsCommand(actorId, userId, new UpdateUserRoleAssignmentsDto(updates2b, updates2a));
+        var updateCommand1 = new UpdateUserRoleAssignmentsCommand(actor.Id, user.Id, new UpdateUserRoleAssignmentsDto(updates1, Array.Empty<Guid>()));
+        var updateCommand2 = new UpdateUserRoleAssignmentsCommand(actor.Id, user.Id, new UpdateUserRoleAssignmentsDto(updates2B, updates2A));
         var getCommand = new GetUserAuditLogsCommand(updateCommand1.UserId);
 
         // Act

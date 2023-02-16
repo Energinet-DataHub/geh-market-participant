@@ -14,14 +14,13 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class EmailEventEntity
 {
-    public sealed class EmailEventEntity
-    {
-        public int Id { get; set; }
-        public string Email { get; set; } = null!;
-        public DateTimeOffset Created { get; set; }
-        public DateTimeOffset? Sent { get; set; }
-        public int EmailEventType { get; set; }
-    }
+    public int Id { get; set; }
+    public string Email { get; set; } = null!;
+    public DateTimeOffset Created { get; set; }
+    public DateTimeOffset? Sent { get; set; }
+    public int EmailEventType { get; set; }
 }

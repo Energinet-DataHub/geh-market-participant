@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -66,12 +65,13 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
 
         var permissionEicFunction = new PermissionEicFunctionEntity()
         {
-            EicFunction = EicFunction.BillingAgent, PermissionId = (int)Permission.UsersManage
+            EicFunction = EicFunction.BillingAgent,
+            PermissionId = (int)Permission.UsersManage
         };
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions = new Collection<PermissionEicFunctionEntity>() { permissionEicFunction },
+            EicFunctions = { permissionEicFunction },
             Description = "fake_test_value"
         };
 
@@ -105,8 +105,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions =
-                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
+            EicFunctions = { permissionEicFunction, permissionEicFunction2 },
             Description = "fake_test_value"
         };
 
@@ -149,16 +148,14 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions =
-                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
+            EicFunctions = { permissionEicFunction, permissionEicFunction2 },
             Description = "fake_test_value"
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
-            EicFunctions =
-                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
+            EicFunctions = { permissionEicFunction3, permissionEicFunction4 },
             Description = "fake_test_value2"
         };
 
@@ -203,16 +200,14 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         var permission = new PermissionEntity()
         {
             Id = (int)Permission.UsersManage,
-            EicFunctions =
-                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction, permissionEicFunction2 },
+            EicFunctions = { permissionEicFunction, permissionEicFunction2 },
             Description = "fake_test_value"
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
-            EicFunctions =
-                new Collection<PermissionEicFunctionEntity>() { permissionEicFunction3, permissionEicFunction4 },
+            EicFunctions = { permissionEicFunction3, permissionEicFunction4 },
             Description = "fake_test_value2"
         };
 

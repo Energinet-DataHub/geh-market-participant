@@ -17,7 +17,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -42,35 +41,25 @@ public sealed class UpdateUserRoleIntegrationTests
     public async Task UpdateUserRole_UpdateUserRoleName()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (_, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
-
-        var userRoleNameToUpdate = "UpdateUserRoleName";
+        var userRole = await _fixture.PrepareUserRoleAsync();
         var newName = "UpdateUserRoleName updated";
 
-        var userRoleId = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync(userRoleNameToUpdate, "Description", UserRoleStatus.Active, EicFunction.BillingAgent, new[] { Permission.UsersView });
-
         var updateCommand = new UpdateUserRoleCommand(
-            userId,
-            userRoleId.Value,
+            frontendUser.Id,
+            userRole.Id,
             new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)Permission.UsersView }));
 
-        var getUserRoleCommand = new GetUserRoleCommand(userRoleId.Value);
+        var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
         // Act
         await mediator.Send(updateCommand);
@@ -84,35 +73,25 @@ public sealed class UpdateUserRoleIntegrationTests
     public async Task UpdateUserRole_UpdateUserRoleDescription()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (_, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
-
-        var userRoleDescriptionToUpdate = "UserRoleName";
+        var userRole = await _fixture.PrepareUserRoleAsync();
         var newDescription = "UserRoleDescription updated";
 
-        var userRoleId = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserRoleDescription", userRoleDescriptionToUpdate, UserRoleStatus.Active, EicFunction.BillingAgent, new[] { Permission.UsersView });
-
         var updateCommand = new UpdateUserRoleCommand(
-            userId,
-            userRoleId.Value,
+            frontendUser.Id,
+            userRole.Id,
             new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, new Collection<int> { (int)Permission.UsersView }));
 
-        var getUserRoleCommand = new GetUserRoleCommand(userRoleId.Value);
+        var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
         // Act
         await mediator.Send(updateCommand);
@@ -126,35 +105,27 @@ public sealed class UpdateUserRoleIntegrationTests
     public async Task UpdateUserRole_UpdateUserRoleStatus()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
-
-        var (_, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
 
         var userRoleStatusToUpdate = UserRoleStatus.Active;
         var newUserRoleStatus = UserRoleStatus.Inactive;
 
-        var userRoleId = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserRoleStatus", string.Empty, userRoleStatusToUpdate, EicFunction.BillingAgent, new[] { Permission.UsersView });
+        var userRole = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Status = userRoleStatusToUpdate));
 
         var updateCommand = new UpdateUserRoleCommand(
-            userId,
-            userRoleId.Value,
+            frontendUser.Id,
+            userRole.Id,
             new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, new Collection<int> { (int)Permission.UsersView }));
 
-        var getUserRoleCommand = new GetUserRoleCommand(userRoleId.Value);
+        var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
         // Act
         await mediator.Send(updateCommand);
@@ -168,35 +139,27 @@ public sealed class UpdateUserRoleIntegrationTests
     public async Task UpdateUserRole_UpdateUserPermissionsStatus()
     {
         // Create context user
-        var (_, frontendUserId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var frontendUser = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        scope.Container.MockFrontendUser(frontendUserId);
+        scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
-
-        var (_, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
 
         var userRolePermissionsToUpdate = new[] { Permission.UsersView };
         var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };
 
-        var userRoleId = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, EicFunction.BillingAgent, userRolePermissionsToUpdate);
+        var userRole = await _fixture.PrepareUserRoleAsync(userRolePermissionsToUpdate);
 
         var updateCommand = new UpdateUserRoleCommand(
-            userId,
-            userRoleId.Value,
+            frontendUser.Id,
+            userRole.Id,
             new UpdateUserRoleDto("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, newUserRolePermissions));
 
-        var getUserRoleCommand = new GetUserRoleCommand(userRoleId.Value);
+        var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
         // Act
         await mediator.Send(updateCommand);

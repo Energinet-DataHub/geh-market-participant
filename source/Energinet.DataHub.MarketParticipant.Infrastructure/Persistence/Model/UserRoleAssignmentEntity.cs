@@ -14,12 +14,11 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class UserRoleAssignmentEntity
 {
-    public sealed class UserRoleAssignmentEntity
-    {
-        public Guid UserId { get; set; }
-        public Guid ActorId { get; set; }
-        public Guid UserRoleId { get; set; }
-    }
+    public Guid UserId { get; set; }
+    public Guid ActorId { get; set; }
+    public Guid UserRoleId { get; set; }
 }

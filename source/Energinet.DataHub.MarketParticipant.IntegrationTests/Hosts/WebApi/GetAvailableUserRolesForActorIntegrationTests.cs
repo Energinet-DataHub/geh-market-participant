@@ -12,11 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -37,18 +35,16 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
     }
 
     [Fact]
-    public async Task GetUserRoleTemplatesForActor_NoTemplates_ReturnsEmptyList()
+    public async Task GetAvailableUserRolesForActor_NoUserRoles_ReturnsEmptyList()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var actorId = await _fixture
-            .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.ElOverblik });
+        var actor = await _fixture.PrepareActorAsync();
 
-        var command = new GetAvailableUserRolesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actor.Id);
 
         // Act
         var response = await mediator.Send(command);
@@ -58,7 +54,7 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
     }
 
     [Fact]
-    public async Task GetUserRoleTemplatesForActor_HasTwoTemplates_ReturnsBoth()
+    public async Task GetAvailableUserRolesForActor_HasTwoUserRoles_ReturnsBoth()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -66,44 +62,27 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var mediator = scope.GetInstance<IMediator>();
 
-        var actorId = await _fixture
-            .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.BalanceResponsibleParty, EicFunction.BillingAgent });
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
-        var userRoleTemplate1 = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            EicFunctions =
-            {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty }
-            }
-        };
+        var userRole1 = await _fixture.PrepareUserRoleAsync(EicFunction.BalanceResponsibleParty);
+        var userRole2 = await _fixture.PrepareUserRoleAsync(EicFunction.BillingAgent);
 
-        var userRoleTemplate2 = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            EicFunctions =
-            {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent }
-            }
-        };
-
-        await context.UserRoles.AddAsync(userRoleTemplate1);
-        await context.UserRoles.AddAsync(userRoleTemplate2);
-        await context.SaveChangesAsync();
-
-        var command = new GetAvailableUserRolesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actor.Id);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.Contains(response.Roles, t => t.Id == userRoleTemplate1.Id);
-        Assert.Contains(response.Roles, t => t.Id == userRoleTemplate2.Id);
+        Assert.Contains(response.Roles, t => t.Id == userRole1.Id);
+        Assert.Contains(response.Roles, t => t.Id == userRole2.Id);
     }
 
     [Fact]
-    public async Task GetUserRoleTemplatesForActor_HasTwoFunctions_DoesNotReturn()
+    public async Task GetAvailableUserRolesForActor_HasTwoFunctions_DoesNotReturn()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -111,30 +90,23 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var mediator = scope.GetInstance<IMediator>();
 
-        var actorId = await _fixture
-            .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.BalanceResponsibleParty, EicFunction.BillingAgent });
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
-        var userRoleTemplate = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            EicFunctions =
-            {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty },
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.GridAccessProvider },
-            }
-        };
+        var userRole = await _fixture.PrepareUserRoleAsync(
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent,
+            EicFunction.GridAccessProvider);
 
-        await context.UserRoles.AddAsync(userRoleTemplate);
-        await context.SaveChangesAsync();
-
-        var command = new GetAvailableUserRolesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actor.Id);
 
         // Act
         var response = await mediator.Send(command);
 
         // Assert
-        Assert.DoesNotContain(response.Roles, t => t.Id == userRoleTemplate.Id);
+        Assert.DoesNotContain(response.Roles, t => t.Id == userRole.Id);
     }
 }

@@ -96,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                         actor.Id,
                         "fake_value",
                         categories[i],
-                        new EmailAddress("fake@fake.dk"),
+                        new MockedEmailAddress(),
                         new PhoneNumber("1234567")));
             }
 
@@ -133,7 +133,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 actor.Id,
                 "fake_value",
                 ContactCategory.Charges,
-                new EmailAddress("fake@fake.dk"),
+                new MockedEmailAddress(),
                 new PhoneNumber("1234567"));
 
             // Act
@@ -175,7 +175,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 actor.Id,
                 "fake_value",
                 ContactCategory.Charges,
-                new EmailAddress("fake@fake.dk"),
+                new MockedEmailAddress(),
                 new PhoneNumber("1234567"));
 
             var contactId = await contactRepository.AddAsync(testContact);
@@ -204,7 +204,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 Guid.NewGuid(),
                 "fake_value",
                 ContactCategory.Charges,
-                new EmailAddress("fake@fake.dk"),
+                new MockedEmailAddress(),
                 new PhoneNumber("1234567"));
 
             // Act + Assert
@@ -238,7 +238,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 actor.Id,
                 "fake_value",
                 ContactCategory.Charges,
-                new EmailAddress("fake@fake.dk"),
+                new MockedEmailAddress(),
                 new PhoneNumber("1234567"));
 
             // Act
