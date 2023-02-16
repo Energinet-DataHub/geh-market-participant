@@ -33,11 +33,16 @@ internal static class EmailSenderRegistration
                 var configuration = container.GetService<IConfiguration>();
 
                 var userInviteFromEmail = configuration.GetSetting(Settings.UserInviteFromEmail);
+                var userInviteBccEmail = configuration.GetSetting(Settings.UserInviteBccEmail);
 
                 var senGridClient = container.GetInstance<ISendGridClient>();
                 var logger = container.GetInstance<ILogger<SendGridEmailSender>>();
 
-                return new SendGridEmailSender(userInviteFromEmail, senGridClient, logger);
+                return new SendGridEmailSender(
+                    userInviteFromEmail,
+                    userInviteBccEmail,
+                    senGridClient,
+                    logger);
             },
             Lifestyle.Scoped);
     }

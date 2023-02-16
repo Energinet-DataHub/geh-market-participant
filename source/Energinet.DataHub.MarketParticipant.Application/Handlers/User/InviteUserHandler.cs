@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -38,24 +39,31 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
     private readonly IActorQueryRepository _actorQueryRepository;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IEmailEventRepository _emailEventRepository;
+    private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
 
     public InviteUserHandler(
         IUserInvitationService userInvitationService,
         IOrganizationRepository organizationRepository,
         IActorQueryRepository actorQueryRepository,
         IUserRoleRepository userRoleRepository,
-        IEmailEventRepository emailEventRepository)
+        IEmailEventRepository emailEventRepository,
+        IOrganizationDomainValidationService organizationDomainValidationService)
     {
         _userInvitationService = userInvitationService;
         _organizationRepository = organizationRepository;
         _actorQueryRepository = actorQueryRepository;
         _userRoleRepository = userRoleRepository;
         _emailEventRepository = emailEventRepository;
+        _organizationDomainValidationService = organizationDomainValidationService;
     }
 
     public async Task<Unit> Handle(InviteUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+
+        await _organizationDomainValidationService
+            .ValidateUserEmailInsideOrganizationDomainsAsync(request.Invitation.AssignedActor, request.Invitation.Email)
+            .ConfigureAwait(false);
 
         var assignedActor = await GetActorAsync(request.Invitation.AssignedActor).ConfigureAwait(false);
         var assignedRoles = await GetUserRolesAsync(request.Invitation.AssignedRoles).ConfigureAwait(false);
