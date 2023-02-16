@@ -59,4 +59,6 @@ public static class Settings
 
     public static Setting<string> UserInviteFromEmail { get; }
         = new("USER_INVITE_FROM_EMAIL");
+    public static Setting<string> UserInviteBccEmail { get; }
+        = new("USER_INVITE_BCC_EMAIL");
 }
