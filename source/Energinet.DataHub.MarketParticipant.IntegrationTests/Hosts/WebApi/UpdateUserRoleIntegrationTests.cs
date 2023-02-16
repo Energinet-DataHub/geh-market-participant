@@ -149,23 +149,20 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var userRolePermissionsToUpdate = new[] { Permission.UsersView };
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersView);
         var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };
-
-        var userRole = await _fixture.PrepareUserRoleAsync(userRolePermissionsToUpdate);
 
         var updateCommand = new UpdateUserRoleCommand(
             frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, newUserRolePermissions));
 
-        var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
-
         // Act
         await mediator.Send(updateCommand);
-        var response = await mediator.Send(getUserRoleCommand);
 
         // Assert
+        var response = await mediator.Send(new GetUserRoleCommand(userRole.Id));
+
         var actualPermissionListAsInts = response.Role.Permissions.Select(x => x.Id).ToList();
         Assert.Equal(2, actualPermissionListAsInts.Count);
         Assert.Equivalent(newUserRolePermissions, actualPermissionListAsInts);

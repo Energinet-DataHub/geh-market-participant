@@ -42,7 +42,10 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var actor = await _fixture.PrepareActorAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.MarketRoles.Clear()),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.SystemOperator));
 
         var command = new GetAvailableUserRolesForActorCommand(actor.Id);
 
