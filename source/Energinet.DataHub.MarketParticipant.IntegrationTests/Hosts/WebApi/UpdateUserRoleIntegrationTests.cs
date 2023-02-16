@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -149,7 +150,7 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersView);
+        var userRole = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersView }, EicFunction.BillingAgent);
         var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };
 
         var updateCommand = new UpdateUserRoleCommand(
