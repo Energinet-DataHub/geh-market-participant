@@ -154,6 +154,8 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var result = await permissionRepository.GetToMarketRoleAsync(EicFunction.BillingAgent);
         Assert.NotEmpty(result);
+        Assert.Contains(Permission.UsersView, result.Select(x => x.Permission));
+        Assert.Contains(Permission.UsersManage, result.Select(x => x.Permission));
 
         var userRole = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersView }, EicFunction.BillingAgent);
         var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };
