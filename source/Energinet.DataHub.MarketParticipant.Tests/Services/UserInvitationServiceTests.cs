@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -61,10 +62,14 @@ public sealed class UserInvitationServiceTests
         // Arrange
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
-            userIdentityRepositoryMock.Object);
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object);
 
         var invitation = _validInvitation;
 
@@ -77,11 +82,53 @@ public sealed class UserInvitationServiceTests
     }
 
     [Fact]
+    public async Task InviteUserAsync_EmailNotAllowed_DoesNotCreateUser()
+    {
+        // Arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+
+        organizationDomainValidationServiceMock
+            .Setup(organizationDomainValidationService =>
+                organizationDomainValidationService.ValidateUserEmailInsideOrganizationDomainsAsync(
+                    It.IsAny<Actor>(),
+                    _validInvitation.Email))
+            .ThrowsAsync(new ValidationException());
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object);
+
+        var invitation = _validInvitation;
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.InviteUserAsync(invitation));
+
+        userRepositoryMock.Verify(
+            userRepository => userRepository.AddOrUpdateAsync(It.IsAny<User>()),
+            Times.Never);
+
+        userIdentityRepositoryMock.Verify(
+            userIdentityRepository => userIdentityRepository.CreateAsync(It.IsAny<UserIdentity>()),
+            Times.Never);
+
+        emailEventRepositoryMock.Verify(
+            emailEventRepository => emailEventRepository.InsertAsync(It.IsAny<EmailEvent>()),
+            Times.Never);
+    }
+
+    [Fact]
     public async Task InviteUserAsync_HasUserIdentityButNotLocalUser_CreatesAndSavesUser()
     {
         // Arrange
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
@@ -97,7 +144,9 @@ public sealed class UserInvitationServiceTests
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
-            userIdentityRepositoryMock.Object);
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object);
 
         var invitation = _validInvitation;
 
@@ -115,6 +164,8 @@ public sealed class UserInvitationServiceTests
         // Arrange
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -139,7 +190,9 @@ public sealed class UserInvitationServiceTests
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
-            userIdentityRepositoryMock.Object);
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object);
 
         var invitation = _validInvitation;
 
@@ -148,10 +201,6 @@ public sealed class UserInvitationServiceTests
 
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
-
-        userIdentityRepositoryMock.Verify(
-            userIdentityRepository => userIdentityRepository.CreateAsync(It.IsAny<UserIdentity>()),
-            Times.Never);
     }
 
     [Fact]
@@ -160,6 +209,8 @@ public sealed class UserInvitationServiceTests
         // Arrange
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -184,7 +235,9 @@ public sealed class UserInvitationServiceTests
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
-            userIdentityRepositoryMock.Object);
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object);
 
         var invitation = _validInvitation;
 
@@ -201,6 +254,54 @@ public sealed class UserInvitationServiceTests
                 user.RoleAssignments.Count == 2 &&
                 user.RoleAssignments.Contains(expectedAssignment))),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_HasUser_SendsInvitationEmail()
+    {
+        // Arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+
+        var externalId = new ExternalUserId(Guid.NewGuid());
+
+        userRepositoryMock
+            .Setup(userRepository => userRepository.GetAsync(externalId))
+            .ReturnsAsync(new User(
+                new UserId(Guid.NewGuid()),
+                externalId,
+                new[] { new UserRoleAssignment(Guid.NewGuid(), new UserRoleId(Guid.NewGuid())) }));
+
+        userIdentityRepositoryMock
+            .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
+            .ReturnsAsync(new UserIdentity(
+                externalId,
+                _validInvitation.Email,
+                UserStatus.Active,
+                _validInvitation.FirstName,
+                _validInvitation.LastName,
+                _validInvitation.PhoneNumber,
+                DateTimeOffset.UtcNow,
+                AuthenticationMethod.Undetermined));
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object);
+
+        var invitation = _validInvitation;
+
+        // Act
+        await target.InviteUserAsync(invitation);
+
+        // Assert
+        emailEventRepositoryMock.Verify(emailEventRepository => emailEventRepository.InsertAsync(
+            It.Is<EmailEvent>(emailEvent =>
+                emailEvent.Email == _validInvitation.Email &&
+                emailEvent.EmailEventType == EmailEventType.UserInvite)));
     }
 
     private void VerifyUserCreatedCorrectly(Mock<IUserRepository> userRepositoryMock)
