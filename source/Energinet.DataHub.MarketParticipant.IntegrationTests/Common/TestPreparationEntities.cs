@@ -27,7 +27,7 @@ internal static class TestPreparationEntities
         Name = "Test Organization Name",
         BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
         Comment = "Test Organization Comment",
-        Domain = new MockedDomain(),
+        Domain = "datahub.dk",
         Status = 1,
         Address = new AddressEntity
         {

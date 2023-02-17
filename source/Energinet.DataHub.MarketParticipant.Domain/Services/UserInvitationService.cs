@@ -25,20 +25,27 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
+    private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
 
     public UserInvitationService(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
-        IEmailEventRepository emailEventRepository)
+        IEmailEventRepository emailEventRepository,
+        IOrganizationDomainValidationService organizationDomainValidationService)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _emailEventRepository = emailEventRepository;
+        _organizationDomainValidationService = organizationDomainValidationService;
     }
 
     public async Task InviteUserAsync(UserInvitation invitation)
     {
         ArgumentNullException.ThrowIfNull(invitation);
+
+        await _organizationDomainValidationService
+            .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
+            .ConfigureAwait(false);
 
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
         if (invitedUser == null)

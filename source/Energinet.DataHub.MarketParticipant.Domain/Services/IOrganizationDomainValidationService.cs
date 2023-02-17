@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 /// <summary>
 /// Service for organization domain validation
@@ -25,8 +25,8 @@ public interface IOrganizationDomainValidationService
     /// <summary>
     /// Validates organization domain against new user email
     /// </summary>
-    /// <param name="actorId">actor id to find organization</param>
+    /// <param name="actor">actor id to find organization</param>
     /// <param name="userInviteEmail">user email</param>
     /// <returns>validation task</returns>
-    Task ValidateUserEmailInsideOrganizationDomainsAsync(Guid actorId, string userInviteEmail);
+    Task ValidateUserEmailInsideOrganizationDomainsAsync(Actor actor, EmailAddress userInviteEmail);
 }

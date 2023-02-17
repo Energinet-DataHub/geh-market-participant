@@ -53,29 +53,22 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var actorId = await _databaseFixture
-            .DatabaseManager
-            .CreateActorAsync(new[] { EicFunction.DataHubAdministrator });
+        var actor = await _databaseFixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor,
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
-        var userRoleId = await _databaseFixture
-            .DatabaseManager
-            .CreateUserRoleAsync(
-                "fake_value",
-                "fake_value",
-                UserRoleStatus.Active,
-                EicFunction.DataHubAdministrator,
-                new[]
-                {
-                    Permission.ActorManage
-                });
+        var userRole = await _databaseFixture.PrepareUserRoleAsync(
+            new[] { Permission.ActorManage },
+            EicFunction.DataHubAdministrator);
 
         var invitation = new UserInvitationDto(
             TestUserEmail,
             "Invitation Integration Tests",
             "(Always safe to delete)",
             "+45 70000000",
-            actorId,
-            new[] { userRoleId.Value });
+            actor.Id,
+            new[] { userRole.Id });
 
         var command = new InviteUserCommand(invitation);
 
