@@ -24,13 +24,16 @@ public sealed class UserInvitationService : IUserInvitationService
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IEmailEventRepository _emailEventRepository;
 
     public UserInvitationService(
         IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IEmailEventRepository emailEventRepository)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
+        _emailEventRepository = emailEventRepository;
     }
 
     public async Task InviteUserAsync(UserInvitation invitation)
@@ -59,6 +62,10 @@ public sealed class UserInvitationService : IUserInvitationService
             var assignment = new UserRoleAssignment(invitation.AssignedActor.Id, assignedRole.Id);
             invitedUser.RoleAssignments.Add(assignment);
         }
+
+        await _emailEventRepository
+            .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
+            .ConfigureAwait(false);
 
         await _userRepository
             .AddOrUpdateAsync(invitedUser)

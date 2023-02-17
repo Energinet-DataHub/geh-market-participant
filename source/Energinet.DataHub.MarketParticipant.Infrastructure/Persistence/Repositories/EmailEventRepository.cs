@@ -87,13 +87,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         private static EmailEvent MapTo(EmailEventEntity emailEventEntities)
         {
             return new EmailEvent(
+                emailEventEntities.Id,
                 new EmailAddress(emailEventEntities.Email),
-                (EmailEventType)emailEventEntities.EmailEventType)
-            {
-                Id = emailEventEntities.Id,
-                Created = emailEventEntities.Created,
-                Sent = emailEventEntities.Sent
-            };
+                emailEventEntities.Created,
+                emailEventEntities.Sent,
+                (EmailEventType)emailEventEntities.EmailEventType);
         }
     }
 }

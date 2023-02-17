@@ -18,7 +18,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-// TODO: UTs
 public sealed class UserIdentity
 {
     public UserIdentity(
