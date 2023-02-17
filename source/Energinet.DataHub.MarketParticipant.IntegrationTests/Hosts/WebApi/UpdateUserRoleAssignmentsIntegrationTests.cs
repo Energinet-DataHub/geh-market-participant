@@ -31,11 +31,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class UpdateUserRolesIntegrationTests
+public sealed class UpdateUserRoleAssignmentsIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public UpdateUserRolesIntegrationTests(MarketParticipantDatabaseFixture fixture)
+    public UpdateUserRoleAssignmentsIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }

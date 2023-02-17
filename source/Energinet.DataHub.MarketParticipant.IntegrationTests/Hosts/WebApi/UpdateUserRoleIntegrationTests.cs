@@ -138,7 +138,7 @@ public sealed class UpdateUserRoleIntegrationTests
     }
 
     [Fact]
-    public async Task UpdateUserRole_UpdateUserPermissionsStatus()
+    public async Task UpdateUserRole_UpdateUserPermissions()
     {
         // Create context user
         var frontendUser = await _fixture.PrepareUserAsync();
@@ -150,14 +150,8 @@ public sealed class UpdateUserRoleIntegrationTests
         scope.Container.MockFrontendUser(frontendUser.Id);
 
         var mediator = scope.GetInstance<IMediator>();
-        var permissionRepository = scope.GetInstance<IPermissionRepository>();
 
-        var result = await permissionRepository.GetToMarketRoleAsync(EicFunction.BillingAgent);
-        Assert.NotEmpty(result);
-        Assert.Contains(Permission.UsersView, result.Select(x => x.Permission));
-        Assert.Contains(Permission.UsersManage, result.Select(x => x.Permission));
-
-        var userRole = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersView }, EicFunction.BillingAgent);
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersView);
         var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };
 
         var updateCommand = new UpdateUserRoleCommand(
