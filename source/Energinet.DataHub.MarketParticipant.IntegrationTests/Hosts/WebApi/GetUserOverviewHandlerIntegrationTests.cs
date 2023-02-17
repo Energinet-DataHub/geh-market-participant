@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -55,7 +54,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
                 x.Select(y => new UserIdentity(
                     y,
-                    new EmailAddress("fake@value"),
+                    new MockedEmailAddress(),
                     UserStatus.Active,
                     y.ToString(),
                     y.ToString(),
@@ -67,13 +66,12 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
-
-        var filter = new UserOverviewFilterDto(actorId, null, Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actor.Id, null, Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
@@ -81,7 +79,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         // assert
         Assert.NotEmpty(actual.Users);
-        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.NotNull(actual.Users.First(x => x.Id == user.Id));
     }
 
     [Fact]
@@ -92,17 +90,24 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         await using var scope = host.BeginScope();
 
         var mock = new Mock<IUserIdentityRepository>();
-        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
-        var userIdsToReturn = new List<ExternalUserId>()
+
+        var actor = await _fixture.PrepareActorAsync();
+
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
+
+        var userIdsToReturn = new List<ExternalUserId>
         {
-           new(externalUserId)
+           new(user.ExternalId)
         };
+
         mock
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(userIdsToReturn.Select(y =>
                 new UserIdentity(
                     y,
-                    new EmailAddress("fake@value"),
+                    new MockedEmailAddress(),
                     UserStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
@@ -114,11 +119,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
-
-        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
@@ -126,7 +127,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         // assert
         Assert.NotEmpty(actual.Users);
-        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.NotNull(actual.Users.First(x => x.Id == user.Id));
         Assert.Equal(1, actual.TotalUserCount);
     }
 
@@ -137,7 +138,10 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
@@ -145,8 +149,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .ReturnsAsync(new[]
             {
                 new UserIdentity(
-                    new ExternalUserId(externalUserId),
-                    new EmailAddress("fake@value"),
+                    new ExternalUserId(user.ExternalId),
+                    new MockedEmailAddress(),
                     UserStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -159,11 +163,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
-
-        var filter = new UserOverviewFilterDto(actorId, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
+        var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
@@ -171,7 +171,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         // assert
         Assert.NotEmpty(actual.Users);
-        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.NotNull(actual.Users.First(x => x.Id == user.Id));
         Assert.Equal(1, actual.TotalUserCount);
     }
 
@@ -182,12 +182,12 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (actorId, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
-
-        var userRoleId = await _fixture.DatabaseManager.AddUserPermissionsAsync(actorId, userId, new[]
-        {
-            Permission.ActorManage
-        });
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleB.Id);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
@@ -195,8 +195,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .ReturnsAsync(new[]
             {
                 new UserIdentity(
-                    new ExternalUserId(externalUserId),
-                    new EmailAddress("fake@value"),
+                    new ExternalUserId(user.ExternalId),
+                    new MockedEmailAddress(),
                     UserStatus.Inactive,
                     "fake_value",
                     "fake_value",
@@ -209,11 +209,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
-
-        var filter = new UserOverviewFilterDto(actorId, "test", new[] { userRoleId }, Enumerable.Empty<UserStatus>());
+        var filter = new UserOverviewFilterDto(actor.Id, "test", new[] { userRoleA.Id }, Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
 
         // act
@@ -221,7 +217,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         // assert
         Assert.NotEmpty(actual.Users);
-        Assert.NotNull(actual.Users.First(x => x.Id == userId));
+        Assert.NotNull(actual.Users.First(x => x.Id == user.Id));
         Assert.Equal(1, actual.TotalUserCount);
     }
 }

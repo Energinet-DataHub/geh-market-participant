@@ -87,7 +87,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             userRole.Name,
             userRole.Description,
             userRole.Status,
-            userRole.Permissions.Select(p => p),
+            userRole.Permissions,
             userRole.EicFunction);
     }
 }

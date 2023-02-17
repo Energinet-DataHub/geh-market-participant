@@ -43,13 +43,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             var actor = new Actor(ActorNumber.Create(actorGln));
             try
             {
-              // Act
-              var result = await _sut
-                    .CreateOrUpdateAppAsync(actor)
-                    .ConfigureAwait(false);
+                // Act
+                var result = await _sut
+                      .CreateOrUpdateAppAsync(actor)
+                      .ConfigureAwait(false);
 
                 // Assert
-              Assert.False(string.IsNullOrEmpty(result.ExternalActorId));
+                Assert.False(string.IsNullOrEmpty(result.ExternalActorId));
             }
             finally
             {
@@ -155,7 +155,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             var actor = new Actor(ActorNumber.Create(new MockedGln()));
 
             // Create actor to delete
-            var actorToDelete = await _sut
+            await _sut
                 .CreateOrUpdateAppAsync(actor)
                 .ConfigureAwait(false);
 

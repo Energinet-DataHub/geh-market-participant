@@ -221,7 +221,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     externalId,
-                    new EmailAddress("fake@value"),
+                    new MockedEmailAddress(),
                     UserStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -259,10 +259,8 @@ public sealed class UserOverviewRepositoryTests
 
         var (userId, externalId, actorId) = await CreateUserWithActorName(context, false, "Axolotl");
 
-        var userRoleId = await _fixture.DatabaseManager.AddUserPermissionsAsync(
-            actorId,
-            userId.Value,
-            new[] { Permission.ActorManage });
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
+        await _fixture.AssignUserRoleAsync(userId.Value, actorId, userRole.Id);
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         userIdentityRepositoryMock
@@ -271,7 +269,7 @@ public sealed class UserOverviewRepositoryTests
             {
                 new UserIdentity(
                     externalId,
-                    new EmailAddress("fake@value"),
+                    new MockedEmailAddress(),
                     UserStatus.Active,
                     "fake_value",
                     "fake_value",
@@ -293,7 +291,7 @@ public sealed class UserOverviewRepositoryTests
             null,
             null,
             Enumerable.Empty<UserStatus>(),
-            new[] { new UserRoleId(userRoleId) });
+            new[] { new UserRoleId(userRole.Id) });
 
         // Assert
         Assert.Single(actual.Items, user => user.Id == userId);
@@ -369,16 +367,15 @@ public sealed class UserOverviewRepositoryTests
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .Returns<IEnumerable<ExternalUserId>>(x =>
                 Task.FromResult(
-                    x.Select(y =>
-                        new UserIdentity(
-                            y,
-                            new EmailAddress("fake@value"),
-                            UserStatus.Inactive,
-                            y.ToString(),
-                            y.ToString(),
-                            null,
-                            DateTime.UtcNow,
-                            AuthenticationMethod.Undetermined))));
+                    x.Select(y => new UserIdentity(
+                        y,
+                        new EmailAddress($"{y}@test.datahub.dk"),
+                        UserStatus.Inactive,
+                        y.ToString(),
+                        y.ToString(),
+                        null,
+                        DateTime.UtcNow,
+                        AuthenticationMethod.Undetermined))));
 
         return userIdentityRepository;
     }
@@ -391,7 +388,7 @@ public sealed class UserOverviewRepositoryTests
             .ReturnsAsync(userIdsToReturnFromSearch.Select(y =>
                 new UserIdentity(
                     y,
-                    new EmailAddress("fake@value"),
+                    new EmailAddress($"{y}@test.datahub.dk"),
                     UserStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
@@ -406,7 +403,7 @@ public sealed class UserOverviewRepositoryTests
                     userIdsToReturnFromGet.Select(y =>
                         new UserIdentity(
                             y,
-                            new EmailAddress("fake@value"),
+                            new EmailAddress($"{y}@test.datahub.dk"),
                             UserStatus.Inactive,
                             y.ToString(),
                             y.ToString(),

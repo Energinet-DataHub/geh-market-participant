@@ -15,11 +15,10 @@
 using System;
 using Energinet.DataHub.Core.App.Common.Security;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class UserRolePermissionEntity
 {
-    public sealed class UserRolePermissionEntity
-    {
-        public Guid UserRoleId { get; set; }
-        public Permission Permission { get; set; }
-    }
+    public Guid UserRoleId { get; set; }
+    public Permission Permission { get; set; }
 }

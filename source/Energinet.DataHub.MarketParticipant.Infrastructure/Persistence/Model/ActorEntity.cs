@@ -15,27 +15,20 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class ActorEntity
 {
-    public sealed class ActorEntity
-    {
-        public ActorEntity()
-        {
-            Name = string.Empty;
-            ActorNumber = string.Empty;
-            MarketRoles = new Collection<MarketRoleEntity>();
-        }
+    public Guid Id { get; set; }
+    public Guid? ActorId { get; set; }
+    public Guid OrganizationId { get; set; }
 
-        public Guid Id { get; set; }
-        public Guid? ActorId { get; set; }
-        public string ActorNumber { get; set; }
-        public int Status { get; set; }
-        public string Name { get; set; }
+    public bool IsFas { get; set; }
+    public string ActorNumber { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public int Status { get; set; }
 
-        public Collection<MarketRoleEntity> MarketRoles { get; }
+    public Collection<MarketRoleEntity> MarketRoles { get; } = new();
 
-        public Guid OrganizationId { get; set; }
-        public bool New { get; set; }
-        public bool IsFas { get; set; }
-    }
+    public bool New { get; set; }
 }

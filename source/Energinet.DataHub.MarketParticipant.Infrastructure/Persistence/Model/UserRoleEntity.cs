@@ -16,24 +16,14 @@ using System;
 using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class UserRoleEntity
-    {
-        public UserRoleEntity()
-        {
-            Name = string.Empty;
-            EicFunctions = new Collection<UserRoleEicFunctionEntity>();
-            Permissions = new Collection<UserRolePermissionEntity>();
-            Description = string.Empty;
-            Status = UserRoleStatus.Inactive;
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string? Description { get; set; }
-        public UserRoleStatus Status { get; set; }
-        public Collection<UserRoleEicFunctionEntity> EicFunctions { get; }
-        public Collection<UserRolePermissionEntity> Permissions { get; }
-    }
+public sealed class UserRoleEntity
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public UserRoleStatus Status { get; set; }
+    public Collection<UserRoleEicFunctionEntity> EicFunctions { get; } = new();
+    public Collection<UserRolePermissionEntity> Permissions { get; } = new();
 }

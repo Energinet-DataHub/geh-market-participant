@@ -14,18 +14,11 @@
 
 using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class PermissionEntity
-    {
-        public PermissionEntity()
-        {
-            Description = string.Empty;
-            EicFunctions = new Collection<PermissionEicFunctionEntity>();
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public int Id { get; set; }
-        public string Description { get; set; }
-        public Collection<PermissionEicFunctionEntity> EicFunctions { get; init; }
-    }
+public sealed class PermissionEntity
+{
+    public int Id { get; set; }
+    public string Description { get; set; } = null!;
+    public Collection<PermissionEicFunctionEntity> EicFunctions { get; } = new();
 }

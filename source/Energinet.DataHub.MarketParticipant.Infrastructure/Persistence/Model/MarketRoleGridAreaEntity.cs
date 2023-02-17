@@ -15,21 +15,13 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class MarketRoleGridAreaEntity
 {
-    public sealed class MarketRoleGridAreaEntity
-    {
-        public MarketRoleGridAreaEntity()
-        {
-            MeteringPointTypes = new Collection<MeteringPointTypeEntity>();
-        }
+    public Guid Id { get; set; }
+    public Guid MarketRoleId { get; set; }
+    public Guid GridAreaId { get; set; }
 
-        public Guid Id { get; set; }
-
-        public Guid MarketRoleId { get; set; }
-
-        public Guid GridAreaId { get; set; }
-
-        public Collection<MeteringPointTypeEntity> MeteringPointTypes { get; }
-    }
+    public Collection<MeteringPointTypeEntity> MeteringPointTypes { get; } = new();
 }

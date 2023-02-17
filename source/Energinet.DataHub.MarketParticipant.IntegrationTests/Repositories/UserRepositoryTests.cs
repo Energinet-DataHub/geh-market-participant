@@ -15,11 +15,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -47,6 +44,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
+
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
         var userRepository = new UserRepository(context, userIdentityRepository);
 
@@ -64,23 +62,19 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context2, userIdentityRepository);
 
-        var email = "fake@mail.com";
-        var userExternalId = Guid.NewGuid();
-        var userEntity = new UserEntity() { ExternalId = userExternalId, Email = email };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
+
+        var user = await _fixture.PrepareUserAsync();
 
         // Act
-        var user = await userRepository.GetAsync(new ExternalUserId(userExternalId));
+        var actual = await userRepository.GetAsync(new ExternalUserId(user.ExternalId));
 
         // Assert
-        Assert.NotNull(user);
-        Assert.Equal(userExternalId, user.ExternalId.Value);
-        Assert.NotEqual(Guid.Empty, user.Id.Value);
+        Assert.NotNull(actual);
+        Assert.Equal(user.ExternalId, actual.ExternalId.Value);
+        Assert.NotEqual(Guid.Empty, actual.Id.Value);
     }
 
     [Fact]
@@ -90,72 +84,24 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context2, userIdentityRepository);
+        var userRepository = new UserRepository(context, userIdentityRepository);
 
-        var email = "fake@mail.com";
-        var userExternalId = Guid.NewGuid();
-        var externalActorId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            ActorId = externalActorId,
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = "44444444"
-        };
-
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-
-        await context.Entry(actorEntity).ReloadAsync();
-        var roleAssignment = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-        var userEntity = new UserEntity()
-        {
-            ExternalId = userExternalId,
-            Email = email,
-            RoleAssignments = { roleAssignment }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
-        var user = await userRepository.GetAsync(new ExternalUserId(userExternalId));
+        var actual = await userRepository.GetAsync(new ExternalUserId(user.ExternalId));
 
         // Assert
-        Assert.NotNull(user);
-        Assert.Equal(userExternalId, user.ExternalId.Value);
-        Assert.NotEqual(Guid.Empty, user.Id.Value);
-        Assert.Single(user.RoleAssignments);
-        Assert.Equal(userRoleTemplate.Id, user.RoleAssignments.First().UserRoleId.Value);
+        Assert.NotNull(actual);
+        Assert.Equal(user.ExternalId, actual.ExternalId.Value);
+        Assert.Equal(user.Id, actual.Id.Value);
+        Assert.Single(actual.RoleAssignments);
+        Assert.Equal(userRole.Id, actual.RoleAssignments.First().UserRoleId.Value);
     }
 
     [Fact]
@@ -165,6 +111,7 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
+
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
         var userRepository = new UserRepository(context, userIdentityRepository);
 
@@ -182,44 +129,17 @@ public sealed class UserRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context2, userIdentityRepository);
 
-        var email = "fake@mail.com";
-        var userEntity = new UserEntity
-        {
-            Id = Guid.NewGuid(),
-            Email = email,
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
-
-        // Act
-        var user = await userRepository.GetAsync(new UserId(userEntity.Id));
-
-        // Assert
-        Assert.NotNull(user);
-        Assert.NotEqual(Guid.Empty, user.Id.Value);
-    }
-
-    [Fact]
-    public async Task GetUserAsync_UserExist_CanReadBack()
-    {
-        // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
         var userRepository = new UserRepository(context, userIdentityRepository);
 
-        var (_, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+        var user = await _fixture.PrepareUserAsync();
 
         // Act
-        var user = await userRepository.GetAsync(new UserId(userId));
+        var actual = await userRepository.GetAsync(new UserId(user.Id));
 
         // Assert
-        Assert.NotNull(user);
-        Assert.NotEqual(Guid.Empty, user.Id.Value);
+        Assert.NotNull(actual);
+        Assert.Equal(user.Id, actual.Id.Value);
     }
 }

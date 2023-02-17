@@ -14,11 +14,10 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class GridAreaLinkEntity
 {
-    public sealed class GridAreaLinkEntity
-    {
-        public Guid Id { get; set; }
-        public Guid GridAreaId { get; set; }
-    }
+    public Guid Id { get; set; }
+    public Guid GridAreaId { get; set; }
 }
