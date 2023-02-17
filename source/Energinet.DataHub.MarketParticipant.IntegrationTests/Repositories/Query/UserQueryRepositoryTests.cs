@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -42,7 +41,7 @@ public sealed class UserQueryRepositoryTests
     public async Task GetActorsAsync_NoUser_ReturnsEmptyList()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
@@ -62,24 +61,16 @@ public sealed class UserQueryRepositoryTests
     public async Task GetActorsAsync_NoActor_ReturnsEmptyList()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var userEntity = new UserEntity
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com"
-        };
-
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var user = await _fixture.PrepareUserAsync();
 
         // Act
         var actorIds = (await userRepository
-            .GetActorsAsync(new ExternalUserId(userExternalId)))
+            .GetActorsAsync(new ExternalUserId(user.Id)))
             .ToList();
 
         // Assert
@@ -90,81 +81,32 @@ public sealed class UserQueryRepositoryTests
     public async Task GetActorsAsync_WithActor_ReturnsCorrectId()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
-        };
-
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-
-        var userRoleTemplate = new UserRoleEntity
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        var roleAssignment = new UserRoleAssignmentEntity
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-
-        var userEntity = new UserEntity
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
         var actorIds = (await userRepository
-            .GetActorsAsync(new ExternalUserId(userExternalId)))
+            .GetActorsAsync(new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
         Assert.NotEmpty(actorIds);
         Assert.Single(actorIds);
-        Assert.Equal(actorEntity.Id, actorIds.First());
+        Assert.Equal(actor.Id, actorIds.First());
     }
 
     [Fact]
     public async Task GetPermissionsAsync_UserDoesNotExist_ReturnsEmptyPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
@@ -181,19 +123,16 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_UserExistWithNoPermissions_ReturnsZeroPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var userEntity = new UserEntity { ExternalId = userExternalId, Email = "fake@mail.com" };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var user = await _fixture.PrepareUserAsync();
 
         // Act
         var perms = await userRepository
-            .GetPermissionsAsync(Guid.NewGuid(), new ExternalUserId(userExternalId));
+            .GetPermissionsAsync(Guid.NewGuid(), new ExternalUserId(user.ExternalId));
 
         // Assert
         Assert.Empty(perms);
@@ -203,65 +142,26 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_UserExistWithPermissions_ReturnsPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } }
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = "11111111"
-        };
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-        var roleAssignment = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-        var userEntity = new UserEntity()
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.OrganizationView },
+            EicFunction.BillingAgent);
+
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -270,68 +170,27 @@ public sealed class UserQueryRepositoryTests
     }
 
     [Fact]
-    public async Task GetPermissionsAsync_ActorDisabled_ReturnsNoPermissions()
+    public async Task GetPermissionsAsync_ActorNotActive_ReturnsNoPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Inactive,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } }
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = "11111112"
-        };
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Inactive),
+            TestPreparationEntities.ValidMarketRole);
 
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-        var roleAssignment = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-        var userEntity = new UserEntity()
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -342,67 +201,26 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_ActorWrongEicFunction_ReturnsNoPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.IndependentAggregator } }
-        };
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.IndependentAggregator));
 
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
-        };
+        var userRole = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.OrganizationView },
+            EicFunction.BillingAgent);
 
-        await context.Organizations.AddAsync(orgEntity);
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        var roleAssignment = new UserRoleAssignmentEntity
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-
-        var userEntity = new UserEntity
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -413,77 +231,31 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_DifferentActorInOrganization_ReturnsNoPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.IndependentAggregator } }
-        };
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
-        var doNotReturnActorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } }
-        };
+        var doNotReturnActor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity, doNotReturnActorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier,
-        };
-        await context.Organizations.AddAsync(orgEntity);
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.OrganizationView },
+            EicFunction.BillingAgent);
 
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        var roleAssignment = new UserRoleAssignmentEntity
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-
-        var userEntity = new UserEntity
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, doNotReturnActor.Id, userRole.Id);
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -494,97 +266,40 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_UserExistWithPermissionsForMultipleActors_ReturnsCorrectPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles =
-            {
-                new MarketRoleEntity { Function = EicFunction.BillingAgent }
-            }
-        };
-        var actor2Entity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor 2",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles =
-            {
-                new MarketRoleEntity { Function = EicFunction.GridAccessProvider }
-            }
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity, actor2Entity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Name = "Test Org",
-            Domain = new MockedDomain(),
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
-        };
-        await context.Organizations.AddAsync(orgEntity);
+        var user = await _fixture.PrepareUserAsync();
+        var actor1 = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
-        };
-        var userRoleTemplate2 = new UserRoleEntity()
-        {
-            Name = "Test Template 2",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.UsersView } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        context.UserRoles.Add(userRoleTemplate2);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-        await context.Entry(actor2Entity).ReloadAsync();
+        var actor2 = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
-        var roleAssignment = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-        var roleAssignment2 = new UserRoleAssignmentEntity()
-        {
-            ActorId = actor2Entity.Id,
-            UserRoleId = userRoleTemplate2.Id
-        };
-        var userEntity = new UserEntity()
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment, roleAssignment2 }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var userRole1 = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.OrganizationView },
+            EicFunction.BillingAgent);
+
+        var userRole2 = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.UsersView },
+            EicFunction.GridAccessProvider);
+
+        await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRole1.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor2.Id, userRole2.Id);
 
         // Act
         var permsActor = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor1.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         var permsActor2 = (await userRepository
-            .GetPermissionsAsync(actor2Entity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor2.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -600,82 +315,32 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_UserExistWithMultiplePermissionsForActor_ReturnsCorrectPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles =
-            {
-                new MarketRoleEntity { Function = EicFunction.DataHubAdministrator },
-                new MarketRoleEntity { Function = EicFunction.GridAccessProvider }
-            }
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = "33333333"
-        };
-        await context.Organizations.AddAsync(orgEntity);
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage }, new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.DataHubAdministrator } }
-        };
-        var userRoleTemplate2 = new UserRoleEntity()
-        {
-            Name = "Test Template 2",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.UsersView } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        context.UserRoles.Add(userRoleTemplate2);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
+        var userRole1 = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.OrganizationManage, Permission.OrganizationView },
+            EicFunction.DataHubAdministrator);
 
-        var roleAssignment = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-        var roleAssignment2 = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate2.Id
-        };
-        var userEntity = new UserEntity()
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment, roleAssignment2 }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var userRole2 = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.UsersView },
+            EicFunction.GridAccessProvider);
+
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole1.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole2.Id);
 
         // Act
         var permsActor = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -690,65 +355,26 @@ public sealed class UserQueryRepositoryTests
     public async Task GetPermissionsAsync_UserExistWithPermissionsNotAllowedForEicFunction_ReturnsCorrectPermissions()
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BalanceResponsibleParty } }
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity()
-            {
-                City = "test city",
-                Country = "Denmark",
-                Number = "1",
-                StreetName = "Teststreet",
-                ZipCode = "1234"
-            },
-            Domain = new MockedDomain(),
-            Name = "Test Org",
-            BusinessRegisterIdentifier = "21111111"
-        };
+        var user = await _fixture.PrepareUserAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-        var userRoleTemplate = new UserRoleEntity()
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationView }, new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BalanceResponsibleParty } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-        var roleAssignment = new UserRoleAssignmentEntity()
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-        var userEntity = new UserEntity()
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.OrganizationManage, Permission.OrganizationView },
+            EicFunction.BalanceResponsibleParty);
+
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -762,64 +388,26 @@ public sealed class UserQueryRepositoryTests
     public async Task IsFas_Correct(bool isFas)
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } },
-            IsFas = isFas
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t =>
             {
-                Country = "DK",
-            },
-            Domain = new MockedDomain(),
-            Name = "Name",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
-        };
-        await context.Organizations.AddAsync(orgEntity);
+                t.IsFas = isFas;
+                t.Status = (int)ActorStatus.Active;
+            }),
+            TestPreparationEntities.ValidMarketRole);
 
-        var userRoleTemplate = new UserRoleEntity
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        var roleAssignment = new UserRoleAssignmentEntity
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-
-        var userEntity = new UserEntity
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
-        var actual = await userRepository
-            .IsFasAsync(actorEntity.Id, new ExternalUserId(userExternalId));
+        var actual = await userRepository.IsFasAsync(actor.Id, new ExternalUserId(user.ExternalId));
 
         // Assert
         Assert.Equal(isFas, actual);
@@ -831,64 +419,27 @@ public sealed class UserQueryRepositoryTests
     public async Task IsFas_DisabledActor_ReturnsFalse(bool isFas)
     {
         // Arrange
-        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRepository = new UserQueryRepository(context);
 
-        var userExternalId = Guid.NewGuid();
-        var actorEntity = new ActorEntity()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Actor",
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Inactive,
-            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } },
-            IsFas = isFas
-        };
-        var orgEntity = new OrganizationEntity()
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t =>
             {
-                Country = "DK",
-            },
-            Domain = new MockedDomain(),
-            Name = "Name",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
-        };
-        await context.Organizations.AddAsync(orgEntity);
+                t.IsFas = isFas;
+                t.Status = (int)ActorStatus.New;
+            }),
+            TestPreparationEntities.ValidMarketRole);
 
-        var userRoleTemplate = new UserRoleEntity
-        {
-            Name = "Test Template",
-            Status = UserRoleStatus.Active,
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
-        };
-        context.UserRoles.Add(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        var roleAssignment = new UserRoleAssignmentEntity
-        {
-            ActorId = actorEntity.Id,
-            UserRoleId = userRoleTemplate.Id
-        };
-
-        var userEntity = new UserEntity
-        {
-            ExternalId = userExternalId,
-            Email = "fake@mail.com",
-            RoleAssignments = { roleAssignment }
-        };
-
-        await context.Users.AddAsync(userEntity);
-        await context.SaveChangesAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
         var actual = await userRepository
-            .IsFasAsync(actorEntity.Id, new ExternalUserId(userExternalId));
+            .IsFasAsync(actor.Id, new ExternalUserId(user.ExternalId));
 
         // Assert
         Assert.False(actual);

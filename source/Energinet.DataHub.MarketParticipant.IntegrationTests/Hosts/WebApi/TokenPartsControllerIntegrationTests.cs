@@ -117,7 +117,11 @@ public sealed class TokenPartsControllerIntegrationTests :
         // Arrange
         var organizationView = Permission.OrganizationView;
 
-        var actor = await _fixture.PrepareActorAsync();
+        var actor = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = 2),
+            TestPreparationEntities.ValidMarketRole);
+
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(organizationView);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
