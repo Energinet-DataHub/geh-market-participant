@@ -125,6 +125,7 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity
         {
             Name = "Test Template",
+            Status = UserRoleStatus.Active,
             Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
@@ -237,7 +238,8 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
             EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
         context.UserRoles.Add(userRoleTemplate);
@@ -264,7 +266,76 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(perms);
-        Assert.Equal(Permission.OrganizationManage, perms.First());
+        Assert.Equal(Permission.OrganizationView, perms.First());
+    }
+
+    [Fact]
+    public async Task GetPermissionsAsync_ActorDisabled_ReturnsNoPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserQueryRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Inactive,
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } }
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity()
+            {
+                City = "test city",
+                Country = "Denmark",
+                Number = "1",
+                StreetName = "Teststreet",
+                ZipCode = "1234"
+            },
+            Domain = new MockedDomain(),
+            Name = "Test Org",
+            BusinessRegisterIdentifier = "11111112"
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+        var userRoleTemplate = new UserRoleEntity()
+        {
+            Name = "Test Template",
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+        };
+        context.UserRoles.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+        await context.Entry(actorEntity).ReloadAsync();
+        var roleAssignment = new UserRoleAssignmentEntity()
+        {
+            ActorId = actorEntity.Id,
+            UserRoleId = userRoleTemplate.Id
+        };
+        var userEntity = new UserEntity()
+        {
+            ExternalId = userExternalId,
+            Email = "fake@mail.com",
+            RoleAssignments = { roleAssignment }
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var perms = (await userRepository
+            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .ToList();
+
+        // Assert
+        Assert.Empty(perms);
     }
 
     [Fact]
@@ -306,6 +377,7 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
+            Status = UserRoleStatus.Active,
             Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
@@ -385,6 +457,7 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
+            Status = UserRoleStatus.Active,
             Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
@@ -446,7 +519,7 @@ public sealed class UserQueryRepositoryTests
             Status = (int)ActorStatus.Active,
             MarketRoles =
             {
-                new MarketRoleEntity { Function = EicFunction.EnergySupplier }
+                new MarketRoleEntity { Function = EicFunction.GridAccessProvider }
             }
         };
         var orgEntity = new OrganizationEntity()
@@ -469,14 +542,16 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
             EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
         };
         var userRoleTemplate2 = new UserRoleEntity()
         {
             Name = "Test Template 2",
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.GridAreasManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.UsersView } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider } }
         };
         context.UserRoles.Add(userRoleTemplate);
         context.UserRoles.Add(userRoleTemplate2);
@@ -517,8 +592,8 @@ public sealed class UserQueryRepositoryTests
         Assert.NotEmpty(permsActor2);
         Assert.Single(permsActor);
         Assert.Single(permsActor2);
-        Assert.Equal(Permission.OrganizationManage, permsActor.First());
-        Assert.Equal(Permission.GridAreasManage, permsActor2.First());
+        Assert.Equal(Permission.OrganizationView, permsActor.First());
+        Assert.Equal(Permission.UsersView, permsActor2.First());
     }
 
     [Fact]
@@ -539,8 +614,8 @@ public sealed class UserQueryRepositoryTests
             Status = (int)ActorStatus.Active,
             MarketRoles =
             {
-                new MarketRoleEntity { Function = EicFunction.BillingAgent },
-                new MarketRoleEntity { Function = EicFunction.EnergySupplier }
+                new MarketRoleEntity { Function = EicFunction.DataHubAdministrator },
+                new MarketRoleEntity { Function = EicFunction.GridAccessProvider }
             }
         };
         var orgEntity = new OrganizationEntity()
@@ -563,14 +638,16 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity()
         {
             Name = "Test Template",
+            Status = UserRoleStatus.Active,
             Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationManage }, new UserRolePermissionEntity() { Permission = Permission.OrganizationView } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BillingAgent } }
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.DataHubAdministrator } }
         };
         var userRoleTemplate2 = new UserRoleEntity()
         {
             Name = "Test Template 2",
-            Permissions = { new UserRolePermissionEntity() { Permission = Permission.GridAreasManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier } }
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.UsersView } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider } }
         };
         context.UserRoles.Add(userRoleTemplate);
         context.UserRoles.Add(userRoleTemplate2);
@@ -606,7 +683,77 @@ public sealed class UserQueryRepositoryTests
         Assert.Equal(3, permsActor.Count);
         Assert.Contains(Permission.OrganizationManage, permsActor);
         Assert.Contains(Permission.OrganizationView, permsActor);
-        Assert.Contains(Permission.GridAreasManage, permsActor);
+        Assert.Contains(Permission.UsersView, permsActor);
+    }
+
+    [Fact]
+    public async Task GetPermissionsAsync_UserExistWithPermissionsNotAllowedForEicFunction_ReturnsCorrectPermissions()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserQueryRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Active,
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BalanceResponsibleParty } }
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity()
+            {
+                City = "test city",
+                Country = "Denmark",
+                Number = "1",
+                StreetName = "Teststreet",
+                ZipCode = "1234"
+            },
+            Domain = new MockedDomain(),
+            Name = "Test Org",
+            BusinessRegisterIdentifier = "21111111"
+        };
+
+        await context.Organizations.AddAsync(orgEntity);
+        await context.SaveChangesAsync();
+        var userRoleTemplate = new UserRoleEntity()
+        {
+            Name = "Test Template",
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity() { Permission = Permission.OrganizationView }, new UserRolePermissionEntity() { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity() { EicFunction = EicFunction.BalanceResponsibleParty } }
+        };
+        context.UserRoles.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+        await context.Entry(actorEntity).ReloadAsync();
+        var roleAssignment = new UserRoleAssignmentEntity()
+        {
+            ActorId = actorEntity.Id,
+            UserRoleId = userRoleTemplate.Id
+        };
+        var userEntity = new UserEntity()
+        {
+            ExternalId = userExternalId,
+            Email = "fake@mail.com",
+            RoleAssignments = { roleAssignment }
+        };
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var perms = (await userRepository
+            .GetPermissionsAsync(actorEntity.Id, new ExternalUserId(userExternalId)))
+            .ToList();
+
+        // Assert
+        Assert.NotEmpty(perms);
+        Assert.Equal(Permission.OrganizationView, perms.Single());
     }
 
     [Theory]
@@ -646,6 +793,7 @@ public sealed class UserQueryRepositoryTests
         var userRoleTemplate = new UserRoleEntity
         {
             Name = "Test Template",
+            Status = UserRoleStatus.Active,
             Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
         };
@@ -675,5 +823,74 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.Equal(isFas, actual);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task IsFas_DisabledActor_ReturnsFalse(bool isFas)
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRepository = new UserQueryRepository(context);
+
+        var userExternalId = Guid.NewGuid();
+        var actorEntity = new ActorEntity()
+        {
+            Id = Guid.NewGuid(),
+            Name = "Test Actor",
+            ActorNumber = new MockedGln(),
+            Status = (int)ActorStatus.Inactive,
+            MarketRoles = { new MarketRoleEntity { Function = EicFunction.BillingAgent } },
+            IsFas = isFas
+        };
+        var orgEntity = new OrganizationEntity()
+        {
+            Actors = { actorEntity },
+            Address = new AddressEntity
+            {
+                Country = "DK",
+            },
+            Domain = new MockedDomain(),
+            Name = "Name",
+            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
+        };
+        await context.Organizations.AddAsync(orgEntity);
+
+        var userRoleTemplate = new UserRoleEntity
+        {
+            Name = "Test Template",
+            Status = UserRoleStatus.Active,
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } }
+        };
+        context.UserRoles.Add(userRoleTemplate);
+        await context.SaveChangesAsync();
+        await context.Entry(actorEntity).ReloadAsync();
+
+        var roleAssignment = new UserRoleAssignmentEntity
+        {
+            ActorId = actorEntity.Id,
+            UserRoleId = userRoleTemplate.Id
+        };
+
+        var userEntity = new UserEntity
+        {
+            ExternalId = userExternalId,
+            Email = "fake@mail.com",
+            RoleAssignments = { roleAssignment }
+        };
+
+        await context.Users.AddAsync(userEntity);
+        await context.SaveChangesAsync();
+
+        // Act
+        var actual = await userRepository
+            .IsFasAsync(actorEntity.Id, new ExternalUserId(userExternalId));
+
+        // Assert
+        Assert.False(actual);
     }
 }

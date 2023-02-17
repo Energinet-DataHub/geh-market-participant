@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Microsoft.EntityFrameworkCore;
@@ -60,42 +61,37 @@ public sealed class UserQueryRepository : IUserQueryRepository
         return fasActorQuery;
     }
 
-    // TODO: Add UT for inactive actor.
     public async Task<IEnumerable<Permission>> GetPermissionsAsync(Guid actorId, ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(actorId);
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        var actorEicFunctions = _marketParticipantDbContext
-            .Actors
-            .Where(a => a.Id == actorId)
-            .Include(a => a.MarketRoles)
-            .SelectMany(a => a.MarketRoles)
-            .Select(r => r.Function);
-
         var query =
-            from u in _marketParticipantDbContext.Users
-            join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
-            join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
-            where u.ExternalId == externalUserId.Value &&
-                  r.ActorId == actorId &&
-                  ur.EicFunctions.All(q => actorEicFunctions.Contains(q.EicFunction))
-            select ur.Permissions;
+            from user in _marketParticipantDbContext.Users
+            where user.ExternalId == externalUserId.Value
+            join userRoleAssignment in _marketParticipantDbContext.UserRoleAssignments on user.Id equals userRoleAssignment.UserId
+            where userRoleAssignment.ActorId == actorId
+            join userRole in _marketParticipantDbContext.UserRoles on userRoleAssignment.UserRoleId equals userRole.Id
+            where userRole.Status == UserRoleStatus.Active
+            join actor in _marketParticipantDbContext.Actors on userRoleAssignment.ActorId equals actor.Id
+            where actor.Status == (int)ActorStatus.Active && userRole.EicFunctions.All(f => actor.MarketRoles.Any(marketRole => marketRole.Function == f.EicFunction))
+            from permission in userRole.Permissions
+            join permissionDetails in _marketParticipantDbContext.Permissions on (int)permission.Permission equals permissionDetails.Id
+            where permissionDetails.EicFunctions.Any(f => userRole.EicFunctions.Any(eic => eic.EicFunction == f.EicFunction))
+            select permission.Permission;
 
-        return await query
-            .SelectMany(x => x.Select(y => y.Permission))
-            .ToListAsync()
-            .ConfigureAwait(false);
+        return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    // TODO: Add UT for inactive actor.
     public Task<bool> IsFasAsync(Guid actorId, ExternalUserId externalUserId)
     {
         var query =
             from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
-            where u.ExternalId == externalUserId.Value && a.Id == actorId
+            where u.ExternalId == externalUserId.Value &&
+                  a.Id == actorId &&
+                  a.Status == (int)ActorStatus.Active
             select a.IsFas;
 
         return query.FirstOrDefaultAsync();
