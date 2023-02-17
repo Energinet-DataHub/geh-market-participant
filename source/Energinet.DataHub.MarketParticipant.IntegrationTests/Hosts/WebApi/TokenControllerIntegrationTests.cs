@@ -119,8 +119,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = Guid.NewGuid();
         var request = new TokenRequest(actorId, externalToken);
@@ -147,8 +147,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = Guid.NewGuid();
         var request = new TokenRequest(actorId, externalToken);
@@ -204,8 +204,8 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = Guid.NewGuid();
         var request = new TokenRequest(actorId, externalToken);

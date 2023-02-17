@@ -62,7 +62,9 @@ public sealed class GetUserRoleHandler
             userRole.Description,
             userRole.EicFunction,
             userRole.Status,
-            userRole.Permissions.Where(x => permissionDetailsLookup.ContainsKey(x)).Select(x => MapPermission(permissionDetailsLookup[x]))));
+            userRole.Permissions
+                .Where(x => permissionDetailsLookup.ContainsKey(x))
+                .Select(x => MapPermission(permissionDetailsLookup[x]))));
     }
 
     private static PermissionDetailsDto MapPermission(PermissionDetails permissionDetails)

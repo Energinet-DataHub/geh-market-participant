@@ -97,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actor.Id,
                 "fake_value",
                 ContactCategory.ElectricalHeating,
-                new EmailAddress("john@doe"),
+                new MockedEmailAddress(),
                 null);
 
             organizationExistsHelperService
@@ -169,7 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actor.Id,
                 "fake_value",
                 ContactCategory.ElectricalHeating,
-                new EmailAddress("john@doe"),
+                new MockedEmailAddress(),
                 null);
 
             organizationExistsHelperService
@@ -243,7 +243,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actor.Id,
                 "fake_value",
                 ContactCategory.ElectricalHeating,
-                new EmailAddress("john@doe"),
+                new MockedEmailAddress(),
                 null);
 
             organizationExistsHelperService

@@ -57,8 +57,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Issuer_IsKnown()
     {
         // Arrange
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -71,8 +71,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Audience_IsKnown()
     {
         // Arrange
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -85,14 +85,14 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_UserId_IsPresent()
     {
         // Arrange
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
 
         // Assert
-        Assert.Single(internalToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && Guid.Parse(c.Value) == testUser.UserId);
+        Assert.Single(internalToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && Guid.Parse(c.Value) == testUser.Id);
     }
 
     [Fact]
@@ -100,8 +100,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var actorId = Guid.NewGuid();
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken, actorId);
@@ -117,15 +117,15 @@ public sealed class TokenPartsControllerIntegrationTests :
         // Arrange
         var organizationView = Permission.OrganizationView;
 
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var (externalUserId, externalActorId) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync(new[] { organizationView });
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(organizationView);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
-        var externalToken = CreateExternalTestToken(externalUserId);
+        var externalToken = CreateExternalTestToken(user.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken, externalActorId);
+        var internalToken = await FetchTokenAsync(externalToken, actor.Id);
 
         // Assert
         Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == PermissionsAsClaims.Lookup[organizationView]));
@@ -136,9 +136,9 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var notBefore = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
+        var testUser = await _fixture.PrepareUserAsync();
         var externalToken = CreateExternalTestToken(
-            testUser.ExternalUserId,
+            testUser.ExternalId,
             notBefore: notBefore,
             expires: notBefore.AddDays(1));
 
@@ -154,8 +154,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var expires = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId, expires: expires);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId, expires: expires);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -168,8 +168,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Type_IsValid()
     {
         // Arrange
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);
@@ -182,8 +182,8 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Algorithm_IsValid()
     {
         // Arrange
-        var testUser = await _fixture.DatabaseManager.CreateUserAsync();
-        var externalToken = CreateExternalTestToken(testUser.ExternalUserId);
+        var testUser = await _fixture.PrepareUserAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
         var internalToken = await FetchTokenAsync(externalToken);

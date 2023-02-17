@@ -193,7 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actor.Id,
                 "fake_value",
                 ContactCategory.EndOfSupply,
-                new EmailAddress("fake@value"),
+                new MockedEmailAddress(),
                 null);
 
             contactRepository

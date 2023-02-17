@@ -61,13 +61,13 @@ public sealed class UserRoleAssignmentAuditLogEntryRepositoryTests
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
         var userRoleAssignmentAuditLogEntryRepository = new UserRoleAssignmentAuditLogEntryRepository(contextGet);
 
-        var (_, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
-        var userRoleId = await _fixture.DatabaseManager.CreateRoleTemplateAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
 
         var entry = new UserRoleAssignmentAuditLogEntry(
             Guid.NewGuid(),
-            userRoleId,
-            new UserId(userId),
+            new UserRoleId(userRole.Id),
+            new UserId(user.Id),
             DateTimeOffset.UtcNow,
             UserRoleAssignmentTypeAuditLog.Added);
 
@@ -76,12 +76,12 @@ public sealed class UserRoleAssignmentAuditLogEntryRepositoryTests
             await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();
 
             var insertAuditLogEntryRepository = new UserRoleAssignmentAuditLogEntryRepository(contextInsert);
-            await insertAuditLogEntryRepository.InsertAuditLogEntryAsync(new UserId(userId), entry);
+            await insertAuditLogEntryRepository.InsertAuditLogEntryAsync(new UserId(user.Id), entry);
         }
 
         // Act
         var actual = await userRoleAssignmentAuditLogEntryRepository
-            .GetAsync(new UserId(userId));
+            .GetAsync(new UserId(user.Id));
 
         // Assert
         Assert.Single(actual, entry);

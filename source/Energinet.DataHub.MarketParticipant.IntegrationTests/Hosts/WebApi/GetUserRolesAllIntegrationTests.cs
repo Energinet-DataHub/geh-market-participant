@@ -13,10 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -44,17 +41,9 @@ public sealed class GetUserRolesAllIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var userRoleId1 = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync("Role1", "Description", UserRoleStatus.Active, EicFunction.BillingAgent, System.Array.Empty<Permission>());
-
-        var userRoleId2 = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync("Role2", "Description", UserRoleStatus.Active, EicFunction.IndependentAggregator, System.Array.Empty<Permission>());
-
-        var userRoleId3 = await _fixture
-            .DatabaseManager
-            .CreateUserRoleAsync("Role3", "Description", UserRoleStatus.Active, EicFunction.BillingAgent, System.Array.Empty<Permission>());
+        var userRole1 = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Name = "Role1"));
+        var userRole2 = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Name = "Role2"));
+        var userRole3 = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Name = "Role3"));
 
         var command1 = new GetAllUserRolesCommand();
 
@@ -62,8 +51,8 @@ public sealed class GetUserRolesAllIntegrationTests
         var response = await mediator.Send(command1);
 
         // Assert
-        Assert.Contains(response.Roles, r => r.Id == userRoleId1.Value && r.Name == "Role1");
-        Assert.Contains(response.Roles, r => r.Id == userRoleId2.Value && r.Name == "Role2");
-        Assert.Contains(response.Roles, r => r.Id == userRoleId3.Value && r.Name == "Role3");
+        Assert.Contains(response.Roles, r => r.Id == userRole1.Id && r.Name == "Role1");
+        Assert.Contains(response.Roles, r => r.Id == userRole2.Id && r.Name == "Role2");
+        Assert.Contains(response.Roles, r => r.Id == userRole3.Id && r.Name == "Role3");
     }
 }

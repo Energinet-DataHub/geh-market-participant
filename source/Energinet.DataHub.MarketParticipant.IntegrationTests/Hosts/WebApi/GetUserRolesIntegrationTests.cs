@@ -36,18 +36,17 @@ public sealed class GetUserRolesIntegrationTests
     }
 
     [Fact]
-    public async Task GetUserRoleTemplates_NoTemplates_ReturnsEmptyList()
+    public async Task GetUserRoles_NoUserRole_ReturnsEmptyList()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
 
-        var command = new GetUserRolesCommand(actorId, userId);
+        var command = new GetUserRolesCommand(actor.Id, user.Id);
 
         // Act
         var response = await mediator.Send(command);
@@ -57,26 +56,22 @@ public sealed class GetUserRolesIntegrationTests
     }
 
     [Fact]
-    public async Task GetUserRoleTemplates_HasTwoTemplates_ReturnsBoth()
+    public async Task GetUserRoles_HasTwoUserRoles_ReturnsBoth()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
+        var user = await _fixture.PrepareUserAsync();
+        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.OrganizationView);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleB.Id);
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.OrganizationView });
-
-        var command = new GetUserRolesCommand(actorId, userId);
+        var command = new GetUserRolesCommand(actor.Id, user.Id);
 
         // Act
         var response = await mediator.Send(command);
@@ -86,35 +81,27 @@ public sealed class GetUserRolesIntegrationTests
     }
 
     [Fact]
-    public async Task GetUserRoleTemplates_HasTwoActors_ReturnsTemplateFromEach()
+    public async Task GetUserRoles_HasTwoActors_ReturnsUserRolesFromEach()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId1, userId, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var actor1 = await _fixture.PrepareActorAsync();
+        var actor2 = await _fixture.PrepareActorAsync();
 
-        var (actorId2, _, _) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.OrganizationView);
+        var userRoleC = await _fixture.PrepareUserRoleAsync(Permission.GridAreasManage);
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId1, userId, new[] { Permission.UsersManage });
+        await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRoleA.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor2.Id, userRoleB.Id);
+        await _fixture.AssignUserRoleAsync(user.Id, actor2.Id, userRoleC.Id);
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId2, userId, new[] { Permission.OrganizationView });
-
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId2, userId, new[] { Permission.GridAreasManage });
-
-        var command1 = new GetUserRolesCommand(actorId1, userId);
-        var command2 = new GetUserRolesCommand(actorId2, userId);
+        var command1 = new GetUserRolesCommand(actor1.Id, user.Id);
+        var command2 = new GetUserRolesCommand(actor2.Id, user.Id);
 
         // Act
         var response1 = await mediator.Send(command1);

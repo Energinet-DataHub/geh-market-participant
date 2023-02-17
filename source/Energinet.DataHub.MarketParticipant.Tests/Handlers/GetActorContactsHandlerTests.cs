@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actor.Id,
                 "fake_value",
                 ContactCategory.EndOfSupply,
-                new EmailAddress("fake@value"),
+                new MockedEmailAddress(),
                 new PhoneNumber("1234"));
 
             contactRepository
@@ -152,7 +152,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actor.Id,
                 "fake_value",
                 ContactCategory.EndOfSupply,
-                new EmailAddress("fake@value"),
+                new MockedEmailAddress(),
                 new PhoneNumber("1234"));
 
             contactRepository

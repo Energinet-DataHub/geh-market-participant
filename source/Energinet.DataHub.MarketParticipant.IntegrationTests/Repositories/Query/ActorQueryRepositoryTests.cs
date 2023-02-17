@@ -14,7 +14,6 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -42,15 +41,15 @@ public sealed class ActorQueryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var actorId = await _fixture.DatabaseManager.CreateActorAsync(new[] { EicFunction.BillingAgent });
+        var actor = await _fixture.PrepareActorAsync();
 
         var target = new ActorQueryRepository(context);
 
         // act
-        var actual = (await target.GetSelectionActorsAsync(new[] { actorId })).ToList();
+        var actual = (await target.GetSelectionActorsAsync(new[] { actor.Id })).ToList();
 
         // assert
         Assert.NotEmpty(actual);
-        Assert.NotNull(actual.First(x => x.Id == actorId));
+        Assert.NotNull(actual.First(x => x.Id == actor.Id));
     }
 }

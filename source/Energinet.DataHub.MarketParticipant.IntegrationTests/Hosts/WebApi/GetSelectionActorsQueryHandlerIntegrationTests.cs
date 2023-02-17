@@ -45,20 +45,19 @@ public sealed class GetSelectionActorsQueryHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var mediator = scope.GetInstance<IMediator>();
 
-        var (actorId, userId, _) = await _fixture.DatabaseManager.CreateUserAsync();
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
-        await _fixture
-            .DatabaseManager
-            .AddUserPermissionsAsync(actorId, userId, new[] { Permission.UsersManage });
-
-        var command = new GetSelectionActorsQueryCommand(userId);
+        var command = new GetSelectionActorsQueryCommand(user.Id);
 
         // act
         var actual = await mediator.Send(command);
 
         // assert
         Assert.Single(actual.Actors);
-        Assert.Equal(actorId, actual.Actors.Single().Id);
+        Assert.Equal(actor.Id, actual.Actors.Single().Id);
     }
 
     [Fact]

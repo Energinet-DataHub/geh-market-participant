@@ -14,15 +14,10 @@
 
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class PermissionEicFunctionEntity
-    {
-        public PermissionEicFunctionEntity()
-        {
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public int PermissionId { get; set; }
-        public EicFunction EicFunction { get; set; }
-    }
+public sealed class PermissionEicFunctionEntity
+{
+    public int PermissionId { get; set; }
+    public EicFunction EicFunction { get; set; }
 }

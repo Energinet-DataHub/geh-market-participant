@@ -15,23 +15,15 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class GridAreaEntity
-    {
-        public GridAreaEntity()
-        {
-            PriceAreaCode = PriceAreaCode.Dk1;
-            Code = string.Empty;
-            Name = string.Empty;
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Code { get; set; }
-        public PriceAreaCode PriceAreaCode { get; set; }
-        public DateTimeOffset ValidFrom { get; set; }
-        public DateTimeOffset? ValidTo { get; set; }
-        public DateTimeOffset? FullFlexDate { get; set; }
-    }
+public sealed class GridAreaEntity
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string Code { get; set; } = null!;
+    public PriceAreaCode PriceAreaCode { get; set; }
+    public DateTimeOffset ValidFrom { get; set; }
+    public DateTimeOffset? ValidTo { get; set; }
+    public DateTimeOffset? FullFlexDate { get; set; }
 }

@@ -14,12 +14,11 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class MeteringPointTypeEntity
 {
-    public class MeteringPointTypeEntity
-    {
-        public Guid Id { get; set; }
-        public Guid MarketRoleGridAreaId { get; set; }
-        public int MeteringTypeId { get; set; }
-    }
+    public Guid Id { get; set; }
+    public Guid MarketRoleGridAreaId { get; set; }
+    public int MeteringTypeId { get; set; }
 }
