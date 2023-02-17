@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -71,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(externalUserId))
                 .ReturnsAsync(new UserIdentity(
                     externalUserId,
-                    new EmailAddress("fake@value"),
+                    new MockedEmailAddress(),
                     UserStatus.Active,
                     "first",
                     "last",

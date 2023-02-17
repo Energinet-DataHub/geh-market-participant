@@ -23,13 +23,13 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
-[Collection("IntegrationPermissionTest")]
+[Collection("IntegrationTest")]
 [IntegrationTest]
 public sealed class PermissionValidityTests
 {
-    private readonly MarketParticipantPermissionDatabaseFixture _fixture;
+    private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public PermissionValidityTests(MarketParticipantPermissionDatabaseFixture fixture)
+    public PermissionValidityTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -37,21 +37,17 @@ public sealed class PermissionValidityTests
     [Fact]
     public async Task Ensure_All_Permissions_Has_Description_And_EicFunction_Assigned()
     {
-        await using var host = await OrganizationIntegrationTestHost.InitializePermissionValidityAsync(_fixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
         // Act
-        var allPermissions = (await permissionRepository.GetAllAsync())
-            .Where(x =>
-                !x.Description.Contains("fake_test_value", StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        var allPermissions = await permissionRepository.GetAllAsync();
+        var actual = allPermissions.ToList();
 
         // Assert
-        Assert.Equal(allPermissions.Select(x => x.Permission), Enum.GetValues<Permission>());
-#pragma warning disable CA1806
-        Assert.All(allPermissions, x => x.EicFunctions.Any());
-#pragma warning restore CA1806
+        Assert.Equal(Enum.GetValues<Permission>(), actual.Select(x => x.Permission));
+        Assert.All(actual, x => Assert.NotEmpty(x.EicFunctions));
     }
 }

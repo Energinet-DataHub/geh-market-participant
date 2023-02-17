@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -50,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var emailEventRepository = new EmailEventRepository(context);
 
-            var emailRandom = new EmailAddress(Random.Shared.Next(444444) + "fakeemail@fake.dk");
+            var emailRandom = new MockedEmailAddress();
             var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
 
             // act
@@ -74,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var emailEventRepository1 = new EmailEventRepository(context1);
 
-            var emailRandom = new EmailAddress(Random.Shared.Next(444444) + "fakeemail@fake.dk");
+            var emailRandom = new MockedEmailAddress();
             var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
 
             // act

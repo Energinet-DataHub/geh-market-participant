@@ -15,20 +15,12 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class UserEntity
-    {
-        public UserEntity()
-        {
-            Id = Guid.Empty;
-            Email = string.Empty;
-            RoleAssignments = new Collection<UserRoleAssignmentEntity>();
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public Guid Id { get; set; }
-        public Guid ExternalId { get; set; }
-        public string Email { get; set; }
-        public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; }
-    }
+public sealed class UserEntity
+{
+    public Guid Id { get; set; }
+    public Guid ExternalId { get; set; }
+    public string Email { get; set; } = null!;
+    public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; } = new();
 }

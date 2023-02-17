@@ -19,8 +19,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -39,50 +39,40 @@ public sealed class UserRoleRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_TemplateDoesNotExist_ReturnsNull()
+    public async Task GetAsync_UserRoleDoesNotExist_ReturnsNull()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleRepository = new UserRoleRepository(context);
 
         // Act
-        var user = await userRoleTemplateRepository.GetAsync(new UserRoleId(Guid.Empty));
+        var user = await userRoleRepository.GetAsync(new UserRoleId(Guid.Empty));
 
         // Assert
         Assert.Null(user);
     }
 
     [Fact]
-    public async Task GetAsync_HasTemplate_ReturnsTemplate()
+    public async Task GetAsync_HasUserRole_ReturnsUserRole()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity);
-        await context2.SaveChangesAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
 
         // Act
-        var userRoleTemplate = await userRoleTemplateRepository.GetAsync(new UserRoleId(userRoleTemplateEntity.Id));
+        var actual = await userRoleRepository.GetAsync(new UserRoleId(userRole.Id));
 
         // Assert
-        Assert.NotNull(userRoleTemplate);
-        Assert.Equal(userRoleTemplateEntity.Name, userRoleTemplate.Name);
-        Assert.Equal(EicFunction.BillingAgent, userRoleTemplate.EicFunction);
-        Assert.Single(userRoleTemplate.Permissions, Permission.UsersManage);
+        Assert.NotNull(actual);
+        Assert.Equal(userRole.Name, actual.Name);
+        Assert.Equal(EicFunction.BillingAgent, actual.EicFunction);
+        Assert.Single(actual.Permissions, Permission.UsersManage);
     }
 
     [Fact]
@@ -92,25 +82,15 @@ public sealed class UserRoleRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity);
-        await context2.SaveChangesAsync();
+        await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
 
         // Act
-        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(Array.Empty<EicFunction>());
+        var actual = await userRoleRepository.GetAsync(Array.Empty<EicFunction>());
 
         // Assert
-        Assert.Empty(userRoleTemplates);
+        Assert.Empty(actual);
     }
 
     [Fact]
@@ -120,35 +100,17 @@ public sealed class UserRoleRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity1 = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        var userRoleTemplateEntity2 = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity1);
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity2);
-        await context2.SaveChangesAsync();
+        var userRole1 = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
+        var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
 
         // Act
-        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BillingAgent });
+        var actual = await userRoleRepository.GetAsync(new[] { EicFunction.BillingAgent });
 
         // Assert
-        Assert.NotNull(userRoleTemplates.FirstOrDefault(x => x.Id.Value == userRoleTemplateEntity1.Id));
-        Assert.NotNull(userRoleTemplates.FirstOrDefault(x => x.Id.Value == userRoleTemplateEntity2.Id));
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userRole1.Id));
+        Assert.NotNull(actual.FirstOrDefault(x => x.Id.Value == userRole2.Id));
     }
 
     [Fact]
@@ -158,34 +120,16 @@ public sealed class UserRoleRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity1 = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent } },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        var userRoleTemplateEntity2 = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty } },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity1);
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity2);
-        await context2.SaveChangesAsync();
+        await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
+        var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BalanceResponsibleParty);
 
         // Act
-        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BalanceResponsibleParty });
+        var actual = await userRoleRepository.GetAsync(new[] { EicFunction.BalanceResponsibleParty });
 
         // Assert
-        Assert.Equal(userRoleTemplateEntity2.Id, userRoleTemplates.Single().Id.Value);
+        Assert.Equal(userRole2.Id, actual.Single().Id.Value);
     }
 
     [Fact]
@@ -195,29 +139,18 @@ public sealed class UserRoleRepositoryTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
+        var userRoleRepository = new UserRoleRepository(context);
 
-        var userRoleTemplateEntity = new UserRoleEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = "fake_value",
-            EicFunctions =
-            {
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BalanceResponsibleParty },
-                new UserRoleEicFunctionEntity { EicFunction = EicFunction.BillingAgent },
-            },
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.UsersManage } },
-        };
-
-        await context2.UserRoles.AddAsync(userRoleTemplateEntity);
-        await context2.SaveChangesAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(
+            new[] { Permission.UsersManage },
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent);
 
         // Act
-        var userRoleTemplates = await userRoleTemplateRepository.GetAsync(new[] { EicFunction.BillingAgent });
+        var actual = await userRoleRepository.GetAsync(new[] { EicFunction.BillingAgent });
 
         // Assert
-        Assert.DoesNotContain(userRoleTemplates, t => t.Id.Value == userRoleTemplateEntity.Id);
+        Assert.DoesNotContain(actual, t => t.Id.Value == userRole.Id);
     }
 
     [Fact]
@@ -228,8 +161,9 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleTemplateRepository = new UserRoleRepository(context);
-        var userRoleTemplateRepository2 = new UserRoleRepository(context2);
+        var userRoleRepository = new UserRoleRepository(context);
+        var userRoleRepository2 = new UserRoleRepository(context2);
+
         var userRole = new UserRole(
             new UserRoleId(Guid.Empty),
             "fake_value",
@@ -237,18 +171,20 @@ public sealed class UserRoleRepositoryTests
             UserRoleStatus.Active,
             new List<Permission>(),
             EicFunction.IndependentAggregator);
+
         await context2.SaveChangesAsync();
 
         // Act
-        var userRoleId = await userRoleTemplateRepository.AddAsync(userRole);
-        var roleFetched = await userRoleTemplateRepository2.GetAsync(userRoleId);
+        var userRoleId = await userRoleRepository.AddAsync(userRole);
 
         // Assert
-        Assert.NotNull(roleFetched);
-        Assert.NotEqual(Guid.Empty, roleFetched?.Id.Value);
-        Assert.Equal(userRole.Name, roleFetched?.Name);
-        Assert.Equal(userRole.Description, roleFetched?.Description);
-        Assert.Equal(userRole.Status, roleFetched?.Status);
-        Assert.Equal(userRole.EicFunction, roleFetched?.EicFunction);
+        var actual = await userRoleRepository2.GetAsync(userRoleId);
+
+        Assert.NotNull(actual);
+        Assert.NotEqual(Guid.Empty, actual.Id.Value);
+        Assert.Equal(userRole.Name, actual.Name);
+        Assert.Equal(userRole.Description, actual.Description);
+        Assert.Equal(userRole.Status, actual.Status);
+        Assert.Equal(userRole.EicFunction, actual.EicFunction);
     }
 }

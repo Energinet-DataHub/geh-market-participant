@@ -16,7 +16,6 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -47,12 +46,12 @@ public sealed class GetUserHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (_, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var user = await _fixture.PrepareUserAsync();
 
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
-            new ExternalUserId(externalUserId),
-            new EmailAddress("fake@value"),
+            new ExternalUserId(user.ExternalId),
+            new MockedEmailAddress(),
             UserStatus.Active,
             "expected_name",
             "expected_name",
@@ -67,7 +66,7 @@ public sealed class GetUserHandlerIntegrationTests
         scope.Container!.Register(() => userIdentityMock.Object);
 
         var mediator = scope.GetInstance<IMediator>();
-        var command = new GetUserCommand(userId);
+        var command = new GetUserCommand(user.Id);
 
         // Act
         var actual = await mediator.Send(command);
@@ -100,12 +99,12 @@ public sealed class GetUserHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var (_, userId, externalUserId) = await _fixture.DatabaseManager.CreateUserAsync();
+        var user = await _fixture.PrepareUserAsync();
 
         var userIdentityMock = new Mock<IUserIdentityRepository>();
         var userIdentity = new UserIdentity(
-            new ExternalUserId(externalUserId),
-            new EmailAddress("fake@value"),
+            new ExternalUserId(user.ExternalId),
+            new MockedEmailAddress(),
             UserStatus.Active,
             "expected_name",
             "expected_name",
@@ -120,7 +119,7 @@ public sealed class GetUserHandlerIntegrationTests
         scope.Container!.Register(() => userIdentityMock.Object);
 
         var mediator = scope.GetInstance<IMediator>();
-        var command = new GetUserCommand(userId);
+        var command = new GetUserCommand(user.Id);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => mediator.Send(command));

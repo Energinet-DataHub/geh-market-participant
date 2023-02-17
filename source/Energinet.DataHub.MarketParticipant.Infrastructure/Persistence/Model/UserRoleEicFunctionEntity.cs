@@ -15,11 +15,10 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class UserRoleEicFunctionEntity
 {
-    public sealed class UserRoleEicFunctionEntity
-    {
-        public Guid UserRoleId { get; set; }
-        public EicFunction EicFunction { get; set; }
-    }
+    public Guid UserRoleId { get; set; }
+    public EicFunction EicFunction { get; set; }
 }

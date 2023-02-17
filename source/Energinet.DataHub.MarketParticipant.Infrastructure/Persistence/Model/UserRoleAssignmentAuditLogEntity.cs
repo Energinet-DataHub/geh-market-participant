@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public class UserRoleAssignmentAuditLogEntryEntity
+public sealed class UserRoleAssignmentAuditLogEntryEntity
 {
     public int Id { get; set; }
     public Guid UserId { get; set; }

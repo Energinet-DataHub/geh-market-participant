@@ -96,13 +96,13 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
         // Arrange
         const string target = "user/actors";
 
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var (externalUserId, actorId) = await _fixture
-            .DatabaseManager
-            .CreateUserAsync(new[] { Permission.OrganizationView });
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(Permission.OrganizationView);
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var testToken = new JwtSecurityToken();
-        testToken.Payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, externalUserId.ToString()));
+        testToken.Payload.AddClaim(new Claim(JwtRegisteredClaimNames.Sub, user.ExternalId.ToString()));
 
         var externalToken = new JwtSecurityTokenHandler().WriteToken(testToken);
         var query = new Uri($"{target}?externalToken={externalToken}", UriKind.Relative);
@@ -120,6 +120,6 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         Assert.NotNull(response);
-        Assert.Equal(actorId, response.ActorIds.Single());
+        Assert.Equal(actor.Id, response.ActorIds.Single());
     }
 }

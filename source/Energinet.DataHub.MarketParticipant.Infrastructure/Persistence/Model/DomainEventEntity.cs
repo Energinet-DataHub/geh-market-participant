@@ -14,16 +14,15 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class DomainEventEntity
 {
-    public sealed class DomainEventEntity
-    {
-        public int Id { get; set; }
-        public Guid EntityId { get; set; }
-        public string EntityType { get; set; } = null!;
-        public bool IsSent { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
-        public string Event { get; set; } = null!;
-        public string EventTypeName { get; set; } = null!;
-    }
+    public int Id { get; set; }
+    public Guid EntityId { get; set; }
+    public string EntityType { get; set; } = null!;
+    public bool IsSent { get; set; }
+    public DateTimeOffset Timestamp { get; set; }
+    public string Event { get; set; } = null!;
+    public string EventTypeName { get; set; } = null!;
 }

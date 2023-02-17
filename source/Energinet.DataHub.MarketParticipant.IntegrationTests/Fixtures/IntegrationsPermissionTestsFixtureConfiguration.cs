@@ -16,9 +16,9 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
-    [CollectionDefinition("IntegrationPermissionTest")]
+    [CollectionDefinition("PermissionIntegrationTest")]
     public sealed class IntegrationsPermissionTestsFixtureConfiguration :
-        ICollectionFixture<MarketParticipantPermissionDatabaseFixture>
+        ICollectionFixture<MarketParticipantDatabaseFixture>
     {
         // This class has no code, and is never created. Its purpose is simply
         // to be the place to apply [CollectionDefinition] and all the

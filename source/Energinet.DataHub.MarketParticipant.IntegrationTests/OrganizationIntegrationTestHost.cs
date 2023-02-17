@@ -61,27 +61,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             return Task.FromResult(host);
         }
 
-        public static Task<OrganizationIntegrationTestHost> InitializePermissionValidityAsync(MarketParticipantPermissionDatabaseFixture databaseFixture)
-        {
-            ArgumentNullException.ThrowIfNull(databaseFixture);
-
-            var host = new OrganizationIntegrationTestHost();
-
-            var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(configuration);
-            host._startup.Initialize(configuration, serviceCollection);
-            serviceCollection
-                .BuildServiceProvider()
-                .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = true);
-
-            host._startup.Container.Options.AllowOverridingRegistrations = true;
-            InitTestServiceBus(host._startup.Container);
-            InitUserIdProvider(host._startup.Container);
-            InitEmailSender(host._startup.Container);
-            return Task.FromResult(host);
-        }
-
         public Scope BeginScope()
         {
             return AsyncScopedLifestyle.BeginScope(_startup.Container);
@@ -103,7 +82,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
                 new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
                 new(Settings.SendGridApiKey.Key, "fake_value"),
-                new(Settings.UserInviteFromEmail.Key, "fake_value")
+                new(Settings.UserInviteFromEmail.Key, "fake_value"),
+                new(Settings.UserInviteBccEmail.Key, "fake_value")
             };
 
             return new ConfigurationBuilder()

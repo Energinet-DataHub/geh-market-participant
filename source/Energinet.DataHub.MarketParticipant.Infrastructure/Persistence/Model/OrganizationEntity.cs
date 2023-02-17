@@ -15,28 +15,17 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+
+public sealed class OrganizationEntity
 {
-    public sealed class OrganizationEntity
-    {
-        public OrganizationEntity()
-        {
-            Name = string.Empty;
-            Actors = new Collection<ActorEntity>();
-            BusinessRegisterIdentifier = string.Empty;
-            Address = new AddressEntity();
-            Status = 1;
-            Domain = string.Empty;
-        }
+    public Guid Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string BusinessRegisterIdentifier { get; set; } = null!;
+    public string? Comment { get; set; }
+    public int Status { get; set; }
+    public AddressEntity Address { get; set; } = new();
+    public string Domain { get; set; } = null!;
 
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string BusinessRegisterIdentifier { get; set; }
-        public string? Comment { get; set; }
-        public int Status { get; set; }
-        public AddressEntity Address { get; set; }
-        public string Domain { get; set; }
-
-        public Collection<ActorEntity> Actors { get; }
-    }
+    public Collection<ActorEntity> Actors { get; } = new();
 }

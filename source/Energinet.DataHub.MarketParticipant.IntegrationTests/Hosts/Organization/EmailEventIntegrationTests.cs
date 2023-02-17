@@ -47,15 +47,17 @@ public sealed class EmailEventIntegrationTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var user = await _fixture.DatabaseManager.CreateUserAsync().ConfigureAwait(false);
+        var user = await _fixture.PrepareUserAsync();
 
-        var userIdentityMock = GetUserIdentityForTest(new ExternalUserId(user.ExternalUserId));
+        var userIdentityMock = GetUserIdentityForTest(new ExternalUserId(user.ExternalId));
 
-        await _fixture.DatabaseManager.EmailEventsClearNotSentAsync().ConfigureAwait(false);
-        await _fixture.DatabaseManager.CreateEmailEventAsync(userIdentityMock.Email, EmailEventType.UserInvite).ConfigureAwait(false);
+        await _fixture.EmailEventsClearNotSentAsync();
+        await _fixture.PrepareEmailEventAsync(TestPreparationEntities.ValidEmailEvent.Patch(t => t.Email = userIdentityMock.Email.Address));
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
-        userIdentityRepository.Setup(e => e.GetAsync(userIdentityMock.Email)).ReturnsAsync(userIdentityMock);
+        userIdentityRepository
+            .Setup(e => e.GetAsync(userIdentityMock.Email))
+            .ReturnsAsync(userIdentityMock);
 
         scope.Container!.Register(() => userIdentityRepository.Object, Lifestyle.Scoped);
 
@@ -66,11 +68,11 @@ public sealed class EmailEventIntegrationTests
         await mediator.Send(command);
     }
 
-    private UserIdentity GetUserIdentityForTest(ExternalUserId externalUserId)
+    private static UserIdentity GetUserIdentityForTest(ExternalUserId externalUserId)
     {
         return new UserIdentity(
             externalUserId,
-            new EmailAddress("GetUserIdentityForTest@test.dk"),
+            new MockedEmailAddress(),
             UserStatus.Active,
             "firstName",
             "lastName",

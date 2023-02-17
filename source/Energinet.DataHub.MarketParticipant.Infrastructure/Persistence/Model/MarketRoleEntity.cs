@@ -16,19 +16,13 @@ using System;
 using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model
-{
-    public sealed class MarketRoleEntity
-    {
-        public MarketRoleEntity()
-        {
-            GridAreas = new Collection<MarketRoleGridAreaEntity>();
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-        public Guid Id { get; set; }
-        public Guid ActorInfoId { get; set; }
-        public EicFunction Function { get; set; }
-        public Collection<MarketRoleGridAreaEntity> GridAreas { get; }
-        public string? Comment { get; set; }
-    }
+public sealed class MarketRoleEntity
+{
+    public Guid Id { get; set; }
+    public Guid ActorInfoId { get; set; }
+    public EicFunction Function { get; set; }
+    public Collection<MarketRoleGridAreaEntity> GridAreas { get; } = new();
+    public string? Comment { get; set; }
 }

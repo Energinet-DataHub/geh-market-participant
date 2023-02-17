@@ -12,28 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
-using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+/// <summary>
+/// Service for organization domain validation
+/// </summary>
+public interface IOrganizationDomainValidationService
 {
-    public sealed class MarketParticipantPermissionDatabaseFixture : IAsyncLifetime
-    {
-        public MarketParticipantPermissionDatabaseFixture()
-        {
-            DatabaseManager = new MarketParticipantDatabaseManager();
-        }
-
-        public MarketParticipantDatabaseManager DatabaseManager { get; }
-
-        public Task InitializeAsync()
-        {
-            return DatabaseManager.CreateDatabaseAsync();
-        }
-
-        public Task DisposeAsync()
-        {
-            return DatabaseManager.DeleteDatabaseAsync();
-        }
-    }
+    /// <summary>
+    /// Validates organization domain against new user email
+    /// </summary>
+    /// <param name="actorId">actor id to find organization</param>
+    /// <param name="userInviteEmail">user email</param>
+    /// <returns>validation task</returns>
+    Task ValidateUserEmailInsideOrganizationDomainsAsync(Guid actorId, string userInviteEmail);
 }
