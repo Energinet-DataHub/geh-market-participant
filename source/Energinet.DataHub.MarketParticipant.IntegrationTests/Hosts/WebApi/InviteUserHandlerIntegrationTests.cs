@@ -52,7 +52,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         var mediator = scope.GetInstance<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "datahub.dk"),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
