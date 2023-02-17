@@ -16,12 +16,13 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public class OrganizationDomainValidationService : IOrganizationDomainValidationService
+public sealed class OrganizationDomainValidationService : IOrganizationDomainValidationService
 {
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IActorQueryRepository _actorQueryRepository;
@@ -34,29 +35,25 @@ public class OrganizationDomainValidationService : IOrganizationDomainValidation
         _actorQueryRepository = actorQueryRepository;
     }
 
-    public async Task ValidateUserEmailInsideOrganizationDomainsAsync(Guid actorId, string userInviteEmail)
+    public async Task ValidateUserEmailInsideOrganizationDomainsAsync(Actor actor, EmailAddress userInviteEmail)
     {
+        ArgumentNullException.ThrowIfNull(actor);
         ArgumentNullException.ThrowIfNull(userInviteEmail);
 
-        var actor = await _actorQueryRepository
-            .GetActorAsync(actorId)
+        var actorWithOrganization = await _actorQueryRepository
+            .GetActorAsync(actor.Id)
             .ConfigureAwait(false);
 
-        if (actor == null)
-        {
-            throw new NotFoundValidationException($"The specified actor {actorId} was not found.");
-        }
-
         var organization = await _organizationRepository
-            .GetAsync(actor.OrganizationId)
+            .GetAsync(actorWithOrganization!.OrganizationId)
             .ConfigureAwait(false);
 
         if (organization == null)
         {
-            throw new NotFoundValidationException($"The specified organization {actor.OrganizationId} was not found.");
+            throw new NotFoundValidationException($"The specified organization {actorWithOrganization.OrganizationId} was not found.");
         }
 
-        if (!userInviteEmail.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
+        if (!userInviteEmail.Address.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
         {
             throw new ValidationException("User email not valid, should match organization domain");
         }

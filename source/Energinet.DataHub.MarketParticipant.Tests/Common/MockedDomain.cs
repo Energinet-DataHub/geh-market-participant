@@ -13,20 +13,28 @@
 // limitations under the License.
 
 using System;
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
-/// <summary>
-/// Service for organization domain validation
-/// </summary>
-public interface IOrganizationDomainValidationService
+#pragma warning disable CA1062, CA2225
+public sealed class MockedDomain
 {
-    /// <summary>
-    /// Validates organization domain against new user email
-    /// </summary>
-    /// <param name="actorId">actor id to find organization</param>
-    /// <param name="userInviteEmail">user email</param>
-    /// <returns>validation task</returns>
-    Task ValidateUserEmailInsideOrganizationDomainsAsync(Guid actorId, string userInviteEmail);
+    private readonly string _value = $"{Guid.NewGuid()}.dk";
+
+    public static implicit operator string(MockedDomain mock)
+    {
+        return mock._value;
+    }
+
+    public static implicit operator OrganizationDomain(MockedDomain mock)
+    {
+        return new OrganizationDomain(mock._value);
+    }
+
+    public override string ToString()
+    {
+        return _value;
+    }
 }
+#pragma warning restore

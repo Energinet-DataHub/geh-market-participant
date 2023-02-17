@@ -15,10 +15,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -35,18 +36,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepositoryMock = new Mock<IOrganizationRepository>();
             var actorQueryRepository = new Mock<IActorQueryRepository>();
 
-            var actorId = Guid.NewGuid();
-            const string actorEmail = "newuser@testdomain.dk";
+            var actor = new Actor(
+                Guid.NewGuid(),
+                null,
+                new MockedGln(),
+                ActorStatus.New,
+                Array.Empty<ActorMarketRole>(),
+                new ActorName("fake_value"));
+
+            var actorEmail = new EmailAddress("newuser@testdomain.dk");
             var orgDomainToTest = new OrganizationDomain("testdomain.dk");
 
-            SetupActorMock(actorId, actorQueryRepository);
-
+            SetupActorMock(actor.Id, actorQueryRepository);
             SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
 
-            // Act + Assert
             var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object, actorQueryRepository.Object);
+
+            // Act + Assert
             await organizationDomainValidationService
-                .ValidateUserEmailInsideOrganizationDomainsAsync(actorId, actorEmail)
+                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail)
                 .ConfigureAwait(false);
         }
 
@@ -57,18 +65,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepositoryMock = new Mock<IOrganizationRepository>();
             var actorQueryRepository = new Mock<IActorQueryRepository>();
 
-            var actorId = Guid.NewGuid();
-            const string actorEmail = "newuser@wrongdomain.dk";
+            var actor = new Actor(
+                Guid.NewGuid(),
+                null,
+                new MockedGln(),
+                ActorStatus.New,
+                Array.Empty<ActorMarketRole>(),
+                new ActorName("fake_value"));
+
+            var actorEmail = new EmailAddress("newuser@wrongdomain.dk");
             var orgDomainToTest = new OrganizationDomain("testdomain.dk");
 
-            SetupActorMock(actorId, actorQueryRepository);
-
+            SetupActorMock(actor.Id, actorQueryRepository);
             SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
 
-            // Act + Assert
             var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object, actorQueryRepository.Object);
+
+            // Act + Assert
             await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                .ValidateUserEmailInsideOrganizationDomainsAsync(actorId, actorEmail))
+                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail))
                 .ConfigureAwait(false);
         }
 
@@ -79,17 +94,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepositoryMock = new Mock<IOrganizationRepository>();
             var actorQueryRepository = new Mock<IActorQueryRepository>();
 
-            var actorId = Guid.NewGuid();
-            const string actorEmail = "newuser@testdomain.dk";
+            var actor = new Actor(
+                Guid.NewGuid(),
+                null,
+                new MockedGln(),
+                ActorStatus.New,
+                Array.Empty<ActorMarketRole>(),
+                new ActorName("fake_value"));
+
+            var actorEmail = new EmailAddress("newuser@testdomain.dk");
             var orgDomainToTest = new OrganizationDomain("test2domain.dk");
 
-            SetupActorMock(actorId, actorQueryRepository);
+            SetupActorMock(actor.Id, actorQueryRepository);
             SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
 
-            // Act + Assert
             var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object, actorQueryRepository.Object);
+
+            // Act + Assert
             await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                    .ValidateUserEmailInsideOrganizationDomainsAsync(actorId, actorEmail))
+                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail))
                 .ConfigureAwait(false);
         }
 
@@ -100,22 +123,27 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organizationRepositoryMock = new Mock<IOrganizationRepository>();
             var actorQueryRepository = new Mock<IActorQueryRepository>();
 
-            var actorId = Guid.NewGuid();
-            const string actorEmail = "newuser@shouldfail-testdomain.dk";
+            var actor = new Actor(
+                Guid.NewGuid(),
+                null,
+                new MockedGln(),
+                ActorStatus.New,
+                Array.Empty<ActorMarketRole>(),
+                new ActorName("fake_value"));
+
+            var actorEmail = new EmailAddress("newuser@shouldfail-testdomain.dk");
             var orgDomainToTest = new OrganizationDomain("testdomain.dk");
 
-            var actor = new Domain.Model.Query.Actor(new OrganizationId(Guid.NewGuid()), actorId, ActorStatus.Active);
-
             actorQueryRepository
-                .Setup(a => a.GetActorAsync(actorId))
-                .ReturnsAsync(actor);
+                .Setup(a => a.GetActorAsync(actor.Id))
+                .ReturnsAsync(new Domain.Model.Query.Actor(new OrganizationId(Guid.NewGuid()), actor.Id, ActorStatus.Active));
 
             SetupOrganizationMock(orgDomainToTest, organizationRepositoryMock);
+            var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object, actorQueryRepository.Object);
 
             // Act + Assert
-            var organizationDomainValidationService = new OrganizationDomainValidationService(organizationRepositoryMock.Object, actorQueryRepository.Object);
             await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                    .ValidateUserEmailInsideOrganizationDomainsAsync(actorId, actorEmail))
+                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail))
                 .ConfigureAwait(false);
         }
 
