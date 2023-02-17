@@ -12,14 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -76,7 +74,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         await mediator.Send(command);
 
         // Assert
-        var createdExternalUser = await TryFindExternalUserAsync();
+        var createdExternalUser = await _graphServiceClientFixture.TryFindExternalUserAsync(TestUserEmail);
         Assert.NotNull(createdExternalUser);
 
         var createdExternalUserId = new ExternalUserId(createdExternalUser);
@@ -90,36 +88,6 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         Assert.NotNull(createdUserIdentity);
     }
 
-    public Task InitializeAsync() => CleanupExternalUserAsync();
-    public Task DisposeAsync() => CleanupExternalUserAsync();
-
-    private async Task CleanupExternalUserAsync()
-    {
-        var existingUser = await TryFindExternalUserAsync();
-        if (existingUser == null)
-            return;
-
-        await _graphServiceClientFixture.Client
-            .Users[existingUser]
-            .Request()
-            .DeleteAsync();
-    }
-
-    private async Task<string?> TryFindExternalUserAsync()
-    {
-        var usersRequest = await _graphServiceClientFixture.Client
-            .Users
-            .Request()
-            .Filter($"identities/any(id:id/issuer eq '{_graphServiceClientFixture.Issuer}' and id/issuerAssignedId eq '{TestUserEmail}')")
-            .Select(user => user.Id)
-            .GetAsync()
-            .ConfigureAwait(false);
-
-        var users = await usersRequest
-            .IteratePagesAsync(_graphServiceClientFixture.Client)
-            .ConfigureAwait(false);
-
-        var user = users.SingleOrDefault();
-        return user?.Id;
-    }
+    public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
+    public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
 }

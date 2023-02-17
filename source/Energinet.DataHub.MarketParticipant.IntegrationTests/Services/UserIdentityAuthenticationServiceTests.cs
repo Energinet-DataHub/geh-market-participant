@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Graph;
 using Xunit;
@@ -82,7 +83,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.GetInstance<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync();
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         // Act
@@ -111,7 +112,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.GetInstance<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync();
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         await _graphServiceClientFixture
@@ -139,7 +140,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         await using var scope = host.BeginScope();
         var target = scope.GetInstance<IUserIdentityAuthenticationService>();
 
-        var externalUserId = await _graphServiceClientFixture.CreateUserAsync();
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
 
         await _graphServiceClientFixture

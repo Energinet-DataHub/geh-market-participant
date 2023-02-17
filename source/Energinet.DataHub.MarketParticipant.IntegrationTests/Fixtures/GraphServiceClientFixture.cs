@@ -14,11 +14,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
 using Xunit;
 using User = Microsoft.Graph.User;
@@ -32,8 +34,6 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
     private GraphServiceClient? _graphClient;
 
     public GraphServiceClient Client => _graphClient ?? throw new InvalidOperationException($"{nameof(GraphServiceClientFixture)} is not initialized or has already been disposed.");
-
-    public string Issuer => _integrationTestConfiguration.B2CSettings.Tenant;
 
     public Task InitializeAsync()
     {
@@ -87,7 +87,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             throw firstException;
     }
 
-    public async Task<ExternalUserId> CreateUserAsync()
+    public async Task<ExternalUserId> CreateUserAsync(string testEmail)
     {
         var newUser = new User
         {
@@ -105,8 +105,8 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 new ObjectIdentity
                 {
                     SignInType = "emailAddress",
-                    Issuer = Issuer,
-                    IssuerAssignedId = $"{Guid.NewGuid()}@test.datahub.dk"
+                    Issuer = _integrationTestConfiguration.B2CSettings.Tenant,
+                    IssuerAssignedId = testEmail
                 }
             }
         };
@@ -121,5 +121,35 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         _createdUsers.Add(externalUserId);
 
         return externalUserId;
+    }
+
+    public async Task<string?> TryFindExternalUserAsync(string testEmail)
+    {
+        var usersRequest = await Client
+            .Users
+            .Request()
+            .Filter($"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')")
+            .Select(user => user.Id)
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        var users = await usersRequest
+            .IteratePagesAsync(Client)
+            .ConfigureAwait(false);
+
+        var user = users.SingleOrDefault();
+        return user?.Id;
+    }
+
+    public async Task CleanupExternalUserAsync(string testEmail)
+    {
+        var existingUser = await TryFindExternalUserAsync(testEmail);
+        if (existingUser == null)
+            return;
+
+        await Client
+            .Users[existingUser]
+            .Request()
+            .DeleteAsync();
     }
 }

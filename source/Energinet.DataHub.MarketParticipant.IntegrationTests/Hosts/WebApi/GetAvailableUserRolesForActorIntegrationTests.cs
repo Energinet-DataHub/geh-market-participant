@@ -62,7 +62,6 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
         var mediator = scope.GetInstance<IMediator>();
 
         var actor = await _fixture.PrepareActorAsync(
@@ -90,7 +89,6 @@ public sealed class GetAvailableUserRolesForActorIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
         var mediator = scope.GetInstance<IMediator>();
 
         var actor = await _fixture.PrepareActorAsync(
