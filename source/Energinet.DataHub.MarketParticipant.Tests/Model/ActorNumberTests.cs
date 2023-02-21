@@ -19,7 +19,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Model
 {
     [UnitTest]
-    public sealed class FrontendUserTests
+    public sealed class ActorNumberTests
     {
         [Fact]
         public void Create_ValidEicNumber_ReturnsEicActorNumber()
