@@ -26,20 +26,26 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
     private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
+    private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
+    private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
 
     public UserInvitationService(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IEmailEventRepository emailEventRepository,
-        IOrganizationDomainValidationService organizationDomainValidationService)
+        IOrganizationDomainValidationService organizationDomainValidationService,
+        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _emailEventRepository = emailEventRepository;
         _organizationDomainValidationService = organizationDomainValidationService;
+        _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
+        _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
     }
 
-    public async Task InviteUserAsync(UserInvitation invitation)
+    public async Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId)
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
@@ -77,9 +83,11 @@ public sealed class UserInvitationService : IUserInvitationService
         await _userRepository
             .AddOrUpdateAsync(invitedUser)
             .ConfigureAwait(false);
+
+        await AuditLogInviteAndUserRoleAssignmentsAsync(invitedUser, invitationSentByUserId, invitation).ConfigureAwait(false);
     }
 
-    public async Task<User?> GetUserAsync(EmailAddress email)
+    private async Task<User?> GetUserAsync(EmailAddress email)
     {
         var invitedIdentity = await _userIdentityRepository
             .GetAsync(email)
@@ -88,5 +96,45 @@ public sealed class UserInvitationService : IUserInvitationService
         return invitedIdentity != null
             ? await _userRepository.GetAsync(invitedIdentity.Id).ConfigureAwait(false)
             : null;
+    }
+
+    private async Task AuditLogInviteAndUserRoleAssignmentsAsync(
+        User invitedUser,
+        UserId invitationSentByUserId,
+        UserInvitation invitation)
+    {
+        await AuditLogUserInviteAsync(invitedUser, invitationSentByUserId, invitation).ConfigureAwait(false);
+
+        foreach (var assignment in invitedUser.RoleAssignments)
+        {
+            await AuditRoleAssignmentAsync(invitedUser.Id, invitationSentByUserId, assignment).ConfigureAwait(false);
+        }
+    }
+
+    private Task AuditLogUserInviteAsync(User toUser, UserId invitationSentByUserId, UserInvitation invitation)
+    {
+        var userInviteAuditLog = new UserInviteAuditLogEntry(
+            toUser.Id,
+            invitationSentByUserId,
+            invitation.AssignedActor.Id,
+            DateTimeOffset.UtcNow);
+
+        return _userInviteAuditLogEntryRepository
+            .InsertAuditLogEntryAsync(userInviteAuditLog);
+    }
+
+    private async Task AuditRoleAssignmentAsync(
+        UserId userId,
+        UserId invitationSentByUserId,
+        UserRoleAssignment userRoleAssignment)
+    {
+        await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
+            userId,
+            new UserRoleAssignmentAuditLogEntry(
+                userRoleAssignment.ActorId,
+                userRoleAssignment.UserRoleId,
+                invitationSentByUserId,
+                DateTimeOffset.UtcNow,
+                UserRoleAssignmentTypeAuditLog.Added)).ConfigureAwait(false);
     }
 }

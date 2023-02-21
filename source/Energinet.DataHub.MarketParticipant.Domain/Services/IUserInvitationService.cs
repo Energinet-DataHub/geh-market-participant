@@ -26,5 +26,6 @@ public interface IUserInvitationService
     /// Invites the user specified in the invitation into DataHub.
     /// </summary>
     /// <param name="invitation">An invitation of a new or existing user.</param>
-    Task InviteUserAsync(UserInvitation invitation);
+    /// <param name="invitationSentByUserId">user sending til invitation</param>
+    Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId);
 }

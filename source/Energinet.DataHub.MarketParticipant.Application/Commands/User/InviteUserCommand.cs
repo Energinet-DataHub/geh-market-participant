@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record InviteUserCommand(UserInvitationDto Invitation) : IRequest;
+public sealed record InviteUserCommand(UserInvitationDto Invitation, Guid InvitedByUserId) : IRequest;

@@ -53,7 +53,7 @@ public sealed class InvitationController : ControllerBase
                     return Unauthorized();
 
                 await _mediator
-                    .Send(new InviteUserCommand(userInvitation))
+                    .Send(new InviteUserCommand(userInvitation, _userContext.CurrentUser.UserId))
                     .ConfigureAwait(false);
 
                 return Ok();

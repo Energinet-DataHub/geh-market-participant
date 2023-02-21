@@ -60,6 +60,8 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
             new[] { Permission.ActorManage },
             EicFunction.DataHubAdministrator);
 
+        var invitedByUser = await _databaseFixture.PrepareUserAsync();
+
         var invitation = new UserInvitationDto(
             TestUserEmail,
             "Invitation Integration Tests",
@@ -68,7 +70,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
             actor.Id,
             new[] { userRole.Id });
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, invitedByUser.Id);
 
         // Act
         await mediator.Send(command);

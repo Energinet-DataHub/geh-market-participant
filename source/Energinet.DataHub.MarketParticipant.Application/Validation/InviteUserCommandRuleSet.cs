@@ -56,5 +56,8 @@ public sealed class InviteUserCommandRuleSet : AbstractValidator<InviteUserComma
                     .NotEmpty()
                     .ForEach(userRoleId => userRoleId.NotEmpty());
             });
+
+        RuleFor(i => i.InvitedByUserId)
+            .NotEmpty();
     }
 }
