@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -60,7 +61,8 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
             new[] { Permission.ActorManage },
             EicFunction.DataHubAdministrator);
 
-        var invitedByUser = await _databaseFixture.PrepareUserAsync();
+        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");
+        var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
 
         var invitation = new UserInvitationDto(
             TestUserEmail,
