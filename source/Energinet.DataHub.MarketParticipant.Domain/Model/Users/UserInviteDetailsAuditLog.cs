@@ -11,12 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
-
-public sealed record GetUserAuditLogResponse(
-    IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-    IEnumerable<UserInviteDetailsAuditLog> InviteDetailsAuditLogs);
+public sealed record UserInviteDetailsAuditLog(
+    UserId UserId,
+    UserId ChangedByUserId,
+    Guid ActorId,
+    string ActorName,
+    DateTimeOffset Timestamp);

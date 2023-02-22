@@ -32,17 +32,19 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context = context;
         }
 
-        public async Task<IEnumerable<UserInviteAuditLogEntry>> GetAsync(UserId userId, Guid actorId)
+        public async Task<IEnumerable<UserInviteDetailsAuditLog>> GetAsync(UserId userId)
         {
-            var userInviteLogs = _context.UserInviteAuditLogEntries
-                .Where(e => e.UserId == userId.Value && e.ActorId == actorId)
-                .Select(log => new UserInviteAuditLogEntry(
+            var logQuery = from log in _context.UserInviteAuditLogEntries
+                join actor in _context.Actors on log.ActorId equals actor.Id
+                where log.UserId == userId.Value
+                select new UserInviteDetailsAuditLog(
                     new UserId(log.UserId),
                     new UserId(log.ChangedByUserId),
-                    actorId,
-                    log.Timestamp));
+                    log.ActorId,
+                    actor.Name,
+                    log.Timestamp);
 
-            return await userInviteLogs.ToListAsync().ConfigureAwait(false);
+            return await logQuery.ToListAsync().ConfigureAwait(false);
         }
 
         public Task InsertAuditLogEntryAsync(UserInviteAuditLogEntry logEntry)

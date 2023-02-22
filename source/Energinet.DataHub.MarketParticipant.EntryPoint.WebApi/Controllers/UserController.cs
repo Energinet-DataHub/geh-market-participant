@@ -143,11 +143,15 @@ public class UserController : ControllerBase
                     .Send(command)
                     .ConfigureAwait(false);
 
-                var filtered = _userContext.CurrentUser.IsFas
+                var filteredUserRoleAssignmentAuditLogs = _userContext.CurrentUser.IsFas
                     ? response.UserRoleAssignmentAuditLogs
                     : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
-                return Ok(new GetUserAuditLogResponse(filtered));
+                var filteredUserInviteDetailsAuditLogs = _userContext.CurrentUser.IsFas
+                    ? response.InviteDetailsAuditLogs
+                    : response.InviteDetailsAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
+
+                return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs));
             },
             _logger).ConfigureAwait(false);
     }
