@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -44,11 +45,10 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
         var userInviteAuditLogEntryRepository = new UserInviteAuditLogEntryRepository(contextGet);
 
         var userId = new UserId(Guid.NewGuid());
-        var actorId = Guid.NewGuid();
 
         // Act
         var actual = await userInviteAuditLogEntryRepository
-            .GetAsync(userId, actorId)
+            .GetAsync(userId)
             .ConfigureAwait(false);
 
         // Assert
@@ -82,10 +82,16 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
 
         // Act
         var actual = await userInviteAuditLogEntryRepository
-            .GetAsync(new UserId(user.Id), actor.Id)
+            .GetAsync(new UserId(user.Id))
             .ConfigureAwait(false);
 
         // Assert
-        Assert.Single(actual, entry);
+        var userInviteDetailsAuditLogs = actual.ToList();
+        Assert.Single(userInviteDetailsAuditLogs);
+        Assert.Equal(entry.UserId, userInviteDetailsAuditLogs[0].UserId);
+        Assert.Equal(entry.ActorId, userInviteDetailsAuditLogs[0].ActorId);
+        Assert.Equal(entry.Timestamp, userInviteDetailsAuditLogs[0].Timestamp);
+        Assert.Equal(entry.ChangedByUserId, userInviteDetailsAuditLogs[0].ChangedByUserId);
+        Assert.Equal(actor.Name, userInviteDetailsAuditLogs[0].ActorName);
     }
 }
