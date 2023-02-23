@@ -16,5 +16,7 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserAuditLogsDto(IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs);
+    public sealed record UserAuditLogsDto(
+        IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
+        IEnumerable<UserInviteDetailsAuditLogDto> InviteDetailsAuditLogs);
 }

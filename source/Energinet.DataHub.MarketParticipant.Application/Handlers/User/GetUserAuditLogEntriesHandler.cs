@@ -51,16 +51,27 @@ public sealed class GetUserAuditLogEntriesHandler
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        return new GetUserAuditLogResponse(roleAssignmentAuditLogs.Select(Map), userInviteLogs);
+        return new GetUserAuditLogResponse(roleAssignmentAuditLogs.Select(Map), userInviteLogs.Select(MapInvites));
     }
 
     private static UserRoleAssignmentAuditLogEntryDto Map(UserRoleAssignmentAuditLogEntry auditLogEntry)
     {
         return new UserRoleAssignmentAuditLogEntryDto(
+            auditLogEntry.UserId.Value,
             auditLogEntry.ActorId,
             auditLogEntry.UserRoleId.Value,
             auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.Timestamp,
             auditLogEntry.AssignmentType);
+    }
+
+    private static UserInviteDetailsAuditLogDto MapInvites(UserInviteDetailsAuditLog auditLogEntry)
+    {
+        return new UserInviteDetailsAuditLogDto(
+            auditLogEntry.UserId.Value,
+            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.ActorId,
+            auditLogEntry.ActorName,
+            auditLogEntry.Timestamp);
     }
 }
