@@ -90,48 +90,6 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         var userIdentityRepository = scope.GetInstance<IUserIdentityRepository>();
         var createdUserIdentity = await userIdentityRepository.GetAsync(createdExternalUserId);
         Assert.NotNull(createdUserIdentity);
-    }
-
-    [Fact]
-    public async Task InviteUser_ValidInvitation_AuditLogsCreated()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-        await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
-
-        var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "datahubtest.dk"),
-            TestPreparationEntities.ValidActor,
-            TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
-
-        var userRole = await _databaseFixture.PrepareUserRoleAsync(
-            new[] { Permission.ActorManage },
-            EicFunction.DataHubAdministrator);
-
-        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahubtest.dk");
-        var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
-
-        const string testUserEmail = "invitation-integration-test-logs@datahubtest.dk";
-
-        var invitation = new UserInvitationDto(
-            testUserEmail,
-            "Invitation Integration Tests",
-            "(Always safe to delete)",
-            "+45 70000000",
-            actor.Id,
-            new[] { userRole.Id });
-
-        var command = new InviteUserCommand(invitation, invitedByUser.Id);
-
-        // Act
-        await mediator.Send(command);
-
-        // Assert
-        var createdExternalUser = await _graphServiceClientFixture.TryFindExternalUserAsync(testUserEmail);
-
-        var userRepository = scope.GetInstance<IUserRepository>();
-        var createdUser = await userRepository.GetAsync(new ExternalUserId(createdExternalUser!));
 
         var userInviteAuditLogEntryRepository = scope.GetInstance<IUserInviteAuditLogEntryRepository>();
         var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser!.Id);
