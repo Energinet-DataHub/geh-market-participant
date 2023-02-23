@@ -37,6 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             var userRoleAssignmentLogs = _context.UserRoleAssignmentAuditLogEntries
                 .Where(e => e.UserId == userId.Value)
                 .Select(log => new UserRoleAssignmentAuditLogEntry(
+                    new UserId(log.UserId),
                     log.ActorId,
                     new UserRoleId(log.UserRoleId),
                     new UserId(log.ChangedByUserId),

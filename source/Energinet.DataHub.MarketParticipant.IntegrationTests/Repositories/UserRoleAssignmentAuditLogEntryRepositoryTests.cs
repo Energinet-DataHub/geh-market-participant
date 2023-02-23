@@ -65,6 +65,7 @@ public sealed class UserRoleAssignmentAuditLogEntryRepositoryTests
         var userRole = await _fixture.PrepareUserRoleAsync();
 
         var entry = new UserRoleAssignmentAuditLogEntry(
+            new UserId(user.Id),
             Guid.NewGuid(),
             new UserRoleId(userRole.Id),
             new UserId(user.Id),

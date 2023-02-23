@@ -110,6 +110,7 @@ public sealed class UserInvitationService : IUserInvitationService
             await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
                 invitedUserId,
                 new UserRoleAssignmentAuditLogEntry(
+                    invitedUserId,
                     assignment.ActorId,
                     assignment.UserRoleId,
                     invitationSentByUserId,
