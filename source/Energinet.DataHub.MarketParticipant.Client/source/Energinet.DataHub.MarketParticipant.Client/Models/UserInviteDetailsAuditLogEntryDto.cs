@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserInviteDetailsAuditLogDto(
+    public sealed record UserInviteDetailsAuditLogEntryDto(
         Guid UserId,
         Guid ChangedByUserId,
         Guid ActorId,
