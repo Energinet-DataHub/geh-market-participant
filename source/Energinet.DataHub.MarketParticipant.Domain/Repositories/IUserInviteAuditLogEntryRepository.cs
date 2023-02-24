@@ -34,5 +34,5 @@ public interface IUserInviteAuditLogEntryRepository
     /// Retrieves all log entries for a given user.
     /// </summary>
     /// <param name="userId">The user id to get the logs for.</param>
-    Task<IEnumerable<UserInviteDetailsAuditLog>> GetAsync(UserId userId);
+    Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId);
 }

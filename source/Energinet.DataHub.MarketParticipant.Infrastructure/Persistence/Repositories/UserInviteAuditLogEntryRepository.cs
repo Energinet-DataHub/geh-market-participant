@@ -32,12 +32,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context = context;
         }
 
-        public async Task<IEnumerable<UserInviteDetailsAuditLog>> GetAsync(UserId userId)
+        public async Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId)
         {
             var logQuery = from log in _context.UserInviteAuditLogEntries
                 join actor in _context.Actors on log.ActorId equals actor.Id
                 where log.UserId == userId.Value
-                select new UserInviteDetailsAuditLog(
+                select new UserInviteDetailsAuditLogEntry(
                     new UserId(log.UserId),
                     new UserId(log.ChangedByUserId),
                     log.ActorId,

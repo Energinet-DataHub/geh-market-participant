@@ -11,14 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserInviteDetailsAuditLogDto(
-    Guid UserId,
-    Guid ChangedByUserId,
+public sealed record UserInviteDetailsAuditLogEntry(
+    UserId UserId,
+    UserId ChangedByUserId,
     Guid ActorId,
     string ActorName,
     DateTimeOffset Timestamp);
