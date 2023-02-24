@@ -18,5 +18,5 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record UserAuditLogsDto(
         IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-        IEnumerable<UserInviteDetailsAuditLogEntryDto> InviteDetailsAuditLogs);
+        IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs);
 }

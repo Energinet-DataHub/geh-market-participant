@@ -16,7 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record UserInviteDetailsAuditLogEntryDto(
+public sealed record UserInviteAuditLogEntryDto(
     Guid UserId,
     Guid ChangedByUserId,
     Guid ActorId,

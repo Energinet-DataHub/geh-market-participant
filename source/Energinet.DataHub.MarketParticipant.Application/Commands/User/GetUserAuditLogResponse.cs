@@ -18,4 +18,4 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
 public sealed record GetUserAuditLogResponse(
     IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-    IEnumerable<UserInviteDetailsAuditLogEntryDto> InviteDetailsAuditLogs);
+    IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs);

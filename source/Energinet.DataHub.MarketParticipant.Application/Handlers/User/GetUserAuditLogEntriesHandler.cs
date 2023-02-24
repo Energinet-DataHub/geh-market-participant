@@ -65,9 +65,9 @@ public sealed class GetUserAuditLogEntriesHandler
             auditLogEntry.AssignmentType);
     }
 
-    private static UserInviteDetailsAuditLogEntryDto MapInvites(UserInviteDetailsAuditLogEntry auditLogEntry)
+    private static UserInviteAuditLogEntryDto MapInvites(UserInviteDetailsAuditLogEntry auditLogEntry)
     {
-        return new UserInviteDetailsAuditLogEntryDto(
+        return new UserInviteAuditLogEntryDto(
             auditLogEntry.UserId.Value,
             auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.ActorId,

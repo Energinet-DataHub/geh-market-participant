@@ -148,8 +148,8 @@ public class UserController : ControllerBase
                     : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
                 var filteredUserInviteDetailsAuditLogs = _userContext.CurrentUser.IsFas
-                    ? response.InviteDetailsAuditLogs
-                    : response.InviteDetailsAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
+                    ? response.InviteAuditLogs
+                    : response.InviteAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
                 return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs));
             },
