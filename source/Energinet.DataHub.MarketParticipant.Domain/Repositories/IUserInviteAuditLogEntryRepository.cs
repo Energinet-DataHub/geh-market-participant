@@ -12,20 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Invites new or existing users into DataHub.
+/// Repository for inserting and querying user roles audit logs
 /// </summary>
-public interface IUserInvitationService
+public interface IUserInviteAuditLogEntryRepository
 {
     /// <summary>
-    /// Invites the user specified in the invitation into DataHub.
+    /// Inserts a <see cref="UserInviteAuditLogEntry"/>
     /// </summary>
-    /// <param name="invitation">An invitation of a new or existing user.</param>
-    /// <param name="invitationSentByUserId">user sending the invitation</param>
-    Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId);
+    /// <param name="logEntry">The audit log entry.</param>
+    Task InsertAuditLogEntryAsync(UserInviteAuditLogEntry logEntry);
+
+    /// <summary>
+    /// Retrieves all log entries for a given user.
+    /// </summary>
+    /// <param name="userId">The user id to get the logs for.</param>
+    Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId);
 }

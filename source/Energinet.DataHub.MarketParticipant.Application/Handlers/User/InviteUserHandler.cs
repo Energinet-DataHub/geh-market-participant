@@ -68,7 +68,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             assignedRoles);
 
         await _userInvitationService
-            .InviteUserAsync(invitation)
+            .InviteUserAsync(invitation, new UserId(request.InvitedByUserId))
             .ConfigureAwait(false);
 
         return Unit.Value;

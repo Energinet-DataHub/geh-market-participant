@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -26,20 +27,26 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
     private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
+    private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
+    private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
 
     public UserInvitationService(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IEmailEventRepository emailEventRepository,
-        IOrganizationDomainValidationService organizationDomainValidationService)
+        IOrganizationDomainValidationService organizationDomainValidationService,
+        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _emailEventRepository = emailEventRepository;
         _organizationDomainValidationService = organizationDomainValidationService;
+        _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
+        _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
     }
 
-    public async Task InviteUserAsync(UserInvitation invitation)
+    public async Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId)
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
@@ -74,12 +81,15 @@ public sealed class UserInvitationService : IUserInvitationService
             .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
             .ConfigureAwait(false);
 
-        await _userRepository
+        var invitedUserId = await _userRepository
             .AddOrUpdateAsync(invitedUser)
             .ConfigureAwait(false);
+
+        await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation).ConfigureAwait(false);
+        await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, invitedUser.RoleAssignments, invitationSentByUserId).ConfigureAwait(false);
     }
 
-    public async Task<User?> GetUserAsync(EmailAddress email)
+    private async Task<User?> GetUserAsync(EmailAddress email)
     {
         var invitedIdentity = await _userIdentityRepository
             .GetAsync(email)
@@ -88,5 +98,36 @@ public sealed class UserInvitationService : IUserInvitationService
         return invitedIdentity != null
             ? await _userRepository.GetAsync(invitedIdentity.Id).ConfigureAwait(false)
             : null;
+    }
+
+    private async Task AuditLogUserInviteAndUserRoleAssignmentsAsync(
+        UserId invitedUserId,
+        ICollection<UserRoleAssignment> invitedUserRoleAssignments,
+        UserId invitationSentByUserId)
+    {
+        foreach (var assignment in invitedUserRoleAssignments)
+        {
+            await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
+                invitedUserId,
+                new UserRoleAssignmentAuditLogEntry(
+                    invitedUserId,
+                    assignment.ActorId,
+                    assignment.UserRoleId,
+                    invitationSentByUserId,
+                    DateTimeOffset.UtcNow,
+                    UserRoleAssignmentTypeAuditLog.Added)).ConfigureAwait(false);
+        }
+    }
+
+    private Task AuditLogUserInviteAsync(UserId toUserId, UserId invitationSentByUserId, UserInvitation invitation)
+    {
+        var userInviteAuditLog = new UserInviteAuditLogEntry(
+            toUserId,
+            invitationSentByUserId,
+            invitation.AssignedActor.Id,
+            DateTimeOffset.UtcNow);
+
+        return _userInviteAuditLogEntryRepository
+            .InsertAuditLogEntryAsync(userInviteAuditLog);
     }
 }

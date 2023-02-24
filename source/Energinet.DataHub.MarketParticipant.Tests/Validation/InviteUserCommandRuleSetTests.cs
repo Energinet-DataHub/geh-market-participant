@@ -37,6 +37,8 @@ public sealed class InviteUserCommandRuleSetTests
         Guid.NewGuid(),
         new[] { Guid.NewGuid() });
 
+    private readonly Guid _validInvitedByUserId = Guid.NewGuid();
+
     [Fact]
     public async Task Validate_Invitation_ValidatesProperty()
     {
@@ -44,7 +46,7 @@ public sealed class InviteUserCommandRuleSetTests
         const string propertyName = nameof(InviteUserCommand.Invitation);
 
         var target = new InviteUserCommandRuleSet();
-        var command = new InviteUserCommand(null!);
+        var command = new InviteUserCommand(null!, Guid.Empty);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -71,7 +73,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { Email = value };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -104,7 +106,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { FirstName = value };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -137,7 +139,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { LastName = value };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -178,7 +180,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { PhoneNumber = value };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -205,7 +207,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { AssignedActor = Guid.Empty };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -224,7 +226,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { AssignedRoles = Array.Empty<Guid>() };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -243,7 +245,7 @@ public sealed class InviteUserCommandRuleSetTests
         var target = new InviteUserCommandRuleSet();
         var invitation = _validInvitation with { AssignedRoles = new[] { Guid.NewGuid(), Guid.Empty } };
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
         var result = await target.ValidateAsync(command).ConfigureAwait(false);

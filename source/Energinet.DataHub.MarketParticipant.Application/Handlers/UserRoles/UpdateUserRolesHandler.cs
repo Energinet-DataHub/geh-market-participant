@@ -98,6 +98,7 @@ public sealed class UpdateUserRolesHandler
         await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
             user.Id,
             new UserRoleAssignmentAuditLogEntry(
+                user.Id,
                 userRoleAssignment.ActorId,
                 userRoleAssignment.UserRoleId,
                 new UserId(_userContext.CurrentUser.UserId),

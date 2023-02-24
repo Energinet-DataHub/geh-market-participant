@@ -56,6 +56,8 @@ public sealed class UserInvitationServiceTests
                 EicFunction.BalanceResponsibleParty)
         });
 
+    private readonly UserId _validInvitedByUserId = new UserId(Guid.NewGuid());
+
     [Fact]
     public async Task InviteUserAsync_NoUser_CreatesAndSavesUser()
     {
@@ -64,17 +66,21 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object);
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object);
 
         var invitation = _validInvitation;
 
         // Act
-        await target.InviteUserAsync(invitation);
+        await target.InviteUserAsync(invitation, _validInvitedByUserId);
 
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
@@ -89,6 +95,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
         organizationDomainValidationServiceMock
             .Setup(organizationDomainValidationService =>
@@ -101,12 +109,14 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object);
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object);
 
         var invitation = _validInvitation;
 
         // Act + Assert
-        await Assert.ThrowsAsync<ValidationException>(() => target.InviteUserAsync(invitation));
+        await Assert.ThrowsAsync<ValidationException>(() => target.InviteUserAsync(invitation, _validInvitedByUserId));
 
         userRepositoryMock.Verify(
             userRepository => userRepository.AddOrUpdateAsync(It.IsAny<User>()),
@@ -129,6 +139,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
@@ -146,12 +158,14 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object);
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object);
 
         var invitation = _validInvitation;
 
         // Act
-        await target.InviteUserAsync(invitation);
+        await target.InviteUserAsync(invitation, _validInvitedByUserId);
 
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
@@ -166,6 +180,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -192,12 +208,14 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object);
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object);
 
         var invitation = _validInvitation;
 
         // Act
-        await target.InviteUserAsync(invitation);
+        await target.InviteUserAsync(invitation, _validInvitedByUserId);
 
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
@@ -211,6 +229,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -237,12 +257,14 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object);
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object);
 
         var invitation = _validInvitation;
 
         // Act
-        await target.InviteUserAsync(invitation);
+        await target.InviteUserAsync(invitation, _validInvitedByUserId);
 
         // Assert
         var expectedRole = _validInvitation.AssignedRoles.Single();
@@ -264,6 +286,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -290,12 +314,14 @@ public sealed class UserInvitationServiceTests
             userRepositoryMock.Object,
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object);
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object);
 
         var invitation = _validInvitation;
 
         // Act
-        await target.InviteUserAsync(invitation);
+        await target.InviteUserAsync(invitation, _validInvitedByUserId);
 
         // Assert
         emailEventRepositoryMock.Verify(emailEventRepository => emailEventRepository.InsertAsync(

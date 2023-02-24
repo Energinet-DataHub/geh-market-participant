@@ -16,4 +16,6 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetUserAuditLogResponse(IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs);
+public sealed record GetUserAuditLogResponse(
+    IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
+    IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs);

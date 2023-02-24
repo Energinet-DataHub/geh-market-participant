@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
-
-public sealed record UserRoleAssignmentAuditLogEntryDto(
-    Guid UserId,
-    Guid ActorId,
-    Guid UserRoleId,
-    Guid ChangedByUserId,
-    DateTimeOffset Timestamp,
-    UserRoleAssignmentTypeAuditLog AssignmentType);
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public sealed record UserInviteAuditLogEntryDto(
+        Guid UserId,
+        Guid ChangedByUserId,
+        Guid ActorId,
+        string ActorName,
+        DateTimeOffset Timestamp);
+}
