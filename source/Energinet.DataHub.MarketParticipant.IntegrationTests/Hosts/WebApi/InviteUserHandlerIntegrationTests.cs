@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -60,6 +61,9 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
             new[] { Permission.ActorManage },
             EicFunction.DataHubAdministrator);
 
+        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");
+        var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
+
         var invitation = new UserInvitationDto(
             TestUserEmail,
             "Invitation Integration Tests",
@@ -68,7 +72,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
             actor.Id,
             new[] { userRole.Id });
 
-        var command = new InviteUserCommand(invitation);
+        var command = new InviteUserCommand(invitation, invitedByUser.Id);
 
         // Act
         await mediator.Send(command);
@@ -86,6 +90,18 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         var userIdentityRepository = scope.GetInstance<IUserIdentityRepository>();
         var createdUserIdentity = await userIdentityRepository.GetAsync(createdExternalUserId);
         Assert.NotNull(createdUserIdentity);
+
+        var userInviteAuditLogEntryRepository = scope.GetInstance<IUserInviteAuditLogEntryRepository>();
+        var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser!.Id);
+        Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
+
+        var userRoleAssignmentAuditLogEntryRepository = scope.GetInstance<IUserRoleAssignmentAuditLogEntryRepository>();
+        var assignmentAuditLogEntries = await userRoleAssignmentAuditLogEntryRepository.GetAsync(createdUser.Id);
+        Assert.Single(assignmentAuditLogEntries, e =>
+            e.ChangedByUserId.Value == invitedByUser.Id &&
+            e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added &&
+            e.ActorId == actor.Id &&
+            e.UserId == createdUser.Id);
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);

@@ -45,6 +45,8 @@ public sealed class InviteUserHandlerTests
         Guid.NewGuid(),
         new[] { Guid.NewGuid() });
 
+    private static readonly Guid _validInvitedByUserId = Guid.NewGuid();
+
     [Fact]
     public async Task Handle_MissingActor_ThrowsException()
     {
@@ -60,7 +62,7 @@ public sealed class InviteUserHandlerTests
             actorQueryRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
-        var inviteUserCommand = new InviteUserCommand(_validInvitation);
+        var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(inviteUserCommand, default));
@@ -108,7 +110,7 @@ public sealed class InviteUserHandlerTests
             actorQueryRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
-        var inviteUserCommand = new InviteUserCommand(_validInvitation);
+        var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
 
         // Act + Assert
         await Assert.ThrowsAsync<ValidationException>(() => target.Handle(inviteUserCommand, default));
@@ -156,7 +158,7 @@ public sealed class InviteUserHandlerTests
             actorQueryRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
-        var inviteUserCommand = new InviteUserCommand(_validInvitation);
+        var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
 
         // Act + Assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(inviteUserCommand, default));
@@ -214,19 +216,21 @@ public sealed class InviteUserHandlerTests
             actorQueryRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
-        var inviteUserCommand = new InviteUserCommand(_validInvitation);
+        var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
 
         // Act
         await target.Handle(inviteUserCommand, default);
 
         // Assert
-        userInvitationServiceMock.Verify(userInvitationService => userInvitationService.InviteUserAsync(It.Is<UserInvitation>(ui =>
-            ui.Email.Address == _validInvitation.Email &&
-            ui.FirstName == _validInvitation.FirstName &&
-            ui.LastName == _validInvitation.LastName &&
-            ui.PhoneNumber.Number == _validInvitation.PhoneNumber &&
-            ui.RequiredAuthentication is SmsAuthenticationMethod &&
-            ui.AssignedActor.Id == _validInvitation.AssignedActor &&
-            ui.AssignedRoles.Single().Id.Value == _validInvitation.AssignedRoles.Single())));
+        userInvitationServiceMock.Verify(userInvitationService => userInvitationService.InviteUserAsync(
+            It.Is<UserInvitation>(ui =>
+                ui.Email.Address == _validInvitation.Email &&
+                ui.FirstName == _validInvitation.FirstName &&
+                ui.LastName == _validInvitation.LastName &&
+                ui.PhoneNumber.Number == _validInvitation.PhoneNumber &&
+                ui.RequiredAuthentication is SmsAuthenticationMethod &&
+                ui.AssignedActor.Id == _validInvitation.AssignedActor &&
+                ui.AssignedRoles.Single().Id.Value == _validInvitation.AssignedRoles.Single()),
+            It.Is<UserId>(u => u.Value == _validInvitedByUserId)));
     }
 }

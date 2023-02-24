@@ -27,10 +27,14 @@ public sealed class GetUserAuditLogEntriesHandler
     : IRequestHandler<GetUserAuditLogsCommand, GetUserAuditLogResponse>
 {
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
 
-    public GetUserAuditLogEntriesHandler(IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
+    public GetUserAuditLogEntriesHandler(
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
+        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository)
     {
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
+        _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
     }
 
     public async Task<GetUserAuditLogResponse> Handle(
@@ -43,16 +47,31 @@ public sealed class GetUserAuditLogEntriesHandler
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        return new GetUserAuditLogResponse(roleAssignmentAuditLogs.Select(Map));
+        var userInviteLogs = await _userInviteAuditLogEntryRepository
+            .GetAsync(new UserId(request.UserId))
+            .ConfigureAwait(false);
+
+        return new GetUserAuditLogResponse(roleAssignmentAuditLogs.Select(Map), userInviteLogs.Select(MapInvites));
     }
 
     private static UserRoleAssignmentAuditLogEntryDto Map(UserRoleAssignmentAuditLogEntry auditLogEntry)
     {
         return new UserRoleAssignmentAuditLogEntryDto(
+            auditLogEntry.UserId.Value,
             auditLogEntry.ActorId,
             auditLogEntry.UserRoleId.Value,
             auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.Timestamp,
             auditLogEntry.AssignmentType);
+    }
+
+    private static UserInviteAuditLogEntryDto MapInvites(UserInviteDetailsAuditLogEntry auditLogEntry)
+    {
+        return new UserInviteAuditLogEntryDto(
+            auditLogEntry.UserId.Value,
+            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.ActorId,
+            auditLogEntry.ActorName,
+            auditLogEntry.Timestamp);
     }
 }

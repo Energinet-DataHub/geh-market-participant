@@ -23,46 +23,43 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
-    public sealed class UserRoleAssignmentAuditLogEntryRepository : IUserRoleAssignmentAuditLogEntryRepository
+    public sealed class UserInviteAuditLogEntryRepository : IUserInviteAuditLogEntryRepository
     {
         private readonly IMarketParticipantDbContext _context;
 
-        public UserRoleAssignmentAuditLogEntryRepository(IMarketParticipantDbContext context)
+        public UserInviteAuditLogEntryRepository(IMarketParticipantDbContext context)
         {
             _context = context;
         }
 
-        public async Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId)
+        public async Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId)
         {
-            var userRoleAssignmentLogs = _context.UserRoleAssignmentAuditLogEntries
-                .Where(e => e.UserId == userId.Value)
-                .Select(log => new UserRoleAssignmentAuditLogEntry(
+            var logQuery = from log in _context.UserInviteAuditLogEntries
+                join actor in _context.Actors on log.ActorId equals actor.Id
+                where log.UserId == userId.Value
+                select new UserInviteDetailsAuditLogEntry(
                     new UserId(log.UserId),
-                    log.ActorId,
-                    new UserRoleId(log.UserRoleId),
                     new UserId(log.ChangedByUserId),
-                    log.Timestamp,
-                    (UserRoleAssignmentTypeAuditLog)log.AssignmentType));
+                    log.ActorId,
+                    actor.Name,
+                    log.Timestamp);
 
-            return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
+            return await logQuery.ToListAsync().ConfigureAwait(false);
         }
 
-        public Task InsertAuditLogEntryAsync(UserId userId, UserRoleAssignmentAuditLogEntry logEntry)
+        public Task InsertAuditLogEntryAsync(UserInviteAuditLogEntry logEntry)
         {
-            ArgumentNullException.ThrowIfNull(userId);
             ArgumentNullException.ThrowIfNull(logEntry);
 
-            var entity = new UserRoleAssignmentAuditLogEntryEntity
+            var entity = new UserInviteAuditLogEntryEntity
             {
-                UserId = userId.Value,
-                ActorId = logEntry.ActorId,
-                UserRoleId = logEntry.UserRoleId.Value,
+                UserId = logEntry.UserId.Value,
                 Timestamp = logEntry.Timestamp,
                 ChangedByUserId = logEntry.ChangedByUserId.Value,
-                AssignmentType = (int)logEntry.AssignmentType
+                ActorId = logEntry.ActorId
             };
 
-            _context.UserRoleAssignmentAuditLogEntries.Add(entity);
+            _context.UserInviteAuditLogEntries.Add(entity);
 
             return _context.SaveChangesAsync();
         }

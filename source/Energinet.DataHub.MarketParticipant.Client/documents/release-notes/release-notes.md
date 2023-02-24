@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.21.0
+
+- Updated user audit log with invites
+- Added user id to user role assignment audit log
+
 ## Version 2.20.0
 
 - UserRoleWithPermissionsDto updated to contain list of permission details
