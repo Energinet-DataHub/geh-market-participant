@@ -55,6 +55,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             foreach (var appRole in application.AppRoles)
             {
+                /*
+        BillingAgent = 3,
+        EnergySupplier = 12,
+        GridAccessProvider = 14,
+        ImbalanceSettlementResponsible = 15,
+        MeteredDataAdministrator = 23,
+        MeteredDataResponsible = 26,
+        MeteringPointAdministrator = 27,
+        SystemOperator = 45,
+        DanishEnergyAgency = 48,
+        ElOverblik = 49,
+        DataHubAdministrator = 50,
+        IndependentAggregator = 51,
+        SerialEnergyTrader = 52
+                 */
                 switch (appRole.Value)
                 {
                     case "balanceresponsibleparty":

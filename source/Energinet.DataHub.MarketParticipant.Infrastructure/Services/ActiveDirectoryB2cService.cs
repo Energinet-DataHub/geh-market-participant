@@ -55,8 +55,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
-            var b2CPermissions = await MapBusinessRoleCodesToB2CRoleIdsAsync(roles).ConfigureAwait(false);
+            var b2CPermissions = await MapEicFunctionsToB2CRoleIdsAsync(permissions).ConfigureAwait(false);
             var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
+
             try
             {
                 var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
@@ -142,6 +143,26 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
                 throw;
             }
+        }
+
+        private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CRoleIdsAsync(IEnumerable<EicFunction> eicFunctions)
+        {
+            var roles = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
+            var b2CIds = new List<Guid>();
+
+            foreach (var eicFunction in eicFunctions)
+            {
+                switch (eicFunction)
+                {
+                    case EicFunction.BillingAgent:
+                        b2CIds.Add(roles.DdkId);
+                        break;
+                    default:
+                        throw new ArgumentNullException(nameof(eicFunctions));
+                }
+            }
+
+            return b2CIds;
         }
 
         private async Task<IEnumerable<Guid>> MapBusinessRoleCodesToB2CRoleIdsAsync(IEnumerable<BusinessRoleCode> businessRoleCodes)
