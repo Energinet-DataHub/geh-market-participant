@@ -66,29 +66,6 @@ public sealed class MarketParticipantClientTests
         {
             ""OrganizationId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
             ""Name"": ""unit test"",
-            ""Actors"": [
-                {
-                    ""ActorId"": ""8a46b5ac-4c7d-48c0-3f16-08da0279759b"",
-                    ""ExternalActorId"": ""75ea715f-381e-46fd-831b-5b61b9db7862"",
-                    ""ActorNumber"": {
-                        ""Value"": ""9656626091925""
-                    },
-                    ""Status"": ""Active"",
-                    ""MarketRoles"": [
-                        {
-                            ""EicFunction"": ""IndependentAggregator"",
-                            ""GridAreas"": [
-                                {
-                                    ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
-                                    ""MeteringPointTypes"": [
-                                        ""D01VeProduction""
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
             ""BusinessRegisterIdentifier"": ""87654321"",
             ""address"": {
                 ""streetName"": ""Testvej"",
@@ -113,11 +90,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"), actualOrganization.OrganizationId);
         Assert.Equal("unit test", actualOrganization.Name);
 
-        var actualActor = actualOrganization.Actors.Single();
-        Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
-        Assert.Equal(Guid.Parse("75ea715f-381e-46fd-831b-5b61b9db7862"), actualActor.ExternalActorId);
-        Assert.Equal("9656626091925", actualActor.ActorNumber.Value);
-        Assert.Equal(ActorStatus.Active, actualActor.Status);
         Assert.Equal(_validBusinessRegisterIdentifier, actualOrganization.BusinessRegisterIdentifier);
         Assert.Equal(_validAddress.City, actualOrganization.Address.City);
         Assert.Equal(_validAddress.Country, actualOrganization.Address.Country);
@@ -125,9 +97,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(_validAddress.StreetName, actualOrganization.Address.StreetName);
         Assert.Equal(_validAddress.ZipCode, actualOrganization.Address.ZipCode);
         Assert.Equal("Test Comment", actualOrganization.Comment);
-
-        var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -139,29 +108,6 @@ public sealed class MarketParticipantClientTests
                     {
                         ""OrganizationId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
                         ""Name"": ""unit test"",
-                        ""Actors"": [
-                            {
-                                ""ActorId"": ""8a46b5ac-4c7d-48c0-3f16-08da0279759b"",
-                                ""ExternalActorId"": ""75ea715f-381e-46fd-831b-5b61b9db7862"",
-                                ""ActorNumber"": {
-                                    ""Value"": ""9656626091925""
-                                },
-                                ""Status"": ""Active"",
-                                ""MarketRoles"": [
-                                    {
-                                        ""EicFunction"": ""IndependentAggregator"",
-                                        ""GridAreas"": [
-                                            {
-                                                ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
-                                                ""MeteringPointTypes"": [
-                                                    ""D01VeProduction""
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ],
                         ""BusinessRegisterIdentifier"": ""87654321"",
                         ""address"": {
                             ""streetName"": ""Testvej"",
@@ -175,29 +121,6 @@ public sealed class MarketParticipantClientTests
                     {
                         ""OrganizationId"": ""c4d950f7-0acf-439b-9bb6-610255218c6e"",
                         ""Name"": ""unit test 2"",
-                        ""Actors"": [
-                            {
-                                ""ActorId"": ""f6792b0b-7dee-4e70-b9d9-46b727e6748b"",
-                                ""ExternalActorId"": ""dfef92e2-923e-43aa-8706-ac7445cddfb3"",
-                                ""ActorNumber"": {
-                                    ""Value"": ""8574664796620""
-                                },
-                                ""Status"": ""New"",
-                                ""MarketRoles"": [
-                                    {
-                                        ""EicFunction"": ""BillingAgent"",
-                                        ""GridAreas"": [
-                                            {
-                                                ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
-                                                ""MeteringPointTypes"": [
-                                                    ""D01VeProduction""
-                                                ]
-                                            }
-                                        ]
-                                    }
-                                ]
-                            }
-                        ],
                         ""BusinessRegisterIdentifier"": ""87654321"",
                         ""address"": {
                             ""streetName"": ""Testvej"",
@@ -233,15 +156,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(_validAddress.ZipCode, firstOrganization.Address.ZipCode);
         Assert.Equal("Test Comment", firstOrganization.Comment);
 
-        var firstActor = firstOrganization.Actors.Single();
-        Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), firstActor.ActorId);
-        Assert.Equal(Guid.Parse("75ea715f-381e-46fd-831b-5b61b9db7862"), firstActor.ExternalActorId);
-        Assert.Equal("9656626091925", firstActor.ActorNumber.Value);
-        Assert.Equal(ActorStatus.Active, firstActor.Status);
-
-        var firstMarketRole = firstActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.IndependentAggregator, firstMarketRole.EicFunction);
-
         var secondOrganization = actual.Skip(1).First();
         Assert.Equal(Guid.Parse("c4d950f7-0acf-439b-9bb6-610255218c6e"), secondOrganization.OrganizationId);
         Assert.Equal("unit test 2", secondOrganization.Name);
@@ -252,15 +166,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(_validAddress.StreetName, secondOrganization.Address.StreetName);
         Assert.Equal(_validAddress.ZipCode, secondOrganization.Address.ZipCode);
         Assert.Equal("Test Comment 2", secondOrganization.Comment);
-
-        var secondActor = secondOrganization.Actors.Single();
-        Assert.Equal(Guid.Parse("f6792b0b-7dee-4e70-b9d9-46b727e6748b"), secondActor.ActorId);
-        Assert.Equal(Guid.Parse("dfef92e2-923e-43aa-8706-ac7445cddfb3"), secondActor.ExternalActorId);
-        Assert.Equal("8574664796620", secondActor.ActorNumber.Value);
-        Assert.Equal(ActorStatus.New, secondActor.Status);
-
-        var secondMarketRole = secondActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.BillingAgent, secondMarketRole.EicFunction);
     }
 
     [Fact]
@@ -271,29 +176,6 @@ public sealed class MarketParticipantClientTests
                 {
 	                ""OrganizationId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
 	                ""Name"": ""unit test"",
-	                ""Actors"": [
-		                {
-			                ""ActorId"": ""8a46b5ac-4c7d-48c0-3f16-08da0279759b"",
-			                ""ExternalActorId"": ""75ea715f-381e-46fd-831b-5b61b9db7862"",
-			                ""ActorNumber"": {
-				                ""Value"": ""9656626091925""
-			                },
-			                ""Status"": ""Active"",
-                            ""MarketRoles"": [
-                                {
-                                    ""EicFunction"": ""IndependentAggregator"",
-                                    ""GridAreas"": [
-                                        {
-                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
-                                            ""MeteringPointTypes"": [
-                                                ""D01VeProduction""
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-		                }
-                    ],
                     ""BusinessRegisterIdentifier"": ""87654321"",
                     ""address"": {
                         ""streetName"": ""Testvej"",
@@ -324,15 +206,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(_validAddress.StreetName, actual.Address.StreetName);
         Assert.Equal(_validAddress.ZipCode, actual.Address.ZipCode);
         Assert.Equal("Test Comment", actual.Comment);
-
-        var actualActor = actual.Actors.Single();
-        Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
-        Assert.Equal(Guid.Parse("75ea715f-381e-46fd-831b-5b61b9db7862"), actualActor.ExternalActorId);
-        Assert.Equal("9656626091925", actualActor.ActorNumber.Value);
-        Assert.Equal(ActorStatus.Active, actualActor.Status);
-
-        var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -343,30 +216,7 @@ public sealed class MarketParticipantClientTests
                 {
 	                ""OrganizationId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
 	                ""Name"": ""unit test"",
-	                ""Actors"": [
-		                {
-			                ""ActorId"": ""8a46b5ac-4c7d-48c0-3f16-08da0279759b"",
-			                ""ExternalActorId"": ""75ea715f-381e-46fd-831b-5b61b9db7862"",
-			                ""ActorNumber"": {
-				                ""Value"": ""9656626091925""
-			                },
-			                ""Status"": ""Active"",
-                            ""MarketRoles"": [
-                                {
-                                    ""EicFunction"": ""IndependentAggregator"",
-                                    ""GridAreas"": [
-                                        {
-                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
-                                            ""MeteringPointTypes"": [
-                                                ""D01VeProduction""
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-		                }
-                    ],
-                    ""BusinessRegisterIdentifier"": ""87654321"",
+	                ""BusinessRegisterIdentifier"": ""87654321"",
                     ""address"": {
                         ""streetName"": ""Testvej"",
                         ""number"": ""2"",
@@ -406,15 +256,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(_validAddress.ZipCode, createdOrg.Address.ZipCode);
         Assert.Equal(_validDomain, createdOrg.Domain);
         Assert.Equal("Test Comment", createdOrg.Comment);
-
-        var actualActor = createdOrg.Actors.Single();
-        Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
-        Assert.Equal(Guid.Parse("75ea715f-381e-46fd-831b-5b61b9db7862"), actualActor.ExternalActorId);
-        Assert.Equal("9656626091925", actualActor.ActorNumber.Value);
-        Assert.Equal(ActorStatus.Active, actualActor.Status);
-
-        var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -425,30 +266,7 @@ public sealed class MarketParticipantClientTests
                 {
 	                ""OrganizationId"": ""fb6665a1-b7be-4744-a8ce-08da0272c916"",
 	                ""Name"": ""unit test 2"",
-	                ""Actors"": [
-		                {
-			                ""ActorId"": ""8a46b5ac-4c7d-48c0-3f16-08da0279759b"",
-			                ""ExternalActorId"": ""75ea715f-381e-46fd-831b-5b61b9db7862"",
-			                ""ActorNumber"": {
-				                ""Value"": ""9656626091925""
-			                },
-			                ""Status"": ""Active"",
-                            ""MarketRoles"": [
-                                {
-                                    ""EicFunction"": ""IndependentAggregator"",
-                                    ""GridAreas"": [
-                                        {
-                                            ""Id"": ""1436B548-927B-4B3E-98BC-152FB8F48A88"",
-                                            ""MeteringPointTypes"": [
-                                                ""D01VeProduction""
-                                            ]
-                                        }
-                                    ]
-                                }
-                            ]
-		                }
-                    ],
-                    ""BusinessRegisterIdentifier"": ""87654321"",
+	                ""BusinessRegisterIdentifier"": ""87654321"",
                     ""address"": {
                         ""streetName"": ""Testvej"",
                         ""number"": ""2"",
@@ -489,15 +307,6 @@ public sealed class MarketParticipantClientTests
         Assert.Equal(changedAddress.ZipCode, changedOrg.Address.ZipCode);
         Assert.Equal("Test Comment 2", changedOrg.Comment);
         Assert.Equal(OrganizationStatus.Active, changedOrg.Status);
-
-        var actualActor = changedOrg.Actors.Single();
-        Assert.Equal(Guid.Parse("8a46b5ac-4c7d-48c0-3f16-08da0279759b"), actualActor.ActorId);
-        Assert.Equal(Guid.Parse("75ea715f-381e-46fd-831b-5b61b9db7862"), actualActor.ExternalActorId);
-        Assert.Equal("9656626091925", actualActor.ActorNumber.Value);
-        Assert.Equal(ActorStatus.Active, actualActor.Status);
-
-        var actualMarketRole = actualActor.MarketRoles.Single();
-        Assert.Equal(EicFunction.IndependentAggregator, actualMarketRole.EicFunction);
     }
 
     [Fact]
@@ -524,9 +333,8 @@ public sealed class MarketParticipantClientTests
         httpTest.RespondWith(incomingJson);
 
         // Act
-        var actual = await target.GetActorAsync(
-                Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916"),
-                Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"))
+        var actual = await target
+            .GetActorAsync(Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59"))
             .ConfigureAwait(false);
 
         // Assert
@@ -671,15 +479,15 @@ public sealed class MarketParticipantClientTests
 
         // Act
         var createdActorId = await target.CreateActorAsync(
-                orgId,
                 new CreateActorDto(
+                    orgId,
                     new ActorNumberDto("123456"),
                     new ActorNameDto("ActorName"),
                     Array.Empty<ActorMarketRoleDto>()))
             .ConfigureAwait(false);
 
         var actual = await target
-            .GetActorAsync(orgId, createdActorId)
+            .GetActorAsync(createdActorId)
             .ConfigureAwait(false);
 
         // Assert
@@ -728,13 +536,11 @@ public sealed class MarketParticipantClientTests
         using var httpTest = new HttpTest();
         using var clientFactory = new PerBaseUrlFlurlClientFactory();
         var target = CreateMarketParticipantClient(clientFactory);
-        var orgId = Guid.Parse("fb6665a1-b7be-4744-a8ce-08da0272c916");
         var actorId = Guid.Parse("361fb10a-4204-46b6-bf9e-171ab2e61a59");
         httpTest.RespondWith(createdActorJson);
 
         // Act
         await target.UpdateActorAsync(
-                orgId,
                 actorId,
                 new ChangeActorDto(
                     ActorStatus.Active,
@@ -743,7 +549,7 @@ public sealed class MarketParticipantClientTests
             .ConfigureAwait(false);
 
         var actual = await target
-            .GetActorAsync(orgId, actorId)
+            .GetActorAsync(actorId)
             .ConfigureAwait(false);
 
         // Assert
@@ -779,7 +585,7 @@ public sealed class MarketParticipantClientTests
         httpTest.RespondWith(incomingJson);
 
         // Act
-        var actual = await target.GetContactsAsync(Guid.NewGuid(), Guid.NewGuid()).ConfigureAwait(false);
+        var actual = await target.GetContactsAsync(Guid.NewGuid()).ConfigureAwait(false);
 
         // Assert
         var actualContact = actual.Single();
@@ -802,7 +608,6 @@ public sealed class MarketParticipantClientTests
 
         // Act
         var contactId = await target.CreateContactAsync(
-                Guid.NewGuid(),
                 Guid.NewGuid(),
                 new CreateActorContactDto("unit test", ContactCategory.Charges, "email", "phone"))
             .ConfigureAwait(false);
