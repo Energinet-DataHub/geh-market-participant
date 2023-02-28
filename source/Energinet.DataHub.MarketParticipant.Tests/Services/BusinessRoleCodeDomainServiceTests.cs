@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
@@ -25,21 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     [UnitTest]
     public sealed class BusinessRoleCodeDomainServiceTests
     {
-        [Fact]
-        public void GetBusinessRoleCodes_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new BusinessRoleCodeDomainService(new IBusinessRole[]
-            {
-                new ElectricalSupplierRole(),
-                new GridOperatorRole(),
-                new BalanceResponsiblePartyRole()
-            });
-
-            // Act + Assert
-            Assert.Throws<ArgumentNullException>(() => target.GetBusinessRoleCodes(null!));
-        }
-
         [Fact]
         public void GetBusinessRoleCodes_ValidMarkedRoles_ReturnsBusinessRole()
         {

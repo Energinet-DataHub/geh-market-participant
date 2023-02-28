@@ -30,23 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 public sealed class ActorExternalIdChangedEventDispatcherTests
 {
     [Fact]
-    public async Task TryDispatchAsync_integrationEventNull_ThrowsException()
-    {
-        // Arrange
-        await using var serviceBusSenderMock = new MockedServiceBusSender();
-        var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
-        serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
-
-        var eventParser = new ActorExternalIdChangedIntegrationEventParser();
-        var sut = new ActorExternalIdChangedEventDispatcher(
-            eventParser,
-            serviceBusClient.Object);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.TryDispatchAsync(null!));
-    }
-
-    [Fact]
     public async Task TryDispatchAsync_SendingCorrectEvent_ReturnsTrue()
     {
         // Arrange

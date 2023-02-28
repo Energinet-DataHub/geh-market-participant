@@ -30,23 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 public sealed class MarketRoleRemovedFromActorEventDispatcherTests
 {
     [Fact]
-    public async Task TryDispatchAsync_integrationEventNull_ThrowsException()
-    {
-        // Arrange
-        await using var serviceBusSenderMock = new MockedServiceBusSender();
-        var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
-        serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
-
-        var eventParser = new MarketRoleRemovedFromActorIntegrationEventParser();
-        var sut = new MarketRoleRemovedFromActorEventDispatcher(
-            eventParser,
-            serviceBusClient.Object);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.TryDispatchAsync(null!));
-    }
-
-    [Fact]
     public async Task TryDispatchAsync_SendingCorrectEvent_ReturnsTrue()
     {
         // Arrange

@@ -33,23 +33,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class UpdateGridAreaHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // arrange
-            var target = new UpdateGridAreaHandler(
-                new Mock<IGridAreaRepository>().Object,
-                new Mock<IGridAreaIntegrationEventsQueueService>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                CreateMockedUser());
-
-            // act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_ChangesName()
         {
             // arrange

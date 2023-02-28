@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -27,16 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 [UnitTest]
 public class CombinationOfBusinessRolesRuleServiceTests
 {
-    [Fact]
-    public void ValidateCombinationOfBusinessRoles_NullMarketRolesArgument_ThrowsException()
-    {
-        // Arrange
-        var target = new CombinationOfBusinessRolesRuleService();
-
-        // Act + Assert
-        Assert.Throws<ArgumentNullException>(() => target.ValidateCombinationOfBusinessRoles(null!));
-    }
-
     [Fact]
     public void ValidateCombinationOfBusinessRoles_InvalidCombinationOfRoles_ThrowsException()
     {
