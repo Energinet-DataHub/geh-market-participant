@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -71,7 +72,7 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
         var entry = new UserInviteAuditLogEntry(
              new UserId(user.Id),
              new UserId(userChangedBy.Id),
-             actor.Id,
+             new ActorId(actor.Id),
              DateTimeOffset.UtcNow);
 
         // Insert an audit log.

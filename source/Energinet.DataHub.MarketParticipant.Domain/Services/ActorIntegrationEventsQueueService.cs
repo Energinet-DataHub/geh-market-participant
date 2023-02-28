@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var actorUpdatedEvent = new ActorUpdatedIntegrationEvent
             {
-                OrganizationId = actor.OrganizationId,
+                OrganizationId = actor.OrganizationId.Value,
                 ActorId = actor.Id.Value,
                 ExternalActorId = actor.ExternalActorId,
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),

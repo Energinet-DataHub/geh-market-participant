@@ -45,16 +45,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new OrganizationCreatedIntegrationEvent
             {
-               Address = new Address(
+                Address = new Address(
                    "fake_value",
                    "fake_value",
                    "fake_value",
                    "fake_value",
                    "fake_value"),
-               Name = "fake_value",
-               OrganizationId = new OrganizationId(Guid.NewGuid()),
-               BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678"),
-               Status = OrganizationStatus.Active
+                Name = "fake_value",
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678"),
+                Status = OrganizationStatus.Active
             };
 
             // act
@@ -88,12 +88,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
-              ActorNumber = new MockedGln(),
-              Status = ActorStatus.Active,
-              ActorId = Guid.NewGuid(),
-              BusinessRoles = { BusinessRoleCode.Ddk },
-              OrganizationId = new OrganizationId(Guid.NewGuid()),
-              ExternalActorId = new ExternalActorId(Guid.NewGuid())
+                ActorNumber = new MockedGln(),
+                Status = ActorStatus.Active,
+                ActorId = Guid.NewGuid(),
+                BusinessRoles = { BusinessRoleCode.Ddk },
+                OrganizationId = Guid.NewGuid(),
+                ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };
 
             // act

@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 
                 var result = upgradeEngine.PerformUpgrade();
 
-                if (result.Successful == true)
+                if (result.Successful)
                     return true;
 
                 if (tryCount > 10)

@@ -20,4 +20,5 @@ public sealed class ActorSynchronizationEntity
 {
     public int Id { get; set; }
     public Guid ActorId { get; set; }
+    public Guid OrganizationId { get; set; }
 }

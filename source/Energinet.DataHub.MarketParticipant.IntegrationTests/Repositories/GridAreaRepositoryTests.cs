@@ -73,12 +73,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Assert
             Assert.NotNull(newGrid);
-            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
-            Assert.Equal(testGrid.Name.Value, newGrid?.Name.Value);
-            Assert.Equal(testGrid.Code, newGrid?.Code);
-            Assert.Equal(testGrid.PriceAreaCode, newGrid?.PriceAreaCode);
-            Assert.Equal(validFrom, newGrid?.ValidFrom);
-            Assert.Equal(validTo, newGrid?.ValidTo);
+            Assert.NotEqual(Guid.Empty, newGrid.Id.Value);
+            Assert.Equal(testGrid.Name.Value, newGrid.Name.Value);
+            Assert.Equal(testGrid.Code, newGrid.Code);
+            Assert.Equal(testGrid.PriceAreaCode, newGrid.PriceAreaCode);
+            Assert.Equal(validFrom, newGrid.ValidFrom);
+            Assert.Equal(validTo, newGrid.ValidTo);
         }
 
         [Fact]
@@ -113,13 +113,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Assert
             Assert.NotNull(newGrid);
-            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
-            Assert.Equal(gridId.Value, newGrid?.Id.Value);
-            Assert.Equal("234", newGrid?.Code.Value);
-            Assert.Equal("NewName", newGrid?.Name.Value);
-            Assert.Equal(PriceAreaCode.Dk2, newGrid?.PriceAreaCode);
-            Assert.Equal(validFrom.AddYears(2), newGrid?.ValidFrom);
-            Assert.Equal(validTo.AddYears(2), newGrid?.ValidTo);
+            Assert.NotEqual(Guid.Empty, newGrid.Id.Value);
+            Assert.Equal(gridId.Value, newGrid.Id.Value);
+            Assert.Equal("234", newGrid.Code.Value);
+            Assert.Equal("NewName", newGrid.Name.Value);
+            Assert.Equal(PriceAreaCode.Dk2, newGrid.PriceAreaCode);
+            Assert.Equal(validFrom.AddYears(2), newGrid.ValidFrom);
+            Assert.Equal(validTo.AddYears(2), newGrid.ValidTo);
         }
 
         [Fact]
@@ -156,13 +156,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Assert
             Assert.NotNull(newGrid);
-            Assert.NotEqual(Guid.Empty, newGrid?.Id.Value);
-            Assert.Equal(gridId.Value, newGrid?.Id.Value);
-            Assert.Equal("234", newGrid?.Code.Value);
-            Assert.Equal("NewName", newGrid?.Name.Value);
-            Assert.Equal(PriceAreaCode.Dk2, newGrid?.PriceAreaCode);
-            Assert.Equal(validFrom.AddYears(2), newGrid?.ValidFrom);
-            Assert.Equal(validTo.AddYears(2), newGrid?.ValidTo);
+            Assert.NotEqual(Guid.Empty, newGrid.Id.Value);
+            Assert.Equal(gridId.Value, newGrid.Id.Value);
+            Assert.Equal("234", newGrid.Code.Value);
+            Assert.Equal("NewName", newGrid.Name.Value);
+            Assert.Equal(PriceAreaCode.Dk2, newGrid.PriceAreaCode);
+            Assert.Equal(validFrom.AddYears(2), newGrid.ValidFrom);
+            Assert.Equal(validTo.AddYears(2), newGrid.ValidTo);
         }
 
         [Fact]

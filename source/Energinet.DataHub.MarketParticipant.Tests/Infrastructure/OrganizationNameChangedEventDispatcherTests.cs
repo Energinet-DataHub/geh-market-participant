@@ -75,12 +75,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
-              ActorNumber = new MockedGln(),
-              Status = ActorStatus.Active,
-              ActorId = Guid.NewGuid(),
-              BusinessRoles = { BusinessRoleCode.Ddk },
-              OrganizationId = new OrganizationId(Guid.NewGuid()),
-              ExternalActorId = new ExternalActorId(Guid.NewGuid())
+                ActorNumber = new MockedGln(),
+                Status = ActorStatus.Active,
+                ActorId = Guid.NewGuid(),
+                BusinessRoles = { BusinessRoleCode.Ddk },
+                OrganizationId = Guid.NewGuid(),
+                ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };
 
             // act

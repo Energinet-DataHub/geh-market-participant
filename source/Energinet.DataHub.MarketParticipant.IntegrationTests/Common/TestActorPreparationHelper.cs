@@ -42,9 +42,12 @@ internal static class TestActorPreparationHelper
             inputActor.MarketRoles.Add(localMarketRole);
         }
 
-        inputOrganization.Actors.Add(inputActor);
-
         await context.Organizations.AddAsync(inputOrganization);
+        await context.SaveChangesAsync();
+
+        inputActor.OrganizationId = inputOrganization.Id;
+
+        await context.Actors.AddAsync(inputActor);
         await context.SaveChangesAsync();
 
         return inputActor;

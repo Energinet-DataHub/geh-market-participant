@@ -99,7 +99,7 @@ public sealed class UserQueryRepositoryTests
         // Assert
         Assert.NotEmpty(actorIds);
         Assert.Single(actorIds);
-        Assert.Equal(actor.Id, actorIds.First());
+        Assert.Equal(actor.Id, actorIds.First().Value);
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = await userRepository
-            .GetPermissionsAsync(Guid.NewGuid(), new ExternalUserId(Guid.NewGuid()));
+            .GetPermissionsAsync(new ActorId(Guid.NewGuid()), new ExternalUserId(Guid.NewGuid()));
 
         // Assert
         Assert.Empty(perms);
@@ -132,7 +132,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = await userRepository
-            .GetPermissionsAsync(Guid.NewGuid(), new ExternalUserId(user.ExternalId));
+            .GetPermissionsAsync(new ActorId(Guid.NewGuid()), new ExternalUserId(user.ExternalId));
 
         // Assert
         Assert.Empty(perms);
@@ -161,7 +161,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -190,7 +190,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -220,7 +220,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -255,7 +255,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -295,11 +295,11 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var permsActor = (await userRepository
-            .GetPermissionsAsync(actor1.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor1.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         var permsActor2 = (await userRepository
-            .GetPermissionsAsync(actor2.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor2.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -340,7 +340,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var permsActor = (await userRepository
-            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -374,7 +374,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var perms = (await userRepository
-            .GetPermissionsAsync(actor.Id, new ExternalUserId(user.ExternalId)))
+            .GetPermissionsAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId)))
             .ToList();
 
         // Assert
@@ -407,7 +407,7 @@ public sealed class UserQueryRepositoryTests
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         // Act
-        var actual = await userRepository.IsFasAsync(actor.Id, new ExternalUserId(user.ExternalId));
+        var actual = await userRepository.IsFasAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId));
 
         // Assert
         Assert.Equal(isFas, actual);
@@ -439,7 +439,7 @@ public sealed class UserQueryRepositoryTests
 
         // Act
         var actual = await userRepository
-            .IsFasAsync(actor.Id, new ExternalUserId(user.ExternalId));
+            .IsFasAsync(new ActorId(actor.Id), new ExternalUserId(user.ExternalId));
 
         // Assert
         Assert.False(actual);

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
@@ -27,11 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection("IntegrationTest")]
     [IntegrationTest]
-    public sealed class UniqueActorMarketRoleGridAreaRepositoryTests
+    public sealed class MarketRoleAndGridAreaForActorReservationServiceTests
     {
         private readonly MarketParticipantDatabaseFixture _fixture;
 
-        public UniqueActorMarketRoleGridAreaRepositoryTests(MarketParticipantDatabaseFixture fixture)
+        public MarketRoleAndGridAreaForActorReservationServiceTests(MarketParticipantDatabaseFixture fixture)
         {
             _fixture = fixture;
         }
@@ -45,12 +44,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var gridArea = await CreateGridAreaAsync(context);
-            var actor = await CreateActorUnderNewOrganizationAsync(context);
+            var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
             var target = new MarketRoleAndGridAreaForActorReservationService(context);
 
             // Act
-            var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
+            var actual = await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
 
             // Assert
             Assert.True(actual);
@@ -65,15 +64,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var gridArea = await CreateGridAreaAsync(context);
-            var actor = await CreateActorUnderNewOrganizationAsync(context);
+            var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
             var target = new MarketRoleAndGridAreaForActorReservationService(context);
-            await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
+            await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
 
-            var newActor = await CreateActorUnderNewOrganizationAsync(context);
+            var newActor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
             // Act
-            var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(newActor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
+            var actual = await target.TryReserveAsync(newActor.Id, EicFunction.EnergySupplier, gridArea.Id);
 
             // Assert
             Assert.False(actual);
@@ -88,31 +87,27 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var gridArea = await CreateGridAreaAsync(context);
-            var actor = await CreateActorUnderNewOrganizationAsync(context);
+            var actor = await CreateActorUnderNewOrganizationAsync(_fixture, context);
 
             var target = new MarketRoleAndGridAreaForActorReservationService(context);
 
             // Act
-            var firstAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
-            var secondAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value));
-            await target.RemoveAsync(actor.Id);
-            var thirdAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
-            var fourthAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id.Value));
+            var firstAddResult = await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
+            var secondAddResult = await target.TryReserveAsync(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id);
+            await target.RemoveAllReservationsAsync(actor.Id);
+            await target.TryReserveAsync(actor.Id, EicFunction.EnergySupplier, gridArea.Id);
+            await target.TryReserveAsync(actor.Id, EicFunction.BalanceResponsibleParty, gridArea.Id);
 
             // Assert
             Assert.True(firstAddResult);
             Assert.True(secondAddResult);
         }
 
-        private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDbContext context)
+        private static async Task<Actor> CreateActorUnderNewOrganizationAsync(MarketParticipantDatabaseFixture fixture, MarketParticipantDbContext context)
         {
-            var organization = new Organization(Guid.NewGuid().ToString(), MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain(new MockedDomain()), null);
-            organization.Actors.Add(new Actor(new MockedGln()));
-
-            var repository = new OrganizationRepository(context);
-            var id = await repository.AddOrUpdateAsync(organization);
-            organization = (await repository.GetAsync(id.Value))!;
-            return organization.Actors.First();
+            var actor = await fixture.PrepareActorAsync();
+            var repository = new ActorRepository(context);
+            return (await repository.GetAsync(new ActorId(actor.Id)))!;
         }
 
         private static async Task<GridArea> CreateGridAreaAsync(MarketParticipantDbContext context)

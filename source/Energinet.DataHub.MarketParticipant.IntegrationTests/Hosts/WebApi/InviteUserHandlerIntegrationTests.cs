@@ -92,7 +92,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         Assert.NotNull(createdUserIdentity);
 
         var userInviteAuditLogEntryRepository = scope.GetInstance<IUserInviteAuditLogEntryRepository>();
-        var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser!.Id);
+        var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
 
         var userRoleAssignmentAuditLogEntryRepository = scope.GetInstance<IUserRoleAssignmentAuditLogEntryRepository>();
@@ -100,7 +100,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         Assert.Single(assignmentAuditLogEntries, e =>
             e.ChangedByUserId.Value == invitedByUser.Id &&
             e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added &&
-            e.ActorId == actor.Id &&
+            e.ActorId.Value == actor.Id &&
             e.UserId == createdUser.Id);
     }
 
