@@ -11,51 +11,41 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
-
-[ApiController]
-[Route("permissions")]
-public sealed class PermissionController : ControllerBase
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
-    private readonly ILogger<PermissionController> _logger;
-    private readonly IMediator _mediator;
-
-    public PermissionController(
-        ILogger<PermissionController> logger,
-        IUserContext<FrontendUser> userContext,
-        IMediator mediator)
+    [ApiController]
+    [Route("[controller]")]
+    public class PermissionController : ControllerBase
     {
-        _logger = logger;
-        _mediator = mediator;
-    }
+        private readonly ILogger<PermissionController> _logger;
+        private readonly IMediator _mediator;
+        public PermissionController(ILogger<PermissionController> logger, IMediator mediator)
+        {
+            _logger = logger;
+            _mediator = mediator;
+        }
 
-    [HttpPut]
-    [AuthorizeUser(Permission.UserRoleManage)]
-    public async Task<IActionResult> UpdateAsync(int id, string description)
-    {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                var command = new UpdatePermissionCommand(id, description);
-
-                await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
-
-                return Ok();
-            },
-            _logger).ConfigureAwait(false);
+        [HttpGet]
+        public async Task<IActionResult> ListAllAsync()
+        {
+            return await this.ProcessAsync(
+                async () =>
+                    {
+                        var getPermissionsCommand = new GetPermissionsCommand();
+                        var response = await _mediator
+                            .Send(getPermissionsCommand)
+                            .ConfigureAwait(false);
+                        return Ok(response.Permissions);
+                    },
+                _logger).ConfigureAwait(false);
+        }
     }
 }
