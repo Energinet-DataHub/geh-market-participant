@@ -33,10 +33,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public void ValidateRolesAcrossActors_NullActorsArgument_ThrowsException()
         {
             // Arrange
-            var target = new OverlappingBusinessRolesRuleService(new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new OverlappingEicFunctionsRuleService(new Mock<IBusinessRoleCodeDomainService>().Object);
 
             // Act
-            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(null!));
+            Assert.Throws<ArgumentNullException>(() => target.ValidateEicFunctionsAcrossActors(null!));
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var businessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
-            var target = new OverlappingBusinessRolesRuleService(businessRoleCodeDomainService.Object);
+            var target = new OverlappingEicFunctionsRuleService(businessRoleCodeDomainService.Object);
 
             businessRoleCodeDomainService.Setup(x => x.GetBusinessRoleCodes(It.IsAny<IEnumerable<EicFunction>>()))
                 .Returns(new[] { BusinessRoleCode.Ddk });
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
-            Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
+            Assert.Throws<ValidationException>(() => target.ValidateEicFunctionsAcrossActors(
                 new[]
                 {
                     actor
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var businessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
-            var target = new OverlappingBusinessRolesRuleService(businessRoleCodeDomainService.Object);
+            var target = new OverlappingEicFunctionsRuleService(businessRoleCodeDomainService.Object);
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
-            Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
+            Assert.Throws<ValidationException>(() => target.ValidateEicFunctionsAcrossActors(
                 new[]
                 {
                     actor,
@@ -95,7 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var businessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
-            var target = new OverlappingBusinessRolesRuleService(businessRoleCodeDomainService.Object);
+            var target = new OverlappingEicFunctionsRuleService(businessRoleCodeDomainService.Object);
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
-            Assert.Throws<ValidationException>(() => target.ValidateRolesAcrossActors(
+            Assert.Throws<ValidationException>(() => target.ValidateEicFunctionsAcrossActors(
                 new[]
                 {
                     actor,
@@ -124,7 +124,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var businessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
-            var target = new OverlappingBusinessRolesRuleService(businessRoleCodeDomainService.Object);
+            var target = new OverlappingEicFunctionsRuleService(businessRoleCodeDomainService.Object);
 
             businessRoleCodeDomainService
                 .Setup(x => x.GetBusinessRoleCodes(
@@ -145,7 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
-            target.ValidateRolesAcrossActors(
+            target.ValidateEicFunctionsAcrossActors(
                 new[]
                 {
                     actor,

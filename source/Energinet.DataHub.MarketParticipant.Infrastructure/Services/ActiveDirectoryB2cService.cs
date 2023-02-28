@@ -25,24 +25,21 @@ using CreateAppRegistrationResponse = Energinet.DataHub.MarketParticipant.Domain
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActiveDirectoryB2cService : IActiveDirectoryB2CService
+    public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
     {
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
         private readonly IActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
-        private readonly ILogger<ActiveDirectoryB2cService> _logger;
+        private readonly ILogger<ActiveDirectoryB2CService> _logger;
 
-        public ActiveDirectoryB2cService(
+        public ActiveDirectoryB2CService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
-            IBusinessRoleCodeDomainService businessRoleCodeDomainService,
             IActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
-            ILogger<ActiveDirectoryB2cService> logger)
+            ILogger<ActiveDirectoryB2CService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
             _activeDirectoryB2CRolesProvider = activeDirectoryB2CRolesProvider;
             _logger = logger;
         }
@@ -54,10 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
             ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
 
-            var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
-            var b2CPermissions = await MapEicFunctionsToB2CRoleIdsAsync(permissions).ConfigureAwait(false);
+            var b2CPermissions = (await MapEicFunctionsToB2CIdsAsync(permissions).ConfigureAwait(false)).ToList();
             var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
-
             try
             {
                 var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
@@ -79,7 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
@@ -111,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
@@ -140,72 +135,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
 
-        private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CRoleIdsAsync(IEnumerable<EicFunction> eicFunctions)
+        private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)
         {
-            var roles = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
+            var mappedEicFunction = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
             var b2CIds = new List<Guid>();
 
             foreach (var eicFunction in eicFunctions)
             {
-                switch (eicFunction)
-                {
-                    case EicFunction.BillingAgent:
-                        b2CIds.Add(roles.DdkId);
-                        break;
-                    default:
-                        throw new ArgumentNullException(nameof(eicFunctions));
-                }
-            }
+                if (mappedEicFunction.EicRolesMapped.ContainsKey(eicFunction))
+                    b2CIds.Add(mappedEicFunction.EicRolesMapped[eicFunction]);
 
-            return b2CIds;
-        }
-
-        private async Task<IEnumerable<Guid>> MapBusinessRoleCodesToB2CRoleIdsAsync(IEnumerable<BusinessRoleCode> businessRoleCodes)
-        {
-            var roles = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
-            var b2CIds = new List<Guid>();
-            foreach (var roleCode in businessRoleCodes)
-            {
-                switch (roleCode)
-                {
-                    case BusinessRoleCode.Ddk:
-                        b2CIds.Add(roles.DdkId);
-                        break;
-                    case BusinessRoleCode.Ddm:
-                        b2CIds.Add(roles.DdmId);
-                        break;
-                    case BusinessRoleCode.Ddq:
-                        b2CIds.Add(roles.DdqId);
-                        break;
-                    case BusinessRoleCode.Ddx:
-                        b2CIds.Add(roles.DdxId);
-                        break;
-                    case BusinessRoleCode.Ddz:
-                        b2CIds.Add(roles.DdzId);
-                        break;
-                    case BusinessRoleCode.Dgl:
-                        b2CIds.Add(roles.DglId);
-                        break;
-                    case BusinessRoleCode.Ez:
-                        b2CIds.Add(roles.EzId);
-                        break;
-                    case BusinessRoleCode.Mdr:
-                        b2CIds.Add(roles.MdrId);
-                        break;
-                    case BusinessRoleCode.Sts:
-                        b2CIds.Add(roles.StsId);
-                        break;
-                    case BusinessRoleCode.Tso:
-                        b2CIds.Add(roles.TsoId);
-                        break;
-                    default:
-                        throw new ArgumentNullException(nameof(businessRoleCodes));
-                }
+                throw new ArgumentNullException(nameof(eicFunctions));
             }
 
             return b2CIds;
@@ -236,7 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
 
@@ -55,52 +56,49 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             foreach (var appRole in application.AppRoles)
             {
-                /*
-        BillingAgent = 3,
-        EnergySupplier = 12,
-        GridAccessProvider = 14,
-        ImbalanceSettlementResponsible = 15,
-        MeteredDataAdministrator = 23,
-        MeteredDataResponsible = 26,
-        MeteringPointAdministrator = 27,
-        SystemOperator = 45,
-        DanishEnergyAgency = 48,
-        ElOverblik = 49,
-        DataHubAdministrator = 50,
-        IndependentAggregator = 51,
-        SerialEnergyTrader = 52
-                 */
                 switch (appRole.Value)
                 {
                     case "balanceresponsibleparty":
-                        _activeDirectoryB2CRoles.DdkId = appRole.Id!.Value;
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.BalanceResponsibleParty, appRole.Id!.Value);
                         break;
-                    case "gridoperator":
-                        _activeDirectoryB2CRoles.DdmId = appRole.Id!.Value;
+                    case "gridaccessprovider":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.GridAccessProvider, appRole.Id!.Value);
                         break;
-                    case "electricalsupplier":
-                        _activeDirectoryB2CRoles.DdqId = appRole.Id!.Value;
+                    case "billingagent":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.BillingAgent, appRole.Id!.Value);
                         break;
-                    case "imbalancesettlementresponsible":
-                        _activeDirectoryB2CRoles.DdxId = appRole.Id!.Value;
+                    case "eloverblik":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.ElOverblik, appRole.Id!.Value);
                         break;
-                    case "meteringpointadministrator":
-                        _activeDirectoryB2CRoles.DdzId = appRole.Id!.Value;
+                    case "energysupplier":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.EnergySupplier, appRole.Id!.Value);
                         break;
-                    case "metereddataadministrator":
-                        _activeDirectoryB2CRoles.DglId = appRole.Id!.Value;
+                    case "independentaggregator":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.IndependentAggregator, appRole.Id!.Value);
                         break;
                     case "systemoperator":
-                        _activeDirectoryB2CRoles.EzId = appRole.Id!.Value;
-                        break;
-                    case "meterdataresponsible":
-                        _activeDirectoryB2CRoles.MdrId = appRole.Id!.Value;
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.SystemOperator, appRole.Id!.Value);
                         break;
                     case "danishenergyagency":
-                        _activeDirectoryB2CRoles.StsId = appRole.Id!.Value;
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.DanishEnergyAgency, appRole.Id!.Value);
                         break;
-                    case "transmissionsystemoperator":
-                        _activeDirectoryB2CRoles.TsoId = appRole.Id!.Value;
+                    case "dataHubadministrator":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.DataHubAdministrator, appRole.Id!.Value);
+                        break;
+                    case "imbalancesettlementresponsible":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.ImbalanceSettlementResponsible, appRole.Id!.Value);
+                        break;
+                    case "metereddataadministrator":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataAdministrator, appRole.Id!.Value);
+                        break;
+                    case "metereddataresponsible":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataResponsible, appRole.Id!.Value);
+                        break;
+                    case "meteringpointadministrator":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteringPointAdministrator, appRole.Id!.Value);
+                        break;
+                    case "serialenergytrader":
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.SerialEnergyTrader, appRole.Id!.Value);
                         break;
                     default:
                         throw new InvalidOperationException(

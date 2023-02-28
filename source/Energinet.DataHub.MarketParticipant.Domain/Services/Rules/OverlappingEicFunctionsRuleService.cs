@@ -20,16 +20,13 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
-    public sealed class OverlappingBusinessRolesRuleService : IOverlappingBusinessRolesRuleService
+    public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunctionsRuleService
     {
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
-
-        public OverlappingBusinessRolesRuleService(IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+        public OverlappingEicFunctionsRuleService()
         {
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
         }
 
-        public void ValidateRolesAcrossActors(IEnumerable<Actor> actors)
+        public void ValidateEicFunctionsAcrossActors(IEnumerable<Actor> actors)
         {
             ArgumentNullException.ThrowIfNull(actors, nameof(actors));
 
@@ -38,16 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
                 var setOfSets = actorsWithSameActorNumber
                     .Select(x => AreRolesUnique(x.MarketRoles.Select(m => m.Function)))
                     .ToList();
-
-                var usedBusinessRoles = new HashSet<BusinessRoleCode>();
-
-                foreach (var businessRole in setOfSets.SelectMany(CreateSet))
-                {
-                    if (!usedBusinessRoles.Add(businessRole))
-                    {
-                        throw new ValidationException($"Cannot add '{businessRole}' as this business role is already assigned to another actor within the organization.");
-                    }
-                }
 
                 var usedMarketRoles = new HashSet<EicFunction>();
 
@@ -74,11 +61,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
                 yield return marketRole;
             }
-        }
-
-        private IEnumerable<BusinessRoleCode> CreateSet(IEnumerable<EicFunction> marketRoles)
-        {
-            return _businessRoleCodeDomainService.GetBusinessRoleCodes(AreRolesUnique(marketRoles));
         }
     }
 }

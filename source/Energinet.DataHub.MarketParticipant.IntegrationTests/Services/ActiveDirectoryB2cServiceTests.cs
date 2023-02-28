@@ -183,9 +183,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
             // Logger
-            var logger = Mock.Of<ILogger<ActiveDirectoryB2cService>>();
+            var logger = Mock.Of<ILogger<ActiveDirectoryB2CService>>();
 
-            return new ActiveDirectoryB2cService(
+            return new ActiveDirectoryB2CService(
                 graphClient,
                 config,
                 businessRoleCodeDomainService,

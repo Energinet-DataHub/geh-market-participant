@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IChangesToActorHelper _changesToActorHelper;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
-        private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+        private readonly IOverlappingEicFunctionsRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
         private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IUnitOfWorkProvider unitOfWorkProvider,
             IChangesToActorHelper changesToActorHelper,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-            IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
+            IOverlappingEicFunctionsRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
             IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
@@ -147,7 +147,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 actor.MarketRoles.Add(marketRole);
             }
 
-            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+            _overlappingBusinessRolesRuleService.ValidateEicFunctionsAcrossActors(organization.Actors);
             _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
         }
     }

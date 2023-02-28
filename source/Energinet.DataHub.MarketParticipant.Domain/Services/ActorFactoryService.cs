@@ -27,7 +27,7 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
-    private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+    private readonly IOverlappingEicFunctionsRuleService _overlappingBusinessRolesRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
     private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
@@ -35,7 +35,7 @@ public sealed class ActorFactoryService : IActorFactoryService
         IOrganizationRepository organizationRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-        IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
+        IOverlappingEicFunctionsRuleService overlappingBusinessRolesRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
@@ -70,7 +70,7 @@ public sealed class ActorFactoryService : IActorFactoryService
 
         organization.Actors.Add(newActor);
 
-        _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+        _overlappingBusinessRolesRuleService.ValidateEicFunctionsAcrossActors(organization.Actors);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()

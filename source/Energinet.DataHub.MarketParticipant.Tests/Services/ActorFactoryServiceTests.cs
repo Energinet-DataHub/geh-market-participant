@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -71,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -92,7 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -116,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -151,7 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 actorIntegrationEventsQueueService.Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -211,7 +211,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -246,7 +246,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             organizationRepository.Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(Guid.NewGuid())));
 
-            var overlappingBusinessRolesService = new Mock<IOverlappingBusinessRolesRuleService>();
+            var overlappingBusinessRolesService = new Mock<IOverlappingEicFunctionsRuleService>();
             var target = new ActorFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
@@ -276,7 +276,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             overlappingBusinessRolesService.Verify(
-                x => x.ValidateRolesAcrossActors(organization.Actors),
+                x => x.ValidateEicFunctionsAcrossActors(organization.Actors),
                 Times.Once);
         }
 
@@ -293,7 +293,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 allowedGridAreasRuleService.Object);
 

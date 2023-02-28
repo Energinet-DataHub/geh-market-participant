@@ -2,6 +2,10 @@
 
 ## Version 2.7.8
 
+- Removed Business role type
+
+## Version 2.7.8
+
 - Removed unused market roles.
 
 ## Version 2.7.7

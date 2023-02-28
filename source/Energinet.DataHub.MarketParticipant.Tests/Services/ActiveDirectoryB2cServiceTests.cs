@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ConfigureAwait(false);
         }
 
-        private static ActiveDirectoryB2cService MockActiveDirectoryB2CService()
+        private static ActiveDirectoryB2CService MockActiveDirectoryB2CService()
         {
             var mockAuthProvider = new Mock<IAuthenticationProvider>();
             var mockHttpProvider = Mock.Of<IHttpProvider>();
@@ -65,14 +65,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var activeDirectoryB2CRoles = new ActiveDirectoryB2CRolesProvider(mockGraphClient.Object, "Backend App Object Id");
             var mockBusinessRoleCodeDomainService = new Mock<IBusinessRoleCodeDomainService>();
 
-            var target = new ActiveDirectoryB2cService(
+            var target = new ActiveDirectoryB2CService(
                 mockGraphClient.Object,
                 new AzureAdConfig(
                     "fake_value",
                     "fake_value"),
                 mockBusinessRoleCodeDomainService.Object,
                 activeDirectoryB2CRoles,
-                new Mock<ILogger<ActiveDirectoryB2cService>>().Object);
+                new Mock<ILogger<ActiveDirectoryB2CService>>().Object);
 
             return target;
         }
