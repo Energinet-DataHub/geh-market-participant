@@ -50,6 +50,14 @@ public sealed class PermissionRepository : IPermissionRepository
             x.EicFunctions.Select(y => y.EicFunction)));
     }
 
+    public async Task UpdatePermissionAsync(Permission permissionToUpdate, string newDescription)
+    {
+        var permissionId = (int)permissionToUpdate;
+        var permission = await _marketParticipantDbContext.Permissions.FirstAsync(p => p.Id == permissionId).ConfigureAwait(false);
+        permission.Description = newDescription;
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
     private IQueryable<PermissionEntity> BuildPermissionQuery(EicFunction? eicFunction)
     {
         var query =
