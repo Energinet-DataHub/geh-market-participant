@@ -77,7 +77,7 @@ public sealed class ActorExternalIdChangedEventDispatcherTests
         // Assert
         Assert.True(result);
         Assert.NotNull(actualEvent);
-        Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+        Assert.Equal(integrationEvent.Id, actualEvent.Id);
         Assert.Equal(integrationEvent.OrganizationId, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.ExternalActorId.ToString(), actualEvent.ExternalActorId.ToString());

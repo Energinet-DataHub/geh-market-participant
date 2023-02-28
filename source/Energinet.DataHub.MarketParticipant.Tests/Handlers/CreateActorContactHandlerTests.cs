@@ -19,7 +19,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -36,61 +35,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class CreateActorContactHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new CreateActorContactHandler(
-                new Mock<IOrganizationExistsHelperService>().Object,
-                new Mock<IActorContactRepository>().Object,
-                new Mock<IOverlappingActorContactCategoriesRuleService>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NonExistingActor_Throws()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var contactRepository = new Mock<IActorContactRepository>();
+            var actorContactRepositoryMock = new Mock<IActorContactRepository>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var overlappingContactCategoriesRuleService = new Mock<IOverlappingActorContactCategoriesRuleService>();
             var target = new CreateActorContactHandler(
-                organizationExistsHelperService.Object,
-                contactRepository.Object,
+                actorRepositoryMock.Object,
+                actorContactRepositoryMock.Object,
                 overlappingContactCategoriesRuleService.Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object);
 
-            var orgId = new OrganizationId(Guid.NewGuid());
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-            const string orgName = "SomeName";
-
-            var actor = new Actor(
-                Guid.NewGuid(),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                orgId,
-                orgName,
-                new[] { actor },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            var actor = TestPreparationModels.MockedActor();
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -100,21 +57,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new MockedEmailAddress(),
                 null);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId.Value))
-                .ReturnsAsync(organization);
-
-            contactRepository
+            actorContactRepositoryMock
                 .Setup(x => x.GetAsync(actor.Id))
                 .ReturnsAsync(new[] { contact, contact, contact });
 
-            contactRepository
+            actorContactRepositoryMock
                 .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
                 .ReturnsAsync(contact.Id);
 
             var wrongId = Guid.NewGuid();
             var command = new CreateActorContactCommand(
-                orgId.Value,
                 wrongId,
                 new CreateActorContactDto("fake_value", "Default", "fake@value", null));
 
@@ -127,42 +79,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NoOverlappingCategories_MustValidate()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IActorContactRepository>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var overlappingContactCategoriesRuleService = new Mock<IOverlappingActorContactCategoriesRuleService>();
             var target = new CreateActorContactHandler(
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 contactRepository.Object,
                 overlappingContactCategoriesRuleService.Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object);
 
-            var orgId = new OrganizationId(Guid.NewGuid());
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-            const string orgName = "SomeName";
+            var actor = TestPreparationModels.MockedActor();
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                orgId,
-                orgName,
-                new[] { actor },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -171,10 +101,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 ContactCategory.ElectricalHeating,
                 new MockedEmailAddress(),
                 null);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId.Value))
-                .ReturnsAsync(organization);
 
             contactRepository
                 .Setup(x => x.GetAsync(actor.Id))
@@ -185,8 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(contact.Id);
 
             var command = new CreateActorContactCommand(
-                orgId.Value,
-                actor.Id,
+                actor.Id.Value,
                 new CreateActorContactDto("fake_value", "Default", "fake@value", null));
 
             // Act
@@ -202,41 +127,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NewContact_ContactIdReturned()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var contactRepository = new Mock<IActorContactRepository>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var target = new CreateActorContactHandler(
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 contactRepository.Object,
                 new Mock<IOverlappingActorContactCategoriesRuleService>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object);
 
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-            var orgId = new OrganizationId(Guid.NewGuid());
-            const string orgName = "SomeName";
+            var actor = TestPreparationModels.MockedActor();
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                orgId,
-                orgName,
-                new[] { actor },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
 
             var contact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -246,17 +149,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new MockedEmailAddress(),
                 null);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId.Value))
-                .ReturnsAsync(organization);
-
             contactRepository
                 .Setup(x => x.AddAsync(It.Is<ActorContact>(y => y.ActorId == actor.Id)))
                 .ReturnsAsync(contact.Id);
 
             var command = new CreateActorContactCommand(
-                orgId.Value,
-                actor.Id,
+                actor.Id.Value,
                 new CreateActorContactDto("fake_value", "Default", "fake@value", null));
 
             // Act

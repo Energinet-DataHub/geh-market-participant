@@ -53,12 +53,12 @@ public sealed class OrganizationBusinessRegisterIdentifierChangedEventDispatcher
         // act
         var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
         var actualMessage = serviceBusSenderMock.SentMessages.Single();
-        var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent;
+        var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as Integration.Model.Dtos.OrganizationBusinessRegisterIdentifierChangedIntegrationEvent;
 
         // assert
         Assert.True(actual);
         Assert.NotNull(actualEvent);
-        Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+        Assert.Equal(integrationEvent.Id, actualEvent.Id);
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.BusinessRegisterIdentifier.Identifier, actualEvent.BusinessRegisterIdentifier);
     }

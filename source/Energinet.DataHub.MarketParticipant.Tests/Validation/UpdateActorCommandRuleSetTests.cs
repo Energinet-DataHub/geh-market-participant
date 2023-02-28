@@ -29,7 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     {
         private const string ValidStatus = "Active";
 
-        private static readonly Guid _validOrganizationId = Guid.NewGuid();
         private static readonly Guid _validActorId = Guid.NewGuid();
 
         [Fact]
@@ -39,30 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(UpdateActorCommand.ChangeActor);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, null!);
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-
-        [Fact]
-        public async Task Validate_OrganizationId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(UpdateActorCommand.OrganizationId);
-
-            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
-            var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
-            var validMarketRoles = new List<ActorMarketRoleDto> { new("CapacityTrader", validGridAreas, string.Empty) };
-
-            var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
-
-            var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(Guid.Empty, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, null!);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -85,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, Guid.Empty, actorDto);
+            var command = new UpdateActorCommand(Guid.Empty, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -115,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(value, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -142,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), null!);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -161,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), null!);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -180,7 +156,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), new ActorMarketRoleDto[] { null! });
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -212,7 +188,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -242,7 +218,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -264,7 +240,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -286,7 +262,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var actorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, actorDto);
+            var command = new UpdateActorCommand(_validActorId, actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -308,7 +284,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, changeActorDto);
+            var command = new UpdateActorCommand(_validActorId, changeActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -338,7 +314,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var changeActorDto = new ChangeActorDto(ValidStatus, new ActorNameDto("fake_name"), validMarketRoles);
 
             var target = new UpdateActorCommandRuleSet();
-            var command = new UpdateActorCommand(_validOrganizationId, _validActorId, changeActorDto);
+            var command = new UpdateActorCommand(_validActorId, changeActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

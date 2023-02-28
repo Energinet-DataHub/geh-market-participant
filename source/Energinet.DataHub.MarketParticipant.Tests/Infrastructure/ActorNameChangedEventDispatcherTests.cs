@@ -77,7 +77,7 @@ public sealed class ActorNameChangedEventDispatcherTests
         // Assert
         Assert.True(result);
         Assert.NotNull(actualEvent);
-        Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+        Assert.Equal(integrationEvent.Id, actualEvent.Id);
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);

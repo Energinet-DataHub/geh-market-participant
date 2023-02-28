@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
-    public sealed class UniqueMarketRoleGridAreaServiceTests
+    public sealed class UniqueMarketRoleGridAreaRuleServiceTests
     {
         [Fact]
         public async Task Ensure_ActorSupplied_CallsRemoveForActor()
@@ -35,14 +35,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
             var actor = new Actor(
-                Guid.NewGuid(),
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
                 new[]
                 {
                     new ActorMarketRole(
-                        Guid.NewGuid(),
                         EicFunction.GridAccessProvider,
                         Enumerable.Empty<ActorGridArea>())
                 },
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             await target.ValidateAsync(actor).ConfigureAwait(false);
 
             // assert
-            repository.Verify(x => x.RemoveAsync(actor.Id), Times.Exactly(1));
+            repository.Verify(x => x.RemoveAllReservationsAsync(actor.Id), Times.Exactly(1));
         }
 
         [Fact]
@@ -60,30 +60,32 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // arrange
             var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
-            repository.Setup(x => x.TryAddAsync(It.IsAny<UniqueActorMarketRoleGridArea>())).ReturnsAsync(true);
+            repository
+                .Setup(x => x.TryReserveAsync(It.IsAny<ActorId>(), EicFunction.GridAccessProvider, It.IsAny<GridAreaId>()))
+                .ReturnsAsync(true);
 
             var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
             var actor = new Actor(
-                Guid.NewGuid(),
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
                 new[]
                 {
                     new ActorMarketRole(
-                        Guid.NewGuid(),
                         EicFunction.GridAccessProvider,
                         new[]
                         {
                             new ActorGridArea(
-                                Guid.NewGuid(),
+                                new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis }),
                             new ActorGridArea(
-                                Guid.NewGuid(),
+                                new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis }),
                             new ActorGridArea(
-                                Guid.NewGuid(),
+                                new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis }),
                         })
                 },
@@ -97,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             {
                 foreach (var ga in mr.GridAreas)
                 {
-                    repository.Verify(x => x.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, mr.Function, ga.Id)), Times.Exactly(1));
+                    repository.Verify(x => x.TryReserveAsync(actor.Id, mr.Function, ga.Id), Times.Exactly(1));
                 }
             }
         }
@@ -117,14 +119,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
                 var actor = new Actor(
-                    Guid.NewGuid(),
+                    new ActorId(Guid.NewGuid()),
+                    new OrganizationId(Guid.NewGuid()),
                     null,
                     new MockedGln(),
                     ActorStatus.Active,
                     new[]
                     {
                     new ActorMarketRole(
-                        Guid.NewGuid(),
                         nonDdmMarketRole,
                         Enumerable.Empty<ActorGridArea>())
                     },
@@ -134,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 await target.ValidateAsync(actor).ConfigureAwait(false);
 
                 // assert
-                repository.Verify(x => x.TryAddAsync(It.IsAny<UniqueActorMarketRoleGridArea>()), Times.Never);
+                repository.Verify(x => x.TryReserveAsync(It.IsAny<ActorId>(), It.IsAny<EicFunction>(), It.IsAny<GridAreaId>()), Times.Never);
             }
         }
     }

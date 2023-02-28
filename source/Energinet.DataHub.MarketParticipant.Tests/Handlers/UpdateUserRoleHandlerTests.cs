@@ -26,7 +26,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using MediatR;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -37,18 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class UpdateUserRoleHandlerTests
     {
         private const int ValidPermission = (int)Permission.ActorManage;
-
-        [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new UpdateUserRoleHandler(new Mock<IUserRoleRepository>().Object, new Mock<IUserRoleAuditLogService>().Object, new Mock<IUserRoleAuditLogEntryRepository>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
 
         [Fact]
         public async Task Handle_UpdateUserRole_UserRoleNotFound()

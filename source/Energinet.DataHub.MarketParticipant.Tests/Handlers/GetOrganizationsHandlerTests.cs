@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -37,33 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationRepository = new Mock<IOrganizationRepository>();
             var target = new GetOrganizationsHandler(organizationRepository.Object);
 
-            var marketRole = new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>());
-
-            var actor = new Actor(
-                Guid.NewGuid(),
-                new ExternalActorId(Guid.NewGuid()),
-                new MockedGln(),
-                ActorStatus.Active,
-                new[] { marketRole },
-                new ActorName(string.Empty));
-
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-
-            var organization = new Organization(
-                new OrganizationId(Guid.NewGuid()),
-                "fake_value",
-                new[] { actor },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            var organization = TestPreparationModels.MockedOrganization();
 
             organizationRepository
                 .Setup(x => x.GetAsync())
@@ -81,15 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var actualOrganization = response.Organizations.Single();
             Assert.Equal(organization.Id.ToString(), actualOrganization.OrganizationId);
-
-            var actualActor = actualOrganization.Actors.Single();
-            Assert.Equal(actor.Id.ToString(), actualActor.ActorId);
-            Assert.Equal(actor.ExternalActorId?.ToString(), actualActor.ExternalActorId);
-            Assert.Equal(actor.ActorNumber.Value, actualActor.ActorNumber.Value);
-            Assert.Equal(actor.Status.ToString(), actualActor.Status);
-
-            var actualMarketRole = actualActor.MarketRoles.Single();
-            Assert.Equal(marketRole.Function.ToString(), actualMarketRole.EicFunction);
         }
     }
 }

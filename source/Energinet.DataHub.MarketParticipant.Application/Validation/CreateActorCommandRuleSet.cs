@@ -29,6 +29,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                 .ChildRules(validator =>
                 {
                     validator
+                        .RuleFor(actor => actor.OrganizationId)
+                        .NotEmpty();
+
+                    validator
                         .RuleFor(actor => actor.ActorNumber)
                         .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>())
                         .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length <= 13);

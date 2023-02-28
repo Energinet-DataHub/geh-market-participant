@@ -14,7 +14,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -33,7 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var currentOrganizationToUpdate = new Organization(
                 new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
                 "org1Name",
-                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("same_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
@@ -43,7 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var anotherOrganizationToUpdateWithSameIdentifier = new Organization(
                 new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
                 "org2Name",
-                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("same_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
@@ -67,7 +64,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var existingOrganisation = new Organization(
                 new OrganizationId(Guid.Parse("3710F53D-9EF8-4EF1-B941-C9C14B443FEC")),
                 "org1Name",
-                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("fake_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
@@ -80,7 +76,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organization = new Organization(
                 new OrganizationId(Guid.Parse("4444F53D-9EF8-4EF1-B941-C9C14B443FEC")),
                 "org1Name",
-                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("unique"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),

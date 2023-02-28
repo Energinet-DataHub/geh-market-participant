@@ -20,7 +20,6 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Moq;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
