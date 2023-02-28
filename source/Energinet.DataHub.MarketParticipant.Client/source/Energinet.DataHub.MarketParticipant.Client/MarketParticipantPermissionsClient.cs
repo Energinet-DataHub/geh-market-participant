@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<IEnumerable<PermissionDto>> GetPermissionsAsync()
+        public async Task<IEnumerable<PermissionDetailsDto>> GetPermissionsAsync()
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return await response
-                .GetJsonAsync<IEnumerable<PermissionDto>>()
+                .GetJsonAsync<IEnumerable<PermissionDetailsDto>>()
                 .ConfigureAwait(false);
         }
     }

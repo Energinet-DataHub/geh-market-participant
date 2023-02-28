@@ -27,6 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// Gets all permissions.
         /// </summary>
-        Task<IEnumerable<PermissionDto>> GetPermissionsAsync();
+        Task<IEnumerable<PermissionDetailsDto>> GetPermissionsAsync();
     }
 }
