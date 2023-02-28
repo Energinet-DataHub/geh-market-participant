@@ -17,5 +17,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
-    public sealed record DeleteActorContactCommand(Guid OrganizationId, Guid ActorId, Guid ContactId) : IRequest;
+    public sealed record DeleteActorContactCommand(Guid ActorId, Guid ContactId) : IRequest;
 }

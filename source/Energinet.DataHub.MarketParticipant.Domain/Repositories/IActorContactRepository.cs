@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -36,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// </summary>
         /// <param name="actorId">The id of the actor to get the contacts for.</param>
         /// <returns>A collection of contacts tied to the specified actor.</returns>
-        Task<IEnumerable<ActorContact>> GetAsync(Guid actorId);
+        Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId);
 
         /// <summary>
         /// Updates a Contact, or adds it if it's not already present.

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +37,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         _userIdentityRepository = userIdentityRepository;
     }
 
-    public Task<int> GetTotalUserCountAsync(Guid? actorId)
+    public Task<int> GetTotalUserCountAsync(ActorId? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         return query.CountAsync();
@@ -49,7 +48,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         UserOverviewSortProperty sortProperty,
         SortDirection sortDirection,
-        Guid? actorId)
+        ActorId? actorId)
     {
         var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         var users = await query
@@ -105,7 +104,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
         int pageSize,
         UserOverviewSortProperty sortProperty,
         SortDirection sortDirection,
-        Guid? actorId,
+        ActorId? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus,
         IEnumerable<UserRoleId> userRoles)
@@ -199,7 +198,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     }
 
     private IQueryable<UserEntity> BuildUsersSearchQuery(
-        Guid? actorId,
+        ActorId? actorId,
         string? searchText,
         IEnumerable<UserRoleId> userRoleIds)
     {
@@ -212,7 +211,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
             join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
-                (actorId == null || r.ActorId == actorId)
+                (actorId == null || r.ActorId == actorId.Value)
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
             select u;
 
@@ -220,7 +219,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     }
 
     private IQueryable<UserEntity> BuildUserLookupQuery(
-        Guid? actorId,
+        ActorId? actorId,
         IEnumerable<ExternalUserId> externalUserIds,
         IEnumerable<UserRoleId> userRoleIds)
     {
@@ -232,7 +231,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
             where
-                (actorId == null || r.ActorId == actorId)
+                (actorId == null || r.ActorId == actorId.Value)
                 && externalUsers.Contains(u.ExternalId)
             select u;
 

@@ -37,7 +37,7 @@ internal static class DomainServiceRegistration
         container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
 
         container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
-        container.Register<IUniqueMarketRoleGridAreaService, UniqueMarketRoleGridAreaService>(Lifestyle.Scoped);
+        container.Register<IUniqueMarketRoleGridAreaRuleService, UniqueMarketRoleGridAreaRuleService>(Lifestyle.Scoped);
         container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
         container.Register<IEnsureUserRolePermissionsService, EnsureUserRolePermissionsService>();
 

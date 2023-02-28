@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -34,13 +35,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId)
         {
-            var logQuery = from log in _context.UserInviteAuditLogEntries
+            var logQuery =
+                from log in _context.UserInviteAuditLogEntries
                 join actor in _context.Actors on log.ActorId equals actor.Id
                 where log.UserId == userId.Value
                 select new UserInviteDetailsAuditLogEntry(
                     new UserId(log.UserId),
                     new UserId(log.ChangedByUserId),
-                    log.ActorId,
+                    new ActorId(log.ActorId),
                     actor.Name,
                     log.Timestamp);
 
@@ -56,11 +58,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 UserId = logEntry.UserId.Value,
                 Timestamp = logEntry.Timestamp,
                 ChangedByUserId = logEntry.ChangedByUserId.Value,
-                ActorId = logEntry.ActorId
+                ActorId = logEntry.ActorId.Value
             };
 
             _context.UserInviteAuditLogEntries.Add(entity);
-
             return _context.SaveChangesAsync();
         }
     }

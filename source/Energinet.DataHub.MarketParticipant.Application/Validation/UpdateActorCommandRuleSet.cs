@@ -23,9 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public UpdateActorCommandRuleSet()
         {
-            RuleFor(command => command.OrganizationId)
-                .NotEmpty();
-
             RuleFor(command => command.ActorId)
                 .NotEmpty();
 

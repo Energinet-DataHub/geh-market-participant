@@ -20,37 +20,41 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
-    public sealed class UniqueMarketRoleGridAreaService : IUniqueMarketRoleGridAreaService
+    public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridAreaRuleService
     {
-        private readonly IUniqueActorMarketRoleGridAreaRepository _repository;
+        private readonly IMarketRoleAndGridAreaForActorReservationService _marketRoleAndGridAreaForActorReservationService;
 
-        public UniqueMarketRoleGridAreaService(IUniqueActorMarketRoleGridAreaRepository repository)
+        public UniqueMarketRoleGridAreaRuleService(IMarketRoleAndGridAreaForActorReservationService marketRoleAndGridAreaForActorReservationService)
         {
-            _repository = repository;
+            _marketRoleAndGridAreaForActorReservationService = marketRoleAndGridAreaForActorReservationService;
         }
 
-        private static HashSet<EicFunction> MarketRoleSet => new HashSet<EicFunction>
+        private static HashSet<EicFunction> MarketRoleSet => new()
         {
             EicFunction.GridAccessProvider
         };
 
-        public async Task EnsureUniqueMarketRolesPerGridAreaAsync(Actor actor)
+        public async Task ValidateAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
             var actorMarketRoles = actor.MarketRoles.Where(x => MarketRoleSet.Contains(x.Function));
 
-            await _repository.RemoveAsync(actor.Id).ConfigureAwait(false);
+            await _marketRoleAndGridAreaForActorReservationService
+                .RemoveAllReservationsAsync(actor.Id)
+                .ConfigureAwait(false);
 
             foreach (var actorMarketRole in actorMarketRoles)
             {
                 foreach (var gridArea in actorMarketRole.GridAreas)
                 {
-                    var uniqueMarketRoleGridArea = new UniqueActorMarketRoleGridArea(actor.Id, actorMarketRole.Function, gridArea.Id);
+                    var couldReserve = await _marketRoleAndGridAreaForActorReservationService
+                        .TryReserveAsync(actor.Id, actorMarketRole.Function, gridArea.Id)
+                        .ConfigureAwait(false);
 
-                    if (!await _repository.TryAddAsync(uniqueMarketRoleGridArea).ConfigureAwait(false))
+                    if (!couldReserve)
                     {
                         throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.");
                     }

@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IActorFactoryService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
 
             // Act + Assert
             await Assert
@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
                 combinationOfBusinessRolesRuleService.Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -122,7 +122,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
                 combinationOfBusinessRolesRuleService.Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
@@ -176,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var uniqueService = new Mock<IUniqueMarketRoleGridAreaService>();
+            var uniqueService = new Mock<IUniqueMarketRoleGridAreaRuleService>();
 
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
@@ -220,7 +220,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ConfigureAwait(false);
 
             // Assert
-            uniqueService.Verify(x => x.EnsureUniqueMarketRolesPerGridAreaAsync(actor), Times.Once);
+            uniqueService.Verify(x => x.ValidateAsync(actor), Times.Once);
         }
     }
 }

@@ -22,9 +22,10 @@ public sealed class Actor
 {
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
 
-    public Actor(ActorNumber actorNumber)
+    public Actor(OrganizationId organizationId, ActorNumber actorNumber)
     {
-        Id = Guid.NewGuid();
+        Id = new ActorId(Guid.Empty);
+        OrganizationId = organizationId;
         ExternalActorId = null;
         ActorNumber = actorNumber;
         Name = new ActorName(string.Empty);
@@ -33,7 +34,8 @@ public sealed class Actor
     }
 
     public Actor(
-        Guid id,
+        ActorId id,
+        OrganizationId organizationId,
         ExternalActorId? externalActorId,
         ActorNumber actorNumber,
         ActorStatus actorStatus,
@@ -41,6 +43,7 @@ public sealed class Actor
         ActorName name)
     {
         Id = id;
+        OrganizationId = organizationId;
         ExternalActorId = externalActorId;
         ActorNumber = actorNumber;
         Name = name;
@@ -51,7 +54,12 @@ public sealed class Actor
     /// <summary>
     /// The internal id of actor.
     /// </summary>
-    public Guid Id { get; }
+    public ActorId Id { get; }
+
+    /// <summary>
+    /// The id of the organization the actor belongs to.
+    /// </summary>
+    public OrganizationId OrganizationId { get; }
 
     /// <summary>
     /// The external actor id for integrating Azure AD and domains.

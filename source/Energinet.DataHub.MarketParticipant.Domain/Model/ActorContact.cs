@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     public sealed class ActorContact
     {
         public ActorContact(
-            Guid actorId,
+            ActorId actorId,
             string name,
             ContactCategory category,
             EmailAddress email,
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public ActorContact(
             ContactId id,
-            Guid actorId,
+            ActorId actorId,
             string name,
             ContactCategory category,
             EmailAddress email,
@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         }
 
         public ContactId Id { get; }
-        public Guid ActorId { get; }
+        public ActorId ActorId { get; }
 
         public string Name { get; }
         public ContactCategory Category { get; }

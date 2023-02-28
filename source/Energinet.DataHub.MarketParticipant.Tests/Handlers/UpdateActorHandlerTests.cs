@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
@@ -121,7 +121,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 allowedGridAreasRuleService.Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
@@ -172,7 +172,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 overlappingBusinessRolesRuleService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
@@ -215,7 +215,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 externalActorSynchronizationService.Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
@@ -260,7 +260,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IOverlappingBusinessRolesRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 

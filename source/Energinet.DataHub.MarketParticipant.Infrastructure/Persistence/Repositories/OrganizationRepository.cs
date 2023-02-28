@@ -46,32 +46,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
             else
             {
-                destination = await GetOrganizationQuery()
+                destination = await _marketParticipantDbContext
+                    .Organizations
                     .FirstAsync(x => x.Id == organization.Id.Value)
                     .ConfigureAwait(false);
             }
 
             OrganizationMapper.MapToEntity(organization, destination);
             _marketParticipantDbContext.Organizations.Update(destination);
-
-            foreach (var actor in destination.Actors.Where(x => x.New))
-            {
-                _marketParticipantDbContext.Entry(actor).State = EntityState.Added;
-                foreach (var mr in actor.MarketRoles)
-                {
-                    _marketParticipantDbContext.Entry(mr).State = EntityState.Added;
-                    foreach (var ga in mr.GridAreas)
-                    {
-                        _marketParticipantDbContext.Entry(ga).State = EntityState.Added;
-                        foreach (var mp in ga.MeteringPointTypes)
-                        {
-                            _marketParticipantDbContext.Entry(mp).State = EntityState.Added;
-                        }
-                    }
-                }
-
-                actor.New = false;
-            }
 
             try
             {
@@ -91,7 +73,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             ArgumentNullException.ThrowIfNull(id, nameof(id));
 
-            var org = await GetOrganizationQuery()
+            var org = await _marketParticipantDbContext
+                .Organizations
                 .FirstOrDefaultAsync(x => x.Id == id.Value)
                 .ConfigureAwait(false);
 
@@ -100,7 +83,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<Organization>> GetAsync()
         {
-            var entities = await GetOrganizationQuery()
+            var entities = await _marketParticipantDbContext
+                .Organizations
                 .OrderBy(x => x.Name)
                 .ToListAsync()
                 .ConfigureAwait(false);
@@ -112,24 +96,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
 
-            var organizations = await GetOrganizationQuery()
-                .Where(x => x.Actors.Any(y => y.ActorNumber == actorNumber.Value))
-                .ToListAsync()
-                .ConfigureAwait(false);
+            var query =
+                from actor in _marketParticipantDbContext.Actors
+                join organization in _marketParticipantDbContext.Organizations
+                    on actor.OrganizationId equals organization.Id
+                where actor.ActorNumber == actorNumber.Value
+                select organization;
 
+            var organizations = await query.ToListAsync().ConfigureAwait(false);
             return organizations.Select(OrganizationMapper.MapFromEntity);
-        }
-
-        private IQueryable<OrganizationEntity> GetOrganizationQuery()
-        {
-            return _marketParticipantDbContext
-                .Organizations
-                .Include(x => x.Actors)
-                .ThenInclude(x => x.MarketRoles)
-                .ThenInclude(x => x.GridAreas)
-                .ThenInclude(m => m.MeteringPointTypes)
-                .Include(x => x.Address)
-                .AsSingleQuery();
         }
     }
 }

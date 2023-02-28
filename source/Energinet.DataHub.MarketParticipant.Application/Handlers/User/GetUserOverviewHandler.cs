@@ -21,27 +21,26 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
 {
-    private readonly IActorQueryRepository _actorQueryRepository;
+    private readonly IActorRepository _actorRepository;
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUserRepository _userRepository;
     private readonly IUserOverviewRepository _repository;
     private readonly IUserRoleRepository _userRoleRepository;
 
     public GetUserOverviewHandler(
-        IActorQueryRepository actorQueryRepository,
+        IActorRepository actorRepository,
         IOrganizationRepository organizationRepository,
         IUserRepository userRepository,
         IUserOverviewRepository repository,
         IUserRoleRepository userRoleRepository)
     {
-        _actorQueryRepository = actorQueryRepository;
+        _actorRepository = actorRepository;
         _organizationRepository = organizationRepository;
         _userRepository = userRepository;
         _repository = repository;
@@ -59,6 +58,9 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
 
         var sortProperty = (Domain.Model.Users.UserOverviewSortProperty)request.SortProperty;
         var sortDirection = (SortDirection)request.SortDirection;
+        var actor = filter.ActorId.HasValue
+            ? new ActorId(filter.ActorId.Value)
+            : null;
 
         // The GetUsers function is kept, as it is more performant if no search criteria are used
         if (!string.IsNullOrEmpty(filter.SearchText) || filter.UserStatus.Any() || filter.UserRoleIds.Any())
@@ -69,7 +71,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                      request.PageSize,
                      sortProperty,
                      sortDirection,
-                     filter.ActorId,
+                     actor,
                      filter.SearchText,
                      filter.UserStatus,
                      filter.UserRoleIds.Select(userRoleId => new UserRoleId(userRoleId)))
@@ -85,10 +87,10 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 request.PageSize,
                 sortProperty,
                 sortDirection,
-                filter.ActorId).ConfigureAwait(false);
+                actor).ConfigureAwait(false);
 
             userCount = await _repository
-                .GetTotalUserCountAsync(filter.ActorId)
+                .GetTotalUserCountAsync(actor)
                 .ConfigureAwait(false);
         }
 
@@ -112,15 +114,13 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             foreach (var assignmentsForActor in userWithAssignments!.RoleAssignments.GroupBy(assignment =>
                          assignment.ActorId))
             {
-                var queryActor = await _actorQueryRepository
-                    .GetActorAsync(assignmentsForActor.Key)
+                var actor = await _actorRepository
+                    .GetAsync(assignmentsForActor.Key)
                     .ConfigureAwait(false);
 
                 var organization = await _organizationRepository
-                    .GetAsync(queryActor!.OrganizationId)
+                    .GetAsync(actor!.OrganizationId)
                     .ConfigureAwait(false);
-
-                var actor = organization!.Actors.Single(a => a.Id == assignmentsForActor.Key);
 
                 var userRoleNames = new List<string>();
 
@@ -137,7 +137,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                     new ActorDto(
                         actor.ActorNumber.Value,
                         actor.Name.Value,
-                        organization.Name),
+                        organization!.Name),
                     userRoleNames));
             }
 

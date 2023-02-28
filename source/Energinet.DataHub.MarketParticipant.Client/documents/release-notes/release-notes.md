@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.22.0
+
+- Actors are no longer placed under an organization.
+
 ## Version 2.21.0
 
 - Updated user audit log with invites

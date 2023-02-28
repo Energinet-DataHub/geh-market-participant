@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridArea = await CreateGridAreaAsync(context);
             var actor = await CreateActorUnderNewOrganizationAsync(context);
 
-            var target = new UniqueActorMarketRoleGridAreaRepository(context);
+            var target = new MarketRoleAndGridAreaForActorReservationService(context);
 
             // Act
             var actual = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
@@ -67,7 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridArea = await CreateGridAreaAsync(context);
             var actor = await CreateActorUnderNewOrganizationAsync(context);
 
-            var target = new UniqueActorMarketRoleGridAreaRepository(context);
+            var target = new MarketRoleAndGridAreaForActorReservationService(context);
             await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));
 
             var newActor = await CreateActorUnderNewOrganizationAsync(context);
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var gridArea = await CreateGridAreaAsync(context);
             var actor = await CreateActorUnderNewOrganizationAsync(context);
 
-            var target = new UniqueActorMarketRoleGridAreaRepository(context);
+            var target = new MarketRoleAndGridAreaForActorReservationService(context);
 
             // Act
             var firstAddResult = await target.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, EicFunction.EnergySupplier, gridArea.Id.Value));

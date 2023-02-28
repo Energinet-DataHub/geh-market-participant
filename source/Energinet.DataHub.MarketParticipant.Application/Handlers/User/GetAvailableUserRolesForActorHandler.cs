@@ -18,8 +18,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
@@ -27,17 +27,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 public sealed class GetAvailableUserRolesForActorHandler
     : IRequestHandler<GetAvailableUserRolesForActorCommand, GetUserRolesResponse>
 {
-    private readonly IActorQueryRepository _actorQueryRepository;
-    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IActorRepository _actorRepository;
     private readonly IUserRoleRepository _userRoleRepository;
 
     public GetAvailableUserRolesForActorHandler(
-        IActorQueryRepository actorQueryRepository,
-        IOrganizationRepository organizationRepository,
+        IActorRepository actorRepository,
         IUserRoleRepository userRoleRepository)
     {
-        _actorQueryRepository = actorQueryRepository;
-        _organizationRepository = organizationRepository;
+        _actorRepository = actorRepository;
         _userRoleRepository = userRoleRepository;
     }
 
@@ -47,8 +44,8 @@ public sealed class GetAvailableUserRolesForActorHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var actor = await _actorQueryRepository
-            .GetActorAsync(request.ActorId)
+        var actor = await _actorRepository
+            .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
 
         if (actor == null)
@@ -56,14 +53,8 @@ public sealed class GetAvailableUserRolesForActorHandler
             throw new NotFoundValidationException(request.ActorId);
         }
 
-        var organization = await _organizationRepository
-            .GetAsync(actor.OrganizationId)
-            .ConfigureAwait(false);
-
-        var eicFunctions = organization!
-            .Actors
-            .Where(a => a.Id == actor.ActorId)
-            .SelectMany(a => a.MarketRoles)
+        var eicFunctions = actor
+            .MarketRoles
             .Select(r => r.Function);
 
         var userRoles = await _userRoleRepository
