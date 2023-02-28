@@ -11,9 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System.Threading;
+
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     {
         private readonly ILogger<PermissionController> _logger;
         private readonly IMediator _mediator;
+
         public PermissionController(ILogger<PermissionController> logger, IMediator mediator)
         {
             _logger = logger;
@@ -38,13 +42,31 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         {
             return await this.ProcessAsync(
                 async () =>
-                    {
-                        var getPermissionsCommand = new GetPermissionsCommand();
-                        var response = await _mediator
-                            .Send(getPermissionsCommand)
-                            .ConfigureAwait(false);
-                        return Ok(response.Permissions);
-                    },
+                {
+                    var getPermissionsCommand = new GetPermissionsCommand();
+                    var response = await _mediator
+                        .Send(getPermissionsCommand)
+                        .ConfigureAwait(false);
+                    return Ok(response.Permissions);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
+        [HttpPut]
+        [AuthorizeUser(Permission.UserRoleManage)]
+        public async Task<IActionResult> UpdateAsync(int id, string description)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var command = new UpdatePermissionCommand(id, description);
+
+                    await _mediator
+                        .Send(command)
+                        .ConfigureAwait(false);
+
+                    return Ok();
+                },
                 _logger).ConfigureAwait(false);
         }
     }
