@@ -21,11 +21,11 @@ internal static class TestPreparationModels
 {
     public static Organization MockedOrganization() => MockedOrganization(Guid.NewGuid());
 
-    public static Organization MockedOrganization(Guid organizationId) => new Organization(
+    public static Organization MockedOrganization(Guid organizationId) => new(
         new OrganizationId(organizationId),
         "Animal Power Company",
         MockedBusinessRegisterIdentifier.New(),
-        new Address("Vejlevej", "1", "7100", "Vejle", "DK"),
+        new Address("Vej Allé", "7", "7100", "Vejle", "DK"),
         new MockedDomain(),
         null,
         OrganizationStatus.Active);
