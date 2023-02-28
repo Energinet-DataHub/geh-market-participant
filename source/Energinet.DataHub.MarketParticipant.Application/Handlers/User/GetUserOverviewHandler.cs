@@ -58,7 +58,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
 
         var sortProperty = (Domain.Model.Users.UserOverviewSortProperty)request.SortProperty;
         var sortDirection = (SortDirection)request.SortDirection;
-        var actor = filter.ActorId.HasValue
+        var actorId = filter.ActorId.HasValue
             ? new ActorId(filter.ActorId.Value)
             : null;
 
@@ -71,7 +71,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                      request.PageSize,
                      sortProperty,
                      sortDirection,
-                     actor,
+                     actorId,
                      filter.SearchText,
                      filter.UserStatus,
                      filter.UserRoleIds.Select(userRoleId => new UserRoleId(userRoleId)))
@@ -87,10 +87,10 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 request.PageSize,
                 sortProperty,
                 sortDirection,
-                actor).ConfigureAwait(false);
+                actorId).ConfigureAwait(false);
 
             userCount = await _repository
-                .GetTotalUserCountAsync(actor)
+                .GetTotalUserCountAsync(actorId)
                 .ConfigureAwait(false);
         }
 
