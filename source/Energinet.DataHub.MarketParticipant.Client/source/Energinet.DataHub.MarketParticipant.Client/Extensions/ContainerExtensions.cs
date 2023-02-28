@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Extensions
             source.AddScoped<IMarketParticipantUserRoleClient, MarketParticipantUserRoleClient>();
             source.AddScoped<IMarketParticipantUserRoleAssignmentClient, MarketParticipantUserRoleAssignmentClient>();
             source.AddScoped<IMarketParticipantUserInvitationClient, MarketParticipantUserInvitationClient>();
+            source.AddScoped<IMarketParticipantPermissionsClient, MarketParticipantPermissionsClient>();
 
             source.AddSingleton<IMarketParticipantClientFactory>(provider =>
                 new MarketParticipantClientFactory(
