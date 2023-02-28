@@ -36,9 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public async Task EnqueueActorUpdatedEventAsync_OrganizationIdNull_ThrowsException()
         {
             // Arrange
-            var target = new ActorIntegrationEventsQueueService(
-                new Mock<IDomainEventRepository>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(new Mock<IDomainEventRepository>().Object);
 
             var actor = new Actor(new MockedGln());
 
@@ -52,9 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public async Task EnqueueActorUpdatedEventAsync_ActorNull_ThrowsException()
         {
             // Arrange
-            var target = new ActorIntegrationEventsQueueService(
-                new Mock<IDomainEventRepository>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(new Mock<IDomainEventRepository>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
 
@@ -69,9 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
-            var target = new ActorIntegrationEventsQueueService(
-                domainEventRepository.Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(domainEventRepository.Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
             var actor = new Actor(new MockedGln());
@@ -92,9 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         public async Task EnqueueActorUpdatedEventAsync_integrationEventsNull_ThrowsException()
         {
             // Arrange
-            var target = new ActorIntegrationEventsQueueService(
-                new Mock<IDomainEventRepository>().Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(new Mock<IDomainEventRepository>().Object);
 
             var organizationId = new OrganizationId(Guid.NewGuid());
 
@@ -112,9 +104,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
-            var target = new ActorIntegrationEventsQueueService(
-                domainEventRepository.Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(domainEventRepository.Object);
 
             var actor = new Actor(new MockedGln());
             var organizationId = new OrganizationId(Guid.NewGuid());

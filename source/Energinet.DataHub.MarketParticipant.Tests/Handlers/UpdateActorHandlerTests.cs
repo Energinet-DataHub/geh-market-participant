@@ -60,7 +60,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             // Act + Assert
@@ -84,7 +83,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
@@ -122,7 +120,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 allowedGridAreasRuleService.Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
@@ -173,7 +170,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
@@ -216,7 +212,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 externalActorSynchronizationService.Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();
@@ -261,7 +256,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
             var organizationId = Guid.NewGuid();

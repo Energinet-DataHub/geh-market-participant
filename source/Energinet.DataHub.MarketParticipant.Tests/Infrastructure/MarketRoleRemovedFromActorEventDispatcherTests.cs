@@ -64,7 +64,6 @@ public sealed class MarketRoleRemovedFromActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            BusinessRole = BusinessRoleCode.Ddq,
             MarketRole = EicFunction.EnergySupplier
         };
 
@@ -82,7 +81,6 @@ public sealed class MarketRoleRemovedFromActorEventDispatcherTests
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.MarketRole.ToString(), actualEvent.MarketRole.ToString());
-        Assert.Equal(integrationEvent.BusinessRole.ToString(), actualEvent.BusinessRoleCode.ToString());
     }
 
     [Fact]
@@ -102,7 +100,6 @@ public sealed class MarketRoleRemovedFromActorEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            BusinessRole = BusinessRoleCode.Ddq,
             MarketRole = EicFunction.EnergySupplier
         };
 

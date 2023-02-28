@@ -29,14 +29,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Helpers;
 public sealed class ChangesToActorHelper : IChangesToActorHelper
 {
     private readonly List<IIntegrationEvent> _changeEvents = new();
-    private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
     private readonly IGridAreaLinkRepository _gridAreaLinkRepository;
 
-    public ChangesToActorHelper(
-        IBusinessRoleCodeDomainService businessRoleCodeDomainService,
-        IGridAreaLinkRepository gridAreaLinkRepository)
+    public ChangesToActorHelper(IGridAreaLinkRepository gridAreaLinkRepository)
     {
-        _businessRoleCodeDomainService = businessRoleCodeDomainService;
         _gridAreaLinkRepository = gridAreaLinkRepository;
     }
 
@@ -128,7 +124,6 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             {
                 OrganizationId = organizationId,
                 ActorId = existingActor.Id,
-                BusinessRole = _businessRoleCodeDomainService.GetBusinessRoleCodes(new List<EicFunction> { marketRole.Function }).FirstOrDefault(),
                 MarketRole = marketRole.Function
             });
 
@@ -144,7 +139,6 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             {
                 OrganizationId = organizationId,
                 ActorId = existingActor.Id,
-                BusinessRole = _businessRoleCodeDomainService.GetBusinessRoleCodes(new List<EicFunction> { marketRole.Function }).FirstOrDefault(),
                 MarketRole = marketRole.Function
             });
 

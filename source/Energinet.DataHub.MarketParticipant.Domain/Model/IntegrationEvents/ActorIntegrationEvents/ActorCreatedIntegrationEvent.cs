@@ -27,9 +27,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Act
         public ActorName Name { get; set; } = null!;
 
         [JsonInclude]
-        public ICollection<BusinessRoleCode> BusinessRoles { get; private set; } = new List<BusinessRoleCode>();
-
-        [JsonInclude]
         public ICollection<ActorMarketRoleEventData> ActorMarketRoles { get; private set; } = new List<ActorMarketRoleEventData>();
     }
 }

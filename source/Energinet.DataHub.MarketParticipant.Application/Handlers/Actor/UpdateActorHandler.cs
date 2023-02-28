@@ -37,11 +37,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IChangesToActorHelper _changesToActorHelper;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
-        private readonly IOverlappingEicFunctionsRuleService _overlappingBusinessRolesRuleService;
+        private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
         private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
-        private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
         private readonly IActorStatusMarketRolesRuleService _actorStatusMarketRolesRuleService;
 
         public UpdateActorHandler(
@@ -50,11 +49,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IUnitOfWorkProvider unitOfWorkProvider,
             IChangesToActorHelper changesToActorHelper,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-            IOverlappingEicFunctionsRuleService overlappingBusinessRolesRuleService,
+            IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
             IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
-            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
             IActorStatusMarketRolesRuleService actorStatusMarketRolesRuleService)
         {
             _organizationRepository = organizationRepository;
@@ -62,11 +60,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _unitOfWorkProvider = unitOfWorkProvider;
             _changesToActorHelper = changesToActorHelper;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
-            _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+            _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
             _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
-            _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
             _actorStatusMarketRolesRuleService = actorStatusMarketRolesRuleService;
         }
 
@@ -90,13 +87,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             UpdateActorMarketRolesAndChildren(organization, actor, request);
 
             await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
-
-            var allMarketRolesForActorGln = organization.Actors
-                .Where(x => x.ActorNumber == actor.ActorNumber)
-                .SelectMany(x => x.MarketRoles)
-                .Select(x => x.Function);
-
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             await _actorStatusMarketRolesRuleService.ValidateAsync(organization.Id, actor).ConfigureAwait(false);
 
@@ -147,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 actor.MarketRoles.Add(marketRole);
             }
 
-            _overlappingBusinessRolesRuleService.ValidateEicFunctionsAcrossActors(organization.Actors);
+            _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(organization.Actors);
             _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
         }
     }

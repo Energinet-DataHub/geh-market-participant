@@ -52,7 +52,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 actorUpdatedIntegrationEvent.ExternalActorId?.Value,
                 actorNumber,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,
-                actorUpdatedIntegrationEvent.BusinessRoles.Select(x => (BusinessRoleCode)x),
                 actorUpdatedIntegrationEvent.ActorMarketRoles.Select(x =>
                     new ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(y =>
                         new ActorGridArea(y.Id, y.MeteringPointTypes)))));

@@ -27,7 +27,7 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IOrganizationRepository _organizationRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
-    private readonly IOverlappingEicFunctionsRuleService _overlappingBusinessRolesRuleService;
+    private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
     private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
@@ -35,14 +35,14 @@ public sealed class ActorFactoryService : IActorFactoryService
         IOrganizationRepository organizationRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-        IOverlappingEicFunctionsRuleService overlappingBusinessRolesRuleService,
+        IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
         _organizationRepository = organizationRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
-        _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+        _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
         _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
         _allowedGridAreasRuleService = allowedGridAreasRuleService;
     }
@@ -70,7 +70,7 @@ public sealed class ActorFactoryService : IActorFactoryService
 
         organization.Actors.Add(newActor);
 
-        _overlappingBusinessRolesRuleService.ValidateEicFunctionsAcrossActors(organization.Actors);
+        _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(organization.Actors);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()

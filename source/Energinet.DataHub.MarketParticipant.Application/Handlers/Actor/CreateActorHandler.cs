@@ -30,18 +30,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
-        private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
         private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
             IActorFactoryService actorFactoryService,
-            ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
             IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
-            _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
             _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
         }
 
@@ -56,14 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actorNumber = ActorNumber.Create(request.Actor.ActorNumber.Value);
             var actorName = new ActorName(request.Actor.Name.Value);
             var marketRoles = MarketRoleMapper.Map(request.Actor.MarketRoles).ToList();
-
-            var allMarketRolesForActorGln = organization.Actors
-                .Where(x => x.ActorNumber == actorNumber)
-                .SelectMany(x => x.MarketRoles)
-                .Select(x => x.Function)
-                .Concat(marketRoles.Select(x => x.Function));
-
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
 
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorNumber, actorName, marketRoles)

@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     case "metereddataadministrator":
                         _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataAdministrator, appRole.Id!.Value);
                         break;
-                    case "metereddataresponsible":
+                    case "meterdataresponsible":
                         _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataResponsible, appRole.Id!.Value);
                         break;
                     case "meteringpointadministrator":

@@ -40,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(
                 new Mock<IOrganizationExistsHelperService>().Object,
                 new Mock<IActorFactoryService>().Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object);
 
             // Act + Assert
@@ -57,11 +56,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             string actorGln = new MockedGln();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
-                combinationOfBusinessRolesRuleService.Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
@@ -117,11 +114,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             string actorGln = new MockedGln();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
-                combinationOfBusinessRolesRuleService.Object,
                 new Mock<IUniqueMarketRoleGridAreaService>().Object);
             var orgId = Guid.NewGuid();
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
@@ -181,7 +176,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 uniqueService.Object);
 
             var orgId = Guid.NewGuid();

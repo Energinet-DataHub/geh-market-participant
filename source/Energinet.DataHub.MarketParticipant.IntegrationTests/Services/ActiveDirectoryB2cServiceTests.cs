@@ -21,7 +21,6 @@ using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
-using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -172,12 +171,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
                 integrationTestConfig.B2CSettings.BackendAppId);
 
-            // Business Role Code Domain Service
-            var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
-            {
-                new MeteredDataResponsibleRole(), new SystemOperatorRole()
-            });
-
             // Active Directory Roles
             var activeDirectoryB2CRoles =
                 new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
@@ -188,7 +181,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             return new ActiveDirectoryB2CService(
                 graphClient,
                 config,
-                businessRoleCodeDomainService,
                 activeDirectoryB2CRoles,
                 logger);
         }

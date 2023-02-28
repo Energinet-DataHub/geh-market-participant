@@ -50,7 +50,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 ActorNumber = new MockedGln(),
                 Status = ActorStatus.Active
             };
-            integrationEvent.BusinessRoles.Add(BusinessRoleCode.Ddk);
 
             var meteringPointType = MeteringPointType.D03NotUsed;
             var actorGridArea = new ActorGridAreaEventData(Guid.NewGuid(), new List<string> { meteringPointType.ToString() });
@@ -74,7 +73,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber.Value);
             Assert.Equal((int)integrationEvent.ActorNumber.Type, (int)actualEvent.ActorNumber.Type);
             Assert.Equal((int)integrationEvent.Status, (int)actualEvent.Status);
-            Assert.Equal((int)integrationEvent.BusinessRoles.Single(), (int)actualEvent.BusinessRoles.Single());
             Assert.Equal((int)marketRole.Function, (int)actualMarketRole.Function);
             Assert.Equal(actorGridArea.Id, actualGridArea.Id);
             Assert.Equal(meteringPointType.ToString(), actualMeteringPoint);

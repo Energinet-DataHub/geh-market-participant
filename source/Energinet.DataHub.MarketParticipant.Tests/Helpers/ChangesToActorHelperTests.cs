@@ -35,14 +35,13 @@ public class ChangesToActorHelperTests
     private readonly OrganizationId _organizationId = CreateOrganizationId();
     private readonly Actor _actor = CreateValidActorWithChildren();
     private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
-    private readonly Mock<IBusinessRoleCodeDomainService> _businessRoleCodeDomainServiceMock = new();
     private readonly Mock<IGridAreaLinkRepository> _gridAreaLinkRepositoryMock = new();
 
     [Fact]
     public async Task FindChangesMadeToActor_OrganizationIdNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
+        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(null!, _actor, _incomingActor));
@@ -52,7 +51,7 @@ public class ChangesToActorHelperTests
     public async Task FindChangesMadeToActor_ExistingActorNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
+        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, null!, _incomingActor));
@@ -62,7 +61,7 @@ public class ChangesToActorHelperTests
     public async Task FindChangesMadeToActor_IncomingNull_ThrowsException()
     {
         // Arrange
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
+        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
 
         // Act + Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, _actor, null!));
@@ -76,7 +75,7 @@ public class ChangesToActorHelperTests
             .Setup(e => e.GetAsync(It.IsAny<GridAreaId>()))
             .ReturnsAsync(new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), It.IsAny<GridAreaId>()));
 
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
+        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
 
         // Act
         var result = await target.FindChangesMadeToActorAsync(_organizationId, _actor, _incomingActor).ConfigureAwait(false);
