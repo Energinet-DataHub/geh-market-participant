@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal(userRoleUpdateSut.Description, deserializedCreatedAuditLog.Description);
             Assert.Equal(userRoleUpdateSut.Status, deserializedCreatedAuditLog.Status);
             Assert.Equal(userRoleUpdateSut.EicFunction, deserializedCreatedAuditLog.EicFunction);
-            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => (int)e), deserializedCreatedAuditLog.Permissions);
+            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => e.ToString()), deserializedCreatedAuditLog.Permissions);
         }
 
         [Fact]
@@ -144,9 +144,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var deserializedCAuditLog = JsonSerializer.Deserialize<UserRoleAuditLogSerialized>(createdAuditLog.ChangeDescriptionJson);
             Assert.True(auditLogs.Count == 1);
             Assert.NotNull(deserializedCAuditLog);
-            var userRoleUpdateSutPermissionsInts = userRoleUpdateSut.Permissions.Select(e => (int)e).ToList();
+            var userRoleUpdateSutPermissionsInts = userRoleUpdateSut.Permissions.Select(e => e.ToString()).ToList();
             var deserializedCAuditLogPermissions = deserializedCAuditLog.Permissions?.ToList();
-            Assert.True(userRoleUpdateSutPermissionsInts.SequenceEqual(deserializedCAuditLogPermissions ?? new List<int>()));
+            Assert.True(userRoleUpdateSutPermissionsInts.SequenceEqual(deserializedCAuditLogPermissions ?? new List<string>()));
         }
 
         [Fact]
