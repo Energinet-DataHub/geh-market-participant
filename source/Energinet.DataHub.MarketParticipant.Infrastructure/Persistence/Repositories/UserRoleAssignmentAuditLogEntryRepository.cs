@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -38,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Where(e => e.UserId == userId.Value)
                 .Select(log => new UserRoleAssignmentAuditLogEntry(
                     new UserId(log.UserId),
-                    log.ActorId,
+                    new ActorId(log.ActorId),
                     new UserRoleId(log.UserRoleId),
                     new UserId(log.ChangedByUserId),
                     log.Timestamp,
@@ -55,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             var entity = new UserRoleAssignmentAuditLogEntryEntity
             {
                 UserId = userId.Value,
-                ActorId = logEntry.ActorId,
+                ActorId = logEntry.ActorId.Value,
                 UserRoleId = logEntry.UserRoleId.Value,
                 Timestamp = logEntry.Timestamp,
                 ChangedByUserId = logEntry.ChangedByUserId.Value,

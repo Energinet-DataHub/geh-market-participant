@@ -30,7 +30,7 @@ public interface IUserOverviewRepository
     /// </summary>
     /// <param name="actorId">The id of the actor.</param>
     /// <returns>The number of users.</returns>
-    Task<int> GetTotalUserCountAsync(Guid? actorId);
+    Task<int> GetTotalUserCountAsync(ActorId? actorId);
 
     /// <summary>
     /// Retrieve users paged.
@@ -46,7 +46,7 @@ public interface IUserOverviewRepository
         int pageSize,
         UserOverviewSortProperty sortProperty,
         SortDirection sortDirection,
-        Guid? actorId);
+        ActorId? actorId);
 
     /// <summary>
     /// Searches users paged
@@ -65,7 +65,7 @@ public interface IUserOverviewRepository
         int pageSize,
         UserOverviewSortProperty sortProperty,
         SortDirection sortDirection,
-        Guid? actorId,
+        ActorId? actorId,
         string? searchText,
         IEnumerable<UserStatus> userStatus,
         IEnumerable<UserRoleId> userRoles);

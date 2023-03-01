@@ -16,5 +16,8 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record ActorMarketRoleDto(EicFunction EicFunction, IEnumerable<ActorGridAreaDto> GridAreas, string? Comment);
+    public sealed record ActorMarketRoleDto(
+        EicFunction EicFunction,
+        IEnumerable<ActorGridAreaDto> GridAreas,
+        string? Comment);
 }

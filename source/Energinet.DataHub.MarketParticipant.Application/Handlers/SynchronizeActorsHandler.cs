@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
@@ -30,20 +29,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers;
 public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActorsCommand>
 {
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IActorRepository _actorRepository;
     private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
     private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
     private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
 
     public SynchronizeActorsHandler(
         IUnitOfWorkProvider unitOfWorkProvider,
-        IOrganizationRepository organizationRepository,
+        IActorRepository actorRepository,
         IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
         IExternalActorIdConfigurationService externalActorIdConfigurationService,
         IExternalActorSynchronizationRepository externalActorSynchronizationRepository)
     {
         _unitOfWorkProvider = unitOfWorkProvider;
-        _organizationRepository = organizationRepository;
+        _actorRepository = actorRepository;
         _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         _externalActorIdConfigurationService = externalActorIdConfigurationService;
         _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
@@ -63,26 +62,20 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
 
             if (nextEntry.HasValue)
             {
-                var (organizationId, actorId) = nextEntry.Value;
-
-                var organization = await _organizationRepository
-                    .GetAsync(organizationId)
-                    .ConfigureAwait(false);
-
-                var actor = organization!
-                    .Actors
-                    .First(actor => actor.Id == actorId);
+                var actor = (await _actorRepository
+                    .GetAsync(new ActorId(nextEntry.Value))
+                    .ConfigureAwait(false))!;
 
                 // TODO: This service must be replaced with a reliable version in a future PR.
                 await _externalActorIdConfigurationService
                     .AssignExternalActorIdAsync(actor)
                     .ConfigureAwait(false);
 
-                await _organizationRepository
-                    .AddOrUpdateAsync(organization)
+                await _actorRepository
+                    .AddOrUpdateAsync(actor)
                     .ConfigureAwait(false);
 
-                await EnqueueExternalActorIdChangedEventAsync(organization.Id, actor).ConfigureAwait(false);
+                await EnqueueExternalActorIdChangedEventAsync(actor).ConfigureAwait(false);
             }
 
             await uow.CommitAsync().ConfigureAwait(false);
@@ -91,17 +84,16 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
         return Unit.Value;
     }
 
-    private Task EnqueueExternalActorIdChangedEventAsync(OrganizationId organizationId, Domain.Model.Actor actor)
+    private Task EnqueueExternalActorIdChangedEventAsync(Domain.Model.Actor actor)
     {
         var externalIdEvent = new ActorExternalIdChangedIntegrationEvent
         {
-            OrganizationId = organizationId.Value,
-            ActorId = actor.Id,
+            OrganizationId = actor.OrganizationId.Value,
+            ActorId = actor.Id.Value,
             ExternalActorId = actor.ExternalActorId?.Value
         };
 
         return _actorIntegrationEventsQueueService.EnqueueActorUpdatedEventAsync(
-            organizationId,
             actor.Id,
             new IIntegrationEvent[] { externalIdEvent });
     }

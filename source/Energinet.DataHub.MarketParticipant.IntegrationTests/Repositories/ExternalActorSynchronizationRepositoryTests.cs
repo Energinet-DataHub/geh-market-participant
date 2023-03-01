@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
@@ -56,18 +55,16 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         await using var scope = host.BeginScope();
         var target = scope.GetInstance<IExternalActorSynchronizationRepository>();
 
-        var organizationId = new OrganizationId(Guid.NewGuid());
         var actorId = Guid.NewGuid();
 
-        await target.ScheduleAsync(organizationId, actorId);
+        await target.ScheduleAsync(actorId);
 
         // Act + Assert
         var next = await target.DequeueNextAsync();
 
         // Assert
         Assert.NotNull(next);
-        Assert.Equal(organizationId, next.Value.OrganizationId);
-        Assert.Equal(actorId, next.Value.ActorId);
+        Assert.Equal(actorId, next);
     }
 
     [Fact]
@@ -78,12 +75,11 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         await using var scope = host.BeginScope();
         var target = scope.GetInstance<IExternalActorSynchronizationRepository>();
 
-        var organizationId = new OrganizationId(Guid.NewGuid());
         var actorId = Guid.NewGuid();
 
-        await target.ScheduleAsync(organizationId, actorId);
-        await target.ScheduleAsync(organizationId, actorId);
-        await target.ScheduleAsync(organizationId, actorId);
+        await target.ScheduleAsync(actorId);
+        await target.ScheduleAsync(actorId);
+        await target.ScheduleAsync(actorId);
 
         // Act + Assert
         var next1 = await target.DequeueNextAsync();

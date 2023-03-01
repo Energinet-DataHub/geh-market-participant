@@ -25,26 +25,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     [UnitTest]
     public sealed class DeleteActorContactCommandRuleSetTests
     {
-        private static readonly Guid _validOrganizationId = Guid.NewGuid();
         private static readonly Guid _validActorId = Guid.NewGuid();
         private static readonly Guid _validContactId = Guid.NewGuid();
-
-        [Fact]
-        public async Task Validate_OrganizationId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(DeleteActorContactCommand.OrganizationId);
-
-            var target = new DeleteActorContactCommandRuleSet();
-            var command = new DeleteActorContactCommand(Guid.Empty, _validActorId, _validContactId);
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
 
         [Fact]
         public async Task Validate_ActorId_ValidatesProperty()
@@ -53,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(DeleteActorContactCommand.ActorId);
 
             var target = new DeleteActorContactCommandRuleSet();
-            var command = new DeleteActorContactCommand(_validOrganizationId, Guid.Empty, _validContactId);
+            var command = new DeleteActorContactCommand(Guid.Empty, _validContactId);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -70,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(DeleteActorContactCommand.ContactId);
 
             var target = new DeleteActorContactCommandRuleSet();
-            var command = new DeleteActorContactCommand(_validOrganizationId, _validActorId, Guid.Empty);
+            var command = new DeleteActorContactCommand(_validActorId, Guid.Empty);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

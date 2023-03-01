@@ -22,17 +22,18 @@ public class ActorGridArea
 {
     public ActorGridArea(IEnumerable<MeteringPointType> meteringPointTypes)
     {
+        Id = new GridAreaId(Guid.Empty);
         MeteringPointTypes = meteringPointTypes.ToList();
     }
 
     public ActorGridArea(
-        Guid id,
+        GridAreaId id,
         IEnumerable<MeteringPointType> meteringPointTypes)
     {
         Id = id;
         MeteringPointTypes = meteringPointTypes.ToList();
     }
 
-    public Guid Id { get; }
+    public GridAreaId Id { get; }
     public ICollection<MeteringPointType> MeteringPointTypes { get; }
 }

@@ -15,17 +15,17 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     /// <summary>
     /// Ensures given market roles only exists once per grid area across all organizations
     /// </summary>
-    public interface IUniqueMarketRoleGridAreaService
+    public interface IUniqueMarketRoleGridAreaRuleService
     {
         /// <summary>
         /// Ensures given market roles only exists once per grid area across all organizations
         /// </summary>
         /// <param name="actor">Actor for which to ensure unique market roles</param>
-        Task EnsureUniqueMarketRolesPerGridAreaAsync(Actor actor);
+        Task ValidateAsync(Actor actor);
     }
 }

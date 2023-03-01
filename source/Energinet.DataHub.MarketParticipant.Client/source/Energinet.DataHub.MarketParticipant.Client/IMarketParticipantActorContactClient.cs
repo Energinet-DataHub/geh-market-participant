@@ -27,26 +27,23 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <summary>
         /// List all contacts for an actor.
         /// </summary>
-        /// <param name="organizationId">The id of the organization.</param>
         /// <param name="actorId">The id of the actor.</param>
         /// <returns>A list of contacts <see cref="ActorDto"/> belonging to the actor.</returns>
-        Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid organizationId, Guid actorId);
+        Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid actorId);
 
         /// <summary>
         /// Creates a new contact for an actor.
         /// </summary>
-        /// <param name="organizationId">The id of the organization.</param>
         /// <param name="actorId">The id of the actor.</param>
         /// <param name="contactDto">The details of the contact to create.</param>
         /// <returns>The id of the created contact.</returns>
-        Task<Guid> CreateContactAsync(Guid organizationId, Guid actorId, CreateActorContactDto contactDto);
+        Task<Guid> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto);
 
         /// <summary>
         /// Removes the specified contact from an actor.
         /// </summary>
-        /// <param name="organizationId">The id of the organization.</param>
         /// <param name="actorId">The id of the actor.</param>
         /// <param name="contactId">The id of the contact.</param>
-        Task DeleteContactAsync(Guid organizationId, Guid actorId, Guid contactId);
+        Task DeleteContactAsync(Guid actorId, Guid contactId);
     }
 }

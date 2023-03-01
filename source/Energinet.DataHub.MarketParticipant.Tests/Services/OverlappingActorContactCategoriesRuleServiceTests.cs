@@ -26,16 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     public sealed class OverlappingActorContactCategoriesRuleServiceTests
     {
         [Fact]
-        public void ValidateCategoriesAcrossContacts_NullContactsArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new OverlappingActorContactCategoriesRuleService();
-
-            // Act + Assert
-            Assert.Throws<ArgumentNullException>(() => target.ValidateCategoriesAcrossContacts(null!));
-        }
-
-        [Fact]
         public void ValidateCategoriesAcrossContacts_CategoriesAreNotUnique_ThrowsException()
         {
             // Arrange
@@ -70,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         private static ActorContact CreateTestContact(ContactCategory category)
         {
             return new ActorContact(
-                Guid.NewGuid(),
+                new ActorId(Guid.NewGuid()),
                 "fake_value",
                 category,
                 new MockedEmailAddress(),

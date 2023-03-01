@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent.Id);
             Assert.Equal(integrationEvent.Status.ToString(), actualEvent.Status.ToString());
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         }

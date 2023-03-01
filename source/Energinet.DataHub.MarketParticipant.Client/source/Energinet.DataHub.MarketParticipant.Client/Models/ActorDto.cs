@@ -19,6 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record ActorDto(
         Guid ActorId,
+        Guid OrganizationId,
         Guid? ExternalActorId,
         ActorNumberDto ActorNumber,
         ActorStatus Status,

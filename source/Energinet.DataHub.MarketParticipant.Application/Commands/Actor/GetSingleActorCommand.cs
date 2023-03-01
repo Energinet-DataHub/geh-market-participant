@@ -17,5 +17,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record GetSingleActorCommand(Guid ActorId, Guid OrganizationId) : IRequest<GetSingleActorResponse>;
+    public sealed record GetSingleActorCommand(Guid ActorId) : IRequest<GetSingleActorResponse>;
 }

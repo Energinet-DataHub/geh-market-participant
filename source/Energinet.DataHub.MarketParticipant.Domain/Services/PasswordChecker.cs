@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 public sealed class PasswordChecker : IPasswordChecker
 {
-    private Dictionary<CharacterSet, HashSet<char>> _sets = new()
+    private readonly Dictionary<CharacterSet, HashSet<char>> _sets = new()
     {
         { CharacterSet.Numbers, "0123456789".ToHashSet() },
         { CharacterSet.Lower, "abcdefghijklmnopqrstuvwxyz".ToHashSet() },
@@ -34,7 +34,7 @@ public sealed class PasswordChecker : IPasswordChecker
 
         if (minLength < 1)
         {
-            throw new InvalidOperationException($"{nameof(minLength)} must be greather than 0");
+            throw new InvalidOperationException($"{nameof(minLength)} must be greater than 0.");
         }
 
         var charSets = _sets.Where(x => characterSets.HasFlag(x.Key)).Select(x => x.Value).ToList();

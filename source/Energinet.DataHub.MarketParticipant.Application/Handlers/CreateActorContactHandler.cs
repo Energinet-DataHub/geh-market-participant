@@ -17,7 +17,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,18 +28,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class CreateActorContactHandler : IRequestHandler<CreateActorContactCommand, CreateActorContactResponse>
     {
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IActorRepository _actorRepository;
         private readonly IActorContactRepository _contactRepository;
         private readonly IOverlappingActorContactCategoriesRuleService _overlappingContactCategoriesRuleService;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
 
         public CreateActorContactHandler(
-            IOrganizationExistsHelperService organizationExistsHelperService,
+            IActorRepository actorRepository,
             IActorContactRepository contactRepository,
             IOverlappingActorContactCategoriesRuleService overlappingContactCategoriesRuleService,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService)
         {
-            _organizationExistsHelperService = organizationExistsHelperService;
+            _actorRepository = actorRepository;
             _contactRepository = contactRepository;
             _overlappingContactCategoriesRuleService = overlappingContactCategoriesRuleService;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
@@ -50,11 +49,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
+            var actor = await _actorRepository
+                .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
-
-            var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
 
             if (actor == null)
                 throw new NotFoundValidationException(request.ActorId);
@@ -73,13 +70,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
-                .EnqueueContactAddedToActorEventAsync(organization.Id, actor, contact)
+                .EnqueueContactAddedToActorEventAsync(actor, contact)
                 .ConfigureAwait(false);
 
             return new CreateActorContactResponse(contactId.Value);
         }
 
-        private static ActorContact CreateContact(Guid actorId, CreateActorContactDto contactDto)
+        private static ActorContact CreateContact(ActorId actorId, CreateActorContactDto contactDto)
         {
             var optionalPhoneNumber = contactDto.Phone == null
                 ? null

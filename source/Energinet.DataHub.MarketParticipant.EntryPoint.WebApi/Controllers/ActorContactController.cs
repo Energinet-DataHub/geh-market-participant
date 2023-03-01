@@ -25,26 +25,28 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
-    [Route("organization")]
+    [Route("actor")]
     public sealed class ActorContactController : ControllerBase
     {
         private readonly ILogger<ActorContactController> _logger;
         private readonly IMediator _mediator;
 
-        public ActorContactController(ILogger<ActorContactController> logger, IMediator mediator)
+        public ActorContactController(
+            ILogger<ActorContactController> logger,
+            IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
         }
 
-        [HttpGet("{organizationId:guid}/actor/{actorId:guid}/contact")]
+        [HttpGet("{actorId:guid}/contact")]
         [AuthorizeUser(Permission.ActorManage)]
-        public async Task<IActionResult> ListAllAsync(Guid organizationId, Guid actorId)
+        public async Task<IActionResult> ListAllAsync(Guid actorId)
         {
             return await this.ProcessAsync(
                 async () =>
                     {
-                        var getOrganizationsCommand = new GetActorContactsCommand(organizationId, actorId);
+                        var getOrganizationsCommand = new GetActorContactsCommand(actorId);
 
                         var response = await _mediator
                             .Send(getOrganizationsCommand)
@@ -55,14 +57,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpPost("{organizationId:guid}/actor/{actorId:guid}/contact")]
+        [HttpPost("{actorId:guid}/contact")]
         [AuthorizeUser(Permission.ActorManage)]
-        public async Task<IActionResult> CreateContactAsync(Guid organizationId, Guid actorId, CreateActorContactDto contactDto)
+        public async Task<IActionResult> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    var createContactCommand = new CreateActorContactCommand(organizationId, actorId, contactDto);
+                    var createContactCommand = new CreateActorContactCommand(actorId, contactDto);
 
                     var response = await _mediator
                         .Send(createContactCommand)
@@ -73,14 +75,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpDelete("{organizationId:guid}/actor/{actorId:guid}/contact/{contactId:guid}")]
+        [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
         [AuthorizeUser(Permission.ActorManage)]
-        public async Task<IActionResult> DeleteContactAsync(Guid organizationId, Guid actorId, Guid contactId)
+        public async Task<IActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    var deleteContactCommand = new DeleteActorContactCommand(organizationId, actorId, contactId);
+                    var deleteContactCommand = new DeleteActorContactCommand(actorId, contactId);
 
                     var response = await _mediator
                         .Send(deleteContactCommand)

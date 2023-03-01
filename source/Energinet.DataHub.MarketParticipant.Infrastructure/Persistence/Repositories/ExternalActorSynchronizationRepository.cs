@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -31,14 +30,12 @@ public sealed class ExternalActorSynchronizationRepository : IExternalActorSynch
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task ScheduleAsync(OrganizationId organizationId, Guid actorId)
+    public async Task ScheduleAsync(Guid actorId)
     {
-        ArgumentNullException.ThrowIfNull(organizationId);
         ArgumentNullException.ThrowIfNull(actorId);
 
         var actorSync = new ActorSynchronizationEntity
         {
-            OrganizationId = organizationId.Value,
             ActorId = actorId
         };
 
@@ -52,7 +49,7 @@ public sealed class ExternalActorSynchronizationRepository : IExternalActorSynch
             .ConfigureAwait(false);
     }
 
-    public async Task<(OrganizationId OrganizationId, Guid ActorId)?> DequeueNextAsync()
+    public async Task<Guid?> DequeueNextAsync()
     {
         var query =
             from actorSync in _marketParticipantDbContext.ActorSynchronizationEntries
@@ -68,6 +65,6 @@ public sealed class ExternalActorSynchronizationRepository : IExternalActorSynch
             .SaveChangesAsync()
             .ConfigureAwait(false);
 
-        return (new OrganizationId(nextEntity.OrganizationId), nextEntity.ActorId);
+        return nextEntity.ActorId;
     }
 }

@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 public sealed class ActorFactoryService : IActorFactoryService
 {
-    private readonly IOrganizationRepository _organizationRepository;
+    private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
     private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
@@ -32,14 +32,14 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
     public ActorFactoryService(
-        IOrganizationRepository organizationRepository,
+        IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
         IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
-        _organizationRepository = organizationRepository;
+        _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
@@ -63,27 +63,29 @@ public sealed class ActorFactoryService : IActorFactoryService
 
         _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
 
-        var newActor = new Actor(actorNumber) { Name = actorName };
+        var newActor = new Actor(organization.Id, actorNumber) { Name = actorName };
 
         foreach (var marketRole in marketRoles)
             newActor.MarketRoles.Add(marketRole);
 
-        organization.Actors.Add(newActor);
+        var existingActors = await _actorRepository
+            .GetActorsAsync(organization.Id)
+            .ConfigureAwait(false);
 
-        _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+        _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(existingActors.Append(newActor));
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        var savedActor = await SaveActorAsync(organization, newActor).ConfigureAwait(false);
+        var savedActor = await SaveActorAsync(newActor).ConfigureAwait(false);
 
         await _actorIntegrationEventsQueueService
-            .EnqueueActorUpdatedEventAsync(organization.Id, savedActor)
+            .EnqueueActorUpdatedEventAsync(savedActor)
             .ConfigureAwait(false);
 
         await _actorIntegrationEventsQueueService
-            .EnqueueActorCreatedEventsAsync(organization.Id, savedActor)
+            .EnqueueActorCreatedEventsAsync(savedActor)
             .ConfigureAwait(false);
 
         await uow.CommitAsync().ConfigureAwait(false);
@@ -91,20 +93,14 @@ public sealed class ActorFactoryService : IActorFactoryService
         return savedActor;
     }
 
-    private async Task<Actor> SaveActorAsync(Organization organization, Actor newActor)
+    private async Task<Actor> SaveActorAsync(Actor newActor)
     {
-        var result = await _organizationRepository
-            .AddOrUpdateAsync(organization)
+        var actorId = await _actorRepository
+            .AddOrUpdateAsync(newActor)
             .ConfigureAwait(false);
 
-        result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
-
-        var savedOrganization = await _organizationRepository
-            .GetAsync(organization.Id)
-            .ConfigureAwait(false);
-
-        return savedOrganization!
-            .Actors
-            .Single(actor => actor.Id == newActor.Id);
+        return (await _actorRepository
+            .GetAsync(actorId)
+            .ConfigureAwait(false))!;
     }
 }

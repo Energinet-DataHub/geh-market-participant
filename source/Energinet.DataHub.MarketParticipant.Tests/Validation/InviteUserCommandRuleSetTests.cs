@@ -15,12 +15,8 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Google.Protobuf.WellKnownTypes;
-using Newtonsoft.Json.Linq;
 using Xunit;
 using Xunit.Categories;
 

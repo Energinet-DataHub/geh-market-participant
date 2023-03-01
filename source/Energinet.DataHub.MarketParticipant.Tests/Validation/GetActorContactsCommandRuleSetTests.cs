@@ -26,30 +26,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     public sealed class GetActorContactsCommandRuleSetTests
     {
         [Fact]
-        public async Task Validate_OrganizationId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(GetActorContactsCommand.OrganizationId);
-
-            var target = new GetActorContactsCommandRuleSet();
-            var command = new GetActorContactsCommand(Guid.Empty, Guid.NewGuid());
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-
-        [Fact]
         public async Task Validate_ActorId_ValidatesProperty()
         {
             // Arrange
             const string propertyName = nameof(GetActorContactsCommand.ActorId);
 
             var target = new GetActorContactsCommandRuleSet();
-            var command = new GetActorContactsCommand(Guid.NewGuid(), Guid.Empty);
+            var command = new GetActorContactsCommand(Guid.Empty);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

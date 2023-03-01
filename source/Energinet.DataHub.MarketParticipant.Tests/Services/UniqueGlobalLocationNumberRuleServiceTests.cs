@@ -67,7 +67,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var gln = new MockedGln();
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
-            organization.Actors.Add(new Actor(gln));
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -90,16 +89,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organization = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "fake_value",
-                new[]
-                {
-                    new Actor(
-                        Guid.NewGuid(),
-                        new ExternalActorId(Guid.NewGuid()),
-                        gln,
-                        ActorStatus.Active,
-                        Enumerable.Empty<ActorMarketRole>(),
-                        new ActorName("fake_value"))
-                },
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
                 new OrganizationDomain("energinet.dk"),

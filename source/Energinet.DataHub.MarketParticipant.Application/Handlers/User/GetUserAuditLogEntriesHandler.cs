@@ -58,7 +58,7 @@ public sealed class GetUserAuditLogEntriesHandler
     {
         return new UserRoleAssignmentAuditLogEntryDto(
             auditLogEntry.UserId.Value,
-            auditLogEntry.ActorId,
+            auditLogEntry.ActorId.Value,
             auditLogEntry.UserRoleId.Value,
             auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.Timestamp,
@@ -70,7 +70,7 @@ public sealed class GetUserAuditLogEntriesHandler
         return new UserInviteAuditLogEntryDto(
             auditLogEntry.UserId.Value,
             auditLogEntry.ChangedByUserId.Value,
-            auditLogEntry.ActorId,
+            auditLogEntry.ActorId.Value,
             auditLogEntry.ActorName,
             auditLogEntry.Timestamp);
     }

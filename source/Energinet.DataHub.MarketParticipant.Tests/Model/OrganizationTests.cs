@@ -14,7 +14,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Xunit;
 using Xunit.Categories;
@@ -137,7 +136,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             return new Organization(
                  new OrganizationId(Guid.Empty),
                  "fake_name",
-                 Enumerable.Empty<Actor>(),
                  new BusinessRegisterIdentifier("fake_value"),
                  new Address(
                     "fake_value",

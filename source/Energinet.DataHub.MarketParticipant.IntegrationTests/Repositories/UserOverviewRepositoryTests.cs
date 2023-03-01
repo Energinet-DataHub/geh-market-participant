@@ -260,7 +260,7 @@ public sealed class UserOverviewRepositoryTests
         var (userId, externalId, actorId) = await CreateUserWithActorName(context, false, "Axolotl");
 
         var userRole = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
-        await _fixture.AssignUserRoleAsync(userId.Value, actorId, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userId.Value, actorId.Value, userRole.Id);
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         userIdentityRepositoryMock
@@ -414,77 +414,6 @@ public sealed class UserOverviewRepositoryTests
         return userIdentityRepository;
     }
 
-    private static async Task<(Guid ActorId, IEnumerable<(UserId UserId, ExternalUserId ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
-    {
-        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
-
-        var users = new List<(UserId UserId, ExternalUserId ExternalId)>();
-
-        for (var i = 0; i < count; ++i)
-        {
-            var user = await CreateUserAsync(context, actorEntity, userRoleTemplate);
-            users.Add((new UserId(user.Id), new ExternalUserId(user.ExternalId)));
-        }
-
-        return (actorEntity.Id, users);
-    }
-
-    private static async Task<(UserId UserId, ExternalUserId ExternalId, Guid ActorId)> CreateUserAndActor(
-        MarketParticipantDbContext context, bool isFas)
-    {
-        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
-        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
-        return (new UserId(userEntity.Id), new ExternalUserId(userEntity.ExternalId), actorEntity.Id);
-    }
-
-    private static async Task<(UserId UserId, ExternalUserId ExternalId, Guid ActorId)> CreateUserWithActorName(
-        MarketParticipantDbContext context, bool isFas, string actorName)
-    {
-        var (_, actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, actorName);
-        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
-        return (new UserId(userEntity.Id), new ExternalUserId(userEntity.ExternalId), actorEntity.Id);
-    }
-
-    private static async Task<(OrganizationEntity Organization, ActorEntity Actor, UserRoleEntity Template)> CreateActorAndTemplate(
-            MarketParticipantDbContext context,
-            bool isFas,
-            string actorName = "Actor name",
-            EicFunction eicFunction = EicFunction.BillingAgent)
-    {
-        var actorEntity = new ActorEntity
-        {
-            Id = Guid.NewGuid(),
-            Name = actorName,
-            ActorNumber = new MockedGln(),
-            Status = (int)ActorStatus.Active,
-            IsFas = isFas
-        };
-
-        var orgEntity = new OrganizationEntity
-        {
-            Actors = { actorEntity },
-            Address = new AddressEntity { Country = "DK" },
-            Domain = new MockedDomain(),
-            Name = "Organization name",
-            BusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New().Identifier
-        };
-
-        await context.Organizations.AddAsync(orgEntity);
-        await context.SaveChangesAsync();
-
-        var userRoleTemplate = new UserRoleEntity
-        {
-            Name = "Template name",
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
-        };
-        await context.UserRoles.AddAsync(userRoleTemplate);
-        await context.SaveChangesAsync();
-        await context.Entry(actorEntity).ReloadAsync();
-
-        return (orgEntity, actorEntity, userRoleTemplate);
-    }
-
     private static async Task<UserEntity> CreateUserAsync(MarketParticipantDbContext context, ActorEntity actorEntity, UserRoleEntity userRole, string email = "test@example.com")
     {
         var roleAssignment = new UserRoleAssignmentEntity
@@ -503,5 +432,64 @@ public sealed class UserOverviewRepositoryTests
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
         return userEntity;
+    }
+
+    private async Task<(ActorId ActorId, IEnumerable<(UserId UserId, ExternalUserId ExternalId)> UserIds)> CreateUsersForSameActorAsync(MarketParticipantDbContext context, int count)
+    {
+        var (actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, false);
+
+        var users = new List<(UserId UserId, ExternalUserId ExternalId)>();
+
+        for (var i = 0; i < count; ++i)
+        {
+            var user = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+            users.Add((new UserId(user.Id), new ExternalUserId(user.ExternalId)));
+        }
+
+        return (new ActorId(actorEntity.Id), users);
+    }
+
+    private async Task<(UserId UserId, ExternalUserId ExternalId, ActorId ActorId)> CreateUserAndActor(
+        MarketParticipantDbContext context, bool isFas)
+    {
+        var (actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas);
+        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+        return (new UserId(userEntity.Id), new ExternalUserId(userEntity.ExternalId), new ActorId(actorEntity.Id));
+    }
+
+    private async Task<(UserId UserId, ExternalUserId ExternalId, ActorId ActorId)> CreateUserWithActorName(
+        MarketParticipantDbContext context, bool isFas, string actorName)
+    {
+        var (actorEntity, userRoleTemplate) = await CreateActorAndTemplate(context, isFas, actorName);
+        var userEntity = await CreateUserAsync(context, actorEntity, userRoleTemplate);
+        return (new UserId(userEntity.Id), new ExternalUserId(userEntity.ExternalId), new ActorId(actorEntity.Id));
+    }
+
+    private async Task<(ActorEntity Actor, UserRoleEntity Template)> CreateActorAndTemplate(
+            MarketParticipantDbContext context,
+            bool isFas,
+            string actorName = "Actor name",
+            EicFunction eicFunction = EicFunction.BillingAgent)
+    {
+        var actorEntity = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(t =>
+            {
+                t.IsFas = isFas;
+                t.Name = actorName;
+            }));
+
+        var userRoleTemplate = new UserRoleEntity
+        {
+            Name = "Template name",
+            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
+        };
+
+        await context.UserRoles.AddAsync(userRoleTemplate);
+        await context.SaveChangesAsync();
+        await context.Entry(actorEntity).ReloadAsync();
+
+        return (actorEntity, userRoleTemplate);
     }
 }
