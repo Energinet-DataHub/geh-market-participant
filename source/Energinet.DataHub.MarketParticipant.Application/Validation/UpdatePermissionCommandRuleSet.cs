@@ -12,25 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class UpdatePermissionCommandRuleSet : AbstractValidator<UpdatePermissionCommand>
 {
-    public sealed class PermissionDetails
+    public UpdatePermissionCommandRuleSet()
     {
-        public PermissionDetails(
-            Permission permission,
-            string description,
-            IEnumerable<EicFunction> eicFunctions)
-        {
-            Permission = permission;
-            Description = description;
-            EicFunctions = eicFunctions;
-        }
+        RuleFor(command => command)
+            .NotNull();
 
-        public Permission Permission { get; }
-        public string Description { get; set; }
-        public IEnumerable<EicFunction> EicFunctions { get; }
+        RuleFor(command => command.Id)
+            .Must(x => Enum.IsDefined((Permission)x));
+
+        RuleFor(command => command.Description)
+            .NotEmpty()
+            .MaximumLength(250);
     }
 }
