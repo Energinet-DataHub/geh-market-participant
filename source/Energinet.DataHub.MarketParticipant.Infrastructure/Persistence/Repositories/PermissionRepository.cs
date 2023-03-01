@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,11 +51,29 @@ public sealed class PermissionRepository : IPermissionRepository
             x.EicFunctions.Select(y => y.EicFunction)));
     }
 
-    public async Task UpdatePermissionAsync(Permission permissionToUpdate, string newDescription)
+    public async Task<PermissionDetails> GetAsync(Permission permission)
     {
-        var permissionId = (int)permissionToUpdate;
+        var permissionEntity = await _marketParticipantDbContext.Permissions
+            .FirstOrDefaultAsync(p => p.Id == (int)permission)
+            .ConfigureAwait(false);
+
+        if (permissionEntity == null)
+        {
+            throw new ArgumentException("permission not found");
+        }
+
+        return new PermissionDetails(
+            (Permission)permissionEntity.Id,
+            permissionEntity.Description,
+            permissionEntity.EicFunctions.Select(y => y.EicFunction));
+    }
+
+    public async Task UpdatePermissionAsync(PermissionDetails permissionDetails)
+    {
+        ArgumentNullException.ThrowIfNull(permissionDetails);
+        var permissionId = (int)permissionDetails.Permission;
         var permission = await _marketParticipantDbContext.Permissions.FirstAsync(p => p.Id == permissionId).ConfigureAwait(false);
-        permission.Description = newDescription;
+        permission.Description = permissionDetails.Description;
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
     }
 

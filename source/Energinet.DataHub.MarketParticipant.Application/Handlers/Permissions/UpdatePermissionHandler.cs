@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -37,7 +38,18 @@ public sealed class UpdatePermissionHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await _permissionRepository.UpdatePermissionAsync((Permission)request.Id, request.Description).ConfigureAwait(false);
+
+        var permissionToUpdate = await _permissionRepository.GetAsync((Permission)request.Id).ConfigureAwait(false);
+
+        if (permissionToUpdate == null)
+        {
+            throw new NotFoundValidationException($"permission not found: {request.Id}");
+        }
+
+        permissionToUpdate.Description = request.Description;
+
+        await _permissionRepository.UpdatePermissionAsync(permissionToUpdate).ConfigureAwait(false);
+
         return Unit.Value;
     }
 }

@@ -276,8 +276,10 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         var permissionToUpdate = permissionDetails.First(p =>
             p.Permission == Permission.UserRoleManage && p.Description == "DescriptionInit");
 
+        permissionToUpdate.Description = newPermissionDescription;
+
         await permissionRepository
-            .UpdatePermissionAsync(permissionToUpdate.Permission, newPermissionDescription)
+            .UpdatePermissionAsync(permissionToUpdate)
             .ConfigureAwait(false);
 
         // Assert

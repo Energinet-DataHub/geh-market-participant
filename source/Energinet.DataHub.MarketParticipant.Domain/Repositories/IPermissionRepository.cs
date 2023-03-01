@@ -38,9 +38,15 @@ public interface IPermissionRepository
     Task<IEnumerable<PermissionDetails>> GetToMarketRoleAsync(EicFunction eicFunction);
 
     /// <summary>
+    /// Get permission
+    /// </summary>
+    /// <param name="permission"></param>
+    /// <returns>Permission details</returns>
+    Task<PermissionDetails> GetAsync(Permission permission);
+
+    /// <summary>
     /// Update permission
     /// </summary>
-    /// <param name="permissionToUpdate">permission to update</param>
-    /// <param name="newDescription">New permission description</param>
-    Task UpdatePermissionAsync(Permission permissionToUpdate, string newDescription);
+    /// <param name="permissionDetails">permission to update</param>
+    Task UpdatePermissionAsync(PermissionDetails permissionDetails);
 }
