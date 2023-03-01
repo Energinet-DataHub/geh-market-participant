@@ -24,7 +24,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-// TODO: ActorRepository UTs
 public sealed class ActorRepository : IActorRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;

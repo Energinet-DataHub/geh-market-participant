@@ -12,48 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
-internal static class TestActorPreparationHelper
+internal static class TestOrganizationPreparationHelper
 {
-    public static Task<ActorEntity> PrepareActorAsync(
-        this MarketParticipantDatabaseFixture fixture)
+    public static Task<OrganizationEntity> PrepareOrganizationAsync(this MarketParticipantDatabaseFixture fixture)
     {
-        return fixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor,
-            TestPreparationEntities.ValidMarketRole);
+        return fixture.PrepareOrganizationAsync(TestPreparationEntities.ValidOrganization);
     }
 
-    public static async Task<ActorEntity> PrepareActorAsync(
+    public static async Task<OrganizationEntity> PrepareOrganizationAsync(
         this MarketParticipantDatabaseFixture fixture,
-        OrganizationEntity inputOrganization,
-        ActorEntity inputActor,
-        params MarketRoleEntity[] inputMarketRoles)
+        OrganizationEntity inputOrganization)
     {
         await using var context = fixture.DatabaseManager.CreateDbContext();
 
-        foreach (var localMarketRole in inputMarketRoles)
-        {
-            inputActor.MarketRoles.Add(localMarketRole);
-        }
-
-        if (inputOrganization.Id == Guid.Empty)
-        {
-            await context.Organizations.AddAsync(inputOrganization);
-            await context.SaveChangesAsync();
-        }
-
-        inputActor.OrganizationId = inputOrganization.Id;
-
-        await context.Actors.AddAsync(inputActor);
+        await context.Organizations.AddAsync(inputOrganization);
         await context.SaveChangesAsync();
 
-        return inputActor;
+        return inputOrganization;
     }
 }
