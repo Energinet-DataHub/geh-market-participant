@@ -41,6 +41,6 @@ public interface IPermissionRepository
     /// Update permission
     /// </summary>
     /// <param name="permissionToUpdate">permission to update</param>
-    /// <param name="newDescription">New permission detail</param>
+    /// <param name="newDescription">New permission description</param>
     Task UpdatePermissionAsync(Permission permissionToUpdate, string newDescription);
 }
