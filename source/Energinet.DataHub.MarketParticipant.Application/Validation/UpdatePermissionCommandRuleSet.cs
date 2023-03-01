@@ -21,6 +21,9 @@ public sealed class UpdatePermissionCommandRuleSet : AbstractValidator<UpdatePer
 {
     public UpdatePermissionCommandRuleSet()
     {
+        RuleFor(command => command)
+            .NotNull();
+
         RuleFor(command => command.Id)
             .NotEmpty();
 

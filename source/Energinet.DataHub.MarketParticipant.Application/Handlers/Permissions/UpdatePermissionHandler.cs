@@ -20,7 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
 public sealed class UpdatePermissionHandler
     : IRequestHandler<UpdatePermissionCommand, Unit>

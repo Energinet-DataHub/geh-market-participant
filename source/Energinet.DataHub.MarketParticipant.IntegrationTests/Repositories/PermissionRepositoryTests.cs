@@ -239,6 +239,56 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Equal(EicFunction.ElOverblik, permissions2.First().EicFunctions.Skip(1).First());
     }
 
+    [Fact]
+    public async Task UpdatePermission_Success()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var permissionRepository = new PermissionRepository(context);
+        var permissionRepositoryAssert = new PermissionRepository(context2);
+
+        var permission = new PermissionEntity
+        {
+            Id = (int)Permission.UserRoleManage,
+            EicFunctions =
+            {
+                new PermissionEicFunctionEntity()
+                {
+                    EicFunction = EicFunction.SystemOperator, PermissionId = (int)Permission.UserRoleManage
+                }
+            },
+            Description = "DescriptionInit"
+        };
+
+        await context.Permissions.AddAsync(permission).ConfigureAwait(false);
+        await context.SaveChangesAsync().ConfigureAwait(false);
+
+        const string newPermissionDescription = "newPermissionDescription";
+
+        // Act
+        var permissions = await permissionRepository
+            .GetToMarketRoleAsync(EicFunction.SystemOperator)
+            .ConfigureAwait(false);
+        var permissionDetails = permissions.ToList();
+        var permissionToUpdate = permissionDetails.First(p =>
+            p.Permission == Permission.UserRoleManage && p.Description == "DescriptionInit");
+
+        await permissionRepository
+            .UpdatePermissionAsync(permissionToUpdate.Permission, newPermissionDescription)
+            .ConfigureAwait(false);
+
+        // Assert
+        var permissionUpdated = await permissionRepositoryAssert
+            .GetToMarketRoleAsync(EicFunction.SystemOperator)
+            .ConfigureAwait(false);
+        var permissionUpdatedList = permissionUpdated.ToList();
+        Assert.Single(permissionUpdatedList);
+        Assert.Equal(newPermissionDescription, permissionUpdatedList[0].Description);
+    }
+
     public async Task InitializeAsync()
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
