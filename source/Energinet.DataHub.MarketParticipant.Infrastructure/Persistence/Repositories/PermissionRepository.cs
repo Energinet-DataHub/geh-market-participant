@@ -51,7 +51,7 @@ public sealed class PermissionRepository : IPermissionRepository
             x.EicFunctions.Select(y => y.EicFunction)));
     }
 
-    public async Task<PermissionDetails> GetAsync(Permission permission)
+    public async Task<PermissionDetails?> GetAsync(Permission permission)
     {
         var permissionEntity = await _marketParticipantDbContext.Permissions
             .FirstOrDefaultAsync(p => p.Id == (int)permission)
@@ -59,7 +59,7 @@ public sealed class PermissionRepository : IPermissionRepository
 
         if (permissionEntity == null)
         {
-            throw new ArgumentException("permission not found");
+            return null;
         }
 
         return new PermissionDetails(

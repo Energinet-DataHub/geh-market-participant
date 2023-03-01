@@ -43,7 +43,7 @@ public sealed class UpdatePermissionHandler
 
         if (permissionToUpdate == null)
         {
-            throw new NotFoundValidationException($"permission not found: {request.Id}");
+            throw new NotFoundValidationException($"Permission not found: {request.Id}");
         }
 
         permissionToUpdate.Description = request.Description;

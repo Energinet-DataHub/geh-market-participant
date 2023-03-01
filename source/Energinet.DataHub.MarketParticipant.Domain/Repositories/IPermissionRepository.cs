@@ -42,7 +42,7 @@ public interface IPermissionRepository
     /// </summary>
     /// <param name="permission"></param>
     /// <returns>Permission details</returns>
-    Task<PermissionDetails> GetAsync(Permission permission);
+    Task<PermissionDetails?> GetAsync(Permission permission);
 
     /// <summary>
     /// Update permission
