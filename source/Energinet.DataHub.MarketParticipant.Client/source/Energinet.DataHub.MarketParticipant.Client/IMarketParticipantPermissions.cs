@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
@@ -28,5 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Gets all permissions.
         /// </summary>
         Task<IEnumerable<PermissionDetailsDto>> GetPermissionsAsync();
+
+        /// <summary>
+        /// Update permission
+        /// </summary>
+        /// <param name="updatePermissionDto">New permission description</param>
+        Task UpdatePermissionAsync(UpdatePermissionDto updatePermissionDto);
     }
 }
