@@ -30,16 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     public sealed class OverlappingBusinessRolesRuleServiceTests
     {
         [Fact]
-        public void ValidateRolesAcrossActors_NullActorsArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new OverlappingBusinessRolesRuleService(new Mock<IBusinessRoleCodeDomainService>().Object);
-
-            // Act
-            Assert.Throws<ArgumentNullException>(() => target.ValidateRolesAcrossActors(null!));
-        }
-
-        [Fact]
         public void ValidateRolesAcrossActors_RolesAreNotUnique_ThrowsException()
         {
             // Arrange
@@ -49,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             businessRoleCodeDomainService.Setup(x => x.GetBusinessRoleCodes(It.IsAny<IEnumerable<EicFunction>>()))
                 .Returns(new[] { BusinessRoleCode.Ddk });
 
-            var actor = new Actor(new MockedGln());
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln());
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
@@ -75,10 +65,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var gln = new MockedGln();
 
-            var actor = new Actor(ActorNumber.Create(gln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(gln));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
-            var newActorWithSameGln = new Actor(ActorNumber.Create(gln));
+            var newActorWithSameGln = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(gln));
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
@@ -104,10 +94,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var gln = new MockedGln();
 
-            var actor = new Actor(ActorNumber.Create(gln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(gln));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
-            var newActorWithSameGln = new Actor(ActorNumber.Create(gln));
+            var newActorWithSameGln = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(gln));
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert
@@ -138,10 +128,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var gln = new MockedGln();
 
-            var actor = new Actor(ActorNumber.Create(gln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(gln));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>()));
 
-            var newActorWithSameGln = new Actor(ActorNumber.Create(gln));
+            var newActorWithSameGln = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(gln));
             newActorWithSameGln.MarketRoles.Add(new ActorMarketRole(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()));
 
             // Act + Assert

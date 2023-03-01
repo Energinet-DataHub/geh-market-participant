@@ -66,22 +66,22 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         public Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId)
         {
-            return _marketParticipantActorClient.GetActorsAsync(organizationId);
+            return _marketParticipantOrganizationClient.GetActorsAsync(organizationId);
         }
 
-        public Task<ActorDto> GetActorAsync(Guid organizationId, Guid actorId)
+        public Task<ActorDto> GetActorAsync(Guid actorId)
         {
-            return _marketParticipantActorClient.GetActorAsync(organizationId, actorId);
+            return _marketParticipantActorClient.GetActorAsync(actorId);
         }
 
-        public Task<Guid> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
+        public Task<Guid> CreateActorAsync(CreateActorDto createActorDto)
         {
-            return _marketParticipantActorClient.CreateActorAsync(organizationId, createActorDto);
+            return _marketParticipantActorClient.CreateActorAsync(createActorDto);
         }
 
-        public Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto)
+        public Task UpdateActorAsync(Guid actorId, ChangeActorDto changeActorDto)
         {
-            return _marketParticipantActorClient.UpdateActorAsync(organizationId, actorId, changeActorDto);
+            return _marketParticipantActorClient.UpdateActorAsync(actorId, changeActorDto);
         }
 
         public Task<IEnumerable<GridAreaDto>> GetGridAreasAsync()
@@ -94,19 +94,19 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantGridAreaClient.UpdateGridAreaAsync(changes);
         }
 
-        public Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid organizationId, Guid actorId)
+        public Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid actorId)
         {
-            return _marketParticipantActorContactClient.GetContactsAsync(organizationId, actorId);
+            return _marketParticipantActorContactClient.GetContactsAsync(actorId);
         }
 
-        public Task<Guid> CreateContactAsync(Guid organizationId, Guid actorId, CreateActorContactDto contactDto)
+        public Task<Guid> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
-            return _marketParticipantActorContactClient.CreateContactAsync(organizationId, actorId, contactDto);
+            return _marketParticipantActorContactClient.CreateContactAsync(actorId, contactDto);
         }
 
-        public Task DeleteContactAsync(Guid organizationId, Guid actorId, Guid contactId)
+        public Task DeleteContactAsync(Guid actorId, Guid contactId)
         {
-            return _marketParticipantActorContactClient.DeleteContactAsync(organizationId, actorId, contactId);
+            return _marketParticipantActorContactClient.DeleteContactAsync(actorId, contactId);
         }
 
         public Task<IEnumerable<GridAreaOverviewItemDto>> GetGridAreaOverviewAsync()

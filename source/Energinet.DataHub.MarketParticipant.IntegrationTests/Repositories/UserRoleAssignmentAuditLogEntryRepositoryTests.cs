@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -66,7 +67,7 @@ public sealed class UserRoleAssignmentAuditLogEntryRepositoryTests
 
         var entry = new UserRoleAssignmentAuditLogEntry(
             new UserId(user.Id),
-            Guid.NewGuid(),
+            new ActorId(Guid.NewGuid()),
             new UserRoleId(userRole.Id),
             new UserId(user.Id),
             DateTimeOffset.UtcNow,

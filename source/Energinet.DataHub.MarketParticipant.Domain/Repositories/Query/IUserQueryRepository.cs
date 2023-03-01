@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -29,7 +29,7 @@ public interface IUserQueryRepository
     /// </summary>
     /// <param name="externalUserId">The external id of the user.</param>
     /// <returns>A list of actor ids attached to the specified user.</returns>
-    Task<IEnumerable<Guid>> GetActorsAsync(ExternalUserId externalUserId);
+    Task<IEnumerable<ActorId>> GetActorsAsync(ExternalUserId externalUserId);
 
     /// <summary>
     /// Gets all permissions a user has for the given actor.
@@ -38,7 +38,7 @@ public interface IUserQueryRepository
     /// <param name="externalUserId">The external id of the user.</param>
     /// <returns>A list of the applicable permissions.</returns>
     Task<IEnumerable<Core.App.Common.Security.Permission>> GetPermissionsAsync(
-        Guid actorId,
+        ActorId actorId,
         ExternalUserId externalUserId);
 
     /// <summary>
@@ -48,6 +48,6 @@ public interface IUserQueryRepository
     /// <param name="externalUserId">The external id of the user.</param>
     /// <returns>Flag indicating whether the user under the actor is FAS</returns>
     Task<bool> IsFasAsync(
-        Guid actorId,
+        ActorId actorId,
         ExternalUserId externalUserId);
 }

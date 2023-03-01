@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -22,7 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantActorClient : IMarketParticipantActorClient
     {
-        private const string OrganizationsBaseUrl = "Organization";
         private const string ActorBaseUrl = "Actor";
 
         private readonly IMarketParticipantClientFactory _clientFactory;
@@ -32,30 +30,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId)
+        public async Task<ActorDto> GetActorAsync(Guid actorId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
-                        .GetAsync())
-                .ConfigureAwait(false);
-
-            var actors = await response
-                .GetJsonAsync<IEnumerable<ActorDto>>()
-                .ConfigureAwait(false);
-
-            return actors;
-        }
-
-        public async Task<ActorDto> GetActorAsync(Guid organizationId, Guid actorId)
-        {
-            var response = await ValidationExceptionHandler
-                .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
+                        .Request(ActorBaseUrl, actorId)
                         .GetAsync())
                 .ConfigureAwait(false);
 
@@ -66,13 +47,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return actor;
         }
 
-        public async Task<Guid> CreateActorAsync(Guid organizationId, CreateActorDto createActorDto)
+        public async Task<Guid> CreateActorAsync(CreateActorDto createActorDto)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
+                        .Request(ActorBaseUrl)
                         .PostJsonAsync(createActorDto))
                 .ConfigureAwait(false);
 
@@ -83,13 +64,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return Guid.Parse(actor);
         }
 
-        public Task UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActorDto)
+        public Task UpdateActorAsync(Guid actorId, ChangeActorDto changeActorDto)
         {
             return ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId)
+                        .Request(ActorBaseUrl, actorId)
                         .PutJsonAsync(changeActorDto));
         }
     }

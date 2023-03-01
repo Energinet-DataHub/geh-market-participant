@@ -20,7 +20,6 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Moq;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
@@ -173,43 +172,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Contains(deserializedAuditLogs, e => e?.Status != null);
             Assert.Contains(deserializedAuditLogs, e => !string.IsNullOrWhiteSpace(e?.Name));
             Assert.True(deserializedAuditLogs.All(e => e?.EicFunction == null));
-        }
-
-        [Fact]
-        public void DetermineUserRoleChangesAndBuildAuditLogs_UserIdNull_Throws()
-        {
-            // arrange
-            DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(null!, BuildUserRoleWithPermissionsDto(), BuildUserRoleWithPermissionsDto());
-        }
-
-        [Fact]
-        public void DetermineUserRoleChangesAndBuildAuditLogs_userRoleDbNull_Throws()
-        {
-            // arrange
-            DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(new UserId(Guid.Empty), null!, BuildUserRoleWithPermissionsDto());
-        }
-
-        [Fact]
-        public void DetermineUserRoleChangesAndBuildAuditLogs_userRoleUpdateNull_Throws()
-        {
-            // arrange
-            DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(new UserId(Guid.Empty), BuildUserRoleWithPermissionsDto(), null!);
-        }
-
-        private static void DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(
-            UserId currentUserId,
-            UserRole userRoleDb,
-            UserRole userRoleUpdate)
-        {
-            // arrange
-            var userRoleAuditLogService = new UserRoleAuditLogService();
-
-            // act + assert
-            Assert.Throws<ArgumentNullException>(() =>
-                userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
-                    currentUserId,
-                    userRoleDb,
-                    userRoleUpdate).ToList());
         }
 
         private static UserRole BuildUserRoleWithPermissionsDto(

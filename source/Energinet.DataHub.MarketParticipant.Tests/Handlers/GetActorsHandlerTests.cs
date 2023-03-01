@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -31,49 +31,21 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetActorsHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new GetActorsHandler(new Mock<IOrganizationExistsHelperService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NoActors_ReturnsEmptyList()
         {
             // Arrange
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorsHandler(organizationExistsHelperService.Object);
+            var target = new GetActorsHandler(
+                new Mock<IActorRepository>().Object,
+                organizationExistsHelperService.Object);
 
-            var organizationId = Guid.NewGuid();
-            const string orgName = "SomeName";
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-
-            var organization = new Organization(
-                new OrganizationId(organizationId),
-                orgName,
-                Enumerable.Empty<Actor>(),
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            var organization = TestPreparationModels.MockedOrganization();
 
             organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
+                .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
                 .ReturnsAsync(organization);
 
-            var command = new GetActorsCommand(organizationId);
+            var command = new GetActorsCommand(organization.Id.Value);
 
             // Act + Assert
             var actual = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -85,47 +57,23 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_HasActors_ReturnsActors()
         {
             // Arrange
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorsHandler(organizationExistsHelperService.Object);
+            var target = new GetActorsHandler(
+                actorRepositoryMock.Object,
+                organizationExistsHelperService.Object);
 
             var orgId = Guid.NewGuid();
-            const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
             var actorId2 = Guid.NewGuid();
-            string actorGln = new MockedGln();
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
 
-            var actor = new Actor(
-                actorId,
-                new ExternalActorId(actorId),
-                ActorNumber.Create(actorGln),
-                ActorStatus.Active,
-                Enumerable.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
+            var actor = TestPreparationModels.MockedActor(actorId, orgId);
+            var actor2 = TestPreparationModels.MockedActor(actorId2, orgId);
+            var organization = TestPreparationModels.MockedOrganization(orgId);
 
-            var actor2 = new Actor(
-                actorId2,
-                new ExternalActorId(actorId2),
-                ActorNumber.Create(actorGln),
-                ActorStatus.Active,
-                Enumerable.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                new OrganizationId(orgId),
-                orgName,
-                new[] { actor, actor2 },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetActorsAsync(organization.Id))
+                .ReturnsAsync(new[] { actor, actor2 });
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
@@ -137,7 +85,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
-            Assert.NotNull(response.Actors);
             Assert.NotEmpty(response.Actors);
             Assert.Equal(2, response.Actors.Count());
 

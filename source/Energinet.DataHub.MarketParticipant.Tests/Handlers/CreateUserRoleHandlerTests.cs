@@ -37,22 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         private const int ValidPermission = (int)Permission.ActorManage;
 
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new CreateUserRoleHandler(
-                new Mock<IUserRoleRepository>().Object,
-                new Mock<IUserRoleAuditLogService>().Object,
-                new Mock<IUserRoleAuditLogEntryRepository>().Object,
-                new Mock<IEnsureUserRolePermissionsService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NewUserRole_UserRoleIdReturned()
         {
             // Arrange

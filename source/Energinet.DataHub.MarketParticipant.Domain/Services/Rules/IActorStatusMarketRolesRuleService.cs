@@ -15,18 +15,16 @@
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+/// <summary>
+/// Validates market roles on a given actor
+/// </summary>
+public interface IActorStatusMarketRolesRuleService
 {
     /// <summary>
     /// Validates market roles on a given actor
     /// </summary>
-    public interface IActorStatusMarketRolesRuleService
-    {
-        /// <summary>
-        /// Validates market roles on a given actor
-        /// </summary>
-        /// <param name="organizationId">ID of the organization the actor belongs to</param>
-        /// <param name="updatedActor">Updated actor</param>
-        Task ValidateAsync(OrganizationId organizationId, Actor updatedActor);
-    }
+    /// <param name="updatedActor">Updated actor</param>
+    Task ValidateAsync(Actor updatedActor);
 }

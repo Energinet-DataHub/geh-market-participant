@@ -30,33 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidEmail = "john@example.com";
         private const string ValidPhone = "+45 01 02 03 04";
 
-        private static readonly Guid _validOrganizationId = Guid.NewGuid();
         private static readonly Guid _validActorId = Guid.NewGuid();
         private static readonly string _test250Length = new('a', 250);
         private static readonly string _test251Length = new('a', 251);
         private static readonly string _test254Length = new('a', 254);
         private static readonly string _test255Length = new('a', 255);
-
-        [Fact]
-        public async Task Validate_OrganizationId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(CreateActorContactCommand.OrganizationId);
-
-            var target = new CreateActorContactCommandRuleSet();
-            var command = new CreateActorContactCommand(Guid.Empty, _validActorId, new CreateActorContactDto(
-                ValidName,
-                ValidCategory,
-                ValidEmail,
-                ValidPhone));
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
 
         [Fact]
         public async Task Validate_ActorId_ValidatesProperty()
@@ -65,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(CreateActorContactCommand.ActorId);
 
             var target = new CreateActorContactCommandRuleSet();
-            var command = new CreateActorContactCommand(_validOrganizationId, Guid.Empty, new CreateActorContactDto(
+            var command = new CreateActorContactCommand(Guid.Empty, new CreateActorContactDto(
                 ValidName,
                 ValidCategory,
                 ValidEmail,
@@ -98,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidPhone);
 
             var target = new CreateActorContactCommandRuleSet();
-            var command = new CreateActorContactCommand(_validOrganizationId, _validActorId, contactDto);
+            var command = new CreateActorContactCommand(_validActorId, contactDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -142,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidPhone);
 
             var target = new CreateActorContactCommandRuleSet();
-            var command = new CreateActorContactCommand(_validOrganizationId, _validActorId, contactDto);
+            var command = new CreateActorContactCommand(_validActorId, contactDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -185,7 +163,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 ValidPhone);
 
             var target = new CreateActorContactCommandRuleSet();
-            var command = new CreateActorContactCommand(_validOrganizationId, _validActorId, contactDto);
+            var command = new CreateActorContactCommand(_validActorId, contactDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -220,7 +198,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 value);
 
             var target = new CreateActorContactCommandRuleSet();
-            var command = new CreateActorContactCommand(_validOrganizationId, _validActorId, contactDto);
+            var command = new CreateActorContactCommand(_validActorId, contactDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

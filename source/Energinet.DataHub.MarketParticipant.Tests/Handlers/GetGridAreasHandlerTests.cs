@@ -28,18 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetGridAreasHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // arrange
-            var target = new GetGridAreasHandler(new Mock<IGridAreaRepository>().Object);
-
-            // act assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_Command_CallsRepository()
         {
             // arrange

@@ -22,7 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
 {
     public sealed class MarketParticipantActorContactClient : IMarketParticipantActorContactClient
     {
-        private const string OrganizationsBaseUrl = "Organization";
         private const string ActorBaseUrl = "Actor";
         private const string ContactBaseUrl = "Contact";
 
@@ -33,13 +32,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             _clientFactory = clientFactory;
         }
 
-        public async Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid organizationId, Guid actorId)
+        public async Task<IEnumerable<ActorContactDto>> GetContactsAsync(Guid actorId)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl)
+                        .Request(ActorBaseUrl, actorId, ContactBaseUrl)
                         .GetAsync())
                 .ConfigureAwait(false);
 
@@ -50,13 +49,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return contacts;
         }
 
-        public async Task<Guid> CreateContactAsync(Guid organizationId, Guid actorId, CreateActorContactDto contactDto)
+        public async Task<Guid> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
             var response = await ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl)
+                        .Request(ActorBaseUrl, actorId, ContactBaseUrl)
                         .PostJsonAsync(contactDto))
                 .ConfigureAwait(false);
 
@@ -67,13 +66,13 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return Guid.Parse(contact);
         }
 
-        public Task DeleteContactAsync(Guid organizationId, Guid actorId, Guid contactId)
+        public Task DeleteContactAsync(Guid actorId, Guid contactId)
         {
             return ValidationExceptionHandler
                 .HandleAsync(
                     () => _clientFactory
                         .CreateClient()
-                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl, actorId, ContactBaseUrl, contactId)
+                        .Request(ActorBaseUrl, actorId, ContactBaseUrl, contactId)
                         .DeleteAsync());
         }
     }

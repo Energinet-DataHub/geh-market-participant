@@ -29,6 +29,4 @@ public sealed class ActorEntity
     public int Status { get; set; }
 
     public Collection<MarketRoleEntity> MarketRoles { get; } = new();
-
-    public bool New { get; set; }
 }

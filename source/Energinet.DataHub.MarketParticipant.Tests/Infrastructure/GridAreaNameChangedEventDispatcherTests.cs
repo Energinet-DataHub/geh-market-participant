@@ -50,12 +50,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent;
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as Integration.Model.Dtos.GridAreaNameChangedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent.Id);
             Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);
         }
 

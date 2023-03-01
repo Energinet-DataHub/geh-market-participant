@@ -31,36 +31,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 public sealed class ActorStatusMarketRolesRuleServiceTests
 {
     [Fact]
-    public async Task Validate_OrganizationIsNotFound_Throws()
-    {
-        var repository = new Mock<IOrganizationRepository>();
-
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
-
-        var updatedActor = CreateActor(ActorStatus.Active, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
-
-        // act + assert
-        var exc = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
-            target.ValidateAsync(new OrganizationId(Guid.NewGuid().ToString()), updatedActor));
-
-        Assert.Equal("Organization not found", exc.Message);
-    }
-
-    [Fact]
     public async Task Validate_ActorIsNotFound_Throws()
     {
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
+        var actorRepositoryMock = new Mock<IActorRepository>();
 
-        var repository = new Mock<IOrganizationRepository>();
-        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
-
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+        var target = new ActorStatusMarketRolesRuleService(actorRepositoryMock.Object);
 
         var updatedActor = CreateActor(ActorStatus.Active, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
 
         // act + assert
         var exc = await Assert.ThrowsAsync<NotFoundValidationException>(() =>
-            target.ValidateAsync(organization.Id, updatedActor));
+            target.ValidateAsync(updatedActor));
 
         Assert.Equal("Actor not found", exc.Message);
     }
@@ -73,20 +54,17 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorHasIdenticalMarketRoles_DoesNotThrow(ActorStatus status)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
-
-        var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
-        organization.Actors.Add(existingActor);
-
         var updatedActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
 
-        var repository = new Mock<IOrganizationRepository>();
-        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(updatedActor.Id))
+            .ReturnsAsync(updatedActor);
 
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+        var target = new ActorStatusMarketRolesRuleService(actorRepositoryMock.Object);
 
         // act + assert
-        await target.ValidateAsync(organization.Id, updatedActor);
+        await target.ValidateAsync(updatedActor);
     }
 
     [Theory]
@@ -97,21 +75,20 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorHasNewMarketRoleAdded_DoesNotThrow(ActorStatus status)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
-
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
-        organization.Actors.Add(existingActor);
 
         var updatedActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         updatedActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[] { new ActorGridArea(new[] { MeteringPointType.D03NotUsed }) }));
 
-        var repository = new Mock<IOrganizationRepository>();
-        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(updatedActor.Id))
+            .ReturnsAsync(existingActor);
 
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+        var target = new ActorStatusMarketRolesRuleService(actorRepositoryMock.Object);
 
         // act + assert
-        await target.ValidateAsync(organization.Id, updatedActor);
+        await target.ValidateAsync(updatedActor);
     }
 
     [Theory]
@@ -122,22 +99,21 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_GridAreaForMarketRoleIsRemoved_ThrowsIfStatusIsNotNew(ActorStatus status, bool throws)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
-
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
-        organization.Actors.Add(existingActor);
 
         var updatedActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         updatedActor.MarketRoles.Single().GridAreas.Clear();
 
-        var repository = new Mock<IOrganizationRepository>();
-        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(updatedActor.Id))
+            .ReturnsAsync(existingActor);
 
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+        var target = new ActorStatusMarketRolesRuleService(actorRepositoryMock.Object);
 
         // act + assert
         if (throws)
-            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(organization.Id, updatedActor));
+            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(updatedActor));
     }
 
     [Theory]
@@ -148,22 +124,21 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorHasUpdatedMeteringPointForMarketRoleGridArea_Throws(ActorStatus status, bool throws)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
-
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
-        organization.Actors.Add(existingActor);
 
         var updatedActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         updatedActor.MarketRoles.Single().GridAreas.Single().MeteringPointTypes.Add(MeteringPointType.D02Analysis);
 
-        var repository = new Mock<IOrganizationRepository>();
-        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(updatedActor.Id))
+            .ReturnsAsync(existingActor);
 
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+        var target = new ActorStatusMarketRolesRuleService(actorRepositoryMock.Object);
 
         // act + assert
         if (throws)
-            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(organization.Id, updatedActor));
+            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(updatedActor));
     }
 
     [Theory]
@@ -174,35 +149,34 @@ public sealed class ActorStatusMarketRolesRuleServiceTests
     public async Task Validate_UpdatedActorWithNoMarketRoles_Throws(ActorStatus status, bool throws)
     {
         // arrange
-        var organization = new Organization("org", new BusinessRegisterIdentifier("12345678"), new Address(null, null, null, null, "DK"), new OrganizationDomain("energinet.dk"), null);
-
         var existingActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
-        organization.Actors.Add(existingActor);
 
         var updatedActor = CreateActor(status, EicFunction.BillingAgent, MeteringPointType.D01VeProduction);
         updatedActor.MarketRoles.Clear();
 
-        var repository = new Mock<IOrganizationRepository>();
-        repository.Setup(x => x.GetAsync(organization.Id)).ReturnsAsync(organization);
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(updatedActor.Id))
+            .ReturnsAsync(existingActor);
 
-        var target = new ActorStatusMarketRolesRuleService(repository.Object);
+        var target = new ActorStatusMarketRolesRuleService(actorRepositoryMock.Object);
 
         // act + assert
         if (throws)
-            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(organization.Id, updatedActor));
+            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateAsync(updatedActor));
     }
 
     private static Actor CreateActor(ActorStatus status, EicFunction eicFunction, MeteringPointType meteringPointType)
     {
         return new Actor(
-            Guid.Parse("9B6CF046-94AC-4210-8D8E-138032F17AAB"),
+            new ActorId(Guid.Parse("9B6CF046-94AC-4210-8D8E-138032F17AAB")),
+            new OrganizationId(Guid.NewGuid()),
             null,
             new MockedGln(),
             status,
             new[]
             {
                 new ActorMarketRole(
-                    Guid.NewGuid(),
                     eicFunction,
                     new[]
                     {

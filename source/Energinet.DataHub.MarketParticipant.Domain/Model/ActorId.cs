@@ -14,7 +14,24 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record ActorId
 {
-    public sealed record UniqueActorMarketRoleGridArea(Guid ActorId, EicFunction MarketRole, Guid GridAreaId);
+    public ActorId(string value)
+    {
+        Value = Guid.Parse(value);
+    }
+
+    public ActorId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }

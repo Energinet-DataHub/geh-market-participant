@@ -15,4 +15,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserRoleAssignment(Guid ActorId, UserRoleId UserRoleId);
+public sealed record UserRoleAssignment(ActorId ActorId, UserRoleId UserRoleId);

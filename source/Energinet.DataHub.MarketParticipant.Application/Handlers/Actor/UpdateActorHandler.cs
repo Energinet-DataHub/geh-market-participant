@@ -32,40 +32,37 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class UpdateActorHandler : IRequestHandler<UpdateActorCommand>
     {
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IActorRepository _actorRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IChangesToActorHelper _changesToActorHelper;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
-        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
+        private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleRuleService;
         private readonly ICombinationOfBusinessRolesRuleService _combinationOfBusinessRolesRuleService;
         private readonly IActorStatusMarketRolesRuleService _actorStatusMarketRolesRuleService;
 
         public UpdateActorHandler(
-            IOrganizationRepository organizationRepository,
-            IOrganizationExistsHelperService organizationExistsHelperService,
+            IActorRepository actorRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
             IChangesToActorHelper changesToActorHelper,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
-            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService,
+            IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleRuleService,
             ICombinationOfBusinessRolesRuleService combinationOfBusinessRolesRuleService,
             IActorStatusMarketRolesRuleService actorStatusMarketRolesRuleService)
         {
-            _organizationRepository = organizationRepository;
-            _organizationExistsHelperService = organizationExistsHelperService;
+            _actorRepository = actorRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _changesToActorHelper = changesToActorHelper;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
-            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
+            _uniqueMarketRoleGridAreaRuleRuleService = uniqueMarketRoleGridAreaRuleRuleService;
             _combinationOfBusinessRolesRuleService = combinationOfBusinessRolesRuleService;
             _actorStatusMarketRolesRuleService = actorStatusMarketRolesRuleService;
         }
@@ -74,31 +71,25 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
+            var actor = await _actorRepository
+                .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
 
-            var actorId = request.ActorId;
-            var actor = organization.Actors.SingleOrDefault(actor => actor.Id == actorId) ?? throw new NotFoundValidationException(actorId);
+            if (actor == null)
+            {
+                throw new NotFoundValidationException(request.ActorId);
+            }
 
             var actorChangedIntegrationEvents = await _changesToActorHelper
-                .FindChangesMadeToActorAsync(organization.Id, actor, request)
+                .FindChangesMadeToActorAsync(actor.OrganizationId, actor, request)
                 .ConfigureAwait(false);
 
             UpdateActorStatus(actor, request);
             UpdateActorName(actor, request);
-            UpdateActorMarketRolesAndChildren(organization, actor, request);
+            await UpdateActorMarketRolesAndChildrenAsync(actor, request).ConfigureAwait(false);
 
-            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
-
-            var allMarketRolesForActorGln = organization.Actors
-                .Where(x => x.ActorNumber == actor.ActorNumber)
-                .SelectMany(x => x.MarketRoles)
-                .Select(x => x.Function);
-
-            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
-
-            await _actorStatusMarketRolesRuleService.ValidateAsync(organization.Id, actor).ConfigureAwait(false);
+            await _uniqueMarketRoleGridAreaRuleRuleService.ValidateAsync(actor).ConfigureAwait(false);
+            await _actorStatusMarketRolesRuleService.ValidateAsync(actor).ConfigureAwait(false);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -106,20 +97,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             await using (uow.ConfigureAwait(false))
             {
-                await _organizationRepository
-                    .AddOrUpdateAsync(organization)
+                await _actorRepository
+                    .AddOrUpdateAsync(actor)
                     .ConfigureAwait(false);
 
                 await _externalActorSynchronizationRepository
-                    .ScheduleAsync(organization.Id, actor.Id)
+                    .ScheduleAsync(actor.Id.Value)
                     .ConfigureAwait(false);
 
                 await _actorIntegrationEventsQueueService
-                    .EnqueueActorUpdatedEventAsync(organization.Id, actor)
+                    .EnqueueActorUpdatedEventAsync(actor)
                     .ConfigureAwait(false);
 
                 await _actorIntegrationEventsQueueService
-                    .EnqueueActorUpdatedEventAsync(organization.Id, actor.Id, actorChangedIntegrationEvents)
+                    .EnqueueActorUpdatedEventAsync(actor.Id, actorChangedIntegrationEvents)
                     .ConfigureAwait(false);
 
                 await uow.CommitAsync().ConfigureAwait(false);
@@ -138,7 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
         }
 
-        private void UpdateActorMarketRolesAndChildren(Domain.Model.Organization organization, Domain.Model.Actor actor, UpdateActorCommand request)
+        private async Task UpdateActorMarketRolesAndChildrenAsync(Domain.Model.Actor actor, UpdateActorCommand request)
         {
             actor.MarketRoles.Clear();
 
@@ -147,8 +138,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 actor.MarketRoles.Add(marketRole);
             }
 
-            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(organization.Actors);
+            var allOrganizationActors = await _actorRepository
+                .GetActorsAsync(actor.OrganizationId)
+                .ConfigureAwait(false);
+
+            var updatedActors = allOrganizationActors
+                .Where(a => a.Id != actor.Id)
+                .Append(actor)
+                .ToList();
+
+            _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(updatedActors);
             _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
+
+            var allMarketRolesForActorGln = updatedActors
+                .Where(x => x.ActorNumber == actor.ActorNumber)
+                .SelectMany(x => x.MarketRoles)
+                .Select(x => x.Function);
+
+            _combinationOfBusinessRolesRuleService.ValidateCombinationOfBusinessRoles(allMarketRolesForActorGln);
         }
     }
 }

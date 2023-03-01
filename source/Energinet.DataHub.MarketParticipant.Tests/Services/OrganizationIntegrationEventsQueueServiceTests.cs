@@ -37,7 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organisationDomainModel = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "Old Name",
-                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("12345678"),
                 new Address(
                     "fake_value",
@@ -80,7 +79,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organisationDomainModel = new Organization(
                 new OrganizationId(Guid.NewGuid()),
                 "Name",
-                Enumerable.Empty<Actor>(),
                 new BusinessRegisterIdentifier("12345678"),
                 new Address(
                     "fake_value",

@@ -32,7 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Domain.Value,
                 organization.Comment,
                 organization.Status.ToString(),
-                organization.Actors.Select(Map).ToList(),
                 Map(organization.Address));
         }
 
@@ -41,6 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             return new ActorDto(
                 actor.Id.ToString(),
+                actor.OrganizationId.ToString(),
                 actor.ExternalActorId?.ToString(),
                 new ActorNumberDto(actor.ActorNumber.Value),
                 actor.Status.ToString(),
@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         {
             return new ActorMarketRoleDto(
                 marketRole.Function.ToString(),
-                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id, e.MeteringPointTypes.Select(m => m.ToString()))),
+                marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id.Value, e.MeteringPointTypes.Select(m => m.ToString()))),
                 marketRole.Comment);
         }
     }

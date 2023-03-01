@@ -23,27 +23,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class UniqueActorMarketRoleGridAreaRepository : IUniqueActorMarketRoleGridAreaRepository
+public sealed class MarketRoleAndGridAreaForActorReservationService : IMarketRoleAndGridAreaForActorReservationService
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public UniqueActorMarketRoleGridAreaRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public MarketRoleAndGridAreaForActorReservationService(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<bool> TryAddAsync(UniqueActorMarketRoleGridArea domain)
+    public async Task<bool> TryReserveAsync(ActorId actorId, EicFunction marketRole, GridAreaId gridAreaId)
     {
-        ArgumentNullException.ThrowIfNull(domain);
+        ArgumentNullException.ThrowIfNull(actorId);
+        ArgumentNullException.ThrowIfNull(gridAreaId);
 
         try
         {
             _marketParticipantDbContext.UniqueActorMarketRoleGridAreas.Add(new UniqueActorMarketRoleGridAreaEntity
             {
-                ActorId = domain.ActorId,
-                MarketRoleFunction = (int)domain.MarketRole,
-                GridAreaId = domain.GridAreaId,
+                ActorId = actorId.Value,
+                MarketRoleFunction = (int)marketRole,
+                GridAreaId = gridAreaId.Value,
             });
+
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
             return true;
         }
@@ -53,12 +55,12 @@ public sealed class UniqueActorMarketRoleGridAreaRepository : IUniqueActorMarket
         }
     }
 
-    public async Task RemoveAsync(Guid actorId)
+    public async Task RemoveAllReservationsAsync(ActorId actorId)
     {
-        var query = from u in _marketParticipantDbContext.UniqueActorMarketRoleGridAreas
-                    where
-                        u.ActorId == actorId
-                    select u;
+        var query =
+            from u in _marketParticipantDbContext.UniqueActorMarketRoleGridAreas
+            where u.ActorId == actorId.Value
+            select u;
 
         var entities = await query.ToListAsync().ConfigureAwait(false);
 

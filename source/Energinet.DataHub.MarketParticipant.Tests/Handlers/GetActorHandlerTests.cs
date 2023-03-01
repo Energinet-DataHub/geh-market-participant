@@ -13,14 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -32,49 +31,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetActorHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new GetActorHandler(new Mock<IOrganizationExistsHelperService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NoActor_ThrowsNotFoundException()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorHandler(organizationExistsHelperService.Object);
+            var actorRepositoryMock = new Mock<IActorRepository>();
+            var target = new GetActorHandler(actorRepositoryMock.Object);
 
-            var organizationId = Guid.NewGuid();
-            const string orgName = "SomeName";
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
+            var actorId = Guid.NewGuid();
 
-            var organization = new Organization(
-                new OrganizationId(organizationId),
-                orgName,
-                Enumerable.Empty<Actor>(),
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+                .ReturnsAsync((Actor?)null);
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
-                .ReturnsAsync(organization);
-
-            var command = new GetSingleActorCommand(Guid.NewGuid(), organizationId);
+            var command = new GetSingleActorCommand(actorId);
 
             // Act + Assert
             await Assert
@@ -86,44 +55,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_HasActor_ReturnsActor()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var target = new GetActorHandler(organizationExistsHelperService.Object);
+            var actorRepositoryMock = new Mock<IActorRepository>();
+            var target = new GetActorHandler(actorRepositoryMock.Object);
 
-            var orgId = Guid.NewGuid();
-            const string orgName = "SomeName";
             var actorId = Guid.NewGuid();
-            string actorGln = new MockedGln();
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
+            var actor = TestPreparationModels.MockedActor(actorId);
 
-            var actor = new Actor(
-                actorId,
-                new ExternalActorId(actorId),
-                ActorNumber.Create(actorGln),
-                ActorStatus.Active,
-                Enumerable.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
 
-            var organization = new Organization(
-                new OrganizationId(orgId),
-                orgName,
-                new[] { actor },
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(orgId))
-                .ReturnsAsync(organization);
-
-            var command = new GetSingleActorCommand(actorId, orgId);
+            var command = new GetSingleActorCommand(actorId);
 
             // Act
             var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

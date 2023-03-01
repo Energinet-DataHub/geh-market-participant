@@ -13,11 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,16 +26,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class DeleteActorContactHandler : IRequestHandler<DeleteActorContactCommand>
     {
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IActorRepository _actorRepository;
         private readonly IActorContactRepository _contactRepository;
         private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
 
         public DeleteActorContactHandler(
-            IOrganizationExistsHelperService organizationExistsHelperService,
+            IActorRepository actorRepository,
             IActorContactRepository contactRepository,
             IActorIntegrationEventsQueueService actorIntegrationEventsQueueService)
         {
-            _organizationExistsHelperService = organizationExistsHelperService;
+            _actorRepository = actorRepository;
             _contactRepository = contactRepository;
             _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         }
@@ -46,11 +44,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
+            var actor = await _actorRepository
+                .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
-
-            var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
 
             if (actor == null)
                 throw new NotFoundValidationException(request.ActorId);
@@ -69,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .ConfigureAwait(false);
 
             await _actorIntegrationEventsQueueService
-                .EnqueueContactRemovedFromActorEventAsync(organization.Id, actor, contact)
+                .EnqueueContactRemovedFromActorEventAsync(actor, contact)
                 .ConfigureAwait(false);
 
             return Unit.Value;

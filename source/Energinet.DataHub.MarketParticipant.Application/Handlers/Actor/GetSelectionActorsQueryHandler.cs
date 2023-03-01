@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -30,16 +31,19 @@ public sealed class GetSelectionActorsQueryHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserQueryRepository _userQueryRepository;
-    private readonly IActorQueryRepository _actorQueryRepository;
+    private readonly IActorRepository _actorRepository;
+    private readonly IOrganizationRepository _organizationRepository;
 
     public GetSelectionActorsQueryHandler(
         IUserRepository userRepository,
         IUserQueryRepository userQueryRepository,
-        IActorQueryRepository actorQueryRepository)
+        IActorRepository actorRepository,
+        IOrganizationRepository organizationRepository)
     {
         _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
-        _actorQueryRepository = actorQueryRepository;
+        _actorRepository = actorRepository;
+        _organizationRepository = organizationRepository;
     }
 
     public async Task<GetSelectionActorsQueryResponse> Handle(
@@ -59,11 +63,31 @@ public sealed class GetSelectionActorsQueryHandler
             .GetActorsAsync(user.ExternalId)
             .ConfigureAwait(false);
 
-        var actors = await _actorQueryRepository
-            .GetSelectionActorsAsync(actorIds)
+        var actors = await _actorRepository
+            .GetActorsAsync(actorIds)
             .ConfigureAwait(false);
 
-        return new GetSelectionActorsQueryResponse(
-            actors.Select(x => new SelectionActorDto(x.Id, x.Gln, x.ActorName, x.OrganizationName)));
+        var organizations = new Dictionary<OrganizationId, Domain.Model.Organization>();
+        var selectionActors = new List<SelectionActorDto>();
+
+        foreach (var actor in actors)
+        {
+            if (!organizations.TryGetValue(actor.OrganizationId, out var organization))
+            {
+                organization = (await _organizationRepository
+                    .GetAsync(actor.OrganizationId)
+                    .ConfigureAwait(false))!;
+
+                organizations.Add(actor.OrganizationId, organization);
+            }
+
+            selectionActors.Add(new SelectionActorDto(
+                actor.Id.Value,
+                actor.ActorNumber.Value,
+                actor.Name.Value,
+                organization.Name));
+        }
+
+        return new GetSelectionActorsQueryResponse(selectionActors);
     }
 }

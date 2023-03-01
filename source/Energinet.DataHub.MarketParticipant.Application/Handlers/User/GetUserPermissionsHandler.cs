@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -52,11 +53,11 @@ public sealed class GetUserPermissionsHandler
             throw new NotFoundValidationException(request.ExternalUserId);
 
         var permissions = await _userQueryRepository
-            .GetPermissionsAsync(request.ActorId, user.ExternalId)
+            .GetPermissionsAsync(new ActorId(request.ActorId), user.ExternalId)
             .ConfigureAwait(false);
 
         var isFas = await _userQueryRepository
-            .IsFasAsync(request.ActorId, user.ExternalId)
+            .IsFasAsync(new ActorId(request.ActorId), user.ExternalId)
             .ConfigureAwait(false);
 
         return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions);

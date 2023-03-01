@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Ctor_NewRole_HasStatusNew()
         {
             // Arrange + Act
-            var actor = new Actor(new MockedGln());
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln());
 
             // Assert
             Assert.Equal(ActorStatus.New, actor.Status);
@@ -99,7 +99,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         private static Actor CreateTestActor(ActorStatus status)
         {
             return new Actor(
-                Guid.Empty,
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 new ExternalActorId(Guid.Empty),
                 new MockedGln(),
                 status,

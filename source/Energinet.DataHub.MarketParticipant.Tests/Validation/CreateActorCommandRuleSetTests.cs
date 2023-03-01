@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(CreateActorCommand.Actor);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), null!);
+            var command = new CreateActorCommand(null!);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -47,19 +47,20 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
         [Theory]
         [InlineData("8F9B8218-BAE6-412B-B91B-0C78A55FF128", true)]
+        [InlineData("00000000-0000-0000-0000-000000000000", false)]
         public async Task Validate_OrganizationId_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = nameof(CreateActorCommand.OrganizationId);
+            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.OrganizationId)}";
 
             var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
-            var actorDto = new CreateActorDto(new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), marketRole);
+            var actorDto = new CreateActorDto(Guid.Parse(value), new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), marketRole);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(value), actorDto);
+            var command = new CreateActorCommand(actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -91,10 +92,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
-            var actorDto = new CreateActorDto(new ActorNameDto("fake_name"), new ActorNumberDto(value), marketRole);
+            var actorDto = new CreateActorDto(Guid.Parse(ValidId), new ActorNameDto("fake_name"), new ActorNumberDto(value), marketRole);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), actorDto);
+            var command = new CreateActorCommand(actorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -118,10 +119,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}";
 
-            var createActorDto = new CreateActorDto(new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), null!);
+            var createActorDto = new CreateActorDto(Guid.Parse(ValidId), new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), null!);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
+            var command = new CreateActorCommand(createActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -137,10 +138,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             // Arrange
             const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0]";
 
-            var createActorDto = new CreateActorDto(new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), new ActorMarketRoleDto[] { null! });
+            var createActorDto = new CreateActorDto(Guid.Parse(ValidId), new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), new ActorMarketRoleDto[] { null! });
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
+            var command = new CreateActorCommand(createActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -166,12 +167,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
 
             var organizationRoleDto = new CreateActorDto(
+                Guid.Parse(ValidId),
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
                 new[] { new ActorMarketRoleDto(value, validGridAreas, string.Empty) });
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -199,12 +201,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
             var organizationRoleDto = new CreateActorDto(
+                Guid.Parse(ValidId),
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
                 marketRole);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -224,12 +227,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
             var organizationRoleDto = new CreateActorDto(
+                Guid.Parse(ValidId),
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
                 marketRole);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -249,12 +253,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
             var organizationRoleDto = new CreateActorDto(
+                Guid.Parse(ValidId),
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
                 marketRole);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), organizationRoleDto);
+            var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);
@@ -282,12 +287,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
             var createActorDto = new CreateActorDto(
+                Guid.Parse(ValidId),
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
                 marketRole);
 
             var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(Guid.Parse(ValidId), createActorDto);
+            var command = new CreateActorCommand(createActorDto);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

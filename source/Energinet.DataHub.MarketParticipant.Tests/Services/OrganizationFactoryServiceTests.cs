@@ -120,7 +120,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organization = new Organization(
                 orgId,
                 "fake_value",
-                Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
                 _validDomain,
@@ -172,7 +171,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var organization = new Organization(
                 orgId,
                 "fake_value",
-                Enumerable.Empty<Actor>(),
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
                 _validDomain,

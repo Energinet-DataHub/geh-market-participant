@@ -17,5 +17,11 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserRoleWithPermissionsDto(Guid Id, string Name, string Description, EicFunction EicFunction, UserRoleStatus Status, IEnumerable<PermissionDetailsDto> Permissions);
+    public sealed record UserRoleWithPermissionsDto(
+        Guid Id,
+        string Name,
+        string Description,
+        EicFunction EicFunction,
+        UserRoleStatus Status,
+        IEnumerable<PermissionDetailsDto> Permissions);
 }

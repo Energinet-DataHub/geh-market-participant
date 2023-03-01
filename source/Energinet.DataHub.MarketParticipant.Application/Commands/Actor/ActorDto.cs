@@ -18,6 +18,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
     public sealed record ActorDto(
         string ActorId,
+        string OrganizationId,
         string? ExternalActorId,
         ActorNumberDto ActorNumber,
         string Status,

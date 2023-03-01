@@ -56,23 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                             .Send(getOrganizationsCommand)
                             .ConfigureAwait(false);
 
-                        var filteredOrganizations = response.Organizations;
-
-                        if (!_userContext.CurrentUser.IsFas)
-                        {
-                            filteredOrganizations = filteredOrganizations.Select(org => org with
-                            {
-                                Actors = org.Actors.Select(actor =>
-                                {
-                                    if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
-                                        return actor;
-
-                                    return actor with { Name = new ActorNameDto(string.Empty) };
-                                })
-                            });
-                        }
-
-                        return Ok(filteredOrganizations);
+                        return Ok(response.Organizations);
                     },
                 _logger).ConfigureAwait(false);
         }
@@ -92,23 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .Send(getSingleOrganizationCommand)
                         .ConfigureAwait(false);
 
-                    var organization = response.Organization;
-
-                    if (!_userContext.CurrentUser.IsFas)
-                    {
-                        organization = organization with
-                        {
-                            Actors = organization.Actors.Select(actor =>
-                            {
-                                if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
-                                    return actor;
-
-                                return actor with { Name = new ActorNameDto(string.Empty) };
-                            })
-                        };
-                    }
-
-                    return Ok(organization);
+                    return Ok(response.Organization);
                 },
                 _logger).ConfigureAwait(false);
         }
@@ -154,6 +122,39 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         .ConfigureAwait(false);
 
                     return Ok(response);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
+        [HttpGet("{organizationId:guid}/actor")]
+        public async Task<IActionResult> GetActorsAsync(Guid organizationId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
+                        return Unauthorized();
+
+                    var getActorsCommand = new GetActorsCommand(organizationId);
+
+                    var response = await _mediator
+                        .Send(getActorsCommand)
+                        .ConfigureAwait(false);
+
+                    var filteredActors = response.Actors;
+
+                    if (!_userContext.CurrentUser.IsFas)
+                    {
+                        filteredActors = filteredActors.Select(actor =>
+                        {
+                            if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
+                                return actor;
+
+                            return actor with { Name = new ActorNameDto(string.Empty) };
+                        });
+                    }
+
+                    return Ok(filteredActors);
                 },
                 _logger).ConfigureAwait(false);
         }
