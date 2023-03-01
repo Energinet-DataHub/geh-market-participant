@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     case "metereddataadministrator":
                         _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataAdministrator, appRole.Id!.Value);
                         break;
-                    case "meterdataresponsible":
+                    case "metereddataresponsible":
                         _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataResponsible, appRole.Id!.Value);
                         break;
                     case "meteringpointadministrator":
@@ -100,12 +100,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     case "serialenergytrader":
                         _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.SerialEnergyTrader, appRole.Id!.Value);
                         break;
-                    default:
-                        throw new InvalidOperationException(
-                            $"Could not find an id associated with the provided role name '{appRole.DisplayName}'.");
                 }
             }
 
+            // Verify that all EIC functions has a corresponding app role
             return _activeDirectoryB2CRoles;
         }
     }
