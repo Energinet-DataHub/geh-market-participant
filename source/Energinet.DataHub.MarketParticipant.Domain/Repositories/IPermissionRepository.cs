@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -35,4 +36,17 @@ public interface IPermissionRepository
     /// <param name="eicFunction">The eicFunction you want to get permissions for.</param>
     /// <returns>List of permissions for this EicFunction.</returns>
     Task<IEnumerable<PermissionDetails>> GetToMarketRoleAsync(EicFunction eicFunction);
+
+    /// <summary>
+    /// Get permission
+    /// </summary>
+    /// <param name="permission"></param>
+    /// <returns>Permission details</returns>
+    Task<PermissionDetails?> GetAsync(Permission permission);
+
+    /// <summary>
+    /// Update permission
+    /// </summary>
+    /// <param name="permissionDetails">permission to update</param>
+    Task UpdatePermissionAsync(PermissionDetails permissionDetails);
 }

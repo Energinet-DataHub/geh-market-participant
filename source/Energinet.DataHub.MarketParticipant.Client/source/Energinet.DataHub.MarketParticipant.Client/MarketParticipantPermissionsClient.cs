@@ -43,5 +43,15 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<PermissionDetailsDto>>()
                 .ConfigureAwait(false);
         }
+
+        public Task UpdatePermissionAsync(UpdatePermissionDto updatePermissionDto)
+        {
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("Permission")
+                        .PutJsonAsync(updatePermissionDto));
+        }
     }
 }
