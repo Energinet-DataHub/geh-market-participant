@@ -97,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 UserRoleChangeType.DescriptionChange => SerializeObject(new UserRoleAuditLogSerialized { Description = userRoleUpdate.Description }),
                 UserRoleChangeType.EicFunctionChange => SerializeObject(new UserRoleAuditLogSerialized { EicFunction = userRoleUpdate.EicFunction }),
                 UserRoleChangeType.StatusChange => SerializeObject(new UserRoleAuditLogSerialized { Status = userRoleUpdate.Status }),
-                UserRoleChangeType.PermissionsChange => SerializeObject(new UserRoleAuditLogSerialized { Permissions = userRoleUpdate.Permissions.Select(e => (int)e) }),
+                UserRoleChangeType.PermissionsChange => SerializeObject(new UserRoleAuditLogSerialized { Permissions = userRoleUpdate.Permissions.Select(e => e.ToString()) }),
                 _ => throw new ArgumentOutOfRangeException(nameof(userRoleChangeType))
             };
         }
@@ -120,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 Description = from.Description,
                 EicFunction = from.EicFunction,
                 Status = from.Status,
-                Permissions = from.Permissions.Select(e => (int)e)
+                Permissions = from.Permissions.Select(e => e.ToString())
             };
         }
     }
