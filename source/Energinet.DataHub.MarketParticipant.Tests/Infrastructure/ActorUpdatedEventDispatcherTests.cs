@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
                 ActorId = Guid.NewGuid(),
-                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                OrganizationId = Guid.NewGuid(),
                 ExternalActorId = new ExternalActorId(Guid.NewGuid()),
                 ActorNumber = new MockedGln(),
                 Status = ActorStatus.Active
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = (MarketParticipant.Integration.Model.Dtos.ActorUpdatedIntegrationEvent)eventParser.Parse(actualMessage.Body.ToArray());
+            var actualEvent = (Integration.Model.Dtos.ActorUpdatedIntegrationEvent)eventParser.Parse(actualMessage.Body.ToArray());
             var actualMarketRole = actualEvent.ActorMarketRoles.Single();
             var actualGridArea = actualMarketRole.GridAreas.Single();
             var actualMeteringPoint = actualGridArea.MeteringPointTypes.Single();
@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             Assert.True(actual);
             Assert.NotNull(actualEvent);
             Assert.Equal(integrationEvent.Id, actualEvent.Id);
-            Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
+            Assert.Equal(integrationEvent.OrganizationId, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.ExternalActorId.Value, actualEvent.ExternalActorId);
             Assert.Equal(integrationEvent.ActorNumber.Value, actualEvent.ActorNumber.Value);
             Assert.Equal((int)integrationEvent.ActorNumber.Type, (int)actualEvent.ActorNumber.Type);

@@ -19,16 +19,21 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class GetActorsHandler : IRequestHandler<GetActorsCommand, GetActorsResponse>
     {
+        private readonly IActorRepository _actorRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
 
-        public GetActorsHandler(IOrganizationExistsHelperService organizationExistsHelperService)
+        public GetActorsHandler(
+            IActorRepository actorRepository,
+            IOrganizationExistsHelperService organizationExistsHelperService)
         {
+            _actorRepository = actorRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
         }
 
@@ -42,8 +47,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .EnsureOrganizationExistsAsync(request.OrganizationId)
                 .ConfigureAwait(false);
 
-            var actors = organization.Actors.Select(OrganizationMapper.Map);
-            return new GetActorsResponse(actors);
+            var actors = await _actorRepository
+                .GetActorsAsync(organization.Id)
+                .ConfigureAwait(false);
+
+            return new GetActorsResponse(actors.Select(OrganizationMapper.Map));
         }
     }
 }

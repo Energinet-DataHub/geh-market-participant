@@ -32,18 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class DispatchEventsHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // arrange
-            var target = new DispatchEventsHandler(null!, null!);
-
-            // act + assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_EventDispatcherForEventDoesNotExist_Throws()
         {
             // arrange

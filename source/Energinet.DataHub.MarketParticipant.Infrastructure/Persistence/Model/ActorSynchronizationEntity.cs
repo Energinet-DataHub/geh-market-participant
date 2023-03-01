@@ -19,6 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 public sealed class ActorSynchronizationEntity
 {
     public int Id { get; set; }
-    public Guid OrganizationId { get; set; }
     public Guid ActorId { get; set; }
+    public Guid OrganizationId { get; set; }
 }

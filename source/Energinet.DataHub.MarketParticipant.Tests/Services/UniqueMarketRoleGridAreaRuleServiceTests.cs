@@ -17,87 +17,89 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
 {
-    public sealed class UniqueMarketRoleGridAreaServiceTests
+    public sealed class UniqueMarketRoleGridAreaRuleServiceTests
     {
         [Fact]
         public async Task Ensure_ActorSupplied_CallsRemoveForActor()
         {
             // arrange
-            var repository = new Mock<IUniqueActorMarketRoleGridAreaRepository>();
+            var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
 
-            var target = new UniqueMarketRoleGridAreaService(repository.Object);
+            var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
             var actor = new Actor(
-                Guid.NewGuid(),
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
                 new[]
                 {
                     new ActorMarketRole(
-                        Guid.NewGuid(),
                         EicFunction.GridAccessProvider,
                         Enumerable.Empty<ActorGridArea>())
                 },
                 new ActorName("fake_value"));
 
             // act
-            await target.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+            await target.ValidateAsync(actor).ConfigureAwait(false);
 
             // assert
-            repository.Verify(x => x.RemoveAsync(actor.Id), Times.Exactly(1));
+            repository.Verify(x => x.RemoveAllReservationsAsync(actor.Id), Times.Exactly(1));
         }
 
         [Fact]
         public async Task Ensure_ActorSupplied_CallsTryAddForAllMarketRoleGridAreas()
         {
             // arrange
-            var repository = new Mock<IUniqueActorMarketRoleGridAreaRepository>();
-            repository.Setup(x => x.TryAddAsync(It.IsAny<UniqueActorMarketRoleGridArea>())).ReturnsAsync(true);
+            var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
+            repository
+                .Setup(x => x.TryReserveAsync(It.IsAny<ActorId>(), EicFunction.GridAccessProvider, It.IsAny<GridAreaId>()))
+                .ReturnsAsync(true);
 
-            var target = new UniqueMarketRoleGridAreaService(repository.Object);
+            var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
             var actor = new Actor(
-                Guid.NewGuid(),
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
                 new[]
                 {
                     new ActorMarketRole(
-                        Guid.NewGuid(),
                         EicFunction.GridAccessProvider,
                         new[]
                         {
                             new ActorGridArea(
-                                Guid.NewGuid(),
+                                new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis }),
                             new ActorGridArea(
-                                Guid.NewGuid(),
+                                new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis }),
                             new ActorGridArea(
-                                Guid.NewGuid(),
+                                new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis }),
                         })
                 },
                 new ActorName("fake_value"));
 
             // act
-            await target.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+            await target.ValidateAsync(actor).ConfigureAwait(false);
 
             // assert
             foreach (var mr in actor.MarketRoles)
             {
                 foreach (var ga in mr.GridAreas)
                 {
-                    repository.Verify(x => x.TryAddAsync(new UniqueActorMarketRoleGridArea(actor.Id, mr.Function, ga.Id)), Times.Exactly(1));
+                    repository.Verify(x => x.TryReserveAsync(actor.Id, mr.Function, ga.Id), Times.Exactly(1));
                 }
             }
         }
@@ -112,29 +114,29 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 }))
             {
                 // arrange
-                var repository = new Mock<IUniqueActorMarketRoleGridAreaRepository>();
+                var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
 
-                var target = new UniqueMarketRoleGridAreaService(repository.Object);
+                var target = new UniqueMarketRoleGridAreaRuleService(repository.Object);
 
                 var actor = new Actor(
-                    Guid.NewGuid(),
+                    new ActorId(Guid.NewGuid()),
+                    new OrganizationId(Guid.NewGuid()),
                     null,
                     new MockedGln(),
                     ActorStatus.Active,
                     new[]
                     {
                     new ActorMarketRole(
-                        Guid.NewGuid(),
                         nonDdmMarketRole,
                         Enumerable.Empty<ActorGridArea>())
                     },
                     new ActorName("fake_value"));
 
                 // act
-                await target.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+                await target.ValidateAsync(actor).ConfigureAwait(false);
 
                 // assert
-                repository.Verify(x => x.TryAddAsync(It.IsAny<UniqueActorMarketRoleGridArea>()), Times.Never);
+                repository.Verify(x => x.TryReserveAsync(It.IsAny<ActorId>(), It.IsAny<EicFunction>(), It.IsAny<GridAreaId>()), Times.Never);
             }
         }
     }

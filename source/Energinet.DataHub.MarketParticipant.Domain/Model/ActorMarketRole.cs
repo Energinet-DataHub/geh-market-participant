@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,14 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorMarketRole
     {
-        public ActorMarketRole(Guid id, EicFunction eic, IEnumerable<ActorGridArea> gridAreas, string? comment)
-        {
-            Id = id;
-            GridAreas = gridAreas.ToList();
-            Function = eic;
-            Comment = comment;
-        }
-
         public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas, string? comment)
         {
             GridAreas = gridAreas.ToList();
@@ -35,19 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Comment = comment;
         }
 
-        public ActorMarketRole(Guid id, EicFunction eic, string? comment)
+        public ActorMarketRole(EicFunction eic, string? comment)
         {
-            Id = id;
             Function = eic;
             GridAreas = new List<ActorGridArea>();
             Comment = comment;
-        }
-
-        public ActorMarketRole(Guid id, EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
-        {
-            Id = id;
-            GridAreas = gridAreas.ToList();
-            Function = eic;
         }
 
         public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
@@ -56,14 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Function = eic;
         }
 
-        public ActorMarketRole(Guid id, EicFunction eic)
+        public ActorMarketRole(EicFunction eic)
         {
-            Id = id;
             Function = eic;
             GridAreas = new List<ActorGridArea>();
         }
 
-        public Guid Id { get; }
         public ICollection<ActorGridArea> GridAreas { get; }
         public EicFunction Function { get; }
         public string? Comment { get; }

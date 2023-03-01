@@ -39,11 +39,12 @@ public sealed class UserInvitationServiceTests
         new PhoneNumber("00000000"),
         new SmsAuthenticationMethod(new PhoneNumber("+45 00000000")),
         new Actor(
-            Guid.NewGuid(),
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(Guid.NewGuid(), EicFunction.BalanceResponsibleParty) },
+            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
             new ActorName("fake_value")),
         new[]
         {
@@ -239,7 +240,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                new[] { new UserRoleAssignment(Guid.NewGuid(), new UserRoleId(Guid.NewGuid())) }));
+                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) }));
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
@@ -296,7 +297,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                new[] { new UserRoleAssignment(Guid.NewGuid(), new UserRoleId(Guid.NewGuid())) }));
+                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) }));
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))

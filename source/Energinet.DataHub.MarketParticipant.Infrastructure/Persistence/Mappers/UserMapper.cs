@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -30,7 +31,7 @@ internal sealed class UserMapper
             .Select(newRa =>
             {
                 var existing = to.RoleAssignments
-                    .FirstOrDefault(oldRa => oldRa.ActorId == newRa.ActorId && oldRa.UserRoleId == newRa.UserRoleId.Value);
+                    .FirstOrDefault(oldRa => oldRa.ActorId == newRa.ActorId.Value && oldRa.UserRoleId == newRa.UserRoleId.Value);
 
                 return existing ?? MapToEntity(newRa, from.Id);
             })
@@ -56,7 +57,7 @@ internal sealed class UserMapper
     {
         return new UserRoleAssignmentEntity
         {
-            ActorId = fromRoleAssignment.ActorId,
+            ActorId = fromRoleAssignment.ActorId.Value,
             UserId = fromId.Value,
             UserRoleId = fromRoleAssignment.UserRoleId.Value,
         };
@@ -64,6 +65,6 @@ internal sealed class UserMapper
 
     private static UserRoleAssignment MapFromEntity(UserRoleAssignmentEntity from)
     {
-        return new UserRoleAssignment(from.ActorId, new UserRoleId(from.UserRoleId));
+        return new UserRoleAssignment(new ActorId(from.ActorId), new UserRoleId(from.UserRoleId));
     }
 }

@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -45,6 +46,7 @@ public sealed class GetUserRolesHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var actorId = new ActorId(request.ActorId);
         var user = await _userRepository
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
@@ -56,7 +58,7 @@ public sealed class GetUserRolesHandler
 
         var assignments = user
             .RoleAssignments
-            .Where(a => a.ActorId == request.ActorId)
+            .Where(a => a.ActorId == actorId)
             .Select(x => x.UserRoleId)
             .Distinct();
 

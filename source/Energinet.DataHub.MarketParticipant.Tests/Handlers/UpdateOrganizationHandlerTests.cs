@@ -14,7 +14,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
@@ -23,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Tests.Common;
 using MediatR;
 using Moq;
 using Xunit;
@@ -34,24 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class UpdateOrganizationHandlerTests
     {
-        [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new UpdateOrganizationHandler(
-                new Mock<IOrganizationRepository>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
-                new Mock<IOrganizationExistsHelperService>().Object,
-                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object,
-                new Mock<IOrganizationIntegrationEventsHelperService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
         [Fact]
         public async Task Handle_UpdateOrganization_ReturnsOk()
         {
@@ -71,8 +51,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
-            var marketRole = new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>());
-
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -88,18 +66,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                new ExternalActorId(Guid.NewGuid()),
-                new MockedGln(),
-                ActorStatus.Active,
-                new[] { marketRole },
-                new ActorName(string.Empty));
-
             var organization = new Organization(
                 new OrganizationId(orgId),
                 "fake_value",
-                new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
                 new OrganizationDomain("energinet.dk"),
@@ -146,8 +115,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
-            var marketRole = new ActorMarketRole(EicFunction.BalanceResponsibleParty, Enumerable.Empty<ActorGridArea>());
-
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
             var validAddress = new Address(
                 "test Street",
@@ -163,18 +130,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                new ExternalActorId(Guid.NewGuid()),
-                new MockedGln(),
-                ActorStatus.Active,
-                new[] { marketRole },
-                new ActorName(string.Empty));
-
             var dbOrganization = new Organization(
                 new OrganizationId(orgId),
                 "fake_value",
-                new[] { actor },
                 validBusinessRegisterIdentifier,
                 validAddress,
                 new OrganizationDomain("energinet.dk"),

@@ -34,11 +34,12 @@ public sealed class UserInvitationTests
         new PhoneNumber("00000000"),
         new SmsAuthenticationMethod(new PhoneNumber("+45 00000000")),
         new Actor(
-            Guid.NewGuid(),
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
             null,
             new MockedGln(),
             ActorStatus.New,
-            new[] { new ActorMarketRole(Guid.NewGuid(), EicFunction.BalanceResponsibleParty) },
+            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
             new ActorName("fake_value")),
         new[]
         {
@@ -76,11 +77,12 @@ public sealed class UserInvitationTests
     {
         // Arrange
         var testActor = new Actor(
-            Guid.NewGuid(),
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
             null,
             new MockedGln(),
             status,
-            new[] { new ActorMarketRole(Guid.NewGuid(), EicFunction.BalanceResponsibleParty) },
+            new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
             new ActorName("fake_value"));
 
         // Act + Assert

@@ -50,5 +50,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="organizationId">The id of the organization to update.</param>
         /// <param name="organizationDto">The updated data for the organization.</param>
         Task UpdateOrganizationAsync(Guid organizationId, ChangeOrganizationDto organizationDto);
+
+        /// <summary>
+        /// List all actors in an organization.
+        /// </summary>
+        /// <param name="organizationId">The id of the organization to get the actors for.</param>
+        /// <returns>A list of actors <see cref="ActorDto"/> belonging to the organization.</returns>
+        Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId);
     }
 }

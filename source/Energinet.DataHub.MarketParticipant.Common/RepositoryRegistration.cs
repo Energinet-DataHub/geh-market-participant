@@ -28,13 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
             container.Register<IDomainEventRepository, DomainEventRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaLinkRepository, GridAreaLinkRepository>(Lifestyle.Scoped);
-            container.Register<IUniqueActorMarketRoleGridAreaRepository, UniqueActorMarketRoleGridAreaRepository>(Lifestyle.Scoped);
+            container.Register<IMarketRoleAndGridAreaForActorReservationService, MarketRoleAndGridAreaForActorReservationService>(Lifestyle.Scoped);
             container.Register<IGridAreaOverviewRepository, GridAreaOverviewRepository>(Lifestyle.Scoped);
             container.Register<IUserOverviewRepository, UserOverviewRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>(Lifestyle.Scoped);
             container.Register<IUserRepository, UserRepository>(Lifestyle.Scoped);
             container.Register<IUserRoleRepository, UserRoleRepository>(Lifestyle.Scoped);
-            container.Register<IActorQueryRepository, Infrastructure.Persistence.Repositories.Query.ActorQueryRepository>(Lifestyle.Scoped);
+            container.Register<IActorRepository, ActorRepository>(Lifestyle.Scoped);
             container.Register<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>(Lifestyle.Scoped);
             container.Register<IUserIdentityRepository, UserIdentityRepository>(Lifestyle.Scoped);
             container.Register<IUserRoleAssignmentAuditLogEntryRepository, UserRoleAssignmentAuditLogEntryRepository>(Lifestyle.Scoped);

@@ -163,8 +163,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var marketRoleId = Guid.NewGuid();
-
             var gridAreaRepo = new GridAreaRepository(context);
             var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
                 new GridAreaName("name"),
@@ -177,16 +175,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             {
                 var orgRepo = new OrganizationRepository(context);
                 var org = new Organization("name", MockedBusinessRegisterIdentifier.New(), new Address(null, null, null, null, "DK"), new OrganizationDomain(new MockedDomain()), null);
-                var actor = new Actor(new MockedGln());
+                var orgId = await orgRepo.AddOrUpdateAsync(org);
+
+                var actor = new Actor(orgId.Value, new MockedGln());
 
                 foreach (var marketRole in marketRoles)
                 {
-                    actor.MarketRoles.Add(new ActorMarketRole(marketRoleId, marketRole, new[] { new ActorGridArea(gridAreaId.Value, new[] { MeteringPointType.D01VeProduction }) }));
+                    actor.MarketRoles.Add(new ActorMarketRole(marketRole, new[] { new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction }) }));
                 }
 
-                org.Actors.Add(actor);
-
-                await orgRepo.AddOrUpdateAsync(org);
+                var actorRepository = new ActorRepository(context);
+                await actorRepository.AddOrUpdateAsync(actor);
             }
 
             return gridAreaId;

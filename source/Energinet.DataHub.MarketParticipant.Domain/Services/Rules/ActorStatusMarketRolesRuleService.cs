@@ -25,25 +25,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     public sealed class ActorStatusMarketRolesRuleService : IActorStatusMarketRolesRuleService
     {
-        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IActorRepository _actorRepository;
 
-        public ActorStatusMarketRolesRuleService(IOrganizationRepository organizationRepository)
+        public ActorStatusMarketRolesRuleService(IActorRepository actorRepository)
         {
-            _organizationRepository = organizationRepository;
+            _actorRepository = actorRepository;
         }
 
-        public async Task ValidateAsync(OrganizationId organizationId, Actor updatedActor)
+        public async Task ValidateAsync(Actor updatedActor)
         {
-            ArgumentNullException.ThrowIfNull(organizationId);
             ArgumentNullException.ThrowIfNull(updatedActor);
 
-            var organization = await _organizationRepository.GetAsync(organizationId).ConfigureAwait(false);
-
-            if (organization == null)
-                throw new NotFoundValidationException("Organization not found");
-
-            var actor = organization.Actors.FirstOrDefault(x => x.Id == updatedActor.Id);
-
+            var actor = await _actorRepository.GetAsync(updatedActor.Id).ConfigureAwait(false);
             if (actor == null)
                 throw new NotFoundValidationException("Actor not found");
 

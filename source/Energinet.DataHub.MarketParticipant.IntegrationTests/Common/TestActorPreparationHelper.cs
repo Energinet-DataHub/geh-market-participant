@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -42,9 +43,15 @@ internal static class TestActorPreparationHelper
             inputActor.MarketRoles.Add(localMarketRole);
         }
 
-        inputOrganization.Actors.Add(inputActor);
+        if (inputOrganization.Id == Guid.Empty)
+        {
+            await context.Organizations.AddAsync(inputOrganization);
+            await context.SaveChangesAsync();
+        }
 
-        await context.Organizations.AddAsync(inputOrganization);
+        inputActor.OrganizationId = inputOrganization.Id;
+
+        await context.Actors.AddAsync(inputActor);
         await context.SaveChangesAsync();
 
         return inputActor;

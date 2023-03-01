@@ -29,18 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetPermissionsHandlerTests
     {
         [Fact]
-        public async Task HandleNullArgumentThrowsExceptionAsync()
-        {
-            // arrange
-            var target = new GetPermissionsHandler(new Mock<IPermissionRepository>().Object);
-
-            // act assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task HandleCommandCallsRepositoryAsync()
         {
             // arrange

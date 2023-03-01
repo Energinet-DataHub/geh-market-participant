@@ -29,13 +29,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
     public sealed class ActorContactRepositoryTests
     {
         private readonly MarketParticipantDatabaseFixture _fixture;
-        private readonly Address _validAddress = new(
-            "test Street",
-            "1",
-            "1111",
-            "Test City",
-            "Test Country");
-        private readonly OrganizationDomain _validDomain = new(new MockedDomain());
 
         public ActorContactRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
@@ -67,17 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = new OrganizationRepository(context);
-
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization);
-
-            organization = await organizationRepository.GetAsync(organizationId.Value);
-            actor = organization!.Actors.First();
+            var actor = await _fixture.PrepareActorAsync();
 
             var contactRepository = new ActorContactRepository(context);
             var categories = new[]
@@ -93,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             {
                 await contactRepository
                     .AddAsync(new ActorContact(
-                        actor.Id,
+                        new ActorId(actor.Id),
                         "fake_value",
                         categories[i],
                         new MockedEmailAddress(),
@@ -101,8 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             }
 
             // Act
-            var testContacts = await contactRepository
-                .GetAsync(actor.Id);
+            var testContacts = await contactRepository.GetAsync(new ActorId(actor.Id));
 
             // Assert
             Assert.Equal(5, testContacts.Count());
@@ -116,21 +98,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization);
-
-            organization = await organizationRepository.GetAsync(organizationId.Value);
-            actor = organization!.Actors.First();
+            var actor = await _fixture.PrepareActorAsync();
 
             var contactRepository = new ActorContactRepository(context);
 
             var testContact = new ActorContact(
-                actor.Id,
+                new ActorId(actor.Id),
                 "fake_value",
                 ContactCategory.Charges,
                 new MockedEmailAddress(),
@@ -143,7 +116,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // Assert
             Assert.NotNull(newContact);
             Assert.NotEqual(Guid.Empty, newContact.Id.Value);
-            Assert.NotEqual(Guid.Empty, newContact.ActorId);
+            Assert.NotEqual(Guid.Empty, newContact.ActorId.Value);
             Assert.Equal(testContact.Category, newContact.Category);
             Assert.Equal(testContact.Email.Address, newContact.Email.Address);
             Assert.Equal(testContact.Name, newContact.Name);
@@ -158,21 +131,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization);
-
-            organization = await organizationRepository.GetAsync(organizationId.Value);
-            actor = organization!.Actors.First();
+            var actor = await _fixture.PrepareActorAsync();
 
             var contactRepository = new ActorContactRepository(context);
 
             var testContact = new ActorContact(
-                actor.Id,
+                new ActorId(actor.Id),
                 "fake_value",
                 ContactCategory.Charges,
                 new MockedEmailAddress(),
@@ -201,7 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var testContact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
-                Guid.NewGuid(),
+                new ActorId(Guid.NewGuid()),
                 "fake_value",
                 ContactCategory.Charges,
                 new MockedEmailAddress(),
@@ -218,16 +182,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var organizationRepository = new OrganizationRepository(context);
-            var organization = new Organization("Test Organization", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            var organizationId = await organizationRepository
-                .AddOrUpdateAsync(organization);
-
-            organization = await organizationRepository.GetAsync(organizationId.Value);
-            actor = organization!.Actors.First();
+            var actor = await _fixture.PrepareActorAsync();
 
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
 
@@ -235,7 +190,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var contactRepositoryReadback = new ActorContactRepository(contextReadback);
 
             var testContact = new ActorContact(
-                actor.Id,
+                new ActorId(actor.Id),
                 "fake_value",
                 ContactCategory.Charges,
                 new MockedEmailAddress(),

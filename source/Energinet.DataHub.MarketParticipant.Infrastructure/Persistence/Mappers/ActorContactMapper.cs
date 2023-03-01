@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
         public static void MapToEntity(ActorContact from, ActorContactEntity to)
         {
             to.Id = from.Id.Value;
-            to.ActorId = from.ActorId;
+            to.ActorId = from.ActorId.Value;
             to.Name = from.Name;
             to.Category = from.Category;
             to.Email = from.Email.Address;
@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
             return new ActorContact(
                 new ContactId(from.Id),
-                from.ActorId,
+                new ActorId(from.ActorId),
                 from.Name,
                 from.Category,
                 new EmailAddress(from.Email),
