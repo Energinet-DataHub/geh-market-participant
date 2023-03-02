@@ -214,6 +214,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var permissionToUseForTest = new PermissionEntity
         {
             Description = "Permission for test",
+            Created = DateTimeOffset.UtcNow,
             Id = (int)Permission.ActorManage,
             EicFunctions =
             {
