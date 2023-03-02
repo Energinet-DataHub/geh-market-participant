@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -70,7 +71,7 @@ public sealed class GetUserRoleHandler
     {
         return new PermissionDetailsDto(
             (int)permissionDetails.Permission,
-            permissionDetails.Permission.ToString(),
+            PermissionsAsClaims.Lookup[permissionDetails.Permission],
             permissionDetails.Description);
     }
 }
