@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -41,7 +42,7 @@ public sealed class GetPermissionDetailsHandler
         return new GetPermissionDetailsResponse(permissions.Select(permission =>
             new PermissionDetailsDto(
                 (int)permission.Permission,
-                permission.Permission.ToString(),
+                PermissionsAsClaims.Lookup[permission.Permission],
                 permission.Description)));
     }
 }
