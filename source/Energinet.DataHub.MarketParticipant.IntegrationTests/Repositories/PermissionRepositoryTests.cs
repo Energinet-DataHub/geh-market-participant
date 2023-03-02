@@ -284,11 +284,11 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
 
         // Assert
         var permissionUpdated = await permissionRepositoryAssert
-            .GetToMarketRoleAsync(EicFunction.SystemOperator)
+            .GetAsync(permissionToUpdate.Permission)
             .ConfigureAwait(false);
-        var permissionUpdatedList = permissionUpdated.ToList();
-        Assert.Single(permissionUpdatedList);
-        Assert.Equal(newPermissionDescription, permissionUpdatedList[0].Description);
+
+        Assert.NotNull(permissionUpdated);
+        Assert.Equal(newPermissionDescription, permissionUpdated.Description);
     }
 
     public async Task InitializeAsync()
