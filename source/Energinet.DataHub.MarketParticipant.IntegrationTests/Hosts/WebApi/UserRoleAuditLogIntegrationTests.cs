@@ -207,6 +207,9 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         // Add needed permissions with Eic functions for tests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var allPermissionAuditLogs = await context.PermissionAuditLogEntries.ToListAsync();
+        context.PermissionAuditLogEntries.RemoveRange(allPermissionAuditLogs);
+
         var allPermissions = await context.Permissions.ToListAsync();
         context.Permissions.RemoveRange(allPermissions);
         await context.SaveChangesAsync();
@@ -233,6 +236,8 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
     public new async Task DisposeAsync()
     {
         await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var allPermissionAuditLogs = await context.PermissionAuditLogEntries.ToListAsync();
+        context.PermissionAuditLogEntries.RemoveRange(allPermissionAuditLogs);
         var allPermissions = await context.Permissions.ToListAsync();
         context.Permissions.RemoveRange(allPermissions);
         await context.SaveChangesAsync();

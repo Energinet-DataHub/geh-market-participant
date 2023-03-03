@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 public sealed class PermissionAuditLogEntryEntity
 {
-    public int Id { get; set; }
+    public int EntryId { get; set; }
     public int PermissionId { get; set; }
     public Guid ChangedByUserId { get; set; }
     public int PermissionChangeType { get; set; }

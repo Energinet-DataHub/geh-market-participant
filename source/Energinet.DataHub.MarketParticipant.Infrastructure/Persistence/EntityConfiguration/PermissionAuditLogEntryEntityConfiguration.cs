@@ -26,8 +26,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
 
             builder.ToTable("PermissionAuditLogEntry");
-            builder.HasKey(x => x.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.HasKey(x => x.EntryId);
+            builder.Property(p => p.EntryId).ValueGeneratedOnAdd();
             builder.Property(x => x.PermissionId);
             builder.Property(x => x.PermissionChangeType);
             builder.Property(x => x.ChangedByUserId);

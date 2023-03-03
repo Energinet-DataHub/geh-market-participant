@@ -82,6 +82,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UserRoleAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserInviteAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new PermissionAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }

@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return await permissions
                 .Select(p =>
                     new PermissionAuditLogEntry(
-                        p.Id,
+                        p.EntryId,
                         (Permission)p.PermissionId,
                         new UserId(p.ChangedByUserId),
                         (PermissionChangeType)p.PermissionChangeType,
