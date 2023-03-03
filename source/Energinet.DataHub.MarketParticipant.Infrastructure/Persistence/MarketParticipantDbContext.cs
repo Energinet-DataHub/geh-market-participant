@@ -50,6 +50,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; private set; } = null!;
     public DbSet<UserInviteAuditLogEntryEntity> UserInviteAuditLogEntries { get; private set; } = null!;
     public DbSet<PermissionEntity> Permissions { get; private set; } = null!;
+    public DbSet<PermissionAuditLogEntryEntity> PermissionAuditLogEntries { get; private set; } = null!;
+
     public DbSet<EmailEventEntity> EmailEventEntries { get; private set; } = null!;
 
     public Task<int> SaveChangesAsync()
