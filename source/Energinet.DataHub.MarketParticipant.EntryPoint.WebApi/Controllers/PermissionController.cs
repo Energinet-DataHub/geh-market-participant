@@ -81,14 +81,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpGet]
+        [HttpGet("{permissionId:int}/auditlogs")]
         [AuthorizeUser(Permission.UserRoleManage)]
-        public async Task<IActionResult> GetAuditLogsAsync()
+        public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
         {
             return await this.ProcessAsync(
                 async () =>
                 {
-                    var command = new GetPermissionAuditLogsCommand(1);
+                    var command = new GetPermissionAuditLogsCommand(permissionId);
 
                     var response = await _mediator
                         .Send(command)
