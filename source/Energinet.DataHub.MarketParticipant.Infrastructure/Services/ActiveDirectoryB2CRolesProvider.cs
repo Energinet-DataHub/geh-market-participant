@@ -104,6 +104,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
 
             // Verify that all EIC functions has a corresponding app role
+            if (_activeDirectoryB2CRoles.EicRolesMapped.Count != Enum.GetNames(typeof(EicFunction)).Length)
+                throw new InvalidOperationException("Not all Eic Functions have an AppRole defined");
+
             return _activeDirectoryB2CRoles;
         }
     }
