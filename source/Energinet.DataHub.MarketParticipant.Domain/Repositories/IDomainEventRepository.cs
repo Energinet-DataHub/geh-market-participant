@@ -16,26 +16,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IDomainEventRepository
 {
-    /// <summary>
-    /// Repository giving access to domain events
-    /// </summary>
-    public interface IDomainEventRepository
-    {
-        /// <summary>
-        /// Inserts a <see cref="DomainEvent"/>
-        /// </summary>
-        Task<DomainEventId> InsertAsync(DomainEvent domainEvent);
+    Task<DomainEventId> InsertAsync(DomainEvent domainEvent);
 
-        /// <summary>
-        /// Saves changes to the given <see cref="DomainEvent"/>
-        /// </summary>
-        Task UpdateAsync(DomainEvent domainEvent);
+    Task UpdateAsync(DomainEvent domainEvent);
 
-        /// <summary>
-        /// Retrieves a specified number of of unsent domain events ordered by oldest first
-        /// </summary>
-        Task<IEnumerable<DomainEvent>> GetOldestUnsentDomainEventsAsync(int numberOfEvents);
-    }
+    Task<IEnumerable<DomainEvent>> GetOldestUnsentDomainEventsAsync(int numberOfEvents);
 }
