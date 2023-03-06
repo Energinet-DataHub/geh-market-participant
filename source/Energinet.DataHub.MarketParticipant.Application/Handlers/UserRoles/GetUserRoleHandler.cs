@@ -71,7 +71,7 @@ public sealed class GetUserRoleHandler
     {
         return new PermissionDetailsDto(
             (int)permissionDetails.Permission,
-            permissionDetails.Permission.ToString(),
+            PermissionsAsClaims.Lookup[permissionDetails.Permission],
             permissionDetails.Description);
     }
 }

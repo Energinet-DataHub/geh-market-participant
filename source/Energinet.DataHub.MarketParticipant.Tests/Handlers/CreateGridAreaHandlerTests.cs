@@ -29,23 +29,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class CreateGridAreaHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new CreateGridAreaHandler(new Mock<IGridAreaFactoryService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NewGridArea_GridAreaReturned()
         {
             // Arrange
             var gridAreaFactoryService = new Mock<IGridAreaFactoryService>();
-            var gridId = Guid.NewGuid();
             var gridArea = new GridArea(
                 new GridAreaName("name"),
                 new GridAreaCode("101"),

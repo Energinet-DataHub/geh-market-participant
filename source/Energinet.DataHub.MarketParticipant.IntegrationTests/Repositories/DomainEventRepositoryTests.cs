@@ -102,7 +102,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         {
             var actorUpdatedIntegrationEvent = new ActorUpdatedIntegrationEvent
             {
-                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                OrganizationId = Guid.NewGuid(),
                 ActorId = Guid.NewGuid(),
                 ActorNumber = new MockedGln()
             };

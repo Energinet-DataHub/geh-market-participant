@@ -24,13 +24,11 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using Actor = Energinet.DataHub.MarketParticipant.Domain.Model.Query.Actor;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 
@@ -53,13 +51,13 @@ public sealed class InviteUserHandlerTests
         // Arrange
         var userInvitationServiceMock = new Mock<IUserInvitationService>();
         var organizationRepositoryMock = new Mock<IOrganizationRepository>();
-        var actorQueryRepositoryMock = new Mock<IActorQueryRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
         var target = new InviteUserHandler(
             userInvitationServiceMock.Object,
             organizationRepositoryMock.Object,
-            actorQueryRepositoryMock.Object,
+            actorRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
         var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
@@ -76,38 +74,32 @@ public sealed class InviteUserHandlerTests
 
         var userInvitationServiceMock = new Mock<IUserInvitationService>();
         var organizationRepositoryMock = new Mock<IOrganizationRepository>();
+
+        var organization = TestPreparationModels.MockedOrganization(organizationId.Value);
+        organization.Status = OrganizationStatus.Deleted;
+
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(organizationId))
-            .ReturnsAsync(new Organization(
-                organizationId,
-                "fake_value",
-                new[]
-                {
-                    new Domain.Model.Actor(
-                        _validInvitation.AssignedActor,
-                        null,
-                        new MockedGln(),
-                        ActorStatus.Active,
-                        new[] { new ActorMarketRole(Guid.NewGuid(), EicFunction.ElOverblik) },
-                        new ActorName("fake_value"))
-                },
-                MockedBusinessRegisterIdentifier.New(),
-                new Address(null, null, null, null, "DK"),
-                new MockedDomain(),
-                null,
-                OrganizationStatus.Deleted));
+            .ReturnsAsync(organization);
 
-        var actorQueryRepositoryMock = new Mock<IActorQueryRepository>();
-        actorQueryRepositoryMock
-            .Setup(actorQueryRepository => actorQueryRepository.GetActorAsync(_validInvitation.AssignedActor))
-            .ReturnsAsync(new Actor(organizationId, _validInvitation.AssignedActor, ActorStatus.New));
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(_validInvitation.AssignedActor)))
+            .ReturnsAsync(new Actor(
+                new ActorId(_validInvitation.AssignedActor),
+                organizationId,
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                new[] { new ActorMarketRole(EicFunction.ElOverblik) },
+                new ActorName("fake_value")));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
         var target = new InviteUserHandler(
             userInvitationServiceMock.Object,
             organizationRepositoryMock.Object,
-            actorQueryRepositoryMock.Object,
+            actorRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
         var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
@@ -126,36 +118,26 @@ public sealed class InviteUserHandlerTests
         var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(organizationId))
-            .ReturnsAsync(new Organization(
-                organizationId,
-                "fake_value",
-                new[]
-                {
-                    new Domain.Model.Actor(
-                        _validInvitation.AssignedActor,
-                        null,
-                        new MockedGln(),
-                        ActorStatus.Active,
-                        new[] { new ActorMarketRole(Guid.NewGuid(), EicFunction.ElOverblik) },
-                        new ActorName("fake_value"))
-                },
-                MockedBusinessRegisterIdentifier.New(),
-                new Address(null, null, null, null, "DK"),
-                new MockedDomain(),
-                null,
-                OrganizationStatus.Active));
+            .ReturnsAsync(TestPreparationModels.MockedOrganization(organizationId.Value));
 
-        var actorQueryRepositoryMock = new Mock<IActorQueryRepository>();
-        actorQueryRepositoryMock
-            .Setup(actorQueryRepository => actorQueryRepository.GetActorAsync(_validInvitation.AssignedActor))
-            .ReturnsAsync(new Actor(organizationId, _validInvitation.AssignedActor, ActorStatus.New));
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(_validInvitation.AssignedActor)))
+            .ReturnsAsync(new Actor(
+                new ActorId(_validInvitation.AssignedActor),
+                organizationId,
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                new[] { new ActorMarketRole(EicFunction.ElOverblik) },
+                new ActorName("fake_value")));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
         var target = new InviteUserHandler(
             userInvitationServiceMock.Object,
             organizationRepositoryMock.Object,
-            actorQueryRepositoryMock.Object,
+            actorRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
         var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
@@ -175,29 +157,19 @@ public sealed class InviteUserHandlerTests
         var organizationRepositoryMock = new Mock<IOrganizationRepository>();
         organizationRepositoryMock
             .Setup(organizationRepository => organizationRepository.GetAsync(organizationId))
-            .ReturnsAsync(new Organization(
-                organizationId,
-                "fake_value",
-                new[]
-                {
-                    new Domain.Model.Actor(
-                        _validInvitation.AssignedActor,
-                        null,
-                        new MockedGln(),
-                        ActorStatus.Active,
-                        new[] { new ActorMarketRole(Guid.NewGuid(), EicFunction.ElOverblik) },
-                        new ActorName("fake_value"))
-                },
-                MockedBusinessRegisterIdentifier.New(),
-                new Address(null, null, null, null, "DK"),
-                new MockedDomain(),
-                null,
-                OrganizationStatus.Active));
+            .ReturnsAsync(TestPreparationModels.MockedOrganization(organizationId.Value));
 
-        var actorQueryRepositoryMock = new Mock<IActorQueryRepository>();
-        actorQueryRepositoryMock
-            .Setup(actorQueryRepository => actorQueryRepository.GetActorAsync(_validInvitation.AssignedActor))
-            .ReturnsAsync(new Actor(organizationId, _validInvitation.AssignedActor, ActorStatus.New));
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(_validInvitation.AssignedActor)))
+            .ReturnsAsync(new Actor(
+                new ActorId(_validInvitation.AssignedActor),
+                organizationId,
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                new[] { new ActorMarketRole(EicFunction.ElOverblik) },
+                new ActorName("fake_value")));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
         userRoleRepositoryMock
@@ -213,7 +185,7 @@ public sealed class InviteUserHandlerTests
         var target = new InviteUserHandler(
             userInvitationServiceMock.Object,
             organizationRepositoryMock.Object,
-            actorQueryRepositoryMock.Object,
+            actorRepositoryMock.Object,
             userRoleRepositoryMock.Object);
 
         var inviteUserCommand = new InviteUserCommand(_validInvitation, _validInvitedByUserId);
@@ -229,7 +201,7 @@ public sealed class InviteUserHandlerTests
                 ui.LastName == _validInvitation.LastName &&
                 ui.PhoneNumber.Number == _validInvitation.PhoneNumber &&
                 ui.RequiredAuthentication is SmsAuthenticationMethod &&
-                ui.AssignedActor.Id == _validInvitation.AssignedActor &&
+                ui.AssignedActor.Id.Value == _validInvitation.AssignedActor &&
                 ui.AssignedRoles.Single().Id.Value == _validInvitation.AssignedRoles.Single()),
             It.Is<UserId>(u => u.Value == _validInvitedByUserId)));
     }

@@ -23,6 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
     public sealed class MarketParticipantOrganizationClient : IMarketParticipantOrganizationClient
     {
         private const string OrganizationsBaseUrl = "Organization";
+        private const string ActorBaseUrl = "Actor";
 
         private readonly IMarketParticipantClientFactory _clientFactory;
 
@@ -90,6 +91,23 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .CreateClient()
                         .Request(OrganizationsBaseUrl, organizationId)
                 .PutJsonAsync(organizationDto));
+        }
+
+        public async Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(OrganizationsBaseUrl, organizationId, ActorBaseUrl)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            var actors = await response
+                .GetJsonAsync<IEnumerable<ActorDto>>()
+                .ConfigureAwait(false);
+
+            return actors;
         }
     }
 }

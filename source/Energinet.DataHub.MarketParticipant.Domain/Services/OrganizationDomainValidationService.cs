@@ -18,21 +18,16 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 public sealed class OrganizationDomainValidationService : IOrganizationDomainValidationService
 {
     private readonly IOrganizationRepository _organizationRepository;
-    private readonly IActorQueryRepository _actorQueryRepository;
 
-    public OrganizationDomainValidationService(
-        IOrganizationRepository organizationRepository,
-        IActorQueryRepository actorQueryRepository)
+    public OrganizationDomainValidationService(IOrganizationRepository organizationRepository)
     {
         _organizationRepository = organizationRepository;
-        _actorQueryRepository = actorQueryRepository;
     }
 
     public async Task ValidateUserEmailInsideOrganizationDomainsAsync(Actor actor, EmailAddress userInviteEmail)
@@ -40,17 +35,13 @@ public sealed class OrganizationDomainValidationService : IOrganizationDomainVal
         ArgumentNullException.ThrowIfNull(actor);
         ArgumentNullException.ThrowIfNull(userInviteEmail);
 
-        var actorWithOrganization = await _actorQueryRepository
-            .GetActorAsync(actor.Id)
-            .ConfigureAwait(false);
-
         var organization = await _organizationRepository
-            .GetAsync(actorWithOrganization!.OrganizationId)
+            .GetAsync(actor.OrganizationId)
             .ConfigureAwait(false);
 
         if (organization == null)
         {
-            throw new NotFoundValidationException($"The specified organization {actorWithOrganization.OrganizationId} was not found.");
+            throw new NotFoundValidationException($"The specified organization {actor.OrganizationId} was not found.");
         }
 
         if (!userInviteEmail.Address.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))

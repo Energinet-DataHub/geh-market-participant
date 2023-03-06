@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -59,7 +60,7 @@ public sealed class UpdateUserRolesHandler
 
         foreach (var addRequest in request.Assignments.Added)
         {
-            var userRoleAssignment = new UserRoleAssignment(request.ActorId, new UserRoleId(addRequest));
+            var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), new UserRoleId(addRequest));
             if (user.RoleAssignments.Contains(userRoleAssignment))
                 continue;
 
@@ -74,7 +75,7 @@ public sealed class UpdateUserRolesHandler
 
         foreach (var removeRequest in request.Assignments.Removed)
         {
-            var userRoleAssignment = new UserRoleAssignment(request.ActorId, new UserRoleId(removeRequest));
+            var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), new UserRoleId(removeRequest));
             if (user.RoleAssignments.Remove(userRoleAssignment))
             {
                 await AuditRoleAssignmentAsync(

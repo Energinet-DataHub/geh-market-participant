@@ -12,29 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Repository for specialized fast read-only access to actors.
+/// Provides access to actors.
 /// </summary>
-public interface IActorQueryRepository
+public interface IActorRepository
 {
     /// <summary>
-    /// Gets an actor directly by their external id.
+    /// Adds the given actor to the repository, or updates it, if it already exists.
+    /// </summary>
+    /// <param name="actor">The actor to add or update.</param>
+    /// <returns>The id of the added/updated actor.</returns>
+    Task<ActorId> AddOrUpdateAsync(Actor actor);
+
+    /// <summary>
+    /// Gets an actor by their internal id.
     /// </summary>
     /// <param name="actorId">The id of the actor.</param>
     /// <returns>An actor for the specified id; or null if not found.</returns>
-    Task<Actor?> GetActorAsync(Guid actorId);
+    Task<Actor?> GetAsync(ActorId actorId);
 
     /// <summary>
-    /// Gets actors used for actor selection.
+    /// Gets all actors with the specified ids.
     /// </summary>
     /// <param name="actorIds">The list of actor ids.</param>
     /// <returns>A list of actors.</returns>
-    Task<IEnumerable<SelectionActor>> GetSelectionActorsAsync(IEnumerable<Guid> actorIds);
+    Task<IEnumerable<Actor>> GetActorsAsync(IEnumerable<ActorId> actorIds);
+
+    /// <summary>
+    /// Gets all actors for the specified organization.
+    /// </summary>
+    /// <param name="organizationId">The organization to get the actors for.</param>
+    /// <returns>A list of actors.</returns>
+    Task<IEnumerable<Actor>> GetActorsAsync(OrganizationId organizationId);
 }

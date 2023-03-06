@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 actorUpdatedIntegrationEvent.Id,
                 actorUpdatedIntegrationEvent.EventCreated,
                 actorUpdatedIntegrationEvent.ActorId,
-                actorUpdatedIntegrationEvent.OrganizationId.Value,
+                actorUpdatedIntegrationEvent.OrganizationId,
                 actorUpdatedIntegrationEvent.ExternalActorId?.Value,
                 actorNumber,
                 (ActorStatus)actorUpdatedIntegrationEvent.Status,

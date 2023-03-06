@@ -12,9 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record ActorId
 {
-    public sealed record UserRoleAuditLogsDto(IEnumerable<UserRoleAuditLogEntryDto> UserRoleAssignmentAuditLogs);
+    public ActorId(string value)
+    {
+        Value = Guid.Parse(value);
+    }
+
+    public ActorId(Guid value)
+    {
+        Value = value;
+    }
+
+    public Guid Value { get; }
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }

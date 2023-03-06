@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record MarketRoleDto(EicFunction EicFunction);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+
+public record UpdatePermissionDto(int Id, string Description);

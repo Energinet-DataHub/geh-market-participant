@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -26,6 +25,4 @@ public sealed class OrganizationEntity
     public int Status { get; set; }
     public AddressEntity Address { get; set; } = new();
     public string Domain { get; set; } = null!;
-
-    public Collection<ActorEntity> Actors { get; } = new();
 }

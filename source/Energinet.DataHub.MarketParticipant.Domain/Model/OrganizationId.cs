@@ -13,28 +13,25 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record OrganizationId
 {
-    public sealed record OrganizationId
+    public OrganizationId(string value)
     {
-        public OrganizationId(string value)
-        {
-            Value = Guid.Parse(value);
-        }
+        Value = Guid.Parse(value);
+    }
 
-        [JsonConstructor]
-        public OrganizationId(Guid value)
-        {
-            Value = value;
-        }
+    public OrganizationId(Guid value)
+    {
+        Value = value;
+    }
 
-        public Guid Value { get; }
+    public Guid Value { get; }
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+    public override string ToString()
+    {
+        return Value.ToString();
     }
 }

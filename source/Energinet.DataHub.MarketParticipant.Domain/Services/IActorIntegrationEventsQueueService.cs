@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -28,39 +27,34 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <summary>
         /// Creates and enqueues an ActorUpdated integration event for the specified actor.
         /// </summary>
-        /// <param name="organizationId">The organization id the actor belongs to.</param>
         /// <param name="actor">The actor to publish an integration event for.</param>
-        Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Actor actor);
+        Task EnqueueActorUpdatedEventAsync(Actor actor);
 
         /// <summary>
         /// Creates and enqueues an ActorCreated integration event for the specified actor.
         /// </summary>
-        /// <param name="organizationId">The organization id the actor belongs to.</param>
         /// <param name="actor">The actor to publish an integration event for.</param>
-        Task EnqueueActorCreatedEventsAsync(OrganizationId organizationId, Actor actor);
+        Task EnqueueActorCreatedEventsAsync(Actor actor);
 
         /// <summary>
         /// Creates and enqueues an ActorUpdated integration event for the specified actor.
         /// </summary>
-        /// <param name="organizationId">The organization id the actor belongs to.</param>
         /// <param name="actorId">The actor id.</param>
         /// <param name="integrationEvents">The events to publish.</param>
-        Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Guid actorId, IEnumerable<IIntegrationEvent> integrationEvents);
+        Task EnqueueActorUpdatedEventAsync(ActorId actorId, IEnumerable<IIntegrationEvent> integrationEvents);
 
         /// <summary>
         /// Creates integration event for contact added to actor
         /// </summary>
-        /// <param name="organizationId"></param>
         /// <param name="actor"></param>
         /// <param name="contact"></param>
-        Task EnqueueContactAddedToActorEventAsync(OrganizationId organizationId, Actor actor, ActorContact contact);
+        Task EnqueueContactAddedToActorEventAsync(Actor actor, ActorContact contact);
 
         /// <summary>
         /// Creates integration event for contact removed from actor
         /// </summary>
-        /// <param name="organizationId"></param>
         /// <param name="actor"></param>
         /// <param name="contact"></param>
-        Task EnqueueContactRemovedFromActorEventAsync(OrganizationId organizationId, Actor actor, ActorContact contact);
+        Task EnqueueContactRemovedFromActorEventAsync(Actor actor, ActorContact contact);
     }
 }

@@ -12,28 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     /// <summary>
-    /// Provides access to UniqueActorMarketRoleGridAreas.
+    /// Ensures given market roles only exists once per grid area across all organizations
     /// </summary>
-    public interface IUniqueActorMarketRoleGridAreaRepository
+    public interface IUniqueMarketRoleGridAreaRuleService
     {
         /// <summary>
-        /// Tries to add the UniqueActorMarketRoleGridArea />
+        /// Ensures given market roles only exists once per grid area across all organizations
         /// </summary>
-        /// <param name="domain"></param>
-        /// <returns>true if operation succeeded, otherwise false.</returns>
-        Task<bool> TryAddAsync(UniqueActorMarketRoleGridArea domain);
-
-        /// <summary>
-        /// Removes all UniqueActorMarketRoleGridAreas for the given actor ID
-        /// </summary>
-        /// <param name="actorId"></param>
-        Task RemoveAsync(Guid actorId);
+        /// <param name="actor">Actor for which to ensure unique market roles</param>
+        Task ValidateAsync(Actor actor);
     }
 }

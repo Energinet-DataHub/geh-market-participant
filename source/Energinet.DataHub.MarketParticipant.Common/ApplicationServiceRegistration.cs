@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -42,6 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
         public static void AddApplicationServices(this Container container)
         {
             container.Register<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<GetPermissionsCommand>, GetPermissionsCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>(Lifestyle.Scoped);
@@ -65,6 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
+            container.Register<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
             container.Register<IValidator<GetAssociatedUserActorsCommand>, GetAssociatedUserActorsCommandRuleSet>();
             container.Register<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
             container.Register<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();

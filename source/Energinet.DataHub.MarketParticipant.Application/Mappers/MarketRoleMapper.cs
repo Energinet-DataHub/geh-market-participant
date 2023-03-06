@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             foreach (var marketRoleDto in marketRoleDtos)
             {
                 var aggregatedGrids = marketRoleDto.GridAreas
-                    .GroupBy(x => x.Id)
+                    .GroupBy(x => new GridAreaId(x.Id))
                     .Select(x => new ActorGridArea(x.Key, x.SelectMany(x => x.MeteringPointTypes)
                     .Select(x => Enum.Parse<MeteringPointType>(x, true)).Distinct()));
 

@@ -28,7 +28,7 @@ using Microsoft.Extensions.Logging;
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
     [ApiController]
-    [Route("organization")]
+    [Route("actor")]
     public class ActorController : ControllerBase
     {
         private readonly ILogger<ActorController> _logger;
@@ -42,41 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _userContext = userContext;
         }
 
-        [HttpGet("{organizationId:guid}/actor")]
-        public async Task<IActionResult> GetActorsAsync(Guid organizationId)
-        {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
-                        return Unauthorized();
-
-                    var getActorsCommand = new GetActorsCommand(organizationId);
-
-                    var response = await _mediator
-                        .Send(getActorsCommand)
-                        .ConfigureAwait(false);
-
-                    var filteredActors = response.Actors;
-
-                    if (!_userContext.CurrentUser.IsFas)
-                    {
-                        filteredActors = filteredActors.Select(actor =>
-                        {
-                            if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
-                                return actor;
-
-                            return actor with { Name = new ActorNameDto(string.Empty) };
-                        });
-                    }
-
-                    return Ok(filteredActors);
-                },
-                _logger).ConfigureAwait(false);
-        }
-
-        [HttpGet("{organizationId:guid}/actor/{actorId:guid}")]
-        public async Task<IActionResult> GetSingleActorAsync(Guid organizationId, Guid actorId)
+        [HttpGet("{actorId:guid}")]
+        public async Task<IActionResult> GetSingleActorAsync(Guid actorId)
         {
             return await this.ProcessAsync(
                 async () =>
@@ -84,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                         return Unauthorized();
 
-                    var getSingleActorCommand = new GetSingleActorCommand(actorId, organizationId);
+                    var getSingleActorCommand = new GetSingleActorCommand(actorId);
 
                     var response = await _mediator
                         .Send(getSingleActorCommand)
@@ -95,9 +62,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpPost("{organizationId:guid}/actor")]
+        [HttpPost]
         [AuthorizeUser(Permission.ActorManage)]
-        public async Task<IActionResult> CreateActorAsync(Guid organizationId, CreateActorDto actorDto)
+        public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
         {
             return await this.ProcessAsync(
                 async () =>
@@ -105,7 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     if (!_userContext.CurrentUser.IsFas)
                         return Unauthorized();
 
-                    var createActorCommand = new CreateActorCommand(organizationId, actorDto);
+                    var createActorCommand = new CreateActorCommand(actorDto);
 
                     var response = await _mediator
                         .Send(createActorCommand)
@@ -116,9 +83,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 _logger).ConfigureAwait(false);
         }
 
-        [HttpPut("{organizationId:guid}/actor/{actorId:guid}")]
+        [HttpPut("{actorId:guid}")]
         [AuthorizeUser(Permission.ActorManage)]
-        public async Task<IActionResult> UpdateActorAsync(Guid organizationId, Guid actorId, ChangeActorDto changeActor)
+        public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
             return await this.ProcessAsync(
                 async () =>
@@ -126,7 +93,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                         return Unauthorized();
 
-                    var updateActorCommand = new UpdateActorCommand(organizationId, actorId, changeActor);
+                    var updateActorCommand = new UpdateActorCommand(actorId, changeActor);
 
                     var response = await _mediator
                         .Send(updateActorCommand)

@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Handlers;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -32,74 +31,30 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class DeleteActorContactHandlerTests
     {
-        private readonly Address _validAddress = new(
-            "test Street",
-            "1",
-            "1111",
-            "Test City",
-            "Test Country");
-
-        private readonly OrganizationDomain _validDomain = new("energinet.dk");
-
-        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
-
-        [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new DeleteActorContactHandler(
-                new Mock<IOrganizationExistsHelperService>().Object,
-                new Mock<IActorContactRepository>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
         [Fact]
         public async Task Handle_NonExistingActor_Throws()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 contactRepository.Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object);
 
-            var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
+            var actor = TestPreparationModels.MockedActor();
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                organizationId,
-                "name",
-                new[] { actor },
-                _validCvrBusinessRegisterIdentifier,
-                _validAddress,
-                _validDomain,
-                "Test Comment",
-                OrganizationStatus.Active);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
-                .ReturnsAsync(organization);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
 
             contactRepository
                 .Setup(x => x.GetAsync(contactId))
                 .ReturnsAsync((ActorContact?)null);
 
             var wrongId = Guid.NewGuid();
-            var command = new DeleteActorContactCommand(organizationId.Value, wrongId, contactId.Value);
+            var command = new DeleteActorContactCommand(wrongId, contactId.Value);
 
             // act + assert
             var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
@@ -110,43 +65,25 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_NoContact_DoesNothing()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 contactRepository.Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object);
 
-            var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
+            var actor = TestPreparationModels.MockedActor();
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                organizationId,
-                "name",
-                new[] { actor },
-                _validCvrBusinessRegisterIdentifier,
-                _validAddress,
-                _validDomain,
-                "Test Comment",
-                OrganizationStatus.Active);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
-                .ReturnsAsync(organization);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
 
             contactRepository
                 .Setup(x => x.GetAsync(contactId))
                 .ReturnsAsync((ActorContact?)null);
 
-            var command = new DeleteActorContactCommand(organizationId.Value, actor.Id, contactId.Value);
+            var command = new DeleteActorContactCommand(actor.Id.Value, contactId.Value);
 
             // Act + Assert
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
@@ -156,37 +93,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_OneContact_IsDeleted()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 contactRepository.Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object);
 
-            var organizationId = new OrganizationId(Guid.NewGuid());
             var contactId = new ContactId(Guid.NewGuid());
+            var actor = TestPreparationModels.MockedActor();
 
-            var actor = new Actor(
-                Guid.NewGuid(),
-                null,
-                new MockedGln(),
-                ActorStatus.Active,
-                Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty));
-
-            var organization = new Organization(
-                organizationId,
-                "name",
-                new[] { actor },
-                _validCvrBusinessRegisterIdentifier,
-                _validAddress,
-                _validDomain,
-                "Test Comment",
-                OrganizationStatus.Active);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId.Value))
-                .ReturnsAsync(organization);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
 
             var contactToDelete = new ActorContact(
                 contactId,
@@ -200,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(contactId))
                 .ReturnsAsync(contactToDelete);
 
-            var command = new DeleteActorContactCommand(organizationId.Value, actor.Id, contactId.Value);
+            var command = new DeleteActorContactCommand(actor.Id.Value, contactId.Value);
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

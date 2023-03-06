@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -24,7 +23,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
@@ -34,18 +32,18 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
 {
     private readonly IUserInvitationService _userInvitationService;
     private readonly IOrganizationRepository _organizationRepository;
-    private readonly IActorQueryRepository _actorQueryRepository;
+    private readonly IActorRepository _actorRepository;
     private readonly IUserRoleRepository _userRoleRepository;
 
     public InviteUserHandler(
         IUserInvitationService userInvitationService,
         IOrganizationRepository organizationRepository,
-        IActorQueryRepository actorQueryRepository,
+        IActorRepository actorRepository,
         IUserRoleRepository userRoleRepository)
     {
         _userInvitationService = userInvitationService;
         _organizationRepository = organizationRepository;
-        _actorQueryRepository = actorQueryRepository;
+        _actorRepository = actorRepository;
         _userRoleRepository = userRoleRepository;
     }
 
@@ -76,8 +74,8 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
 
     private async Task<Domain.Model.Actor> GetActorAsync(Guid actorId)
     {
-        var actor = await _actorQueryRepository
-            .GetActorAsync(actorId)
+        var actor = await _actorRepository
+            .GetAsync(new ActorId(actorId))
             .ConfigureAwait(false);
 
         if (actor == null)
@@ -90,7 +88,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             .ConfigureAwait(false);
 
         return organization != null && organization.Status != OrganizationStatus.Deleted
-            ? organization.Actors.First(a => a.Id == actor.ActorId)
+            ? actor
             : throw new ValidationException("The organization of the actor has been deleted.");
     }
 

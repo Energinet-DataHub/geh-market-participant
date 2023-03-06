@@ -26,8 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("ActorInfoNew");
             builder.HasKey(actor => actor.Id);
-            builder.Property(actor => actor.Id).ValueGeneratedNever();
-            builder.Ignore(actor => actor.New);
+            builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
             builder
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()

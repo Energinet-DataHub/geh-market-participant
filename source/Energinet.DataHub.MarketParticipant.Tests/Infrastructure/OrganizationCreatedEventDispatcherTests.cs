@@ -45,27 +45,27 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new OrganizationCreatedIntegrationEvent
             {
-               Address = new Address(
+                Address = new Address(
                    "fake_value",
                    "fake_value",
                    "fake_value",
                    "fake_value",
                    "fake_value"),
-               Name = "fake_value",
-               OrganizationId = new OrganizationId(Guid.NewGuid()),
-               BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678"),
-               Status = OrganizationStatus.Active
+                Name = "fake_value",
+                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                BusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678"),
+                Status = OrganizationStatus.Active
             };
 
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationCreatedIntegrationEvent;
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as Integration.Model.Dtos.OrganizationCreatedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent.Id);
             Assert.Equal(integrationEvent.Name, actualEvent.Name);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.Address.City, actualEvent.Address.City);
@@ -88,11 +88,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
 
             var integrationEvent = new ActorUpdatedIntegrationEvent
             {
-              ActorNumber = new MockedGln(),
-              Status = ActorStatus.Active,
-              ActorId = Guid.NewGuid(),
-              OrganizationId = new OrganizationId(Guid.NewGuid()),
-              ExternalActorId = new ExternalActorId(Guid.NewGuid())
+                ActorNumber = new MockedGln(),
+                Status = ActorStatus.Active,
+                ActorId = Guid.NewGuid(),
+                OrganizationId = Guid.NewGuid(),
+                ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };
 
             // act

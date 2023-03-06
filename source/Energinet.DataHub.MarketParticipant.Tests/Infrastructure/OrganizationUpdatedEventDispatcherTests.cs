@@ -59,12 +59,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             // act
             var actual = await target.TryDispatchAsync(integrationEvent).ConfigureAwait(false);
             var actualMessage = serviceBusSenderMock.SentMessages.Single();
-            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as MarketParticipant.Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent;
+            var actualEvent = eventParser.Parse(actualMessage.Body.ToArray()) as Integration.Model.Dtos.OrganizationUpdatedIntegrationEvent;
 
             // assert
             Assert.True(actual);
             Assert.NotNull(actualEvent);
-            Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+            Assert.Equal(integrationEvent.Id, actualEvent.Id);
             Assert.Equal(integrationEvent.Name, actualEvent.Name);
             Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
             Assert.Equal(integrationEvent.Address.City, actualEvent.Address.City);
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
               ActorNumber = new MockedGln(),
               Status = ActorStatus.Active,
               ActorId = Guid.NewGuid(),
-              OrganizationId = new OrganizationId(Guid.NewGuid()),
+              OrganizationId = Guid.NewGuid(),
               ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };
 

@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    public sealed record UniqueActorMarketRoleGridArea(Guid ActorId, EicFunction MarketRole, Guid GridAreaId);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+
+public sealed record GetPermissionsCommand() : IRequest<GetPermissionsResponse>;

@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.App.Common;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -38,10 +39,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var externalUserId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var actorId = Guid.NewGuid();
-            var userRoleAssignments = new List<UserRoleAssignment>()
+            var userRoleAssignments = new List<UserRoleAssignment>
             {
-                new(Guid.NewGuid(), new UserRoleId(Guid.NewGuid())),
-                new(actorId, new UserRoleId(Guid.NewGuid())),
+                new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
+                new(new ActorId(actorId), new UserRoleId(Guid.NewGuid())),
             };
             var user = new User(
                 new UserId(userId),

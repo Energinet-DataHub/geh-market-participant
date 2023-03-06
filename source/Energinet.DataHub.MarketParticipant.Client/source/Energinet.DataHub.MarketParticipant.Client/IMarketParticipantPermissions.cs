@@ -12,20 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Client.Models;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services
+namespace Energinet.DataHub.MarketParticipant.Client
 {
     /// <summary>
-    /// Ensures given market roles only exists once per grid area across all organizations
+    /// Manages Permissions.
     /// </summary>
-    public interface IUniqueMarketRoleGridAreaService
+    public interface IMarketParticipantPermissionsClient
     {
         /// <summary>
-        /// Ensures given market roles only exists once per grid area across all organizations
+        /// Gets all permissions.
         /// </summary>
-        /// <param name="actor">Actor for which to ensure unique market roles</param>
-        Task EnsureUniqueMarketRolesPerGridAreaAsync(Actor actor);
+        Task<IEnumerable<PermissionDetailsDto>> GetPermissionsAsync();
+
+        /// <summary>
+        /// Update permission
+        /// </summary>
+        /// <param name="updatePermissionDto">New permission description</param>
+        Task UpdatePermissionAsync(UpdatePermissionDto updatePermissionDto);
     }
 }

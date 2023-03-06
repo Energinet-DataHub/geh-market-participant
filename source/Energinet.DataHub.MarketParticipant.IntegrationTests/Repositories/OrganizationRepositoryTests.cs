@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -150,7 +148,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             newOrg = new Organization(
                 newOrg!.Id,
                 "NewName",
-                newOrg.Actors,
                 newOrg.BusinessRegisterIdentifier,
                 newOrg.Address,
                 _validDomain,
@@ -169,181 +166,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task AddOrUpdateAsync_ActorAdded_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-
-            var initialActor = new Actor(new MockedGln());
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            organization.Actors.Add(initialActor);
-
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Act
-            var newActor = new Actor(new MockedGln());
-            organization!.Actors.Add(newActor);
-
-            await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Assert
-            Assert.NotNull(organization);
-            Assert.Equal(2, organization.Actors.Count);
-            Assert.Contains(organization.Actors, x => x.ExternalActorId == initialActor.ExternalActorId);
-            Assert.Contains(organization.Actors, x => x.ExternalActorId == newActor.ExternalActorId);
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_AddGridAreaToActor_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-            var gridAreaRepository = new GridAreaRepository(context);
-
-            var gridArea = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var expected = await gridAreaRepository
-                .AddOrUpdateAsync(gridArea)
-                ;
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-
-            var initalActor = new Actor(new MockedGln());
-            initalActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, new[] { new ActorGridArea(expected.Value, Enumerable.Empty<MeteringPointType>()) }));
-            organization.Actors.Add(initalActor);
-
-            // Act
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-
-            organization = await orgRepository.GetAsync(orgId.Value);
-            var actualGridArea = organization!
-                .Actors
-                .Single()
-                .MarketRoles
-                .Single()
-                .GridAreas.Single();
-
-            // Assert
-            Assert.Equal(expected.Value, actualGridArea.Id);
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_MarketRoleAdded_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-
-            var balancePowerSupplierActor = new Actor(new MockedGln());
-            balancePowerSupplierActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, new List<ActorGridArea>()));
-            organization.Actors.Add(balancePowerSupplierActor);
-
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Act
-            var meteringPointAdministratorActor = new Actor(new MockedGln());
-            meteringPointAdministratorActor.MarketRoles.Add(new ActorMarketRole(EicFunction.MeteringPointAdministrator, new List<ActorGridArea>()));
-            organization!.Actors.Add(meteringPointAdministratorActor);
-
-            await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Assert
-            Assert.NotNull(organization);
-            Assert.Equal(2, organization.Actors.Count);
-            Assert.Contains(
-                organization.Actors,
-                x => x.MarketRoles.All(y => y.Function == EicFunction.BillingAgent));
-            Assert.Contains(
-                organization.Actors,
-                x => x.MarketRoles.All(y => y.Function == EicFunction.MeteringPointAdministrator));
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_MeteringPointAdded_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-            var gridAreaRepository = new GridAreaRepository(context);
-
-            var gridAreaToInsert = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var gridAreaToInsert_Id = await gridAreaRepository
-                .AddOrUpdateAsync(gridAreaToInsert)
-                ;
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-
-            var someActor = new Actor(new MockedGln());
-            someActor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>
-            {
-                new(gridAreaToInsert_Id.Value, new List<MeteringPointType>
-                {
-                    MeteringPointType.D02Analysis
-                })
-            }));
-            organization.Actors.Add(someActor);
-
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Act
-            foreach (var organizationActor in organization!.Actors)
-            {
-                foreach (var organizationActorMarketRole in organizationActor.MarketRoles)
-                {
-                    foreach (var actorGridArea in organizationActorMarketRole.GridAreas)
-                    {
-                        actorGridArea.MeteringPointTypes.Add(MeteringPointType.D05NetProduction);
-                    }
-                }
-            }
-
-            await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            var actorMeteringPointTypes =
-                organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
-
-            // Assert
-            Assert.NotNull(organization);
-            Assert.Equal(2, actorMeteringPointTypes.Count);
-            Assert.Contains(
-                actorMeteringPointTypes,
-                x => x == MeteringPointType.D02Analysis);
-            Assert.Contains(
-                actorMeteringPointTypes,
-                x => x == MeteringPointType.D05NetProduction);
-        }
-
-        [Fact]
         public async Task GetAsync_DifferentContexts_CanReadBack()
         {
             // Arrange
@@ -356,108 +178,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository2 = new OrganizationRepository(context2);
 
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            var gln = new MockedGln();
 
             // Act
-            organization.Actors.Add(new Actor(gln));
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
             organization = await orgRepository2.GetAsync(orgId.Value);
 
             // Assert
             Assert.NotNull(organization);
-            Assert.Single(organization.Actors);
-            Assert.Contains(organization.Actors, x => x.ActorNumber == gln);
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_ActorWith1MeteringTypesAdded_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-            var orgRepositoryRead = new OrganizationRepository(contextRead);
-            var gridAreaRepository = new GridAreaRepository(context);
-
-            var gridAreaToInsert = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var gridAreaToInsert_Id = await gridAreaRepository
-                .AddOrUpdateAsync(gridAreaToInsert)
-                ;
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-
-            var meteringPointTypes = new List<MeteringPointType>() { MeteringPointType.D05NetProduction };
-            var gridArea = new ActorGridArea(gridAreaToInsert_Id.Value, meteringPointTypes);
-
-            var actorWithMeteringTypes = new Actor(new MockedGln());
-            actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new List<ActorGridArea>() { gridArea }));
-            organization.Actors.Add(actorWithMeteringTypes);
-
-            // Act
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepositoryRead.GetAsync(orgId.Value);
-
-            var actorMeteringPointTypes =
-                organization!.Actors.Single().MarketRoles.Single().GridAreas.Single().MeteringPointTypes;
-
-            // Assert
-            Assert.NotNull(organization);
-            Assert.Contains(
-                actorMeteringPointTypes,
-                x => x.Equals(MeteringPointType.D05NetProduction));
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_OrganizationRoleWith2MeteringTypesAdded_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            await using var contextRead = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-            var orgRepositoryRead = new OrganizationRepository(contextRead);
-            var gridAreaRepository = new GridAreaRepository(context);
-
-            var gridAreaToInsert = new GridArea(
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var gridAreaToInsert_Id = await gridAreaRepository
-                .AddOrUpdateAsync(gridAreaToInsert)
-                ;
-
-            var meteringPointTypesToAdd = new[] { MeteringPointType.D03NotUsed, MeteringPointType.D12TotalConsumption };
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-
-            var actorWithMeteringTypes = new Actor(new MockedGln());
-            actorWithMeteringTypes.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, new List<ActorGridArea> { new(gridAreaToInsert_Id.Value, meteringPointTypesToAdd) }));
-            organization.Actors.Add(actorWithMeteringTypes);
-
-            // Act
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepositoryRead.GetAsync(orgId.Value);
-
-            // Assert
-            Assert.NotNull(organization);
-            Assert.Contains(
-                meteringPointTypesToAdd,
-                x => x.Equals(MeteringPointType.D03NotUsed));
-            Assert.Contains(
-                meteringPointTypesToAdd,
-                x => x.Equals(MeteringPointType.D12TotalConsumption));
         }
 
         [Fact]
@@ -472,16 +199,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var globalLocationNumber = new MockedGln();
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
 
-            organization.Actors.Add(new Actor(globalLocationNumber));
             await orgRepository.AddOrUpdateAsync(organization);
 
             // Act
-            var organizations = await orgRepository2
-                .GetAsync()
-                ;
+            var organizations = await orgRepository2.GetAsync();
 
             // Assert
             Assert.NotEmpty(organizations);
@@ -502,49 +225,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var globalLocationNumber = new MockedGln();
             var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
 
-            organization.Actors.Add(new Actor(globalLocationNumber));
-            await orgRepository.AddOrUpdateAsync(organization);
+            var organizationId = await orgRepository.AddOrUpdateAsync(organization);
+            await _fixture.PrepareActorAsync(
+                TestPreparationEntities.ValidOrganization,
+                TestPreparationEntities.ValidActor.Patch(t =>
+                {
+                    t.ActorNumber = globalLocationNumber;
+                    t.OrganizationId = organizationId.Value.Value;
+                }));
 
             // Act
-            var organizations = await orgRepository2
-                .GetAsync(globalLocationNumber)
-                ;
+            var organizations = await orgRepository2.GetAsync(globalLocationNumber);
 
             // Assert
             Assert.NotNull(organizations);
-            var expected = organizations.Single();
-            Assert.Equal(globalLocationNumber, expected.Actors.Single().ActorNumber);
-        }
-
-        [Fact]
-        public async Task AddOrUpdateAsync_ActorName_CanReadBack()
-        {
-            // Arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var orgRepository = new OrganizationRepository(context);
-
-            var initialActor = new Actor(new MockedGln()) { Name = new ActorName("ActorName") };
-
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
-            organization.Actors.Add(initialActor);
-
-            var orgId = await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Act
-            var newActor = new Actor(new MockedGln()) { Name = new ActorName("fake_value") };
-            organization!.Actors.Add(newActor);
-
-            await orgRepository.AddOrUpdateAsync(organization);
-            organization = await orgRepository.GetAsync(orgId.Value);
-
-            // Assert
-            Assert.NotNull(organization);
-            Assert.Equal(2, organization.Actors.Count);
-            Assert.Contains(organization.Actors, x => x.Name == initialActor.Name);
-            Assert.Contains(organization.Actors, x => x.Name == newActor.Name);
         }
     }
 }

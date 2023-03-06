@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Query;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
-public sealed record Actor(OrganizationId OrganizationId, Guid ActorId, ActorStatus Status);
+public sealed record GetPermissionsResponse(IEnumerable<PermissionDto> Permissions);

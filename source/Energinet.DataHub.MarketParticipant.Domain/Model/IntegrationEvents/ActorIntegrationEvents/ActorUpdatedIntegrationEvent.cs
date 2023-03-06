@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.Act
     public sealed class ActorUpdatedIntegrationEvent : IntegrationEventBase
     {
         public Guid ActorId { get; set; }
-        public OrganizationId OrganizationId { get; set; } = null!;
+        public Guid OrganizationId { get; set; }
         public ExternalActorId? ExternalActorId { get; set; }
         public ActorNumberEventData ActorNumber { get; set; } = null!;
         public ActorStatus Status { get; set; }

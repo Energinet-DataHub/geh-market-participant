@@ -13,13 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -30,31 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class CreateOrganizationHandlerTests
     {
         [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new CreateOrganizationHandler(new Mock<IOrganizationFactoryService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_NewOrganization_ReturnsOrganizationId()
         {
             // Arrange
             var orgFactory = new Mock<IOrganizationFactoryService>();
             var target = new CreateOrganizationHandler(orgFactory.Object);
-            var orgId = Guid.NewGuid();
-            var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("123");
-            var validAddress = new Address(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
             var validAddressDto = new AddressDto(
                 "test Street",
                 "1",
@@ -64,15 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             const string validCvr = "123";
             const string orgName = "fake_value";
 
-            var organization = new Organization(
-                new OrganizationId(orgId),
-                orgName,
-                Enumerable.Empty<Actor>(),
-                validBusinessRegisterIdentifier,
-                validAddress,
-                new OrganizationDomain("energinet.dk"),
-                "Test Comment",
-                OrganizationStatus.Active);
+            var organization = TestPreparationModels.MockedOrganization();
 
             orgFactory
                 .Setup(x => x.CreateAsync(

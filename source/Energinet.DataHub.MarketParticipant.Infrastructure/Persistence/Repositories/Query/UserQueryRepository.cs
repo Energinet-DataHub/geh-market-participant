@@ -33,7 +33,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<IEnumerable<Guid>> GetActorsAsync(ExternalUserId externalUserId)
+    public async Task<IEnumerable<ActorId>> GetActorsAsync(ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
@@ -48,7 +48,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
             .ConfigureAwait(false);
 
         if (roleAssignmentsQuery.Any())
-            return roleAssignmentsQuery;
+            return roleAssignmentsQuery.Select(id => new ActorId(id));
 
         var fasActorQuery = await _marketParticipantDbContext
             .Actors
@@ -58,10 +58,10 @@ public sealed class UserQueryRepository : IUserQueryRepository
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return fasActorQuery;
+        return fasActorQuery.Select(id => new ActorId(id));
     }
 
-    public async Task<IEnumerable<Permission>> GetPermissionsAsync(Guid actorId, ExternalUserId externalUserId)
+    public async Task<IEnumerable<Permission>> GetPermissionsAsync(ActorId actorId, ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(actorId);
         ArgumentNullException.ThrowIfNull(externalUserId);
@@ -70,7 +70,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
             from user in _marketParticipantDbContext.Users
             where user.ExternalId == externalUserId.Value
             join userRoleAssignment in _marketParticipantDbContext.UserRoleAssignments on user.Id equals userRoleAssignment.UserId
-            where userRoleAssignment.ActorId == actorId
+            where userRoleAssignment.ActorId == actorId.Value
             join userRole in _marketParticipantDbContext.UserRoles on userRoleAssignment.UserRoleId equals userRole.Id
             where userRole.Status == UserRoleStatus.Active
             join actor in _marketParticipantDbContext.Actors on userRoleAssignment.ActorId equals actor.Id
@@ -83,14 +83,14 @@ public sealed class UserQueryRepository : IUserQueryRepository
         return await query.ToListAsync().ConfigureAwait(false);
     }
 
-    public Task<bool> IsFasAsync(Guid actorId, ExternalUserId externalUserId)
+    public Task<bool> IsFasAsync(ActorId actorId, ExternalUserId externalUserId)
     {
         var query =
             from u in _marketParticipantDbContext.Users
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
             where u.ExternalId == externalUserId.Value &&
-                  a.Id == actorId &&
+                  a.Id == actorId.Value &&
                   a.Status == (int)ActorStatus.Active
             select a.IsFas;
 

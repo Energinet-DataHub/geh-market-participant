@@ -13,41 +13,40 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class GetActorHandler : IRequestHandler<GetSingleActorCommand, GetSingleActorResponse>
     {
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IActorRepository _actorRepository;
 
-        public GetActorHandler(IOrganizationExistsHelperService organizationExistsHelperService)
+        public GetActorHandler(IActorRepository actorRepository)
         {
-            _organizationExistsHelperService = organizationExistsHelperService;
+            _actorRepository = actorRepository;
         }
 
         public async Task<GetSingleActorResponse> Handle(GetSingleActorCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
+            var actor = await _actorRepository
+                .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
 
-            var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
-
-            return actor switch
+            if (actor == null)
             {
-                null => throw new NotFoundValidationException(request.ActorId),
-                _ => new GetSingleActorResponse(OrganizationMapper.Map(actor))
-            };
+                throw new NotFoundValidationException(request.ActorId);
+            }
+
+            return new GetSingleActorResponse(OrganizationMapper.Map(actor));
         }
     }
 }

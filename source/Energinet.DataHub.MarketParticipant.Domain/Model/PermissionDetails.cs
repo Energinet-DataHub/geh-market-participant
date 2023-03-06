@@ -17,8 +17,20 @@ using Energinet.DataHub.Core.App.Common.Security;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public record PermissionDetails(
-        Permission Permission,
-        string Description,
-        IEnumerable<EicFunction> EicFunctions);
+    public sealed class PermissionDetails
+    {
+        public PermissionDetails(
+            Permission permission,
+            string description,
+            IEnumerable<EicFunction> eicFunctions)
+        {
+            Permission = permission;
+            Description = description;
+            EicFunctions = eicFunctions;
+        }
+
+        public Permission Permission { get; }
+        public string Description { get; set; }
+        public IEnumerable<EicFunction> EicFunctions { get; }
+    }
 }

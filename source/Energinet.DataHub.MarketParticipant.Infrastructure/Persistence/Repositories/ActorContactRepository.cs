@@ -44,13 +44,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return contact is null ? null : ActorContactMapper.MapFromEntity(contact);
         }
 
-        public async Task<IEnumerable<ActorContact>> GetAsync(Guid actorId)
+        public async Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId)
         {
             ArgumentNullException.ThrowIfNull(actorId);
 
             var query =
                 from contact in _marketParticipantDbContext.ActorContacts
-                where contact.ActorId == actorId
+                where contact.ActorId == actorId.Value
                 select contact;
 
             var entities = await query

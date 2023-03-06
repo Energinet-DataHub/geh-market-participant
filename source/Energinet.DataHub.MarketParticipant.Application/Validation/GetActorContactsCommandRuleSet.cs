@@ -21,9 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public GetActorContactsCommandRuleSet()
         {
-            RuleFor(command => command.OrganizationId)
-                .NotEmpty();
-
             RuleFor(command => command.ActorId)
                 .NotEmpty();
         }

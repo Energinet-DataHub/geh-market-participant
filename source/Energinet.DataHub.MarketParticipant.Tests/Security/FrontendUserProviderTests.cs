@@ -17,11 +17,11 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using Actor = Energinet.DataHub.MarketParticipant.Domain.Model.Query.Actor;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Security;
 
@@ -32,9 +32,9 @@ public sealed class FrontendUserProviderTests
     public async Task ProvideUserAsync_UnknownActor_ReturnsNull()
     {
         // Arrange
-        var actorQueryRepositoryMock = new Mock<IActorQueryRepository>();
+        var actorRepositoryMock = new Mock<IActorRepository>();
 
-        var target = new FrontendUserProvider(actorQueryRepositoryMock.Object);
+        var target = new FrontendUserProvider(actorRepositoryMock.Object);
 
         // Act
         var actual = await target.ProvideUserAsync(Guid.NewGuid(), Guid.NewGuid(), false, Array.Empty<Claim>());
@@ -52,12 +52,19 @@ public sealed class FrontendUserProviderTests
     {
         // Arrange
         var actorId = Guid.NewGuid();
-        var actorQueryRepositoryMock = new Mock<IActorQueryRepository>();
-        actorQueryRepositoryMock
-            .Setup(actorQueryRepository => actorQueryRepository.GetActorAsync(actorId))
-            .ReturnsAsync(new Actor(new OrganizationId(Guid.NewGuid()), Guid.NewGuid(), actorStatus));
+        var actorRepositoryMock = new Mock<IActorRepository>();
+        actorRepositoryMock
+            .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+            .ReturnsAsync(new Actor(
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                actorStatus,
+                Array.Empty<ActorMarketRole>(),
+                new ActorName(string.Empty)));
 
-        var target = new FrontendUserProvider(actorQueryRepositoryMock.Object);
+        var target = new FrontendUserProvider(actorRepositoryMock.Object);
 
         // Act + Assert
         if (isValid)

@@ -25,26 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     [UnitTest]
     public sealed class GetActorCommandRuleSetTests
     {
-        private static readonly Guid _validOrganizationId = Guid.NewGuid();
-        private static readonly Guid _validActorId = Guid.NewGuid();
-
-        [Fact]
-        public async Task Validate_OrganizationId_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = nameof(GetSingleActorCommand.OrganizationId);
-
-            var target = new GetSingleActorCommandRuleSet();
-            var command = new GetSingleActorCommand(_validActorId, Guid.Empty);
-
-            // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-
         [Fact]
         public async Task Validate_ActorId_ValidatesProperty()
         {
@@ -52,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             const string propertyName = nameof(GetSingleActorCommand.ActorId);
 
             var target = new GetSingleActorCommandRuleSet();
-            var command = new GetSingleActorCommand(Guid.Empty, _validOrganizationId);
+            var command = new GetSingleActorCommand(Guid.Empty);
 
             // Act
             var result = await target.ValidateAsync(command).ConfigureAwait(false);

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -35,66 +36,30 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class UpdateActorHandlerTests
     {
-        private readonly Address _validAddress = new(
-            "test Street",
-            "1",
-            "1111",
-            "Test City",
-            "Test Country");
-
-        private readonly OrganizationDomain _validDomain = new("energinet.dk");
-
-        private readonly BusinessRegisterIdentifier _validCvrBusinessRegisterIdentifier = new("12345678");
-
-        [Fact]
-        public async Task Handle_NullArgument_ThrowsException()
-        {
-            // Arrange
-            var target = new UpdateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                new Mock<IOrganizationExistsHelperService>().Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IChangesToActorHelper>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
-                new Mock<IActorStatusMarketRolesRuleService>().Object);
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None))
-                .ConfigureAwait(false);
-        }
-
         [Fact]
         public async Task Handle_NoActor_ThrowsNotFoundException()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var target = new UpdateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
-            var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
+            var actorId = Guid.NewGuid();
 
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
-                .ReturnsAsync(organization);
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
+                .ReturnsAsync((Actor?)null);
 
             var command = new UpdateActorCommand(
-                organizationId,
-                Guid.NewGuid(),
+                actorId,
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
@@ -107,41 +72,32 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_AllowedGridAreas_AreValidated()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var allowedGridAreasRuleService = new Mock<IAllowedGridAreasRuleService>();
 
             var target = new UpdateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 allowedGridAreasRuleService.Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
-            var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
-                .ReturnsAsync(organization);
+            var actor = MockActor(actorRepositoryMock);
 
             var meteringPoints = new[]
             {
                 MeteringPointType.D02Analysis.ToString(), MeteringPointType.E17Consumption.ToString(),
                 MeteringPointType.E17Consumption.ToString()
             };
-            var gridAreas = new[] { new ActorGridAreaDto(actor.Id, meteringPoints) };
+            var gridAreas = new[] { new ActorGridAreaDto(Guid.NewGuid(), meteringPoints) };
             var marketRoles = new[] { new ActorMarketRoleDto("EnergySupplier", gridAreas, string.Empty) };
 
             var command = new UpdateActorCommand(
-                organizationId,
-                actor.Id,
+                actor.Id.Value,
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), marketRoles));
 
             // Act
@@ -157,41 +113,31 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_OverlappingRoles_AreValidated()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var overlappingBusinessRolesRuleService = new Mock<IOverlappingEicFunctionsRuleService>();
-
+            var actorRepositoryMock = new Mock<IActorRepository>();
+            var overlappingEicFunctionsService = new Mock<IOverlappingEicFunctionsRuleService>();
             var target = new UpdateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                overlappingBusinessRolesRuleService.Object,
+                overlappingEicFunctionsService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
-            var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
-                .ReturnsAsync(organization);
+            var actor = MockActor(actorRepositoryMock);
 
             var command = new UpdateActorCommand(
-                organizationId,
-                actor.Id,
+                actor.Id.Value,
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
             await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
 
             // Assert
-            overlappingBusinessRolesRuleService.Verify(
-                x => x.ValidateEicFunctionsAcrossActors(organization.Actors),
+            overlappingEicFunctionsService.Verify(
+                x => x.ValidateEicFunctionsAcrossActors(It.Is<IEnumerable<Actor>>(col => col.Any(a => a.Id == actor.Id))),
                 Times.Once);
         }
 
@@ -199,33 +145,24 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_ExternalActorId_SyncIsScheduled()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var externalActorSynchronizationService = new Mock<IExternalActorSynchronizationRepository>();
 
             var target = new UpdateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IChangesToActorHelper>().Object,
                 new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 externalActorSynchronizationService.Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
-            var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
-                .ReturnsAsync(organization);
+            var actor = MockActor(actorRepositoryMock);
 
             var command = new UpdateActorCommand(
-                organizationId,
-                actor.Id,
+                actor.Id.Value,
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
@@ -233,9 +170,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             externalActorSynchronizationService.Verify(
-                x => x.ScheduleAsync(
-                    It.Is<OrganizationId>(oid => oid == organization.Id),
-                    It.Is<Guid>(aid => aid == actor.Id)),
+                x => x.ScheduleAsync(It.Is<Guid>(aid => aid == actor.Id.Value)),
                 Times.Once);
         }
 
@@ -243,33 +178,24 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         public async Task Handle_UpdatedActor_DispatchesEvent()
         {
             // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
+            var actorRepositoryMock = new Mock<IActorRepository>();
             var actorIntegrationEventsQueueService = new Mock<IActorIntegrationEventsQueueService>();
 
             var target = new UpdateActorHandler(
-                new Mock<IOrganizationRepository>().Object,
-                organizationExistsHelperService.Object,
+                actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IChangesToActorHelper>().Object,
                 actorIntegrationEventsQueueService.Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IActorStatusMarketRolesRuleService>().Object);
 
-            var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
-            var actor = new Actor(new MockedGln());
-            organization.Actors.Add(actor);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organizationId))
-                .ReturnsAsync(organization);
+            var actor = MockActor(actorRepositoryMock);
 
             var command = new UpdateActorCommand(
-                organizationId,
-                actor.Id,
+                actor.Id.Value,
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
@@ -277,8 +203,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             actorIntegrationEventsQueueService.Verify(
-                x => x.EnqueueActorUpdatedEventAsync(It.IsAny<OrganizationId>(), It.IsAny<Actor>()),
+                x => x.EnqueueActorUpdatedEventAsync(It.IsAny<Actor>()),
                 Times.Once);
+        }
+
+        private static Actor MockActor(Mock<IActorRepository> actorRepositoryMock)
+        {
+            var actor = TestPreparationModels.MockedActor();
+
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
+                .ReturnsAsync(actor);
+
+            return actor;
         }
     }
 }

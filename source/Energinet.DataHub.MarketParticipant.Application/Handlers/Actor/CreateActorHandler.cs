@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
@@ -30,16 +31,19 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
-        private readonly IUniqueMarketRoleGridAreaService _uniqueMarketRoleGridAreaService;
+        private readonly IActorRepository _actorRepository;
+        private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
             IActorFactoryService actorFactoryService,
-            IUniqueMarketRoleGridAreaService uniqueMarketRoleGridAreaService)
+            IActorRepository actorRepository,
+            IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
-            _uniqueMarketRoleGridAreaService = uniqueMarketRoleGridAreaService;
+            _actorRepository = actorRepository;
+            _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
         }
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
@@ -47,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
             var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
+                .EnsureOrganizationExistsAsync(request.Actor.OrganizationId)
                 .ConfigureAwait(false);
 
             var actorNumber = ActorNumber.Create(request.Actor.ActorNumber.Value);
@@ -58,9 +62,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .CreateAsync(organization, actorNumber, actorName, marketRoles)
                 .ConfigureAwait(false);
 
-            await _uniqueMarketRoleGridAreaService.EnsureUniqueMarketRolesPerGridAreaAsync(actor).ConfigureAwait(false);
+            await _uniqueMarketRoleGridAreaRuleService.ValidateAsync(actor).ConfigureAwait(false);
 
-            return new CreateActorResponse(actor.Id);
+            return new CreateActorResponse(actor.Id.Value);
         }
     }
 }

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
@@ -24,6 +23,5 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         string Domain,
         string Comment,
         OrganizationStatus Status,
-        AddressDto Address,
-        IReadOnlyList<ActorDto> Actors);
+        AddressDto Address);
 }

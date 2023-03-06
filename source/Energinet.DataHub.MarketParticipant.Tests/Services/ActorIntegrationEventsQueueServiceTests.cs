@@ -33,70 +33,24 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
     public sealed class ActorIntegrationEventsQueueServiceTests
     {
         [Fact]
-        public async Task EnqueueActorUpdatedEventAsync_OrganizationIdNull_ThrowsException()
-        {
-            // Arrange
-            var target = new ActorIntegrationEventsQueueService(new Mock<IDomainEventRepository>().Object);
-
-            var actor = new Actor(new MockedGln());
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueActorUpdatedEventAsync(null!, actor))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
-        public async Task EnqueueActorUpdatedEventAsync_ActorNull_ThrowsException()
-        {
-            // Arrange
-            var target = new ActorIntegrationEventsQueueService(new Mock<IDomainEventRepository>().Object);
-
-            var organizationId = new OrganizationId(Guid.NewGuid());
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueActorUpdatedEventAsync(organizationId, null!))
-                .ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task EnqueueActorUpdatedEventAsync_WithActor_CreatesEvent()
         {
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new ActorIntegrationEventsQueueService(domainEventRepository.Object);
 
-            var organizationId = new OrganizationId(Guid.NewGuid());
-            var actor = new Actor(new MockedGln());
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln());
 
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BillingAgent, Enumerable.Empty<ActorGridArea>()));
             actor.MarketRoles.Add(new ActorMarketRole(EicFunction.IndependentAggregator, Enumerable.Empty<ActorGridArea>()));
 
             // Act
-            await target.EnqueueActorUpdatedEventAsync(organizationId, actor).ConfigureAwait(false);
+            await target.EnqueueActorUpdatedEventAsync(actor).ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
-                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id)),
+                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id.Value)),
                 Times.Once);
-        }
-
-        [Fact]
-        public async Task EnqueueActorUpdatedEventAsync_integrationEventsNull_ThrowsException()
-        {
-            // Arrange
-            var target = new ActorIntegrationEventsQueueService(new Mock<IDomainEventRepository>().Object);
-
-            var organizationId = new OrganizationId(Guid.NewGuid());
-
-            // Act + Assert
-            await Assert
-                .ThrowsAsync<ArgumentNullException>(() => target.EnqueueActorUpdatedEventAsync(
-                    organizationId,
-                    Guid.NewGuid(),
-                    null!))
-                .ConfigureAwait(false);
         }
 
         [Fact]
@@ -106,8 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var domainEventRepository = new Mock<IDomainEventRepository>();
             var target = new ActorIntegrationEventsQueueService(domainEventRepository.Object);
 
-            var actor = new Actor(new MockedGln());
-            var organizationId = new OrganizationId(Guid.NewGuid());
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln());
 
             var integrationEvents = new List<IIntegrationEvent>();
             integrationEvents.Add(new ActorStatusChangedIntegrationEvent());
@@ -121,14 +74,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act
             await target.EnqueueActorUpdatedEventAsync(
-                    organizationId,
                     actor.Id,
                     integrationEvents)
                 .ConfigureAwait(false);
 
             // Assert
             domainEventRepository.Verify(
-                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id)),
+                x => x.InsertAsync(It.Is<DomainEvent>(y => y.DomainObjectId == actor.Id.Value)),
                 Times.Exactly(8));
         }
     }

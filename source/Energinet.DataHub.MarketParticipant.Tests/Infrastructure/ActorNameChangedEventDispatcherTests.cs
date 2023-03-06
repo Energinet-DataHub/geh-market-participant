@@ -30,23 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure;
 public sealed class ActorNameChangedEventDispatcherTests
 {
     [Fact]
-    public async Task TryDispatchAsync_integrationEventNull_ThrowsException()
-    {
-        // Arrange
-        await using var serviceBusSenderMock = new MockedServiceBusSender();
-        var serviceBusClient = new Mock<IMarketParticipantServiceBusClient>();
-        serviceBusClient.Setup(x => x.CreateSender()).Returns(serviceBusSenderMock);
-
-        var eventParser = new ActorNameChangedIntegrationEventParser();
-        var sut = new ActorNameChangedEventDispatcher(
-            eventParser,
-            serviceBusClient.Object);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => sut.TryDispatchAsync(null!));
-    }
-
-    [Fact]
     public async Task TryDispatchAsync_SendingCorrectEvent_ReturnsTrue()
     {
         // Arrange
@@ -77,7 +60,7 @@ public sealed class ActorNameChangedEventDispatcherTests
         // Assert
         Assert.True(result);
         Assert.NotNull(actualEvent);
-        Assert.Equal(integrationEvent.Id, actualEvent!.Id);
+        Assert.Equal(integrationEvent.Id, actualEvent.Id);
         Assert.Equal(integrationEvent.OrganizationId.Value, actualEvent.OrganizationId);
         Assert.Equal(integrationEvent.ActorId, actualEvent.ActorId);
         Assert.Equal(integrationEvent.Name.Value, actualEvent.Name);

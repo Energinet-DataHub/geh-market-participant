@@ -33,15 +33,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             _domainEventRepository = domainEventRepository;
         }
 
-        public Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Actor actor)
+        public Task EnqueueActorUpdatedEventAsync(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
             var actorUpdatedEvent = new ActorUpdatedIntegrationEvent
             {
-                OrganizationId = organizationId,
-                ActorId = actor.Id,
+                OrganizationId = actor.OrganizationId.Value,
+                ActorId = actor.Id.Value,
                 ExternalActorId = actor.ExternalActorId,
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),
                 Status = actor.Status,
@@ -54,24 +53,23 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                         actorMarketRole.Function,
                         actorMarketRole.GridAreas.Select(
                             x => new ActorGridAreaEventData(
-                                x.Id,
+                                x.Id.Value,
                                 x.MeteringPointTypes.Select(y => y.ToString()).ToList()))
                             .ToList()));
             }
 
-            var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorUpdatedEvent);
+            var domainEvent = new DomainEvent(actor.Id.Value, nameof(Actor), actorUpdatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
         }
 
-        public Task EnqueueActorCreatedEventsAsync(OrganizationId organizationId, Actor actor)
+        public Task EnqueueActorCreatedEventsAsync(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
             var actorCreatedEvent = new ActorCreatedIntegrationEvent
             {
-                OrganizationId = organizationId,
-                ActorId = actor.Id,
+                OrganizationId = actor.OrganizationId,
+                ActorId = actor.Id.Value,
                 Status = actor.Status,
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),
                 Name = actor.Name
@@ -84,18 +82,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                         actorMarketRole.Function,
                         actorMarketRole.GridAreas.Select(
                                 x => new ActorGridAreaEventData(
-                                    x.Id,
+                                    x.Id.Value,
                                     x.MeteringPointTypes.Select(y => y.ToString()).ToList()))
                             .ToList()));
             }
 
-            var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorCreatedEvent);
+            var domainEvent = new DomainEvent(actor.Id.Value, nameof(Actor), actorCreatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
         }
 
-        public async Task EnqueueActorUpdatedEventAsync(OrganizationId organizationId, Guid actorId, IEnumerable<IIntegrationEvent> integrationEvents)
+        public async Task EnqueueActorUpdatedEventAsync(ActorId actorId, IEnumerable<IIntegrationEvent> integrationEvents)
         {
-            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
+            ArgumentNullException.ThrowIfNull(actorId, nameof(actorId));
             ArgumentNullException.ThrowIfNull(integrationEvents, nameof(integrationEvents));
 
             foreach (var integrationEvent in integrationEvents)
@@ -104,7 +102,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 {
                     case ActorStatusChangedIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId.Value, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
@@ -112,28 +110,28 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                     case ActorNameChangedIntegrationEvent:
                     case ActorExternalIdChangedIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId.Value, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
                     case MarketRoleAddedToActorIntegrationEvent or MarketRoleRemovedFromActorIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId.Value, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
                     case GridAreaAddedToActorIntegrationEvent or GridAreaRemovedFromActorIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId.Value, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
 
                     case MeteringPointTypeAddedToActorIntegrationEvent or MeteringPointTypeRemovedFromActorIntegrationEvent:
                         {
-                            var domainEvent = new DomainEvent(actorId, nameof(Actor), integrationEvent);
+                            var domainEvent = new DomainEvent(actorId.Value, nameof(Actor), integrationEvent);
                             await _domainEventRepository.InsertAsync(domainEvent).ConfigureAwait(false);
                             break;
                         }
@@ -145,37 +143,35 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             }
         }
 
-        public Task EnqueueContactAddedToActorEventAsync(OrganizationId organizationId, Actor actor, ActorContact contact)
+        public Task EnqueueContactAddedToActorEventAsync(Actor actor, ActorContact contact)
         {
-            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             ArgumentNullException.ThrowIfNull(contact, nameof(contact));
 
             var actorCreatedEvent = new ContactAddedToActorIntegrationEvent
             {
-                OrganizationId = organizationId,
-                ActorId = actor.Id,
+                OrganizationId = actor.OrganizationId,
+                ActorId = actor.Id.Value,
                 Contact = new ActorContactEventData(contact.Name, contact.Email, contact.Category, contact.Phone)
             };
 
-            var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorCreatedEvent);
+            var domainEvent = new DomainEvent(actor.Id.Value, nameof(Actor), actorCreatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
         }
 
-        public Task EnqueueContactRemovedFromActorEventAsync(OrganizationId organizationId, Actor actor, ActorContact contact)
+        public Task EnqueueContactRemovedFromActorEventAsync(Actor actor, ActorContact contact)
         {
-            ArgumentNullException.ThrowIfNull(organizationId, nameof(organizationId));
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             ArgumentNullException.ThrowIfNull(contact, nameof(contact));
 
             var actorCreatedEvent = new ContactRemovedFromActorIntegrationEvent
             {
-                OrganizationId = organizationId,
-                ActorId = actor.Id,
+                OrganizationId = actor.OrganizationId,
+                ActorId = actor.Id.Value,
                 Contact = new ActorContactEventData(contact.Name, contact.Email, contact.Category, contact.Phone)
             };
 
-            var domainEvent = new DomainEvent(actor.Id, nameof(Actor), actorCreatedEvent);
+            var domainEvent = new DomainEvent(actor.Id.Value, nameof(Actor), actorCreatedEvent);
             return _domainEventRepository.InsertAsync(domainEvent);
         }
     }

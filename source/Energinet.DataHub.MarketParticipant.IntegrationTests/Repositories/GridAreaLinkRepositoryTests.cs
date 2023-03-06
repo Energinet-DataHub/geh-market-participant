@@ -74,8 +74,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Assert
             Assert.NotNull(gridLink);
-            Assert.NotEqual(Guid.Empty, gridLink?.Id.Value);
-            Assert.Equal(gridId.Value, gridLink?.GridAreaId.Value);
+            Assert.NotEqual(Guid.Empty, gridLink.Id.Value);
+            Assert.Equal(gridId.Value, gridLink.GridAreaId.Value);
         }
     }
 }

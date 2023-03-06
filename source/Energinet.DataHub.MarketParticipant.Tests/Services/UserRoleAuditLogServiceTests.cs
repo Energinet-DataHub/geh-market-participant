@@ -20,7 +20,6 @@ using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Moq;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Services
@@ -53,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal(userRoleUpdateSut.Description, deserializedCreatedAuditLog.Description);
             Assert.Equal(userRoleUpdateSut.Status, deserializedCreatedAuditLog.Status);
             Assert.Equal(userRoleUpdateSut.EicFunction, deserializedCreatedAuditLog.EicFunction);
-            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => (int)e), deserializedCreatedAuditLog.Permissions);
+            Assert.Equal(userRoleUpdateSut.Permissions.Select(e => e.ToString()), deserializedCreatedAuditLog.Permissions);
         }
 
         [Fact]
@@ -145,9 +144,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var deserializedCAuditLog = JsonSerializer.Deserialize<UserRoleAuditLogSerialized>(createdAuditLog.ChangeDescriptionJson);
             Assert.True(auditLogs.Count == 1);
             Assert.NotNull(deserializedCAuditLog);
-            var userRoleUpdateSutPermissionsInts = userRoleUpdateSut.Permissions.Select(e => (int)e).ToList();
+            var userRoleUpdateSutPermissionsInts = userRoleUpdateSut.Permissions.Select(e => e.ToString()).ToList();
             var deserializedCAuditLogPermissions = deserializedCAuditLog.Permissions?.ToList();
-            Assert.True(userRoleUpdateSutPermissionsInts.SequenceEqual(deserializedCAuditLogPermissions ?? new List<int>()));
+            Assert.True(userRoleUpdateSutPermissionsInts.SequenceEqual(deserializedCAuditLogPermissions ?? new List<string>()));
         }
 
         [Fact]
@@ -173,43 +172,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Contains(deserializedAuditLogs, e => e?.Status != null);
             Assert.Contains(deserializedAuditLogs, e => !string.IsNullOrWhiteSpace(e?.Name));
             Assert.True(deserializedAuditLogs.All(e => e?.EicFunction == null));
-        }
-
-        [Fact]
-        public void DetermineUserRoleChangesAndBuildAuditLogs_UserIdNull_Throws()
-        {
-            // arrange
-            DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(null!, BuildUserRoleWithPermissionsDto(), BuildUserRoleWithPermissionsDto());
-        }
-
-        [Fact]
-        public void DetermineUserRoleChangesAndBuildAuditLogs_userRoleDbNull_Throws()
-        {
-            // arrange
-            DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(new UserId(Guid.Empty), null!, BuildUserRoleWithPermissionsDto());
-        }
-
-        [Fact]
-        public void DetermineUserRoleChangesAndBuildAuditLogs_userRoleUpdateNull_Throws()
-        {
-            // arrange
-            DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(new UserId(Guid.Empty), BuildUserRoleWithPermissionsDto(), null!);
-        }
-
-        private static void DetermineUserRoleChangesAndBuildAuditLogs_AssertThrows(
-            UserId currentUserId,
-            UserRole userRoleDb,
-            UserRole userRoleUpdate)
-        {
-            // arrange
-            var userRoleAuditLogService = new UserRoleAuditLogService();
-
-            // act + assert
-            Assert.Throws<ArgumentNullException>(() =>
-                userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
-                    currentUserId,
-                    userRoleDb,
-                    userRoleUpdate).ToList());
         }
 
         private static UserRole BuildUserRoleWithPermissionsDto(

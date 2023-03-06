@@ -38,36 +38,6 @@ public class ChangesToActorHelperTests
     private readonly Mock<IGridAreaLinkRepository> _gridAreaLinkRepositoryMock = new();
 
     [Fact]
-    public async Task FindChangesMadeToActor_OrganizationIdNull_ThrowsException()
-    {
-        // Arrange
-        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(null!, _actor, _incomingActor));
-    }
-
-    [Fact]
-    public async Task FindChangesMadeToActor_ExistingActorNull_ThrowsException()
-    {
-        // Arrange
-        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, null!, _incomingActor));
-    }
-
-    [Fact]
-    public async Task FindChangesMadeToActor_IncomingNull_ThrowsException()
-    {
-        // Arrange
-        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => target.FindChangesMadeToActorAsync(_organizationId, _actor, null!));
-    }
-
-    [Fact]
     public async Task FindChangesMadeToActor_NewDataIncoming_ChangesAreFoundAndIntegrationEventsAreaReturned()
     {
         // Arrange
@@ -110,31 +80,30 @@ public class ChangesToActorHelperTests
     private static Actor CreateValidActorWithChildren()
     {
         return new Actor(
-            Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
+            new ActorId(Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c")),
+            new OrganizationId(Guid.NewGuid()),
             new ExternalActorId(Guid.NewGuid()),
             ActorNumber.Create("8814729239298"),
             ActorStatus.Active,
             new List<ActorMarketRole>
             {
                 new ActorMarketRole(
-                    Guid.Parse("579010ed-b960-486f-857f-a7c020ffed4d"),
                     EicFunction.EnergySupplier,
                     new List<ActorGridArea>
                     {
                         new ActorGridArea(
-                            Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d"),
+                            new GridAreaId(Guid.Parse("02222dec-9ac7-4732-80e3-3e943501e93d")),
                             new List<MeteringPointType>
                             {
                                 MeteringPointType.E17Consumption
                             })
                     }),
                 new ActorMarketRole(
-                    Guid.Parse("8bd18c6e-c971-4be8-93cf-e3d4345a2d14"),
                     EicFunction.IndependentAggregator,
                     new List<ActorGridArea>
                     {
                         new ActorGridArea(
-                            Guid.Parse("2aca6c52-3282-40e5-a071-c740c9d432b6"),
+                            new GridAreaId(Guid.Parse("2aca6c52-3282-40e5-a071-c740c9d432b6")),
                             new List<MeteringPointType>
                             {
                                 MeteringPointType.D02Analysis,
@@ -142,7 +111,7 @@ public class ChangesToActorHelperTests
                                 MeteringPointType.E18Production
                             }),
                         new ActorGridArea(
-                            Guid.Parse("35d007b1-12d0-470f-8186-231b9e51f9e0"),
+                            new GridAreaId(Guid.Parse("35d007b1-12d0-470f-8186-231b9e51f9e0")),
                             new List<MeteringPointType>
                             {
                                 MeteringPointType.E20Exchange,
@@ -156,7 +125,6 @@ public class ChangesToActorHelperTests
     private static UpdateActorCommand CreateValidIncomingActorWithChildren()
     {
         return new UpdateActorCommand(
-            Guid.NewGuid(),
             Guid.Parse("83d845e5-567d-41bb-bfc5-e062e56fb23c"),
             new ChangeActorDto(
                 "Passive",

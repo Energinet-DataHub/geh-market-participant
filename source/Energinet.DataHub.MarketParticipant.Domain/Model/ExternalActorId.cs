@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Text.Json.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -24,7 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             Value = Guid.Parse(value);
         }
 
-        [JsonConstructor]
         public ExternalActorId(Guid value)
         {
             Value = value;

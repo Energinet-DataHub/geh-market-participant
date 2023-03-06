@@ -18,8 +18,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -27,14 +27,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 {
     public sealed class GetActorContactsHandler : IRequestHandler<GetActorContactsCommand, GetActorContactsResponse>
     {
-        private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
+        private readonly IActorRepository _actorRepository;
         private readonly IActorContactRepository _contactRepository;
 
         public GetActorContactsHandler(
-            IOrganizationExistsHelperService organizationExistsHelperService,
+            IActorRepository actorRepository,
             IActorContactRepository contactRepository)
         {
-            _organizationExistsHelperService = organizationExistsHelperService;
+            _actorRepository = actorRepository;
             _contactRepository = contactRepository;
         }
 
@@ -42,11 +42,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var organization = await _organizationExistsHelperService
-                .EnsureOrganizationExistsAsync(request.OrganizationId)
+            var actor = await _actorRepository
+                .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
-
-            var actor = organization.Actors.FirstOrDefault(x => x.Id == request.ActorId);
 
             if (actor == null)
                 throw new NotFoundValidationException(request.ActorId);
