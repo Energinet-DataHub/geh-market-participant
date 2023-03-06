@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UpdatePermissionCommand(int Id, string Description) : IRequest<Unit>;
+public sealed record UpdatePermissionCommand(Guid ChangedByUserId, int PermissionId, string Description) : IRequest<Unit>;

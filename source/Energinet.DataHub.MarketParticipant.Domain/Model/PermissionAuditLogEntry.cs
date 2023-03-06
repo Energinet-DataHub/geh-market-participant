@@ -18,7 +18,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed record PermissionAuditLogEntry(
-    int EntryId,
     Permission Permission,
     UserId ChangedByUserId,
     PermissionChangeType PermissionChangeType,

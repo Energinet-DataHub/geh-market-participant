@@ -68,7 +68,6 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         var userRoleWithCreatedPermission = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
 
         var entry = new PermissionAuditLogEntry(
-            1,
             userRoleWithCreatedPermission.Permissions[0].Permission,
             new UserId(userChangedBy.Id),
             PermissionChangeType.DescriptionChange,
@@ -88,7 +87,6 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         // Assert
         var permissionAuditLogs = actual.ToList();
         Assert.Single(permissionAuditLogs);
-        Assert.Equal(entry.EntryId, permissionAuditLogs[0].EntryId);
         Assert.Equal(entry.ChangedByUserId, permissionAuditLogs[0].ChangedByUserId);
         Assert.Equal(entry.Timestamp, permissionAuditLogs[0].Timestamp);
         Assert.Equal(entry.PermissionChangeType, permissionAuditLogs[0].PermissionChangeType);

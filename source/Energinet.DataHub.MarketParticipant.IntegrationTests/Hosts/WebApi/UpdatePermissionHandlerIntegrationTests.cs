@@ -41,12 +41,16 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
+        var frontendUser = await _fixture.PrepareUserAsync();
+        scope.Container.MockFrontendUser(frontendUser.Id);
+
         var mediator = scope.GetInstance<IMediator>();
 
         var userRoleWithPermission = await _fixture.PrepareUserRoleAsync();
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
+            frontendUser.Id,
             (int)userRoleWithPermission.Permissions[0].Permission,
             newPermissionDescription);
 

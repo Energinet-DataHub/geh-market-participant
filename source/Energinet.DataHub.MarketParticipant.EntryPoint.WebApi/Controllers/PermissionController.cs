@@ -69,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     if (!_userContext.CurrentUser.IsFas)
                         return Unauthorized();
 
-                    var command = new UpdatePermissionCommand(updatePermissionDto.Id, updatePermissionDto.Description);
+                    var command = new UpdatePermissionCommand(_userContext.CurrentUser.UserId, updatePermissionDto.Id, updatePermissionDto.Description);
 
                     await _mediator
                         .Send(command)
