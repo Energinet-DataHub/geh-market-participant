@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
 public record PermissionAuditLogDto(
     int PermissionId,
-    int PermissionChangeType,
+    PermissionChangeType PermissionChangeType,
     Guid ChangedByUserId,
     DateTimeOffset Timestamp);

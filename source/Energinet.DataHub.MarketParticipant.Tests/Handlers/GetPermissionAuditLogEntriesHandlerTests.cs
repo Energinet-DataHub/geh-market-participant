@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // assert
             var logs = actual.PermissionAuditLogs.ToList();
             Assert.Equal(2, logs.Count);
-            Assert.Equal(2, logs.Count(l => l.PermissionChangeType == (int)PermissionChangeType.DescriptionChange));
+            Assert.Equal(2, logs.Count(l => l.PermissionChangeType == PermissionChangeType.DescriptionChange));
             Assert.Equal(2, logs.Count(l => l.ChangedByUserId == userId.Value));
         }
     }
