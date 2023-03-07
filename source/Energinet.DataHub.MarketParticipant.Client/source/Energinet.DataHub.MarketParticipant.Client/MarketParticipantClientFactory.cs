@@ -56,10 +56,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
         private string GetAuthorizationHeaderValue()
         {
-            return _httpContextAccessor.HttpContext.Request.Headers
+            var authToken = _httpContextAccessor.HttpContext.Request.Headers
                 .Where(x => x.Key.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
                 .Select(x => x.Value.ToString())
-                .Single();
+                .FirstOrDefault();
+
+            return string.IsNullOrEmpty(authToken) ? throw new InvalidOperationException("Authorization header is missing") : authToken;
         }
 
         private void SetAuthorizationHeader(IFlurlClient httpClient)
