@@ -53,5 +53,20 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .Request("Permission")
                         .PutJsonAsync(updatePermissionDto));
         }
+
+        public async Task<IEnumerable<PermissionAuditLogDto>> GetAuditLogsAsync(int permissionId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("Permission", permissionId, "auditlogs")
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<IEnumerable<PermissionAuditLogDto>>()
+                .ConfigureAwait(false);
+        }
     }
 }

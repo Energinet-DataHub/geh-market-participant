@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using Energinet.DataHub.Core.App.Common.Security;
 
@@ -22,15 +23,18 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public PermissionDetails(
             Permission permission,
             string description,
-            IEnumerable<EicFunction> eicFunctions)
+            IEnumerable<EicFunction> eicFunctions,
+            DateTimeOffset created)
         {
             Permission = permission;
             Description = description;
             EicFunctions = eicFunctions;
+            Created = created;
         }
 
         public Permission Permission { get; }
         public string Description { get; set; }
+        public DateTimeOffset Created { get; }
         public IEnumerable<EicFunction> EicFunctions { get; }
     }
 }

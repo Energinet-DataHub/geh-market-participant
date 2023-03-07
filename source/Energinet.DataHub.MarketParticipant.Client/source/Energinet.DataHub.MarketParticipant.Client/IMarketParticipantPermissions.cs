@@ -33,5 +33,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="updatePermissionDto">New permission description</param>
         Task UpdatePermissionAsync(UpdatePermissionDto updatePermissionDto);
+
+        /// <summary>
+        /// Get Permission audit logs
+        /// </summary>
+        Task<IEnumerable<PermissionAuditLogDto>> GetAuditLogsAsync(int permissionId);
     }
 }

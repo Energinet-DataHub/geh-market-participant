@@ -26,7 +26,7 @@ public sealed class UpdatePermissionCommandRuleSet : AbstractValidator<UpdatePer
         RuleFor(command => command)
             .NotNull();
 
-        RuleFor(command => command.Id)
+        RuleFor(command => command.PermissionId)
             .Must(x => Enum.IsDefined((Permission)x));
 
         RuleFor(command => command.Description)
