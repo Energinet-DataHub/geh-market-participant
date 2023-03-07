@@ -277,6 +277,16 @@ public sealed class UserInvitationServiceTests
                 user.RoleAssignments.Count == 2 &&
                 user.RoleAssignments.Contains(expectedAssignment))),
             Times.Once);
+
+        userRoleAssignmentAuditLogEntryRepository
+            .Verify(
+                e => e.InsertAuditLogEntryAsync(
+                    It.IsAny<UserId>(),
+                    It.Is<UserRoleAssignmentAuditLogEntry>(
+                        u =>
+                            u.ActorId == expectedAssignment.ActorId &&
+                            u.UserRoleId == expectedAssignment.UserRoleId)),
+                Times.Once());
     }
 
     [Fact]
