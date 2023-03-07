@@ -282,7 +282,10 @@ public sealed class UserInvitationServiceTests
             .Verify(
                 e => e.InsertAuditLogEntryAsync(
                     It.IsAny<UserId>(),
-                    It.IsAny<UserRoleAssignmentAuditLogEntry>()),
+                    It.Is<UserRoleAssignmentAuditLogEntry>(
+                        u =>
+                            u.ActorId == expectedAssignment.ActorId &&
+                            u.UserRoleId == expectedAssignment.UserRoleId)),
                 Times.Once());
     }
 
