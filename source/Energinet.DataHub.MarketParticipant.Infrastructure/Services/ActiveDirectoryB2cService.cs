@@ -149,8 +149,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             {
                 if (mappedEicFunction.EicRolesMapped.ContainsKey(eicFunction))
                     b2CIds.Add(mappedEicFunction.EicRolesMapped[eicFunction]);
-
-                throw new ArgumentNullException(nameof(eicFunctions));
             }
 
             return b2CIds;
