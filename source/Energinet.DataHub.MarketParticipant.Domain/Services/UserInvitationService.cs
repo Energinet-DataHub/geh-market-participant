@@ -71,10 +71,13 @@ public sealed class UserInvitationService : IUserInvitationService
             invitedUser = new User(userIdentityId);
         }
 
+        var userInviteRoleAssignments = new List<UserRoleAssignment>();
+
         foreach (var assignedRole in invitation.AssignedRoles)
         {
             var assignment = new UserRoleAssignment(invitation.AssignedActor.Id, assignedRole.Id);
             invitedUser.RoleAssignments.Add(assignment);
+            userInviteRoleAssignments.Add(assignment);
         }
 
         await _emailEventRepository
@@ -86,7 +89,7 @@ public sealed class UserInvitationService : IUserInvitationService
             .ConfigureAwait(false);
 
         await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation).ConfigureAwait(false);
-        await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, invitedUser.RoleAssignments, invitationSentByUserId).ConfigureAwait(false);
+        await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, userInviteRoleAssignments, invitationSentByUserId).ConfigureAwait(false);
     }
 
     private async Task<User?> GetUserAsync(EmailAddress email)
