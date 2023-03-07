@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.26.0
+
+- Adding api for permission change audit logs
+
 ## Version 2.24.0
 
 - Adding api for updating permission details
