@@ -36,19 +36,13 @@ public sealed class PermissionRepository : IPermissionRepository
     public async Task<IEnumerable<PermissionDetails>> GetAllAsync()
     {
         var permissions = await BuildPermissionQuery(null).ToListAsync().ConfigureAwait(false);
-        return permissions.Select(x => new PermissionDetails(
-            (Permission)x.Id,
-            x.Description,
-            x.EicFunctions.Select(y => y.EicFunction)));
+        return permissions.Select(MapToPermissionDetails);
     }
 
     public async Task<IEnumerable<PermissionDetails>> GetToMarketRoleAsync(EicFunction eicFunction)
     {
         var permissions = await BuildPermissionQuery(eicFunction).ToListAsync().ConfigureAwait(false);
-        return permissions.Select(x => new PermissionDetails(
-            (Permission)x.Id,
-            x.Description,
-            x.EicFunctions.Select(y => y.EicFunction)));
+        return permissions.Select(MapToPermissionDetails);
     }
 
     public async Task<PermissionDetails?> GetAsync(Permission permission)
@@ -62,10 +56,7 @@ public sealed class PermissionRepository : IPermissionRepository
             return null;
         }
 
-        return new PermissionDetails(
-            (Permission)permissionEntity.Id,
-            permissionEntity.Description,
-            permissionEntity.EicFunctions.Select(y => y.EicFunction));
+        return MapToPermissionDetails(permissionEntity);
     }
 
     public async Task UpdatePermissionAsync(PermissionDetails permissionDetails)
@@ -75,6 +66,15 @@ public sealed class PermissionRepository : IPermissionRepository
         var permission = await _marketParticipantDbContext.Permissions.FirstAsync(p => p.Id == permissionId).ConfigureAwait(false);
         permission.Description = permissionDetails.Description;
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+    }
+
+    private PermissionDetails MapToPermissionDetails(PermissionEntity permissionEntity)
+    {
+        return new PermissionDetails(
+            (Permission)permissionEntity.Id,
+            permissionEntity.Description,
+            permissionEntity.EicFunctions.Select(y => y.EicFunction),
+            permissionEntity.Created);
     }
 
     private IQueryable<PermissionEntity> BuildPermissionQuery(EicFunction? eicFunction)

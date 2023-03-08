@@ -13,8 +13,17 @@
 // limitations under the License.
 
 using System;
-using MediatR;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record UpdatePermissionCommand(Guid ChangedByUserId, int PermissionId, string Description) : IRequest<Unit>;
+public sealed class GetPermissionAuditLogEntriesCommandRuleSet : AbstractValidator<GetPermissionAuditLogsCommand>
+{
+    public GetPermissionAuditLogEntriesCommandRuleSet()
+    {
+        RuleFor(command => command.PermissionId)
+            .Must(p => Enum.IsDefined(typeof(Permission), p));
+    }
+}

@@ -72,7 +72,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = { permissionEicFunction },
-            Description = "fake_test_value"
+            Description = "fake_test_value",
+            Created = DateTimeOffset.UtcNow
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -87,6 +88,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
         Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
         Assert.Contains(permissions, p => p.EicFunctions.Count() == 1);
+        Assert.Contains(permissions, p => p.Created.Equals(permission.Created));
         Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
     }
 
@@ -106,7 +108,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = { permissionEicFunction, permissionEicFunction2 },
-            Description = "fake_test_value"
+            Description = "fake_test_value",
+            Created = DateTimeOffset.UtcNow
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -149,14 +152,16 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = { permissionEicFunction, permissionEicFunction2 },
-            Description = "fake_test_value"
+            Description = "fake_test_value",
+            Created = DateTimeOffset.UtcNow
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
             EicFunctions = { permissionEicFunction3, permissionEicFunction4 },
-            Description = "fake_test_value2"
+            Description = "fake_test_value2",
+            Created = DateTimeOffset.UtcNow
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -200,14 +205,16 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         {
             Id = (int)Permission.UsersManage,
             EicFunctions = { permissionEicFunction, permissionEicFunction2 },
-            Description = "fake_test_value"
+            Description = "fake_test_value",
+            Created = DateTimeOffset.UtcNow
         };
 
         var permission2 = new PermissionEntity()
         {
             Id = (int)Permission.ActorManage,
             EicFunctions = { permissionEicFunction3, permissionEicFunction4 },
-            Description = "fake_test_value2"
+            Description = "fake_test_value2",
+            Created = DateTimeOffset.UtcNow
         };
 
         await context2.Permissions.AddAsync(permission);
@@ -260,7 +267,8 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
                     EicFunction = EicFunction.SystemOperator, PermissionId = (int)Permission.UserRoleManage
                 }
             },
-            Description = "DescriptionInit"
+            Description = "DescriptionInit",
+            Created = DateTimeOffset.UtcNow
         };
 
         await context.Permissions.AddAsync(permission).ConfigureAwait(false);
@@ -284,11 +292,11 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
 
         // Assert
         var permissionUpdated = await permissionRepositoryAssert
-            .GetToMarketRoleAsync(EicFunction.SystemOperator)
+            .GetAsync(permissionToUpdate.Permission)
             .ConfigureAwait(false);
-        var permissionUpdatedList = permissionUpdated.ToList();
-        Assert.Single(permissionUpdatedList);
-        Assert.Equal(newPermissionDescription, permissionUpdatedList[0].Description);
+
+        Assert.NotNull(permissionUpdated);
+        Assert.Equal(newPermissionDescription, permissionUpdated.Description);
     }
 
     public async Task InitializeAsync()

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.Core.App.Common.Security;
@@ -69,13 +70,38 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     if (!_userContext.CurrentUser.IsFas)
                         return Unauthorized();
 
-                    var command = new UpdatePermissionCommand(updatePermissionDto.Id, updatePermissionDto.Description);
+                    var command = new UpdatePermissionCommand(_userContext.CurrentUser.UserId, updatePermissionDto.Id, updatePermissionDto.Description);
 
                     await _mediator
                         .Send(command)
                         .ConfigureAwait(false);
 
                     return Ok();
+                },
+                _logger).ConfigureAwait(false);
+        }
+
+        [HttpGet("{permissionId:int}/auditlogs")]
+        [AuthorizeUser(Permission.UserRoleManage)]
+        public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var command = new GetPermissionAuditLogsCommand(permissionId);
+
+                    var response = await _mediator
+                        .Send(command)
+                        .ConfigureAwait(false);
+
+                    var logsFiltered = response.PermissionAuditLogs;
+
+                    if (!_userContext.CurrentUser.IsFas)
+                    {
+                        logsFiltered = logsFiltered.Where(u => u.ChangedByUserId == _userContext.CurrentUser.UserId);
+                    }
+
+                    return Ok(logsFiltered);
                 },
                 _logger).ConfigureAwait(false);
         }

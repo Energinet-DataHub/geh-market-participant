@@ -11,10 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 using System;
-using MediatR;
+using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed record UpdatePermissionCommand(Guid ChangedByUserId, int PermissionId, string Description) : IRequest<Unit>;
+public sealed record PermissionAuditLogEntry(
+    Permission Permission,
+    UserId ChangedByUserId,
+    PermissionChangeType PermissionChangeType,
+    DateTimeOffset Timestamp);

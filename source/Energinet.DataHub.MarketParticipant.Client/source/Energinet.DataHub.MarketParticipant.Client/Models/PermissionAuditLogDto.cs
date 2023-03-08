@@ -13,8 +13,12 @@
 // limitations under the License.
 
 using System;
-using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-
-public sealed record UpdatePermissionCommand(Guid ChangedByUserId, int PermissionId, string Description) : IRequest<Unit>;
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public record PermissionAuditLogDto(
+        int PermissionId,
+        PermissionChangeType PermissionChangeType,
+        Guid ChangedByUserId,
+        DateTimeOffset Timestamp);
+}
