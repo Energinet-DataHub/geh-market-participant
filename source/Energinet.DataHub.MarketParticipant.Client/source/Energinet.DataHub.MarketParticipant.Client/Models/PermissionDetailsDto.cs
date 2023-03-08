@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record PermissionDetailsDto(int Id, string Name, string Description);
+    public sealed record PermissionDetailsDto(int Id, string Name, string Description, DateTimeOffset Created);
 }
