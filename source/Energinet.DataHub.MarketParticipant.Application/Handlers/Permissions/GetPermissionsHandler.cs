@@ -42,6 +42,7 @@ public sealed class GetPermissionsHandler
             new PermissionDto(
                 (int)permission.Permission,
                 permission.Permission.ToString(),
-                permission.Description)));
+                permission.Description,
+                permission.Created)));
     }
 }

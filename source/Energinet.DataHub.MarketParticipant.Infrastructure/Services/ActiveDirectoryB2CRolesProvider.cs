@@ -87,9 +87,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     case "transmissionsystemoperator":
                         _activeDirectoryB2CRoles.TsoId = appRole.Id!.Value;
                         break;
-                    default:
-                        throw new InvalidOperationException(
-                            $"Could not find an id associated with the provided role name '{appRole.DisplayName}'.");
                 }
             }
 
