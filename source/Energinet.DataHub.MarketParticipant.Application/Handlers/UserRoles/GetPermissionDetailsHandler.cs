@@ -43,6 +43,7 @@ public sealed class GetPermissionDetailsHandler
             new PermissionDetailsDto(
                 (int)permission.Permission,
                 PermissionsAsClaims.Lookup[permission.Permission],
-                permission.Description)));
+                permission.Description,
+                permission.Created)));
     }
 }
