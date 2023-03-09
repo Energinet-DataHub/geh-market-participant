@@ -22,10 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunctionsRuleService
     {
-        public OverlappingEicFunctionsRuleService()
-        {
-        }
-
         public void ValidateEicFunctionsAcrossActors(IEnumerable<Actor> actors)
         {
             ArgumentNullException.ThrowIfNull(actors, nameof(actors));

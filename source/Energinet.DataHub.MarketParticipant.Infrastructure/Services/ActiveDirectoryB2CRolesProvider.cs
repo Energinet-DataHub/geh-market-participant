@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
@@ -54,52 +55,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     $"No application, '{nameof(application)}', was found in Active Directory.");
             }
 
+            var lookup = ((EicFunction[])typeof(EicFunction).GetEnumValues()).ToDictionary(x => x.ToString().ToUpperInvariant());
+
             foreach (var appRole in application.AppRoles)
             {
-                switch (appRole.Value)
+                if (lookup.TryGetValue(appRole.Value.ToUpperInvariant(), out var val))
                 {
-                    case "balanceresponsibleparty":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.BalanceResponsibleParty, appRole.Id!.Value);
-                        break;
-                    case "gridaccessprovider":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.GridAccessProvider, appRole.Id!.Value);
-                        break;
-                    case "billingagent":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.BillingAgent, appRole.Id!.Value);
-                        break;
-                    case "eloverblik":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.ElOverblik, appRole.Id!.Value);
-                        break;
-                    case "energysupplier":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.EnergySupplier, appRole.Id!.Value);
-                        break;
-                    case "independentaggregator":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.IndependentAggregator, appRole.Id!.Value);
-                        break;
-                    case "systemoperator":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.SystemOperator, appRole.Id!.Value);
-                        break;
-                    case "danishenergyagency":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.DanishEnergyAgency, appRole.Id!.Value);
-                        break;
-                    case "dataHubadministrator":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.DataHubAdministrator, appRole.Id!.Value);
-                        break;
-                    case "imbalancesettlementresponsible":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.ImbalanceSettlementResponsible, appRole.Id!.Value);
-                        break;
-                    case "metereddataadministrator":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataAdministrator, appRole.Id!.Value);
-                        break;
-                    case "metereddataresponsible":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteredDataResponsible, appRole.Id!.Value);
-                        break;
-                    case "meteringpointadministrator":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.MeteringPointAdministrator, appRole.Id!.Value);
-                        break;
-                    case "serialenergytrader":
-                        _activeDirectoryB2CRoles.EicRolesMapped.Add(EicFunction.SerialEnergyTrader, appRole.Id!.Value);
-                        break;
+                    _activeDirectoryB2CRoles.EicRolesMapped.Add(val, appRole.Id!.Value);
                 }
             }
 
