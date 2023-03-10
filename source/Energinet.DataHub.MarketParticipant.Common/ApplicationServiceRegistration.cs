@@ -80,6 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
             container.Register<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
             container.Register<IValidator<SendUserInviteEmailCommand>, SendUserInviteEmailCommandRuleSet>();
+            container.Register<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2cService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
