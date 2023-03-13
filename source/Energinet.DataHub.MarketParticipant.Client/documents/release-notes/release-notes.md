@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.28.0
+
+- dotnet 7.
+
 ## Version 2.27.0
 
 - Updating permission details response with Created date
