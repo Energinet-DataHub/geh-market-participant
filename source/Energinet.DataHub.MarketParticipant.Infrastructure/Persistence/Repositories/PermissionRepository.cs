@@ -59,6 +59,21 @@ public sealed class PermissionRepository : IPermissionRepository
         return MapToPermissionDetails(permissionEntity);
     }
 
+    public async Task<IEnumerable<EicFunction>> GetAssignedToMarketRolesAsync(Permission permission)
+    {
+        var query =
+            from p in _marketParticipantDbContext.Permissions
+            where p.Id == (int)permission
+            select p.EicFunctions;
+
+        return (await query
+            .AsNoTracking()
+            .ToListAsync()
+            .ConfigureAwait(false))
+        .SelectMany(x => x.Select(y => y.EicFunction))
+        .Distinct();
+    }
+
     public async Task UpdatePermissionAsync(PermissionDetails permissionDetails)
     {
         ArgumentNullException.ThrowIfNull(permissionDetails);
