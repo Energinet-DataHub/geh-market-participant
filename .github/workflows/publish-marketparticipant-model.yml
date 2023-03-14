@@ -40,12 +40,14 @@ jobs:
         uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v10
         with:
           USE_AZURE_FUNCTIONS_TOOLS: "true"
+          DOTNET_VERSION: 7.0.200
 
       - name: Build and test solution
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v10
         with:
           SOLUTION_FILE_PATH: "./source/Energinet.DataHub.MarketParticipant.Libraries.sln"
           CODE_COVERAGE_FLAGS: clientlibraries
+          DOTNET_VERSION: 7.0.200
 
       - name: Pack Client project
         uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@v10

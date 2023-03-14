@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.27.1
+## Version 2.28.1
 
 - Added endpoint to get which user roles are assigned to a given permission
+
+## Version 2.28.0
+
+- dotnet 7.
 
 ## Version 2.27.0
 

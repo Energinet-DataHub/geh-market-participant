@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
+## Version 2.8.0
+
+- dotnet 7.
+
 ## Version 2.7.8
 
 - Removed unused market roles.
