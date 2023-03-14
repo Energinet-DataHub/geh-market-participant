@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Xunit;
 
@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var permissions = new[] { Permission.ActorManage, Permission.OrganizationManage };
+            var permissions = new[] { PermissionId.ActorManage, PermissionId.OrganizationManage };
             var userRoleDb = BuildUserRoleWithPermissionsDto(name: string.Empty);
             var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: permissions);
 
@@ -130,8 +130,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var userRoleDb = BuildUserRoleWithPermissionsDto(permissions: new[] { Permission.ActorManage });
-            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: new[] { Permission.OrganizationManage });
+            var userRoleDb = BuildUserRoleWithPermissionsDto(permissions: new[] { PermissionId.ActorManage });
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: new[] { PermissionId.OrganizationManage });
 
             // act
             var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
@@ -179,14 +179,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             string description = "UserRoleDescription",
             EicFunction eicFunction = EicFunction.BillingAgent,
             UserRoleStatus status = UserRoleStatus.Active,
-            IEnumerable<Permission>? permissions = null)
+            IEnumerable<PermissionId>? permissions = null)
         {
             return new UserRole(
                 new UserRoleId(Guid.NewGuid()),
                 name,
                 description,
                 status,
-                permissions ?? Enumerable.Empty<Permission>(),
+                permissions ?? Enumerable.Empty<PermissionId>(),
                 eicFunction);
         }
     }

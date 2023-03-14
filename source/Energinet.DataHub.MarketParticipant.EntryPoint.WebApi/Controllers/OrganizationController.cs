@@ -16,11 +16,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [AuthorizeUser(Permission.OrganizationManage)]
+        [Security.AuthorizeUser(PermissionId.OrganizationManage)]
         public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             return await this.ProcessAsync(
@@ -103,7 +102,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{organizationId:guid}")]
-        [AuthorizeUser(Permission.OrganizationManage)]
+        [Security.AuthorizeUser(PermissionId.OrganizationManage)]
         public async Task<IActionResult> UpdateOrganizationAsync(
             Guid organizationId,
             ChangeOrganizationDto organization)

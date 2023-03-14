@@ -77,18 +77,20 @@ public sealed class UserRoleRepository : IUserRoleRepository
     public async Task<UserRoleId> AddAsync(UserRole userRole)
     {
         ArgumentNullException.ThrowIfNull(userRole);
-        var role = new UserRoleEntity()
+
+        var role = new UserRoleEntity
         {
             Name = userRole.Name,
             Description = userRole.Description,
             Status = userRole.Status,
         };
-        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity() { Permission = x }))
+
+        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }))
         {
             role.Permissions.Add(permissionEntity);
         }
 
-        role.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = userRole.EicFunction });
+        role.EicFunctions.Add(new UserRoleEicFunctionEntity { EicFunction = userRole.EicFunction });
         _marketParticipantDbContext.UserRoles.Add(role);
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         return new UserRoleId(role.Id);

@@ -14,23 +14,14 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-/// <summary>
-/// Service for user role audit logs
-/// </summary>
 public interface IEnsureUserRolePermissionsService
 {
-    /// <summary>
-    /// Creates audit log for user role created
-    /// </summary>
-    /// <param name="permissions">current user id</param>
-    /// <param name="eicFunction">current user role id</param>
-    /// <returns>User role audit log for saving</returns>
     Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(
-        IEnumerable<Permission> permissions,
+        IEnumerable<PermissionId> permissions,
         EicFunction eicFunction);
 }

@@ -19,11 +19,10 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -102,7 +101,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/actors")]
-    [AuthorizeUser(Permission.UsersManage)]
+    [Security.AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetUserActorsAsync(Guid userId)
     {
         return await this.ProcessAsync(
@@ -131,7 +130,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/auditlogentry")]
-    [AuthorizeUser(Permission.UsersManage)]
+    [Security.AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
     {
         return await this.ProcessAsync(

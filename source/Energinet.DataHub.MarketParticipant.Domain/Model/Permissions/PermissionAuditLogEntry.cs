@@ -12,16 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Xunit;
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
-{
-    [CollectionDefinition("PermissionIntegrationTest")]
-    public sealed class IntegrationsPermissionTestsFixtureConfiguration :
-        ICollectionFixture<MarketParticipantDatabaseFixture>
-    {
-        // This class has no code, and is never created. Its purpose is simply
-        // to be the place to apply [CollectionDefinition] and all the
-        // ICollectionFixture<> interfaces.
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+
+public sealed record PermissionAuditLogEntry(
+    PermissionId Permission,
+    UserId ChangedByUserId,
+    PermissionChangeType PermissionChangeType,
+    DateTimeOffset Timestamp);

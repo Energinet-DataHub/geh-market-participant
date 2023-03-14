@@ -19,8 +19,8 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -98,7 +98,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.OrganizationView);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationView);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var testToken = new JwtSecurityToken();

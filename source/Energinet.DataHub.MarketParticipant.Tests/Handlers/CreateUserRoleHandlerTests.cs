@@ -18,11 +18,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class CreateUserRoleHandlerTests
     {
-        private const int ValidPermission = (int)Permission.ActorManage;
+        private const int ValidPermission = (int)PermissionId.ActorManage;
 
         [Fact]
         public async Task Handle_NewUserRole_UserRoleIdReturned()
@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
-                new List<Permission>(),
+                new List<PermissionId>(),
                 EicFunction.BillingAgent);
 
             userRoleRepositoryMock
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(userRole.Id);
 
             userRoleHelperServiceMock
-                .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<Permission>>(), It.IsAny<EicFunction>()))
+                .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
                 .ReturnsAsync(true);
 
             var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(
@@ -103,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
-                new List<Permission>(),
+                new List<PermissionId>(),
                 EicFunction.BillingAgent);
 
             userRoleRepositoryMock
@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(userRole.Id);
 
             userRoleHelperServiceMock
-                .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<Permission>>(), It.IsAny<EicFunction>()))
+                .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
                 .ReturnsAsync(false);
 
             var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(

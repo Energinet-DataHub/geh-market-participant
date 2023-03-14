@@ -16,8 +16,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -40,7 +40,7 @@ public sealed class GetPermissionAuditLogsHandler
         ArgumentNullException.ThrowIfNull(request);
 
         var permissionAuditLogs = await _permissionAuditLogsRepository
-            .GetAsync((Permission)request.PermissionId)
+            .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
         return new GetPermissionAuditLogsResponse(permissionAuditLogs.Select(auditLogEntry =>

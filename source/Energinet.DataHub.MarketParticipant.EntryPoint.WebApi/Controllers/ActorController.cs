@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -63,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [AuthorizeUser(Permission.ActorManage)]
+        [Security.AuthorizeUser(PermissionId.ActorManage)]
         public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
         {
             return await this.ProcessAsync(
@@ -84,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{actorId:guid}")]
-        [AuthorizeUser(Permission.ActorManage)]
+        [Security.AuthorizeUser(PermissionId.ActorManage)]
         public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
             return await this.ProcessAsync(

@@ -15,11 +15,10 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -46,7 +45,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet]
-    [AuthorizeUser(Permission.UsersManage)]
+    [Security.AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAsync()
     {
         return await this.ProcessAsync(
@@ -64,7 +63,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("{userRoleId:guid}")]
-    [AuthorizeUser(Permission.UsersManage)]
+    [Security.AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid userRoleId)
     {
         return await this.ProcessAsync(
@@ -82,7 +81,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpPost]
-    [AuthorizeUser(Permission.UserRoleManage)]
+    [Security.AuthorizeUser(PermissionId.UserRoleManage)]
     public async Task<IActionResult> CreateAsync(CreateUserRoleDto userRole)
     {
         return await this.ProcessAsync(
@@ -100,7 +99,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpPut("{userRoleId:guid}")]
-    [AuthorizeUser(Permission.UserRoleManage)]
+    [Security.AuthorizeUser(PermissionId.UserRoleManage)]
     public async Task<IActionResult> UpdateAsync(
         Guid userRoleId,
         UpdateUserRoleDto userRole)
@@ -121,7 +120,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("{userRoleId:guid}/auditlogentry")]
-    [AuthorizeUser(Permission.UsersManage)]
+    [Security.AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetUserRoleAuditLogsAsync(Guid userRoleId)
     {
         return await this.ProcessAsync(
@@ -139,7 +138,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("permissions")]
-    [AuthorizeUser(Permission.UsersManage)]
+    [Security.AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetPermissionDetailsAsync(EicFunction eicFunction)
     {
         return await this.ProcessAsync(

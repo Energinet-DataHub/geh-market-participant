@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -68,7 +68,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var filter = new UserOverviewFilterDto(actor.Id, null, Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
@@ -94,7 +94,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var actor = await _fixture.PrepareActorAsync();
 
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var userIdsToReturn = new List<ExternalUserId>
@@ -140,7 +140,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
@@ -184,8 +184,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.ActorManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleB.Id);
 

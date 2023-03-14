@@ -22,8 +22,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
-public sealed class GetPermissionsHandler
-    : IRequestHandler<GetPermissionsCommand, GetPermissionsResponse>
+public sealed class GetPermissionsHandler : IRequestHandler<GetPermissionsCommand, GetPermissionsResponse>
 {
     private readonly IPermissionRepository _permissionRepository;
 
@@ -40,9 +39,9 @@ public sealed class GetPermissionsHandler
         var permissions = await _permissionRepository.GetAllAsync().ConfigureAwait(false);
         return new GetPermissionsResponse(permissions.Select(permission =>
             new PermissionDto(
-                (int)permission.Permission,
-                permission.Permission.ToString(),
+                (int)permission.Id,
+                permission.Claim,
                 permission.Description,
-                permission.Created)));
+                permission.Created.ToDateTimeOffset())));
     }
 }

@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -46,7 +46,7 @@ internal static class TestPreparationEntities
         ActorId = null,
         IsFas = false,
         Name = "Test Actor Name",
-        Status = 1
+        Status = ActorStatus.New
     };
 
     public static MarketRoleEntity ValidMarketRole => new()
@@ -72,7 +72,7 @@ internal static class TestPreparationEntities
         },
         Permissions =
         {
-            new UserRolePermissionEntity { Permission = Permission.UsersView }
+            new UserRolePermissionEntity { Permission = PermissionId.UsersView }
         }
     };
 

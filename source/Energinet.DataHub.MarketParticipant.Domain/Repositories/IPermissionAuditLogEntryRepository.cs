@@ -14,9 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -35,5 +33,5 @@ public interface IPermissionAuditLogEntryRepository
     /// Retrieves all log entries for a given permission.
     /// </summary>
     /// <param name="permission">The permission to get the logs for.</param>
-    Task<IEnumerable<PermissionAuditLogEntry>> GetAsync(Permission permission);
+    Task<IEnumerable<PermissionAuditLogEntry>> GetAsync(PermissionId permission);
 }
