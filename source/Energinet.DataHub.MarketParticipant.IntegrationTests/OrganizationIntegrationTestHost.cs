@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
         private static IConfiguration BuildConfig(string dbConnectionString)
         {
-            KeyValuePair<string, string>[] keyValuePairs =
+            KeyValuePair<string, string?>[] keyValuePairs =
             {
                 new(Settings.SqlDbConnectionString.Key, dbConnectionString),
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
                 new(Settings.SendGridApiKey.Key, "fake_value"),
                 new(Settings.UserInviteFromEmail.Key, "fake_value"),
-                new(Settings.UserInviteBccEmail.Key, "fake_value")
+                new(Settings.UserInviteBccEmail.Key, "fake_value"),
             };
 
             return new ConfigurationBuilder()

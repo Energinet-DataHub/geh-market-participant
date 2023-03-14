@@ -68,13 +68,13 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
     private static IConfiguration BuildConfig(string dbConnectionString)
     {
-        KeyValuePair<string, string>[] keyValuePairs =
+        KeyValuePair<string, string?>[] keyValuePairs =
         {
             new(Settings.SqlDbConnectionString.Key, dbConnectionString),
             new(Settings.ServiceBusTopicName.Key, "fake_value"),
             new(Settings.ExternalOpenIdUrl.Key, "fake_value"),
             new(Settings.BackendAppId.Key, "fake_value"),
-            new(Settings.InternalOpenIdUrl.Key, "fake_value")
+            new(Settings.InternalOpenIdUrl.Key, "fake_value"),
         };
 
         return new ConfigurationBuilder()

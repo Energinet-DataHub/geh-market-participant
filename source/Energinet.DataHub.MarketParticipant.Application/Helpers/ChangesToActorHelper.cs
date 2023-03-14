@@ -91,7 +91,8 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
             .Select(marketRole => marketRole.Function)
             .ToList();
 
-        var incomingEicFunctions = incomingMarketRoles
+        var marketRolesEnumerated = incomingMarketRoles.ToList();
+        var incomingEicFunctions = marketRolesEnumerated
             .Select(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction))
             .ToList();
 
@@ -109,7 +110,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                     .First(marketRole => marketRole.Function == existingEicFunction)
                     .GridAreas;
 
-                var incomingGridAreas = incomingMarketRoles
+                var incomingGridAreas = marketRolesEnumerated
                     .First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == existingEicFunction)
                     .GridAreas;
 
@@ -137,8 +138,9 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 
         foreach (var eicFunction in eicFunctionsToAddToActor)
         {
-            var gridAreas = incomingMarketRoles.First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == eicFunction).GridAreas;
-            var marketRole = new ActorMarketRole(eicFunction, gridAreas.Select(gridArea => new ActorGridArea(new GridAreaId(gridArea.Id), gridArea.MeteringPointTypes.Select(meteringPointType => Enum.Parse<MeteringPointType>(meteringPointType)))));
+            var gridAreas = marketRolesEnumerated.First(marketRole => Enum.Parse<EicFunction>(marketRole.EicFunction) == eicFunction).GridAreas;
+            var gridAreasEnumerated = gridAreas.ToArray();
+            var marketRole = new ActorMarketRole(eicFunction, gridAreasEnumerated.Select(gridArea => new ActorGridArea(new GridAreaId(gridArea.Id), gridArea.MeteringPointTypes.Select(Enum.Parse<MeteringPointType>))));
 
             _changeEvents.Add(new MarketRoleAddedToActorIntegrationEvent
             {
@@ -152,9 +154,9 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
                 organizationId,
                 existingActor.Id.Value,
                 eicFunction,
-                gridAreas.Select(gridArea => new ActorGridArea(
+                gridAreasEnumerated.Select(gridArea => new ActorGridArea(
                     new GridAreaId(gridArea.Id),
-                    gridArea.MeteringPointTypes.Select(meteringPointType => Enum.Parse<MeteringPointType>(meteringPointType))))).ConfigureAwait(false);
+                    gridArea.MeteringPointTypes.Select(Enum.Parse<MeteringPointType>)))).ConfigureAwait(false);
         }
     }
 
@@ -186,7 +188,7 @@ public sealed class ChangesToActorHelper : IChangesToActorHelper
 
         foreach (var gridArea in existingMarketRole.GridAreas)
         {
-            if (incomingActorGridAreaDtos.FirstOrDefault(x => x.Id == gridArea.Id.Value) is ActorGridAreaDto incomingDto)
+            if (incomingActorGridAreaDtos.FirstOrDefault(x => x.Id == gridArea.Id.Value) is { } incomingDto)
             {
                 AddChangeEventsIfMeteringPointTypeChanged(
                     organizationId,
