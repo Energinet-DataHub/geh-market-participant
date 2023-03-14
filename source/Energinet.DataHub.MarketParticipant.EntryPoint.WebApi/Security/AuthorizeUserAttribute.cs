@@ -21,7 +21,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 
-// TODO: Move tests.
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
 public sealed class AuthorizeUserAttribute : Attribute, IAuthorizeData
 {
