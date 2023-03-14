@@ -107,7 +107,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("marketrolestopermission")]
-        [AuthorizeUser(Permission.UsersManage)]
+        [AuthorizeUser(PermissionId.UsersManage)]
         public async Task<IActionResult> MarketRolesAssignedToPermissionAsync(int permissionId)
         {
             return await this.ProcessAsync(

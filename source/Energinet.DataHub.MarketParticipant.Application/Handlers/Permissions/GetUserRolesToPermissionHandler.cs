@@ -13,12 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -39,10 +37,9 @@ public sealed class GetMarketRolesToPermissionHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var userRoles = new List<UserRoleDto>();
 
         var eicFunctions = await _permissionRepository
-            .GetAssignedToMarketRolesAsync((Permission)request.PermissionId)
+            .GetAssignedToMarketRolesAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
         return new GetMarketRolesToPermissionResponse(eicFunctions);

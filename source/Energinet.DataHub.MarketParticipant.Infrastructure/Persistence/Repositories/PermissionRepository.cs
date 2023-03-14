@@ -48,14 +48,9 @@ public sealed class PermissionRepository : IPermissionRepository
         return GetAsync(knownPermissions);
     }
 
-    public async Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions)
+    public Task<IEnumerable<EicFunction>> GetAssignedToMarketRolesAsync(PermissionId permission)
     {
-        var knownPermissions = KnownPermissions.All
-            .Where(p => permissions.Contains(p.Id))
-            .ToList();
-
-        var foundPermissions = await GetAsync(knownPermissions).ConfigureAwait(false);
-        return foundPermissions;
+        return Task.FromResult<IEnumerable<EicFunction>>(KnownPermissions.All.Single(p => p.Id == permission).AssignableTo);
     }
 
     public async Task<Permission> GetAsync(PermissionId permission)
@@ -66,6 +61,16 @@ public sealed class PermissionRepository : IPermissionRepository
 
         var foundPermissions = await GetAsync(knownPermissions).ConfigureAwait(false);
         return foundPermissions.Single();
+    }
+
+    public async Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions)
+    {
+        var knownPermissions = KnownPermissions.All
+            .Where(p => permissions.Contains(p.Id))
+            .ToList();
+
+        var foundPermissions = await GetAsync(knownPermissions).ConfigureAwait(false);
+        return foundPermissions;
     }
 
     public async Task UpdatePermissionAsync(Permission permission)

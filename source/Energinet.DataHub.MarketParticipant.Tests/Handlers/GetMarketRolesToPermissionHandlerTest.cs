@@ -15,13 +15,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
-using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
@@ -38,13 +35,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var repositoryMock = new Mock<IPermissionRepository>();
             repositoryMock
-                .Setup(x => x.GetAssignedToMarketRolesAsync(It.IsAny<Permission>()))
+                .Setup(x => x.GetAssignedToMarketRolesAsync(It.IsAny<PermissionId>()))
                 .ReturnsAsync(Array.Empty<EicFunction>());
 
             var target = new GetMarketRolesToPermissionHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetMarketRolesToPermissionCommand((int)Permission.UserRoleManage), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetMarketRolesToPermissionCommand((int)PermissionId.UserRoleManage), CancellationToken.None).ConfigureAwait(false);
 
             // assert
             Assert.NotNull(actual.EicFunctions);
