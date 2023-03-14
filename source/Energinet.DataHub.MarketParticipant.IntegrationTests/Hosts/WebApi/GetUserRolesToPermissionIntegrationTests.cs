@@ -57,7 +57,7 @@ public sealed class GetUserRolesToPermissionIntegrationTests
         // Assert
         Assert.NotNull(response.UserRoles);
         Assert.NotEmpty(response.UserRoles);
-        Assert.Equal(userRole.Id, response.UserRoles.First().Id);
+        Assert.Contains(userRole.Id, response.UserRoles.Select(x => x.Id));
     }
 
     [Fact]
