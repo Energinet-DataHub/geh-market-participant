@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -63,4 +64,11 @@ public interface IUserRoleRepository
     /// </summary>
     /// <param name="userRoleUpdate">The user role to update</param>
     Task UpdateAsync(UserRole userRoleUpdate);
+
+    /// <summary>
+    /// Gets user roles that have the given permission assigned to them
+    /// </summary>
+    /// <param name="permission">The permission you want to get user roles for.</param>
+    /// <returns>A list of user roles.</returns>
+    Task<IEnumerable<UserRole>> GetAsync(Permission permission);
 }

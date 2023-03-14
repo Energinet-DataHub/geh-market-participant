@@ -155,4 +155,22 @@ public sealed class UserRoleController : ControllerBase
             },
             _logger).ConfigureAwait(false);
     }
+
+    [HttpGet("assignedtopermission")]
+    [AuthorizeUser(Permission.UsersManage)]
+    public async Task<IActionResult> AssignedToPermissionAsync(int permissionId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new GetUserRolesToPermissionCommand(permissionId);
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response.UserRoles);
+            },
+            _logger).ConfigureAwait(false);
+    }
 }
