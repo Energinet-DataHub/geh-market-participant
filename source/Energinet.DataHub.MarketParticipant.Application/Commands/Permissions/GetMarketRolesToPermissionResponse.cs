@@ -13,19 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
-public interface IPermissionRepository
-{
-    Task<IEnumerable<Permission>> GetAllAsync();
-    Task<IEnumerable<Permission>> GetForMarketRoleAsync(EicFunction eicFunction);
-    Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions);
-    Task<IEnumerable<EicFunction>> GetAssignedToMarketRolesAsync(PermissionId permission);
-  
-    Task<Permission> GetAsync(PermissionId permission);
-    Task UpdatePermissionAsync(Permission permission);
-}
+public sealed record GetMarketRolesToPermissionResponse(IEnumerable<EicFunction> EicFunctions);
