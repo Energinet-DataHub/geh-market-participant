@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -44,7 +45,7 @@ public sealed class UserOverviewController : ControllerBase
     }
 
     [HttpPost("users/search")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> SearchUsersAsync(
         int pageNumber,
         int pageSize,

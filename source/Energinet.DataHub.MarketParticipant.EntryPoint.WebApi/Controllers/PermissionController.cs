@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -60,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut]
-        [Security.AuthorizeUser(PermissionId.UserRoleManage)]
+        [AuthorizeUser(PermissionId.UserRoleManage)]
         public async Task<IActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
         {
             return await this.ProcessAsync(
@@ -81,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{permissionId:int}/auditlogs")]
-        [Security.AuthorizeUser(PermissionId.UserRoleManage)]
+        [AuthorizeUser(PermissionId.UserRoleManage)]
         public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
         {
             return await this.ProcessAsync(

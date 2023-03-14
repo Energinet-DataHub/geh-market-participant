@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -43,7 +44,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
     }
 
     [HttpGet("actors/{actorId:guid}/users/{userId:guid}/roles")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid actorId, Guid userId)
     {
         return await this.ProcessAsync(
@@ -64,7 +65,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
     }
 
     [HttpGet("actors/{actorId:guid}/roles")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAssignableAsync(Guid actorId)
     {
         return await this.ProcessAsync(
@@ -85,7 +86,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
     }
 
     [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(
         Guid actorId,
         Guid userId,

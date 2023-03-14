@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -61,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [Security.AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorManage)]
         public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
         {
             return await this.ProcessAsync(
@@ -82,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{actorId:guid}")]
-        [Security.AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorManage)]
         public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
             return await this.ProcessAsync(

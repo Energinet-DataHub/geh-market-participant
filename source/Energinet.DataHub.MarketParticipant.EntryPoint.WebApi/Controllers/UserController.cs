@@ -101,7 +101,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/actors")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetUserActorsAsync(Guid userId)
     {
         return await this.ProcessAsync(
@@ -130,7 +130,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}/auditlogentry")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
     {
         return await this.ProcessAsync(

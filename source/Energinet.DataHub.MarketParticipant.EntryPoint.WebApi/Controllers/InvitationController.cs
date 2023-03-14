@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -42,7 +43,7 @@ public sealed class InvitationController : ControllerBase
     }
 
     [HttpPost("users/invite")]
-    [Security.AuthorizeUser(PermissionId.UsersManage)] // TODO: UTs
+    [AuthorizeUser(PermissionId.UsersManage)] // TODO: UTs
     public async Task<IActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
         return await this.ProcessAsync(
