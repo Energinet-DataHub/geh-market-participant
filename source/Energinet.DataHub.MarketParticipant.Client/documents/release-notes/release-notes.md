@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.27.1
+
+- Added endpoint to get which user roles are assigned to a given permission
+
 ## Version 2.27.0
 
 - Updating permission details response with Created date
