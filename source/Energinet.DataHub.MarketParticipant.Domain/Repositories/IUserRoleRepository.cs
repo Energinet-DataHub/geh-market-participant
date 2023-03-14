@@ -14,8 +14,8 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -70,5 +70,5 @@ public interface IUserRoleRepository
     /// </summary>
     /// <param name="permission">The permission you want to get user roles for.</param>
     /// <returns>A list of user roles.</returns>
-    Task<IEnumerable<UserRole>> GetAsync(Permission permission);
+    Task<IEnumerable<UserRole>> GetAsync(PermissionId permission);
 }

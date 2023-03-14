@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -126,7 +126,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
         }
     }
 
-    public async Task<IEnumerable<UserRole>> GetAsync(Permission permission)
+    public async Task<IEnumerable<UserRole>> GetAsync(PermissionId permission)
     {
         var userRoles = await BuildUserRoleQuery()
             .Where(t => t

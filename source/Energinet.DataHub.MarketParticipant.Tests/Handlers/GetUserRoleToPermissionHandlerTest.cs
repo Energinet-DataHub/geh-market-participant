@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -35,13 +35,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var repositoryMock = new Mock<IUserRoleRepository>();
             repositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<Permission>()))
+                .Setup(x => x.GetAsync(It.IsAny<PermissionId>()))
                 .ReturnsAsync(Array.Empty<UserRole>());
 
             var target = new GetUserRolesToPermissionHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetUserRolesToPermissionCommand((int)Permission.UserRoleManage), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetUserRolesToPermissionCommand((int)PermissionId.UserRoleManage), CancellationToken.None).ConfigureAwait(false);
 
             // assert
             Assert.NotNull(actual.UserRoles);
