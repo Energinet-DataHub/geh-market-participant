@@ -38,5 +38,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Get Permission audit logs
         /// </summary>
         Task<IEnumerable<PermissionAuditLogDto>> GetAuditLogsAsync(int permissionId);
+
+        /// <summary>
+        /// Gets all Eic function that this permission is assigned to
+        /// </summary>
+        /// <param name="permissionId"></param>
+        /// <returns>a list of eic functions that have this permission assigned</returns>
+        Task<IEnumerable<EicFunction>> GetMarketRolesAssignedToPermissionAsync(int permissionId);
     }
 }

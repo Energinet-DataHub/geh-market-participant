@@ -68,5 +68,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<PermissionAuditLogDto>>()
                 .ConfigureAwait(false);
         }
+
+        public async Task<IEnumerable<EicFunction>> GetMarketRolesAssignedToPermissionAsync(int permissionId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("Permission", "marketrolestopermission")
+                        .SetQueryParam("permissionId", permissionId)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<IEnumerable<EicFunction>>()
+                .ConfigureAwait(false);
+        }
     }
 }
