@@ -40,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{actorId:guid}/contact")]
-        [AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> ListAllAsync(Guid actorId)
         {
             return await this.ProcessAsync(
@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost("{actorId:guid}/contact")]
-        [AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
             return await this.ProcessAsync(
@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
-        [AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
         {
             return await this.ProcessAsync(

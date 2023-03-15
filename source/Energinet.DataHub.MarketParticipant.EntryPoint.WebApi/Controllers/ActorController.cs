@@ -62,7 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
         {
             return await this.ProcessAsync(
@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{actorId:guid}")]
-        [AuthorizeUser(PermissionId.ActorManage)]
+        [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
             return await this.ProcessAsync(

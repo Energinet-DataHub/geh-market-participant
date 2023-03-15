@@ -62,7 +62,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             "description",
             UserRoleStatus.Active,
             EicFunction.BillingAgent,
-            new Collection<int> { (int)PermissionId.OrganizationView });
+            new Collection<int> { (int)PermissionId.OrganizationsView });
 
         var createUserRoleCommand = new CreateUserRoleCommand(user.Id, createUserRoleDto);
         var expectedResult = GenerateLogEntries(createUserRoleDto, Guid.NewGuid(), Guid.NewGuid()).First();
@@ -207,7 +207,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             "description",
             UserRoleStatus.Active,
             EicFunction.BillingAgent,
-            new Collection<int> { (int)PermissionId.OrganizationView });
+            new Collection<int> { (int)PermissionId.OrganizationsView });
     }
 
     private static IEnumerable<UserRoleAuditLogEntry> GenerateLogEntries(CreateUserRoleDto createUserRoleDto, Guid? userId, Guid? userRoleId)

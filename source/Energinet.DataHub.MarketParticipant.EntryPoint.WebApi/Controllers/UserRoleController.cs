@@ -82,7 +82,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpPost]
-    [AuthorizeUser(PermissionId.UserRoleManage)]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> CreateAsync(CreateUserRoleDto userRole)
     {
         return await this.ProcessAsync(
@@ -100,7 +100,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpPut("{userRoleId:guid}")]
-    [AuthorizeUser(PermissionId.UserRoleManage)]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> UpdateAsync(
         Guid userRoleId,
         UpdateUserRoleDto userRole)

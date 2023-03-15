@@ -32,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var permissions = new[] { PermissionId.ActorManage, PermissionId.OrganizationManage };
+            var permissions = new[] { PermissionId.ActorsManage, PermissionId.OrganizationsManage };
             var userRoleDb = BuildUserRoleWithPermissionsDto(name: string.Empty);
             var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: permissions);
 
@@ -130,8 +130,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // arrange
             var userRoleAuditLogService = new UserRoleAuditLogService();
 
-            var userRoleDb = BuildUserRoleWithPermissionsDto(permissions: new[] { PermissionId.ActorManage });
-            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: new[] { PermissionId.OrganizationManage });
+            var userRoleDb = BuildUserRoleWithPermissionsDto(permissions: new[] { PermissionId.ActorsManage });
+            var userRoleUpdateSut = BuildUserRoleWithPermissionsDto(permissions: new[] { PermissionId.OrganizationsManage });
 
             // act
             var auditLogs = userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
