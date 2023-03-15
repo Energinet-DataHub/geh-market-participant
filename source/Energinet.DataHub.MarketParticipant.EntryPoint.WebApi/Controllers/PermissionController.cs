@@ -105,23 +105,5 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 },
                 _logger).ConfigureAwait(false);
         }
-
-        [HttpGet("marketrolestopermission")]
-        [AuthorizeUser(PermissionId.UsersManage)]
-        public async Task<IActionResult> MarketRolesAssignedToPermissionAsync(int permissionId)
-        {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetMarketRolesToPermissionCommand(permissionId);
-
-                    var response = await _mediator
-                        .Send(command)
-                        .ConfigureAwait(false);
-
-                    return Ok(response.EicFunctions);
-                },
-                _logger).ConfigureAwait(false);
-        }
     }
 }

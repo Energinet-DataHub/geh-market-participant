@@ -42,6 +42,7 @@ public sealed class GetPermissionsHandler : IRequestHandler<GetPermissionsComman
                 (int)permission.Id,
                 permission.Claim,
                 permission.Description,
-                permission.Created.ToDateTimeOffset())));
+                permission.Created.ToDateTimeOffset(),
+                permission.AssignableTo)));
     }
 }

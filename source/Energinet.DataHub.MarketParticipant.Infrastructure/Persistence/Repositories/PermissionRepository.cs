@@ -48,11 +48,6 @@ public sealed class PermissionRepository : IPermissionRepository
         return GetAsync(knownPermissions);
     }
 
-    public Task<IEnumerable<EicFunction>> GetAssignedToMarketRolesAsync(PermissionId permission)
-    {
-        return Task.FromResult<IEnumerable<EicFunction>>(KnownPermissions.All.Single(p => p.Id == permission).AssignableTo);
-    }
-
     public async Task<Permission> GetAsync(PermissionId permission)
     {
         var knownPermissions = KnownPermissions.All
