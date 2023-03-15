@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -40,12 +40,12 @@ public sealed class GetUserRolesToPermissionHandler
         ArgumentNullException.ThrowIfNull(request);
         var userRoles = new List<UserRoleDto>();
 
-        foreach (var userRole in await _userRoleRepository.GetAsync((Permission)request.PermissionId).ConfigureAwait(false))
+        foreach (var userRole in await _userRoleRepository.GetAsync((PermissionId)request.PermissionId).ConfigureAwait(false))
         {
             userRoles.Add(new UserRoleDto(
                 userRole.Id.Value,
                 userRole.Name,
-                userRole.Name,
+                userRole.Description,
                 userRole.EicFunction,
                 userRole.Status));
         }

@@ -15,8 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -48,7 +47,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
 
         // Act
         var actual = await permissionAuditLogEntryRepository
-            .GetAsync(Permission.UserRoleManage)
+            .GetAsync(PermissionId.UserRoleManage)
             .ConfigureAwait(false);
 
         // Assert
@@ -65,7 +64,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(contextGet);
 
         var userChangedBy = await _fixture.PrepareUserAsync();
-        var userRoleWithCreatedPermission = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
+        var userRoleWithCreatedPermission = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
 
         var entry = new PermissionAuditLogEntry(
             userRoleWithCreatedPermission.Permissions[0].Permission,
@@ -81,7 +80,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
 
         // Act
         var actual = await permissionAuditLogEntryRepository
-            .GetAsync(Permission.UsersManage)
+            .GetAsync(PermissionId.UsersManage)
             .ConfigureAwait(false);
 
         // Assert

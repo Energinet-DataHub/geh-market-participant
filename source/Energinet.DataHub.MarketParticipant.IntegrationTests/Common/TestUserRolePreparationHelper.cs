@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -30,7 +30,7 @@ internal static class TestUserRolePreparationHelper
 
     public static Task<UserRoleEntity> PrepareUserRoleAsync(
         this MarketParticipantDatabaseFixture fixture,
-        params Permission[] permissions)
+        params PermissionId[] permissions)
     {
         var localUserRole = TestPreparationEntities.ValidUserRole;
         localUserRole.Permissions.Clear();
@@ -48,7 +48,7 @@ internal static class TestUserRolePreparationHelper
 
     public static Task<UserRoleEntity> PrepareUserRoleAsync(
         this MarketParticipantDatabaseFixture fixture,
-        Permission[] permissions,
+        PermissionId[] permissions,
         params EicFunction[] functions)
     {
         var localUserRole = TestPreparationEntities.ValidUserRole;

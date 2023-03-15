@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
@@ -66,22 +65,6 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
             return await response
                 .GetJsonAsync<IEnumerable<PermissionAuditLogDto>>()
-                .ConfigureAwait(false);
-        }
-
-        public async Task<IEnumerable<EicFunction>> GetMarketRolesAssignedToPermissionAsync(int permissionId)
-        {
-            var response = await ValidationExceptionHandler
-                .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request("Permission", "marketrolestopermission")
-                        .SetQueryParam("permissionId", permissionId)
-                        .GetAsync())
-                .ConfigureAwait(false);
-
-            return await response
-                .GetJsonAsync<IEnumerable<EicFunction>>()
                 .ConfigureAwait(false);
         }
     }

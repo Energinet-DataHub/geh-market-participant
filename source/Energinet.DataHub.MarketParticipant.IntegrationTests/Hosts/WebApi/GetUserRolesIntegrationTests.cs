@@ -14,8 +14,8 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -66,8 +66,8 @@ public sealed class GetUserRolesIntegrationTests
         var actor = await _fixture.PrepareActorAsync();
 
         var user = await _fixture.PrepareUserAsync();
-        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.OrganizationView);
+        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationView);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleB.Id);
 
@@ -92,9 +92,9 @@ public sealed class GetUserRolesIntegrationTests
         var actor2 = await _fixture.PrepareActorAsync();
 
         var user = await _fixture.PrepareUserAsync();
-        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.OrganizationView);
-        var userRoleC = await _fixture.PrepareUserRoleAsync(Permission.GridAreasManage);
+        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationView);
+        var userRoleC = await _fixture.PrepareUserRoleAsync(PermissionId.GridAreasManage);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRoleA.Id);
         await _fixture.AssignUserRoleAsync(user.Id, actor2.Id, userRoleB.Id);

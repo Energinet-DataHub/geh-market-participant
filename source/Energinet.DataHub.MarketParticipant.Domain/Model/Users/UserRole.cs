@@ -14,7 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -24,7 +24,7 @@ public sealed class UserRole
         string name,
         string description,
         UserRoleStatus status,
-        IEnumerable<Permission> permissions,
+        IEnumerable<PermissionId> permissions,
         EicFunction eicFunction)
     {
         Id = new UserRoleId(Guid.Empty);
@@ -40,7 +40,7 @@ public sealed class UserRole
         string name,
         string description,
         UserRoleStatus status,
-        IEnumerable<Permission> permissions,
+        IEnumerable<PermissionId> permissions,
         EicFunction eicFunction)
     {
         Id = id;
@@ -55,6 +55,6 @@ public sealed class UserRole
     public string Name { get; set; }
     public string Description { get; set; }
     public UserRoleStatus Status { get; set; }
-    public IEnumerable<Permission> Permissions { get; set; }
+    public IEnumerable<PermissionId> Permissions { get; set; }
     public EicFunction EicFunction { get; }
 }

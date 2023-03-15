@@ -22,10 +22,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.AspNetCore.Hosting;
@@ -115,11 +117,11 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Role_IsKnown()
     {
         // Arrange
-        var organizationView = Permission.OrganizationView;
+        var organizationView = PermissionId.OrganizationView;
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = 2),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole);
 
         var user = await _fixture.PrepareUserAsync();
@@ -132,7 +134,8 @@ public sealed class TokenPartsControllerIntegrationTests :
         var internalToken = await FetchTokenAsync(externalToken, actor.Id);
 
         // Assert
-        Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == PermissionsAsClaims.Lookup[organizationView]));
+        var organizationViewClaim = KnownPermissions.All.Single(kp => kp.Id == organizationView).Claim;
+        Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == organizationViewClaim));
     }
 
     [Fact]

@@ -1,5 +1,10 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.29.0
+
+- Removed endpoint to get which market roles are assigned to a given permission
+- Assignable market roles are now part of permissions
+
 ## Version 2.28.2
 
 - Added endpoint to get which market roles are assigned to a given permission

@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -38,12 +37,12 @@ public sealed class GetPermissionDetailsHandler
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        var permissions = await _permissionRepository.GetToMarketRoleAsync(request.EicFunction).ConfigureAwait(false);
+        var permissions = await _permissionRepository.GetForMarketRoleAsync(request.EicFunction).ConfigureAwait(false);
         return new GetPermissionDetailsResponse(permissions.Select(permission =>
             new PermissionDetailsDto(
-                (int)permission.Permission,
-                PermissionsAsClaims.Lookup[permission.Permission],
+                (int)permission.Id,
+                permission.Name,
                 permission.Description,
-                permission.Created)));
+                permission.Created.ToDateTimeOffset())));
     }
 }

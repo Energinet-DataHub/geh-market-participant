@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -60,6 +61,6 @@ public sealed class GetUserPermissionsHandler
             .IsFasAsync(new ActorId(request.ActorId), user.ExternalId)
             .ConfigureAwait(false);
 
-        return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions);
+        return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions.Select(permission => permission.Claim));
     }
 }

@@ -17,9 +17,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -54,7 +54,7 @@ public sealed class CreateUserRoleHandler
 
         var valid = await _ensureUserRolePermissionsService
             .EnsurePermissionsSelectedAreValidForMarketRoleAsync(
-                request.UserRoleDto.Permissions.Select(x => (Permission)x),
+                request.UserRoleDto.Permissions.Select(x => (PermissionId)x),
                 request.UserRoleDto.EicFunction)
             .ConfigureAwait(false);
 
@@ -65,7 +65,7 @@ public sealed class CreateUserRoleHandler
             request.UserRoleDto.Name,
             request.UserRoleDto.Description,
             request.UserRoleDto.Status,
-            request.UserRoleDto.Permissions.Select(x => (Permission)x),
+            request.UserRoleDto.Permissions.Select(x => (PermissionId)x),
             request.UserRoleDto.EicFunction);
 
         var createdUserRoleId = await _userRoleRepository

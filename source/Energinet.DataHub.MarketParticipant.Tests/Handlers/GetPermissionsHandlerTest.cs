@@ -17,7 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var repositoryMock = new Mock<IPermissionRepository>();
             repositoryMock
                 .Setup(x => x.GetAllAsync())
-                .ReturnsAsync(Array.Empty<PermissionDetails>());
+                .ReturnsAsync(Array.Empty<Permission>());
 
             var target = new GetPermissionsHandler(repositoryMock.Object);
 
