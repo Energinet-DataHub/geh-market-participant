@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
@@ -24,6 +24,6 @@ public sealed class GetPermissionAuditLogEntriesCommandRuleSet : AbstractValidat
     public GetPermissionAuditLogEntriesCommandRuleSet()
     {
         RuleFor(command => command.PermissionId)
-            .Must(p => Enum.IsDefined(typeof(Permission), p));
+            .Must(p => Enum.IsDefined(typeof(PermissionId), p));
     }
 }
