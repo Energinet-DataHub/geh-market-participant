@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record PermissionDetailsDto(int Id, string Name, string Description, DateTimeOffset Created);
+    public sealed record PermissionDetailsDto(int Id, string Name, string Description, DateTimeOffset Created, IEnumerable<EicFunction> AssignableTo);
 }
