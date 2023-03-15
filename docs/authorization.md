@@ -14,7 +14,7 @@ As an example, the payload of an access token giving permissions `organizations:
 }
 ```
 
-Domains can either validate the token using the middleware provided in [Energinet.DataHub.Core.App.WebApp](https://github.com/Energinet-DataHub/geh-core/blob/main/source/App/documents/authorization.md) or use another OIDC approach. The OIDC configuration endpoint is https://app-webapi-markpart-*environment*.azurewebsites.net/.well-known/openid-configuration. APIM and BFF also validate the tokens.
+Domains can either validate the token using the middleware provided in [Energinet.DataHub.Core.App.WebApp](https://github.com/Energinet-DataHub/geh-core/blob/main/source/App/documents/authorization.md) or use another OIDC approach. The OIDC configuration endpoint is https://app-webapi-markpart-*environment*.azurewebsites.net/.well-known/openid-configuration. APIM and BFF are also configured to validate the tokens.
 
 ## Signing Key
 
@@ -31,10 +31,10 @@ Adding or editing a permission can be done in three steps:
 1) Add a new permission id to `PermissionId` enum.
 2) Register the new permission in `KnownPermissions` class. Specify the following:
 
-- The newly created `PermissionId`.
-- The claim to be used for the given permission. The claim will be sent with the token and shown to the users in the UI. Use a simple and concise value; the convention is *[kebab-cased-plural-feature-name]:[access]*, e.g. `grid-areas:manage` or `organizations:view`.
-- The date for when the permission has been introduced. Used for audit logs only.
-- A list of market roles that may support the permission. If a given actor or a given user role does not belong to any of the market roles on this list, the permission will not apply to them.
+  - The newly created `PermissionId`.
+  - The claim to be used for the given permission. The claim will be sent with the token and shown to the users in the UI. Use a simple and concise value; the convention is *[kebab-cased-plural-feature-name]:[access]*, e.g. `grid-areas:manage` or `organizations:view`.
+  - The date for when the permission has been introduced. Used for audit logs only.
+  - A list of market roles that may support the permission. If a given actor or a given user role does not belong to any of the market roles on this list, the permission will not apply to them.
 
 3) Create a PR in `geh-market-participant` and wait for it to be completed.
 4) (Optional) If the permission is needed to guard features in `greenforce-frontend`, add the claim entry to `libs\dh\shared\feature-authorization\src\lib\permission.ts`.
