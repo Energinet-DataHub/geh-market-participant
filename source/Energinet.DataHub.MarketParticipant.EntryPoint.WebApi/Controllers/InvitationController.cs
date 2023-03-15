@@ -43,7 +43,7 @@ public sealed class InvitationController : ControllerBase
     }
 
     [HttpPost("users/invite")]
-    [AuthorizeUser(PermissionId.UsersManage)] // TODO: UTs
+    [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
         return await this.ProcessAsync(
