@@ -30,7 +30,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using Permission = Energinet.DataHub.Core.App.Common.Security.Permission;
 using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;

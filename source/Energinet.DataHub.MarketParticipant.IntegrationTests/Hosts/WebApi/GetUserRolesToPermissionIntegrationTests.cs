@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture.Kernel;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -49,7 +46,7 @@ public sealed class GetUserRolesToPermissionIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var command = new GetUserRolesToPermissionCommand((int)Permission.UsersView);
+        var command = new GetUserRolesToPermissionCommand((int)PermissionId.UsersView);
 
         // Act
         var response = await mediator.Send(command);
@@ -68,7 +65,7 @@ public sealed class GetUserRolesToPermissionIntegrationTests
         await using var scope = host.BeginScope();
 
         var mediator = scope.GetInstance<IMediator>();
-        var command = new GetUserRolesToPermissionCommand((int)Permission.UserRoleManage);
+        var command = new GetUserRolesToPermissionCommand((int)PermissionId.UserRoleManage);
 
         // Act
         var response = await mediator.Send(command);
