@@ -19,6 +19,9 @@ using NodaTime.Text;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 
+/// <summary>
+/// Contains all the registered permissions. See /docs/authorization.md for more information.
+/// </summary>
 public static class KnownPermissions
 {
     public static IReadOnlyCollection<KnownPermission> All { get; } = new KnownPermission[]
