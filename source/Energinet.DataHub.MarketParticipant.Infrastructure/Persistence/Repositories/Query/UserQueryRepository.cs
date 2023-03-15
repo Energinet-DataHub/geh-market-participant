@@ -16,9 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,10 +28,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserQueryRepository : IUserQueryRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IPermissionRepository _permissionRepository;
 
-    public UserQueryRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public UserQueryRepository(
+        IMarketParticipantDbContext marketParticipantDbContext,
+        IPermissionRepository permissionRepository)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+        _permissionRepository = permissionRepository;
     }
 
     public async Task<IEnumerable<ActorId>> GetActorsAsync(ExternalUserId externalUserId)
@@ -66,7 +71,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
         ArgumentNullException.ThrowIfNull(actorId);
         ArgumentNullException.ThrowIfNull(externalUserId);
 
-        var query =
+        var userRoleQuery =
             from user in _marketParticipantDbContext.Users
             where user.ExternalId == externalUserId.Value
             join userRoleAssignment in _marketParticipantDbContext.UserRoleAssignments on user.Id equals userRoleAssignment.UserId
@@ -74,13 +79,41 @@ public sealed class UserQueryRepository : IUserQueryRepository
             join userRole in _marketParticipantDbContext.UserRoles on userRoleAssignment.UserRoleId equals userRole.Id
             where userRole.Status == UserRoleStatus.Active
             join actor in _marketParticipantDbContext.Actors on userRoleAssignment.ActorId equals actor.Id
-            where actor.Status == (int)ActorStatus.Active && userRole.EicFunctions.All(f => actor.MarketRoles.Any(marketRole => marketRole.Function == f.EicFunction))
-            from permission in userRole.Permissions
-            join permissionDetails in _marketParticipantDbContext.Permissions on (int)permission.Permission equals permissionDetails.Id
-            where permissionDetails.EicFunctions.Any(f => userRole.EicFunctions.Any(eic => eic.EicFunction == f.EicFunction))
-            select permission.Permission;
+            where actor.Status == ActorStatus.Active && userRole.EicFunctions.All(f => actor.MarketRoles.Any(marketRole => marketRole.Function == f.EicFunction))
+            select userRole;
 
-        return await query.ToListAsync().ConfigureAwait(false);
+        var userRoles = await userRoleQuery
+            .Include(ur => ur.EicFunctions)
+            .Include(ur => ur.Permissions)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        var userRolePermissions = userRoles
+            .SelectMany(userRole => userRole.Permissions)
+            .Select(permission => permission.Permission);
+
+        var potentialPermissions = (await _permissionRepository
+            .GetAsync(userRolePermissions)
+            .ConfigureAwait(false))
+            .ToDictionary(p => p.Id);
+
+        var finalPermissions = new List<Permission>();
+
+        foreach (var userRole in userRoles)
+        {
+            foreach (var permission in userRole.Permissions)
+            {
+                if (!potentialPermissions.TryGetValue(permission.Permission, out var knownPermission))
+                    continue;
+
+                if (!knownPermission.AssignableTo.Any(e => userRole.EicFunctions.Any(m => m.EicFunction == e)))
+                    continue;
+
+                finalPermissions.Add(knownPermission);
+            }
+        }
+
+        return finalPermissions;
     }
 
     public Task<bool> IsFasAsync(ActorId actorId, ExternalUserId externalUserId)
@@ -91,7 +124,7 @@ public sealed class UserQueryRepository : IUserQueryRepository
             join a in _marketParticipantDbContext.Actors on r.ActorId equals a.Id
             where u.ExternalId == externalUserId.Value &&
                   a.Id == actorId.Value &&
-                  a.Status == (int)ActorStatus.Active
+                  a.Status == ActorStatus.Active
             select a.IsFas;
 
         return query.FirstOrDefaultAsync();

@@ -15,9 +15,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -44,7 +45,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var userExternalId = Guid.NewGuid();
 
@@ -64,7 +65,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -84,7 +85,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync();
@@ -109,7 +110,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         // Act
         var perms = await userRepository
@@ -126,7 +127,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -145,16 +146,16 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.OrganizationView },
+            new[] { PermissionId.OrganizationView },
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -166,7 +167,7 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(perms);
-        Assert.Equal(Permission.OrganizationView, perms.First());
+        Assert.Equal(PermissionId.OrganizationView, perms.First().Id);
     }
 
     [Fact]
@@ -176,12 +177,12 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Inactive),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Inactive),
             TestPreparationEntities.ValidMarketRole);
 
         var userRole = await _fixture.PrepareUserRoleAsync();
@@ -204,16 +205,16 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.IndependentAggregator));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.OrganizationView },
+            new[] { PermissionId.OrganizationView },
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -234,21 +235,21 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
         var doNotReturnActor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.OrganizationView },
+            new[] { PermissionId.OrganizationView },
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, doNotReturnActor.Id, userRole.Id);
@@ -269,25 +270,25 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor1 = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
         var actor2 = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.OrganizationView },
+            new[] { PermissionId.OrganizationView },
             EicFunction.BillingAgent);
 
         var userRole2 = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.UsersView },
+            new[] { PermissionId.UsersView },
             EicFunction.GridAccessProvider);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRole1.Id);
@@ -307,8 +308,8 @@ public sealed class UserQueryRepositoryTests
         Assert.NotEmpty(permsActor2);
         Assert.Single(permsActor);
         Assert.Single(permsActor2);
-        Assert.Equal(Permission.OrganizationView, permsActor.First());
-        Assert.Equal(Permission.UsersView, permsActor2.First());
+        Assert.Equal(PermissionId.OrganizationView, permsActor.First().Id);
+        Assert.Equal(PermissionId.UsersView, permsActor2.First().Id);
     }
 
     [Fact]
@@ -318,21 +319,21 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.OrganizationManage, Permission.OrganizationView },
+            new[] { PermissionId.OrganizationManage, PermissionId.OrganizationView },
             EicFunction.DataHubAdministrator);
 
         var userRole2 = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.UsersView },
+            new[] { PermissionId.UsersView },
             EicFunction.GridAccessProvider);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole1.Id);
@@ -346,9 +347,9 @@ public sealed class UserQueryRepositoryTests
         // Assert
         Assert.NotEmpty(permsActor);
         Assert.Equal(3, permsActor.Count);
-        Assert.Contains(Permission.OrganizationManage, permsActor);
-        Assert.Contains(Permission.OrganizationView, permsActor);
-        Assert.Contains(Permission.UsersView, permsActor);
+        Assert.Contains(PermissionId.OrganizationManage, permsActor.Select(p => p.Id));
+        Assert.Contains(PermissionId.OrganizationView, permsActor.Select(p => p.Id));
+        Assert.Contains(PermissionId.UsersView, permsActor.Select(p => p.Id));
     }
 
     [Fact]
@@ -358,16 +359,16 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(t => t.Status = (int)ActorStatus.Active),
+            TestPreparationEntities.ValidActor.Patch(t => t.Status = ActorStatus.Active),
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.OrganizationManage, Permission.OrganizationView },
+            new[] { PermissionId.OrganizationManage, PermissionId.OrganizationView },
             EicFunction.BalanceResponsibleParty);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -379,7 +380,7 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(perms);
-        Assert.Equal(Permission.OrganizationView, perms.Single());
+        Assert.Equal(PermissionId.OrganizationView, perms.Single().Id);
     }
 
     [Theory]
@@ -391,14 +392,14 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(t =>
             {
                 t.IsFas = isFas;
-                t.Status = (int)ActorStatus.Active;
+                t.Status = ActorStatus.Active;
             }),
             TestPreparationEntities.ValidMarketRole);
 
@@ -422,14 +423,14 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context);
+        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(t =>
             {
                 t.IsFas = isFas;
-                t.Status = (int)ActorStatus.New;
+                t.Status = ActorStatus.New;
             }),
             TestPreparationEntities.ValidMarketRole);
 

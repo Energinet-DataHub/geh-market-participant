@@ -12,12 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+#pragma warning disable CA1711 // Rename type name Permission so that it does not end in 'Permission'.
 
-public sealed class PermissionEicFunctionEntity
-{
-    public int PermissionId { get; set; }
-    public EicFunction EicFunction { get; set; }
-}
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
+
+public sealed record KnownPermission(
+    PermissionId Id,
+    string Claim,
+    Instant Created,
+    IReadOnlyCollection<EicFunction> AssignableTo);
+
+#pragma warning restore CA1711

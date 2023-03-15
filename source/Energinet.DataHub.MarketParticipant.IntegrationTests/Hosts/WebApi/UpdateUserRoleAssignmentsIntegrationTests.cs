@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -88,8 +88,8 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
+        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.ActorManage);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
 
@@ -126,9 +126,9 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var actor1 = await _fixture.PrepareActorAsync();
         var actor2 = await _fixture.PrepareActorAsync();
 
-        var userRoleA = await _fixture.PrepareUserRoleAsync(Permission.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(Permission.OrganizationManage);
-        var userRoleNew = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
+        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationManage);
+        var userRoleNew = await _fixture.PrepareUserRoleAsync(PermissionId.ActorManage);
 
         var user = await _fixture.PrepareUserAsync();
         await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRoleA.Id);

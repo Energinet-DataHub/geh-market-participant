@@ -16,9 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,72 +34,106 @@ public sealed class PermissionRepository : IPermissionRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<IEnumerable<PermissionDetails>> GetAllAsync()
+    public Task<IEnumerable<Permission>> GetAllAsync()
     {
-        var permissions = await BuildPermissionQuery(null).ToListAsync().ConfigureAwait(false);
-        return permissions.Select(MapToPermissionDetails);
+        return GetAsync(KnownPermissions.All);
     }
 
-    public async Task<IEnumerable<PermissionDetails>> GetToMarketRoleAsync(EicFunction eicFunction)
+    public Task<IEnumerable<Permission>> GetForMarketRoleAsync(EicFunction eicFunction)
     {
-        var permissions = await BuildPermissionQuery(eicFunction).ToListAsync().ConfigureAwait(false);
-        return permissions.Select(MapToPermissionDetails);
+        var knownPermissions = KnownPermissions.All
+            .Where(p => p.AssignableTo.Contains(eicFunction))
+            .ToList();
+
+        return GetAsync(knownPermissions);
     }
 
-    public async Task<PermissionDetails?> GetAsync(Permission permission)
+    public async Task<Permission> GetAsync(PermissionId permission)
     {
-        var permissionEntity = await _marketParticipantDbContext.Permissions
-            .FirstOrDefaultAsync(p => p.Id == (int)permission)
+        var knownPermissions = KnownPermissions.All
+            .Where(p => p.Id == permission)
+            .ToList();
+
+        var foundPermissions = await GetAsync(knownPermissions).ConfigureAwait(false);
+        return foundPermissions.Single();
+    }
+
+    public async Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions)
+    {
+        var knownPermissions = KnownPermissions.All
+            .Where(p => permissions.Contains(p.Id))
+            .ToList();
+
+        var foundPermissions = await GetAsync(knownPermissions).ConfigureAwait(false);
+        return foundPermissions;
+    }
+
+    public async Task UpdatePermissionAsync(Permission permission)
+    {
+        ArgumentNullException.ThrowIfNull(permission);
+
+        var entity = await _marketParticipantDbContext
+            .Permissions
+            .FindAsync(permission.Id)
             .ConfigureAwait(false);
 
-        if (permissionEntity == null)
+        if (entity == null)
         {
-            return null;
+            await _marketParticipantDbContext.Permissions
+                .AddAsync(new PermissionEntity { Id = permission.Id, Description = permission.Description })
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            entity.Description = permission.Description;
         }
 
-        return MapToPermissionDetails(permissionEntity);
+        await _marketParticipantDbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
     }
 
-    public async Task<IEnumerable<EicFunction>> GetAssignedToMarketRolesAsync(Permission permission)
+    private async Task<IEnumerable<Permission>> GetAsync(IReadOnlyCollection<KnownPermission> wantedPermissions)
     {
-        var query =
-            from p in _marketParticipantDbContext.Permissions
-            where p.Id == (int)permission
-            select p.EicFunctions;
+        var dbPermissions = await BuildPermissionQuery(wantedPermissions)
+            .ToDictionaryAsync(p => p.Id)
+            .ConfigureAwait(false);
 
-        return (await query
-            .AsNoTracking()
-            .ToListAsync()
-            .ConfigureAwait(false))
-        .SelectMany(x => x.Select(y => y.EicFunction))
-        .Distinct();
+        var permissions = new List<Permission>();
+
+        foreach (var permission in wantedPermissions)
+        {
+            if (dbPermissions.TryGetValue(permission.Id, out var dbPermission))
+            {
+                permissions.Add(new Permission(
+                    permission.Id,
+                    permission.Claim,
+                    dbPermission.Description,
+                    permission.Created,
+                    permission.AssignableTo));
+            }
+            else
+            {
+                permissions.Add(new Permission(
+                    permission.Id,
+                    permission.Claim,
+                    string.Empty,
+                    permission.Created,
+                    permission.AssignableTo));
+            }
+        }
+
+        return permissions;
     }
 
-    public async Task UpdatePermissionAsync(PermissionDetails permissionDetails)
+    private IQueryable<PermissionEntity> BuildPermissionQuery(IEnumerable<KnownPermission> permissions)
     {
-        ArgumentNullException.ThrowIfNull(permissionDetails);
-        var permissionId = (int)permissionDetails.Permission;
-        var permission = await _marketParticipantDbContext.Permissions.FirstAsync(p => p.Id == permissionId).ConfigureAwait(false);
-        permission.Description = permissionDetails.Description;
-        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-    }
+        var permissionIds = permissions
+            .Select(p => p.Id)
+            .ToList();
 
-    private PermissionDetails MapToPermissionDetails(PermissionEntity permissionEntity)
-    {
-        return new PermissionDetails(
-            (Permission)permissionEntity.Id,
-            permissionEntity.Description,
-            permissionEntity.EicFunctions.Select(y => y.EicFunction),
-            permissionEntity.Created);
-    }
-
-    private IQueryable<PermissionEntity> BuildPermissionQuery(EicFunction? eicFunction)
-    {
-        var query =
-            from p in _marketParticipantDbContext.Permissions
-            where eicFunction == null || p.EicFunctions.Any(x => x.EicFunction == eicFunction)
-            select p;
-
-        return query;
+        return _marketParticipantDbContext
+            .Permissions
+            .Where(p => permissionIds.Contains(p.Id));
     }
 }

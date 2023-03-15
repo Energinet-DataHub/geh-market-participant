@@ -13,12 +13,12 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 public sealed class UserRolePermissionEntity
 {
     public Guid UserRoleId { get; set; }
-    public Permission Permission { get; set; }
+    public PermissionId Permission { get; set; }
 }

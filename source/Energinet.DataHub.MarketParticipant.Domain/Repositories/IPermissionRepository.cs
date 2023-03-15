@@ -14,46 +14,18 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-/// <summary>
-/// Provides access to user roles.
-/// </summary>
 public interface IPermissionRepository
 {
-    /// <summary>
-    /// Returns all existing Permissions
-    /// </summary>
-    /// <returns>All permissions with their details</returns>
-    Task<IEnumerable<PermissionDetails>> GetAllAsync();
+    Task<IEnumerable<Permission>> GetAllAsync();
+    Task<IEnumerable<Permission>> GetForMarketRoleAsync(EicFunction eicFunction);
 
-    /// <summary>
-    /// Gets all permission that are available for a given <see cref="EicFunction"/> EicFunction.
-    /// </summary>
-    /// <param name="eicFunction">The eicFunction you want to get permissions for.</param>
-    /// <returns>List of permissions for this EicFunction.</returns>
-    Task<IEnumerable<PermissionDetails>> GetToMarketRoleAsync(EicFunction eicFunction);
+    Task<Permission> GetAsync(PermissionId permission);
+    Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions);
 
-    /// <summary>
-    /// Get permission
-    /// </summary>
-    /// <param name="permission"></param>
-    /// <returns>Permission details</returns>
-    Task<PermissionDetails?> GetAsync(Permission permission);
-
-    /// <summary>
-    /// Get EicFunctions that have this permission assigned
-    /// </summary>
-    /// <param name="permission"></param>
-    /// <returns>a List of Eic functions that have this permission assigned</returns>
-    Task<IEnumerable<EicFunction>> GetAssignedToMarketRolesAsync(Permission permission);
-
-    /// <summary>
-    /// Update permission
-    /// </summary>
-    /// <param name="permissionDetails">permission to update</param>
-    Task UpdatePermissionAsync(PermissionDetails permissionDetails);
+    Task UpdatePermissionAsync(Permission permission);
 }

@@ -14,8 +14,8 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
@@ -47,7 +47,7 @@ public sealed class UserInvitationTests
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
-                Array.Empty<Permission>(),
+                Array.Empty<PermissionId>(),
                 EicFunction.BalanceResponsibleParty)
         });
 
@@ -122,7 +122,7 @@ public sealed class UserInvitationTests
             "fake_value",
             "fake_value",
             status,
-            Array.Empty<Permission>(),
+            Array.Empty<PermissionId>(),
             EicFunction.BalanceResponsibleParty);
 
         // Act + Assert
@@ -163,7 +163,7 @@ public sealed class UserInvitationTests
             "fake_value",
             "fake_value",
             UserRoleStatus.Active,
-            Array.Empty<Permission>(),
+            Array.Empty<PermissionId>(),
             eicFunction);
 
         // Act + Assert

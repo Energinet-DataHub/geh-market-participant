@@ -15,8 +15,8 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -57,7 +57,7 @@ public sealed class UpdateUserRoleIntegrationTests
         var updateCommand = new UpdateUserRoleCommand(
             frontendUser.Id,
             userRole.Id,
-            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)Permission.UsersView }));
+            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
         var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
@@ -89,7 +89,7 @@ public sealed class UpdateUserRoleIntegrationTests
         var updateCommand = new UpdateUserRoleCommand(
             frontendUser.Id,
             userRole.Id,
-            new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, new Collection<int> { (int)Permission.UsersView }));
+            new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
         var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
@@ -123,7 +123,7 @@ public sealed class UpdateUserRoleIntegrationTests
         var updateCommand = new UpdateUserRoleCommand(
             frontendUser.Id,
             userRole.Id,
-            new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, new Collection<int> { (int)Permission.UsersView }));
+            new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, new Collection<int> { (int)PermissionId.UsersView }));
 
         var getUserRoleCommand = new GetUserRoleCommand(userRole.Id);
 
@@ -149,8 +149,8 @@ public sealed class UpdateUserRoleIntegrationTests
 
         var mediator = scope.GetInstance<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.UsersView);
-        var newUserRolePermissions = new Collection<int> { (int)Permission.UsersView, (int)Permission.UsersManage };
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
+        var newUserRolePermissions = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
 
         var updateCommand = new UpdateUserRoleCommand(
             frontendUser.Id,

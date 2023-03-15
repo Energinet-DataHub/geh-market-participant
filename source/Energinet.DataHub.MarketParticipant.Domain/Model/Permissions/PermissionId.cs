@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+
+public enum PermissionId
 {
-    public enum PermissionChangeType
-    {
-        DescriptionChange = 1
-    }
+    OrganizationView = 1,
+    OrganizationManage = 2,
+    GridAreasManage = 3,
+    ActorManage = 4,
+    UsersManage = 5,
+    UsersView = 6,
+    UserRoleManage = 7,
 }

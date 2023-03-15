@@ -13,18 +13,12 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-using FluentValidation;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation
-{
-    public sealed class GetMarketRolesToPermissionCommandRuleSet : AbstractValidator<GetMarketRolesToPermissionCommand>
-    {
-        public GetMarketRolesToPermissionCommandRuleSet()
-        {
-            RuleFor(command => command.PermissionId)
-                .Must(permissionId => Enum.IsDefined((Permission)permissionId));
-        }
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+
+public sealed record PermissionAuditLogEntry(
+    PermissionId Permission,
+    UserId ChangedByUserId,
+    PermissionChangeType PermissionChangeType,
+    DateTimeOffset Timestamp);
