@@ -65,7 +65,7 @@ public sealed class GetUserRolesToPermissionIntegrationTests
         await using var scope = host.BeginScope();
 
         var mediator = scope.GetInstance<IMediator>();
-        var command = new GetUserRolesToPermissionCommand((int)PermissionId.UserRoleManage);
+        var command = new GetUserRolesToPermissionCommand((int)PermissionId.UserRolesManage);
 
         // Act
         var response = await mediator.Send(command);

@@ -58,7 +58,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
         var userRole = await _databaseFixture.PrepareUserRoleAsync(
-            new[] { PermissionId.ActorManage },
+            new[] { PermissionId.ActorsManage },
             EicFunction.DataHubAdministrator);
 
         var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");

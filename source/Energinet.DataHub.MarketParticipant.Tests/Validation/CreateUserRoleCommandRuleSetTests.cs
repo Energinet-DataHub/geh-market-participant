@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidDescription = "This is the support role";
         private const UserRoleStatus ValidStatus = UserRoleStatus.Active;
         private const EicFunction ValidEicFunction = EicFunction.EnergySupplier;
-        private const int ValidPermission = (int)PermissionId.ActorManage;
+        private const int ValidPermission = (int)PermissionId.ActorsManage;
 
         [Fact]
         public async Task Validate_UserRole_ValidatesProperty_UserId()

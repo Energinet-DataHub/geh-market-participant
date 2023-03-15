@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class UpdateUserRoleHandlerTests
     {
-        private const int ValidPermission = (int)PermissionId.ActorManage;
+        private const int ValidPermission = (int)PermissionId.ActorsManage;
 
         [Fact]
         public async Task Handle_UpdateUserRole_UserRoleNotFound()

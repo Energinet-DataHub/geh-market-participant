@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost]
-        [AuthorizeUser(PermissionId.OrganizationManage)]
+        [AuthorizeUser(PermissionId.OrganizationsManage)]
         public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             return await this.ProcessAsync(
@@ -103,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut("{organizationId:guid}")]
-        [AuthorizeUser(PermissionId.OrganizationManage)]
+        [AuthorizeUser(PermissionId.OrganizationsManage)]
         public async Task<IActionResult> UpdateOrganizationAsync(
             Guid organizationId,
             ChangeOrganizationDto organization)

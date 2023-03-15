@@ -184,7 +184,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.ActorManage);
+        var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleB.Id);

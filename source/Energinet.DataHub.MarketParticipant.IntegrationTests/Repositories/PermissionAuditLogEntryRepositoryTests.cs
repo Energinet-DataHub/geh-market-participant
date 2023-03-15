@@ -47,7 +47,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
 
         // Act
         var actual = await permissionAuditLogEntryRepository
-            .GetAsync(PermissionId.UserRoleManage)
+            .GetAsync(PermissionId.UserRolesManage)
             .ConfigureAwait(false);
 
         // Assert

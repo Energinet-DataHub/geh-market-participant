@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class CreateUserRoleHandlerTests
     {
-        private const int ValidPermission = (int)PermissionId.ActorManage;
+        private const int ValidPermission = (int)PermissionId.ActorsManage;
 
         [Fact]
         public async Task Handle_NewUserRole_UserRoleIdReturned()
