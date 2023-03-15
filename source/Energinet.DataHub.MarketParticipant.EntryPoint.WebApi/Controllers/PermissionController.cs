@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut]
-        [AuthorizeUser(PermissionId.UserRoleManage)]
+        [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<IActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
         {
             return await this.ProcessAsync(
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{permissionId:int}/auditlogs")]
-        [AuthorizeUser(PermissionId.UserRoleManage)]
+        [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
         {
             return await this.ProcessAsync(

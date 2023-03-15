@@ -72,10 +72,10 @@ public sealed class PermissionRepositoryTests
         var permissionRepository = new PermissionRepository(context);
 
         // Act
-        var actual = await permissionRepository.GetAsync(PermissionId.OrganizationView);
+        var actual = await permissionRepository.GetAsync(PermissionId.OrganizationsView);
 
         // Assert
-        var organizationViewPermission = KnownPermissions.All.Single(kp => kp.Id == PermissionId.OrganizationView);
+        var organizationViewPermission = KnownPermissions.All.Single(kp => kp.Id == PermissionId.OrganizationsView);
         Assert.Equal(organizationViewPermission.Id, actual.Id);
         Assert.Equal(organizationViewPermission.Claim, actual.Claim);
         Assert.Equal(organizationViewPermission.Created, actual.Created);
@@ -144,14 +144,14 @@ public sealed class PermissionRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var initialPermission = await permissionRepository.GetAsync(PermissionId.ActorManage);
+        var initialPermission = await permissionRepository.GetAsync(PermissionId.ActorsManage);
 
         // Act
         initialPermission.Description = $"{Guid.NewGuid()}";
         await permissionRepository.UpdatePermissionAsync(initialPermission);
 
         // Assert
-        var actual = await permissionRepository.GetAsync(PermissionId.ActorManage);
+        var actual = await permissionRepository.GetAsync(PermissionId.ActorsManage);
         Assert.Equal(initialPermission.Description, actual.Description);
     }
 }

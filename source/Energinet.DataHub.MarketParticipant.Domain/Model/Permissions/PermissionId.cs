@@ -16,11 +16,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 public enum PermissionId
 {
-    OrganizationView = 1,
-    OrganizationManage = 2,
+    OrganizationsView = 1,
+    OrganizationsManage = 2,
     GridAreasManage = 3,
-    ActorManage = 4,
+    ActorsManage = 4,
     UsersManage = 5,
     UsersView = 6,
-    UserRoleManage = 7,
+    UserRolesManage = 7,
+    PermissionsManage = 8,
 }

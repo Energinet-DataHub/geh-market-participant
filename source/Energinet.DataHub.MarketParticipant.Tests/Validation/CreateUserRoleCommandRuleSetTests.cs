@@ -16,10 +16,10 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Xunit;
 using Xunit.Categories;
@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         private const string ValidDescription = "This is the support role";
         private const UserRoleStatus ValidStatus = UserRoleStatus.Active;
         private const EicFunction ValidEicFunction = EicFunction.EnergySupplier;
-        private const int ValidPermission = (int)Permission.ActorManage;
+        private const int ValidPermission = (int)PermissionId.ActorsManage;
 
         [Fact]
         public async Task Validate_UserRole_ValidatesProperty_UserId()

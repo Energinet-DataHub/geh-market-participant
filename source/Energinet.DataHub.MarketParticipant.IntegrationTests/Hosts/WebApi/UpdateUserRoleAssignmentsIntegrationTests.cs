@@ -89,7 +89,7 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.ActorManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
 
@@ -127,8 +127,8 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var actor2 = await _fixture.PrepareActorAsync();
 
         var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationManage);
-        var userRoleNew = await _fixture.PrepareUserRoleAsync(PermissionId.ActorManage);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
+        var userRoleNew = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
 
         var user = await _fixture.PrepareUserAsync();
         await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRoleA.Id);

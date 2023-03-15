@@ -117,7 +117,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Role_IsKnown()
     {
         // Arrange
-        var organizationView = PermissionId.OrganizationView;
+        var organizationView = PermissionId.OrganizationsView;
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,

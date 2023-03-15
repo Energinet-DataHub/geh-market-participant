@@ -26,7 +26,7 @@ public static class KnownPermissions
 {
     public static IReadOnlyCollection<KnownPermission> All { get; } = new KnownPermission[]
     {
-        new(PermissionId.OrganizationView, "organizations:view", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
+        new(PermissionId.OrganizationsView, "organizations:view", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent,
@@ -43,7 +43,7 @@ public static class KnownPermissions
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
         }),
-        new(PermissionId.OrganizationManage, "organizations:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
+        new(PermissionId.OrganizationsManage, "organizations:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),
@@ -51,7 +51,7 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.ActorManage, "actors:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
+        new(PermissionId.ActorsManage, "actors:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),
@@ -88,7 +88,11 @@ public static class KnownPermissions
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
         }),
-        new(PermissionId.UserRoleManage, "user-roles:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
+        new(PermissionId.UserRolesManage, "user-roles:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.PermissionsManage, "permissions:manage", InstantPattern.ExtendedIso.Parse("2023-03-15T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         })
