@@ -25,7 +25,7 @@ public sealed class PasswordChecker : IPasswordChecker
         { CharacterSet.Numbers, "0123456789".ToHashSet() },
         { CharacterSet.Lower, "abcdefghijklmnopqrstuvwxyz".ToHashSet() },
         { CharacterSet.Upper, "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToHashSet() },
-        { CharacterSet.Special, "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~".ToHashSet() },
+        { CharacterSet.Special, " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~".ToHashSet() },
     };
 
     public bool PasswordSatisfiesComplexity(string password, int minLength, CharacterSet characterSets, int minNumberOfSetsToHit)
