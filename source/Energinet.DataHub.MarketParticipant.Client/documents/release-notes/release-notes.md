@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.29.1
+
+- Bump version as part of pipeline change.
+
 ## Version 2.29.0
 
 - Removed endpoint to get which market roles are assigned to a given permission
