@@ -126,8 +126,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         {
             userIdentities = userIdentities
                 .Where(userIdentity =>
-                    (userIdentity.PhoneNumber != null &&
-                     userIdentity.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (userIdentity.PhoneNumber != null && userIdentity.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
                     userIdentity.Email.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                     userIdentity.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                     userIdentity.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
@@ -205,7 +204,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             new ExternalUserId(user.Id!),
             new EmailAddress(userEmailAddress),
             user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
-            user.GivenName ?? user.DisplayName ?? string.Empty,
+            user.GivenName ?? user.DisplayName!,
             user.Surname ?? string.Empty,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
             user.CreatedDateTime!.Value,
