@@ -28,6 +28,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models.ODataErrors;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -120,7 +121,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 // Arrange
                 var roles = new List<EicFunction>
                 {
-                    EicFunction.SystemOperator, // transmission system operator
+                    EicFunction.SystemOperator // transmission system operator
                 };
 
                 var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
@@ -138,14 +139,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 cleanupId = null;
 
                 // Assert
-                var ex = await Assert.ThrowsAsync<ServiceException>(async () => await _sut
+                var ex = await Assert.ThrowsAsync<ODataError>(async () => await _sut
                         .GetExistingAppRegistrationAsync(
                             new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
                             new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
                         .ConfigureAwait(false))
                     .ConfigureAwait(false);
 
-                Assert.Equal(HttpStatusCode.NotFound, ex.StatusCode);
+                Assert.Equal((int)HttpStatusCode.NotFound, ex.ResponseStatusCode);
             }
             finally
             {
@@ -165,7 +166,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             var graphClient = new GraphServiceClient(
                 clientSecretCredential,
-                new[] { "https://graph.microsoft.com/.default" });
+                new[]
+                {
+                    "https://graph.microsoft.com/.default"
+                });
 
             // Azure AD Config
             var config = new AzureAdConfig(
@@ -175,7 +179,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             // Business Role Code Domain Service
             var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
             {
-                new MeteredDataResponsibleRole(), new SystemOperatorRole()
+                new MeteredDataResponsibleRole(),
+                new SystemOperatorRole()
             });
 
             // Active Directory Roles
@@ -183,9 +188,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
 
             // Logger
-            var logger = Mock.Of<ILogger<ActiveDirectoryB2cService>>();
+            var logger = Mock.Of<ILogger<ActiveDirectoryB2CService>>();
 
-            return new ActiveDirectoryB2cService(
+            return new ActiveDirectoryB2CService(
                 graphClient,
                 config,
                 businessRoleCodeDomainService,

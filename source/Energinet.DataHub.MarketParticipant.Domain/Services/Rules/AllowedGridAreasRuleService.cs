@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
     {
         private static readonly EicFunction[] _rolesAllowingSingleGridAreaOnly =
         {
-            EicFunction.GridAccessProvider,
+            EicFunction.GridAccessProvider
         };
 
         public void ValidateGridAreas(IEnumerable<ActorMarketRole> marketRoles)

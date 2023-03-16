@@ -19,26 +19,27 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using CreateAppRegistrationResponse = Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory.CreateAppRegistrationResponse;
+using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
-    public sealed class ActiveDirectoryB2cService : IActiveDirectoryB2CService
+    public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
     {
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
         private readonly IActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
-        private readonly ILogger<ActiveDirectoryB2cService> _logger;
+        private readonly ILogger<ActiveDirectoryB2CService> _logger;
 
-        public ActiveDirectoryB2cService(
+        public ActiveDirectoryB2CService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
             IBusinessRoleCodeDomainService businessRoleCodeDomainService,
             IActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
-            ILogger<ActiveDirectoryB2cService> logger)
+            ILogger<ActiveDirectoryB2CService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
@@ -56,29 +57,30 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
             var b2CPermissions = await MapBusinessRoleCodesToB2CRoleIdsAsync(roles).ConfigureAwait(false);
-            var permissionsToPass = b2CPermissions.Select(x => x.ToString()).ToList();
+            var enumeratedPermissions = b2CPermissions.ToList();
+            var permissionsToPass = enumeratedPermissions.Select(x => x.ToString()).ToList();
             try
             {
                 var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
 
-                var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId).ConfigureAwait(false);
+                var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId!).ConfigureAwait(false);
 
-                foreach (var permission in b2CPermissions)
+                foreach (var permission in enumeratedPermissions)
                 {
                     await GrantAddedRoleToServicePrincipalAsync(
-                        servicePrincipal.Id,
-                        permission)
+                            servicePrincipal.Id!,
+                            permission)
                         .ConfigureAwait(false);
                 }
 
                 return new CreateAppRegistrationResponse(
-                    new ExternalActorId(app.AppId),
-                    app.Id,
-                    servicePrincipal.Id);
+                    new ExternalActorId(app.AppId!),
+                    app.Id!,
+                    servicePrincipal.Id!);
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
@@ -92,25 +94,25 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 var appId = externalActorId.Value.ToString();
                 var applicationUsingAppId = await _graphClient
                     .Applications
-                    .Request()
-                    .Filter($"appId eq '{appId}'")
-                    .GetAsync()
+                    .GetAsync(x =>
+                    {
+                        x.QueryParameters.Filter = $"appId eq '{appId}'";
+                    })
                     .ConfigureAwait(false);
 
-                var foundApp = applicationUsingAppId.SingleOrDefault();
+                var foundApp = (await applicationUsingAppId!.IteratePagesAsync<Microsoft.Graph.Models.Application>(_graphClient).ConfigureAwait(false)).SingleOrDefault();
                 if (foundApp == null)
                 {
                     throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
                 }
 
                 await _graphClient.Applications[foundApp.Id]
-                    .Request()
                     .DeleteAsync()
                     .ConfigureAwait(false);
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
@@ -124,22 +126,27 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             try
             {
-                var retrievedApp = await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
-                    .Request()
-                    .Select(a => new { a.AppId, a.Id, a.DisplayName, a.AppRoles })
-                    .GetAsync().ConfigureAwait(false);
+                var retrievedApp = (await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
+                    .GetAsync(x =>
+                    {
+                        x.QueryParameters.Select = new[]
+                        {
+                            "appId", "id", "displayName", "appRoles"
+                        };
+                    })
+                    .ConfigureAwait(false))!;
 
                 var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
 
                 return new ActiveDirectoryAppInformation(
-                    retrievedApp.AppId,
-                    retrievedApp.Id,
-                    retrievedApp.DisplayName,
+                    retrievedApp.AppId!,
+                    retrievedApp.Id!,
+                    retrievedApp.DisplayName!,
                     appRoles);
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
@@ -194,11 +201,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             try
             {
-                var roles = await _graphClient.ServicePrincipals[servicePrincipalObjectId]
+                var response = await _graphClient.ServicePrincipals[servicePrincipalObjectId]
                     .AppRoleAssignments
-                    .Request()
                     .GetAsync()
                     .ConfigureAwait(false);
+
+                var roles = await response!.IteratePagesAsync<AppRoleAssignment>(_graphClient).ConfigureAwait(false);
 
                 if (roles is null)
                 {
@@ -215,7 +223,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
             catch (Exception e)
             {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2cService)}");
+                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
         }
@@ -233,8 +241,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var role = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
                 .AppRoleAssignedTo
-                .Request()
-                .AddAsync(appRole).ConfigureAwait(false);
+                .PostAsync(appRole).ConfigureAwait(false);
 
             if (role is null)
             {
@@ -242,7 +249,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private async Task<Microsoft.Graph.Application> CreateAppInB2CAsync(
+        private async Task<Microsoft.Graph.Models.Application> CreateAppInB2CAsync(
             string consumerAppName,
             IReadOnlyList<string> permissions)
         {
@@ -253,26 +260,25 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     Type = "Role"
                 }).ToList();
 
-            return await _graphClient.Applications
-                .Request()
-                .AddAsync(new Microsoft.Graph.Application
+            return (await _graphClient.Applications
+                .PostAsync(new Microsoft.Graph.Models.Application
                 {
                     DisplayName = consumerAppName,
                     Api = new ApiApplication
                     {
-                        RequestedAccessTokenVersion = 2,
+                        RequestedAccessTokenVersion = 2
                     },
                     CreatedDateTime = DateTimeOffset.Now,
-                    RequiredResourceAccess = new[]
+                    RequiredResourceAccess = new List<RequiredResourceAccess>
                     {
-                        new RequiredResourceAccess
+                        new()
                         {
                             ResourceAppId = _azureAdConfig.BackendAppId,
                             ResourceAccess = resourceAccesses
                         }
                     },
                     SignInAudience = "AzureADMultipleOrgs"
-                }).ConfigureAwait(false);
+                }).ConfigureAwait(false))!;
         }
 
         private async Task<ServicePrincipal> AddServicePrincipalToAppInB2CAsync(string consumerAppId)
@@ -282,9 +288,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 AppId = consumerAppId
             };
 
-            return await _graphClient.ServicePrincipals
-                .Request()
-                .AddAsync(consumerServicePrincipal).ConfigureAwait(false);
+            return (await _graphClient.ServicePrincipals
+                .PostAsync(consumerServicePrincipal).ConfigureAwait(false))!;
         }
     }
 }

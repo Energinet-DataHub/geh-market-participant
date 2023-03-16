@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 PermissionId = logEntry.Permission,
                 PermissionChangeType = logEntry.PermissionChangeType,
                 Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
+                ChangedByUserId = logEntry.ChangedByUserId.Value
             };
 
             _context.PermissionAuditLogEntries.Add(entity);
