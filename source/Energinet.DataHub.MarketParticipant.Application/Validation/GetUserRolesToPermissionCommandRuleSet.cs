@@ -12,10 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public enum PermissionChangeType
+    public sealed class GetUserRolesToPermissionCommandRuleSet : AbstractValidator<GetUserRolesToPermissionCommand>
     {
-        DescriptionChange = 1
+        public GetUserRolesToPermissionCommandRuleSet()
+        {
+            RuleFor(command => command.PermissionId)
+                .Must(permissionId => Enum.IsDefined((PermissionId)permissionId));
+        }
     }
 }

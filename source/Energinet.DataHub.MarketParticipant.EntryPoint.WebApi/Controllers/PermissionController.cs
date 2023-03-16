@@ -15,12 +15,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPut]
-        [AuthorizeUser(Permission.UserRoleManage)]
+        [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<IActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
         {
             return await this.ProcessAsync(
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{permissionId:int}/auditlogs")]
-        [AuthorizeUser(Permission.UserRoleManage)]
+        [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
         {
             return await this.ProcessAsync(

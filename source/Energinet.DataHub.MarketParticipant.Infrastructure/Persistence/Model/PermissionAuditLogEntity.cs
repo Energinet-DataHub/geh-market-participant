@@ -13,14 +13,15 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 public sealed class PermissionAuditLogEntryEntity
 {
     public int EntryId { get; set; }
-    public int PermissionId { get; set; }
+    public PermissionId PermissionId { get; set; }
     public Guid ChangedByUserId { get; set; }
-    public int PermissionChangeType { get; set; }
+    public PermissionChangeType PermissionChangeType { get; set; }
     public DateTimeOffset Timestamp { get; set; }
 }

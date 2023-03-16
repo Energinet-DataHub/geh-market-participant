@@ -15,20 +15,19 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
-[Collection("PermissionIntegrationTest")]
+[Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class PermissionRepositoryTests : IAsyncLifetime
+public sealed class PermissionRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
@@ -38,7 +37,7 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetAllAsync_NoPermissionsExist_ReturnsEmpty()
+    public async Task GetAllAsync_AllPermissions_ReturnsPermissionWithCorrectDetails()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -47,272 +46,112 @@ public sealed class PermissionRepositoryTests : IAsyncLifetime
         var permissionRepository = new PermissionRepository(context);
 
         // Act
-        var permissions = await permissionRepository.GetAllAsync();
-
-        // Assert
-        Assert.Empty(permissions);
-    }
-
-    [Fact]
-    public async Task GetAllAsync_OnePermissionsWithOneEicFunctionExist_ReturnsPermissionWithCorrectDetails()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var permissionRepository = new PermissionRepository(context);
-
-        var permissionEicFunction = new PermissionEicFunctionEntity()
-        {
-            EicFunction = EicFunction.BillingAgent,
-            PermissionId = (int)Permission.UsersManage
-        };
-        var permission = new PermissionEntity()
-        {
-            Id = (int)Permission.UsersManage,
-            EicFunctions = { permissionEicFunction },
-            Description = "fake_test_value",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        await context2.Permissions.AddAsync(permission);
-        await context2.SaveChangesAsync();
-
-        // Act
-        var permissions = (await permissionRepository.GetAllAsync()).ToList();
-
-        // Assert
-        Assert.NotEmpty(permissions);
-        Assert.Single(permissions);
-        Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(permissions, p => p.EicFunctions.Count() == 1);
-        Assert.Contains(permissions, p => p.Created.Equals(permission.Created));
-        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
-    }
-
-    [Fact]
-    public async Task GetAllAsync_OnePermissionsWithMultipleEicFunctionsExist_ReturnsPermissionWithCorrectDetails()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-        var permissionRepository = new PermissionRepository(context);
-
-        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
-        var permission = new PermissionEntity()
-        {
-            Id = (int)Permission.UsersManage,
-            EicFunctions = { permissionEicFunction, permissionEicFunction2 },
-            Description = "fake_test_value",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        await context2.Permissions.AddAsync(permission);
-        await context2.SaveChangesAsync();
-
-        // Act
-        var permissions = (await permissionRepository
-                .GetAllAsync())
-            .Where(x =>
-                !string.IsNullOrWhiteSpace(x.Description) &&
-                x.Description.Equals("fake_test_value", StringComparison.OrdinalIgnoreCase))
+        var actual = (await permissionRepository
+            .GetAllAsync())
             .ToList();
 
         // Assert
-        Assert.NotEmpty(permissions);
-        Assert.Single(permissions);
-        Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(permissions, p => p.EicFunctions.Count() == 2);
-        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
-        Assert.Equal(EicFunction.ElOverblik, permissions.First().EicFunctions.Skip(1).First());
+        foreach (var knownPermission in KnownPermissions.All)
+        {
+            var returnedPermission = actual.Single(p => p.Id == knownPermission.Id);
+
+            Assert.Equal(knownPermission.Id, returnedPermission.Id);
+            Assert.Equal(knownPermission.Claim, returnedPermission.Claim);
+            Assert.Equal(knownPermission.Created, returnedPermission.Created);
+            Assert.Equal(knownPermission.AssignableTo, returnedPermission.AssignableTo);
+        }
     }
 
     [Fact]
-    public async Task GetAllAsync_MultiplePermissionsWithMultipleEicFunctionsExist_ReturnsPermissionWithCorrectDetails()
+    public async Task GetAsync_SinglePermission_ReturnsPermissionWithCorrectDetails()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
-
-        var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
-        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
-        var permission = new PermissionEntity()
-        {
-            Id = (int)Permission.UsersManage,
-            EicFunctions = { permissionEicFunction, permissionEicFunction2 },
-            Description = "fake_test_value",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        var permission2 = new PermissionEntity()
-        {
-            Id = (int)Permission.ActorManage,
-            EicFunctions = { permissionEicFunction3, permissionEicFunction4 },
-            Description = "fake_test_value2",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        await context2.Permissions.AddAsync(permission);
-        await context2.Permissions.AddAsync(permission2);
-        await context2.SaveChangesAsync();
-
         // Act
-        var permissions = (await permissionRepository.GetAllAsync()).ToList();
+        var actual = await permissionRepository.GetAsync(PermissionId.OrganizationsView);
 
         // Assert
-        Assert.NotEmpty(permissions);
-        Assert.Equal(2, permissions.Count);
-        Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => p.Permission == Permission.ActorManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
-        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value2", StringComparison.OrdinalIgnoreCase));
-        Assert.Equal(2, permissions.First().EicFunctions.Count());
-        Assert.Equal(2, permissions.Skip(1).First().EicFunctions.Count());
-        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
-        Assert.Equal(EicFunction.ElOverblik, permissions.First().EicFunctions.Skip(1).First());
-        Assert.Equal(EicFunction.BillingAgent, permissions.Skip(1).First().EicFunctions.First());
-        Assert.Equal(EicFunction.ElOverblik, permissions.Skip(1).First().EicFunctions.Skip(1).First());
+        var organizationViewPermission = KnownPermissions.All.Single(kp => kp.Id == PermissionId.OrganizationsView);
+        Assert.Equal(organizationViewPermission.Id, actual.Id);
+        Assert.Equal(organizationViewPermission.Claim, actual.Claim);
+        Assert.Equal(organizationViewPermission.Created, actual.Created);
+        Assert.Equal(organizationViewPermission.AssignableTo, actual.AssignableTo);
     }
 
     [Fact]
-    public async Task GetToMarketRoleAsync_MultiplePermissionsWithMultipleEicFunctionsExist_ReturnsPermissionToCorrectEicFunctionWithCorrectDetails()
+    public async Task GetAsync_MultiplePermissions_ReturnsPermissionWithCorrectDetails()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
 
-        var permissionEicFunction = new PermissionEicFunctionEntity() { EicFunction = EicFunction.BillingAgent };
-        var permissionEicFunction2 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
-
-        var permissionEicFunction3 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.GridAccessProvider };
-        var permissionEicFunction4 = new PermissionEicFunctionEntity() { EicFunction = EicFunction.ElOverblik };
-        var permission = new PermissionEntity()
-        {
-            Id = (int)Permission.UsersManage,
-            EicFunctions = { permissionEicFunction, permissionEicFunction2 },
-            Description = "fake_test_value",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        var permission2 = new PermissionEntity()
-        {
-            Id = (int)Permission.ActorManage,
-            EicFunctions = { permissionEicFunction3, permissionEicFunction4 },
-            Description = "fake_test_value2",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        await context2.Permissions.AddAsync(permission);
-        await context2.Permissions.AddAsync(permission2);
-        await context2.SaveChangesAsync();
-
         // Act
-        var permissions = (await permissionRepository.GetToMarketRoleAsync(EicFunction.BillingAgent))
-            .ToList();
-
-        var permissions2 = (await permissionRepository.GetToMarketRoleAsync(EicFunction.GridAccessProvider))
+        var actual = (await permissionRepository
+            .GetAsync(KnownPermissions.All.Select(kp => kp.Id)))
             .ToList();
 
         // Assert
-        Assert.NotEmpty(permissions);
-        Assert.Single(permissions);
-        Assert.Contains(permissions, p => p.Permission == Permission.UsersManage);
-        Assert.Contains(permissions, p => string.Equals(p.Description, "fake_test_value", StringComparison.OrdinalIgnoreCase));
-        Assert.Equal(2, permissions.First().EicFunctions.Count());
-        Assert.Equal(EicFunction.BillingAgent, permissions.First().EicFunctions.First());
-        Assert.Equal(EicFunction.ElOverblik, permissions.First().EicFunctions.Skip(1).First());
+        foreach (var knownPermission in KnownPermissions.All)
+        {
+            var returnedPermission = actual.Single(p => p.Id == knownPermission.Id);
 
-        Assert.NotEmpty(permissions2);
-        Assert.Single(permissions2);
-        Assert.Contains(permissions2, p => p.Permission == Permission.ActorManage);
-        Assert.Contains(permissions2, p => string.Equals(p.Description, "fake_test_value2", StringComparison.OrdinalIgnoreCase));
-        Assert.Equal(2, permissions2.First().EicFunctions.Count());
-        Assert.Equal(EicFunction.GridAccessProvider, permissions2.First().EicFunctions.First());
-        Assert.Equal(EicFunction.ElOverblik, permissions2.First().EicFunctions.Skip(1).First());
+            Assert.Equal(knownPermission.Id, returnedPermission.Id);
+            Assert.Equal(knownPermission.Claim, returnedPermission.Claim);
+            Assert.Equal(knownPermission.Created, returnedPermission.Created);
+            Assert.Equal(knownPermission.AssignableTo, returnedPermission.AssignableTo);
+        }
     }
 
     [Fact]
-    public async Task UpdatePermission_Success()
+    public async Task GetForMarketRoleAsync_MultiplePermissions_ReturnsPermissionWithCorrectDetails()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var permissionRepository = new PermissionRepository(context);
-        var permissionRepositoryAssert = new PermissionRepository(context2);
-
-        var permission = new PermissionEntity
-        {
-            Id = (int)Permission.UserRoleManage,
-            EicFunctions =
-            {
-                new PermissionEicFunctionEntity()
-                {
-                    EicFunction = EicFunction.SystemOperator, PermissionId = (int)Permission.UserRoleManage
-                }
-            },
-            Description = "DescriptionInit",
-            Created = DateTimeOffset.UtcNow
-        };
-
-        await context.Permissions.AddAsync(permission).ConfigureAwait(false);
-        await context.SaveChangesAsync().ConfigureAwait(false);
-
-        const string newPermissionDescription = "newPermissionDescription";
 
         // Act
-        var permissions = await permissionRepository
-            .GetToMarketRoleAsync(EicFunction.SystemOperator)
-            .ConfigureAwait(false);
-        var permissionDetails = permissions.ToList();
-        var permissionToUpdate = permissionDetails.First(p =>
-            p.Permission == Permission.UserRoleManage && p.Description == "DescriptionInit");
-
-        permissionToUpdate.Description = newPermissionDescription;
-
-        await permissionRepository
-            .UpdatePermissionAsync(permissionToUpdate)
-            .ConfigureAwait(false);
+        var actual = (await permissionRepository
+            .GetForMarketRoleAsync(EicFunction.DataHubAdministrator)
+            .ConfigureAwait(false))
+            .ToList();
 
         // Assert
-        var permissionUpdated = await permissionRepositoryAssert
-            .GetAsync(permissionToUpdate.Permission)
-            .ConfigureAwait(false);
+        foreach (var knownPermission in KnownPermissions.All.Where(kp => kp.AssignableTo.Contains(EicFunction.DataHubAdministrator)))
+        {
+            var returnedPermission = actual.Single(p => p.Id == knownPermission.Id);
 
-        Assert.NotNull(permissionUpdated);
-        Assert.Equal(newPermissionDescription, permissionUpdated.Description);
+            Assert.Equal(knownPermission.Id, returnedPermission.Id);
+            Assert.Equal(knownPermission.Claim, returnedPermission.Claim);
+            Assert.Equal(knownPermission.Created, returnedPermission.Created);
+            Assert.Equal(knownPermission.AssignableTo, returnedPermission.AssignableTo);
+        }
     }
 
-    public async Task InitializeAsync()
+    [Fact]
+    public async Task UpdatePermissionAsync_NewDescription_ReturnsPermissionWithCorrectDetails()
     {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var allPermissions = await context.Permissions.ToListAsync();
-        context.Permissions.RemoveRange(allPermissions);
-        await context.SaveChangesAsync();
-    }
+        var permissionRepository = new PermissionRepository(context);
 
-    public async Task DisposeAsync()
-    {
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var allPermissions =
-            await context.Permissions.Where(x => x.Description.Contains("fake_test_value")).ToListAsync();
-        context.Permissions.RemoveRange(allPermissions);
-        await context.SaveChangesAsync();
+        var initialPermission = await permissionRepository.GetAsync(PermissionId.ActorsManage);
+
+        // Act
+        initialPermission.Description = $"{Guid.NewGuid()}";
+        await permissionRepository.UpdatePermissionAsync(initialPermission);
+
+        // Assert
+        var actual = await permissionRepository.GetAsync(PermissionId.ActorsManage);
+        Assert.Equal(initialPermission.Description, actual.Description);
     }
 }

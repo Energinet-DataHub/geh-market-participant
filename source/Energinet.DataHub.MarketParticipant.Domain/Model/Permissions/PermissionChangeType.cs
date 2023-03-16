@@ -11,14 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public sealed record PermissionAuditLogEntry(
-    Permission Permission,
-    UserId ChangedByUserId,
-    PermissionChangeType PermissionChangeType,
-    DateTimeOffset Timestamp);
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions
+{
+    public enum PermissionChangeType
+    {
+        DescriptionChange = 1
+    }
+}

@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
-public sealed class PermissionEicFunctionEntity
-{
-    public int PermissionId { get; set; }
-    public EicFunction EicFunction { get; set; }
-}
+public sealed record PermissionAuditLogEntry(
+    PermissionId Permission,
+    UserId ChangedByUserId,
+    PermissionChangeType PermissionChangeType,
+    DateTimeOffset Timestamp);

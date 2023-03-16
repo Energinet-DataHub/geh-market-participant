@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -77,18 +78,20 @@ public sealed class UserRoleRepository : IUserRoleRepository
     public async Task<UserRoleId> AddAsync(UserRole userRole)
     {
         ArgumentNullException.ThrowIfNull(userRole);
-        var role = new UserRoleEntity()
+
+        var role = new UserRoleEntity
         {
             Name = userRole.Name,
             Description = userRole.Description,
             Status = userRole.Status
         };
-        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity() { Permission = x }))
+
+        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }))
         {
             role.Permissions.Add(permissionEntity);
         }
 
-        role.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = userRole.EicFunction });
+        role.EicFunctions.Add(new UserRoleEicFunctionEntity { EicFunction = userRole.EicFunction });
         _marketParticipantDbContext.UserRoles.Add(role);
         await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         return new UserRoleId(role.Id);
@@ -121,6 +124,18 @@ public sealed class UserRoleRepository : IUserRoleRepository
         {
             throw new ArgumentException("User role not found");
         }
+    }
+
+    public async Task<IEnumerable<UserRole>> GetAsync(PermissionId permission)
+    {
+        var userRoles = await BuildUserRoleQuery()
+            .Where(t => t
+                .Permissions
+                .Any(f => f.Permission == permission))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return userRoles.Select(MapUserRole);
     }
 
     private static UserRole MapUserRole(UserRoleEntity userRole)

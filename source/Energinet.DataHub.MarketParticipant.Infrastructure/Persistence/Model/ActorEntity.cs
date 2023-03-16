@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -26,7 +27,7 @@ public sealed class ActorEntity
     public bool IsFas { get; set; }
     public string ActorNumber { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public int Status { get; set; }
+    public ActorStatus Status { get; set; }
 
     public Collection<MarketRoleEntity> MarketRoles { get; } = new();
 }

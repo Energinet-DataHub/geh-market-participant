@@ -12,21 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
-{
-    /// <summary>
-    /// Describes a marked role, defined by its function and permissions.
-    /// </summary>
-    public sealed class MarketRole
-    {
-        public MarketRole(EicFunction function)
-        {
-            Function = function;
-        }
+using System.Collections.Generic;
 
-        /// <summary>
-        /// Specifies the EIC function of the current role.
-        /// </summary>
-        public EicFunction Function { get; }
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+
+public sealed record GetUserRolesToPermissionResponse(IEnumerable<UserRoleDto> UserRoles);

@@ -15,10 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -45,8 +44,7 @@ public sealed class UpdatePermissionHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var permissionToUpdate = await _permissionRepository.GetAsync((Permission)request.PermissionId).ConfigureAwait(false);
-
+        var permissionToUpdate = await _permissionRepository.GetAsync((PermissionId)request.PermissionId).ConfigureAwait(false);
         if (permissionToUpdate == null)
         {
             throw new NotFoundValidationException($"Permission not found: {request.PermissionId}");
@@ -58,7 +56,7 @@ public sealed class UpdatePermissionHandler
 
         await _permissionAuditLogEntryRepository
             .InsertAuditLogEntryAsync(new PermissionAuditLogEntry(
-                permissionToUpdate.Permission,
+                permissionToUpdate.Id,
                 new UserId(request.ChangedByUserId),
                 PermissionChangeType.DescriptionChange,
                 DateTimeOffset.UtcNow))

@@ -16,10 +16,9 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -32,18 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     public sealed class GetPermissionAuditLogEntriesHandlerTests
     {
         [Fact]
-        public async Task Handle_Command_IsNull_Throws()
-        {
-            // arrange
-            var repositoryMock = new Mock<IPermissionAuditLogEntryRepository>();
-
-            var target = new GetPermissionAuditLogsHandler(repositoryMock.Object);
-
-            // act + assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => target.Handle(null!, CancellationToken.None)).ConfigureAwait(false);
-        }
-
-        [Fact]
         public async Task Handle_Command_CallsRepository()
         {
             // arrange
@@ -51,16 +38,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var repositoryMock = new Mock<IPermissionAuditLogEntryRepository>();
             repositoryMock
-                .Setup(x => x.GetAsync(Permission.UsersView))
+                .Setup(x => x.GetAsync(PermissionId.UsersView))
                 .ReturnsAsync(new[]
                     {
                         new PermissionAuditLogEntry(
-                            Permission.UsersView,
+                            PermissionId.UsersView,
                             userId,
                             PermissionChangeType.DescriptionChange,
                             DateTimeOffset.UtcNow),
                         new PermissionAuditLogEntry(
-                            Permission.UsersView,
+                            PermissionId.UsersView,
                             userId,
                             PermissionChangeType.DescriptionChange,
                             DateTimeOffset.UtcNow.AddHours(1))
@@ -68,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new GetPermissionAuditLogsHandler(repositoryMock.Object);
 
-            var command = new GetPermissionAuditLogsCommand((int)Permission.UsersView);
+            var command = new GetPermissionAuditLogsCommand((int)PermissionId.UsersView);
 
             // act
             var actual = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);

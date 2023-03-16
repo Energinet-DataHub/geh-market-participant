@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
@@ -37,7 +38,7 @@ public interface IUserQueryRepository
     /// <param name="actorId">The id of the actor.</param>
     /// <param name="externalUserId">The external id of the user.</param>
     /// <returns>A list of the applicable permissions.</returns>
-    Task<IEnumerable<Core.App.Common.Security.Permission>> GetPermissionsAsync(
+    Task<IEnumerable<Permission>> GetPermissionsAsync(
         ActorId actorId,
         ExternalUserId externalUserId);
 

@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
+## Version 2.8.1
+
+- Updated deployment, no code changes.
+
 ## Version 2.8.0
 
 - dotnet 7.

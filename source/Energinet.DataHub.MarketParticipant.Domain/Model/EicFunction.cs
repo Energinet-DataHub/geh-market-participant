@@ -12,23 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public enum EicFunction
 {
-    public enum EicFunction
-    {
-        BalanceResponsibleParty = 1,
-        BillingAgent = 3,
-        EnergySupplier = 12,
-        GridAccessProvider = 14,
-        ImbalanceSettlementResponsible = 15,
-        MeteredDataAdministrator = 23,
-        MeteredDataResponsible = 26,
-        MeteringPointAdministrator = 27,
-        SystemOperator = 45,
-        DanishEnergyAgency = 48,
-        ElOverblik = 49,
-        DataHubAdministrator = 50,
-        IndependentAggregator = 51,
-        SerialEnergyTrader = 52
-    }
+    BalanceResponsibleParty = 1,
+    BillingAgent = 3,
+    EnergySupplier = 12,
+    GridAccessProvider = 14,
+    ImbalanceSettlementResponsible = 15,
+    MeteredDataAdministrator = 23,
+    MeteredDataResponsible = 26,
+    MeteringPointAdministrator = 27,
+    SystemOperator = 45,
+    DanishEnergyAgency = 48,
+    ElOverblik = 49,
+    DataHubAdministrator = 50,
+    IndependentAggregator = 51,
+    SerialEnergyTrader = 52
 }

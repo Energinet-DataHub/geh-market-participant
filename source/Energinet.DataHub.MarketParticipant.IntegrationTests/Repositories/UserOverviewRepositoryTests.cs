@@ -18,6 +18,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,7 +30,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Moq;
 using Xunit;
 using Xunit.Categories;
-using Permission = Energinet.DataHub.Core.App.Common.Security.Permission;
 using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
@@ -259,7 +259,7 @@ public sealed class UserOverviewRepositoryTests
 
         var (userId, externalId, actorId) = await CreateUserWithActorName(context, false, "Axolotl");
 
-        var userRole = await _fixture.PrepareUserRoleAsync(Permission.ActorManage);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         await _fixture.AssignUserRoleAsync(userId.Value, actorId.Value, userRole.Id);
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
@@ -482,7 +482,7 @@ public sealed class UserOverviewRepositoryTests
         var userRoleTemplate = new UserRoleEntity
         {
             Name = "Template name",
-            Permissions = { new UserRolePermissionEntity { Permission = Permission.OrganizationManage } },
+            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.OrganizationsManage } },
             EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
         };
 

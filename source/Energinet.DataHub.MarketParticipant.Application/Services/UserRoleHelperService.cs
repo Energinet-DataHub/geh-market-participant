@@ -15,8 +15,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
@@ -30,10 +30,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             _permissionRepository = permissionRepository;
         }
 
-        public async Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(IEnumerable<Permission> permissions, EicFunction eicFunction)
+        public async Task<bool> EnsurePermissionsSelectedAreValidForMarketRoleAsync(IEnumerable<PermissionId> permissions, EicFunction eicFunction)
         {
-            var permissionsToEic = await _permissionRepository.GetToMarketRoleAsync(eicFunction).ConfigureAwait(false);
-            var valid = permissions.All(x => permissionsToEic.Any(y => y.Permission == x));
+            var permissionsToEic = await _permissionRepository
+                .GetForMarketRoleAsync(eicFunction)
+                .ConfigureAwait(false);
+
+            var valid = permissions.All(x => permissionsToEic.Any(y => y.Id == x));
             return valid;
         }
     }
