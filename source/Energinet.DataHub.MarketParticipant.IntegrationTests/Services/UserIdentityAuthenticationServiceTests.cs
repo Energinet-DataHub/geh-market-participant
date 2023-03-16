@@ -13,15 +13,19 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Graph;
+using Microsoft.Graph.Models;
+using Microsoft.Kiota.Abstractions;
 using Xunit;
 using Xunit.Categories;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
@@ -90,13 +94,14 @@ public sealed class UserIdentityAuthenticationServiceTests
         await target.AddAuthenticationAsync(externalUserId, smsAuthMethod);
 
         // Assert
-        var actualMethods = await _graphServiceClientFixture
+        var actualResponse = (await _graphServiceClientFixture
             .Client
             .Users[externalUserId.ToString()]
             .Authentication
             .PhoneMethods
-            .Request()
-            .GetAsync();
+            .GetAsync())!;
+
+        var actualMethods = (await actualResponse.IteratePagesAsync<PhoneAuthenticationMethod>(_graphServiceClientFixture.Client)).ToList();
 
         Assert.Single(actualMethods);
         Assert.Single(actualMethods, method =>
@@ -120,13 +125,16 @@ public sealed class UserIdentityAuthenticationServiceTests
             .Users[externalUserId.ToString()]
             .Authentication
             .PhoneMethods
-            .Request()
-            .WithRetryOnNotFound()
-            .AddAsync(new PhoneAuthenticationMethod
-            {
-                PhoneNumber = _validPhoneNumber.Number,
-                PhoneType = AuthenticationPhoneType.Mobile
-            });
+            .PostAsync(
+                new PhoneAuthenticationMethod
+                {
+                    PhoneNumber = _validPhoneNumber.Number,
+                    PhoneType = AuthenticationPhoneType.Mobile
+                },
+                configuration => configuration.Options = new List<IRequestOption>
+                {
+                    NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+                });
 
         // Act + Assert
         await target.AddAuthenticationAsync(externalUserId, smsAuthMethod);
@@ -148,8 +156,7 @@ public sealed class UserIdentityAuthenticationServiceTests
             .Users[externalUserId.ToString()]
             .Authentication
             .PhoneMethods
-            .Request()
-            .AddAsync(new PhoneAuthenticationMethod
+            .PostAsync(new PhoneAuthenticationMethod
             {
                 PhoneNumber = "+45 71000000",
                 PhoneType = AuthenticationPhoneType.Mobile

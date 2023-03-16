@@ -67,7 +67,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             .Where(t => t
                 .EicFunctions
                 .Select(f => f.EicFunction)
-                .All(f => eicFunctions.Contains(f)))
+                .All(eicFunctions.Contains))
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -81,7 +81,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
         {
             Name = userRole.Name,
             Description = userRole.Description,
-            Status = userRole.Status,
+            Status = userRole.Status
         };
         foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity() { Permission = x }))
         {

@@ -17,8 +17,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
-using Microsoft.Extensions.Logging;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory
 {
@@ -27,14 +28,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor";
 
         private readonly GraphServiceClient _graphClient;
-        private readonly ILogger<ActiveDirectoryService> _logger;
 
-        public ActiveDirectoryService(
-            GraphServiceClient graphClient,
-            ILogger<ActiveDirectoryService> logger)
+        public ActiveDirectoryService(GraphServiceClient graphClient)
         {
             _graphClient = graphClient;
-            _logger = logger;
         }
 
         public async Task DeleteActorAsync(Actor actor)
@@ -47,18 +44,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             }
 
             // Remove service Principal for actor application registration
-            var appServicePrincipal = await GetServicePrincipalToAppAsync(actorApp.AppId).ConfigureAwait(false);
+            var appServicePrincipal = await GetServicePrincipalToAppAsync(actorApp.AppId!).ConfigureAwait(false);
             if (appServicePrincipal is not null)
             {
                 await _graphClient.ServicePrincipals[appServicePrincipal.Id]
-                    .Request()
                     .DeleteAsync()
                     .ConfigureAwait(false);
             }
 
             // Remove actor application
             await _graphClient.Applications[actorApp.Id]
-                .Request()
                 .DeleteAsync()
                 .ConfigureAwait(false);
         }
@@ -76,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             ArgumentNullException.ThrowIfNull(actor);
             var app = await EnsureAppAsync(actor).ConfigureAwait(false);
             await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
-            return (app.AppId, app.DisplayName);
+            return (app.AppId!, app.DisplayName!);
         }
 
         private static string GenerateActorDisplayName(Actor actor)
@@ -94,10 +89,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             var actorName = totalNameLength > 120
                 ? new string(actor.Name.Value.Take(120 - lengthForActorName).ToArray())
                 : actor.Name.Value;
-            return $"{ActorApplicationRegistrationDisplayNamePrefix}_{actor.ActorNumber.Value}_{actorName ?? "-"}_{actor.Id}";
+            return $"{ActorApplicationRegistrationDisplayNamePrefix}_{actor.ActorNumber.Value}_{actorName}_{actor.Id}";
         }
 
-        private async Task<Microsoft.Graph.Application> EnsureAppAsync(Actor actor)
+        private async Task<Microsoft.Graph.Models.Application> EnsureAppAsync(Actor actor)
         {
             var app = await GetAppAsync(actor).ConfigureAwait(false);
             if (app is not null) return app;
@@ -106,36 +101,42 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             return app;
         }
 
-        private async Task<Microsoft.Graph.Application?> GetAppAsync(Actor actor)
+        private async Task<Microsoft.Graph.Models.Application?> GetAppAsync(Actor actor)
         {
-         return (await _graphClient
-                    .Applications
-                    .Request()
-                    .Filter($"displayName eq '{GenerateActorDisplayName(actor)}'")
-                    .GetAsync()
-                    .ConfigureAwait(false))
+            var applicationCollectionResponse = await _graphClient
+                .Applications
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"displayName eq '{GenerateActorDisplayName(actor)}'";
+                })
+                .ConfigureAwait(false);
+
+            return (await applicationCollectionResponse!.IteratePagesAsync<Microsoft.Graph.Models.Application>(_graphClient).ConfigureAwait(false))
                 .FirstOrDefault();
         }
 
         private async Task<ServicePrincipal?> GetServicePrincipalToAppAsync(string appId)
         {
-            return (await _graphClient
-                    .ServicePrincipals
-                    .Request()
-                    .Filter($"appId eq '{appId}'")
-                    .GetAsync()
-                    .ConfigureAwait(false))
-                .FirstOrDefault();
+            var response = await _graphClient
+                .ServicePrincipals
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"appId eq '{appId}'";
+                })
+                .ConfigureAwait(false);
+            return (await response!.IteratePagesAsync<ServicePrincipal>(_graphClient).ConfigureAwait(false)).FirstOrDefault();
         }
 
-        private async Task EnsureServicePrincipalToAppAsync(Microsoft.Graph.Application app)
+        private async Task EnsureServicePrincipalToAppAsync(Microsoft.Graph.Models.Application app)
         {
-            var servicePrincipal = (await _graphClient.ServicePrincipals
-                .Request()
-                .Filter($"appId eq '{app.AppId}'")
-                .GetAsync()
-                .ConfigureAwait(false))
-                .FirstOrDefault();
+            var response = await _graphClient.ServicePrincipals
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"appId eq '{app.AppId}'";
+                })
+                .ConfigureAwait(false);
+
+            var servicePrincipal = (await response!.IteratePagesAsync<ServicePrincipal>(_graphClient).ConfigureAwait(false)).FirstOrDefault();
 
             if (servicePrincipal is not null)
             {
@@ -148,25 +149,24 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
             };
 
             await _graphClient.ServicePrincipals
-                .Request()
-                .AddAsync(servicePrincipal).ConfigureAwait(false);
+                .PostAsync(servicePrincipal)
+                .ConfigureAwait(false);
         }
 
-        private async Task<Microsoft.Graph.Application> CreateAppRegistrationAsync(Actor actor)
+        private async Task<Microsoft.Graph.Models.Application> CreateAppRegistrationAsync(Actor actor)
         {
             var app = await _graphClient.Applications
-                .Request()
-                .AddAsync(new Microsoft.Graph.Application
+                .PostAsync(new Microsoft.Graph.Models.Application
                 {
                     DisplayName = GenerateActorDisplayName(actor),
                     Api = new ApiApplication
                     {
-                        RequestedAccessTokenVersion = 2,
+                        RequestedAccessTokenVersion = 2
                     },
                     CreatedDateTime = DateTimeOffset.Now,
-                    SignInAudience = SignInAudience.AzureADMyOrg.ToString(),
+                    SignInAudience = SignInAudience.AzureADMyOrg.ToString()
                 }).ConfigureAwait(false);
-            return app;
+            return app!;
         }
-   }
+    }
 }

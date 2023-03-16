@@ -99,7 +99,7 @@ public sealed class TokenControllerIntegrationTests :
                     kid = string.Empty,
                     kty = string.Empty,
                     n = string.Empty,
-                    e = string.Empty,
+                    e = string.Empty
                 }
             }
         };
@@ -241,7 +241,7 @@ public sealed class TokenControllerIntegrationTests :
             ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 "http://locahost/.well-known/openid-configuration",
                 new OpenIdConnectConfigurationRetriever(),
-                new HttpDocumentRetriever(CreateClient()) { RequireHttps = false }),
+                new HttpDocumentRetriever(CreateClient()) { RequireHttps = false })
         };
 
         var result = await new JwtSecurityTokenHandler()

@@ -42,9 +42,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
 
             var application = await _graphClient.Applications[_appObjectId]
-                .Request()
-                .Select(a => new { a.DisplayName, a.AppRoles })
-                .GetAsync()
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Select = new[]
+                    {
+                        "displayName",
+                        "appRoles"
+                    };
+                })
                 .ConfigureAwait(false);
 
             if (application is null)
@@ -53,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     $"No application, '{nameof(application)}', was found in Active Directory.");
             }
 
-            foreach (var appRole in application.AppRoles)
+            foreach (var appRole in application.AppRoles!)
             {
                 switch (appRole.Value)
                 {

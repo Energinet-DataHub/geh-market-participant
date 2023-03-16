@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles
 
         public IEnumerable<EicFunction> Functions { get; } = new[]
         {
-            EicFunction.GridAccessProvider,
+            EicFunction.GridAccessProvider
         };
     }
 }

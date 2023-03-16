@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var markedRoles = new[]
             {
                 EicFunction.BalanceResponsibleParty,
-                EicFunction.EnergySupplier,
+                EicFunction.EnergySupplier
             };
 
             // Act

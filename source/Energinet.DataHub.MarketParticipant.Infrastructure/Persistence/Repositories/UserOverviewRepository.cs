@@ -61,7 +61,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             y => new
             {
                 Id = new UserId(y.Id),
-                ExternalId = new ExternalUserId(y.ExternalId),
+                ExternalId = new ExternalUserId(y.ExternalId)
             });
 
         var userIdentities = (await _userIdentityRepository

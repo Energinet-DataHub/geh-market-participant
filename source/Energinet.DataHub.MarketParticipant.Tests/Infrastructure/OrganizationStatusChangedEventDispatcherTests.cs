@@ -75,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
             var integrationEvent = new OrganizationNameChangedIntegrationEvent
             {
                 Name = "NewName",
-                OrganizationId = new OrganizationId(Guid.NewGuid()),
+                OrganizationId = new OrganizationId(Guid.NewGuid())
             };
 
             // act

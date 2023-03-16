@@ -43,7 +43,7 @@ internal static class ActorMapper
             {
                 var gridAreaEntity = new MarketRoleGridAreaEntity
                 {
-                    GridAreaId = marketRoleGridArea.Id.Value,
+                    GridAreaId = marketRoleGridArea.Id.Value
                 };
 
                 foreach (var meteringPointType in marketRoleGridArea.MeteringPointTypes)

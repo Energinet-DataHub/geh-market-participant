@@ -21,9 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
-using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -208,12 +206,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
                 clientSecretCredential,
                 new[] { "https://graph.microsoft.com/.default" });
 
-            // Logger
-            var logger = Mock.Of<ILogger<ActiveDirectoryService>>();
-
-            return new ActiveDirectoryService(
-                graphClient,
-                logger);
+            return new ActiveDirectoryService(graphClient);
         }
     }
 }

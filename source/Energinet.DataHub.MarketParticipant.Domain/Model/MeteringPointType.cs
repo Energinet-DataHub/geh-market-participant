@@ -38,6 +38,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         D99InternalUse = 19,
         E17Consumption = 20,
         E18Production = 21,
-        E20Exchange = 22,
+        E20Exchange = 22
     }
 }
