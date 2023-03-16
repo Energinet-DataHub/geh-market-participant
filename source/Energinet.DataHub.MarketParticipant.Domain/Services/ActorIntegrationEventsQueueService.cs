@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorId = actor.Id.Value,
                 ExternalActorId = actor.ExternalActorId,
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),
-                Status = actor.Status,
+                Status = actor.Status
             };
 
             foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))

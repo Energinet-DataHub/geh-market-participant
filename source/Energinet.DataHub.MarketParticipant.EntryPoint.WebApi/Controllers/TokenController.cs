@@ -68,7 +68,7 @@ public class TokenController : ControllerBase
         var configuration = new
         {
             issuer = Issuer,
-            jwks_uri = $"https://{Request.Host}/token/keys",
+            jwks_uri = $"https://{Request.Host}/token/keys"
         };
 
         return Ok(configuration);

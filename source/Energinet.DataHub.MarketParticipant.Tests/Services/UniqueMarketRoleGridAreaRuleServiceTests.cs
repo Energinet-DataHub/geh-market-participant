@@ -86,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                                 new[] { MeteringPointType.D02Analysis }),
                             new ActorGridArea(
                                 new GridAreaId(Guid.NewGuid()),
-                                new[] { MeteringPointType.D02Analysis }),
+                                new[] { MeteringPointType.D02Analysis })
                         })
                 },
                 new ActorName("fake_value"));
@@ -110,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             foreach (var nonDdmMarketRole in Enum.GetValues<EicFunction>().Except(
                 new[]
                 {
-                    EicFunction.GridAccessProvider,
+                    EicFunction.GridAccessProvider
                 }))
             {
                 // arrange

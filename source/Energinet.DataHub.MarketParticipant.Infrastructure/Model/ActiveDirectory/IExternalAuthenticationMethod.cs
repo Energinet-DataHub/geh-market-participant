@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.Graph;
+using Microsoft.Graph.Users.Item.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
@@ -26,12 +27,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirecto
         /// Assigns the current authentication method to the user configured in the provided builder.
         /// </summary>
         /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
-        Task AssignAsync(IAuthenticationRequestBuilder authenticationBuilder);
+        Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder);
 
         /// <summary>
         /// Verifies if the current authentication method is already applied to the user configured in the provided builder.
         /// </summary>
+        /// <param name="client"><see cref="IBaseClient"/>.</param>
         /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
-        Task<bool> VerifyAsync(IAuthenticationRequestBuilder authenticationBuilder);
+        Task<bool> VerifyAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder);
     }
 }

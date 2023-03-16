@@ -13,11 +13,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
+using Microsoft.Graph.Users.Item.Authentication;
+using Microsoft.Kiota.Abstractions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 
@@ -30,34 +34,38 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
         _smsAuthenticationMethod = smsAuthenticationMethod;
     }
 
-    public Task AssignAsync(IAuthenticationRequestBuilder authenticationBuilder)
+    public Task AssignAsync(AuthenticationRequestBuilder authenticationBuilder)
     {
         ArgumentNullException.ThrowIfNull(authenticationBuilder);
 
         return authenticationBuilder
             .PhoneMethods
-            .Request()
-            .WithRetryOnNotFound()
-            .AddAsync(new PhoneAuthenticationMethod
-            {
-                PhoneNumber = _smsAuthenticationMethod.PhoneNumber.Number,
-                PhoneType = AuthenticationPhoneType.Mobile
-            });
+            .PostAsync(
+                new PhoneAuthenticationMethod
+                {
+                    PhoneNumber = _smsAuthenticationMethod.PhoneNumber.Number,
+                    PhoneType = AuthenticationPhoneType.Mobile
+                },
+                configuration => configuration.Options = new List<IRequestOption>
+                {
+                    NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+                });
     }
 
-    public async Task<bool> VerifyAsync(IAuthenticationRequestBuilder authenticationBuilder)
+    public async Task<bool> VerifyAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder)
     {
         ArgumentNullException.ThrowIfNull(authenticationBuilder);
 
         var collection = await authenticationBuilder
             .PhoneMethods
-            .Request()
-            .WithRetryOnNotFound()
-            .GetAsync()
+            .GetAsync(configuration => configuration.Options = new List<IRequestOption>
+            {
+                NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+            })
             .ConfigureAwait(false);
 
-        var phoneMethods = await collection
-            .IteratePagesAsync(authenticationBuilder.Client)
+        var phoneMethods = await collection!
+            .IteratePagesAsync<PhoneAuthenticationMethod>(client)
             .ConfigureAwait(false);
 
         return phoneMethods

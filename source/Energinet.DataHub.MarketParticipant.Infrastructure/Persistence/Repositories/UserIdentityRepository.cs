@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -24,9 +23,10 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
-using User = Microsoft.Graph.User;
+using User = Microsoft.Graph.Models.User;
 using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.UserIdentity;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -37,17 +37,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private readonly AzureIdentityConfig _azureIdentityConfig;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
     private readonly IUserPasswordGenerator _passwordGenerator;
-    private readonly Expression<Func<User, object>> _selectForMapping = user => new
+
+    private readonly string[] _selectors =
     {
-        user.Id,
-        user.UserType,
-        user.DisplayName,
-        user.GivenName,
-        user.Surname,
-        user.Identities,
-        user.MobilePhone,
-        user.CreatedDateTime,
-        user.AccountEnabled
+        "id",
+        "userType",
+        "displayName",
+        "givenName",
+        "surname",
+        "identities",
+        "mobilePhone",
+        "createdDateTime",
+        "accountEnabled"
     };
 
     public UserIdentityRepository(
@@ -66,12 +67,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         ArgumentNullException.ThrowIfNull(externalId);
 
-        var user = await _graphClient
+        var user = (await _graphClient
             .Users[externalId.Value.ToString()]
-            .Request()
-            .Select(_selectForMapping)
-            .GetAsync()
-            .ConfigureAwait(false);
+            .GetAsync(x => x.QueryParameters.Select = _selectors).ConfigureAwait(false))!;
 
         return IsMember(user) ? Map(user) : null;
     }
@@ -92,17 +90,14 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         foreach (var segment in ids.Chunk(15))
         {
             var usersRequest = await _graphClient.Users
-                .Request()
-                .Filter($"id in ({string.Join(",", segment.Select(x => $"'{x}'"))})")
-                .Select(_selectForMapping)
-                .GetAsync()
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Select = _selectors;
+                    x.QueryParameters.Filter = $"id in ({string.Join(",", segment.Select(s => $"'{s}'"))})";
+                })
                 .ConfigureAwait(false);
 
-            var users = await usersRequest
-                .IteratePagesAsync(_graphClient)
-                .ConfigureAwait(false);
-
-            result.AddRange(users.Where(IsMember).Select(Map));
+            result.AddRange((await usersRequest!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(Map));
         }
 
         return result;
@@ -114,40 +109,24 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         if (accountEnabled.HasValue)
         {
-            var formattedValue = accountEnabled.Value ? "true" : "false";
-            filters.Add($"accountEnabled eq {formattedValue}");
+            filters.Add($"accountEnabled eq {(accountEnabled.Value ? "true" : "false")}");
         }
 
-        var queryOptions = new List<Option>
+        var request = await _graphClient.Users.GetAsync(x =>
         {
-            new HeaderOption("ConsistencyLevel", "eventual"),
-            new QueryOption("$count", "true"),
-        };
+            x.Headers.Add("ConsistencyLevel", "eventual");
+            x.QueryParameters.Count = true;
+            if (filters.Any())
+                x.QueryParameters.Filter = string.Join(" and ", filters);
+        }).ConfigureAwait(false);
 
-        var request = _graphClient.Users.Request(queryOptions);
-
-        if (filters.Any())
-        {
-            request = request.Filter(string.Join(" and ", filters));
-        }
-
-        var collection = await request
-            .Select(_selectForMapping)
-            .GetAsync()
-            .ConfigureAwait(false);
-
-        var users = await collection
-            .IteratePagesAsync(_graphClient)
-            .ConfigureAwait(false);
-
-        var userIdentities = users.Where(IsMember).Select(Map);
+        var userIdentities = (await request!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(Map);
 
         if (!string.IsNullOrEmpty(searchText))
         {
             userIdentities = userIdentities
                 .Where(userIdentity =>
-                    (userIdentity.PhoneNumber != null &&
-                    userIdentity.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                    (userIdentity.PhoneNumber != null && userIdentity.PhoneNumber.Number.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
                     userIdentity.Email.Address.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                     userIdentity.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                     userIdentity.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase));
@@ -180,9 +159,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                     ForceChangePasswordNextSignIn = true,
                     Password = _passwordGenerator.GenerateRandomPassword()
                 },
-                Identities = new[]
+                Identities = new List<ObjectIdentity>
                 {
-                    new ObjectIdentity
+                    new()
                     {
                         SignInType = "emailAddress",
                         Issuer = _azureIdentityConfig.Issuer,
@@ -192,12 +171,11 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             };
 
             createdUser = await _graphClient.Users
-                .Request()
-                .AddAsync(newUser)
+                .PostAsync(newUser)
                 .ConfigureAwait(false);
         }
 
-        var externalUserId = new ExternalUserId(createdUser.Id);
+        var externalUserId = new ExternalUserId(createdUser!.Id!);
 
         await _userIdentityAuthenticationService
             .AddAuthenticationAsync(externalUserId, userIdentity.Authentication)
@@ -205,8 +183,10 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         await _graphClient
             .Users[createdUser.Id]
-            .Request()
-            .UpdateAsync(new User { AccountEnabled = true })
+            .PatchAsync(new User
+            {
+                AccountEnabled = true
+            })
             .ConfigureAwait(false);
 
         return externalUserId;
@@ -215,16 +195,16 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private static UserIdentity Map(User user)
     {
         var userEmailAddress = user
-            .Identities
+            .Identities!
             .Where(ident => ident.SignInType == "emailAddress")
-            .Select(ident => ident.IssuerAssignedId)
+            .Select(ident => ident.IssuerAssignedId!)
             .Single();
 
         return new UserIdentity(
-            new ExternalUserId(user.Id),
+            new ExternalUserId(user.Id!),
             new EmailAddress(userEmailAddress),
             user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
-            user.GivenName ?? user.DisplayName,
+            user.GivenName ?? user.DisplayName!,
             user.Surname ?? string.Empty,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
             user.CreatedDateTime!.Value,
@@ -233,7 +213,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
     private static bool IsMember(User user)
     {
-        return user.UserType == "Member" &&
+        return user is { UserType: "Member", Identities: { } } &&
                user.Identities.Any(ident => ident.SignInType == "emailAddress");
     }
 
@@ -243,17 +223,14 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
 
         var usersRequest = await _graphClient
             .Users
-            .Request()
-            .Filter($"identities/any(id:id/issuer eq '{_azureIdentityConfig.Issuer}' and id/issuerAssignedId eq '{email.Address}')")
-            .Select(_selectForMapping)
-            .GetAsync()
+            .GetAsync(x =>
+            {
+                x.QueryParameters.Select = _selectors;
+                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_azureIdentityConfig.Issuer}' and id/issuerAssignedId eq '{email.Address}')";
+            })
             .ConfigureAwait(false);
 
-        var users = await usersRequest
-            .IteratePagesAsync(_graphClient)
-            .ConfigureAwait(false);
-
-        return users.SingleOrDefault();
+        return (await usersRequest!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).SingleOrDefault();
     }
 
     private async Task<User?> CheckCreatedUserAsync(EmailAddress email)

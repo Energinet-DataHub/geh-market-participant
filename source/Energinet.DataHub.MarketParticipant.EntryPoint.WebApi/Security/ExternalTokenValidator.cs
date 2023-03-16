@@ -39,7 +39,7 @@ public sealed class ExternalTokenValidator : IExternalTokenValidator
             ClockSkew = TimeSpan.Zero,
             ConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
                 metadataAddress,
-                new OpenIdConnectConfigurationRetriever()),
+                new OpenIdConnectConfigurationRetriever())
         };
     }
 

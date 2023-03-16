@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Net;
-using Microsoft.Graph;
+using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure;
 
-public static class GraphServiceClientExtensions
+public static class NotFoundRetryHandlerOptionFactory
 {
-    public static TRequest WithRetryOnNotFound<TRequest>(this TRequest request)
-        where TRequest : IBaseRequest
+    public static RetryHandlerOption CreateNotFoundRetryHandlerOption()
     {
-        ArgumentNullException.ThrowIfNull(request);
-        return request.WithShouldRetry((_, _, message) => message.StatusCode == HttpStatusCode.NotFound);
+        return new RetryHandlerOption
+        {
+            ShouldRetry = (_, _, response) => response.StatusCode == HttpStatusCode.NotFound
+        };
     }
 }

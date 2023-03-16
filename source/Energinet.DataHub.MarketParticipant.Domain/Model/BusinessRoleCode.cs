@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         Mdr = 8,
         Sts = 9,
         Ez = 10,
-        Tso = 11,
+        Tso = 11
     }
 }

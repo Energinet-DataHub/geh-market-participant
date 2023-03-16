@@ -59,7 +59,7 @@ internal sealed class UserMapper
         {
             ActorId = fromRoleAssignment.ActorId.Value,
             UserId = fromId.Value,
-            UserRoleId = fromRoleAssignment.UserRoleId.Value,
+            UserRoleId = fromRoleAssignment.UserRoleId.Value
         };
     }
 

@@ -25,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirector
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -91,10 +92,9 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             .Users[actual.Id.ToString()]
             .Authentication
             .PasswordMethods
-            .Request()
             .GetAsync();
 
-        var passwordMethods = await password.IteratePagesAsync(_graphServiceClientFixture.Client);
+        var passwordMethods = await password!.IteratePagesAsync<PasswordAuthenticationMethod>(_graphServiceClientFixture.Client);
         Assert.NotEmpty(passwordMethods);
     }
 
