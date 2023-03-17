@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
 
         private static IConfiguration BuildConfig()
         {
-            KeyValuePair<string, string>[] keyValuePairs =
+            KeyValuePair<string, string?>[] keyValuePairs =
             {
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
                 new(Settings.ServiceBusTopicName.Key, "fake_value"),

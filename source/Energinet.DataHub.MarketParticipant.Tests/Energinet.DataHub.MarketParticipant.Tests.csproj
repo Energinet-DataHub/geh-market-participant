@@ -45,6 +45,7 @@ limitations under the License.
 
   <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Common\Energinet.DataHub.MarketParticipant.Common.csproj" />
+    <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.csproj" />
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Infrastructure\Energinet.DataHub.MarketParticipant.Infrastructure.csproj" />
   </ItemGroup>
 
