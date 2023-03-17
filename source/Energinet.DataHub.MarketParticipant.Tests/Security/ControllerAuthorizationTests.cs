@@ -59,6 +59,6 @@ public sealed class ControllerAuthorizationTests
                 .ToList();
 
         // assert
-        Assert.False(endpointsMissingAuthorization.Any(), $"Following enpoints are missing auth:\n\t{string.Join("\n\t", endpointsMissingAuthorization)}");
+        Assert.False(endpointsMissingAuthorization.Any(), $"Following endpoints are missing auth:\n\t{string.Join("\n\t", endpointsMissingAuthorization)}");
     }
 }
