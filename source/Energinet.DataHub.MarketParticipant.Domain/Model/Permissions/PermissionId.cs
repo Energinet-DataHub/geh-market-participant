@@ -24,4 +24,5 @@ public enum PermissionId
     UsersView = 6,
     UserRolesManage = 7,
     PermissionsManage = 8,
+    SettlementsManage = 9
 }
