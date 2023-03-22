@@ -162,5 +162,15 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<UserRoleDto>>()
                 .ConfigureAwait(false);
         }
+
+        public Task DeactivateUserRoleAsync(Guid userRoleId)
+        {
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request($"user-roles/{userRoleId}/deactivate")
+                        .PutAsync());
+        }
     }
 }

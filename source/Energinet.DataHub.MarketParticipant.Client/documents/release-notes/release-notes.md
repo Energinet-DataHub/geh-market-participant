@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.29.2
+
+- Add new endpoint to deactivate a user role
+
 ## Version 2.29.1
 
 - Bump version as part of pipeline change.
