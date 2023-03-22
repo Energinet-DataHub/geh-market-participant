@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.Core.App.Common.Security;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 

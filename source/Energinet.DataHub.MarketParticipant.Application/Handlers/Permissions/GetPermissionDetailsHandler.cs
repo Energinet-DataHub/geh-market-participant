@@ -16,11 +16,11 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
 public sealed class GetPermissionDetailsHandler
     : IRequestHandler<GetPermissionDetailsCommand, GetPermissionDetailsResponse>
