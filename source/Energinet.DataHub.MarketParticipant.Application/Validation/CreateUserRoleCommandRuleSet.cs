@@ -15,7 +15,6 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
