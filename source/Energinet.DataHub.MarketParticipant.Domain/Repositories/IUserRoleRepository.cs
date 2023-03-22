@@ -42,8 +42,9 @@ public interface IUserRoleRepository
     /// Gets the user role by name.
     /// </summary>
     /// <param name="userRoleName">The user role name.</param>
+    /// <param name="marketRole">Search for user role with market role related</param>
     /// <returns>The role if it exists; otherwise null.</returns>
-    Task<UserRole?> GetByNameAsync(string userRoleName);
+    Task<UserRole?> GetByNameInMarketRoleAsync(string userRoleName, EicFunction marketRole);
 
     /// <summary>
     /// Gets user roles that support the specified EIC-functions.
