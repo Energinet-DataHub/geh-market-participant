@@ -13,11 +13,14 @@
 // limitations under the License.
 
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -52,7 +55,11 @@ public sealed class UpdateUserRoleIntegrationTests
         var mediator = scope.GetInstance<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync();
-        var newName = "UpdateUserRoleName updated";
+        var newName = "NewUserRoleNameTestsRunIntegration";
+
+        var existingUserRoleWithSameNameInOtherMarketRoleScope = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = newName);
+        existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Clear();
+        existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier });
 
         var updateCommand = new UpdateUserRoleCommand(
             frontendUser.Id,
@@ -67,6 +74,34 @@ public sealed class UpdateUserRoleIntegrationTests
 
         // Assert
         Assert.Equal(newName, response.Role.Name);
+    }
+
+    [Fact]
+    public async Task UpdateUserRole_UpdateUserRoleName_ButNameExistInMarketRoleScope_Throws()
+    {
+        // Create context user
+        var frontendUser = await _fixture.PrepareUserAsync();
+
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        scope.Container.MockFrontendUser(frontendUser.Id);
+
+        var mediator = scope.GetInstance<IMediator>();
+
+        await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "TestNameU1"));
+        var userRoleToUpdate = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "TestNameU2"));
+
+        var newName = "TestNameU1";
+
+        var updateCommand = new UpdateUserRoleCommand(
+            frontendUser.Id,
+            userRoleToUpdate.Id,
+            new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(updateCommand));
     }
 
     [Fact]

@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 EicFunction.BillingAgent);
 
             userRoleRepositoryMock
-                .Setup(x => x.GetByNameAsync(It.IsAny<string>()))
+                .Setup(x => x.GetByNameInMarketRoleAsync(It.IsAny<string>(), existingUserRoleWithSameName.EicFunction))
                 .ReturnsAsync(existingUserRoleWithSameName);
 
             var userRoleToUpdate = new UserRole(
