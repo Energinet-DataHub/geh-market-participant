@@ -217,7 +217,7 @@ public sealed class UserRoleRepositoryTests
     }
 
     [Fact]
-    public async Task GetByNameInMarkerRole_NameDoseNotExistInMarketRole()
+    public async Task GetByNameInMarkerRole_NameDoesNotExistInMarketRole()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);

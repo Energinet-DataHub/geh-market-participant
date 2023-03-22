@@ -59,7 +59,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
 
         if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
         {
-            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists");
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role");
         }
 
         var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRoleToUpdate);
