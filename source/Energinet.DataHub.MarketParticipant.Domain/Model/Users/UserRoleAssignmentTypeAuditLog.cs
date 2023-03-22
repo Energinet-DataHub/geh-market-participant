@@ -17,5 +17,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 public enum UserRoleAssignmentTypeAuditLog
 {
     Added,
-    Removed
+    Removed,
+    RemovedDueToDeactivation
 }

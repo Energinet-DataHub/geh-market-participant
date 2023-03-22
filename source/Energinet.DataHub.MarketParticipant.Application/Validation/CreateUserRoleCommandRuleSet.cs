@@ -15,7 +15,6 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -43,13 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(role => role.Status)
-                        .IsInEnum()
-                        .Must(x => x is UserRoleStatus.Active or UserRoleStatus.Draft);
-
-                    validator
-                        .RuleFor(role => role.Permissions)
-                        .NotEmpty()
-                        .When(role => role.Status is not UserRoleStatus.Draft);
+                        .IsInEnum();
 
                     validator
                         .RuleForEach(role => role.Permissions)
