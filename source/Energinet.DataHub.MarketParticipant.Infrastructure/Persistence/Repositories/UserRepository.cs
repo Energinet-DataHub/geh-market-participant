@@ -82,7 +82,7 @@ public sealed class UserRepository : IUserRepository
         return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
     }
 
-    public async Task<IEnumerable<User>?> GetToUserRoleAsync(UserRoleId userRoleId)
+    public async Task<IEnumerable<User>> GetToUserRoleAsync(UserRoleId userRoleId)
     {
         var userEntities = await BuildUserQuery()
             .Where(x => x.RoleAssignments.Any(y => y.UserRoleId == userRoleId.Value))

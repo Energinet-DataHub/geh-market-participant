@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -171,6 +172,24 @@ public sealed class UserRoleController : ControllerBase
                     .ConfigureAwait(false);
 
                 return Ok(response.UserRoles);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpPut("{userRoleId:guid}/deactivate")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<IActionResult> DeactivateUserRoleAsync(Guid userRoleId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new DeactivateUserRoleCommand(userRoleId, _userContext.CurrentUser.UserId);
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok();
             },
             _logger).ConfigureAwait(false);
     }
