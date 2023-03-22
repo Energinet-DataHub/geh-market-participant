@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
         [Theory]
         [InlineData((int)UserRoleStatus.Active, true)]
-        [InlineData((int)UserRoleStatus.Inactive, false)]
+        [InlineData((int)UserRoleStatus.Inactive, true)]
         [InlineData(12, false)]
         public async Task Validate_Status_ValidatesProperty(int value, bool isValid)
         {
