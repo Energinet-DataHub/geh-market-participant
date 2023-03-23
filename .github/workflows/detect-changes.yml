@@ -29,6 +29,8 @@ on:
         value: ${{ jobs.changes.outputs.client_package }}
       model_package:
         value: ${{ jobs.changes.outputs.model_package }}
+      render_diagrams:
+        value: ${{ jobs.changes.outputs.render_diagrams }}
 
 jobs:
   changes:
@@ -39,6 +41,7 @@ jobs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
       client_package: ${{ steps.filter.outputs.client_package }}
       model_package: ${{ steps.filter.outputs.model_package }}
+      render_diagrams: ${{ steps.filter.outputs.render_diagrams }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
       - name: Checkout repository
@@ -64,3 +67,7 @@ jobs:
               - '.github/workflows/detect-changes.yml'
               - '.github/workflows/publish-marketparticipant-model.yml'
               - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+            render_diagrams:
+              - 'docs/c4-model.dsl'
+              - '.github/workflows/render-diagrams.yml'
+              - '.github/workflows/detect-changes.yml'
