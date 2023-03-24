@@ -68,6 +68,6 @@ jobs:
               - '.github/workflows/publish-marketparticipant-model.yml'
               - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
             render_diagrams:
-              - 'docs/diagrams/c4-model.dsl'
+              - 'docs/c4-model.dsl'
               - '.github/workflows/render-diagrams.yml'
               - '.github/workflows/detect-changes.yml'
