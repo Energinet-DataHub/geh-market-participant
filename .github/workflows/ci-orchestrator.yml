@@ -36,6 +36,12 @@ jobs:
     uses: ./.github/workflows/publish-marketparticipant-model.yml
     secrets: inherit
 
+  render_diagrams:
+    needs: changes
+    if: ${{ needs.changes.outputs.render_diagrams == 'true' }}
+    uses: ./.github/workflows/render-diagrams.yml
+    secrets: inherit
+
   #
   # Branch policy status check
   #
@@ -47,6 +53,7 @@ jobs:
       ci_dotnet,
       ci_client_package,
       ci_model_package,
+      render_diagrams,
     ]
     if: |
       always()
