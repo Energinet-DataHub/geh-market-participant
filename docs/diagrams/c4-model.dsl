@@ -1,7 +1,7 @@
 workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-arch-diagrams/main/source/datahub3-model/model.dsl {
     model {
         !ref dh3 {
-            dh3WebApp = group "Web App" {
+            dh3WebApp = group "Web App." {
                 frontend = container "UI" "Provides DH3 functionality to users via their web browser." "Angular"
                 bff = container "Backend for frontend" "Combines data for presentation on DataHub 3 UI." "Asp.Net Core Web API"
 
@@ -18,7 +18,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
                 markpartEventActorSynchronizer -> markpartDb "Updates actors with external B2C id" "Entity Framework Core"
                 markpartMailDispatcher -> markpartDb "Reads data regarding newly invited users" "Entity Framework Core"
             }
-            
+
             shared = group "Shared resources" {
                 sharedBus = container "Azure B2C" "" "" "Microsoft Azure"
             }
