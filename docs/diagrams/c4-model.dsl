@@ -3,7 +3,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
         !ref dh3 {
             dh3WebApp = group "Web App" {
                 frontend = container "UI" "Provides DH3 functionality to users via their web browser." "Angular"
-                bff = container "Backend for frontend" "Combines data for presentation on DataHub 3 UI" "Asp.Net Core Web API"
+                bff = container "Backend for frontend" "Combines data for presentation on DataHub 3 UI." "Asp.Net Core Web API"
 
                 frontend -> bff "Uses" "JSON/HTTPS"
             }
