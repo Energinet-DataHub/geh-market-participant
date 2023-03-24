@@ -9,10 +9,10 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             }
 
             markpart = group "Market Participant" {
-                markpartApi = container "Market Participant API" "Multi-tenant API for managing actors, users and permissions" "Asp.Net Core Web API"
-                markpartEventActorSynchronizer = container "Actor Synchronizer" "Creates B2C application registration for newly created actors" "Azure Function App (Timer Trigger)" "Microsoft Azure - Function Apps"
-                markpartMailDispatcher = container "Mail Dispatcher" "Responsible for sending user invitations" "Azure Function App (Timer Trigger)" "Microsoft Azure - Function Apps"
-                markpartDb = container "Database" "Stores data regarding actors, users and permissions" "SQL Database Schema" "Data Storage,Microsoft Azure - SQL Database"
+                markpartApi = container "Market Participant API" "Multi-tenant API for managing actors, users and permissions." "Asp.Net Core Web API"
+                markpartEventActorSynchronizer = container "Actor Synchronizer" "Creates B2C application registration for newly created actors." "Azure Function App (Timer Trigger)" "Microsoft Azure - Function Apps"
+                markpartMailDispatcher = container "Mail Dispatcher" "Responsible for sending user invitations." "Azure Function App (Timer Trigger)" "Microsoft Azure - Function Apps"
+                markpartDb = container "Database" "Stores data regarding actors, users and permissions." "SQL Database Schema" "Data Storage,Microsoft Azure - SQL Database"
 
                 markpartApi -> markpartDb "Reads and writes actor/user data" "Entity Framework Core"
                 markpartEventActorSynchronizer -> markpartDb "Updates actors with external B2C id" "Entity Framework Core"
