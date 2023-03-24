@@ -19,7 +19,7 @@ on:
 
 jobs:
   render_c4:
-    uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@v10
+    uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@djorgensen/structurrizr-workflow-update-dsl-files-filter
     with:
       dsl: docs/diagrams/c4-model.dsl
     secrets: inherit
