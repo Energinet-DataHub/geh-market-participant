@@ -19,7 +19,7 @@ on:
 
 jobs:
   render_c4:
-    uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@fix-structurizr-workflow
+    uses: Energinet-DataHub/.github/.github/workflows/structurizr.yml@v10
     with:
       dsl: docs/diagrams/c4-model.dsl
     secrets: inherit
