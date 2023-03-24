@@ -15,8 +15,8 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
                 markpartDb = container "Database" "Stores data regarding actors, users and permissions." "SQL Database Schema" "Data Storage,Microsoft Azure - SQL Database"
 
                 markpartApi -> markpartDb "Reads and writes actor/user data." "Entity Framework Core"
-                markpartEventActorSynchronizer -> markpartDb "Updates actors with external B2C id" "Entity Framework Core"
-                markpartMailDispatcher -> markpartDb "Reads data regarding newly invited users" "Entity Framework Core"
+                markpartEventActorSynchronizer -> markpartDb "Updates actors with external B2C id." "Entity Framework Core"
+                markpartMailDispatcher -> markpartDb "Reads data regarding newly invited users." "Entity Framework Core"
             }
 
             shared = group "Shared resources" {
