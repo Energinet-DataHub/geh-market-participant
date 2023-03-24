@@ -26,7 +26,7 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
 
         sendGrid = softwareSystem "SendGrid" "External 3rd party mail dispatcher"
 
-        dh3User -> frontend "Views and manages data across all actors"
+        dhSysAdmin -> frontend "Views and manages data across all actors"
         extUser -> frontend "Views and manages data within the users assigned actor"
         bff -> markpartApi "Uses" "JSON/HTTPS"
         markpartEventActorSynchronizer -> sharedBus "Creates B2C application registration" "Microsoft.Graph/HTTPS"
