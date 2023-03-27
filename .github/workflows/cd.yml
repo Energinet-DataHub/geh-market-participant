@@ -35,22 +35,22 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v10
     with:
-      SOLUTION_FILE_PATH: "source/Energinet.DataHub.MarketParticipant.sln"
-      USE_AZURE_FUNCTIONS_TOOLS: true
-      ENVIRONMENT: AzureAuth
-      DOTNET_VERSION: 7.0.200
+      solution_file_path: "source/Energinet.DataHub.MarketParticipant.sln"
+      use_azure_functions_tools: true
+      environment: AzureAuth
+      dotnet_version: 7.0.200
     secrets:
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_SPN_ID: ${{ secrets.AZURE_SPN_ID_OIDC }}
-      AZURE_KEYVAULT_URL: ${{ secrets.AZURE_KEYVAULT_URL }}
+      azure_tenant_id: ${{ secrets.azure_tenant_id }}
+      azure_subscription_id: ${{ secrets.azure_subscription_id }}
+      azure_spn_id: ${{ secrets.azure_spn_id_oidc }}
+      azure_keyvault_url: ${{ secrets.azure_keyvault_url }}
 
   dotnet_promote_prerelease:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/promote-prerelease.yml@v10
     with:
-      RELEASE_NAME_PREFIX: dotnet
+      release_name_prefix: dotnet
 
   #
   # Dispatch deployment request
@@ -67,8 +67,8 @@ jobs:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v2
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-          repository: "${{ secrets.ENVIRONMENT_REPOSITORY_PATH }}"
+          token: ${{ secrets.pat_token }}
+          repository: "${{ secrets.environment_repository_path }}"
           event-type: "market-participant-deployment-request-domain"
           client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
 
