@@ -43,6 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
         {
             container.Register<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetPermissionsCommand>, GetPermissionsCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<GetPermissionCommand>, GetPermissionCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>(Lifestyle.Scoped);

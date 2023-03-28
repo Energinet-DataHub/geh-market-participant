@@ -176,22 +176,29 @@ public class TokenController : ControllerBase
 
     private async Task<string> CreateSignedTokenAsync(JwtSecurityToken dataHubToken)
     {
-        var signingClient = await _signingKeyRing
-            .GetSigningClientAsync()
-            .ConfigureAwait(false);
+        try
+        {
+            var signingClient = await _signingKeyRing
+                .GetSigningClientAsync()
+                .ConfigureAwait(false);
 
-        dataHubToken.Header[JwtHeaderParameterNames.Typ] = JwtConstants.TokenType;
-        dataHubToken.Header[JwtHeaderParameterNames.Alg] = _signingKeyRing.Algorithm;
-        dataHubToken.Header[JwtHeaderParameterNames.Kid] = GetKeyVersionIdentifier(signingClient.KeyId);
+            dataHubToken.Header[JwtHeaderParameterNames.Typ] = JwtConstants.TokenType;
+            dataHubToken.Header[JwtHeaderParameterNames.Alg] = _signingKeyRing.Algorithm;
+            dataHubToken.Header[JwtHeaderParameterNames.Kid] = GetKeyVersionIdentifier(signingClient.KeyId);
 
-        var headerAndPayload = new JwtSecurityTokenHandler().WriteToken(dataHubToken);
+            var headerAndPayload = new JwtSecurityTokenHandler().WriteToken(dataHubToken);
 
-        var signResult = await signingClient
-            .SignDataAsync(
-                new SignatureAlgorithm(_signingKeyRing.Algorithm),
-                Encoding.UTF8.GetBytes(headerAndPayload[..^1]))
-            .ConfigureAwait(false);
+            var signResult = await signingClient
+                .SignDataAsync(
+                    new SignatureAlgorithm(_signingKeyRing.Algorithm),
+                    Encoding.UTF8.GetBytes(headerAndPayload[..^1]))
+                .ConfigureAwait(false);
 
-        return headerAndPayload + Base64UrlEncoder.Encode(signResult.Signature);
+            return headerAndPayload + Base64UrlEncoder.Encode(signResult.Signature);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error creating signed token", ex);
+        }
     }
 }
