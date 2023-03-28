@@ -142,4 +142,52 @@ public sealed class UserRepositoryTests
         Assert.NotNull(actual);
         Assert.Equal(user.Id, actual.Id.Value);
     }
+
+    [Fact]
+    public async Task GetToUserRoleAsync_UserWithNoMatchingRole_ReturnsNull()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
+
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        var unknownRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
+
+        // Act
+        var actual = await userRepository.GetToUserRoleAsync(new UserRoleId(unknownRole.Id));
+
+        // Assert
+        Assert.Empty(actual);
+    }
+
+    [Fact]
+    public async Task GetToUserRoleAsync_UserWithMatchingRole_ReturnsUser()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
+        var userRepository = new UserRepository(context, userIdentityRepository);
+
+        var actor = await _fixture.PrepareActorAsync();
+        var user = await _fixture.PrepareUserAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync();
+        await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
+
+        // Act
+        var actual = (await userRepository.GetToUserRoleAsync(new UserRoleId(userRole.Id))).ToList();
+
+        // Assert
+        Assert.NotEmpty(actual);
+        Assert.Equal(user.Id, actual.First().Id.Value);
+    }
 }

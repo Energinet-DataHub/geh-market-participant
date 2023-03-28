@@ -51,10 +51,10 @@ public sealed class UserRoleRepository : IUserRoleRepository
             : MapUserRole(userRole);
     }
 
-    public async Task<UserRole?> GetByNameAsync(string userRoleName)
+    public async Task<UserRole?> GetByNameInMarketRoleAsync(string userRoleName, EicFunction marketRole)
     {
         var userRole = await BuildUserRoleQuery()
-            .SingleOrDefaultAsync(r => r.Name == userRoleName)
+            .SingleOrDefaultAsync(r => r.Name == userRoleName && r.EicFunctions.Any(e => e.EicFunction == marketRole))
             .ConfigureAwait(false);
 
         return userRole == null

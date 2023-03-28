@@ -55,11 +55,13 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             throw new NotFoundValidationException(request.UserRoleId);
         }
 
-        var userRoleWithSameName = await _userRoleRepository.GetByNameAsync(request.UserRoleUpdateDto.Name).ConfigureAwait(false);
+        if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} is deactivated and can't be updated");
 
+        var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
         if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
         {
-            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists");
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role");
         }
 
         var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRoleToUpdate);

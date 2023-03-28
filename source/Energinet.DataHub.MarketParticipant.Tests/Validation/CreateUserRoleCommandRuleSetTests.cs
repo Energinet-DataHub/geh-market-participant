@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_Name_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Name)}";
+            const string propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Name)}";
 
             var createGridAreaDto = new CreateUserRoleDto(
                 value,
@@ -109,11 +109,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
 
         [Theory]
         [InlineData((int)UserRoleStatus.Active, true)]
+        [InlineData((int)UserRoleStatus.Inactive, true)]
         [InlineData(12, false)]
         public async Task Validate_Status_ValidatesProperty(int value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Status)}";
+            const string propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Status)}";
 
             var createGridAreaDto = new CreateUserRoleDto(
                 ValidName,
@@ -147,7 +148,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_EicFunction_ValidatesProperty(int value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.EicFunction)}";
+            const string propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.EicFunction)}";
 
             var createGridAreaDto = new CreateUserRoleDto(
                 ValidName,
@@ -184,7 +185,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_Permissions_ValidatesProperty(int value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Permissions)}[0]";
+            const string propertyName = $"{nameof(CreateUserRoleCommand.UserRoleDto)}.{nameof(CreateUserRoleDto.Permissions)}[0]";
 
             var createGridAreaDto = new CreateUserRoleDto(
                 ValidName,

@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
-public sealed record GetPermissionDetailsResponse(IEnumerable<PermissionDetailsDto> Permissions);
+public record PermissionDetailsDto(
+    int Id,
+    string Name,
+    string Description,
+    DateTimeOffset Created);
