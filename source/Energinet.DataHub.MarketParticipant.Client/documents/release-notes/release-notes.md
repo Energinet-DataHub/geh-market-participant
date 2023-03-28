@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.29.3
+
+- Add missing enum value for UserRoleAssignmentTypeAuditLog
+
 ## Version 2.29.2
 
 - Add new endpoint to deactivate a user role
