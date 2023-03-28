@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
@@ -115,7 +114,7 @@ public sealed class UserRoleController : ControllerBase
 
                 var command = new UpdateUserRoleCommand(_userContext.CurrentUser.UserId, userRoleId, userRole);
 
-                var result = await _mediator.Send(command).ConfigureAwait(false);
+                await _mediator.Send(command).ConfigureAwait(false);
 
                 return Ok();
             },
@@ -185,7 +184,7 @@ public sealed class UserRoleController : ControllerBase
             {
                 var command = new DeactivateUserRoleCommand(userRoleId, _userContext.CurrentUser.UserId);
 
-                var response = await _mediator
+                await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
