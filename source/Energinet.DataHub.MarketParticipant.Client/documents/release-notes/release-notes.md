@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.29.3
+## Version 2.29.4
 
 - Add missing enum value for UserRoleAssignmentTypeAuditLog
+
+## Version 2.29.3
+
+- No functional change.
 
 ## Version 2.29.2
 
