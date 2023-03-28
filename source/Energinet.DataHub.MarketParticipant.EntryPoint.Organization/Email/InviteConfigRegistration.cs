@@ -13,29 +13,25 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application;
-using Energinet.DataHub.MarketParticipant.Application.Services;
-using Microsoft.Extensions.Logging;
-using SendGrid;
+using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
 
-internal static class EmailSenderRegistration
+internal static class InviteConfigRegistration
 {
-    public static void AddSendGridEmailSenderClient(this Container container)
+    public static void AddInviteConfigRegistration(this Container container)
     {
-        container.Register<IEmailSender>(
-            () =>
-            {
-                var configuration = container.GetInstance<InviteConfig>();
-                var senGridClient = container.GetInstance<ISendGridClient>();
-                var logger = container.GetInstance<ILogger<SendGridEmailSender>>();
-
-                return new SendGridEmailSender(
-                    configuration,
-                    senGridClient,
-                    logger);
-            },
-            Lifestyle.Scoped);
+        container.RegisterSingleton(() =>
+        {
+            var configuration = container.GetService<IConfiguration>();
+            var from = configuration.GetSetting(Settings.UserInviteFromEmail);
+            var bcc = configuration.GetSetting(Settings.UserInviteBccEmail);
+            var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
+            return new InviteConfig(from, bcc, userFlow);
+        });
     }
 }
