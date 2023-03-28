@@ -83,6 +83,6 @@ jobs:
       contains(needs.*.result, 'failure')
     uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
     with:
-      TEAM_NAME: Titans
-      SUBJECT: "Deployment dispatch failed: Market Participant"
+      team_name: Titans
+      subject: "Deployment dispatch failed: Market Participant"
     secrets: inherit
