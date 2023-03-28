@@ -58,7 +58,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new UpdateUserRolesHandler(
                 userRepositoryMock.Object,
                 auditLogEntryRepository.Object,
-                userContextMock);
+                userContextMock,
+                new Mock<IUserRoleRepository>().Object);
 
             var updatedRoleAssignments = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
 
