@@ -31,16 +31,19 @@ public sealed class UpdateUserRolesHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserContext<FrontendUser> _userContext;
 
     public UpdateUserRolesHandler(
         IUserRepository userRepository,
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUserContext<FrontendUser> userContext)
+        IUserContext<FrontendUser> userContext,
+        IUserRoleRepository userRoleRepository)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
         _userContext = userContext;
+        _userRoleRepository = userRoleRepository;
     }
 
     public async Task<Unit> Handle(
@@ -60,6 +63,11 @@ public sealed class UpdateUserRolesHandler
 
         foreach (var addRequest in request.Assignments.Added)
         {
+            var userRoleId = new UserRoleId(addRequest);
+            var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
+            if (userRole is { Status: UserRoleStatus.Inactive })
+                continue;
+
             var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), new UserRoleId(addRequest));
             if (user.RoleAssignments.Contains(userRoleAssignment))
                 continue;
