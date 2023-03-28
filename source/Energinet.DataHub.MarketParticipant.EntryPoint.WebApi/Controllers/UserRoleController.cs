@@ -184,7 +184,7 @@ public sealed class UserRoleController : ControllerBase
             {
                 var command = new DeactivateUserRoleCommand(userRoleId, _userContext.CurrentUser.UserId);
 
-                var response = await _mediator
+                await _mediator
                     .Send(command)
                     .ConfigureAwait(false);
 
