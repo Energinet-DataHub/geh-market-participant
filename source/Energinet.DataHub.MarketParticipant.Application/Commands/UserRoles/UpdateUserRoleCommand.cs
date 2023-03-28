@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UpdateUserRoleCommand(Guid ChangedByUserId, Guid UserRoleId, UpdateUserRoleDto UserRoleUpdateDto) : IRequest<UpdateUserRoleResponse>;
+public sealed record UpdateUserRoleCommand(Guid ChangedByUserId, Guid UserRoleId, UpdateUserRoleDto UserRoleUpdateDto) : IRequest;

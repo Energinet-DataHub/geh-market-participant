@@ -117,12 +117,7 @@ public sealed class UserRoleController : ControllerBase
 
                 var result = await _mediator.Send(command).ConfigureAwait(false);
 
-                return result.Result switch
-                {
-                    UpdateUserRoleResult.Failure => StatusCode((int)HttpStatusCode.InternalServerError),
-                    UpdateUserRoleResult.NoUpdateWasDeactivated => BadRequest(),
-                    _ => Ok()
-                };
+                return Ok();
             },
             _logger).ConfigureAwait(false);
     }

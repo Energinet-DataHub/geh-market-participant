@@ -27,7 +27,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand, UpdateUserRoleResponse>
+public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand>
 {
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserRoleAuditLogService _userRoleAuditLogService;
@@ -43,7 +43,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<UpdateUserRoleResponse> Handle(
+    public async Task<Unit> Handle(
         UpdateUserRoleCommand request,
         CancellationToken cancellationToken)
     {
@@ -56,7 +56,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         }
 
         if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
-            return new UpdateUserRoleResponse(UpdateUserRoleResult.NoUpdateWasDeactivated);
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} is deactivated and can't be updated");
 
         var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
         if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
@@ -78,7 +78,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.ChangedByUserId), userRoleInitStateForAuditLog, userRoleToUpdate);
         await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
 
-        return new UpdateUserRoleResponse(UpdateUserRoleResult.Success);
+        return Unit.Value;
     }
 
     private static UserRole CopyUserRoleForAuditLog(UserRole userRole)
