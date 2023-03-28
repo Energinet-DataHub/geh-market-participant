@@ -35,7 +35,7 @@ jobs:
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-solution-ci.yml@v10
     with:
-      solution_file_path: "source/Energinet.DataHub.MarketParticipant.sln"
+      solution_file_path: source/Energinet.DataHub.MarketParticipant.sln
       use_azure_functions_tools: true
       environment: AzureAuth
       dotnet_version: 7.0.200
@@ -68,9 +68,9 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.pat_token }}
-          repository: "${{ secrets.environment_repository_path }}"
-          event-type: "market-participant-deployment-request-domain"
-          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}'
+          repository: ${{ secrets.environment_repository_path }}
+          event-type: market-participant-deployment-request-domain
+          client-payload: '{"domain_pr": "${{ steps.find_pull_request.outputs.pull_request_number }}"}' # yamllint disable-line rule:quoted-strings
 
   #
   # Send notification to teams channel if deployment dispatch failed
@@ -83,6 +83,6 @@ jobs:
       contains(needs.*.result, 'failure')
     uses: Energinet-DataHub/.github/.github/workflows/notify-team.yml@v10
     with:
-      TEAM_NAME: "Titans"
+      TEAM_NAME: Titans
       SUBJECT: "Deployment dispatch failed: Market Participant"
     secrets: inherit
