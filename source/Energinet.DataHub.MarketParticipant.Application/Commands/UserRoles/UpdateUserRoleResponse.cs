@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using MediatR;
-
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record UpdateUserRoleCommand(Guid ChangedByUserId, Guid UserRoleId, UpdateUserRoleDto UserRoleUpdateDto) : IRequest<UpdateUserRoleResponse>;
+public sealed record UpdateUserRoleResponse(UpdateUserRoleResult Result);

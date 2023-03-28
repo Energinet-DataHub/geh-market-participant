@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand>
+public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand, UpdateUserRoleResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserRoleAuditLogService _userRoleAuditLogService;
@@ -43,7 +43,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(
+    public async Task<UpdateUserRoleResponse> Handle(
         UpdateUserRoleCommand request,
         CancellationToken cancellationToken)
     {
@@ -55,8 +55,10 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             throw new NotFoundValidationException(request.UserRoleId);
         }
 
-        var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
+        if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
+            return new UpdateUserRoleResponse(UpdateUserRoleResult.NoUpdateWasDeactivated);
 
+        var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
         if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
         {
             throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role");
@@ -76,7 +78,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.ChangedByUserId), userRoleInitStateForAuditLog, userRoleToUpdate);
         await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
 
-        return Unit.Value;
+        return new UpdateUserRoleResponse(UpdateUserRoleResult.Success);
     }
 
     private static UserRole CopyUserRoleForAuditLog(UserRole userRole)
