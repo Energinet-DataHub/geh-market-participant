@@ -31,7 +31,7 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       tests_dll_file_path: \source\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.Tests.dll
-      download_attempt_limit: 12
+      download_attempt_limit: 18
       code_coverage_flags: business
       dotnet_version: 7.0.200
 
@@ -40,7 +40,7 @@ jobs:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
       tests_dll_file_path: \source\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll
-      download_attempt_limit: 12
+      download_attempt_limit: 18
       use_azure_functions_tools: true
       code_coverage_flags: business
       environment: AzureAuth
