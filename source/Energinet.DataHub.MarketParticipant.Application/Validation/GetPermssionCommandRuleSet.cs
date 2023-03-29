@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -22,7 +24,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         public GetPermissionCommandRuleSet()
         {
             RuleFor(command => command.Id)
-                .NotEmpty();
+                .NotEmpty()
+                .Must(p => Enum.IsDefined(typeof(PermissionId), p));
         }
     }
 }
