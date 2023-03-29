@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -42,6 +43,23 @@ namespace Energinet.DataHub.MarketParticipant.Client
 
             var actor = await response
                 .GetJsonAsync<ActorDto>()
+                .ConfigureAwait(false);
+
+            return actor;
+        }
+
+        public async Task<IEnumerable<ActorDto>> GetActorsAsync()
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(ActorBaseUrl)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            var actor = await response
+                .GetJsonAsync<IEnumerable<ActorDto>>()
                 .ConfigureAwait(false);
 
             return actor;

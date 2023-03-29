@@ -38,6 +38,12 @@ public interface IActorRepository
     Task<Actor?> GetAsync(ActorId actorId);
 
     /// <summary>
+    /// Gets all actors.
+    /// </summary>
+    /// <returns>A list of actors.</returns>
+    Task<IEnumerable<Actor>> GetActorsAsync();
+
+    /// <summary>
     /// Gets all actors with the specified ids.
     /// </summary>
     /// <param name="actorIds">The list of actor ids.</param>
