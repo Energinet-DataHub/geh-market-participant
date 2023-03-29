@@ -75,7 +75,7 @@ public sealed class UpdateUserRolesHandler
                 case null:
                     throw new ValidationException($"User role with id {userRoleId} does not exist and can't be added as a role");
                 case { Status: not UserRoleStatus.Active }:
-                    throw new ValidationException($"User role with name {userRole.Name} is not in active status that can't be added as a role");
+                    throw new ValidationException($"User role with name {userRole.Name} is not in active status and can't be added as a role");
                 case { Status: UserRoleStatus.Active }:
                     {
                         user.RoleAssignments.Add(userRoleAssignment);
