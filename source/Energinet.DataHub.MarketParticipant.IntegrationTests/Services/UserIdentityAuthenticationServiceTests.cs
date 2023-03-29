@@ -167,7 +167,6 @@ public sealed class UserIdentityAuthenticationServiceTests
                     NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
                 });
 
-
         // Act + Assert
         await Assert.ThrowsAnyAsync<Exception>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
     }
