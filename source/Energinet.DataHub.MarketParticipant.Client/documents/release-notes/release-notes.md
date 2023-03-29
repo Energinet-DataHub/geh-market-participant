@@ -2,11 +2,11 @@
 
 ## Version 2.29.4
 
-- Add missing enum value for UserRoleAssignmentTypeAuditLog
+- No functional change.
 
 ## Version 2.29.3
 
-- No functional change.
+- Add missing enum value for UserRoleAssignmentTypeAuditLog
 
 ## Version 2.29.2
 
