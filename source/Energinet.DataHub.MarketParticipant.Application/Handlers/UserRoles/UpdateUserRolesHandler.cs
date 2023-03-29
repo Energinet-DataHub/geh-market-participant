@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
@@ -31,16 +32,19 @@ public sealed class UpdateUserRolesHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUserContext<FrontendUser> _userContext;
 
     public UpdateUserRolesHandler(
         IUserRepository userRepository,
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUserContext<FrontendUser> userContext)
+        IUserContext<FrontendUser> userContext,
+        IUserRoleRepository userRoleRepository)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
         _userContext = userContext;
+        _userRoleRepository = userRoleRepository;
     }
 
     public async Task<Unit> Handle(
@@ -60,17 +64,30 @@ public sealed class UpdateUserRolesHandler
 
         foreach (var addRequest in request.Assignments.Added)
         {
-            var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), new UserRoleId(addRequest));
+            var userRoleId = new UserRoleId(addRequest);
+            var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), userRoleId);
             if (user.RoleAssignments.Contains(userRoleAssignment))
                 continue;
 
-            user.RoleAssignments.Add(userRoleAssignment);
+            var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
+            switch (userRole)
+            {
+                case null:
+                    throw new ValidationException($"User role with id {userRoleId} does not exist and can't be added as a role");
+                case { Status: not UserRoleStatus.Active }:
+                    throw new ValidationException($"User role with name {userRole.Name} is not in active status and can't be added as a role");
+                case { Status: UserRoleStatus.Active }:
+                    {
+                        user.RoleAssignments.Add(userRoleAssignment);
 
-            await AuditRoleAssignmentAsync(
-                    user,
-                    userRoleAssignment,
-                    UserRoleAssignmentTypeAuditLog.Added)
-                .ConfigureAwait(false);
+                        await AuditRoleAssignmentAsync(
+                                user,
+                                userRoleAssignment,
+                                UserRoleAssignmentTypeAuditLog.Added)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+            }
         }
 
         foreach (var removeRequest in request.Assignments.Removed)

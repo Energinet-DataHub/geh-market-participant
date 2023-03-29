@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.29.4
+## Version 2.29.5
 
 - No functional change.
+
+## Version 2.29.4
+
+- Add endpoint for getting a single detailed permission
 
 ## Version 2.29.3
 
