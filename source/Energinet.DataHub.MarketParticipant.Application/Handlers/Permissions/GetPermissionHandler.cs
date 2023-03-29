@@ -16,6 +16,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -40,6 +41,9 @@ public sealed class GetPermissionHandler : IRequestHandler<GetPermissionCommand,
         var permission = await _permissionRepository
                             .GetAsync((PermissionId)request.Id)
                             .ConfigureAwait(false);
+
+        if (permission == null)
+            throw new NotFoundValidationException($"Permission with id {request.Id} not found");
 
         return new GetPermissionResponse(
             new PermissionDto(
