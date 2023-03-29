@@ -74,11 +74,8 @@ public sealed class ActorRepository : IActorRepository
 
     public async Task<IEnumerable<Actor>> GetActorsAsync()
     {
-        var query =
-            from actor in _marketParticipantDbContext.Actors
-            select actor;
-
-        var actors = await query
+        var actors = await _marketParticipantDbContext
+            .Actors
             .Include(a => a.MarketRoles)
             .ThenInclude(m => m.GridAreas)
             .ToListAsync()
