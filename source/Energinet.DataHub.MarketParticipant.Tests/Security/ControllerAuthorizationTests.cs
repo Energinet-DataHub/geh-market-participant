@@ -40,6 +40,7 @@ public sealed class ControllerAuthorizationTests
             $"{nameof(OrganizationController)}.{nameof(OrganizationController.GetSingleOrganizationAsync)}",
             $"{nameof(OrganizationController)}.{nameof(OrganizationController.GetActorsAsync)}",
             $"{nameof(PermissionController)}.{nameof(PermissionController.ListAllAsync)}",
+            $"{nameof(PermissionController)}.{nameof(PermissionController.GetPermissionAsync)}",
             $"{nameof(UserController)}.{nameof(UserController.GetAsync)}"
         };
 

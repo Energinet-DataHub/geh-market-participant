@@ -24,6 +24,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
     public interface IMarketParticipantPermissionsClient
     {
         /// <summary>
+        /// Gets a permission.
+        /// </summary>
+        Task<PermissionDetailsDto> GetPermissionAsync(int permissionId);
+
+        /// <summary>
         /// Gets all permissions.
         /// </summary>
         Task<IEnumerable<PermissionDetailsDto>> GetPermissionsAsync();
