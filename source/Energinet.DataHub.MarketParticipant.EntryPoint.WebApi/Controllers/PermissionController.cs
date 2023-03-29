@@ -44,6 +44,21 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _mediator = mediator;
         }
 
+        [HttpGet("{permissionId:int}")]
+        public async Task<IActionResult> GetPermissionAsync(int permissionId)
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    var getPermissionCommand = new GetPermissionCommand(permissionId);
+                    var response = await _mediator
+                        .Send(getPermissionCommand)
+                        .ConfigureAwait(false);
+                    return Ok(response.Permission);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
         [HttpGet]
         public async Task<IActionResult> ListAllAsync()
         {
