@@ -74,8 +74,8 @@ public sealed class UpdateUserRolesHandler
             {
                 case null:
                     throw new ValidationException($"User role with id {userRoleId} does not exist and can't be added as a role");
-                case { Status: UserRoleStatus.Inactive }:
-                    throw new ValidationException($"User role with name {userRole.Name} is deactivated and can't be added as a role");
+                case { Status: not UserRoleStatus.Active }:
+                    throw new ValidationException($"User role with name {userRole.Name} is not in active status that can't be added as a role");
                 case { Status: UserRoleStatus.Active }:
                     {
                         user.RoleAssignments.Add(userRoleAssignment);
@@ -87,9 +87,6 @@ public sealed class UpdateUserRolesHandler
                             .ConfigureAwait(false);
                         break;
                     }
-
-                case { Status: not UserRoleStatus.Active or UserRoleStatus.Inactive }:
-                    throw new ValidationException($"User role with name {userRole.Name} has unknown status and can't be added as a role");
             }
         }
 
