@@ -14,7 +14,8 @@ Under Properties pane, apply the following settings.
 - Multifactor authentication - MFA enforcement - Always on
 
 Under Page layouts pane, apply the following settings.
-NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
+
+> NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
 
 - Layout name 'Forgot password page' - Use custom page content - Yes
 - Layout name 'Forgot password page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/forgotpassword-unified.html`
@@ -37,7 +38,8 @@ Under Properties pane, apply the following settings.
 - Session behavior - Web app session timeout - Absolute
 
 Under Page layouts pane, apply the following settings.
-NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
+
+> NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
 
 - Layout name 'Sign in page' - Use custom page content - Yes
 - Layout name 'Sign in page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/login-unified.html`
