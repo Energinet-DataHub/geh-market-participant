@@ -163,8 +163,61 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
 
             // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() =>
+            var ex = await Assert.ThrowsAsync<ValidationException>(() =>
                 target.Handle(command, CancellationToken.None)).ConfigureAwait(false);
+            Assert.Contains("is not in active status and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public async Task Handle_UserRoleAssignment_AddUnkownStatusRole_ThrowsException()
+        {
+            // Arrange
+            var userContextMock = CreateMockedUser();
+            var userRepositoryMock = new Mock<IUserRepository>();
+            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+            var auditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+            var externalUserId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+            var actorId = Guid.NewGuid();
+            var deactivatedUserRoleId = new UserRoleId(Guid.NewGuid());
+            var userRoleAssignments = new List<UserRoleAssignment>
+            {
+                new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
+                new(new ActorId(actorId), new UserRoleId(Guid.NewGuid()))
+            };
+            var user = new User(
+                new UserId(userId),
+                new ExternalUserId(externalUserId),
+                userRoleAssignments);
+
+            var deactivatedUserRole = new UserRole(
+                deactivatedUserRoleId,
+                "test",
+                "test",
+                (UserRoleStatus)255,
+                new List<PermissionId>(),
+                EicFunction.BillingAgent);
+
+            userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
+            userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);
+
+            var target = new UpdateUserRolesHandler(
+                userRepositoryMock.Object,
+                auditLogEntryRepository.Object,
+                userContextMock,
+                userRoleRepositoryMock.Object);
+
+            var updatedRoleAssignments = new List<Guid> { Guid.NewGuid(), Guid.NewGuid() };
+
+            var command = new UpdateUserRoleAssignmentsCommand(
+                actorId,
+                userId,
+                new UpdateUserRoleAssignmentsDto(updatedRoleAssignments, new[] { userRoleAssignments[1].UserRoleId.Value }));
+
+            // Act + Assert
+            var ex = await Assert.ThrowsAsync<ValidationException>(() =>
+                target.Handle(command, CancellationToken.None)).ConfigureAwait(false);
+            Assert.Contains("does not exist and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         private static UserContext<FrontendUser> CreateMockedUser()
