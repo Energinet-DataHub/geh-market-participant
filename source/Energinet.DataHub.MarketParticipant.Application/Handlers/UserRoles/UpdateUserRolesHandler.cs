@@ -65,21 +65,32 @@ public sealed class UpdateUserRolesHandler
         foreach (var addRequest in request.Assignments.Added)
         {
             var userRoleId = new UserRoleId(addRequest);
-            var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
-            if (userRole is { Status: UserRoleStatus.Inactive })
-                throw new ValidationException($"User role with name {userRole.Name} is deactivated and can't be added as a role");
-
-            var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), new UserRoleId(addRequest));
+            var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), userRoleId);
             if (user.RoleAssignments.Contains(userRoleAssignment))
                 continue;
 
-            user.RoleAssignments.Add(userRoleAssignment);
+            var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
+            switch (userRole)
+            {
+                case null:
+                    throw new ValidationException($"User role with id {userRoleId} does not exist and can't be added as a role");
+                case { Status: UserRoleStatus.Inactive }:
+                    throw new ValidationException($"User role with name {userRole.Name} is deactivated and can't be added as a role");
+                case { Status: UserRoleStatus.Active }:
+                    {
+                        user.RoleAssignments.Add(userRoleAssignment);
 
-            await AuditRoleAssignmentAsync(
-                    user,
-                    userRoleAssignment,
-                    UserRoleAssignmentTypeAuditLog.Added)
-                .ConfigureAwait(false);
+                        await AuditRoleAssignmentAsync(
+                                user,
+                                userRoleAssignment,
+                                UserRoleAssignmentTypeAuditLog.Added)
+                            .ConfigureAwait(false);
+                        break;
+                    }
+
+                case { Status: not UserRoleStatus.Active or UserRoleStatus.Inactive }:
+                    throw new ValidationException($"User role with name {userRole.Name} has unknown status and can't be added as a role");
+            }
         }
 
         foreach (var removeRequest in request.Assignments.Removed)
