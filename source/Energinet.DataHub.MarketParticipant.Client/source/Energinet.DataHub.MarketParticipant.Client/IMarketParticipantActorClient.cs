@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 
@@ -29,6 +30,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="actorId">The id of the actor to get.</param>
         /// <returns>An <see cref="ActorDto" /> actor.</returns>
         Task<ActorDto> GetActorAsync(Guid actorId);
+
+        /// <summary>
+        /// List all actors.
+        /// </summary>
+        /// <returns>A list of <see cref="ActorDto"/>.</returns>
+        Task<IEnumerable<ActorDto>> GetActorsAsync();
 
         /// <summary>
         /// Creates an actor in a specific organization.

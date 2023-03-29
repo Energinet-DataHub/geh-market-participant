@@ -72,6 +72,18 @@ public sealed class ActorRepository : IActorRepository
             : ActorMapper.MapFromEntity(foundActor);
     }
 
+    public async Task<IEnumerable<Actor>> GetActorsAsync()
+    {
+        var actors = await _marketParticipantDbContext
+            .Actors
+            .Include(a => a.MarketRoles)
+            .ThenInclude(m => m.GridAreas)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return actors.Select(ActorMapper.MapFromEntity);
+    }
+
     public async Task<IEnumerable<Actor>> GetActorsAsync(IEnumerable<ActorId> actorIds)
     {
         var ids = actorIds
