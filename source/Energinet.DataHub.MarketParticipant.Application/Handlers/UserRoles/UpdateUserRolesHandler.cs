@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
@@ -66,7 +67,7 @@ public sealed class UpdateUserRolesHandler
             var userRoleId = new UserRoleId(addRequest);
             var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
             if (userRole is { Status: UserRoleStatus.Inactive })
-                continue;
+                throw new ValidationException($"User role with name {userRole.Name} is deactivated and can't be added as a role");
 
             var userRoleAssignment = new UserRoleAssignment(new ActorId(request.ActorId), new UserRoleId(addRequest));
             if (user.RoleAssignments.Contains(userRoleAssignment))
