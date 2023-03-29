@@ -104,5 +104,37 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             await Assert.ThrowsAsync<ValidationException>(() =>
                 target.Handle(updateUserRoleCommand, CancellationToken.None)).ConfigureAwait(false);
         }
+
+        [Fact]
+        public async Task Handle_UpdateUserRole_UserRoleDeactivated()
+        {
+            // Arrange
+            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
+            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
+            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
+            var roleId = Guid.NewGuid();
+            var existingUserRoleWithSameName = new UserRole(
+                new UserRoleId(Guid.NewGuid()),
+                "UserRoleNameNew",
+                "fake_value",
+                UserRoleStatus.Inactive,
+                new List<PermissionId>(),
+                EicFunction.BillingAgent);
+
+            userRoleRepositoryMock
+                .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
+                .ReturnsAsync(existingUserRoleWithSameName);
+
+            var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), roleId, new UpdateUserRoleDto(
+                "newName",
+                "newDescription",
+                UserRoleStatus.Active,
+                new Collection<int> { ValidPermission }));
+
+            // Act + Assert
+            await Assert.ThrowsAsync<ValidationException>(() =>
+                target.Handle(updateUserRoleCommand, CancellationToken.None)).ConfigureAwait(false);
+        }
     }
 }
