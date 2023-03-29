@@ -36,7 +36,7 @@ public sealed class GetAllActorsHandler : IRequestHandler<GetAllActorsCommand, G
         GetAllActorsCommand request,
         CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         var actors = await _actorRepository
             .GetActorsAsync()
