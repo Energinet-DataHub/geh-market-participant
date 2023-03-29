@@ -156,11 +156,17 @@ public sealed class UserIdentityAuthenticationServiceTests
             .Users[externalUserId.ToString()]
             .Authentication
             .PhoneMethods
-            .PostAsync(new PhoneAuthenticationMethod
-            {
-                PhoneNumber = "+45 71000000",
-                PhoneType = AuthenticationPhoneType.Mobile
-            });
+            .PostAsync(
+                new PhoneAuthenticationMethod
+                {
+                    PhoneNumber = "+45 71000000",
+                    PhoneType = AuthenticationPhoneType.Mobile
+                },
+                configuration => configuration.Options = new List<IRequestOption>
+                {
+                    NotFoundRetryHandlerOptionFactory.CreateNotFoundRetryHandlerOption()
+                });
+
 
         // Act + Assert
         await Assert.ThrowsAnyAsync<Exception>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));

@@ -53,10 +53,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
         private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
         {
+            var inviteUrl = _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge";
             var from = new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail);
-            const string subject = "Invitation til DataHub";
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
-            var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet her: {_config.UserInviteFlow}";
+            const string subject = "Invitation til DataHub";
+            var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet her: {inviteUrl}";
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
 
