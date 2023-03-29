@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
@@ -27,7 +27,7 @@ public sealed class UpdatePermissionCommandRuleSet : AbstractValidator<UpdatePer
             .NotNull();
 
         RuleFor(command => command.PermissionId)
-            .Must(x => Enum.IsDefined((Permission)x));
+            .Must(x => Enum.IsDefined((PermissionId)x));
 
         RuleFor(command => command.Description)
             .NotEmpty()

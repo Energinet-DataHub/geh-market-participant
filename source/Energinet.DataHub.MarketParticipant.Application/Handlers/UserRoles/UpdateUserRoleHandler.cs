@@ -17,10 +17,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -50,17 +50,18 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         ArgumentNullException.ThrowIfNull(request);
 
         var userRoleToUpdate = await _userRoleRepository.GetAsync(new UserRoleId(request.UserRoleId)).ConfigureAwait(false);
-
         if (userRoleToUpdate == null)
         {
             throw new NotFoundValidationException(request.UserRoleId);
         }
 
-        var userRoleWithSameName = await _userRoleRepository.GetByNameAsync(request.UserRoleUpdateDto.Name).ConfigureAwait(false);
+        if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} is deactivated and can't be updated");
 
+        var userRoleWithSameName = await _userRoleRepository.GetByNameInMarketRoleAsync(request.UserRoleUpdateDto.Name, userRoleToUpdate.EicFunction).ConfigureAwait(false);
         if (userRoleWithSameName != null && userRoleWithSameName.Id.Value != userRoleToUpdate.Id.Value)
         {
-            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists");
+            throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role");
         }
 
         var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRoleToUpdate);
@@ -68,7 +69,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         userRoleToUpdate.Name = request.UserRoleUpdateDto.Name;
         userRoleToUpdate.Description = request.UserRoleUpdateDto.Description;
         userRoleToUpdate.Status = request.UserRoleUpdateDto.Status;
-        userRoleToUpdate.Permissions = request.UserRoleUpdateDto.Permissions.Select(p => (Permission)p);
+        userRoleToUpdate.Permissions = request.UserRoleUpdateDto.Permissions.Select(p => (PermissionId)p);
 
         await _userRoleRepository
             .UpdateAsync(userRoleToUpdate)

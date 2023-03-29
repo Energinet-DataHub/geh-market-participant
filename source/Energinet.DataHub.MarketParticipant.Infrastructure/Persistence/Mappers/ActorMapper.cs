@@ -26,7 +26,7 @@ internal static class ActorMapper
         to.OrganizationId = from.OrganizationId.Value;
         to.ActorId = from.ExternalActorId?.Value;
         to.ActorNumber = from.ActorNumber.Value;
-        to.Status = (int)from.Status;
+        to.Status = from.Status;
         to.Name = from.Name.Value;
 
         // Market roles are currently treated as value types, so they are deleted and recreated with each update.
@@ -43,7 +43,7 @@ internal static class ActorMapper
             {
                 var gridAreaEntity = new MarketRoleGridAreaEntity
                 {
-                    GridAreaId = marketRoleGridArea.Id.Value,
+                    GridAreaId = marketRoleGridArea.Id.Value
                 };
 
                 foreach (var meteringPointType in marketRoleGridArea.MeteringPointTypes)
@@ -76,7 +76,7 @@ internal static class ActorMapper
         });
 
         var actorNumber = ActorNumber.Create(from.ActorNumber);
-        var actorStatus = (ActorStatus)from.Status;
+        var actorStatus = from.Status;
         var actorName = new ActorName(from.Name);
 
         return new Actor(

@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
-public record PermissionDto(int Id, string Name, string Description, DateTimeOffset Created);
+public record PermissionDto(int Id, string Name, string Description, DateTimeOffset Created, IEnumerable<EicFunction> AssignableTo);

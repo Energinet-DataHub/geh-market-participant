@@ -16,34 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using Microsoft.Graph;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 
 public static class EnumerableExtensions
 {
-    public static async Task<IEnumerable<T>> IteratePagesAsync<T>(this ICollectionPage<T> collection, IBaseClient graphClient)
-    {
-        var results = new List<T>();
-        var pageIterator = PageIterator<T>
-            .CreatePageIterator(
-                graphClient,
-                collection,
-                item =>
-                {
-                    results.Add(item);
-                    return true;
-                });
-
-        while (pageIterator.State != PagingState.Complete)
-        {
-            await pageIterator.IterateAsync().ConfigureAwait(false);
-        }
-
-        return results;
-    }
-
     public static IOrderedEnumerable<T> OrderBy<T>(this IEnumerable<T> source, string property)
     {
         ArgumentNullException.ThrowIfNull(source);

@@ -16,8 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -34,16 +33,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context = context;
         }
 
-        public async Task<IEnumerable<PermissionAuditLogEntry>> GetAsync(Permission permission)
+        public async Task<IEnumerable<PermissionAuditLogEntry>> GetAsync(PermissionId permission)
         {
-            var permissions = _context.PermissionAuditLogEntries.Where(p => p.PermissionId == (int)permission);
+            var permissions = _context.PermissionAuditLogEntries
+                .Where(p => p.PermissionId == permission);
 
             return await permissions
                 .Select(p =>
                     new PermissionAuditLogEntry(
-                        (Permission)p.PermissionId,
+                        p.PermissionId,
                         new UserId(p.ChangedByUserId),
-                        (PermissionChangeType)p.PermissionChangeType,
+                        p.PermissionChangeType,
                         p.Timestamp)).ToListAsync().ConfigureAwait(false);
         }
 
@@ -51,12 +51,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         {
             ArgumentNullException.ThrowIfNull(logEntry);
 
-            var entity = new PermissionAuditLogEntryEntity()
+            var entity = new PermissionAuditLogEntryEntity
             {
-                PermissionId = (int)logEntry.Permission,
-                PermissionChangeType = (int)logEntry.PermissionChangeType,
+                PermissionId = logEntry.Permission,
+                PermissionChangeType = logEntry.PermissionChangeType,
                 Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
+                ChangedByUserId = logEntry.ChangedByUserId.Value
             };
 
             _context.PermissionAuditLogEntries.Add(entity);

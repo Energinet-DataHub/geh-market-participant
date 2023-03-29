@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite),
+                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite)
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite),
+                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite)
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
@@ -114,7 +114,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var events = new[]
             {
-                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite),
+                new EmailEvent(new MockedEmailAddress(), EmailEventType.UserInvite)
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();

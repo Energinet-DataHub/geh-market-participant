@@ -29,6 +29,8 @@ on:
         value: ${{ jobs.changes.outputs.client_package }}
       model_package:
         value: ${{ jobs.changes.outputs.model_package }}
+      render_diagrams:
+        value: ${{ jobs.changes.outputs.render_diagrams }}
 
 jobs:
   changes:
@@ -39,28 +41,33 @@ jobs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
       client_package: ${{ steps.filter.outputs.client_package }}
       model_package: ${{ steps.filter.outputs.model_package }}
+      render_diagrams: ${{ steps.filter.outputs.render_diagrams }}
     steps:
-    # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
-    - name: Checkout repository
-      if: ${{ github.event_name != 'pull_request' }}
-      uses: actions/checkout@v3
+      # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
+      - name: Checkout repository
+        if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/checkout@v3
 
-    - name: Detect file changes
-      uses: dorny/paths-filter@v2
-      id: filter
-      with:
-        filters: |
-          dotnet:
-            - '.github/workflows/cd.yml'
-            - '.github/workflows/ci-dotnet.yml'
-            - '.github/workflows/detect-changes.yml'
-            - '.github/actions/dotnet-*/**'
-            - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
-          client_package:
-            - '.github/workflows/detect-changes.yml'
-            - '.github/workflows/publish-marketparticipant-client.yml'
-            - 'source/((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
-          model_package:
-            - '.github/workflows/detect-changes.yml'
-            - '.github/workflows/publish-marketparticipant-model.yml'
-            - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+      - name: Detect file changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            dotnet:
+              - '.github/workflows/cd.yml'
+              - '.github/workflows/ci-dotnet.yml'
+              - '.github/workflows/detect-changes.yml'
+              - '.github/actions/dotnet-*/**'
+              - 'source/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+            client_package:
+              - '.github/workflows/detect-changes.yml'
+              - '.github/workflows/publish-marketparticipant-client.yml'
+              - 'source/((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+            model_package:
+              - '.github/workflows/detect-changes.yml'
+              - '.github/workflows/publish-marketparticipant-model.yml'
+              - 'source/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+            render_diagrams:
+              - 'docs/diagrams/c4-model.dsl'
+              - '.github/workflows/render-diagrams.yml'
+              - '.github/workflows/detect-changes.yml'

@@ -16,7 +16,9 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Common.Configuration;
 
+#pragma warning disable CA1724
 public static class Settings
+#pragma warning restore CA1724
 {
     public static Setting<string> SqlDbConnectionString { get; }
         = new("SQL_MP_DB_CONNECTION_STRING");

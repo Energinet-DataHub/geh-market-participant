@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -79,6 +80,16 @@ public sealed class UserRepository : IUserRepository
             .ConfigureAwait(false);
 
         return userEntity == null ? null : UserMapper.MapFromEntity(userEntity);
+    }
+
+    public async Task<IEnumerable<User>> GetToUserRoleAsync(UserRoleId userRoleId)
+    {
+        var userEntities = await BuildUserQuery()
+            .Where(x => x.RoleAssignments.Any(y => y.UserRoleId == userRoleId.Value))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return userEntities.Select(UserMapper.MapFromEntity);
     }
 
     private IQueryable<UserEntity> BuildUserQuery()

@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
+using Microsoft.Graph.Models.ODataErrors;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
@@ -42,7 +43,7 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
 
         var authenticationBuilder = _graphClient
             .Users[userId.ToString()]
-            .Authentication;
+            .Authentication!;
 
         var externalAuthenticationMethod = ChooseExternalMethod(authenticationMethod);
 
@@ -52,24 +53,22 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
                 .AssignAsync(authenticationBuilder)
                 .ConfigureAwait(false);
         }
-        catch (ServiceException ex) when (ex.StatusCode == HttpStatusCode.BadRequest)
+        catch (ODataError ex) when (ex.ResponseStatusCode == (int)HttpStatusCode.BadRequest)
         {
             // If there is a bad request with 'Mobile phone method is already registered for this account.', MFA is already configured.
             // Check if MFA is equivalent to current authentication method, then ignore the error.
             // Otherwise, the user is in an unknown state and exception is thrown.
-            if (!await externalAuthenticationMethod.VerifyAsync(authenticationBuilder).ConfigureAwait(false))
+            if (!await externalAuthenticationMethod.VerifyAsync(_graphClient, authenticationBuilder).ConfigureAwait(false))
                 throw;
         }
     }
 
     private static IExternalAuthenticationMethod ChooseExternalMethod(AuthenticationMethod authenticationMethod)
     {
-        switch (authenticationMethod)
+        return authenticationMethod switch
         {
-            case SmsAuthenticationMethod smsAuthenticationMethod:
-                return new ExternalSmsAuthenticationMethod(smsAuthenticationMethod);
-            default:
-                throw new ArgumentOutOfRangeException(nameof(authenticationMethod));
-        }
+            SmsAuthenticationMethod smsAuthenticationMethod => new ExternalSmsAuthenticationMethod(smsAuthenticationMethod),
+            _ => throw new ArgumentOutOfRangeException(nameof(authenticationMethod))
+        };
     }
 }

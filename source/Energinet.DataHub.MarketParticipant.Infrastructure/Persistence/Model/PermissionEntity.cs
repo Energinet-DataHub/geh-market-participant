@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 public sealed class PermissionEntity
 {
-    public int Id { get; set; }
+    public PermissionId Id { get; set; }
     public string Description { get; set; } = null!;
-    public DateTimeOffset Created { get; set; }
-    public Collection<PermissionEicFunctionEntity> EicFunctions { get; } = new();
 }

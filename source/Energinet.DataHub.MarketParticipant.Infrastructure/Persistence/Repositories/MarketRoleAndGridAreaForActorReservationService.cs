@@ -43,7 +43,7 @@ public sealed class MarketRoleAndGridAreaForActorReservationService : IMarketRol
             {
                 ActorId = actorId.Value,
                 MarketRoleFunction = (int)marketRole,
-                GridAreaId = gridAreaId.Value,
+                GridAreaId = gridAreaId.Value
             });
 
             await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);

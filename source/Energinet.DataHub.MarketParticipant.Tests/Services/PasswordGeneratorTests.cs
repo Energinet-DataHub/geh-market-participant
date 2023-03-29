@@ -26,7 +26,7 @@ public sealed class PasswordGeneratorTests
     private const string Num = "0123456789";
     private const string Low = "abcdefghijklmnopqrstuvwxyz";
     private const string Upp = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private const string Spe = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+    private const string Spe = " !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
     [Fact]
     public void Generate_GeneratedPassword_MustMatchComplexityParams()

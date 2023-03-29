@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -44,9 +44,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
 
             var application = await _graphClient.Applications[_appObjectId]
-                .Request()
-                .Select(a => new { a.DisplayName, a.AppRoles })
-                .GetAsync()
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Select = new[]
+                    {
+                        "displayName",
+                        "appRoles"
+                    };
+                })
                 .ConfigureAwait(false);
 
             if (application is null)

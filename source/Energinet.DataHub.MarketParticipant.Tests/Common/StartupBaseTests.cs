@@ -78,14 +78,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
 
         private static IConfiguration BuildConfig()
         {
-            KeyValuePair<string, string>[] keyValuePairs =
+            KeyValuePair<string, string?>[] keyValuePairs =
             {
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
                 new(Settings.ServiceBusTopicName.Key, "fake_value"),
                 new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
                 new(Settings.B2CBackendObjectId.Key, "fake_value"),
                 new(Settings.B2CBackendId.Key, "fake_value"),
-                new(Settings.B2CTenant.Key, "fake_value"),
+                new(Settings.B2CTenant.Key, "fake_value")
             };
 
             return new ConfigurationBuilder()

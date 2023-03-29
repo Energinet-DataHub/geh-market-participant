@@ -16,10 +16,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
@@ -52,9 +52,9 @@ public sealed class GetUserRoleHandler
             throw new NotFoundValidationException(request.UserRoleId);
 
         var permissionDetailsLookup = (await _permissionRepository
-            .GetToMarketRoleAsync(userRole.EicFunction)
+            .GetForMarketRoleAsync(userRole.EicFunction)
             .ConfigureAwait(false))
-            .ToDictionary(x => x.Permission);
+            .ToDictionary(x => x.Id);
 
         return new GetUserRoleResponse(new UserRoleWithPermissionsDto(
             userRole.Id.Value,
@@ -67,11 +67,12 @@ public sealed class GetUserRoleHandler
                 .Select(x => MapPermission(permissionDetailsLookup[x]))));
     }
 
-    private static PermissionDetailsDto MapPermission(PermissionDetails permissionDetails)
+    private static PermissionDetailsDto MapPermission(Permission permission)
     {
         return new PermissionDetailsDto(
-            (int)permissionDetails.Permission,
-            PermissionsAsClaims.Lookup[permissionDetails.Permission],
-            permissionDetails.Description);
+            (int)permission.Id,
+            permission.Name,
+            permission.Description,
+            permission.Created.ToDateTimeOffset());
     }
 }

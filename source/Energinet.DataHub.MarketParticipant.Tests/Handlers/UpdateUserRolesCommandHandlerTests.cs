@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRoleAssignments = new List<UserRoleAssignment>
             {
                 new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())),
-                new(new ActorId(actorId), new UserRoleId(Guid.NewGuid())),
+                new(new ActorId(actorId), new UserRoleId(Guid.NewGuid()))
             };
             var user = new User(
                 new UserId(userId),

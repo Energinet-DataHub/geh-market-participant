@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorId = actor.Id.Value,
                 ExternalActorId = actor.ExternalActorId,
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),
-                Status = actor.Status,
+                Status = actor.Status
             };
 
             foreach (var actorMarketRole in actor.MarketRoles)

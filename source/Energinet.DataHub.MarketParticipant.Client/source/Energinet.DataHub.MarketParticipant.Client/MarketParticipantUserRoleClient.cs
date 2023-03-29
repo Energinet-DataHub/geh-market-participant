@@ -146,5 +146,31 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<IEnumerable<PermissionDetailsDto>>()
                 .ConfigureAwait(false);
         }
+
+        public async Task<IEnumerable<UserRoleDto>> GetAssignedToPermissionAsync(int permissionId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user-roles", "assignedtopermission")
+                        .SetQueryParam("permissionId", permissionId)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<IEnumerable<UserRoleDto>>()
+                .ConfigureAwait(false);
+        }
+
+        public Task DeactivateUserRoleAsync(Guid userRoleId)
+        {
+            return ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request($"user-roles/{userRoleId}/deactivate")
+                        .PutAsync());
+        }
     }
 }

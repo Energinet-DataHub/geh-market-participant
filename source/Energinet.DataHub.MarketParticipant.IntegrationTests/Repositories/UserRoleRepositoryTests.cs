@@ -16,9 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -63,7 +64,7 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleRepository = new UserRoleRepository(context);
 
-        var userRole = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
+        var userRole = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
 
         // Act
         var actual = await userRoleRepository.GetAsync(new UserRoleId(userRole.Id));
@@ -72,7 +73,7 @@ public sealed class UserRoleRepositoryTests
         Assert.NotNull(actual);
         Assert.Equal(userRole.Name, actual.Name);
         Assert.Equal(EicFunction.BillingAgent, actual.EicFunction);
-        Assert.Single(actual.Permissions, Permission.UsersManage);
+        Assert.Single(actual.Permissions, PermissionId.UsersManage);
     }
 
     [Fact]
@@ -84,7 +85,7 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleRepository = new UserRoleRepository(context);
 
-        await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
+        await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
 
         // Act
         var actual = await userRoleRepository.GetAsync(Array.Empty<EicFunction>());
@@ -102,8 +103,8 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleRepository = new UserRoleRepository(context);
 
-        var userRole1 = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
-        var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
+        var userRole1 = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
+        var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
 
         // Act
         var actual = await userRoleRepository.GetAsync(new[] { EicFunction.BillingAgent });
@@ -122,8 +123,8 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleRepository = new UserRoleRepository(context);
 
-        await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BillingAgent);
-        var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { Permission.UsersManage }, EicFunction.BalanceResponsibleParty);
+        await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
+        var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BalanceResponsibleParty);
 
         // Act
         var actual = await userRoleRepository.GetAsync(new[] { EicFunction.BalanceResponsibleParty });
@@ -142,7 +143,7 @@ public sealed class UserRoleRepositoryTests
         var userRoleRepository = new UserRoleRepository(context);
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { Permission.UsersManage },
+            new[] { PermissionId.UsersManage },
             EicFunction.BalanceResponsibleParty,
             EicFunction.BillingAgent);
 
@@ -169,7 +170,7 @@ public sealed class UserRoleRepositoryTests
             "fake_value",
             "fake_value",
             UserRoleStatus.Active,
-            new List<Permission>(),
+            new List<PermissionId>(),
             EicFunction.IndependentAggregator);
 
         await context2.SaveChangesAsync();
@@ -186,5 +187,57 @@ public sealed class UserRoleRepositoryTests
         Assert.Equal(userRole.Description, actual.Description);
         Assert.Equal(userRole.Status, actual.Status);
         Assert.Equal(userRole.EicFunction, actual.EicFunction);
+    }
+
+    [Fact]
+    public async Task GetByNameInMarkerRole_NameExistInMarketRole()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleRepository = new UserRoleRepository(context);
+
+        var userRoleNameForUpdate = "Access1";
+
+        var existingUserRole = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = userRoleNameForUpdate);
+        var userRole = await _fixture.PrepareUserRoleAsync(existingUserRole);
+
+        // Act
+        var actual = await userRoleRepository.GetAsync(new UserRoleId(userRole.Id));
+
+        var useRoleUnderMarketRole = await userRoleRepository
+            .GetByNameInMarketRoleAsync(userRoleNameForUpdate, existingUserRole.EicFunctions.First().EicFunction);
+
+        // Assert
+        Assert.NotNull(useRoleUnderMarketRole);
+        Assert.NotNull(actual);
+        Assert.Equal(userRole.Name, actual.Name);
+        Assert.Equal(userRole.EicFunctions.First().EicFunction, actual.EicFunction);
+    }
+
+    [Fact]
+    public async Task GetByNameInMarkerRole_NameDoesNotExistInMarketRole()
+    {
+        // Arrange
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleRepository = new UserRoleRepository(context);
+
+        var existingUserRole = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "Access1");
+        existingUserRole.EicFunctions.Clear();
+        existingUserRole.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier });
+        var userRole = await _fixture.PrepareUserRoleAsync(existingUserRole);
+
+        // Act
+        var actual = await userRoleRepository.GetAsync(new UserRoleId(userRole.Id));
+
+        var useRoleUnderMarketRole = await userRoleRepository
+            .GetByNameInMarketRoleAsync("Access1", EicFunction.BillingAgent);
+
+        // Assert
+        Assert.Null(useRoleUnderMarketRole);
+        Assert.NotNull(actual);
     }
 }

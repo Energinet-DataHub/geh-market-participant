@@ -22,8 +22,9 @@ using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using Xunit;
-using User = Microsoft.Graph.User;
+using User = Microsoft.Graph.Models.User;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
@@ -68,7 +69,6 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             {
                 await _graphClient
                     .Users[externalUserId.ToString()]
-                    .Request()
                     .DeleteAsync();
             }
 #pragma warning disable CA1508
@@ -100,9 +100,9 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 ForceChangePasswordNextSignIn = true,
                 Password = Guid.NewGuid().ToString()
             },
-            Identities = new[]
+            Identities = new List<ObjectIdentity>()
             {
-                new ObjectIdentity
+                new()
                 {
                     SignInType = "emailAddress",
                     Issuer = _integrationTestConfiguration.B2CSettings.Tenant,
@@ -113,11 +113,10 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
         var createdUser = await Client
             .Users
-            .Request()
-            .AddAsync(newUser)
+            .PostAsync(newUser)
             .ConfigureAwait(false);
 
-        var externalUserId = new ExternalUserId(createdUser.Id);
+        var externalUserId = new ExternalUserId(createdUser!.Id!);
         _createdUsers.Add(externalUserId);
 
         return externalUserId;
@@ -127,14 +126,18 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
     {
         var usersRequest = await Client
             .Users
-            .Request()
-            .Filter($"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')")
-            .Select(user => user.Id)
-            .GetAsync()
+            .GetAsync(x =>
+            {
+                x.QueryParameters.Select = new[]
+                {
+                    "id"
+                };
+                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
+            })
             .ConfigureAwait(false);
 
-        var users = await usersRequest
-            .IteratePagesAsync(Client)
+        var users = await usersRequest!
+            .IteratePagesAsync<User>(Client)
             .ConfigureAwait(false);
 
         var user = users.SingleOrDefault();
@@ -149,7 +152,6 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
         await Client
             .Users[existingUser]
-            .Request()
             .DeleteAsync();
     }
 }

@@ -1,4 +1,4 @@
-﻿<!--
+<!--
 Copyright 2020 Energinet DataHub A/S
 
 Licensed under the Apache License, Version 2.0 (the "License2");
@@ -17,7 +17,7 @@ limitations under the License.
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
@@ -32,14 +32,12 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.8.2" />
     <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.12.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.3.4" />
-    <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="7.3.4" />
-    <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.8.0-alpha-246" />
+    <PackageReference Include="Energinet.DataHub.MarketParticipant.Integration.Model" Version="2.7.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.2" />
     <PackageReference Include="NodaTime" Version="3.1.6" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageReference Include="Microsoft.Graph" Version="4.53.0" />
+    <PackageReference Include="Microsoft.Graph" Version="5.1.0" />
   </ItemGroup>
 
 </Project>

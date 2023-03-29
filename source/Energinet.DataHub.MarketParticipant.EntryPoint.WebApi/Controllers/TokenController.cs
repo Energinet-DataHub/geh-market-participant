@@ -20,7 +20,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys.Cryptography;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
@@ -69,7 +68,7 @@ public class TokenController : ControllerBase
         var configuration = new
         {
             issuer = Issuer,
-            jwks_uri = $"https://{Request.Host}/token/keys",
+            jwks_uri = $"https://{Request.Host}/token/keys"
         };
 
         return Ok(configuration);
@@ -138,8 +137,8 @@ public class TokenController : ControllerBase
             return Unauthorized();
         }
 
-        var roleClaims = grantedPermissions.Permissions
-            .Select(p => new Claim(RoleClaim, PermissionsAsClaims.Lookup[p]));
+        var roleClaims = grantedPermissions.PermissionClaims
+            .Select(p => new Claim(RoleClaim, p));
 
         var dataHubTokenClaims = roleClaims
             .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
@@ -27,6 +26,21 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public MarketParticipantPermissionsClient(IMarketParticipantClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
+        }
+
+        public async Task<PermissionDetailsDto> GetPermissionAsync(int permissionId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("Permission", permissionId)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            return await response
+                .GetJsonAsync<PermissionDetailsDto>()
+                .ConfigureAwait(false);
         }
 
         public async Task<IEnumerable<PermissionDetailsDto>> GetPermissionsAsync()

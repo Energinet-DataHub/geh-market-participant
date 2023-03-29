@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -42,4 +43,11 @@ public interface IUserRepository
     /// <param name="userId">The id of the user.</param>
     /// <returns>The user if it exists; otherwise null.</returns>
     Task<User?> GetAsync(UserId userId);
+
+    /// <summary>
+    /// Gets the users having the specified user role
+    /// </summary>
+    /// <param name="userRoleId">The id of the user role.</param>
+    /// <returns>A List of user with the actual role; otherwise empty.</returns>
+    Task<IEnumerable<User>> GetToUserRoleAsync(UserRoleId userRoleId);
 }

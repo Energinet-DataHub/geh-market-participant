@@ -79,5 +79,18 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="eicFunction">The Eic Function to get permissions for</param>
         /// <returns>Collection of permission</returns>
         Task<IEnumerable<PermissionDetailsDto>> GetPermissionDetailsAsync(EicFunction eicFunction);
+
+        /// <summary>
+        /// Gets user roles that have the given permission assigned to them
+        /// </summary>
+        /// <param name="permissionId">The permission you want to get user roles for.</param>
+        /// <returns>A list of user roles.</returns>
+        Task<IEnumerable<UserRoleDto>> GetAssignedToPermissionAsync(int permissionId);
+
+        /// <summary>
+        /// Deactivates the supplied user role, and removes the role from all users it was assigned to
+        /// </summary>
+        /// <param name="userRoleId">The user role to deactivate</param>
+        Task DeactivateUserRoleAsync(Guid userRoleId);
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2020 Energinet DataHub A/S
+// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models.ODataErrors;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -119,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 // Arrange
                 var roles = new List<EicFunction>
                 {
-                    EicFunction.SystemOperator, // transmission system operator
+                    EicFunction.SystemOperator // transmission system operator
                 };
 
                 var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
@@ -137,14 +138,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 cleanupId = null;
 
                 // Assert
-                var ex = await Assert.ThrowsAsync<ServiceException>(async () => await _sut
+                var ex = await Assert.ThrowsAsync<ODataError>(async () => await _sut
                         .GetExistingAppRegistrationAsync(
                             new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
                             new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
                         .ConfigureAwait(false))
                     .ConfigureAwait(false);
 
-                Assert.Equal(HttpStatusCode.NotFound, ex.StatusCode);
+                Assert.Equal((int)HttpStatusCode.NotFound, ex.ResponseStatusCode);
             }
             finally
             {
@@ -164,7 +165,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             var graphClient = new GraphServiceClient(
                 clientSecretCredential,
-                new[] { "https://graph.microsoft.com/.default" });
+                new[]
+                {
+                    "https://graph.microsoft.com/.default"
+                });
 
             // Azure AD Config
             var config = new AzureAdConfig(

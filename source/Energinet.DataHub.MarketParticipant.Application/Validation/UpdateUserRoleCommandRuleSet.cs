@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation
@@ -45,7 +45,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .IsInEnum();
 
                     validator
-                        .RuleForEach(e => e.Permissions).Must(p => Enum.IsDefined(typeof(Permission), p));
+                        .RuleForEach(e => e.Permissions)
+                        .Must(p => Enum.IsDefined(typeof(PermissionId), p));
                 });
         }
     }

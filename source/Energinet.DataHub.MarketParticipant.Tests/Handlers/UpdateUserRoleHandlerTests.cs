@@ -18,12 +18,12 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Security;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
     [UnitTest]
     public sealed class UpdateUserRoleHandlerTests
     {
-        private const int ValidPermission = (int)Permission.ActorManage;
+        private const int ValidPermission = (int)PermissionId.ActorsManage;
 
         [Fact]
         public async Task Handle_UpdateUserRole_UserRoleNotFound()
@@ -75,11 +75,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "UserRoleNameNew",
                 "fake_value",
                 UserRoleStatus.Active,
-                new List<Permission>(),
+                new List<PermissionId>(),
                 EicFunction.BillingAgent);
 
             userRoleRepositoryMock
-                .Setup(x => x.GetByNameAsync(It.IsAny<string>()))
+                .Setup(x => x.GetByNameInMarketRoleAsync(It.IsAny<string>(), existingUserRoleWithSameName.EicFunction))
                 .ReturnsAsync(existingUserRoleWithSameName);
 
             var userRoleToUpdate = new UserRole(
@@ -87,7 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "UserRoleName",
                 "fake_value",
                 UserRoleStatus.Active,
-                new List<Permission>(),
+                new List<PermissionId>(),
                 EicFunction.BillingAgent);
 
             var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
@@ -99,6 +99,38 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             userRoleRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
                 .ReturnsAsync(userRoleToUpdate);
+
+            // Act + Assert
+            await Assert.ThrowsAsync<ValidationException>(() =>
+                target.Handle(updateUserRoleCommand, CancellationToken.None)).ConfigureAwait(false);
+        }
+
+        [Fact]
+        public async Task Handle_UpdateUserRole_UserRoleDeactivated()
+        {
+            // Arrange
+            var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
+            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
+            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
+            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
+            var roleId = Guid.NewGuid();
+            var existingUserRoleWithSameName = new UserRole(
+                new UserRoleId(Guid.NewGuid()),
+                "UserRoleNameNew",
+                "fake_value",
+                UserRoleStatus.Inactive,
+                new List<PermissionId>(),
+                EicFunction.BillingAgent);
+
+            userRoleRepositoryMock
+                .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
+                .ReturnsAsync(existingUserRoleWithSameName);
+
+            var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), roleId, new UpdateUserRoleDto(
+                "newName",
+                "newDescription",
+                UserRoleStatus.Active,
+                new Collection<int> { ValidPermission }));
 
             // Act + Assert
             await Assert.ThrowsAsync<ValidationException>(() =>

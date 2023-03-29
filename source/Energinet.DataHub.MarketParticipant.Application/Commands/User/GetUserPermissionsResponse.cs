@@ -14,8 +14,7 @@
 
 using System;
 using System.Collections.Generic;
-using Energinet.DataHub.Core.App.Common.Security;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetUserPermissionsResponse(Guid UserId, bool IsFas, IEnumerable<Permission> Permissions);
+public sealed record GetUserPermissionsResponse(Guid UserId, bool IsFas, IEnumerable<string> PermissionClaims);

@@ -17,27 +17,15 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
-{
-    public sealed class PermissionEntityConfiguration : IEntityTypeConfiguration<PermissionEntity>
-    {
-        public void Configure(EntityTypeBuilder<PermissionEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("Permission");
-            builder.HasKey(permission => permission.Id);
-            builder.Property(permission => permission.Id).ValueGeneratedNever();
-            builder.OwnsMany(permission => permission.EicFunctions, ConfigureEicFunctions);
-        }
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-        private static void ConfigureEicFunctions(
-            OwnedNavigationBuilder<PermissionEntity, PermissionEicFunctionEntity> eicBuilder)
-        {
-            eicBuilder.WithOwner().HasForeignKey("PermissionId");
-            eicBuilder.ToTable("PermissionEicFunction");
-            eicBuilder.Property<Guid>("Id").ValueGeneratedOnAdd();
-            eicBuilder.Property(p => p.EicFunction).HasColumnName("EicFunction");
-            eicBuilder.Property(p => p.PermissionId).HasColumnName("PermissionId");
-        }
+public sealed class PermissionEntityConfiguration : IEntityTypeConfiguration<PermissionEntity>
+{
+    public void Configure(EntityTypeBuilder<PermissionEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        builder.ToTable("Permission");
+        builder.HasKey(permission => permission.Id);
+        builder.Property(permission => permission.Id).ValueGeneratedNever();
     }
 }
