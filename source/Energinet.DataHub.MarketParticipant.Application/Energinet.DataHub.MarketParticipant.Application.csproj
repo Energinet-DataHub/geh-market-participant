@@ -25,7 +25,7 @@ limitations under the License.
 
   <ItemGroup>
     <PackageReference Include="Energinet.DataHub.Core.App.Common.Security" Version="7.4.0" />
-    <PackageReference Include="FluentValidation" Version="11.4.0" />
+    <PackageReference Include="FluentValidation" Version="11.5.1" />
     <PackageReference Include="MediatR" Version="11.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Include="SendGrid" Version="9.28.1" />
