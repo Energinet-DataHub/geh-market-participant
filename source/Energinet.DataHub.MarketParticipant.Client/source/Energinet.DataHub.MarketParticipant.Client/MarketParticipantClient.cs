@@ -74,6 +74,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantActorClient.GetActorAsync(actorId);
         }
 
+        public Task<IEnumerable<ActorDto>> GetActorsAsync()
+        {
+            return _marketParticipantActorClient.GetActorsAsync();
+        }
+
         public Task<Guid> CreateActorAsync(CreateActorDto createActorDto)
         {
             return _marketParticipantActorClient.CreateActorAsync(createActorDto);

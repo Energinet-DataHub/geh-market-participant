@@ -41,6 +41,34 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             _userContext = userContext;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetActorsAsync()
+        {
+            return await this.ProcessAsync(
+                async () =>
+                {
+                    if (!_userContext.CurrentUser.IsFas)
+                    {
+                        var getSingleActorCommand = new GetSingleActorCommand(_userContext.CurrentUser.ActorId);
+
+                        var singleResponse = await _mediator
+                            .Send(getSingleActorCommand)
+                            .ConfigureAwait(false);
+
+                        return Ok(new[] { singleResponse.Actor });
+                    }
+
+                    var getAllActorsCommand = new GetAllActorsCommand();
+
+                    var response = await _mediator
+                        .Send(getAllActorsCommand)
+                        .ConfigureAwait(false);
+
+                    return Ok(response.Actors);
+                },
+                _logger).ConfigureAwait(false);
+        }
+
         [HttpGet("{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid actorId)
         {
