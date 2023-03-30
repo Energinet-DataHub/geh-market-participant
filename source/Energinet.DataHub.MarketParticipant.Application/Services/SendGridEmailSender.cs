@@ -25,28 +25,26 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
     public class SendGridEmailSender : IEmailSender
     {
-        private readonly string _fromEmail;
-        private readonly string _bccEmail;
+        private readonly InviteConfig _config;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
 
         public SendGridEmailSender(
-            string fromEmail,
-            string bccEmail,
+            InviteConfig config,
             ISendGridClient sendGridClient,
             ILogger<SendGridEmailSender> logger)
         {
-            _fromEmail = fromEmail;
-            _bccEmail = bccEmail;
+            _config = config;
             _logger = logger;
             _client = sendGridClient;
         }
 
         public Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
         {
-            ArgumentNullException.ThrowIfNull(emailAddress, nameof(emailAddress));
+            ArgumentNullException.ThrowIfNull(emailAddress);
+            ArgumentNullException.ThrowIfNull(emailEvent);
 
-            return emailEvent?.EmailEventType switch
+            return emailEvent.EmailEventType switch
             {
                 EmailEventType.UserInvite => SendUserInviteAsync(emailAddress),
                 _ => throw new NotFoundException("EmailEventType not recognized")
@@ -55,12 +53,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
         private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
         {
-            var from = new SendGrid.Helpers.Mail.EmailAddress(_fromEmail);
-            const string subject = "Invitation til DataHub";
+            var inviteUrl = _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge";
+            var from = new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail);
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
-            var htmlContent = "Invitation til DataHub<br /><br />Bliv oprettet her: https://www.energinet.dk";
+            const string subject = "Invitation til DataHub";
+            var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet her: {inviteUrl}";
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
-            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_bccEmail));
+            msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
 
             var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
 
