@@ -20,13 +20,11 @@ Under Page layouts pane, apply the following settings.
 
 > NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
 
-Version to use is 2.1.21.
-
-- Layout name 'Forgot password page' - Use custom page content - Yes
+- Layout name 'Forgot password page' - Use custom page content - Yes, version 2.1.21
 - Layout name 'Forgot password page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/forgotpassword-unified.html`
-- Layout name 'Change password page' - Use custom page content - Yes
+- Layout name 'Change password page' - Use custom page content - Yes, version 2.1.21
 - Layout name 'Change password page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/changepassword-unified.html`
-- Layout name 'Multifactor authentication page' - Use custom page content - Yes
+- Layout name 'Multifactor authentication page' - Use custom page content - Yes, version 1.2.10
 - Layout name 'Multifactor authentication page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/multifactorauth-unified.html`
 
 ![Invite Flow Page Layout](https://user-images.githubusercontent.com/77341673/228801236-18c95292-8b1b-4e1f-96ce-cc4302413dcc.PNG)
@@ -52,7 +50,5 @@ Under Page layouts pane, apply the following settings.
 
 > NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
 
-Version to use is 2.1.5.
-
-- Layout name 'Sign in page' - Use custom page content - Yes
+- Layout name 'Sign in page' - Use custom page content - Yes, version 2.1.5.
 - Layout name 'Sign in page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/login-unified.html`
