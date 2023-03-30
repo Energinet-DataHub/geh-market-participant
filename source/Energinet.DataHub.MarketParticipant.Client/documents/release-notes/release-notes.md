@@ -1,5 +1,13 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.29.6
+
+- Added endpoint to get all actors.
+
+## Version 2.29.5
+
+- No functional change.
+
 ## Version 2.29.4
 
 - Add endpoint for getting a single detailed permission

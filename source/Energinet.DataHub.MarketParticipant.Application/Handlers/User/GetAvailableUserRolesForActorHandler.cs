@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
@@ -61,9 +62,13 @@ public sealed class GetAvailableUserRolesForActorHandler
             .GetAsync(eicFunctions)
             .ConfigureAwait(false);
 
-        return new GetUserRolesResponse(userRoles.Select(t =>
-        {
-            return new UserRoleDto(t.Id.Value, t.Name, t.Description, t.EicFunction, t.Status);
-        }));
+        return new GetUserRolesResponse(userRoles
+            .Where(u => u.Status == UserRoleStatus.Active)
+            .Select(t => new UserRoleDto(
+                t.Id.Value,
+                t.Name,
+                t.Description,
+                t.EicFunction,
+                t.Status)));
     }
 }
