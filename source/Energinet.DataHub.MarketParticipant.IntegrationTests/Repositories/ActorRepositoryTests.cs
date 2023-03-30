@@ -98,6 +98,27 @@ public sealed class ActorRepositoryTests
     }
 
     [Fact]
+    public async Task GetActorsAsync_All_CanReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+
+        var actor1 = await _fixture.PrepareActorAsync();
+        var actor2 = await _fixture.PrepareActorAsync();
+
+        // Act
+        var actual = (await actorRepository.GetActorsAsync()).ToList();
+
+        // Assert
+        Assert.NotEmpty(actual);
+        Assert.Contains(actual, a => a.Id.Value == actor1.Id);
+        Assert.Contains(actual, a => a.Id.Value == actor2.Id);
+    }
+
+    [Fact]
     public async Task GetActorsAsync_ById_CanReadBack()
     {
         // Arrange

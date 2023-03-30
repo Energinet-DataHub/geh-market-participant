@@ -52,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>(Lifestyle.Scoped);
+            container.Register<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>(Lifestyle.Scoped);
             container.Register<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>(Lifestyle.Scoped);
