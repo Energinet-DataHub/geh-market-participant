@@ -27,9 +27,9 @@ Under Page layouts pane, apply the following settings.
 - Layout name 'Multifactor authentication page' - Use custom page content - Yes
 - Layout name 'Multifactor authentication page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/multifactorauth-unified.html`
 
-[Invite Flow Page Layout](https://user-images.githubusercontent.com/77341673/228801236-18c95292-8b1b-4e1f-96ce-cc4302413dcc.PNG)
+![Invite Flow Page Layout](https://user-images.githubusercontent.com/77341673/228801236-18c95292-8b1b-4e1f-96ce-cc4302413dcc.PNG)
 
-## Configuring 'B2C_1_SignInFlow' user flow!
+## Configuring 'B2C_1_SignInFlow' user flow
 
 Under Properties pane, apply the following settings.
 
