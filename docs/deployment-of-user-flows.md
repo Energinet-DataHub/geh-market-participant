@@ -20,6 +20,8 @@ Under Page layouts pane, apply the following settings.
 
 > NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
 
+Version to use is 2.1.21.
+
 - Layout name 'Forgot password page' - Use custom page content - Yes
 - Layout name 'Forgot password page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/forgotpassword-unified.html`
 - Layout name 'Change password page' - Use custom page content - Yes
@@ -49,6 +51,8 @@ Under Properties pane, apply the following settings.
 Under Page layouts pane, apply the following settings.
 
 > NOTE: Replace `<host-name>` with environment-specific host name, e.g. jolly-sand-03f839703.azurestaticapps.net.
+
+Version to use is 2.1.5.
 
 - Layout name 'Sign in page' - Use custom page content - Yes
 - Layout name 'Sign in page' - Custom page URI - `https://<host-name>/assets/b2c-custom-layouts/login-unified.html`
