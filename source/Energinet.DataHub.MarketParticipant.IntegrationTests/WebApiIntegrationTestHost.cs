@@ -73,7 +73,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new(Settings.SqlDbConnectionString.Key, dbConnectionString),
             new(Settings.ServiceBusTopicName.Key, "fake_value"),
             new(Settings.ExternalOpenIdUrl.Key, "fake_value"),
-            new(Settings.BackendAppId.Key, "fake_value"),
+            new(Settings.BackendBffAppId.Key, "fake_value"),
             new(Settings.InternalOpenIdUrl.Key, "fake_value")
         };
 

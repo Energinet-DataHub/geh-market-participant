@@ -152,7 +152,7 @@ public class TokenController : ControllerBase
 
         var dataHubToken = new JwtSecurityToken(
             Issuer,
-            _configuration.GetSetting(Settings.BackendAppId),
+            _configuration.GetSetting(Settings.BackendBffAppId),
             dataHubTokenClaims,
             externalJwt.ValidFrom,
             externalJwt.ValidTo);
