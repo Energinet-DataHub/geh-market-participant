@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             var from = new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail);
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
             const string subject = "Invitation til DataHub";
-            var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet her: {inviteUrl}";
+            var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet <a href=\"{inviteUrl}\">her</a>";
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
 
