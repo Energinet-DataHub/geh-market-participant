@@ -45,8 +45,8 @@ public static class Settings
         = new("EXTERNAL_OPEN_ID_URL");
     public static Setting<string> InternalOpenIdUrl { get; }
         = new("INTERNAL_OPEN_ID_URL");
-    public static Setting<string> BackendAppId { get; }
-        = new("BACKEND_SERVICE_APP_ID");
+    public static Setting<string> BackendBffAppId { get; }
+        = new("BACKEND_BFF_APP_ID");
 
     public static Setting<bool> AllowAllTokens { get; }
         = new("ALLOW_ALL_TOKENS", false);

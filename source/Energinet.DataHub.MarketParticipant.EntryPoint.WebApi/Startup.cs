@@ -111,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             {
                 var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
                 var internalOpenIdUrl = configuration.GetSetting(Settings.InternalOpenIdUrl);
-                var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+                var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
                 services.AddJwtBearerAuthentication(externalOpenIdUrl, internalOpenIdUrl, backendAppId);
             }
 
@@ -162,7 +162,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             container.RegisterSingleton<IExternalTokenValidator>(() =>
             {
                 var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-                var backendAppId = configuration.GetSetting(Settings.BackendAppId);
+                var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
                 return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
             });
 
