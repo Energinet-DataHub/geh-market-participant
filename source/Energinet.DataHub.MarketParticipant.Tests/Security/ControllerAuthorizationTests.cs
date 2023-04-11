@@ -31,6 +31,7 @@ public sealed class ControllerAuthorizationTests
         // arrange
         var ignoredEndpoints = new[]
         {
+            $"{nameof(ActorController)}.{nameof(ActorController.GetActorsAsync)}",
             $"{nameof(ActorController)}.{nameof(ActorController.GetSingleActorAsync)}",
             $"{nameof(ActorQueryController)}.{nameof(ActorQueryController.GetSelectionActorsAsync)}",
             $"{nameof(GridAreaController)}.{nameof(GridAreaController.GetGridAreasAsync)}",

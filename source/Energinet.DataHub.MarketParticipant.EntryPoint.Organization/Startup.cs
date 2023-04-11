@@ -48,6 +48,7 @@ internal sealed class Startup : StartupBase
     {
         Container.Register<SynchronizeActorsTimerTrigger>();
         Container.Register<EmailEventTimerTrigger>();
+        Container.AddInviteConfigRegistration();
         Container.AddSendGridEmailSenderClient();
 
         // Health check

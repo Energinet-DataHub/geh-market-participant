@@ -11,7 +11,10 @@ jobs:
   #
   ci_base:
     uses: Energinet-DataHub/.github/.github/workflows/ci-base.yml@v10
-  
+    with:
+      skip_yaml_lint: false
+      skip_actions_casing_validation: false
+
   #
   # Detect changes to start relevant workflows
   #
@@ -48,13 +51,8 @@ jobs:
 
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
-    needs: [
-      ci_base,
-      ci_dotnet,
-      ci_client_package,
-      ci_model_package,
-      render_diagrams,
-    ]
+    needs:
+      [ci_base, ci_dotnet, ci_client_package, ci_model_package, render_diagrams]
     if: |
       always()
     steps:
