@@ -41,12 +41,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
             var actorRepositoryMock = new Mock<IActorRepository>();
-            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
                 actorRepositoryMock.Object,
-                combinationOfBusinessRolesRuleService.Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
 
             var organization = TestPreparationModels.MockedOrganization();
@@ -87,12 +85,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
             var actorRepositoryMock = new Mock<IActorRepository>();
-            var combinationOfBusinessRolesRuleService = new Mock<ICombinationOfBusinessRolesRuleService>();
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
                 actorRepositoryMock.Object,
-                combinationOfBusinessRolesRuleService.Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
 
             var organization = TestPreparationModels.MockedOrganization();
@@ -140,7 +136,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 organizationExistsHelperService.Object,
                 actorFactory.Object,
                 actorRepositoryMock.Object,
-                new Mock<ICombinationOfBusinessRolesRuleService>().Object,
                 uniqueService.Object);
 
             var organization = TestPreparationModels.MockedOrganization();

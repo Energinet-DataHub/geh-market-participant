@@ -27,14 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public sealed class ActorIntegrationEventsQueueService : IActorIntegrationEventsQueueService
     {
         private readonly IDomainEventRepository _domainEventRepository;
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
 
-        public ActorIntegrationEventsQueueService(
-            IDomainEventRepository domainEventRepository,
-            IBusinessRoleCodeDomainService businessRoleCodeDomainService)
+        public ActorIntegrationEventsQueueService(IDomainEventRepository domainEventRepository)
         {
             _domainEventRepository = domainEventRepository;
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
         }
 
         public Task EnqueueActorUpdatedEventAsync(Actor actor)
@@ -49,11 +45,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),
                 Status = actor.Status
             };
-
-            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))
-            {
-                actorUpdatedEvent.BusinessRoles.Add(businessRole);
-            }
 
             foreach (var actorMarketRole in actor.MarketRoles)
             {
@@ -83,11 +74,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 ActorNumber = new ActorNumberEventData(actor.ActorNumber.Value, actor.ActorNumber.Type),
                 Name = actor.Name
             };
-
-            foreach (var businessRole in _businessRoleCodeDomainService.GetBusinessRoleCodes(actor.MarketRoles.Select(m => m.Function)))
-            {
-                actorCreatedEvent.BusinessRoles.Add(businessRole);
-            }
 
             foreach (var actorMarketRole in actor.MarketRoles)
             {

@@ -13,9 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -58,42 +62,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     $"No application, '{nameof(application)}', was found in Active Directory.");
             }
 
-            foreach (var appRole in application.AppRoles!)
+            var lookup = ((EicFunction[])typeof(EicFunction).GetEnumValues()).ToDictionary(x => x.ToString().ToUpperInvariant());
+
+            if (application.AppRoles is not null)
             {
-                switch (appRole.Value)
+                foreach (var appRole in application.AppRoles)
                 {
-                    case "balanceresponsibleparty":
-                        _activeDirectoryB2CRoles.DdkId = appRole.Id!.Value;
-                        break;
-                    case "gridoperator":
-                        _activeDirectoryB2CRoles.DdmId = appRole.Id!.Value;
-                        break;
-                    case "electricalsupplier":
-                        _activeDirectoryB2CRoles.DdqId = appRole.Id!.Value;
-                        break;
-                    case "imbalancesettlementresponsible":
-                        _activeDirectoryB2CRoles.DdxId = appRole.Id!.Value;
-                        break;
-                    case "meteringpointadministrator":
-                        _activeDirectoryB2CRoles.DdzId = appRole.Id!.Value;
-                        break;
-                    case "metereddataadministrator":
-                        _activeDirectoryB2CRoles.DglId = appRole.Id!.Value;
-                        break;
-                    case "systemoperator":
-                        _activeDirectoryB2CRoles.EzId = appRole.Id!.Value;
-                        break;
-                    case "meterdataresponsible":
-                        _activeDirectoryB2CRoles.MdrId = appRole.Id!.Value;
-                        break;
-                    case "danishenergyagency":
-                        _activeDirectoryB2CRoles.StsId = appRole.Id!.Value;
-                        break;
-                    case "transmissionsystemoperator":
-                        _activeDirectoryB2CRoles.TsoId = appRole.Id!.Value;
-                        break;
+                    if (!string.IsNullOrWhiteSpace(appRole.Value) && lookup.TryGetValue(appRole.Value.ToUpperInvariant(), out var val))
+                    {
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(val, appRole.Id!.Value);
+                    }
                 }
             }
+
+            // Verify that all EIC functions has a corresponding app role
+            if (_activeDirectoryB2CRoles.EicRolesMapped.Count != Enum.GetNames(typeof(EicFunction)).Length)
+                throw new InvalidOperationException("Not all Eic Functions have an AppRole defined");
 
             return _activeDirectoryB2CRoles;
         }

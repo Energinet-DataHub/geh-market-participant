@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -85,7 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 actorIntegrationEventsQueueService.Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -122,7 +122,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
@@ -154,7 +154,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
-            var overlappingBusinessRolesService = new Mock<IOverlappingBusinessRolesRuleService>();
+            var overlappingBusinessRolesService = new Mock<IOverlappingEicFunctionsRuleService>();
             var target = new ActorFactoryService(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
@@ -185,7 +185,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Assert
             overlappingBusinessRolesService.Verify(
-                x => x.ValidateRolesAcrossActors(It.IsAny<IEnumerable<Actor>>()),
+                x => x.ValidateEicFunctionsAcrossActors(It.IsAny<IEnumerable<Actor>>()),
                 Times.Once);
         }
 
@@ -199,7 +199,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IActorIntegrationEventsQueueService>().Object,
-                new Mock<IOverlappingBusinessRolesRuleService>().Object,
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 allowedGridAreasRuleService.Object);
 

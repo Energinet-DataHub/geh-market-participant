@@ -21,7 +21,6 @@ using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
-using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
@@ -102,7 +101,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                     .ConfigureAwait(false);
 
                 // Assert
-                Assert.Equal("f312e8a2-5c5d-4bb1-b925-2d9656bcebc2", app.AppRoles.First().RoleId);
+                Assert.Equal("1a80662d-8261-4aca-9d24-b60ebc28da70", app.AppRoles.First().RoleId);
                 Assert.Equal("9873b7cb-6b0e-46db-9142-90d0e82c035a", app.AppRoles.ElementAt(1).RoleId);
             }
             finally
@@ -176,13 +175,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
                 integrationTestConfig.B2CSettings.BackendAppId);
 
-            // Business Role Code Domain Service
-            var businessRoleCodeDomainService = new BusinessRoleCodeDomainService(new IBusinessRole[]
-            {
-                new MeteredDataResponsibleRole(),
-                new SystemOperatorRole()
-            });
-
             // Active Directory Roles
             var activeDirectoryB2CRoles =
                 new ActiveDirectoryB2CRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
@@ -193,7 +185,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             return new ActiveDirectoryB2CService(
                 graphClient,
                 config,
-                businessRoleCodeDomainService,
                 activeDirectoryB2CRoles,
                 logger);
         }

@@ -87,7 +87,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Infrastructure
                 ActorNumber = new MockedGln(),
                 Status = ActorStatus.Active,
                 ActorId = Guid.NewGuid(),
-                BusinessRoles = { BusinessRoleCode.Ddk },
                 OrganizationId = Guid.NewGuid(),
                 ExternalActorId = new ExternalActorId(Guid.NewGuid())
             };

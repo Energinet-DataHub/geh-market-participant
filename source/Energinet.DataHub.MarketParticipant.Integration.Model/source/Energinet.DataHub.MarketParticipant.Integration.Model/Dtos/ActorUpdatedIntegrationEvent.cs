@@ -31,7 +31,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         /// Can be null; this will happen if the status is New or Deleted, or the chosen roles do not give permission to the actor.</param>
         /// <param name="actorNumber">GLN.</param>
         /// <param name="status">The status of the current actor.</param>
-        /// <param name="businessRoles">The ebIX roles assigned to the actor.</param>
         /// <param name="actorMarketRoles">Actors market roles.</param>
         public ActorUpdatedIntegrationEvent(
             Guid id,
@@ -41,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             Guid? externalActorId,
             ActorNumber actorNumber,
             ActorStatus status,
-            IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<ActorMarketRole> actorMarketRoles)
         : base(id, eventCreated)
         {
@@ -50,18 +48,14 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             ExternalActorId = externalActorId;
             ActorNumber = actorNumber;
             Status = status;
-            BusinessRoles = businessRoles;
             ActorMarketRoles = actorMarketRoles;
         }
 
         public Guid ActorId { get; }
         public Guid OrganizationId { get; }
-
         public Guid? ExternalActorId { get; }
         public ActorNumber ActorNumber { get; }
         public ActorStatus Status { get; }
-
-        public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
         public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
     }
 }

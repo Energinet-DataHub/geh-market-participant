@@ -50,7 +50,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                 Guid.Parse(contract.Id),
                 Guid.Parse(contract.ActorId),
                 Guid.Parse(contract.OrganizationId),
-                Enum.IsDefined(typeof(BusinessRoleCode), contract.BusinessRole) ? (BusinessRoleCode)contract.BusinessRole : throw new FormatException(nameof(contract.BusinessRole)),
                 Enum.IsDefined(typeof(EicFunction), contract.MarketRoleFunction) ? (EicFunction)contract.MarketRoleFunction : throw new FormatException(nameof(contract.MarketRoleFunction)),
                 contract.EventCreated.ToDateTime());
 
@@ -71,7 +70,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers.Actor
                 EventCreated = Timestamp.FromDateTime(integrationEvent.EventCreated),
                 ActorId = integrationEvent.ActorId.ToString(),
                 OrganizationId = integrationEvent.OrganizationId.ToString(),
-                BusinessRole = (int)integrationEvent.BusinessRoleCode,
                 MarketRoleFunction = (int)integrationEvent.MarketRole,
                 Type = integrationEvent.Type
             };
