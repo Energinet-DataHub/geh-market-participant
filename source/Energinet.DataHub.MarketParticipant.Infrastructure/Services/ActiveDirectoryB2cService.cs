@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -154,8 +154,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             foreach (var eicFunction in eicFunctions)
             {
-                if (mappedEicFunction.EicRolesMapped.ContainsKey(eicFunction))
-                    b2CIds.Add(mappedEicFunction.EicRolesMapped[eicFunction]);
+                if (mappedEicFunction.EicRolesMapped.TryGetValue(eicFunction, out var value))
+                    b2CIds.Add(value);
             }
 
             return b2CIds;

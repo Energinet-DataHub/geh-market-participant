@@ -13,11 +13,13 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -62,11 +64,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var lookup = ((EicFunction[])typeof(EicFunction).GetEnumValues()).ToDictionary(x => x.ToString().ToUpperInvariant());
 
-            foreach (var appRole in application.AppRoles)
+            if (application.AppRoles is not null)
             {
-                if (lookup.TryGetValue(appRole.Value.ToUpperInvariant(), out var val))
+                foreach (var appRole in application.AppRoles)
                 {
-                    _activeDirectoryB2CRoles.EicRolesMapped.Add(val, appRole.Id!.Value);
+                    if (!string.IsNullOrWhiteSpace(appRole.Value) && lookup.TryGetValue(appRole.Value.ToUpperInvariant(), out var val))
+                    {
+                        _activeDirectoryB2CRoles.EicRolesMapped.Add(val, appRole.Id!.Value);
+                    }
                 }
             }
 
