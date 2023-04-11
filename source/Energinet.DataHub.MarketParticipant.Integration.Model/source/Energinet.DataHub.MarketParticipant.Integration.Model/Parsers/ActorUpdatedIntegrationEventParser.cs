@@ -59,8 +59,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                 externalActorId,
                 new Dtos.ActorNumber(contract.ActorNumber, (Dtos.ActorNumberType)contract.ActorNumberType),
                 Enum.IsDefined((ActorStatus)contract.Status) ? (ActorStatus)contract.Status : throw new FormatException(nameof(contract.Status)),
-                contract.BusinessRoles.Select(
-                    x => Enum.IsDefined((BusinessRoleCode)x) ? (BusinessRoleCode)x : throw new FormatException(nameof(contract.BusinessRoles))).ToList(),
                 contract.ActorMarketRoles.Select(
                     x => new Dtos.ActorMarketRole((EicFunction)x.Function, x.GridAreas.Select(
                         g => new Dtos.ActorGridArea(Guid.Parse(g.Id), g.MeteringPointTypes)))));
@@ -97,11 +95,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Parsers
                     })
                 }
             };
-
-            foreach (var x in integrationEvent.BusinessRoles)
-            {
-                contract.BusinessRoles.Add((int)x);
-            }
 
             return contract;
         }

@@ -20,6 +20,5 @@ public sealed class MarketRoleAddedToActorIntegrationEvent : IntegrationEventBas
 {
     public OrganizationId OrganizationId { get; set; } = null!;
     public Guid ActorId { get; init; }
-    public BusinessRoleCode BusinessRole { get; init; }
     public EicFunction MarketRole { get; init; }
 }

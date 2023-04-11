@@ -35,7 +35,6 @@ public class ChangesToActorHelperTests
     private readonly OrganizationId _organizationId = CreateOrganizationId();
     private readonly Actor _actor = CreateValidActorWithChildren();
     private readonly UpdateActorCommand _incomingActor = CreateValidIncomingActorWithChildren();
-    private readonly Mock<IBusinessRoleCodeDomainService> _businessRoleCodeDomainServiceMock = new();
     private readonly Mock<IGridAreaLinkRepository> _gridAreaLinkRepositoryMock = new();
 
     [Fact]
@@ -46,7 +45,7 @@ public class ChangesToActorHelperTests
             .Setup(e => e.GetAsync(It.IsAny<GridAreaId>()))
             .ReturnsAsync(new GridAreaLink(new GridAreaLinkId(Guid.NewGuid()), It.IsAny<GridAreaId>()));
 
-        var target = new ChangesToActorHelper(_businessRoleCodeDomainServiceMock.Object, _gridAreaLinkRepositoryMock.Object);
+        var target = new ChangesToActorHelper(_gridAreaLinkRepositoryMock.Object);
 
         // Act
         var result = await target.FindChangesMadeToActorAsync(_organizationId, _actor, _incomingActor).ConfigureAwait(false);

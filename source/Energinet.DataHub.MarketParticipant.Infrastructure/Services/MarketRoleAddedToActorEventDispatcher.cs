@@ -45,7 +45,6 @@ public sealed class MarketRoleAddedToActorEventDispatcher : EventDispatcherBase
             marketRoleAddedToActorIntegrationEvent.Id,
             marketRoleAddedToActorIntegrationEvent.ActorId,
             marketRoleAddedToActorIntegrationEvent.OrganizationId.Value,
-            (BusinessRoleCode)marketRoleAddedToActorIntegrationEvent.BusinessRole,
             (EicFunction)marketRoleAddedToActorIntegrationEvent.MarketRole,
             marketRoleAddedToActorIntegrationEvent.EventCreated);
 

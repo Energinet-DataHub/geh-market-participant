@@ -83,7 +83,6 @@ public sealed class ActorNameChangedEventDispatcherTests
         {
             OrganizationId = new OrganizationId(Guid.NewGuid()),
             ActorId = Guid.NewGuid(),
-            BusinessRole = BusinessRoleCode.Ddq,
             MarketRole = EicFunction.EnergySupplier
         };
 

@@ -26,7 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             ActorStatus status,
             ActorNumber actorNumber,
             string name,
-            IEnumerable<BusinessRoleCode> businessRoles,
             IEnumerable<ActorMarketRole> actorMarketRoles,
             DateTime eventCreated)
             : base(eventId, eventCreated)
@@ -35,7 +34,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
             OrganizationId = organizationId;
             Status = status;
             ActorNumber = actorNumber;
-            BusinessRoles = businessRoles;
             ActorMarketRoles = actorMarketRoles;
             Name = name;
         }
@@ -45,7 +43,6 @@ namespace Energinet.DataHub.MarketParticipant.Integration.Model.Dtos
         public ActorStatus Status { get; }
         public ActorNumber ActorNumber { get; }
         public string Name { get; }
-        public IEnumerable<BusinessRoleCode> BusinessRoles { get; }
         public IEnumerable<ActorMarketRole> ActorMarketRoles { get; }
     }
 }

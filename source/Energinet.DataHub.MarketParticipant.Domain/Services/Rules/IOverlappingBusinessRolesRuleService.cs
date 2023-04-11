@@ -20,13 +20,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
     /// <summary>
     /// Ensures that actors within an organization have valid roles.
     /// </summary>
-    public interface IOverlappingBusinessRolesRuleService
+    public interface IOverlappingEicFunctionsRuleService
     {
         /// <summary>
-        /// Ensures that the given actors have unique roles and can exist in the same organization.
+        /// Ensures that the given actors have unique Eic functions and can exist in the same organization.
         /// Throws an exception, if the roles are invalid.
         /// </summary>
         /// <param name="actors">The list of actors in an organization.</param>
-        void ValidateRolesAcrossActors(IEnumerable<Actor> actors);
+        void ValidateEicFunctionsAcrossActors(IEnumerable<Actor> actors);
     }
 }
