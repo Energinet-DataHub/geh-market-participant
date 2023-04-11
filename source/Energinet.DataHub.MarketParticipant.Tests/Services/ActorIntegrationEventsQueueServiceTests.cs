@@ -37,9 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
-            var target = new ActorIntegrationEventsQueueService(
-                domainEventRepository.Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(domainEventRepository.Object);
 
             var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln());
 
@@ -60,9 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var domainEventRepository = new Mock<IDomainEventRepository>();
-            var target = new ActorIntegrationEventsQueueService(
-                domainEventRepository.Object,
-                new Mock<IBusinessRoleCodeDomainService>().Object);
+            var target = new ActorIntegrationEventsQueueService(domainEventRepository.Object);
 
             var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln());
 

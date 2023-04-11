@@ -27,7 +27,7 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
-    private readonly IOverlappingBusinessRolesRuleService _overlappingBusinessRolesRuleService;
+    private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
     private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
@@ -35,14 +35,14 @@ public sealed class ActorFactoryService : IActorFactoryService
         IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
-        IOverlappingBusinessRolesRuleService overlappingBusinessRolesRuleService,
+        IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
-        _overlappingBusinessRolesRuleService = overlappingBusinessRolesRuleService;
+        _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
         _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
         _allowedGridAreasRuleService = allowedGridAreasRuleService;
     }
@@ -72,7 +72,7 @@ public sealed class ActorFactoryService : IActorFactoryService
             .GetActorsAsync(organization.Id)
             .ConfigureAwait(false);
 
-        _overlappingBusinessRolesRuleService.ValidateRolesAcrossActors(existingActors.Append(newActor));
+        _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(existingActors.Append(newActor));
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()

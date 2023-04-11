@@ -14,7 +14,6 @@
 
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.BusinessRoles;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using SimpleInjector;
@@ -30,9 +29,8 @@ internal static class DomainServiceRegistration
         container.Register<IOrganizationIntegrationEventsQueueService, OrganizationIntegrationEventsQueueService>(Lifestyle.Scoped);
 
         container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
-        container.Register<IOverlappingBusinessRolesRuleService, OverlappingBusinessRolesRuleService>(Lifestyle.Scoped);
+        container.Register<IOverlappingEicFunctionsRuleService, OverlappingEicFunctionsRuleService>(Lifestyle.Scoped);
         container.Register<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>(Lifestyle.Scoped);
-        container.Register<ICombinationOfBusinessRolesRuleService, CombinationOfBusinessRolesRuleService>(Lifestyle.Scoped);
         container.Register<IAllowedGridAreasRuleService, AllowedGridAreasRuleService>(Lifestyle.Scoped);
         container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
 
@@ -44,18 +42,6 @@ internal static class DomainServiceRegistration
         container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
         container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
         container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
-        container.Register<IBusinessRoleCodeDomainService, BusinessRoleCodeDomainService>(Lifestyle.Scoped);
-        container.Collection.Register<IBusinessRole>(
-            new ElectricalSupplierRole(),
-            new BalanceResponsiblePartyRole(),
-            new DanishEnergyAgencyRole(),
-            new GridOperatorRole(),
-            new ImbalanceSettlementResponsibleRole(),
-            new MeteredDataAdministratorRole(),
-            new MeteredDataResponsibleRole(),
-            new MeteringPointAdministratorRole(),
-            new SystemOperatorRole(),
-            new TransmissionSystemOperatorRole());
 
         container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
         container.Register<IOrganizationDomainValidationService, OrganizationDomainValidationService>(Lifestyle.Scoped);

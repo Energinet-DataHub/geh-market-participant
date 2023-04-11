@@ -13,21 +13,19 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
 {
     public class ActiveDirectoryB2CRoles
     {
+        public ActiveDirectoryB2CRoles()
+        {
+            EicRolesMapped = new Dictionary<EicFunction, Guid>();
+        }
+
         public bool IsLoaded { get; set; }
-        public Guid DdkId { get; set; }
-        public Guid DdmId { get; set; }
-        public Guid DdqId { get; set; }
-        public Guid DdxId { get; set; }
-        public Guid DdzId { get; set; }
-        public Guid DglId { get; set; }
-        public Guid EzId { get; set; }
-        public Guid MdrId { get; set; }
-        public Guid StsId { get; set; }
-        public Guid TsoId { get; set; }
+        public Dictionary<EicFunction, Guid> EicRolesMapped { get; }
     }
 }

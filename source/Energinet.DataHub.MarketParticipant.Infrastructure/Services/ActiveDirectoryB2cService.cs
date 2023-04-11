@@ -30,20 +30,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     {
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
-        private readonly IBusinessRoleCodeDomainService _businessRoleCodeDomainService;
         private readonly IActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
         private readonly ILogger<ActiveDirectoryB2CService> _logger;
 
         public ActiveDirectoryB2CService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
-            IBusinessRoleCodeDomainService businessRoleCodeDomainService,
             IActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
             ILogger<ActiveDirectoryB2CService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
-            _businessRoleCodeDomainService = businessRoleCodeDomainService;
             _activeDirectoryB2CRolesProvider = activeDirectoryB2CRolesProvider;
             _logger = logger;
         }
@@ -55,8 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
             ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
 
-            var roles = _businessRoleCodeDomainService.GetBusinessRoleCodes(permissions);
-            var b2CPermissions = await MapBusinessRoleCodesToB2CRoleIdsAsync(roles).ConfigureAwait(false);
+            var b2CPermissions = (await MapEicFunctionsToB2CIdsAsync(permissions).ConfigureAwait(false)).ToList();
             var enumeratedPermissions = b2CPermissions.ToList();
             var permissionsToPass = enumeratedPermissions.Select(x => x.ToString()).ToList();
             try
@@ -151,47 +147,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        private async Task<IEnumerable<Guid>> MapBusinessRoleCodesToB2CRoleIdsAsync(IEnumerable<BusinessRoleCode> businessRoleCodes)
+        private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)
         {
-            var roles = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
+            var mappedEicFunction = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
             var b2CIds = new List<Guid>();
-            foreach (var roleCode in businessRoleCodes)
+
+            foreach (var eicFunction in eicFunctions)
             {
-                switch (roleCode)
-                {
-                    case BusinessRoleCode.Ddk:
-                        b2CIds.Add(roles.DdkId);
-                        break;
-                    case BusinessRoleCode.Ddm:
-                        b2CIds.Add(roles.DdmId);
-                        break;
-                    case BusinessRoleCode.Ddq:
-                        b2CIds.Add(roles.DdqId);
-                        break;
-                    case BusinessRoleCode.Ddx:
-                        b2CIds.Add(roles.DdxId);
-                        break;
-                    case BusinessRoleCode.Ddz:
-                        b2CIds.Add(roles.DdzId);
-                        break;
-                    case BusinessRoleCode.Dgl:
-                        b2CIds.Add(roles.DglId);
-                        break;
-                    case BusinessRoleCode.Ez:
-                        b2CIds.Add(roles.EzId);
-                        break;
-                    case BusinessRoleCode.Mdr:
-                        b2CIds.Add(roles.MdrId);
-                        break;
-                    case BusinessRoleCode.Sts:
-                        b2CIds.Add(roles.StsId);
-                        break;
-                    case BusinessRoleCode.Tso:
-                        b2CIds.Add(roles.TsoId);
-                        break;
-                    default:
-                        throw new ArgumentNullException(nameof(businessRoleCodes));
-                }
+                if (mappedEicFunction.EicRolesMapped.TryGetValue(eicFunction, out var value))
+                    b2CIds.Add(value);
             }
 
             return b2CIds;

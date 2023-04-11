@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Integration.Model Release notes
 
+## Version 2.9.0
+
+- Removed Business role type
+
 ## Version 2.8.2
 
 - No functional change.
