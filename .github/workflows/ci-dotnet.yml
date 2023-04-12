@@ -23,14 +23,14 @@ jobs:
   dotnet_ci_build:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v10
     with:
-      solution_file_path: source/Energinet.DataHub.MarketParticipant.sln
+      solution_file_path: source/marketparticipant/Energinet.DataHub.MarketParticipant.sln
       dotnet_version: 7.0.200
 
   # Run all tests in 'Tests.dll'
   unit_test:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
-      tests_dll_file_path: \source\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.Tests.dll
+      tests_dll_file_path: \source\marketparticipant\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.Tests.dll
       download_attempt_limit: 18
       code_coverage_flags: business
       dotnet_version: 7.0.200
@@ -39,7 +39,7 @@ jobs:
   integration_test:
     uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v10
     with:
-      tests_dll_file_path: \source\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll
+      tests_dll_file_path: \source\marketparticipant\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll
       download_attempt_limit: 18
       use_azure_functions_tools: true
       code_coverage_flags: business
