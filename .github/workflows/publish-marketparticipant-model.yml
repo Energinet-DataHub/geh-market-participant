@@ -19,7 +19,7 @@ on:
     branches:
       - main
     paths:
-      - source/Energinet.DataHub.MarketParticipant.Integration.Model/**
+      - source/api-client/Energinet.DataHub.MarketParticipant.Integration.Model/**
       - .github/workflows/publish-marketparticipant-model.yml
   workflow_call: {}
   workflow_dispatch: {}
@@ -45,21 +45,21 @@ jobs:
       - name: Build and test solution
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v10
         with:
-          solution_file_path: ./source/Energinet.DataHub.MarketParticipant.Libraries.sln
+          solution_file_path: ./source/api-client/Energinet.DataHub.MarketParticipant.Libraries.sln
           code_coverage_flags: clientlibraries
           dotnet_version: 7.0.200
 
       - name: Pack Client project
         uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@v10
         with:
-          project_path: ./source/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Energinet.DataHub.MarketParticipant.Integration.Model.csproj
+          project_path: ./source/api-client/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Energinet.DataHub.MarketParticipant.Integration.Model.csproj
 
       - name: Package content or build has changed
         id: changed-content
         uses: tj-actions/changed-files@v17.2
         with:
           files: |
-            source/Energinet.DataHub.MarketParticipant.Integration.Model/**/*.*
+            source/api-client/Energinet.DataHub.MarketParticipant.Integration.Model/**/*.*
             .github/workflows/publish-marketparticipant-model.yml
 
       - name: Assert versions of NuGet packages and push them to NuGet.org
