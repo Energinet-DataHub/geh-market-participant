@@ -42,6 +42,7 @@ Under Properties pane, apply the following settings.
 - Token lifetime - Lifetime length (days) - 1
 - Session behavior - Web app session lifetime (minutes) - 15
 - Session behavior - Web app session timeout - Absolute
+- Session behavior - Single sign-on configuration - Disabled
 
 ![Sign In Flow Properties 1](https://user-images.githubusercontent.com/77341673/228801340-cb77d4a1-773d-417e-9f22-7dfd7ae6b196.PNG)
 ![Sign In Flow Properties 2](https://user-images.githubusercontent.com/77341673/228801401-882d0faa-5c1c-4b43-bfbf-f3c4957530e4.PNG)
