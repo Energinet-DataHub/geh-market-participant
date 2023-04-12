@@ -52,7 +52,7 @@ jobs:
       - name: Pack Client project
         uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@v10
         with:
-          project_path: ./source/api-client/Energinet.DataHub.MarketParticipant.Integration.Model/source/Energinet.DataHub.MarketParticipant.Integration.Model/Energinet.DataHub.MarketParticipant.Integration.Model.csproj
+          project_path: ./source/api-client/Energinet.DataHub.MarketParticipant.Integration.Model/source/api-client/Energinet.DataHub.MarketParticipant.Integration.Model/Energinet.DataHub.MarketParticipant.Integration.Model.csproj
 
       - name: Package content or build has changed
         id: changed-content
