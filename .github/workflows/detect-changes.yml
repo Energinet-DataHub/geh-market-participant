@@ -58,7 +58,6 @@ jobs:
               - '.github/workflows/ci-dotnet.yml'
               - '.github/workflows/detect-changes.yml'
               - '.github/actions/dotnet-*/**'
-              - 'source/api-client/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
             client_package:
               - '.github/workflows/detect-changes.yml'
               - '.github/workflows/publish-marketparticipant-client.yml'
@@ -66,7 +65,6 @@ jobs:
             model_package:
               - '.github/workflows/detect-changes.yml'
               - '.github/workflows/publish-marketparticipant-model.yml'
-              - 'source/api-client/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
             render_diagrams:
               - 'docs/diagrams/c4-model.dsl'
               - '.github/workflows/render-diagrams.yml'
