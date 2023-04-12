@@ -24,7 +24,6 @@ using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
@@ -80,8 +79,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
         {
             KeyValuePair<string, string?>[] keyValuePairs =
             {
-                new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-                new(Settings.ServiceBusTopicName.Key, "fake_value"),
                 new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
                 new(Settings.B2CBackendObjectId.Key, "fake_value"),
                 new(Settings.B2CBackendId.Key, "fake_value"),
@@ -116,7 +113,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Common
                 container.Register(() => new Mock<IUnitOfWorkProvider>().Object);
                 container.Register(() => new Mock<IMarketParticipantDbContext>().Object, Lifestyle.Scoped);
                 container.Register(() => new Mock<IEmailSender>().Object);
-                container.RegisterSingleton(() => new Mock<IMarketParticipantServiceBusClient>().Object);
                 container.RegisterSingleton(() => new GraphServiceClient(new HttpClient()));
             }
         }

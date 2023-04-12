@@ -38,7 +38,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<MarketRoleEntity> MarketRoles { get; private set; } = null!;
     public DbSet<MarketRoleGridAreaEntity> MarketRoleGridAreas { get; private set; } = null!;
     public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
-    public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
     public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
     public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
     public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
@@ -68,7 +67,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new MarketRoleGridAreaEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
         modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());

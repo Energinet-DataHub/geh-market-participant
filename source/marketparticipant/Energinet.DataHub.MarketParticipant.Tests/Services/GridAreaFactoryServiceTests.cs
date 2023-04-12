@@ -36,8 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new GridAreaFactoryService(
                 gridAreaLinkRepository.Object,
                 gridAreaRepository.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IGridAreaIntegrationEventsQueueService>().Object);
+                UnitOfWorkProviderMock.Create());
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -58,8 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new GridAreaFactoryService(
                 gridAreaLinkRepository.Object,
                 gridAreaRepository.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IGridAreaIntegrationEventsQueueService>().Object);
+                UnitOfWorkProviderMock.Create());
 
             // Act + Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => target.CreateAsync(
@@ -80,8 +78,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new GridAreaFactoryService(
                 gridAreaLinkRepository.Object,
                 gridAreaRepository.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IGridAreaIntegrationEventsQueueService>().Object);
+                UnitOfWorkProviderMock.Create());
+
             var gridAreaId = new GridAreaId(Guid.NewGuid());
             var gridArea = new GridArea(
                 gridAreaId,
@@ -127,64 +125,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal(PriceAreaCode.Dk1, response.PriceAreaCode);
             gridAreaLinkRepository.Verify(x => x.AddOrUpdateAsync(It.Is<GridAreaLink>(y => y.GridAreaId == gridAreaId)), Times.Once);
             gridAreaLinkRepository.Verify(x => x.GetAsync(It.IsAny<GridAreaLinkId>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task CreateAsync_NewGridArea_DispatchesEvent()
-        {
-            // Arrange
-            var gridAreaRepository = new Mock<IGridAreaRepository>();
-            var gridAreaLinkRepository = new Mock<IGridAreaLinkRepository>();
-            var gridAreaIntegrationEventsQueueService = new Mock<IGridAreaIntegrationEventsQueueService>();
-            var target = new GridAreaFactoryService(
-                gridAreaLinkRepository.Object,
-                gridAreaRepository.Object,
-                UnitOfWorkProviderMock.Create(),
-                gridAreaIntegrationEventsQueueService.Object);
-            var gridAreaId = new GridAreaId(Guid.NewGuid());
-            var gridArea = new GridArea(
-                gridAreaId,
-                new GridAreaName("fake_value"),
-                new GridAreaCode("123"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var gridAreaLinkId = new GridAreaLinkId(Guid.NewGuid());
-            var gridAreaLink = new GridAreaLink(gridAreaLinkId, gridAreaId);
-
-            gridAreaRepository
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<GridArea>()))
-                .ReturnsAsync(gridArea.Id);
-
-            gridAreaRepository
-                .Setup(x => x.GetAsync(gridArea.Id))
-                .ReturnsAsync(gridArea);
-
-            gridAreaLinkRepository
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<GridAreaLink>()))
-                .ReturnsAsync(gridAreaLink.Id);
-
-            gridAreaLinkRepository
-                .Setup(x => x.GetAsync(gridAreaLink.Id))
-                .ReturnsAsync(gridAreaLink);
-
-            // Act
-            await target
-                .CreateAsync(
-                    new GridAreaCode("123"),
-                    new GridAreaName("fake_value"),
-                    PriceAreaCode.Dk1,
-                    DateTimeOffset.MinValue,
-                    null)
-                .ConfigureAwait(false);
-
-            // Assert
-            gridAreaIntegrationEventsQueueService.Verify(
-                x => x.EnqueueGridAreaCreatedEventAsync(
-                    It.Is<GridArea>(y => y.Id == gridAreaId),
-                    It.Is<GridAreaLink>(y => y.Id == gridAreaLinkId && y.GridAreaId == gridAreaId)),
-                Times.Once);
         }
     }
 }
