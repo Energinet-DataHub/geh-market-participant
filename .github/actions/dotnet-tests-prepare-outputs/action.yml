@@ -33,11 +33,11 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Energinet.DataHub.MarketParticipant.IntegrationTests\Energinet.DataHub.MarketParticipant.IntegrationTests.csproj' \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.IntegrationTests\Energinet.DataHub.MarketParticipant.IntegrationTests.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '.\source\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0'
+          --output '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net6.0'
 
     # To ensure code coverage tooling is available in bin folder, we use publish on test assemblies
     # See https://github.com/coverlet-coverage/coverlet/issues/521#issuecomment-522429394
@@ -45,11 +45,11 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Energinet.DataHub.MarketParticipant.Tests\Energinet.DataHub.MarketParticipant.Tests.csproj' \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.Tests\Energinet.DataHub.MarketParticipant.Tests.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
-          --output '.\source\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0'
+          --output '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net6.0'
 
     - name: Copy all bin folders
       shell: bash

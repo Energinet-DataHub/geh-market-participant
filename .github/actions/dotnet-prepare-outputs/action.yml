@@ -36,7 +36,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj' \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.EntryPoint.Organization\Energinet.DataHub.MarketParticipant.EntryPoint.Organization.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
@@ -46,7 +46,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.csproj' \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi\Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
@@ -56,7 +56,7 @@ runs:
       shell: bash
       run: |
         dotnet publish \
-          '.\source\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj' \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp\Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.csproj' \
           --no-build \
           --no-restore \
           --configuration Release \
