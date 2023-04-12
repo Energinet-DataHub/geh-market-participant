@@ -29,7 +29,7 @@ env:
 
 jobs:
   build_and_publish:
-    runs-on: windows-2022
+    runs-on: ubuntu-latest
     name: Publish bundle to NuGet.org
 
     steps:
