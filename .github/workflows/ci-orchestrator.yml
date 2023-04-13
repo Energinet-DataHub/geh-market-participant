@@ -33,12 +33,6 @@ jobs:
     uses: ./.github/workflows/publish-marketparticipant-client.yml
     secrets: inherit
 
-  ci_model_package:
-    needs: changes
-    if: ${{ needs.changes.outputs.model_package == 'true' }}
-    uses: ./.github/workflows/publish-marketparticipant-model.yml
-    secrets: inherit
-
   render_diagrams:
     needs: changes
     if: ${{ needs.changes.outputs.render_diagrams == 'true' }}
