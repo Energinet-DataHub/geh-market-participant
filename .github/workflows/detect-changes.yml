@@ -40,7 +40,6 @@ jobs:
     outputs:
       dotnet: ${{ steps.filter.outputs.dotnet }}
       client_package: ${{ steps.filter.outputs.client_package }}
-      model_package: ${{ steps.filter.outputs.model_package }}
       render_diagrams: ${{ steps.filter.outputs.render_diagrams }}
     steps:
       # For pull requests it's not necessary to checkout the code because GitHub REST API is used to determine changes
@@ -58,15 +57,11 @@ jobs:
               - '.github/workflows/ci-dotnet.yml'
               - '.github/workflows/detect-changes.yml'
               - '.github/actions/dotnet-*/**'
-              - 'source/api-client/!((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+              - 'source/marketparticipant/**'
             client_package:
               - '.github/workflows/detect-changes.yml'
               - '.github/workflows/publish-marketparticipant-client.yml'
-              - 'source/api-client/((Energinet.DataHub.MarketParticipant.Client|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
-            model_package:
-              - '.github/workflows/detect-changes.yml'
-              - '.github/workflows/publish-marketparticipant-model.yml'
-              - 'source/api-client/((Energinet.DataHub.MarketParticipant.Integration.Model|Energinet.DataHub.MarketParticipant.Libraries.Tests)/**)/**'
+              - 'source/api-client/**'
             render_diagrams:
               - 'docs/diagrams/c4-model.dsl'
               - '.github/workflows/render-diagrams.yml'

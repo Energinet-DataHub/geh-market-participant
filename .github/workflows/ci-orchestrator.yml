@@ -33,12 +33,6 @@ jobs:
     uses: ./.github/workflows/publish-marketparticipant-client.yml
     secrets: inherit
 
-  ci_model_package:
-    needs: changes
-    if: ${{ needs.changes.outputs.model_package == 'true' }}
-    uses: ./.github/workflows/publish-marketparticipant-model.yml
-    secrets: inherit
-
   render_diagrams:
     needs: changes
     if: ${{ needs.changes.outputs.render_diagrams == 'true' }}
@@ -52,7 +46,7 @@ jobs:
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
     needs:
-      [ci_base, ci_dotnet, ci_client_package, ci_model_package, render_diagrams]
+      [ci_base, ci_dotnet, ci_client_package, render_diagrams]
     if: |
       always()
     steps:
