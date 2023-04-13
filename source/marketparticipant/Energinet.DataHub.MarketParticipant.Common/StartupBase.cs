@@ -53,7 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             Container.AddInfrastructureServices();
             Container.AddDbContextInterfaces();
             Container.AddRepositories();
-            Container.AddServiceBus();
             Container.AddDomainServices();
             Container.AddUnitOfWorkProvider();
             Container.AddAzureAdConfiguration();

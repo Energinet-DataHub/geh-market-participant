@@ -17,14 +17,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
@@ -34,8 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IActorRepository _actorRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IChangesToActorHelper _changesToActorHelper;
-        private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
         private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
         private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
@@ -45,8 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         public UpdateActorHandler(
             IActorRepository actorRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
-            IChangesToActorHelper changesToActorHelper,
-            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
             IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
             IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
@@ -55,8 +49,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             _actorRepository = actorRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _changesToActorHelper = changesToActorHelper;
-            _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
             _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
             _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
@@ -77,10 +69,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 throw new NotFoundValidationException(request.ActorId);
             }
 
-            var actorChangedIntegrationEvents = await _changesToActorHelper
-                .FindChangesMadeToActorAsync(actor.OrganizationId, actor, request)
-                .ConfigureAwait(false);
-
             UpdateActorStatus(actor, request);
             UpdateActorName(actor, request);
             await UpdateActorMarketRolesAndChildrenAsync(actor, request).ConfigureAwait(false);
@@ -100,14 +88,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
                 await _externalActorSynchronizationRepository
                     .ScheduleAsync(actor.Id.Value)
-                    .ConfigureAwait(false);
-
-                await _actorIntegrationEventsQueueService
-                    .EnqueueActorUpdatedEventAsync(actor)
-                    .ConfigureAwait(false);
-
-                await _actorIntegrationEventsQueueService
-                    .EnqueueActorUpdatedEventAsync(actor.Id, actorChangedIntegrationEvents)
                     .ConfigureAwait(false);
 
                 await uow.CommitAsync().ConfigureAwait(false);

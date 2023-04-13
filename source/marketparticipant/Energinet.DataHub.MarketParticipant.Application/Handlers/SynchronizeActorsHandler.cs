@@ -18,8 +18,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.ActorIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
@@ -30,20 +28,17 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
 {
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IActorRepository _actorRepository;
-    private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
     private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
     private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
 
     public SynchronizeActorsHandler(
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorRepository actorRepository,
-        IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
         IExternalActorIdConfigurationService externalActorIdConfigurationService,
         IExternalActorSynchronizationRepository externalActorSynchronizationRepository)
     {
         _unitOfWorkProvider = unitOfWorkProvider;
         _actorRepository = actorRepository;
-        _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         _externalActorIdConfigurationService = externalActorIdConfigurationService;
         _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
     }
@@ -74,27 +69,11 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
                 await _actorRepository
                     .AddOrUpdateAsync(actor)
                     .ConfigureAwait(false);
-
-                await EnqueueExternalActorIdChangedEventAsync(actor).ConfigureAwait(false);
             }
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
 
         return Unit.Value;
-    }
-
-    private Task EnqueueExternalActorIdChangedEventAsync(Domain.Model.Actor actor)
-    {
-        var externalIdEvent = new ActorExternalIdChangedIntegrationEvent
-        {
-            OrganizationId = actor.OrganizationId.Value,
-            ActorId = actor.Id.Value,
-            ExternalActorId = actor.ExternalActorId?.Value
-        };
-
-        return _actorIntegrationEventsQueueService.EnqueueActorUpdatedEventAsync(
-            actor.Id,
-            new IIntegrationEvent[] { externalIdEvent });
     }
 }

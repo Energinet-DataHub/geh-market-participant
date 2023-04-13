@@ -24,18 +24,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         private readonly IGridAreaLinkRepository _gridAreaLinkRepository;
         private readonly IGridAreaRepository _gridAreaRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IGridAreaIntegrationEventsQueueService _gridAreaIntegrationEventsQueueService;
 
         public GridAreaFactoryService(
             IGridAreaLinkRepository gridAreaLinkRepository,
             IGridAreaRepository gridAreaRepository,
-            IUnitOfWorkProvider unitOfWorkProvider,
-            IGridAreaIntegrationEventsQueueService gridAreaIntegrationEventsQueueService)
+            IUnitOfWorkProvider unitOfWorkProvider)
         {
             _gridAreaLinkRepository = gridAreaLinkRepository;
             _gridAreaRepository = gridAreaRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _gridAreaIntegrationEventsQueueService = gridAreaIntegrationEventsQueueService;
         }
 
         public async Task<GridArea> CreateAsync(GridAreaCode code, GridAreaName name, PriceAreaCode priceAreaCode, DateTimeOffset validFrom, DateTimeOffset? validTo)
@@ -59,15 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
             var newGridAreaLink = new GridAreaLink(savedGridArea.Id);
 
-            var savedGridAreaLink = await SaveGridAreaLinkAsync(newGridAreaLink).ConfigureAwait(false);
-
-            await _gridAreaIntegrationEventsQueueService
-                .EnqueueGridAreaCreatedEventAsync(savedGridArea, savedGridAreaLink)
-                .ConfigureAwait(false);
-
-            await _gridAreaIntegrationEventsQueueService
-                .EnqueueLegacyGridAreaUpdatedEventAsync(savedGridArea, savedGridAreaLink)
-                .ConfigureAwait(false);
+            await SaveGridAreaLinkAsync(newGridAreaLink).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
 
@@ -87,17 +76,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             return savedGridArea!;
         }
 
-        private async Task<GridAreaLink> SaveGridAreaLinkAsync(GridAreaLink gridAreaLink)
+        private async Task SaveGridAreaLinkAsync(GridAreaLink gridAreaLink)
         {
-            var orgId = await _gridAreaLinkRepository
+            await _gridAreaLinkRepository
                 .AddOrUpdateAsync(gridAreaLink)
                 .ConfigureAwait(false);
-
-            var savedGridAreaLink = await _gridAreaLinkRepository
-                .GetAsync(orgId)
-                .ConfigureAwait(false);
-
-            return savedGridAreaLink!;
         }
     }
 }

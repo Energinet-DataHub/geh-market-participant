@@ -23,7 +23,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Domain.Model.GridAreaAuditLogEntryField;
 
@@ -32,20 +31,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
     public sealed class UpdateGridAreaHandler : IRequestHandler<UpdateGridAreaCommand>
     {
         private readonly IGridAreaRepository _gridAreaRepository;
-        private readonly IGridAreaIntegrationEventsQueueService _gridAreaIntegrationEventsQueueService;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IGridAreaAuditLogEntryRepository _gridAreaAuditLogEntryRepository;
         private readonly IUserContext<FrontendUser> _userContext;
 
         public UpdateGridAreaHandler(
             IGridAreaRepository gridAreaRepository,
-            IGridAreaIntegrationEventsQueueService gridAreaIntegrationEventsQueueService,
             IUnitOfWorkProvider unitOfWorkProvider,
             IGridAreaAuditLogEntryRepository gridAreaAuditLogEntryRepository,
             IUserContext<FrontendUser> userContext)
         {
             _gridAreaRepository = gridAreaRepository;
-            _gridAreaIntegrationEventsQueueService = gridAreaIntegrationEventsQueueService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _gridAreaAuditLogEntryRepository = gridAreaAuditLogEntryRepository;
             _userContext = userContext;
@@ -79,9 +75,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 
                     await _gridAreaRepository.AddOrUpdateAsync(updatedGridArea).ConfigureAwait(false);
                     await CreateLogEntryAsync(gridArea.Id, GridAreaAuditLogEntryField.Name, gridArea.Name.Value, updatedGridArea.Name.Value).ConfigureAwait(false);
-                    await _gridAreaIntegrationEventsQueueService
-                        .EnqueueGridAreaNameChangedEventAsync(updatedGridArea)
-                        .ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);

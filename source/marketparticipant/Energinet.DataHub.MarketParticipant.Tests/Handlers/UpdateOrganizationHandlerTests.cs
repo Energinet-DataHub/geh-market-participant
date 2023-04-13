@@ -38,16 +38,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var organizationIntegrationEventsQueueService = new Mock<IOrganizationIntegrationEventsQueueService>();
-            var organizationIntegrationEventsHelperService = new Mock<IOrganizationIntegrationEventsHelperService>();
 
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                organizationIntegrationEventsQueueService.Object,
                 organizationExistsHelperService.Object,
-                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object,
-                organizationIntegrationEventsHelperService.Object);
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 
@@ -102,16 +98,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var organizationRepository = new Mock<IOrganizationRepository>();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var organizationIntegrationEventsQueueService = new Mock<IOrganizationIntegrationEventsQueueService>();
-            var organizationIntegrationEventsHelperService = new Mock<IOrganizationIntegrationEventsHelperService>();
 
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                organizationIntegrationEventsQueueService.Object,
                 organizationExistsHelperService.Object,
-                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object,
-                organizationIntegrationEventsHelperService.Object);
+                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             var orgId = new Guid("1572cb86-3c1d-4899-8d7a-983d8de0796b");
 

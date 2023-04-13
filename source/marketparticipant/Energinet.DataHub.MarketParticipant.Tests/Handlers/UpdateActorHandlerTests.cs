@@ -19,12 +19,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Helpers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -44,8 +42,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new UpdateActorHandler(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IChangesToActorHelper>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
@@ -78,8 +74,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new UpdateActorHandler(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IChangesToActorHelper>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 allowedGridAreasRuleService.Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
@@ -118,8 +112,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new UpdateActorHandler(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IChangesToActorHelper>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingEicFunctionsService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 new Mock<IExternalActorSynchronizationRepository>().Object,
@@ -151,8 +143,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new UpdateActorHandler(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IChangesToActorHelper>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object,
                 externalActorSynchronizationService.Object,
@@ -171,39 +161,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Assert
             externalActorSynchronizationService.Verify(
                 x => x.ScheduleAsync(It.Is<Guid>(aid => aid == actor.Id.Value)),
-                Times.Once);
-        }
-
-        [Fact]
-        public async Task Handle_UpdatedActor_DispatchesEvent()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var actorIntegrationEventsQueueService = new Mock<IActorIntegrationEventsQueueService>();
-
-            var target = new UpdateActorHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IChangesToActorHelper>().Object,
-                actorIntegrationEventsQueueService.Object,
-                new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object,
-                new Mock<IExternalActorSynchronizationRepository>().Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IActorStatusMarketRolesRuleService>().Object);
-
-            var actor = MockActor(actorRepositoryMock);
-
-            var command = new UpdateActorCommand(
-                actor.Id.Value,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
-
-            // Act
-            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
-
-            // Assert
-            actorIntegrationEventsQueueService.Verify(
-                x => x.EnqueueActorUpdatedEventAsync(It.IsAny<Actor>()),
                 Times.Once);
         }
 
