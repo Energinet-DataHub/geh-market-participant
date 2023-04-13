@@ -39,8 +39,4 @@ limitations under the License.
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Client\source\Energinet.DataHub.MarketParticipant.Client\Energinet.DataHub.MarketParticipant.Client.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Exceptions" />
-  </ItemGroup>
-
 </Project>
