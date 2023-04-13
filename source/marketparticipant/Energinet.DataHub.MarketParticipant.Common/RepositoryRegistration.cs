@@ -26,7 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IActorContactRepository, ActorContactRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaRepository, GridAreaRepository>(Lifestyle.Scoped);
             container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
-            container.Register<IDomainEventRepository, DomainEventRepository>(Lifestyle.Scoped);
             container.Register<IGridAreaLinkRepository, GridAreaLinkRepository>(Lifestyle.Scoped);
             container.Register<IMarketRoleAndGridAreaForActorReservationService, MarketRoleAndGridAreaForActorReservationService>(Lifestyle.Scoped);
             container.Register<IGridAreaOverviewRepository, GridAreaOverviewRepository>(Lifestyle.Scoped);

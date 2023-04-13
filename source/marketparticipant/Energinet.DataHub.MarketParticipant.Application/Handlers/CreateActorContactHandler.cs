@@ -20,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
@@ -31,18 +30,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
         private readonly IActorRepository _actorRepository;
         private readonly IActorContactRepository _contactRepository;
         private readonly IOverlappingActorContactCategoriesRuleService _overlappingContactCategoriesRuleService;
-        private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
 
         public CreateActorContactHandler(
             IActorRepository actorRepository,
             IActorContactRepository contactRepository,
-            IOverlappingActorContactCategoriesRuleService overlappingContactCategoriesRuleService,
-            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService)
+            IOverlappingActorContactCategoriesRuleService overlappingContactCategoriesRuleService)
         {
             _actorRepository = actorRepository;
             _contactRepository = contactRepository;
             _overlappingContactCategoriesRuleService = overlappingContactCategoriesRuleService;
-            _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         }
 
         public async Task<CreateActorContactResponse> Handle(CreateActorContactCommand request, CancellationToken cancellationToken)
@@ -67,10 +63,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             var contactId = await _contactRepository
                 .AddAsync(contact)
-                .ConfigureAwait(false);
-
-            await _actorIntegrationEventsQueueService
-                .EnqueueContactAddedToActorEventAsync(actor, contact)
                 .ConfigureAwait(false);
 
             return new CreateActorContactResponse(contactId.Value);

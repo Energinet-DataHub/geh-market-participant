@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -44,8 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 actorRepositoryMock.Object,
                 actorContactRepositoryMock.Object,
-                overlappingContactCategoriesRuleService.Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
+                overlappingContactCategoriesRuleService.Object);
 
             var actor = TestPreparationModels.MockedActor();
 
@@ -85,8 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 actorRepositoryMock.Object,
                 contactRepository.Object,
-                overlappingContactCategoriesRuleService.Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
+                overlappingContactCategoriesRuleService.Object);
 
             var actor = TestPreparationModels.MockedActor();
 
@@ -132,8 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new CreateActorContactHandler(
                 actorRepositoryMock.Object,
                 contactRepository.Object,
-                new Mock<IOverlappingActorContactCategoriesRuleService>().Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
+                new Mock<IOverlappingActorContactCategoriesRuleService>().Object);
 
             var actor = TestPreparationModels.MockedActor();
 

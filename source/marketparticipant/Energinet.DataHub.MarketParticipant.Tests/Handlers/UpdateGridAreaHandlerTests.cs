@@ -21,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -50,7 +49,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateGridAreaHandler(
                 gridAreaRepository.Object,
-                new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IGridAreaAuditLogEntryRepository>().Object,
                 CreateMockedUser());
@@ -60,38 +58,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // assert
             gridAreaRepository.Verify(x => x.AddOrUpdateAsync(It.Is<GridArea>(y => y.Name.Value == "newName")), Times.Once);
-        }
-
-        [Fact]
-        public async Task Handle_NameChanged_SendsDomainEvent()
-        {
-            // arrange
-            var gridAreaId = Guid.NewGuid();
-            var gridArea = new GridArea(
-                new GridAreaName("name"),
-                new GridAreaCode("101"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null);
-
-            var gridAreaRepository = new Mock<IGridAreaRepository>();
-            gridAreaRepository.Setup(x => x.GetAsync(new GridAreaId(gridAreaId)))
-                .ReturnsAsync(gridArea);
-
-            var eventQueue = new Mock<IGridAreaIntegrationEventsQueueService>();
-
-            var target = new UpdateGridAreaHandler(
-                gridAreaRepository.Object,
-                eventQueue.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IGridAreaAuditLogEntryRepository>().Object,
-                CreateMockedUser());
-
-            // act
-            await target.Handle(new UpdateGridAreaCommand(gridAreaId, new ChangeGridAreaDto(gridAreaId, "newName")), CancellationToken.None);
-
-            // assert
-            eventQueue.Verify(x => x.EnqueueGridAreaNameChangedEventAsync(It.Is<GridArea>(y => y.Name.Value == "newName")), Times.Once);
         }
 
         [Fact]
@@ -114,7 +80,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateGridAreaHandler(
                 gridAreaRepository.Object,
-                new Mock<IGridAreaIntegrationEventsQueueService>().Object,
                 UnitOfWorkProviderMock.Create(),
                 auditLogEntryRepository.Object,
                 CreateMockedUser());

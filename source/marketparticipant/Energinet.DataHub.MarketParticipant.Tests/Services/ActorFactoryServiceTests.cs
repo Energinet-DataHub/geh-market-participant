@@ -50,7 +50,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new ActorFactoryService(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
@@ -76,43 +75,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAsync_NewActor_DispatchesEvent()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var actorIntegrationEventsQueueService = new Mock<IActorIntegrationEventsQueueService>();
-            var target = new ActorFactoryService(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                actorIntegrationEventsQueueService.Object,
-                new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IAllowedGridAreasRuleService>().Object);
-
-            var organization = TestPreparationModels.MockedOrganization();
-            var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
-
-            actorRepositoryMock
-                .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln()));
-
-            // Act
-            await target
-                .CreateAsync(
-                    organization,
-                    new MockedGln(),
-                    new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
-
-            // Assert
-            actorIntegrationEventsQueueService.Verify(
-                x => x.EnqueueActorUpdatedEventAsync(
-                    It.IsAny<Actor>()),
-                Times.Once);
-        }
-
-        [Fact]
         public async Task CreateAsync_NewActor_EnsuresGlnUniqueness()
         {
             // Arrange
@@ -121,7 +83,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new ActorFactoryService(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
@@ -158,7 +119,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new ActorFactoryService(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
@@ -198,7 +158,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new ActorFactoryService(
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IActorIntegrationEventsQueueService>().Object,
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 allowedGridAreasRuleService.Object);
