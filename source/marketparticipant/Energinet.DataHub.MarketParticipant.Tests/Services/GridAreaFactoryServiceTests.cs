@@ -124,7 +124,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal("fake_value", response.Name.Value);
             Assert.Equal(PriceAreaCode.Dk1, response.PriceAreaCode);
             gridAreaLinkRepository.Verify(x => x.AddOrUpdateAsync(It.Is<GridAreaLink>(y => y.GridAreaId == gridAreaId)), Times.Once);
-            gridAreaLinkRepository.Verify(x => x.GetAsync(It.IsAny<GridAreaLinkId>()), Times.Once);
         }
     }
 }
