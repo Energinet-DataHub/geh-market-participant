@@ -20,7 +20,6 @@ using Energinet.DataHub.MarketParticipant.Application.Handlers;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -39,8 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
                 actorRepositoryMock.Object,
-                contactRepository.Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
+                contactRepository.Object);
 
             var contactId = new ContactId(Guid.NewGuid());
             var actor = TestPreparationModels.MockedActor();
@@ -69,8 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
                 actorRepositoryMock.Object,
-                contactRepository.Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
+                contactRepository.Object);
 
             var contactId = new ContactId(Guid.NewGuid());
             var actor = TestPreparationModels.MockedActor();
@@ -97,8 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var contactRepository = new Mock<IActorContactRepository>();
             var target = new DeleteActorContactHandler(
                 actorRepositoryMock.Object,
-                contactRepository.Object,
-                new Mock<IActorIntegrationEventsQueueService>().Object);
+                contactRepository.Object);
 
             var contactId = new ContactId(Guid.NewGuid());
             var actor = TestPreparationModels.MockedActor();

@@ -26,7 +26,6 @@ public sealed class ActorFactoryService : IActorFactoryService
 {
     private readonly IActorRepository _actorRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
     private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
     private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
@@ -34,14 +33,12 @@ public sealed class ActorFactoryService : IActorFactoryService
     public ActorFactoryService(
         IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IActorIntegrationEventsQueueService actorIntegrationEventsQueueService,
         IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
         IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
-        _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
         _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
         _allowedGridAreasRuleService = allowedGridAreasRuleService;
@@ -79,14 +76,6 @@ public sealed class ActorFactoryService : IActorFactoryService
             .ConfigureAwait(false);
 
         var savedActor = await SaveActorAsync(newActor).ConfigureAwait(false);
-
-        await _actorIntegrationEventsQueueService
-            .EnqueueActorUpdatedEventAsync(savedActor)
-            .ConfigureAwait(false);
-
-        await _actorIntegrationEventsQueueService
-            .EnqueueActorCreatedEventsAsync(savedActor)
-            .ConfigureAwait(false);
 
         await uow.CommitAsync().ConfigureAwait(false);
 

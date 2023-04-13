@@ -15,13 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Azure.Messaging.ServiceBus;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,7 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = true);
 
             host._startup.Container.Options.AllowOverridingRegistrations = true;
-            InitTestServiceBus(host._startup.Container);
             InitUserIdProvider(host._startup.Container);
             InitEmailSender(host._startup.Container);
             return Task.FromResult(host);
@@ -76,8 +73,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             KeyValuePair<string, string?>[] keyValuePairs =
             {
                 new(Settings.SqlDbConnectionString.Key, dbConnectionString),
-                new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
-                new(Settings.ServiceBusTopicName.Key, "fake_value"),
                 new(Settings.B2CBackendServicePrincipalNameObjectId.Key, Guid.Empty.ToString()),
                 new(Settings.B2CBackendId.Key, Guid.Empty.ToString()),
                 new(Settings.B2CBackendObjectId.Key, Guid.Empty.ToString()),
@@ -91,18 +86,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .AddInMemoryCollection(keyValuePairs)
                 .AddEnvironmentVariables()
                 .Build();
-        }
-
-        private static void InitTestServiceBus(Container container)
-        {
-            var mockSender = new Mock<ServiceBusSender>();
-            var mockClient = new Mock<IMarketParticipantServiceBusClient>();
-
-            mockClient
-                .Setup(mock => mock.CreateSender())
-                .Returns(mockSender.Object);
-
-            container.Register(() => mockClient.Object, Lifestyle.Singleton);
         }
 
         private static void InitUserIdProvider(Container container)

@@ -24,10 +24,6 @@ internal static class DomainServiceRegistration
 {
     public static void AddDomainServices(this Container container)
     {
-        container.Register<IActorIntegrationEventsQueueService, ActorIntegrationEventsQueueService>(Lifestyle.Scoped);
-        container.Register<IGridAreaIntegrationEventsQueueService, GridAreaIntegrationEventsQueueService>(Lifestyle.Scoped);
-        container.Register<IOrganizationIntegrationEventsQueueService, OrganizationIntegrationEventsQueueService>(Lifestyle.Scoped);
-
         container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
         container.Register<IOverlappingEicFunctionsRuleService, OverlappingEicFunctionsRuleService>(Lifestyle.Scoped);
         container.Register<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>(Lifestyle.Scoped);

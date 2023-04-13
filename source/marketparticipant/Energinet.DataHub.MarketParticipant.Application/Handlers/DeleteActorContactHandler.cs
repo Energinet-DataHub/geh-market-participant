@@ -19,7 +19,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers
@@ -28,16 +27,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
     {
         private readonly IActorRepository _actorRepository;
         private readonly IActorContactRepository _contactRepository;
-        private readonly IActorIntegrationEventsQueueService _actorIntegrationEventsQueueService;
 
         public DeleteActorContactHandler(
             IActorRepository actorRepository,
-            IActorContactRepository contactRepository,
-            IActorIntegrationEventsQueueService actorIntegrationEventsQueueService)
+            IActorContactRepository contactRepository)
         {
             _actorRepository = actorRepository;
             _contactRepository = contactRepository;
-            _actorIntegrationEventsQueueService = actorIntegrationEventsQueueService;
         }
 
         public async Task<Unit> Handle(DeleteActorContactCommand request, CancellationToken cancellationToken)
@@ -62,10 +58,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             await _contactRepository
                 .RemoveAsync(contact)
-                .ConfigureAwait(false);
-
-            await _actorIntegrationEventsQueueService
-                .EnqueueContactRemovedFromActorEventAsync(actor, contact)
                 .ConfigureAwait(false);
 
             return Unit.Value;

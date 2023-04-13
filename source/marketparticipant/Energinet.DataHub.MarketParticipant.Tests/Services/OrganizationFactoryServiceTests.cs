@@ -13,12 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents;
-using Energinet.DataHub.MarketParticipant.Domain.Model.IntegrationEvents.OrganizationIntegrationEvents;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Handlers;
@@ -50,7 +46,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             // Act + Assert
@@ -71,7 +66,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             // Act + Assert
@@ -92,7 +86,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             // Act + Assert
@@ -113,7 +106,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new OrganizationFactoryService(
                 organizationRepository.Object,
                 UnitOfWorkProviderMock.Create(),
-                new Mock<IOrganizationIntegrationEventsQueueService>().Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
             var orgId = new OrganizationId(Guid.NewGuid());
@@ -153,54 +145,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             Assert.Equal(_validAddress.Number, organization.Address.Number);
             Assert.Equal(_validAddress.StreetName, organization.Address.StreetName);
             Assert.Equal(_validAddress.ZipCode, organization.Address.ZipCode);
-        }
-
-        [Fact]
-        public async Task CreateAsync_NewOrganization_DispatchesEvent()
-        {
-            // Arrange
-            var organizationRepository = new Mock<IOrganizationRepository>();
-            var organizationIntegrationEventsQueueService = new Mock<IOrganizationIntegrationEventsQueueService>();
-            var target = new OrganizationFactoryService(
-                organizationRepository.Object,
-                UnitOfWorkProviderMock.Create(),
-                organizationIntegrationEventsQueueService.Object,
-                new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
-
-            var orgId = new OrganizationId(Guid.NewGuid());
-            var organization = new Organization(
-                orgId,
-                "fake_value",
-                _validCvrBusinessRegisterIdentifier,
-                _validAddress,
-                _validDomain,
-                "Test Comment",
-                OrganizationStatus.Active);
-
-            organizationRepository
-                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
-                .ReturnsAsync(new Result<OrganizationId, OrganizationError>(organization.Id));
-
-            organizationRepository
-                .Setup(x => x.GetAsync(organization.Id))
-                .ReturnsAsync(organization);
-
-            // Act
-            await target
-                .CreateAsync(
-                    "fake_value",
-                    _validCvrBusinessRegisterIdentifier,
-                    _validAddress,
-                    _validDomain,
-                    "Test Comment")
-                .ConfigureAwait(false);
-
-            // Assert
-            organizationIntegrationEventsQueueService.Verify(
-                x => x.EnqueueOrganizationIntegrationEventsAsync(
-                    orgId,
-                    It.Is<IEnumerable<IIntegrationEvent>>(y => y.Any(e => ((OrganizationCreatedIntegrationEvent)e).OrganizationId == organization.Id))),
-                Times.Once);
         }
     }
 }
