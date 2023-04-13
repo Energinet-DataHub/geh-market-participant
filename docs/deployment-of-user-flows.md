@@ -13,8 +13,9 @@ Under Properties pane, apply the following settings.
 - Enable JavaScript enforcing page layout - On
 - Multifactor authentication - Type of method - SMS only
 - Multifactor authentication - MFA enforcement - Always on
+- Password configuration - Select "Custom" and set "Minimum length" to 14. The rest should be as default shown below.
 
-![Invite Flow Properties](https://user-images.githubusercontent.com/77341673/228801159-7320e8bf-97f3-462c-80bb-c2580777aed3.PNG)
+![Invite Flow Properties](https://user-images.githubusercontent.com/7224482/231726529-f175e1b4-09e7-45bc-8813-4f182b6fc9e6.PNG)
 
 Under Page layouts pane, apply the following settings.
 
