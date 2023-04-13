@@ -46,7 +46,7 @@ jobs:
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
     needs:
-      [ci_base, ci_dotnet, ci_client_package, ci_model_package, render_diagrams]
+      [ci_base, ci_dotnet, ci_client_package, render_diagrams]
     if: |
       always()
     steps:
