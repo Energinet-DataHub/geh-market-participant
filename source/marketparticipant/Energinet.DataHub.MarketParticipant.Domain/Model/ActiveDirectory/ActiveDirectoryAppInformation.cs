@@ -20,5 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
         string AppId,
         string AppObjectId,
         string AppName,
-        IEnumerable<ActiveDirectoryRole> AppRoles);
+        IEnumerable<ActiveDirectoryRole> AppRoles,
+        IDictionary<string, object> AdditionalData);
 }

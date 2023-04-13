@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             try
             {
                 var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
-
+                await AddExtensionPropertyWithValueAsync(actorNumber, app.AppId!).ConfigureAwait(false);
                 var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId!).ConfigureAwait(false);
 
                 foreach (var permission in enumeratedPermissions)
@@ -138,7 +138,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     retrievedApp.AppId!,
                     retrievedApp.Id!,
                     retrievedApp.DisplayName!,
-                    appRoles);
+                    appRoles,
+                    retrievedApp.AdditionalData);
             }
             catch (Exception e)
             {
@@ -210,6 +211,24 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             if (role is null)
             {
                 throw new InvalidOperationException($"The object: '{nameof(role)}' is null.");
+            }
+        }
+
+        private async Task AddExtensionPropertyWithValueAsync(ActorNumber actorNumber, string appId)
+        {
+            var ext = new ExtensionProperty() { Name = "GLN/EIC", DataType = "String", TargetObjects = new List<string>() { "Application" } };
+            var result = await _graphClient.Applications[appId].ExtensionProperties.PostAsync(ext).ConfigureAwait(false);
+            if (result is { Name: not null })
+            {
+                var app = new Microsoft.Graph.Models.Application();
+                var content = new Dictionary<string, object>
+                {
+                    {
+                        result.Name, actorNumber.Value
+                    }
+                };
+                app.AdditionalData = content;
+                await _graphClient.Applications[appId].PatchAsync(app).ConfigureAwait(false);
             }
         }
 
