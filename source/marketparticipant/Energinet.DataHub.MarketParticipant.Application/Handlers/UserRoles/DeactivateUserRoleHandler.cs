@@ -28,8 +28,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class DeactivateUserRoleHandler
-    : IRequestHandler<DeactivateUserRoleCommand>
+public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRoleCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
@@ -57,7 +56,7 @@ public sealed class DeactivateUserRoleHandler
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(
+    public async Task Handle(
         DeactivateUserRoleCommand request,
         CancellationToken cancellationToken)
     {
@@ -80,17 +79,14 @@ public sealed class DeactivateUserRoleHandler
 
         await using (uow.ConfigureAwait(false))
         {
-            if (users != null)
+            foreach (var user in users)
             {
-                foreach (var user in users)
-                {
-                    var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
-                    user.RoleAssignments.Remove(role);
+                var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
+                user.RoleAssignments.Remove(role);
 
-                    await AuditRoleAssignmentAsync(user, role, UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)
-                        .ConfigureAwait(false);
-                    await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
-                }
+                await AuditRoleAssignmentAsync(user, role, UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)
+                    .ConfigureAwait(false);
+                await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
             var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRole);
@@ -107,8 +103,6 @@ public sealed class DeactivateUserRoleHandler
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
-
-        return Unit.Value;
     }
 
     private static UserRole CopyUserRoleForAuditLog(UserRole userRole)

@@ -117,11 +117,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     var updateOrganizationCommand =
                         new UpdateOrganizationCommand(organizationId, organization);
 
-                    var response = await _mediator
+                    await _mediator
                         .Send(updateOrganizationCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok();
                 },
                 _logger).ConfigureAwait(false);
         }

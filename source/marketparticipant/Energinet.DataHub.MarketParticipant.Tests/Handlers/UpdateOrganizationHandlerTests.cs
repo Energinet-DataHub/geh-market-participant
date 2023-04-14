@@ -22,7 +22,6 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using MediatR;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -83,13 +82,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
-            // Act
-            var response = await target
+            // Act + Assert
+            await target
                 .Handle(command, CancellationToken.None)
                 .ConfigureAwait(false);
-
-            // Assert
-            Assert.Equal(Unit.Value, response);
         }
 
         [Fact]

@@ -46,8 +46,6 @@ namespace Energinet.DataHub.MarketParticipant.Common.MediatR
             container.Collection.Register(typeof(IPipelineBehavior<,>), builtInBehaviors);
             container.Collection.Register(typeof(IRequestPreProcessor<>), new[] { typeof(EmptyRequestPreProcessor<>) });
             container.Collection.Register(typeof(IRequestPostProcessor<,>), new[] { typeof(EmptyRequestPostProcessor<,>) });
-
-            container.Register(() => new ServiceFactory(container.GetInstance), Lifestyle.Singleton);
         }
 
         private static void RegisterHandlers(Container container, System.Type collectionType, Assembly[] assemblies)

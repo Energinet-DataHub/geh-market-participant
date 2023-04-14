@@ -27,8 +27,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class UpdateUserRolesHandler
-    : IRequestHandler<UpdateUserRoleAssignmentsCommand>
+public sealed class UpdateUserRolesHandler : IRequestHandler<UpdateUserRoleAssignmentsCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
@@ -47,7 +46,7 @@ public sealed class UpdateUserRolesHandler
         _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<Unit> Handle(
+    public async Task Handle(
         UpdateUserRoleAssignmentsCommand request,
         CancellationToken cancellationToken)
     {
@@ -104,8 +103,6 @@ public sealed class UpdateUserRolesHandler
         }
 
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
-
-        return Unit.Value;
     }
 
     private async Task AuditRoleAssignmentAsync(

@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
         }
 
         [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Issue: https://github.com/dotnet/roslyn-analyzers/issues/5712")]
-        public async Task<Unit> Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -78,8 +78,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
-
-            return Unit.Value;
         }
     }
 }
