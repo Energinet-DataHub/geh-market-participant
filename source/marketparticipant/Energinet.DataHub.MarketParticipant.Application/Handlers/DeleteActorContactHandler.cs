@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             _contactRepository = contactRepository;
         }
 
-        public async Task<Unit> Handle(DeleteActorContactCommand request, CancellationToken cancellationToken)
+        public async Task Handle(DeleteActorContactCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -53,14 +53,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
 
             if (contact == null)
             {
-                return Unit.Value;
+                return;
             }
 
             await _contactRepository
                 .RemoveAsync(contact)
                 .ConfigureAwait(false);
-
-            return Unit.Value;
         }
     }
 }

@@ -122,11 +122,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
                     var updateActorCommand = new UpdateActorCommand(actorId, changeActor);
 
-                    var response = await _mediator
+                    await _mediator
                         .Send(updateActorCommand)
                         .ConfigureAwait(false);
 
-                    return Ok(response);
+                    return Ok();
                 },
                 _logger).ConfigureAwait(false);
         }

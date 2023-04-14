@@ -98,11 +98,11 @@ public sealed class UserRoleAssignmentController : ControllerBase
                 if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                     return Unauthorized();
 
-                var result = await _mediator
+                await _mediator
                     .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, assignments))
                     .ConfigureAwait(false);
 
-                return Ok(result);
+                return Ok();
             },
             _logger).ConfigureAwait(false);
     }

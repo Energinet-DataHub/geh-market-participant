@@ -47,7 +47,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
         _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<Unit> Handle(InviteUserCommand request, CancellationToken cancellationToken)
+    public async Task Handle(InviteUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -68,8 +68,6 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
         await _userInvitationService
             .InviteUserAsync(invitation, new UserId(request.InvitedByUserId))
             .ConfigureAwait(false);
-
-        return Unit.Value;
     }
 
     private async Task<Domain.Model.Actor> GetActorAsync(Guid actorId)
