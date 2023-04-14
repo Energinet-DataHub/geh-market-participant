@@ -1,0 +1,20 @@
+{
+  "SQL_MP_DB_CONNECTION_STRING": "Connection string to 'mssqldb-registry-markpart-<environment>' database.",
+
+  "INTERNAL_OPEN_ID_URL": "The OpenId configuration endpoint for internal token. When testing locally, use for example https://localhost:6001/.well-known/openid-configuration",
+  "EXTERNAL_OPEN_ID_URL": "The OpenId configuration endpoint for external Azure token, formatted as https://<tentant-id>.b2clogin.com/<tentant-id>.onmicrosoft.com/<sign-in-user-flow>/v2.0/.well-known/openid-configuration",
+  "BACKEND_BFF_APP_ID": "The client id of the 'backend-bff-app' application registration.",
+
+  "ALLOW_ALL_TOKENS": false,
+
+  "AZURE_B2C_BACKEND_ID": "The client id of the 'backend-b2b-app' application registration.",
+  "AZURE_B2C_BACKEND_OBJECT_ID": "The object id of the 'backend-b2b-app' application registration.",
+  "AZURE_B2C_BACKEND_SPN_OBJECT_ID": "The object id of the 'backend-b2b-app' service principal (the enterprise application for the application registration).",
+
+  "AZURE_B2C_SPN_ID": "The client id of the 'sp-b2c-<environment>' service principal with management permssions.",
+  "AZURE_B2C_SPN_SECRET": "The client secret of the 'sp-b2c-<environment>' service principal with management permssions.",
+  "AZURE_B2C_TENANT": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
+
+  "TOKEN_KEY_NAME": "The name of the key used to sign the token.",
+  "TOKEN_KEY_VAULT": "The address of the key vault containing the token signing key."
+}
