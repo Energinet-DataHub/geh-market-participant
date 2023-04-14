@@ -13,8 +13,9 @@ Under Properties pane, apply the following settings.
 - Enable JavaScript enforcing page layout - On
 - Multifactor authentication - Type of method - SMS only
 - Multifactor authentication - MFA enforcement - Always on
+- Password configuration - Select "Custom" and set "Minimum length" to 14. The rest should be as default shown below.
 
-![Invite Flow Properties](https://user-images.githubusercontent.com/77341673/228801159-7320e8bf-97f3-462c-80bb-c2580777aed3.PNG)
+![Invite Flow Properties](https://user-images.githubusercontent.com/7224482/231726529-f175e1b4-09e7-45bc-8813-4f182b6fc9e6.PNG)
 
 Under Page layouts pane, apply the following settings.
 
@@ -43,9 +44,11 @@ Under Properties pane, apply the following settings.
 - Session behavior - Web app session lifetime (minutes) - 15
 - Session behavior - Web app session timeout - Absolute
 - Session behavior - Single sign-on configuration - Disabled
+- Password configuration - Select "Custom" and set "Minimum length" to 14. Check "Self-service password reset" and "Forced password reset". The rest should be as default shown below.
 
 ![Sign In Flow Properties 1](https://user-images.githubusercontent.com/77341673/228801340-cb77d4a1-773d-417e-9f22-7dfd7ae6b196.PNG)
 ![Sign In Flow Properties 2](https://user-images.githubusercontent.com/77341673/228801401-882d0faa-5c1c-4b43-bfbf-f3c4957530e4.PNG)
+![Sign In Flow Properties 3](https://user-images.githubusercontent.com/7224482/232004505-84e1d662-3111-4fd7-9b8a-1da95e587f6e.PNG)
 
 Under Page layouts pane, apply the following settings.
 
