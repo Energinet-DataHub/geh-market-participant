@@ -13,7 +13,6 @@
 
   "AZURE_B2C_SPN_ID": "The client id of the 'sp-b2c-<environment>' service principal with management permssions.",
   "AZURE_B2C_SPN_SECRET": "The client secret of the 'sp-b2c-<environment>' service principal with management permssions.",
-
   "AZURE_B2C_TENANT": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
 
   "TOKEN_KEY_NAME": "The name of the key used to sign the token.",
