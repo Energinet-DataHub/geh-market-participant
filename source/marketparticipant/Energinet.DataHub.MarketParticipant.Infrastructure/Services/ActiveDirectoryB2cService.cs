@@ -216,20 +216,34 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         private async Task AddExtensionPropertyWithValueAsync(ActorNumber actorNumber, string appId)
         {
-            var ext = new ExtensionProperty() { Name = "GLN/EIC", DataType = "String", TargetObjects = new List<string>() { "Application" } };
-            var result = await _graphClient.Applications[appId].ExtensionProperties.PostAsync(ext).ConfigureAwait(false);
-            if (result is { Name: not null })
+            var ext = await GetExistingExtensionPropertyAsync(appId).ConfigureAwait(false)
+                      ?? await CreateExistingExtensionPropertyAsync(appId).ConfigureAwait(false);
+            if (ext is { Name: not null })
             {
                 var app = new Microsoft.Graph.Models.Application();
                 var content = new Dictionary<string, object>
                 {
                     {
-                        result.Name, actorNumber.Value
+                        ext.Name, actorNumber.Value
                     }
                 };
                 app.AdditionalData = content;
                 await _graphClient.Applications[appId].PatchAsync(app).ConfigureAwait(false);
             }
+        }
+
+        private async Task<ExtensionProperty?> GetExistingExtensionPropertyAsync(string appId)
+        {
+            var allProps = await _graphClient.Applications[appId].ExtensionProperties.GetAsync().ConfigureAwait(false);
+            return allProps?.Value?.FirstOrDefault(ext =>
+                string.Equals(ext.Name, "GLNEIC", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private async Task<ExtensionProperty?> CreateExistingExtensionPropertyAsync(string appId)
+        {
+            var ext = new ExtensionProperty() { Name = "GLNEIC", DataType = "String", TargetObjects = new List<string>() { "Application" } };
+            var result = await _graphClient.Applications[appId].ExtensionProperties.PostAsync(ext).ConfigureAwait(false);
+            return result;
         }
 
         private async Task<Microsoft.Graph.Models.Application> CreateAppInB2CAsync(
