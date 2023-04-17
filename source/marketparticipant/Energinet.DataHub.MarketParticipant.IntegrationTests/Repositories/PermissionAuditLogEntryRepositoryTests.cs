@@ -70,7 +70,8 @@ public sealed class PermissionAuditLogEntryRepositoryTests
             userRoleWithCreatedPermission.Permissions[0].Permission,
             new UserId(userChangedBy.Id),
             PermissionChangeType.DescriptionChange,
-            DateTimeOffset.UtcNow);
+            DateTimeOffset.UtcNow,
+            "Description");
 
         // Insert an audit log.
         await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();

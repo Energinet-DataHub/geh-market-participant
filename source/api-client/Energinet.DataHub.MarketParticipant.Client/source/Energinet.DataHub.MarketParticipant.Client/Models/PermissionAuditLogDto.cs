@@ -20,5 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         int PermissionId,
         PermissionChangeType PermissionChangeType,
         Guid ChangedByUserId,
-        DateTimeOffset Timestamp);
+        DateTimeOffset Timestamp,
+        string Value);
 }

@@ -24,4 +24,5 @@ public sealed class PermissionAuditLogEntryEntity
     public Guid ChangedByUserId { get; set; }
     public PermissionChangeType PermissionChangeType { get; set; }
     public DateTimeOffset Timestamp { get; set; }
+    public string Value { get; set; } = string.Empty;
 }

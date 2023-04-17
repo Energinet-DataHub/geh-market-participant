@@ -59,7 +59,8 @@ public sealed class UpdatePermissionHandler
                 permissionToUpdate.Id,
                 new UserId(request.ChangedByUserId),
                 PermissionChangeType.DescriptionChange,
-                DateTimeOffset.UtcNow))
+                DateTimeOffset.UtcNow,
+                request.Description))
             .ConfigureAwait(false);
 
         return Unit.Value;
