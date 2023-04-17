@@ -45,12 +45,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                             PermissionId.UsersView,
                             userId,
                             PermissionChangeType.DescriptionChange,
-                            DateTimeOffset.UtcNow),
+                            DateTimeOffset.UtcNow,
+                            "value1"),
                         new PermissionAuditLogEntry(
                             PermissionId.UsersView,
                             userId,
                             PermissionChangeType.DescriptionChange,
-                            DateTimeOffset.UtcNow.AddHours(1))
+                            DateTimeOffset.UtcNow.AddHours(1),
+                            "value2")
                     });
 
             var target = new GetPermissionAuditLogsHandler(repositoryMock.Object);

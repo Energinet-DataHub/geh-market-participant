@@ -44,7 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         p.PermissionId,
                         new UserId(p.ChangedByUserId),
                         p.PermissionChangeType,
-                        p.Timestamp)).ToListAsync().ConfigureAwait(false);
+                        p.Timestamp,
+                        p.Value)).ToListAsync().ConfigureAwait(false);
         }
 
         public Task InsertAuditLogEntryAsync(PermissionAuditLogEntry logEntry)

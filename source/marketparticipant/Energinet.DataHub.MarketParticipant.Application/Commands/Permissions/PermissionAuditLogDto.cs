@@ -21,4 +21,5 @@ public record PermissionAuditLogDto(
     int PermissionId,
     PermissionChangeType PermissionChangeType,
     Guid ChangedByUserId,
-    DateTimeOffset Timestamp);
+    DateTimeOffset Timestamp,
+    string Value);
