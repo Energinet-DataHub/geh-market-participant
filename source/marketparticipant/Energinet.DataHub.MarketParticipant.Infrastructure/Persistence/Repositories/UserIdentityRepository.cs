@@ -193,6 +193,19 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return externalUserId;
     }
 
+    public Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+        ArgumentNullException.ThrowIfNull(phoneNumber);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                MobilePhone = phoneNumber.Number
+            });
+    }
+
     private static UserIdentity Map(User user)
     {
         var userEmailAddress = user
