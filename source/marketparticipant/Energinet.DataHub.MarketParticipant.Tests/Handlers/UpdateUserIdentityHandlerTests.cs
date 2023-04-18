@@ -83,7 +83,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232323");
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232324");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
