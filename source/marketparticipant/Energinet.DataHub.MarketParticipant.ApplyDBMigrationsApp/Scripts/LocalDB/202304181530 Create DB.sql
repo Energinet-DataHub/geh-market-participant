@@ -3,20 +3,20 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[OrganizationInfo]
+CREATE TABLE [dbo].[Organization]
 (
     [Id]   [uniqueidentifier] NOT NULL,
     [Name] [nvarchar](max)    NOT NULL,
     [Gln]  [nvarchar](50)     NOT NULL
-        CONSTRAINT [PK_OrganizationInfo] PRIMARY KEY CLUSTERED
+        CONSTRAINT [PK_Organization] PRIMARY KEY CLUSTERED
             (
              [Id] ASC
                 ) WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [dbo].[OrganizationInfo]
-    ADD CONSTRAINT [DF_OrganizationInfo_Id] DEFAULT (newid()) FOR [Id]
+ALTER TABLE [dbo].[Organization]
+    ADD CONSTRAINT [DF_Organization_Id] DEFAULT (newid()) FOR [Id]
 GO
 
 -- 202202161302 Create GridAreaNew Table.sql
@@ -49,12 +49,12 @@ CREATE TABLE [dbo].[OrganizationRole]
     [Status] [int] NOT NULL,
 
 	CONSTRAINT PK_OrganizationRole PRIMARY KEY ([Id]),
-	CONSTRAINT FK_OrganizationId_OrganizationInfo FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[OrganizationInfo]([Id])
+	CONSTRAINT FK_OrganizationId_Organization FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[Organization]([Id])
 )
 GO
 
 -- 202202181115 Add ActorId to Organization Table.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     ADD [ActorId] [uniqueidentifier]
 GO
 
@@ -88,17 +88,17 @@ CREATE TABLE [dbo].[MarketRole]
 )
 GO
 
--- 202202251045 OrganizationInfo GLN unique.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+-- 202202251045 Organization GLN unique.sql
+ALTER TABLE [dbo].[Organization]
 ADD CONSTRAINT UNIQUE_GLN UNIQUE (Gln)
 GO
 
 -- 202203081530 Refactor Organization.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     DROP CONSTRAINT [UNIQUE_GLN]
 GO
 
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     DROP COLUMN [Gln], [ActorId]
 GO
 
@@ -121,7 +121,7 @@ CREATE TABLE [dbo].[ActorInfoNew]
     [GridAreaId]     [uniqueidentifier] NULL,
 
     CONSTRAINT PK_ActorInfoNew PRIMARY KEY ([Id]),
-    CONSTRAINT FK_OrganizationId_OrganizationInfo FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[OrganizationInfo]([Id]),
+    CONSTRAINT FK_OrganizationId_Organization FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[Organization]([Id]),
     CONSTRAINT UQ_ActorId UNIQUE ([ActorId])
 )
 GO
@@ -172,13 +172,13 @@ GO
 
 ALTER TABLE [dbo].[Contact]
 ADD [OrganizationId] [uniqueidentifier] NOT NULL
-CONSTRAINT FK_OrganizationId_Contact_OrganizationInfo FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[OrganizationInfo]([Id])
+CONSTRAINT FK_OrganizationId_Contact_Organization FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[Organization]([Id])
 CONSTRAINT UQ_Categories UNIQUE ([OrganizationId], [Category])
 GO
 
 
 -- 202203311033 Add Address And Cvr to Organization.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     ADD BusinessRegisterIdentifier nvarchar(8) DEFAULT N'',
         Address_StreetName nvarchar(250) NULL,
         Address_Number nvarchar(15) NULL,
@@ -188,18 +188,18 @@ ALTER TABLE [dbo].[OrganizationInfo]
 GO
 
 -- 202204051318 Alter Address Columns for Organization.sql
-UPDATE [dbo].[OrganizationInfo]
+UPDATE [dbo].[Organization]
 SET Address_Country = N'DK'
 GO
 
-UPDATE [dbo].[OrganizationInfo]
+UPDATE [dbo].[Organization]
 SET BusinessRegisterIdentifier = N''
 GO
 
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     ALTER COLUMN Address_Country nvarchar(50) NOT NULL
 
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     ALTER COLUMN BusinessRegisterIdentifier nvarchar(8) NOT NULL
 GO
 
@@ -210,7 +210,7 @@ ALTER TABLE [dbo].[GridAreaNew]
 GO
 
 -- 202204062145 Add Comment to Organization.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     ADD
         Comment nvarchar(max)
 GO
@@ -355,9 +355,9 @@ CREATE TABLE [dbo].[UniqueActorMarketRoleGridArea]
 )
 GO
 
--- 202207151250 OrganizationInfo BusinessRegisterIdetifier unique.sql
-ALTER TABLE [dbo].[OrganizationInfo]
-ADD CONSTRAINT UQ_OrganizationInfo_BusinessRegisterIdentifier UNIQUE (BusinessRegisterIdentifier)
+-- 202207151250 Organization BusinessRegisterIdetifier unique.sql
+ALTER TABLE [dbo].[Organization]
+ADD CONSTRAINT UQ_Organization_BusinessRegisterIdentifier UNIQUE (BusinessRegisterIdentifier)
 GO
 
 -- 202207250930 Add Name to Actor.sql
@@ -366,7 +366,7 @@ ALTER TABLE [dbo].[ActorInfoNew]
 GO
 
 -- 202207250945 Add Status to Organization.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+ALTER TABLE [dbo].[Organization]
     ADD
         [Status] INT NOT NULL DEFAULT(1)
 GO
@@ -681,14 +681,14 @@ CREATE TABLE [dbo].[EmailEvent]
 GO
 
 
--- 202302071515 OrganizationInfo Domain.sql
-ALTER TABLE [dbo].[OrganizationInfo]
+-- 202302071515 Organization Domain.sql
+ALTER TABLE [dbo].[Organization]
     ADD [Domain] nvarchar(255) NOT NULL DEFAULT('')
 GO
 
--- 202302130900 OrganizationInfo Domain unique index.sql
-ALTER TABLE [dbo].[OrganizationInfo]
-ADD CONSTRAINT UQ_OrganizationInfo_Domain UNIQUE (Domain);
+-- 202302130900 Organization Domain unique index.sql
+ALTER TABLE [dbo].[Organization]
+ADD CONSTRAINT UQ_Organization_Domain UNIQUE (Domain);
 
 -- 202302201100 Add UserInviteAuditLog Table.sql
 SET ANSI_NULLS ON
