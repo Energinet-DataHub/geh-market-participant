@@ -203,6 +203,50 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         Assert.Equal(UserStatus.Inactive, actual.Status);
     }
 
+    [Fact]
+    public async Task UpdateUserPhoneNumber()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+
+        var userIdentityAuthenticationServiceMock = new Mock<IUserIdentityAuthenticationService>();
+        userIdentityAuthenticationServiceMock
+            .Setup(userIdentityAuthenticationService => userIdentityAuthenticationService.AddAuthenticationAsync(
+                It.IsAny<ExternalUserId>(),
+                It.IsAny<AuthenticationMethod>()))
+            .ThrowsAsync(new TimeoutException());
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationServiceMock.Object,
+            userPasswordGenerator);
+
+        var userIdentity = new Domain.Model.Users.UserIdentity(
+            new EmailAddress(TestUserEmail),
+            "User Integration Tests",
+            "(Always safe to delete)",
+            new PhoneNumber("+45 70000000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71000000")));
+
+        var newPhoneNumber = new PhoneNumber("+45 70000001");
+
+        // Act
+        await Assert.ThrowsAsync<TimeoutException>(() => target.CreateAsync(userIdentity));
+        await target.UpdateUserPhoneNumberAsync(userIdentity.Id, newPhoneNumber);
+
+        // Assert
+        var actual = await target.GetAsync(userIdentity.Id);
+
+        Assert.NotNull(actual);
+        Assert.Equal(newPhoneNumber, actual.PhoneNumber);
+    }
+
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
     public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
 }
