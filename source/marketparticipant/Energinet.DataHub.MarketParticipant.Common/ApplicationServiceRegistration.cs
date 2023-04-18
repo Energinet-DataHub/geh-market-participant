@@ -78,6 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
             container.Register<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
+            container.Register<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2CService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);

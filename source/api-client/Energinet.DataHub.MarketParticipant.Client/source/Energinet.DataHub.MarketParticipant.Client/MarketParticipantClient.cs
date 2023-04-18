@@ -149,6 +149,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantUserClient.GetUserAuditLogsAsync(userId);
         }
 
+        public Task UpdateUserPhoneNumberAsync(Guid userId, UserIdentityUpdateDto userIdentityUpdateDto)
+        {
+            return _marketParticipantUserClient.UpdateUserPhoneNumberAsync(userId, userIdentityUpdateDto);
+        }
+
         public Task<UserOverviewResultDto> SearchUsersAsync(
             int pageNumber,
             int pageSize,
