@@ -203,6 +203,37 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         Assert.Equal(UserStatus.Inactive, actual.Status);
     }
 
+    [Fact]
+    public async Task UpdateUserPhoneNumber()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        var newPhoneNumber = new PhoneNumber("+45 70007777");
+
+        // Act
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        await target.UpdateUserPhoneNumberAsync(externalId, newPhoneNumber);
+
+        // Assert
+        var actual = await target.GetAsync(externalId);
+
+        Assert.NotNull(actual);
+        Assert.Equal(newPhoneNumber, actual.PhoneNumber);
+    }
+
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
     public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
 }

@@ -42,5 +42,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Gets audit logs for the specified user.
         /// </summary>
         Task<UserAuditLogsDto> GetUserAuditLogsAsync(Guid userId);
+
+        /// <summary>
+        /// Update phone number for user identity
+        /// </summary>
+        /// <param name="userId">user to update</param>
+        /// <param name="userIdentityUpdateDto">update values</param>
+        Task UpdateUserPhoneNumberAsync(Guid userId, UserIdentityUpdateDto userIdentityUpdateDto);
     }
 }
