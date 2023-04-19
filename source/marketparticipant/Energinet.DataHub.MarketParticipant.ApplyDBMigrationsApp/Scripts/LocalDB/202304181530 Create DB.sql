@@ -111,7 +111,7 @@ GO
 DROP TABLE [dbo].[OrganizationRole]
 GO
 
-CREATE TABLE [dbo].[ActorInfoNew]
+CREATE TABLE [dbo].[Actor]
 (
     [Id]             [uniqueidentifier] NOT NULL,
     [OrganizationId] [uniqueidentifier] NOT NULL,
@@ -120,7 +120,7 @@ CREATE TABLE [dbo].[ActorInfoNew]
     [Status]         [int]              NOT NULL,
     [GridAreaId]     [uniqueidentifier] NULL,
 
-    CONSTRAINT PK_ActorInfoNew PRIMARY KEY ([Id]),
+    CONSTRAINT PK_Actor PRIMARY KEY ([Id]),
     CONSTRAINT FK_OrganizationId_Organization FOREIGN KEY ([OrganizationId]) REFERENCES [dbo].[Organization]([Id]),
     CONSTRAINT UQ_ActorId UNIQUE ([ActorId])
 )
@@ -129,22 +129,22 @@ GO
 CREATE TABLE [dbo].[MarketRole]
 (
     [Id]          [uniqueidentifier] NOT NULL,
-    [ActorInfoId] [uniqueidentifier] NOT NULL,
+    [ActorId] [uniqueidentifier] NOT NULL,
     [Function]    [int]              NOT NULL,
 
     CONSTRAINT PK_MarketRole PRIMARY KEY ([Id]),
-    CONSTRAINT FK_ActorInfoId_ActorInfo_MarketRole FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
+    CONSTRAINT FK_ActorId_Actor_MarketRole FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor]([Id])
 )
 GO
 
-CREATE TABLE [dbo].[ActorInfoMeteringType]
+CREATE TABLE [dbo].[ActorMeteringType]
 (
     [Id]             [uniqueidentifier] NOT NULL,
     [MeteringTypeId] [int]              NOT NULL,
-    [ActorInfoId]    [uniqueidentifier] NOT NULL,
+    [ActorId]    [uniqueidentifier] NOT NULL,
 
-    CONSTRAINT PK_ActorInfoMeteringType PRIMARY KEY ([Id]),
-    CONSTRAINT FK_ActorInfoId_ActorInfo_MeteringType FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
+    CONSTRAINT PK_ActorMeteringType PRIMARY KEY ([Id]),
+    CONSTRAINT FK_ActorId_Actor_MeteringType FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor]([Id])
 )
 GO
 
@@ -233,30 +233,30 @@ CREATE TABLE [dbo].[GridAreaLinkNew](
 ) ON [PRIMARY]
 GO
 
--- 202205180900 Create GridAreaActorInfoLink Table.sql
-ALTER TABLE [dbo].[ActorInfoNew]
+-- 202205180900 Create GridAreaActorLink Table.sql
+ALTER TABLE [dbo].[Actor]
     DROP COLUMN [GridAreaId]
 GO
 
-CREATE TABLE [dbo].[GridAreaActorInfoLink]
+CREATE TABLE [dbo].[GridAreaActorLink]
 (
     [Id]             [uniqueidentifier] NOT NULL,
     [GridAreaId]     [uniqueidentifier] NOT NULL,
-    [ActorInfoId]    [uniqueidentifier] NOT NULL,
+    [ActorId]    [uniqueidentifier] NOT NULL,
 
-    CONSTRAINT PK_GridAreaActorInfoLink PRIMARY KEY ([Id]),
-    CONSTRAINT FK_GridAreaId_GridArea_GridAreaActorInfoLink FOREIGN KEY ([GridAreaId]) REFERENCES [dbo].[GridAreaNew]([Id]),
-    CONSTRAINT FK_ActorInfoId_ActorInfo_GridAreaActorInfoLink FOREIGN KEY ([ActorInfoId]) REFERENCES [dbo].[ActorInfoNew]([Id])
+    CONSTRAINT PK_GridAreaActorLink PRIMARY KEY ([Id]),
+    CONSTRAINT FK_GridAreaId_GridArea_GridAreaActorLink FOREIGN KEY ([GridAreaId]) REFERENCES [dbo].[GridAreaNew]([Id]),
+    CONSTRAINT FK_ActorId_Actor_GridAreaActorLink FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor]([Id])
 )
 GO
 
 
 -- 202205201000 Optional ActorId.sql
-ALTER TABLE [dbo].[ActorInfoNew]
+ALTER TABLE [dbo].[Actor]
     ALTER COLUMN [ActorId] [uniqueidentifier] NULL
 GO
 
-ALTER TABLE [dbo].[ActorInfoNew]
+ALTER TABLE [dbo].[Actor]
     DROP CONSTRAINT [UQ_ActorId]
 GO
 
@@ -272,7 +272,7 @@ CREATE TABLE [dbo].[ActorContact]
     [Phone]             [nvarchar](250)    NOT NULL,
 
     CONSTRAINT PK_ActorContact PRIMARY KEY ([Id]),
-    CONSTRAINT FK_ActorContact_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[ActorInfoNew]([Id]),
+    CONSTRAINT FK_ActorContact_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor]([Id]),
 )
 GO
 
@@ -291,7 +291,7 @@ GO
 
 
 -- 202206131236 Rename Gln To ActorNumber.sql
-EXEC sp_rename 'ActorInfoNew.Gln', 'ActorNumber', 'COLUMN';
+EXEC sp_rename 'Actor.Gln', 'ActorNumber', 'COLUMN';
 GO   
 
 -- 202206171100 Create MarketRoleGridArea Table.sql
@@ -334,9 +334,9 @@ GO
 
 -- 202206301238 Drop old actor gridarea and mp tables.sql
 
-DROP TABLE [dbo].[ActorInfoMeteringType]
+DROP TABLE [dbo].[ActorMeteringType]
 
-DROP TABLE [dbo].[GridAreaActorInfoLink]
+DROP TABLE [dbo].[GridAreaActorLink]
 
 DROP TABLE [dbo].[Contact]
 
@@ -349,7 +349,7 @@ CREATE TABLE [dbo].[UniqueActorMarketRoleGridArea]
     [GridAreaId]            [uniqueidentifier] NOT NULL,
 
     CONSTRAINT PK_UniqueActorMarketRoleGridArea PRIMARY KEY ([Id]),
-    CONSTRAINT FK_UniqueActorMarketRoleGridArea_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[ActorInfoNew]([Id]),
+    CONSTRAINT FK_UniqueActorMarketRoleGridArea_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor]([Id]),
     CONSTRAINT FK_UniqueActorMarketRoleGridArea_GridArea FOREIGN KEY ([GridAreaId]) REFERENCES [dbo].[GridAreaNew]([Id]),
     CONSTRAINT UQ_UniqueActorMarketRoleGridArea_MarketRoleFunction_GridAreaId UNIQUE ([MarketRoleFunction], [GridAreaId])
 )
@@ -361,7 +361,7 @@ ADD CONSTRAINT UQ_Organization_BusinessRegisterIdentifier UNIQUE (BusinessRegist
 GO
 
 -- 202207250930 Add Name to Actor.sql
-ALTER TABLE [dbo].[ActorInfoNew]
+ALTER TABLE [dbo].[Actor]
     ADD [Name] nvarchar(255) NOT NULL DEFAULT('')
 GO
 
@@ -407,29 +407,29 @@ GO
 -- 202209191415 Delete deleted actors.sql
 DELETE x
 FROM [dbo].[ActorContact] x
-JOIN [dbo].[ActorInfoNew] a ON x.ActorId = a.Id AND a.Status = 5
+JOIN [dbo].[Actor] a ON x.ActorId = a.Id AND a.Status = 5
 
 DELETE z
 FROM [dbo].[GridAreaMeteringPointType] z
 JOIN [dbo].[MarketRoleGridArea] y ON z.MarketRoleGridAreaId = y.Id
 JOIN [dbo].[MarketRole] x ON y.MarketRoleId = x.Id
-JOIN [dbo].[ActorInfoNew] a ON x.ActorInfoId = a.Id AND a.Status = 5
+JOIN [dbo].[Actor] a ON x.ActorId = a.Id AND a.Status = 5
 
 DELETE y
 FROM [dbo].[MarketRoleGridArea] y
 JOIN [dbo].[MarketRole] x ON y.MarketRoleId = x.Id
-JOIN [dbo].[ActorInfoNew] a ON x.ActorInfoId = a.Id AND a.Status = 5
+JOIN [dbo].[Actor] a ON x.ActorId = a.Id AND a.Status = 5
 
 DELETE x
 FROM [dbo].[MarketRole] x
-JOIN [dbo].[ActorInfoNew] a ON x.ActorInfoId = a.Id AND a.Status = 5
+JOIN [dbo].[Actor] a ON x.ActorId = a.Id AND a.Status = 5
 
 DELETE x
 FROM [dbo].[UniqueActorMarketRoleGridArea] x
-JOIN [dbo].[ActorInfoNew] a ON x.ActorId = a.Id AND a.Status = 5
+JOIN [dbo].[Actor] a ON x.ActorId = a.Id AND a.Status = 5
 
 DELETE a
-FROM [dbo].[ActorInfoNew] a WHERE a.Status = 5
+FROM [dbo].[Actor] a WHERE a.Status = 5
 
 GO
 
@@ -541,7 +541,7 @@ CREATE TABLE [dbo].[UserRoleTemplatePermission](
     GO
 
 -- 202211301515 Add IsFas to Actor.sql
-ALTER TABLE [dbo].[ActorInfoNew]
+ALTER TABLE [dbo].[Actor]
     ADD [IsFas] bit NOT NULL DEFAULT(0)
 GO
 
@@ -709,7 +709,7 @@ CREATE TABLE [dbo].[UserInviteAuditLogEntry](
 
     CONSTRAINT FK_UserInviteAuditLogEntry_ChangedByUserId_User FOREIGN KEY ([ChangedByUserId]) REFERENCES [dbo].[User]([Id]),
     CONSTRAINT FK_UserInviteAuditLogEntry_UserId_User FOREIGN KEY ([UserId]) REFERENCES [dbo].[User]([Id]),
-    CONSTRAINT FK_UserInviteAuditLogEntry_ActorId_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[ActorInfoNew]([Id]),
+    CONSTRAINT FK_UserInviteAuditLogEntry_ActorId_Actor FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor]([Id]),
     )
 GO
 

@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             var actorsWithMarketRoleGridArea =
                 from actor in _marketParticipantDbContext.Actors
                 join marketRole in _marketParticipantDbContext.MarketRoles
-                    on actor.Id equals marketRole.ActorInfoId
+                    on actor.Id equals marketRole.ActorId
                 join marketRoleGridArea in _marketParticipantDbContext.MarketRoleGridAreas
                     on marketRole.Id equals marketRoleGridArea.MarketRoleId
                 where marketRole.Function == EicFunction.GridAccessProvider
