@@ -53,7 +53,7 @@ public sealed class InitiateMitIdSignupHandlerTests
 
         // assert
         userRepositoryMock
-            .Verify(x => x.AddOrUpdateAsync(It.Is<User>(u => u == user && u.MitIdSignupInitiatedTimestampAt > DateTimeOffset.UtcNow.AddMinutes(-1))));
+            .Verify(x => x.AddOrUpdateAsync(It.Is<User>(u => u == user && u.MitIdSignupInitiatedAt > DateTimeOffset.UtcNow.AddMinutes(-1))));
     }
 
     [Fact]

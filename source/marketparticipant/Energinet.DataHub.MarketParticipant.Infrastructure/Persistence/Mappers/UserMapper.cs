@@ -25,7 +25,7 @@ internal static class UserMapper
     {
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
-        to.MitIdSignupInitiatedAt = from.MitIdSignupInitiatedTimestampAt;
+        to.MitIdSignupInitiatedAt = from.MitIdSignupInitiatedAt;
 
         var newAssignments = from
             .RoleAssignments
