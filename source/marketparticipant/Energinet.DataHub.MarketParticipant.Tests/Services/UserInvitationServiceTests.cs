@@ -191,7 +191,8 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                Array.Empty<UserRoleAssignment>()));
+                Array.Empty<UserRoleAssignment>(),
+                null));
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
@@ -240,7 +241,8 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) }));
+                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null));
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
@@ -307,7 +309,8 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
                 externalId,
-                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) }));
+                new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null));
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
