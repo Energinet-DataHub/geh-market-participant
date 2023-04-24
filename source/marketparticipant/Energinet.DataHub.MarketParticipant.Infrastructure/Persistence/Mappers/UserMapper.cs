@@ -19,12 +19,13 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 
-internal sealed class UserMapper
+internal static class UserMapper
 {
     public static void MapToEntity(User from, UserEntity to)
     {
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
+        to.MitIdSignupInitiatedAt = from.MitIdSignupInitiatedAt;
 
         var newAssignments = from
             .RoleAssignments
@@ -50,7 +51,8 @@ internal sealed class UserMapper
         return new User(
             new UserId(from.Id),
             new ExternalUserId(from.ExternalId),
-            from.RoleAssignments.Select(MapFromEntity));
+            from.RoleAssignments.Select(MapFromEntity),
+            from.MitIdSignupInitiatedAt);
     }
 
     private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)

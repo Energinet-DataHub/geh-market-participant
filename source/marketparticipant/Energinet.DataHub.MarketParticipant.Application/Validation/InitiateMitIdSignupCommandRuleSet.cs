@@ -12,21 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-
-public record UserId
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public UserId(Guid value)
+    public sealed class InitiateMitIdSignupCommandRuleSet : AbstractValidator<InitiateMitIdSignupCommand>
     {
-        Value = value;
-    }
-
-    public Guid Value { get; }
-
-    public override string ToString()
-    {
-        return Value.ToString();
+        public InitiateMitIdSignupCommandRuleSet()
+        {
+            RuleFor(command => command.UserId)
+                .NotEmpty();
+        }
     }
 }
