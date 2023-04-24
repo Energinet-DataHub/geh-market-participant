@@ -13,20 +13,8 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public record UserId
-{
-    public UserId(Guid value)
-    {
-        Value = value;
-    }
-
-    public Guid Value { get; }
-
-    public override string ToString()
-    {
-        return Value.ToString();
-    }
-}
+public sealed record InitiateMitIdSignupCommand(Guid UserId) : IRequest;
