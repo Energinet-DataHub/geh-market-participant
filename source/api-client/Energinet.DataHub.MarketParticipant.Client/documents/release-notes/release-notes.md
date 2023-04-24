@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.30.1
+
+- Added endpoint for updating a user phone number
+
 ## Version 2.29.6
 
 - Added endpoint to get all actors.
