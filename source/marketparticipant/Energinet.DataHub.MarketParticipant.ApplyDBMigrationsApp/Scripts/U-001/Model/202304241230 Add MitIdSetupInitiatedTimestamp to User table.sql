@@ -1,3 +1,3 @@
 ALTER TABLE [dbo].[User]
-    ADD [MitIdSignupInitiatedAt] [datetime2] NULL
+    ADD [MitIdSignupInitiatedAt] [datetimeoffset] NULL
 GO
