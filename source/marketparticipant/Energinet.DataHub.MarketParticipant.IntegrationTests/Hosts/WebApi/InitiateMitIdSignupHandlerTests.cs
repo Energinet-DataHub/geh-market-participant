@@ -53,6 +53,6 @@ public sealed class InitiateMitIdSignupHandlerTests
         var actual = context.Users.First(x => x.Id == user.Id);
 
         // assert
-        Assert.True(actual.MitIdSignupInitiatedTimestamp > DateTime.Now.AddMinutes(-1));
+        Assert.True(actual.MitIdSignupInitiatedTimestampUtc > DateTimeOffset.UtcNow.AddMinutes(-1));
     }
 }

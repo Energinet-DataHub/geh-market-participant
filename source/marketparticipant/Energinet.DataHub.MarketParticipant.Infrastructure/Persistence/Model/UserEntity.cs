@@ -23,5 +23,5 @@ public sealed class UserEntity
     public Guid ExternalId { get; set; }
     public string Email { get; set; } = null!;
     public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; } = new();
-    public DateTime? MitIdSignupInitiatedTimestamp { get; set; }
+    public DateTimeOffset? MitIdSignupInitiatedTimestampUtc { get; set; }
 }

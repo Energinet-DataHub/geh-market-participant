@@ -25,7 +25,7 @@ internal static class UserMapper
     {
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
-        to.MitIdSignupInitiatedTimestamp = from.MitIdSignupInitiatedTimestamp;
+        to.MitIdSignupInitiatedTimestampUtc = from.MitIdSignupInitiatedTimestampUtc;
 
         var newAssignments = from
             .RoleAssignments
@@ -52,7 +52,7 @@ internal static class UserMapper
             new UserId(from.Id),
             new ExternalUserId(from.ExternalId),
             from.RoleAssignments.Select(MapFromEntity),
-            from.MitIdSignupInitiatedTimestamp);
+            from.MitIdSignupInitiatedTimestampUtc);
     }
 
     private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)

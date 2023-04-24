@@ -19,5 +19,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
     public sealed class InitiateMitIdSignupCommandRuleSet : AbstractValidator<InitiateMitIdSignupCommand>
     {
+        public InitiateMitIdSignupCommandRuleSet()
+        {
+            RuleFor(command => command.UserId)
+                .NotEmpty();
+        }
     }
 }

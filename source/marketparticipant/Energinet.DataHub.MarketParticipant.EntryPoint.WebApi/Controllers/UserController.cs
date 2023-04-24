@@ -178,8 +178,8 @@ public class UserController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
-    [HttpPost("initiate-midid-signup")]
-    public async Task<IActionResult> InitiateMidIdSignupAsync()
+    [HttpPost("initiate-mitid-signup")]
+    public async Task<IActionResult> InitiateMitIdSignupAsync()
     {
         return await this.ProcessAsync(
             async () =>

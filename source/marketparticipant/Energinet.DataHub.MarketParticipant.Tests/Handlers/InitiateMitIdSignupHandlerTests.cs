@@ -39,7 +39,7 @@ public sealed class InitiateMitIdSignupHandlerTests
             new UserId(userId),
             new ExternalUserId(Guid.NewGuid()),
             Enumerable.Empty<UserRoleAssignment>(),
-            DateTime.UnixEpoch);
+            null);
 
         userRepositoryMock.Setup(x => x.GetAsync(new UserId(userId)))
             .ReturnsAsync(user);
@@ -53,7 +53,7 @@ public sealed class InitiateMitIdSignupHandlerTests
 
         // assert
         userRepositoryMock
-            .Verify(x => x.AddOrUpdateAsync(It.Is<User>(u => u == user && u.MitIdSignupInitiatedTimestamp > DateTime.Now.Date)));
+            .Verify(x => x.AddOrUpdateAsync(It.Is<User>(u => u == user && u.MitIdSignupInitiatedTimestampUtc > DateTimeOffset.UtcNow.AddMinutes(-1))));
     }
 
     [Fact]
