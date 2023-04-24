@@ -13,15 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed class UserEntity
-{
-    public Guid Id { get; set; }
-    public Guid ExternalId { get; set; }
-    public string Email { get; set; } = null!;
-    public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; } = new();
-    public DateTime? MitIdSignupInitiatedTimestamp { get; set; }
-}
+public sealed record InitiateMitIdSignupCommand(Guid UserId) : IRequest;

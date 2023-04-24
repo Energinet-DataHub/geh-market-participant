@@ -12,16 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.ObjectModel;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-
-public sealed class UserEntity
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public Guid Id { get; set; }
-    public Guid ExternalId { get; set; }
-    public string Email { get; set; } = null!;
-    public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; } = new();
-    public DateTime? MitIdSignupInitiatedTimestamp { get; set; }
+    public sealed class InitiateMitIdSignupCommandRuleSet : AbstractValidator<InitiateMitIdSignupCommand>
+    {
+    }
 }

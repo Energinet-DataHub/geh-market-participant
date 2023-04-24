@@ -178,6 +178,23 @@ public class UserController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
+    [HttpPost("initiate-midid-signup")]
+    public async Task<IActionResult> InitiateMidIdSignupAsync()
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new InitiateMitIdSignupCommand(_userContext.CurrentUser.UserId);
+
+                await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok();
+            },
+            _logger).ConfigureAwait(false);
+    }
+
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);

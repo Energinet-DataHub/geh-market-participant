@@ -40,7 +40,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232323");
         var validUserId = Guid.NewGuid();
 
-        var user = new User(new UserId(validUserId), new ExternalUserId(Guid.NewGuid()), new List<UserRoleAssignment>());
+        var user = new User(new UserId(validUserId), new ExternalUserId(Guid.NewGuid()), new List<UserRoleAssignment>(), null);
         userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
 
         var target = new UpdateUserIdentityHandler(
