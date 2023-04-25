@@ -88,5 +88,18 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .GetJsonAsync<UserAuditLogsDto>()
                 .ConfigureAwait(false);
         }
+
+        public async Task UpdateUserPhoneNumberAsync(
+            Guid userId,
+            UserIdentityUpdateDto userIdentityUpdateDto)
+        {
+            await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user", userId, "useridentity")
+                        .PutJsonAsync(userIdentityUpdateDto))
+                .ConfigureAwait(false);
+        }
     }
 }

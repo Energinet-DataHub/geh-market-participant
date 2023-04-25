@@ -13,16 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed class PermissionAuditLogEntryEntity
-{
-    public int EntryId { get; set; }
-    public PermissionId PermissionId { get; set; }
-    public Guid ChangedByUserId { get; set; }
-    public PermissionChangeType PermissionChangeType { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
-    public string Value { get; set; } = string.Empty;
-}
+public sealed record UpdateUserIdentityCommand(UserIdentityUpdateDto UserIdentityUpdate, Guid UserId) : IRequest;

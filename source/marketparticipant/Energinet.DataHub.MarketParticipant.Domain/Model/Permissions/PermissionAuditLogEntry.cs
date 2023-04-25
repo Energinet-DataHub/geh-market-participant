@@ -21,4 +21,5 @@ public sealed record PermissionAuditLogEntry(
     PermissionId Permission,
     UserId ChangedByUserId,
     PermissionChangeType PermissionChangeType,
-    DateTimeOffset Timestamp);
+    DateTimeOffset Timestamp,
+    string Value);

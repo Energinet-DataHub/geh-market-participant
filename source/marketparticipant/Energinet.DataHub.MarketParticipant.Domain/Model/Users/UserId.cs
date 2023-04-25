@@ -18,11 +18,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public record UserId
 {
-    public UserId(string value)
-    {
-        Value = Guid.Parse(value);
-    }
-
     public UserId(Guid value)
     {
         Value = value;

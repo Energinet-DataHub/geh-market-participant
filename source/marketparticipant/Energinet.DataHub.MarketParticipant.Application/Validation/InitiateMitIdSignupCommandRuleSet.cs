@@ -12,17 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-
-public sealed class PermissionAuditLogEntryEntity
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    public int EntryId { get; set; }
-    public PermissionId PermissionId { get; set; }
-    public Guid ChangedByUserId { get; set; }
-    public PermissionChangeType PermissionChangeType { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
-    public string Value { get; set; } = string.Empty;
+    public sealed class InitiateMitIdSignupCommandRuleSet : AbstractValidator<InitiateMitIdSignupCommand>
+    {
+        public InitiateMitIdSignupCommandRuleSet()
+        {
+            RuleFor(command => command.UserId)
+                .NotEmpty();
+        }
+    }
 }

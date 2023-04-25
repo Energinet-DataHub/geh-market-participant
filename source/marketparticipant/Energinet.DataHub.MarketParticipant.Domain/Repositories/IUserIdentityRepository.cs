@@ -57,4 +57,11 @@ public interface IUserIdentityRepository
     /// <param name="userIdentity">The user identity to create.</param>
     /// <returns>The id of the external user identity.</returns>
     Task<ExternalUserId> CreateAsync(UserIdentity userIdentity);
+
+    /// <summary>
+    /// Updates the phone number of a user identity.
+    /// </summary>
+    /// <param name="externalUserId">external user id</param>
+    /// <param name="phoneNumber">new phone number</param>
+    Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber);
 }

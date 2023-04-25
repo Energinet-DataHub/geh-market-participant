@@ -155,6 +155,46 @@ public class UserController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
+    [HttpPut("{userId:guid}/useridentity")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<IActionResult> UpdateUserIdentityAsync(
+        Guid userId,
+        UserIdentityUpdateDto userIdentityUpdateDto)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
+
+                if (!_userContext.CurrentUser.IsFas)
+                    return Unauthorized();
+
+                var response = await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok(response);
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpPost("initiate-mitid-signup")]
+    public async Task<IActionResult> InitiateMitIdSignupAsync()
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new InitiateMitIdSignupCommand(_userContext.CurrentUser.UserId);
+
+                await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok();
+            },
+            _logger).ConfigureAwait(false);
+    }
+
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);

@@ -44,7 +44,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         p.PermissionId,
                         new UserId(p.ChangedByUserId),
                         p.PermissionChangeType,
-                        p.Timestamp)).ToListAsync().ConfigureAwait(false);
+                        p.Timestamp,
+                        p.Value)).ToListAsync().ConfigureAwait(false);
         }
 
         public Task InsertAuditLogEntryAsync(PermissionAuditLogEntry logEntry)
@@ -56,7 +57,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 PermissionId = logEntry.Permission,
                 PermissionChangeType = logEntry.PermissionChangeType,
                 Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value
+                ChangedByUserId = logEntry.ChangedByUserId.Value,
+                Value = logEntry.Value
             };
 
             _context.PermissionAuditLogEntries.Add(entity);

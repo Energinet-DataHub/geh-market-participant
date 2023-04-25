@@ -30,14 +30,22 @@ public sealed class User
     public User(
         UserId id,
         ExternalUserId externalId,
-        IEnumerable<UserRoleAssignment> roleAssignments)
+        IEnumerable<UserRoleAssignment> roleAssignments,
+        DateTimeOffset? mitIdSignupInitiatedAt)
     {
         Id = id;
         ExternalId = externalId;
         RoleAssignments = roleAssignments.ToHashSet();
+        MitIdSignupInitiatedAt = mitIdSignupInitiatedAt;
     }
 
     public UserId Id { get; }
-    public ExternalUserId ExternalId { get; set; }
+    public ExternalUserId ExternalId { get; }
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
+    public DateTimeOffset? MitIdSignupInitiatedAt { get; private set;  }
+
+    public void InitiateMitIdSignup()
+    {
+        MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
+    }
 }
