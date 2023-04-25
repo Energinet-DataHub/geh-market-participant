@@ -59,7 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             try
             {
                 var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
-                await AddExtensionPropertyWithValueAsync(actorNumber, app.Id!).ConfigureAwait(false);
+                /* TODO: Enable once we know how to get values into the token.
+                 await AddExtensionPropertyWithValueAsync(actorNumber, app.Id!).ConfigureAwait(false); */
                 var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId!).ConfigureAwait(false);
 
                 foreach (var permission in enumeratedPermissions)
