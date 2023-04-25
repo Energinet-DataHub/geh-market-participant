@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Graph.Models.ODataErrors;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -58,7 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             try
             {
                 var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
-
+                /* TODO: Enable once we know how to get values into the token.
+                 await AddExtensionPropertyWithValueAsync(actorNumber, app.Id!).ConfigureAwait(false); */
                 var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId!).ConfigureAwait(false);
 
                 foreach (var permission in enumeratedPermissions)
@@ -138,7 +140,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     retrievedApp.AppId!,
                     retrievedApp.Id!,
                     retrievedApp.DisplayName!,
-                    appRoles);
+                    appRoles,
+                    retrievedApp.AdditionalData);
             }
             catch (Exception e)
             {
@@ -211,6 +214,55 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             {
                 throw new InvalidOperationException($"The object: '{nameof(role)}' is null.");
             }
+        }
+
+        private async Task AddExtensionPropertyWithValueAsync(ActorNumber actorNumber, string appId)
+        {
+            var ext = await GetExistingExtensionPropertyAsync().ConfigureAwait(false)
+                      ?? await CreateExistingExtensionPropertyAsync().ConfigureAwait(false);
+
+            if (ext is { Name: not null })
+            {
+                var updatedApp = new Microsoft.Graph.Models.Application
+                {
+                    AdditionalData = new Dictionary<string, object>
+                    {
+                        {
+                            ext.Name, actorNumber.Value
+                        }
+                    }
+                };
+                await _graphClient.Applications[appId].PatchAsync(updatedApp).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<ExtensionProperty?> GetExistingExtensionPropertyAsync()
+        {
+            var extApp = (await _graphClient
+                .Applications
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"displayName eq 'b2c-extensions-app. Do not modify. Used by AADB2C for storing user data.'";
+                })
+                .ConfigureAwait(false))?.Value?.FirstOrDefault();
+            if (extApp is not { Id: not null }) throw new InvalidOperationException("Extension app not found in B2C, can't add extension properties");
+            var allProps = await _graphClient.Applications[extApp.Id].ExtensionProperties.GetAsync().ConfigureAwait(false);
+            return allProps?.Value?.FirstOrDefault(ext => ext.Name != null && ext.Name.Contains("GLNEIC", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private async Task<ExtensionProperty?> CreateExistingExtensionPropertyAsync()
+        {
+            var ext = new ExtensionProperty() { Name = "GLNEIC", DataType = "String", TargetObjects = new List<string>() { "Application" } };
+            var extApp = (await _graphClient
+                .Applications
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"displayName eq 'b2c-extensions-app. Do not modify. Used by AADB2C for storing user data.'";
+                })
+                .ConfigureAwait(false))?.Value?.FirstOrDefault();
+            if (extApp is not { Id: not null }) throw new InvalidOperationException("Extension app not found in B2C, can't add extension properties");
+            var result = await _graphClient.Applications[extApp.Id].ExtensionProperties.PostAsync(ext).ConfigureAwait(false);
+            return result;
         }
 
         private async Task<Microsoft.Graph.Models.Application> CreateAppInB2CAsync(

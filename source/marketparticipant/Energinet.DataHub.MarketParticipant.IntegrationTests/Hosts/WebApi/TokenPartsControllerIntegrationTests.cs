@@ -60,10 +60,11 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Equal("https://datahub.dk", internalToken.Issuer);
@@ -74,10 +75,11 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Equal(TestBackendAppId, internalToken.Audiences.Single());
@@ -88,10 +90,11 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Single(internalToken.Claims, c => c.Type == JwtRegisteredClaimNames.Sub && Guid.Parse(c.Value) == testUser.Id);
@@ -101,15 +104,15 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_ActorId_IsKnown()
     {
         // Arrange
-        var actorId = Guid.NewGuid();
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken, actorId);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
-        Assert.Equal(actorId.ToString(), internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Azp).Value);
+        Assert.Equal(testActor.Id.ToString(), internalToken.Claims.Single(c => c.Type == JwtRegisteredClaimNames.Azp).Value);
         Assert.Empty(internalToken.Claims.Where(c => c.Type == "role"));
     }
 
@@ -144,13 +147,14 @@ public sealed class TokenPartsControllerIntegrationTests :
         // Arrange
         var notBefore = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(
             testUser.ExternalId,
             notBefore: notBefore,
             expires: notBefore.AddDays(1));
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Equal(notBefore, internalToken.ValidFrom);
@@ -162,10 +166,11 @@ public sealed class TokenPartsControllerIntegrationTests :
         // Arrange
         var expires = DateTime.UtcNow.Date.AddDays(RandomNumberGenerator.GetInt32(3));
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId, expires: expires);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Equal(expires, internalToken.ValidTo);
@@ -176,10 +181,11 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Equal(JwtConstants.TokenType, internalToken.Header[JwtHeaderParameterNames.Typ]);
@@ -190,10 +196,11 @@ public sealed class TokenPartsControllerIntegrationTests :
     {
         // Arrange
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         // Act
-        var internalToken = await FetchTokenAsync(externalToken);
+        var internalToken = await FetchTokenAsync(externalToken, testActor.Id);
 
         // Assert
         Assert.Equal(SecurityAlgorithms.RsaSha256, internalToken.Header[JwtHeaderParameterNames.Alg]);

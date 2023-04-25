@@ -75,6 +75,41 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         }
 
         [Fact]
+        public async Task CreateConsumerAppRegistrationAsync_AddExtensionPropertyAndReadBack_Success()
+        {
+            ExternalActorId? cleanupId = null;
+
+            try
+            {
+                // Arrange
+                var roles = new List<EicFunction>
+                {
+                    EicFunction.SystemOperator // transmission system operator
+                };
+
+                // Act
+                var response = await _sut
+                    .CreateAppRegistrationAsync(new MockedGln(), roles)
+                    .ConfigureAwait(false);
+
+                cleanupId = response.ExternalActorId;
+
+                // Assert
+                var app = await _sut.GetExistingAppRegistrationAsync(
+                        new AppRegistrationObjectId(Guid.Parse(response.AppObjectId)),
+                        new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId))
+                    .ConfigureAwait(false);
+
+                Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
+                Assert.NotEmpty(app.AdditionalData);
+            }
+            finally
+            {
+                await CleanupAsync(cleanupId).ConfigureAwait(false);
+            }
+        }
+
+        [Fact]
         public async Task GetExistingAppRegistrationAsync_AddTwoRolesToAppRegistration_Success()
         {
             ExternalActorId? cleanupId = null;
