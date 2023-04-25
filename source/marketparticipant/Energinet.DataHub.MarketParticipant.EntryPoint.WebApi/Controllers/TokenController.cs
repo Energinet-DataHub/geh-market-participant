@@ -129,12 +129,17 @@ public class TokenController : ControllerBase
         var issuedAt = EpochTime.GetIntDate(DateTime.UtcNow);
 
         GetUserPermissionsResponse grantedPermissions;
+        GetSingleActorResponse actorResponse;
 
         try
         {
             grantedPermissions = await _mediator
                 .Send(new GetUserPermissionsCommand(externalUserId, actorId))
                 .ConfigureAwait(false);
+
+            actorResponse = await _mediator
+                            .Send(new GetSingleActorCommand(actorId))
+                            .ConfigureAwait(false);
         }
         catch (NotFoundValidationException)
         {
@@ -147,22 +152,9 @@ public class TokenController : ControllerBase
         var dataHubTokenClaims = roleClaims
             .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
-            .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
-
-        try
-        {
-            var actorResponse = await _mediator
-                .Send(new GetSingleActorCommand(actorId))
-                .ConfigureAwait(false);
-
-            dataHubTokenClaims = dataHubTokenClaims
-                .Append(new Claim(ActorNumberClaim, actorResponse.Actor.ActorNumber.ToString()))
-                .Append(new Claim(MarketRolesClaim, string.Join(',', actorResponse.Actor.MarketRoles.Select(x => x.EicFunction))));
-        }
-        catch (NotFoundValidationException)
-        {
-           //TODO: What do we do here?
-        }
+            .Append(new Claim(TokenClaim, tokenRequest.ExternalToken))
+            .Append(new Claim(ActorNumberClaim, actorResponse.Actor.ActorNumber.ToString()))
+            .Append(new Claim(MarketRolesClaim, string.Join(',', actorResponse.Actor.MarketRoles.Select(x => x.EicFunction))));
 
         if (grantedPermissions.IsFas)
         {
