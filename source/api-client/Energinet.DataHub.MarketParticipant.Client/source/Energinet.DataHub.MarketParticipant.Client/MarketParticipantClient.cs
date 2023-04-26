@@ -154,6 +154,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantUserClient.UpdateUserPhoneNumberAsync(userId, userIdentityUpdateDto);
         }
 
+        public Task InitiateMitIdSignupAsync()
+        {
+            return _marketParticipantUserClient.InitiateMitIdSignupAsync();
+        }
+
         public Task<UserOverviewResultDto> SearchUsersAsync(
             int pageNumber,
             int pageSize,
