@@ -148,9 +148,10 @@ public sealed class TokenControllerIntegrationTests :
         const string target = "token";
 
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
-        var actorId = Guid.NewGuid();
+        var actorId = testActor.Id;
         var request = new TokenRequest(actorId, externalToken);
 
         using var httpContent = new StringContent(
@@ -205,9 +206,10 @@ public sealed class TokenControllerIntegrationTests :
         const string target = "token";
 
         var testUser = await _fixture.PrepareUserAsync();
+        var testActor = await _fixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
-        var actorId = Guid.NewGuid();
+        var actorId = testActor.Id;
         var request = new TokenRequest(actorId, externalToken);
 
         using var httpContent = new StringContent(
