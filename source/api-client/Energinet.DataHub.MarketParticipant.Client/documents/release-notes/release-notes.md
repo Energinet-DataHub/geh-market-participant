@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.30.2
+
+- Added endpoint for initiating MitID signup.
+
 ## Version 2.30.1
 
 - Added endpoint for updating a user phone number
