@@ -20,11 +20,13 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys.Cryptography;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Authorization;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -42,6 +44,8 @@ public class TokenController : ControllerBase
     private const string TokenClaim = "token";
     private const string MembershipClaim = "membership";
     private const string FasMembership = "fas";
+    private const string ActorNumberClaim = "actornumber";
+    private const string MarketRolesClaim = "marketroles";
 
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly ISigningKeyRing _signingKeyRing;
@@ -125,12 +129,17 @@ public class TokenController : ControllerBase
         var issuedAt = EpochTime.GetIntDate(DateTime.UtcNow);
 
         GetUserPermissionsResponse grantedPermissions;
+        GetSingleActorResponse actorResponse;
 
         try
         {
             grantedPermissions = await _mediator
                 .Send(new GetUserPermissionsCommand(externalUserId, actorId))
                 .ConfigureAwait(false);
+
+            actorResponse = await _mediator
+                            .Send(new GetSingleActorCommand(actorId))
+                            .ConfigureAwait(false);
         }
         catch (NotFoundValidationException)
         {
@@ -143,7 +152,9 @@ public class TokenController : ControllerBase
         var dataHubTokenClaims = roleClaims
             .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
-            .Append(new Claim(TokenClaim, tokenRequest.ExternalToken));
+            .Append(new Claim(TokenClaim, tokenRequest.ExternalToken))
+            .Append(new Claim(ActorNumberClaim, actorResponse.Actor.ActorNumber.ToString()))
+            .Append(new Claim(MarketRolesClaim, string.Join(',', actorResponse.Actor.MarketRoles.Select(x => x.EicFunction))));
 
         if (grantedPermissions.IsFas)
         {
