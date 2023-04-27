@@ -27,8 +27,6 @@ on:
         value: ${{ jobs.changes.outputs.dotnet }}
       client_package:
         value: ${{ jobs.changes.outputs.client_package }}
-      model_package:
-        value: ${{ jobs.changes.outputs.model_package }}
       render_diagrams:
         value: ${{ jobs.changes.outputs.render_diagrams }}
 
