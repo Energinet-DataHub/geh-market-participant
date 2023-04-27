@@ -153,7 +153,7 @@ public class TokenController : ControllerBase
             .Append(new Claim(JwtRegisteredClaimNames.Sub, grantedPermissions.UserId.ToString()))
             .Append(new Claim(JwtRegisteredClaimNames.Azp, actorId.ToString()))
             .Append(new Claim(TokenClaim, tokenRequest.ExternalToken))
-            .Append(new Claim(ActorNumberClaim, actorResponse.Actor.ActorNumber.ToString()))
+            .Append(new Claim(ActorNumberClaim, actorResponse.Actor.ActorNumber.Value))
             .Append(new Claim(MarketRolesClaim, string.Join(',', actorResponse.Actor.MarketRoles.Select(x => x.EicFunction))));
 
         if (grantedPermissions.IsFas)
