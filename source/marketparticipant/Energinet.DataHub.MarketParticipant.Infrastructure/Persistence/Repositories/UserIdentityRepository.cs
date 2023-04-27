@@ -74,6 +74,20 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return IsMember(user) ? Map(user) : null;
     }
 
+    public async Task<UserIdentity?> FindIdentityReadyForOpenIdSetupAsync(ExternalUserId externalId)
+    {
+        ArgumentNullException.ThrowIfNull(externalId);
+
+        var user = (await _graphClient
+            .Users[externalId.Value.ToString()]
+            .GetAsync(x => x.QueryParameters.Select = _selectors).ConfigureAwait(false))!;
+
+        var userWithOenIdConnect = user is { UserType: "Member", Identities: { } } &&
+            user.Identities.Any(ident => ident.SignInType == "openIdConnect");
+
+        return userWithOenIdConnect ? Map(user) : null;
+    }
+
     public async Task<UserIdentity?> GetAsync(EmailAddress email)
     {
         ArgumentNullException.ThrowIfNull(email);
@@ -204,6 +218,35 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             {
                 MobilePhone = phoneNumber.Number
             });
+    }
+
+    public Task UpdateUserSignInIdentitiesAsync(UserIdentity userIdentity, string signInType)
+    {
+        ArgumentNullException.ThrowIfNull(userIdentity);
+
+        return _graphClient
+            .Users[userIdentity.Id.Value.ToString()]
+            .PatchAsync(new User
+            {
+                Identities = new List<ObjectIdentity>
+                {
+                    new()
+                    {
+                        SignInType = signInType,
+                        Issuer = _azureIdentityConfig.Issuer,
+                        IssuerAssignedId = userIdentity.Email.ToString()
+                    }
+                }
+            });
+    }
+
+    public Task DeleteUserIdentityAsync(ExternalUserId externalUserId)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .DeleteAsync();
     }
 
     private static UserIdentity Map(User user)
