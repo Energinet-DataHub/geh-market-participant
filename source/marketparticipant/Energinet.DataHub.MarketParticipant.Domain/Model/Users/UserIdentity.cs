@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
@@ -28,7 +29,8 @@ public sealed class UserIdentity
         string lastName,
         PhoneNumber? phoneNumber,
         DateTimeOffset createdDate,
-        AuthenticationMethod authentication)
+        AuthenticationMethod authentication,
+        IList<LoginIdentity>? loginIdentities)
     {
         Id = id;
         Email = email;
@@ -38,6 +40,7 @@ public sealed class UserIdentity
         PhoneNumber = phoneNumber;
         CreatedDate = createdDate;
         Authentication = authentication;
+        LoginIdentities = loginIdentities;
     }
 
     public UserIdentity(
@@ -58,6 +61,7 @@ public sealed class UserIdentity
         PhoneNumber = phoneNumber;
         CreatedDate = DateTimeOffset.UtcNow;
         Authentication = authentication;
+        LoginIdentities = new List<LoginIdentity>();
 
         ValidateName();
     }
@@ -71,6 +75,7 @@ public sealed class UserIdentity
     public PhoneNumber? PhoneNumber { get; }
     public DateTimeOffset CreatedDate { get; }
     public AuthenticationMethod Authentication { get; }
+    public IList<LoginIdentity>? LoginIdentities { get; }
 
     private void ValidateName()
     {

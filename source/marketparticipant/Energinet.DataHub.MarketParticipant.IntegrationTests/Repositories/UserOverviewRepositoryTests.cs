@@ -227,7 +227,8 @@ public sealed class UserOverviewRepositoryTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.Undetermined)
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())
             });
 
         var target = new UserOverviewRepository(
@@ -275,7 +276,8 @@ public sealed class UserOverviewRepositoryTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.Undetermined)
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())
             });
 
         var target = new UserOverviewRepository(
@@ -375,7 +377,8 @@ public sealed class UserOverviewRepositoryTests
                         y.ToString(),
                         null,
                         DateTime.UtcNow,
-                        AuthenticationMethod.Undetermined))));
+                        AuthenticationMethod.Undetermined,
+                        new List<LoginIdentity>()))));
 
         return userIdentityRepository;
     }
@@ -394,7 +397,8 @@ public sealed class UserOverviewRepositoryTests
                     y.ToString(),
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.Undetermined)));
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())));
 
         userIdentityRepository
             .Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
@@ -409,7 +413,8 @@ public sealed class UserOverviewRepositoryTests
                             y.ToString(),
                             null,
                             DateTime.UtcNow,
-                            AuthenticationMethod.Undetermined))));
+                            AuthenticationMethod.Undetermined,
+                            new List<LoginIdentity>()))));
 
         return userIdentityRepository;
     }

@@ -48,7 +48,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         "identities",
         "mobilePhone",
         "createdDateTime",
-        "accountEnabled"
+        "accountEnabled",
+        "userPrincipalName",
+        "otherMails"
     };
 
     public UserIdentityRepository(
@@ -82,10 +84,13 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .Users[externalId.Value.ToString()]
             .GetAsync(x => x.QueryParameters.Select = _selectors).ConfigureAwait(false))!;
 
+        // TODO: Check issuer is pp nets
         var userWithOenIdConnect = user is { UserType: "Member", Identities: { } } &&
-            user.Identities.Any(ident => ident.SignInType == "openIdConnect");
+            user.Identities.Any(ident => ident.SignInType == "federated");
 
-        return userWithOenIdConnect ? Map(user) : null;
+        var userEmail = user.OtherMails?.First() ?? throw new NotSupportedException("User dose not have a email address");
+
+        return userWithOenIdConnect ? Map(user, userEmail) : null;
     }
 
     public async Task<UserIdentity?> GetAsync(EmailAddress email)
@@ -220,23 +225,22 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             });
     }
 
-    public Task UpdateUserSignInIdentitiesAsync(UserIdentity userIdentity, string signInType)
+    public Task UpdateUserLoginIdentitiesAsync(ExternalUserId externalUserId, IEnumerable<LoginIdentity> loginIdentities)
     {
-        ArgumentNullException.ThrowIfNull(userIdentity);
+        ArgumentNullException.ThrowIfNull(externalUserId);
+        ArgumentNullException.ThrowIfNull(loginIdentities);
 
         return _graphClient
-            .Users[userIdentity.Id.Value.ToString()]
+            .Users[externalUserId.Value.ToString()]
             .PatchAsync(new User
             {
-                Identities = new List<ObjectIdentity>
+                Identities = loginIdentities.Select(loginIdentity => new ObjectIdentity
                 {
-                    new()
-                    {
-                        SignInType = signInType,
-                        Issuer = _azureIdentityConfig.Issuer,
-                        IssuerAssignedId = userIdentity.Email.ToString()
-                    }
-                }
+                    SignInType = loginIdentity.SignInType,
+                    Issuer = loginIdentity.Issuer,
+                    IssuerAssignedId = loginIdentity.IssuerAssignedId,
+                    OdataType = loginIdentity.OdataType
+                }).ToList()
             });
     }
 
@@ -265,7 +269,31 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             user.Surname ?? string.Empty,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
             user.CreatedDateTime!.Value,
-            AuthenticationMethod.Undetermined);
+            AuthenticationMethod.Undetermined,
+            user.Identities?.Select(Map).ToList());
+    }
+
+    private static LoginIdentity Map(ObjectIdentity identity)
+    {
+        return new LoginIdentity(
+            identity.SignInType,
+            identity.Issuer,
+            identity.IssuerAssignedId,
+            identity.OdataType);
+    }
+
+    private static UserIdentity Map(User user, string emailAddress)
+    {
+        return new UserIdentity(
+            new ExternalUserId(user.Id!),
+            new EmailAddress(emailAddress),
+            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
+            user.GivenName ?? user.DisplayName!,
+            user.Surname ?? string.Empty,
+            string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
+            user.CreatedDateTime!.Value,
+            AuthenticationMethod.Undetermined,
+            user.Identities?.Select(Map).ToList());
     }
 
     private static bool IsMember(User user)

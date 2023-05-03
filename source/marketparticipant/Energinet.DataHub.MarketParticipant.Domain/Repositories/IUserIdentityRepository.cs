@@ -73,11 +73,11 @@ public interface IUserIdentityRepository
     Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber);
 
     /// <summary>
-    /// Update user identity sign in identities
+    /// Update user login identities
     /// </summary>
-    /// <param name="userIdentity"></param>
-    /// <param name="signInType"></param>
-    Task UpdateUserSignInIdentitiesAsync(UserIdentity userIdentity, string signInType);
+    /// <param name="externalUserId"></param>
+    /// <param name="loginIdentities"></param>
+    Task UpdateUserLoginIdentitiesAsync(ExternalUserId externalUserId, IEnumerable<LoginIdentity> loginIdentities);
 
     /// <summary>
     /// Deletes user identity
