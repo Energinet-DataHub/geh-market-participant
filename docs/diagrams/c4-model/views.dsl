@@ -24,16 +24,16 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             !include https://raw.githubusercontent.com/Energinet-DataHub/geh-market-participant/dstenroejl/align-c4-models/docs/diagrams/c4-model/model.dsl
 
             # Include EDI model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/dh3-infrastructure/dstenroejl/continue-refactoring-of-diagrams/c4-model/edi-model.dsl?token=GHSAT0AAAAAABXFU5ELB6EQCIJH32UKF5SKZCSWLWA
+            !include https://raw.githubusercontent.com/Energinet-DataHub/
 
             # Include Wholesale model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/dh3-infrastructure/dstenroejl/continue-refactoring-of-diagrams/c4-model/wholesale-model.dsl?token=GHSAT0AAAAAABXFU5EKDQKDJ5FWFVSUT2AMZCSWL6A
+            !include https://raw.githubusercontent.com/Energinet-DataHub/
 
             # Include Frontend model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/dh3-infrastructure/dstenroejl/continue-refactoring-of-diagrams/c4-model/frontend-model.dsl?token=GHSAT0AAAAAABXFU5ELQPQKK4OYQHQJJ3PEZCSWMEA
+            !include https://raw.githubusercontent.com/Energinet-DataHub/
 
             # Include Migration model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/dh3-infrastructure/dstenroejl/continue-refactoring-of-diagrams/c4-model/migration-model.dsl?token=GHSAT0AAAAAABXFU5EL53FWD66NOSQXBBOKZCSWMKA
+            !include https://raw.githubusercontent.com/Energinet-DataHub/
         }
     }
 
