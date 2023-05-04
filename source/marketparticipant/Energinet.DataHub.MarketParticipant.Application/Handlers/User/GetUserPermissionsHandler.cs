@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -63,6 +64,9 @@ public sealed class GetUserPermissionsHandler
             user = await _userRepository
                 .GetAsync(new ExternalUserId(userIdentity.Id.Value))
                 .ConfigureAwait(false);
+
+            if (user == null)
+                throw new NotFoundValidationException(userIdentity.Id.Value);
         }
 
         var permissions = await _userQueryRepository

@@ -40,46 +40,34 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
 
     public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(Guid requestExternalUserId)
     {
-        // if no user found .. THEN => {
-        // Call service to get ad user from external user id
-        // IsMember, MitID/openid
-        var identityUser = await _userIdentityRepository
-            .FindIdentityReadyForOpenIdSetupAsync(new ExternalUserId(requestExternalUserId)).ConfigureAwait(false);
+        var identityUserOpenId = await _userIdentityRepository.FindIdentityReadyForOpenIdSetupAsync(new ExternalUserId(requestExternalUserId)).ConfigureAwait(false);
 
-        // User should have MitId, if not return unauthorized
-        if (identityUser == null)
+        if (identityUserOpenId == null)
             throw new UnauthorizedAccessException($"External user id {requestExternalUserId} not found for open id setup.");
 
-        // Ok, find user created in user flow by email with emailAddress signInType.
-        var userIdentityInvitedOnEmail =
-            await _userIdentityRepository.GetAsync(identityUser.Email).ConfigureAwait(false);
+        var userIdentityInvitedOnEmail = await _userIdentityRepository.GetAsync(identityUserOpenId.Email).ConfigureAwait(false);
 
         if (userIdentityInvitedOnEmail == null)
-            throw new NotFoundValidationException($"User with email {identityUser.Email} not found.");
+            throw new NotFoundValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
 
-        // Validate user time for MitId
-        var userLocalIdentityEmail =
-            await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
+        var userLocalIdentityByEmail = await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
 
-        if (userLocalIdentityEmail == null)
+        if (userLocalIdentityByEmail == null)
             throw new NotFoundValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
 
-        if (userLocalIdentityEmail.MitIdSignupInitiatedAt < DateTime.UtcNow.AddMinutes(-300))
-            throw new UnauthorizedAccessException($"OpenId signup initiated at {userLocalIdentityEmail.MitIdSignupInitiatedAt} is expired.");
+        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTime.UtcNow.AddMinutes(-300))
+            throw new UnauthorizedAccessException($"OpenId signup initiated at {userLocalIdentityByEmail.MitIdSignupInitiatedAt} is expired.");
 
-        // Move openid login identity to user created from userflow
-        // Find current identities, add to list and update and set
-        MoveOpenIdLoginIdentityToInvitedUser(identityUser, userIdentityInvitedOnEmail);
+        MoveOpenIdLoginIdentityToInvitedUser(identityUserOpenId, userIdentityInvitedOnEmail);
 
         if (userIdentityInvitedOnEmail.LoginIdentities == null)
             throw new NotSupportedException($"OpenID login identity not found for user with id {userIdentityInvitedOnEmail.Id}.");
 
+        await _userIdentityRepository.DeleteOpenIdUserIdentityAsync(identityUserOpenId.Id).ConfigureAwait(false);
+
         await _userIdentityRepository
             .UpdateUserLoginIdentitiesAsync(userIdentityInvitedOnEmail.Id, userIdentityInvitedOnEmail.LoginIdentities)
             .ConfigureAwait(false);
-
-        // Delete MitID user
-        await _userIdentityRepository.DeleteUserIdentityAsync(identityUser.Id).ConfigureAwait(false);
 
         return userIdentityInvitedOnEmail;
     }

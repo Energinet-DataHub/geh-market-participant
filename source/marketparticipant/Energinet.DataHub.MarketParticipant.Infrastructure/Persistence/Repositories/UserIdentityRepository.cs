@@ -238,13 +238,12 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 {
                     SignInType = loginIdentity.SignInType,
                     Issuer = loginIdentity.Issuer,
-                    IssuerAssignedId = loginIdentity.IssuerAssignedId,
-                    OdataType = loginIdentity.OdataType
+                    IssuerAssignedId = loginIdentity.IssuerAssignedId
                 }).ToList()
             });
     }
 
-    public Task DeleteUserIdentityAsync(ExternalUserId externalUserId)
+    public Task DeleteOpenIdUserIdentityAsync(ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
@@ -278,8 +277,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return new LoginIdentity(
             identity.SignInType,
             identity.Issuer,
-            identity.IssuerAssignedId,
-            identity.OdataType);
+            identity.IssuerAssignedId);
     }
 
     private static UserIdentity Map(User user, string emailAddress)

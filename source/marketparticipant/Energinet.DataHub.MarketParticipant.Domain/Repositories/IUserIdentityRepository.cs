@@ -83,5 +83,5 @@ public interface IUserIdentityRepository
     /// Deletes user identity
     /// </summary>
     /// <param name="externalUserId"></param>
-    Task DeleteUserIdentityAsync(ExternalUserId externalUserId);
+    Task DeleteOpenIdUserIdentityAsync(ExternalUserId externalUserId);
 }

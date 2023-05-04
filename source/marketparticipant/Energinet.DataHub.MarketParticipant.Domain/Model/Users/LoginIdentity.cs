@@ -19,17 +19,14 @@ public sealed class LoginIdentity
     public LoginIdentity(
         string? signInType,
         string? issuer,
-        string? issuerAssignedId,
-        string? odataType)
+        string? issuerAssignedId)
     {
         SignInType = signInType;
         Issuer = issuer;
         IssuerAssignedId = issuerAssignedId;
-        OdataType = odataType;
     }
 
     public string? SignInType { get; }
     public string? Issuer { get; }
     public string? IssuerAssignedId { get; }
-    public string? OdataType { get; }
 }
