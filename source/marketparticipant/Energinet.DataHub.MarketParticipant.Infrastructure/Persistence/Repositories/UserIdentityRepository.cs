@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Graph.Models.ODataErrors;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddress;
 using User = Microsoft.Graph.Models.User;
@@ -80,17 +81,25 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         ArgumentNullException.ThrowIfNull(externalId);
 
-        var user = (await _graphClient
-            .Users[externalId.Value.ToString()]
-            .GetAsync(x => x.QueryParameters.Select = _selectors).ConfigureAwait(false))!;
+        try
+        {
+            var user = (await _graphClient
+                .Users[externalId.Value.ToString()]
+                .GetAsync(x => x.QueryParameters.Select = _selectors)
+                .ConfigureAwait(false))!;
 
-        // TODO: Check issuer is pp nets
-        var userWithOenIdConnect = user is { UserType: "Member", Identities: { } } &&
-            user.Identities.Any(ident => ident.SignInType == "federated");
+            // TODO: Check issuer is pp nets
+            var userWithOenIdConnect = user is { UserType: "Member", Identities: { } } &&
+                                       user.Identities.Any(ident => ident.SignInType == "federated");
 
-        var userEmail = user.OtherMails?.First() ?? throw new NotSupportedException("User dose not have a email address");
+            var userEmail = user.OtherMails?.First() ?? throw new NotSupportedException("User dose not have a email address");
 
-        return userWithOenIdConnect ? Map(user, userEmail) : null;
+            return userWithOenIdConnect ? Map(user, userEmail) : null;
+        }
+        catch (ODataError ex) when (ex.ResponseStatusCode == 404)
+        {
+            return null;
+        }
     }
 
     public async Task<UserIdentity?> GetAsync(EmailAddress email)
