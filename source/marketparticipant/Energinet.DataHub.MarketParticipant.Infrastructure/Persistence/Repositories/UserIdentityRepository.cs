@@ -89,12 +89,12 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 .ConfigureAwait(false))!;
 
             // TODO: Check issuer is pp nets
-            var userWithOenIdConnect = user is { UserType: "Member", Identities: { } } &&
+            var userWithOpenIdConnect = user is { UserType: "Member", Identities: { } } &&
                                        user.Identities.Any(ident => ident.SignInType == "federated");
 
-            var userEmail = user.OtherMails?.First() ?? throw new NotSupportedException("User dose not have a email address");
+            var userEmail = user.OtherMails?.FirstOrDefault();
 
-            return userWithOenIdConnect ? Map(user, userEmail) : null;
+            return userWithOpenIdConnect && userEmail != null ? Map(user, userEmail) : null;
         }
         catch (ODataError ex) when (ex.ResponseStatusCode == 404)
         {
@@ -125,7 +125,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 })
                 .ConfigureAwait(false);
 
-            result.AddRange((await usersRequest!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(Map));
+            result.AddRange((await usersRequest!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(u => Map(u)));
         }
 
         return result;
@@ -149,7 +149,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 x.QueryParameters.Filter = string.Join(" and ", filters);
         }).ConfigureAwait(false);
 
-        var userIdentities = (await request!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(Map);
+        var userIdentities = (await request!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(u => Map(u));
 
         if (!string.IsNullOrEmpty(searchText))
         {
@@ -252,7 +252,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             });
     }
 
-    public Task DeleteOpenIdUserIdentityAsync(ExternalUserId externalUserId)
+    public Task DeleteAsync(ExternalUserId externalUserId)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
@@ -261,9 +261,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .DeleteAsync();
     }
 
-    private static UserIdentity Map(User user)
+    private static UserIdentity Map(User user, string? emailAddress = null)
     {
-        var userEmailAddress = user
+        var userEmailAddress = emailAddress ?? user
             .Identities!
             .Where(ident => ident.SignInType == "emailAddress")
             .Select(ident => ident.IssuerAssignedId!)
@@ -278,7 +278,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
             user.CreatedDateTime!.Value,
             AuthenticationMethod.Undetermined,
-            user.Identities?.Select(Map).ToList());
+            user.Identities!.Select(Map).ToList());
     }
 
     private static LoginIdentity Map(ObjectIdentity identity)
@@ -287,20 +287,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             identity.SignInType,
             identity.Issuer,
             identity.IssuerAssignedId);
-    }
-
-    private static UserIdentity Map(User user, string emailAddress)
-    {
-        return new UserIdentity(
-            new ExternalUserId(user.Id!),
-            new EmailAddress(emailAddress),
-            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
-            user.GivenName ?? user.DisplayName!,
-            user.Surname ?? string.Empty,
-            string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
-            user.CreatedDateTime!.Value,
-            AuthenticationMethod.Undetermined,
-            user.Identities?.Select(Map).ToList());
     }
 
     private static bool IsMember(User user)

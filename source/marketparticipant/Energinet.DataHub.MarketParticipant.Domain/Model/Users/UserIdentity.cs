@@ -30,7 +30,7 @@ public sealed class UserIdentity
         PhoneNumber? phoneNumber,
         DateTimeOffset createdDate,
         AuthenticationMethod authentication,
-        IList<LoginIdentity>? loginIdentities)
+        IList<LoginIdentity> loginIdentities)
     {
         Id = id;
         Email = email;
@@ -75,7 +75,7 @@ public sealed class UserIdentity
     public PhoneNumber? PhoneNumber { get; }
     public DateTimeOffset CreatedDate { get; }
     public AuthenticationMethod Authentication { get; }
-    public IList<LoginIdentity>? LoginIdentities { get; }
+    public IList<LoginIdentity> LoginIdentities { get; }
 
     private void ValidateName()
     {

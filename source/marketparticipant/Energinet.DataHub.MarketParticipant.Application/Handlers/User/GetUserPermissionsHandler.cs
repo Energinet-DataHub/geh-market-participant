@@ -59,14 +59,11 @@ public sealed class GetUserPermissionsHandler
 
         if (user == null)
         {
-            var userIdentity = await _userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(request.ExternalUserId).ConfigureAwait(false);
+            var userIdentity = await _userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(new ExternalUserId(request.ExternalUserId)).ConfigureAwait(false);
 
             user = await _userRepository
                 .GetAsync(new ExternalUserId(userIdentity.Id.Value))
                 .ConfigureAwait(false);
-
-            if (user == null)
-                throw new NotFoundValidationException(userIdentity.Id.Value);
         }
 
         var permissions = await _userQueryRepository

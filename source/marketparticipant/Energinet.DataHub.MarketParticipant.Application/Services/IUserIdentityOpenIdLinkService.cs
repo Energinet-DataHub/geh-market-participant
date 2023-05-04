@@ -12,21 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-/// <summary>
-/// Validate and setup open id on user identity
-/// </summary>
 public interface IUserIdentityOpenIdLinkService
 {
-    /// <summary>
-    /// Validates user for open id and sets up open id on user identity
-    /// </summary>
-    /// <param name="requestExternalUserId"></param>
-    /// <returns>UserIdentity with linked open id</returns>
-    Task<UserIdentity> ValidateAndSetupOpenIdAsync(Guid requestExternalUserId);
+    Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId);
 }

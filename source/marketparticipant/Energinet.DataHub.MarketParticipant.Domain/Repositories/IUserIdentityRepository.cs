@@ -34,7 +34,6 @@ public interface IUserIdentityRepository
     /// Retrieves user identity for the provided external id with openid ready to set up.
     /// </summary>
     /// <param name="externalId"></param>
-    /// <returns>return UserIdentity</returns>
     Task<UserIdentity?> FindIdentityReadyForOpenIdSetupAsync(ExternalUserId externalId);
 
     /// <summary>
@@ -83,5 +82,5 @@ public interface IUserIdentityRepository
     /// Deletes user identity
     /// </summary>
     /// <param name="externalUserId"></param>
-    Task DeleteOpenIdUserIdentityAsync(ExternalUserId externalUserId);
+    Task DeleteAsync(ExternalUserId externalUserId);
 }

@@ -18,7 +18,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -26,21 +25,18 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
-    private readonly ILogger<UserIdentityOpenIdLinkService> _logger;
 
     public UserIdentityOpenIdLinkService(
         IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository,
-        ILogger<UserIdentityOpenIdLinkService> logger)
+        IUserIdentityRepository userIdentityRepository)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
-        _logger = logger;
     }
 
-    public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(Guid requestExternalUserId)
+    public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId)
     {
-        var identityUserOpenId = await _userIdentityRepository.FindIdentityReadyForOpenIdSetupAsync(new ExternalUserId(requestExternalUserId)).ConfigureAwait(false);
+        var identityUserOpenId = await _userIdentityRepository.FindIdentityReadyForOpenIdSetupAsync(requestExternalUserId).ConfigureAwait(false);
 
         if (identityUserOpenId == null)
             throw new NotFoundValidationException($"External user id {requestExternalUserId} not found for open id setup.");
@@ -55,15 +51,12 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         if (userLocalIdentityByEmail == null)
             throw new NotFoundValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
 
-        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTime.UtcNow.AddMinutes(-300))
+        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTime.UtcNow.AddMinutes(-15))
             throw new UnauthorizedAccessException($"OpenId signup initiated at {userLocalIdentityByEmail.MitIdSignupInitiatedAt} is expired.");
 
         MoveOpenIdLoginIdentityToInvitedUser(identityUserOpenId, userIdentityInvitedOnEmail);
 
-        if (userIdentityInvitedOnEmail.LoginIdentities == null)
-            throw new NotSupportedException($"OpenID login identity not found for user with id {userIdentityInvitedOnEmail.Id}.");
-
-        await _userIdentityRepository.DeleteOpenIdUserIdentityAsync(identityUserOpenId.Id).ConfigureAwait(false);
+        await _userIdentityRepository.DeleteAsync(identityUserOpenId.Id).ConfigureAwait(false);
 
         await _userIdentityRepository
             .UpdateUserLoginIdentitiesAsync(userIdentityInvitedOnEmail.Id, userIdentityInvitedOnEmail.LoginIdentities)
@@ -81,6 +74,6 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         if (loginIdentityToMove == null)
             throw new NotFoundValidationException($"OpenId login identity not found for user with id {openIdUserIdUserIdentity.Id}.");
 
-        invitedUserIdentity.LoginIdentities?.Add(loginIdentityToMove);
+        invitedUserIdentity.LoginIdentities.Add(loginIdentityToMove);
     }
 }
