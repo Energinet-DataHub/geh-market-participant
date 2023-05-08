@@ -44,36 +44,38 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         var userIdentityInvitedOnEmail = await _userIdentityRepository.GetAsync(identityUserOpenId.Email).ConfigureAwait(false);
 
         if (userIdentityInvitedOnEmail == null)
+        {
+            await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new NotFoundValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
+        }
 
         var userLocalIdentityByEmail = await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
 
         if (userLocalIdentityByEmail == null)
+        {
+            await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new NotFoundValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
+        }
 
         if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTime.UtcNow.AddMinutes(-15))
+        {
+            await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new UnauthorizedAccessException($"OpenId signup initiated at {userLocalIdentityByEmail.MitIdSignupInitiatedAt} is expired.");
+        }
 
-        MoveOpenIdLoginIdentityToInvitedUser(identityUserOpenId, userIdentityInvitedOnEmail);
+        userIdentityInvitedOnEmail.LinkOpenIdFrom(identityUserOpenId);
 
-        await _userIdentityRepository.DeleteAsync(identityUserOpenId.Id).ConfigureAwait(false);
+        await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
 
         await _userIdentityRepository
-            .UpdateUserLoginIdentitiesAsync(userIdentityInvitedOnEmail.Id, userIdentityInvitedOnEmail.LoginIdentities)
+            .AssignUserLoginIdentitiesAsync(userIdentityInvitedOnEmail)
             .ConfigureAwait(false);
 
         return userIdentityInvitedOnEmail;
     }
 
-    private static void MoveOpenIdLoginIdentityToInvitedUser(
-        UserIdentity openIdUserIdUserIdentity,
-        UserIdentity invitedUserIdentity)
+    private Task DeleteOpenIdUserAsync(ExternalUserId externalUserId)
     {
-        var loginIdentityToMove = openIdUserIdUserIdentity.LoginIdentities?.First(e => e.SignInType == "federated");
-
-        if (loginIdentityToMove == null)
-            throw new NotFoundValidationException($"OpenId login identity not found for user with id {openIdUserIdUserIdentity.Id}.");
-
-        invitedUserIdentity.LoginIdentities.Add(loginIdentityToMove);
+        return _userIdentityRepository.DeleteAsync(externalUserId);
     }
 }

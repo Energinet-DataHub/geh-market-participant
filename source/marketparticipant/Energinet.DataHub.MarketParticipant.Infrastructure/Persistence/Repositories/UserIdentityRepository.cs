@@ -234,16 +234,15 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             });
     }
 
-    public Task UpdateUserLoginIdentitiesAsync(ExternalUserId externalUserId, IEnumerable<LoginIdentity> loginIdentities)
+    public Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity)
     {
-        ArgumentNullException.ThrowIfNull(externalUserId);
-        ArgumentNullException.ThrowIfNull(loginIdentities);
+        ArgumentNullException.ThrowIfNull(userIdentity);
 
         return _graphClient
-            .Users[externalUserId.Value.ToString()]
+            .Users[userIdentity.Id.ToString()]
             .PatchAsync(new User
             {
-                Identities = loginIdentities.Select(loginIdentity => new ObjectIdentity
+                Identities = userIdentity.LoginIdentities.Select(loginIdentity => new ObjectIdentity
                 {
                     SignInType = loginIdentity.SignInType,
                     Issuer = loginIdentity.Issuer,
@@ -284,9 +283,9 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     private static LoginIdentity Map(ObjectIdentity identity)
     {
         return new LoginIdentity(
-            identity.SignInType,
-            identity.Issuer,
-            identity.IssuerAssignedId);
+            identity.SignInType!,
+            identity.Issuer!,
+            identity.IssuerAssignedId!);
     }
 
     private static bool IsMember(User user)

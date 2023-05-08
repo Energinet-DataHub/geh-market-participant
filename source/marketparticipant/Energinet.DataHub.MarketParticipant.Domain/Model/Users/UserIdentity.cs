@@ -15,12 +15,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class UserIdentity
 {
+    private readonly List<LoginIdentity> _loginIdentities;
+
     public UserIdentity(
         ExternalUserId id,
         EmailAddress email,
@@ -30,7 +33,7 @@ public sealed class UserIdentity
         PhoneNumber? phoneNumber,
         DateTimeOffset createdDate,
         AuthenticationMethod authentication,
-        IList<LoginIdentity> loginIdentities)
+        IEnumerable<LoginIdentity> loginIdentities)
     {
         Id = id;
         Email = email;
@@ -40,7 +43,7 @@ public sealed class UserIdentity
         PhoneNumber = phoneNumber;
         CreatedDate = createdDate;
         Authentication = authentication;
-        LoginIdentities = loginIdentities;
+        _loginIdentities = loginIdentities.ToList();
     }
 
     public UserIdentity(
@@ -61,7 +64,7 @@ public sealed class UserIdentity
         PhoneNumber = phoneNumber;
         CreatedDate = DateTimeOffset.UtcNow;
         Authentication = authentication;
-        LoginIdentities = new List<LoginIdentity>();
+        _loginIdentities = new List<LoginIdentity>();
 
         ValidateName();
     }
@@ -75,7 +78,21 @@ public sealed class UserIdentity
     public PhoneNumber? PhoneNumber { get; }
     public DateTimeOffset CreatedDate { get; }
     public AuthenticationMethod Authentication { get; }
-    public IList<LoginIdentity> LoginIdentities { get; }
+    public IReadOnlyCollection<LoginIdentity> LoginIdentities => _loginIdentities;
+
+    public void LinkOpenIdFrom(UserIdentity userIdentity)
+    {
+        ArgumentNullException.ThrowIfNull(userIdentity, nameof(userIdentity));
+
+        if (userIdentity.Email != Email)
+        {
+            throw new ValidationException($"Email address of user {userIdentity.Id} does not match email address of user {Id}.");
+        }
+
+        var loginIdentityToMove = userIdentity.LoginIdentities.First(e => e.SignInType == "federated");
+
+        _loginIdentities.Add(loginIdentityToMove);
+    }
 
     private void ValidateName()
     {

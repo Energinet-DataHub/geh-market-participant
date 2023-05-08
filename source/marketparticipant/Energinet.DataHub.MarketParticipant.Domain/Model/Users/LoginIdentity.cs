@@ -17,16 +17,16 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 public sealed class LoginIdentity
 {
     public LoginIdentity(
-        string? signInType,
-        string? issuer,
-        string? issuerAssignedId)
+        string signInType,
+        string issuer,
+        string issuerAssignedId)
     {
         SignInType = signInType;
         Issuer = issuer;
         IssuerAssignedId = issuerAssignedId;
     }
 
-    public string? SignInType { get; }
-    public string? Issuer { get; }
-    public string? IssuerAssignedId { get; }
+    public string SignInType { get; }
+    public string Issuer { get; }
+    public string IssuerAssignedId { get; }
 }
