@@ -82,7 +82,7 @@ public sealed class UserIdentity
 
     public void LinkOpenIdFrom(UserIdentity userIdentity)
     {
-        ArgumentNullException.ThrowIfNull(userIdentity, nameof(userIdentity));
+        ArgumentNullException.ThrowIfNull(userIdentity);
 
         if (userIdentity.Email != Email)
         {
