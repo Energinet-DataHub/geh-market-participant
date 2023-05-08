@@ -72,11 +72,10 @@ public interface IUserIdentityRepository
     Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber);
 
     /// <summary>
-    /// Update user login identities
+    /// Assign user login identities
     /// </summary>
-    /// <param name="externalUserId"></param>
-    /// <param name="loginIdentities"></param>
-    Task UpdateUserLoginIdentitiesAsync(ExternalUserId externalUserId, IEnumerable<LoginIdentity> loginIdentities);
+    /// <param name="userIdentity"></param>
+    Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity);
 
     /// <summary>
     /// Deletes user identity
