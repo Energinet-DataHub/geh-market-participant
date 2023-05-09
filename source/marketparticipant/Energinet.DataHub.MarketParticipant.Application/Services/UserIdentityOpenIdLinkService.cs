@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -57,7 +56,7 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
             throw new NotFoundValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
         }
 
-        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTime.UtcNow.AddMinutes(-15))
+        if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTimeOffset.UtcNow.AddMinutes(-15))
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new UnauthorizedAccessException($"OpenId signup initiated at {userLocalIdentityByEmail.MitIdSignupInitiatedAt} is expired.");

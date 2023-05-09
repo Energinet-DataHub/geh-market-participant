@@ -34,34 +34,53 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             // Arrange
             var externalUserId = new ExternalUserId(Guid.NewGuid());
+            var email = new MockedEmailAddress();
 
             var userIdentityRepository = new Mock<IUserIdentityRepository>();
             userIdentityRepository
                 .Setup(e => e.FindIdentityReadyForOpenIdSetupAsync(externalUserId))
-                .ReturnsAsync(GetUserIdentity);
+                .ReturnsAsync(GetUserIdentity(externalUserId, email, "federated"));
+
+            var userToReturnFromService = GetUserIdentity(externalUserId, email, "emailAddress");
+            userIdentityRepository
+                .Setup(u => u.GetAsync(email))
+                .ReturnsAsync(userToReturnFromService);
+
+            var userRepository = new Mock<IUserRepository>();
+            userRepository.Setup(e => e.GetAsync(externalUserId)).ReturnsAsync(GetUser(externalUserId));
 
             var userIdentityOpenIdLinkService = new UserIdentityOpenIdLinkService(
-                Mock.Of<IUserRepository>(),
+                userRepository.Object,
                 userIdentityRepository.Object);
 
+            // Act
             var userIdentity = await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId).ConfigureAwait(false);
 
-            // Act + Assert
+            // Assert
             Assert.NotNull(userIdentity);
+            userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
+            userIdentityRepository.Verify(e => e.AssignUserLoginIdentitiesAsync(userToReturnFromService));
         }
 
-        private static UserIdentity GetUserIdentity()
+        private static UserIdentity GetUserIdentity(ExternalUserId externalUserId, MockedEmailAddress email, string signInType)
         {
             return new UserIdentity(
-                new ExternalUserId(Guid.NewGuid()),
-                new MockedEmailAddress(),
+                externalUserId,
+                email,
                 UserStatus.Active,
                 "fake_value",
                 "fake_value",
                 null,
                 DateTime.UtcNow,
                 AuthenticationMethod.Undetermined,
-                new List<LoginIdentity>() { new("federated", "issuer", "issuerAssignedId") });
+                new List<LoginIdentity>() { new(signInType, "issuer", "issuerAssignedId") });
+        }
+
+        private static User GetUser(ExternalUserId externalUserId)
+        {
+            var user = new User(externalUserId);
+            user.InitiateMitIdSignup();
+            return user;
         }
     }
 }
