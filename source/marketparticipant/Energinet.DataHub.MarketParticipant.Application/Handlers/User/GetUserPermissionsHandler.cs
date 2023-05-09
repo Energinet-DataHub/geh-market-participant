@@ -18,7 +18,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -32,18 +31,15 @@ public sealed class GetUserPermissionsHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserQueryRepository _userQueryRepository;
-    private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserIdentityOpenIdLinkService _userIdentityOpenIdLinkService;
 
     public GetUserPermissionsHandler(
         IUserRepository userRepository,
         IUserQueryRepository userQueryRepository,
-        IUserIdentityRepository userIdentityRepository,
         IUserIdentityOpenIdLinkService userIdentityOpenIdLinkService)
     {
         _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
-        _userIdentityRepository = userIdentityRepository;
         _userIdentityOpenIdLinkService = userIdentityOpenIdLinkService;
     }
 
