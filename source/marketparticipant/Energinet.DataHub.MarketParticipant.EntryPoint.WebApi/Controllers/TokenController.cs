@@ -26,7 +26,6 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -142,6 +141,10 @@ public class TokenController : ControllerBase
                             .ConfigureAwait(false);
         }
         catch (NotFoundValidationException)
+        {
+            return Unauthorized();
+        }
+        catch (UnauthorizedAccessException)
         {
             return Unauthorized();
         }
