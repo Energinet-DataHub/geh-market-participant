@@ -87,38 +87,23 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             throw firstException;
     }
 
+    public async Task<ExternalUserId> CreateUserAsync(
+        string testEmail,
+        IEnumerable<ObjectIdentity> appendIdentities)
+    {
+        var newUser = CreateTestUserModel(testEmail);
+        newUser.Identities!.AddRange(appendIdentities);
+        newUser.OtherMails = new List<string> { testEmail };
+
+        var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
+        return externalUserId;
+    }
+
     public async Task<ExternalUserId> CreateUserAsync(string testEmail)
     {
-        var newUser = new User
-        {
-            AccountEnabled = false,
-            DisplayName = "User Integration Tests (Always safe to delete)",
-            GivenName = "Test Fist Name",
-            Surname = "Test Last Name",
-            PasswordProfile = new PasswordProfile
-            {
-                ForceChangePasswordNextSignIn = true,
-                Password = Guid.NewGuid().ToString()
-            },
-            Identities = new List<ObjectIdentity>()
-            {
-                new()
-                {
-                    SignInType = "emailAddress",
-                    Issuer = _integrationTestConfiguration.B2CSettings.Tenant,
-                    IssuerAssignedId = testEmail
-                }
-            }
-        };
+        var newUser = CreateTestUserModel(testEmail);
 
-        var createdUser = await Client
-            .Users
-            .PostAsync(newUser)
-            .ConfigureAwait(false);
-
-        var externalUserId = new ExternalUserId(createdUser!.Id!);
-        _createdUsers.Add(externalUserId);
-
+        var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
         return externalUserId;
     }
 
@@ -153,5 +138,43 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         await Client
             .Users[existingUser]
             .DeleteAsync();
+    }
+
+    private async Task<ExternalUserId> CreateUserAndAddToCleanUpListAsync(User newUser)
+    {
+        var createdUser = await Client
+            .Users
+            .PostAsync(newUser)
+            .ConfigureAwait(false);
+
+        var externalUserId = new ExternalUserId(createdUser!.Id!);
+        _createdUsers.Add(externalUserId);
+
+        return externalUserId;
+    }
+
+    private User CreateTestUserModel(string testEmail)
+    {
+        return new User
+        {
+            AccountEnabled = false,
+            DisplayName = "User Integration Tests (Always safe to delete)",
+            GivenName = "Test Fist Name",
+            Surname = "Test Last Name",
+            PasswordProfile = new PasswordProfile
+            {
+                ForceChangePasswordNextSignIn = true,
+                Password = Guid.NewGuid().ToString()
+            },
+            Identities = new List<ObjectIdentity>()
+            {
+                new()
+                {
+                    SignInType = "emailAddress",
+                    Issuer = _integrationTestConfiguration.B2CSettings.Tenant,
+                    IssuerAssignedId = testEmail
+                }
+            }
+        };
     }
 }
