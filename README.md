@@ -9,8 +9,8 @@ Welcome to the Market Participant domain of the [Green Energy Hub project](https
     - [API](#api)
         - [Organization](#organization)
         - [Actor](#actor)
-        - [Contact](#contact)
         - [Actor Contact](#actor-contact)
+        - [Grid Area](#grid-area)
 - [Domain C4 model](#domain-c4-model)
 
 ## Introduction
