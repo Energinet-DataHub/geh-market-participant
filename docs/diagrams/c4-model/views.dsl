@@ -7,7 +7,6 @@
 # be reusable and included in other Structurizr files like `views.dsl` and
 # deployment diagram files.
 
-# TODO: Reset to use main before merging PR
 workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-arch-diagrams/main/docs/diagrams/c4-model/dh3-base-model.dsl {
 
     model {
@@ -23,6 +22,15 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
 
             # Include Market Participant model
             !include model.dsl
+
+            # Include EDI model
+            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-edi/dstenroejl/align-c4-models/docs/diagrams/c4-model/model.dsl
+
+            # Include Wholesale model
+            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-wholesale/dstenroejl/align-c4-models/docs/diagrams/c4-model/model.dsl
+
+            # Include Frontend model
+            !include https://raw.githubusercontent.com/Energinet-DataHub/greenforce-frontend/dstenroejl/align-c4-models/docs/diagrams/c4-model/model.dsl
         }
     }
 
