@@ -258,7 +258,7 @@ public sealed class TokenControllerIntegrationTests :
     }
 
     [Fact]
-    public async Task Token_ValidOpenIdSetup_ReturnsValidToken()
+    public async Task Token_ValidOpenIdSetup_UserUpdatedWithOpenIdIdentity()
     {
         // Arrange
         const string target = "token";
