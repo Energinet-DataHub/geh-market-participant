@@ -4,16 +4,16 @@
 
 Welcome to the Market Participant domain of the [Green Energy Hub project](https://github.com/Energinet-DataHub/green-energy-hub).
 
-- [Intro](#intro)
-- [Communicating with Market Participant](#Communicating-with-Market-Participant)
-    - [API](#API)
-        - [Organization](#Organization)
-        - [Actor](#Actor)
-        - [Contact](#Contact)
-        - [Actor Contact](#Actor-Contact)
-- [Integration Events](#Integration-events)
+- [Introduction](#introduction)
+- [Communicating with Market Participant](#communicating-with-market-participant)
+    - [API](#api)
+        - [Organization](#organization)
+        - [Actor](#actor)
+        - [Contact](#contact)
+        - [Actor Contact](#actor-contact)
+- [Integration Events](#integration-events)
 
-## Intro
+## Introduction
 
 Market Participant is where everything related to Organization, Actors, GridAreas and their relationships are handled.
 
