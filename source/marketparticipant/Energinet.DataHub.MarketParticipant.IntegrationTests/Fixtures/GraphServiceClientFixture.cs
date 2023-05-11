@@ -92,6 +92,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         IEnumerable<ObjectIdentity> appendIdentities)
     {
         var newUser = CreateTestUserModel(testEmail);
+        newUser.Identities!.Clear();
         newUser.Identities!.AddRange(appendIdentities);
         newUser.OtherMails = new List<string> { testEmail };
 
@@ -107,7 +108,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         return externalUserId;
     }
 
-    public async Task<string?> TryFindExternalUserAsync(string testEmail)
+    public async Task<User?> TryFindExternalUserAsync(string testEmail)
     {
         var usersRequest = await Client
             .Users
@@ -126,7 +127,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             .ConfigureAwait(false);
 
         var user = users.SingleOrDefault();
-        return user?.Id;
+        return user;
     }
 
     public async Task CleanupExternalUserAsync(string testEmail)
@@ -136,7 +137,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             return;
 
         await Client
-            .Users[existingUser]
+            .Users[existingUser.Id]
             .DeleteAsync();
     }
 
@@ -159,7 +160,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         {
             AccountEnabled = false,
             DisplayName = "User Integration Tests (Always safe to delete)",
-            GivenName = "Test Fist Name",
+            GivenName = "Test First Name",
             Surname = "Test Last Name",
             PasswordProfile = new PasswordProfile
             {

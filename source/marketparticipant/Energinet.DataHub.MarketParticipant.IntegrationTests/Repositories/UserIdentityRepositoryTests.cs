@@ -320,7 +320,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         // Assert
         Assert.NotNull(userIdentity);
         Assert.Equal(externalId, userIdentity.Id);
-        Assert.Equal(3, userIdentity.LoginIdentities.Count);
+        Assert.Equal(2, userIdentity.LoginIdentities.Count);
         Assert.Single(userIdentity.LoginIdentities, e => e.SignInType == "federated");
     }
 
