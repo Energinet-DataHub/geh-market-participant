@@ -41,14 +41,12 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             include ->markpartDomain->
             exclude "relationship.tag==OAuth"
             exclude "element.tag==Intermediate Technology"
-            autolayout
         }
 
         container dh3 "MarketParticipantDetailed" {
             title "[Container] DataHub 3.0 - Market Participant (Detailed with OAuth)"
             include ->markpartDomain->
             exclude "relationship.tag==Simple View"
-            autolayout
         }
     }
 }
