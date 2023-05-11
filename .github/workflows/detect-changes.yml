@@ -61,6 +61,7 @@ jobs:
               - '.github/workflows/publish-marketparticipant-client.yml'
               - 'source/api-client/**'
             render_diagrams:
-              - 'docs/diagrams/c4-model.dsl'
+              - 'docs/diagrams/c4-model/views.dsl'
+              - 'docs/diagrams/c4-model/model.dsl'
               - '.github/workflows/render-diagrams.yml'
               - '.github/workflows/detect-changes.yml'
