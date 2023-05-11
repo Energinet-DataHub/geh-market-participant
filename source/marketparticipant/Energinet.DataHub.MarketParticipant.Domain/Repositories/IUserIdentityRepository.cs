@@ -31,6 +31,12 @@ public interface IUserIdentityRepository
     Task<UserIdentity?> GetAsync(ExternalUserId externalId);
 
     /// <summary>
+    /// Retrieves user identity for the provided external id with openid ready to set up.
+    /// </summary>
+    /// <param name="externalId"></param>
+    Task<UserIdentity?> FindIdentityReadyForOpenIdSetupAsync(ExternalUserId externalId);
+
+    /// <summary>
     /// Retrieves user identity for the given sign-in email address.
     /// </summary>
     /// <param name="email">The sign-in email address of the user identity.</param>
@@ -64,4 +70,16 @@ public interface IUserIdentityRepository
     /// <param name="externalUserId">external user id</param>
     /// <param name="phoneNumber">new phone number</param>
     Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber);
+
+    /// <summary>
+    /// Assign user login identities
+    /// </summary>
+    /// <param name="userIdentity"></param>
+    Task AssignUserLoginIdentitiesAsync(UserIdentity userIdentity);
+
+    /// <summary>
+    /// Deletes user identity
+    /// </summary>
+    /// <param name="externalUserId"></param>
+    Task DeleteAsync(ExternalUserId externalUserId);
 }
