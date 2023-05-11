@@ -121,7 +121,8 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             {
                 x.QueryParameters.Select = new[]
                 {
-                    "id"
+                    "id",
+                    "identities"
                 };
                 x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
             })
