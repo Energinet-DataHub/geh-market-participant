@@ -42,8 +42,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class TokenControllerIntegrationTests :
     WebApiIntegrationTestsBase,
-    IClassFixture<KeyClientFixture>
+    IClassFixture<KeyClientFixture>,
+    IAsyncLifetime
 {
+    private const string TestUserInviteOpenIdEmail = "invitation-openid-integration-test@datahub.dk";
+
     private readonly KeyClientFixture _keyClientFixture;
     private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
@@ -273,16 +276,15 @@ public sealed class TokenControllerIntegrationTests :
             }
         };
 
-        var invitedEmailAddress = new MockedEmailAddress();
-        var invitedUserExternalId = await _graphServiceClientFixture.CreateUserAsync(invitedEmailAddress);
-        var openIdUserExternalUserId = await _graphServiceClientFixture.CreateUserAsync(invitedEmailAddress, openIdIdentity);
+        var invitedUserExternalId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail);
+        var openIdUserExternalUserId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail, openIdIdentity);
 
         await _marketParticipantDatabaseFixture
             .PrepareUserAsync(TestPreparationEntities
                 .UnconnectedUser.Patch(e =>
                 {
                     e.ExternalId = invitedUserExternalId.Value;
-                    e.Email = invitedEmailAddress;
+                    e.Email = TestUserInviteOpenIdEmail;
                 }));
 
         var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
@@ -303,13 +305,17 @@ public sealed class TokenControllerIntegrationTests :
         await response.Content.ReadAsStringAsync();
 
         // Assert
-        var updatedUser = await _graphServiceClientFixture.TryFindExternalUserAsync(invitedEmailAddress);
+        var updatedUser = await _graphServiceClientFixture.TryFindExternalUserAsync(TestUserInviteOpenIdEmail);
 
         Assert.NotNull(updatedUser);
         Assert.NotNull(updatedUser.Identities);
         Assert.Equal(3, updatedUser.Identities.Count);
         Assert.Single(updatedUser.Identities, e => e.SignInType == "federated");
     }
+
+    public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
+
+    public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

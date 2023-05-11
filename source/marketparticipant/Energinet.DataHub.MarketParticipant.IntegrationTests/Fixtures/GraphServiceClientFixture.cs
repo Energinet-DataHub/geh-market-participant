@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Graph.Models.ODataErrors;
 using Xunit;
 using User = Microsoft.Graph.Models.User;
 
@@ -71,6 +72,10 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                     .Users[externalUserId.ToString()]
                     .DeleteAsync();
             }
+            catch (ODataError dataError) when (dataError.ResponseStatusCode == 404)
+            {
+                // User already deleted.
+            }
 #pragma warning disable CA1508
             catch (Exception ex) when (firstException == null)
 #pragma warning restore CA1508
@@ -89,11 +94,11 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
     public async Task<ExternalUserId> CreateUserAsync(
         string testEmail,
-        IEnumerable<ObjectIdentity> appendIdentities)
+        IEnumerable<ObjectIdentity> identities)
     {
         var newUser = CreateTestUserModel(testEmail);
         newUser.Identities!.Clear();
-        newUser.Identities!.AddRange(appendIdentities);
+        newUser.Identities!.AddRange(identities);
         newUser.OtherMails = new List<string> { testEmail };
 
         var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
