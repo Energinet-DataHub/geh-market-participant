@@ -163,7 +163,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 integrationTestConfig.B2CSettings.ServicePrincipalId,
                 integrationTestConfig.B2CSettings.ServicePrincipalSecret);
 
-            var graphClient = new GraphServiceClient(
+            using var graphClient = new GraphServiceClient(
                 clientSecretCredential,
                 new[]
                 {

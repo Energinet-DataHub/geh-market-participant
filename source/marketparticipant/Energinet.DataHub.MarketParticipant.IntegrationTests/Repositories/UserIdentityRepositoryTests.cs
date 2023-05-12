@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -232,6 +234,94 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 
         Assert.NotNull(actual);
         Assert.Equal(newPhoneNumber, actual.PhoneNumber);
+    }
+
+    [Fact]
+    public async Task AssignUserLoginIdentities()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        // Act
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var userIdentity = await target.GetAsync(externalId);
+
+        var openIdLoginIdentity = new LoginIdentity("federated", Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+        var loginIdentitiesWithOpenId = userIdentity!.LoginIdentities.ToList();
+        loginIdentitiesWithOpenId.Add(openIdLoginIdentity);
+
+        var userIdentityCopy = new Domain.Model.Users.UserIdentity(
+            userIdentity.Id,
+            userIdentity.Email,
+            userIdentity.Status,
+            userIdentity.FirstName,
+            userIdentity.LastName,
+            userIdentity.PhoneNumber,
+            userIdentity.CreatedDate,
+            userIdentity.Authentication,
+            loginIdentitiesWithOpenId);
+
+        await target.AssignUserLoginIdentitiesAsync(userIdentityCopy);
+
+        // Assert
+        var actual = await target.GetAsync(externalId);
+
+        Assert.NotNull(actual);
+        Assert.Equal(2, userIdentity.LoginIdentities.Count);
+        Assert.Equal(3, actual.LoginIdentities.Count);
+        Assert.Single(actual.LoginIdentities, e => e.SignInType == "federated");
+    }
+
+    [Fact]
+    public async Task FindIdentityReadyForOpenIdSetupAsync()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        var openIdIdentity = new List<ObjectIdentity>()
+        {
+            new()
+            {
+                SignInType = "federated",
+                Issuer = Guid.NewGuid().ToString(),
+                IssuerAssignedId = Guid.NewGuid().ToString()
+            }
+        };
+
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress(), openIdIdentity);
+
+        // Act
+        var userIdentity = await target.FindIdentityReadyForOpenIdSetupAsync(externalId);
+
+        // Assert
+        Assert.NotNull(userIdentity);
+        Assert.Equal(externalId, userIdentity.Id);
+        Assert.Equal(2, userIdentity.LoginIdentities.Count);
+        Assert.Single(userIdentity.LoginIdentities, e => e.SignInType == "federated");
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);

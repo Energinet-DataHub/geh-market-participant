@@ -60,7 +60,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     y.ToString(),
                     null,
                     DateTimeOffset.UtcNow,
-                    AuthenticationMethod.Undetermined)));
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -113,7 +114,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     y.ToString(),
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.Undetermined)));
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())));
 
         scope.Container!.Register(() => mock.Object);
 
@@ -156,7 +158,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.Undetermined)
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);
@@ -202,7 +205,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     "fake_value",
                     null,
                     DateTime.UtcNow,
-                    AuthenticationMethod.Undetermined)
+                    AuthenticationMethod.Undetermined,
+                    new List<LoginIdentity>())
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);

@@ -85,6 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
             container.Register<IUserRoleAuditLogService, UserRoleAuditLogService>(Lifestyle.Scoped);
             container.Register<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>(Lifestyle.Scoped);
+            container.Register<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>(Lifestyle.Scoped);
         }
     }
 }

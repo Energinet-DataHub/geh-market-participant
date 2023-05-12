@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -153,7 +154,8 @@ public sealed class UserInvitationServiceTests
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
                 DateTimeOffset.UtcNow,
-                AuthenticationMethod.Undetermined));
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object));
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
@@ -204,7 +206,8 @@ public sealed class UserInvitationServiceTests
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
                 DateTimeOffset.UtcNow,
-                AuthenticationMethod.Undetermined));
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object));
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
@@ -254,7 +257,8 @@ public sealed class UserInvitationServiceTests
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
                 DateTimeOffset.UtcNow,
-                AuthenticationMethod.Undetermined));
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object));
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
@@ -322,7 +326,8 @@ public sealed class UserInvitationServiceTests
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
                 DateTimeOffset.UtcNow,
-                AuthenticationMethod.Undetermined));
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object));
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,

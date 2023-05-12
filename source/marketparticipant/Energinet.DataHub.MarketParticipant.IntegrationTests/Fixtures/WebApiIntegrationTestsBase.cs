@@ -22,11 +22,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
 public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup>
 {
-    private readonly MarketParticipantDatabaseFixture _fixture;
+    private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
 
-    protected WebApiIntegrationTestsBase(MarketParticipantDatabaseFixture fixture)
+    protected WebApiIntegrationTestsBase(MarketParticipantDatabaseFixture marketParticipantDatabaseFixture)
     {
-        _fixture = fixture;
+        _marketParticipantDatabaseFixture = marketParticipantDatabaseFixture;
     }
 
     public static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
@@ -35,7 +35,7 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.UseSetting(Settings.SqlDbConnectionString.Key, _fixture.DatabaseManager.ConnectionString);
+        builder.UseSetting(Settings.SqlDbConnectionString.Key, _marketParticipantDatabaseFixture.DatabaseManager.ConnectionString);
         builder.UseSetting(Settings.ExternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.InternalOpenIdUrl.Key, "fake_value");
         builder.UseSetting(Settings.BackendBffAppId.Key, TestBackendAppId);

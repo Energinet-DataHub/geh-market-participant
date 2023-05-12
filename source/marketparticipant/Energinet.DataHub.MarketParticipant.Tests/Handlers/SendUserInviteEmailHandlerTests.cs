@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
@@ -52,7 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "lastName",
                 new PhoneNumber("23232323"),
                 DateTimeOffset.Now,
-                AuthenticationMethod.Undetermined);
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object);
 
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock.Setup(e => e.GetAsync(events[0].Email)).ReturnsAsync(userIdentity);
@@ -128,7 +130,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "lastName",
                 new PhoneNumber("23232323"),
                 DateTimeOffset.Now,
-                AuthenticationMethod.Undetermined);
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object);
 
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock.Setup(e => e.GetAsync(events[0].Email)).ReturnsAsync(userIdentity);
