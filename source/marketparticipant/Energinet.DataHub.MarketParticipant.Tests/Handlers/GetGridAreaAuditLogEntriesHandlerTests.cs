@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     "last",
                     null,
                     DateTimeOffset.UtcNow,
-                    AuthenticationMethod.Undetermined));
+                    AuthenticationMethod.Undetermined,
+                    new Mock<IList<LoginIdentity>>().Object));
 
             var target = new GetGridAreaAuditLogEntriesHandler(
                 repositoryMock.Object,

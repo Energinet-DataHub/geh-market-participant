@@ -17,7 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -31,13 +31,16 @@ public sealed class GetUserPermissionsHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IUserIdentityOpenIdLinkService _userIdentityOpenIdLinkService;
 
     public GetUserPermissionsHandler(
         IUserRepository userRepository,
-        IUserQueryRepository userQueryRepository)
+        IUserQueryRepository userQueryRepository,
+        IUserIdentityOpenIdLinkService userIdentityOpenIdLinkService)
     {
         _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
+        _userIdentityOpenIdLinkService = userIdentityOpenIdLinkService;
     }
 
     public async Task<GetUserPermissionsResponse> Handle(
@@ -51,10 +54,16 @@ public sealed class GetUserPermissionsHandler
             .ConfigureAwait(false);
 
         if (user == null)
-            throw new NotFoundValidationException(request.ExternalUserId);
+        {
+            var userIdentity = await _userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(new ExternalUserId(request.ExternalUserId)).ConfigureAwait(false);
+
+            user = await _userRepository
+                .GetAsync(new ExternalUserId(userIdentity.Id.Value))
+                .ConfigureAwait(false);
+        }
 
         var permissions = await _userQueryRepository
-            .GetPermissionsAsync(new ActorId(request.ActorId), user.ExternalId)
+            .GetPermissionsAsync(new ActorId(request.ActorId), user!.ExternalId)
             .ConfigureAwait(false);
 
         var isFas = await _userQueryRepository

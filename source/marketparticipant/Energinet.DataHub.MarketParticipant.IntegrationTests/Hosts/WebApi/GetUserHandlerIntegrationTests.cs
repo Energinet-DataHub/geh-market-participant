@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -57,7 +58,8 @@ public sealed class GetUserHandlerIntegrationTests
             "expected_name",
             null,
             DateTimeOffset.UtcNow,
-            AuthenticationMethod.Undetermined);
+            AuthenticationMethod.Undetermined,
+            new List<LoginIdentity>());
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
@@ -110,7 +112,8 @@ public sealed class GetUserHandlerIntegrationTests
             "expected_name",
             null,
             DateTimeOffset.UtcNow,
-            AuthenticationMethod.Undetermined);
+            AuthenticationMethod.Undetermined,
+            new List<LoginIdentity>());
 
         userIdentityMock
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
