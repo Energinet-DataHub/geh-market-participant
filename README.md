@@ -4,16 +4,16 @@
 
 Welcome to the Market Participant domain of the [Green Energy Hub project](https://github.com/Energinet-DataHub/green-energy-hub).
 
-- [Intro](#intro)
-- [Communicating with Market Participant](#Communicating-with-Market-Participant)
-    - [API](#API)
-        - [Organization](#Organization)
-        - [Actor](#Actor)
-        - [Contact](#Contact)
-        - [Actor Contact](#Actor-Contact)
-- [Integration Events](#Integration-events)
+- [Introduction](#introduction)
+- [Communicating with Market Participant](#communicating-with-market-participant)
+    - [API](#api)
+        - [Organization](#organization)
+        - [Actor](#actor)
+        - [Actor Contact](#actor-contact)
+        - [Grid Area](#grid-area)
+- [Domain C4 model](#domain-c4-model)
 
-## Intro
+## Introduction
 
 Market Participant is where everything related to Organization, Actors, GridAreas and their relationships are handled.
 
@@ -196,4 +196,18 @@ The Following endpoints are available, separated by concerns.
 ```
 
 ---
----
+
+## Domain C4 model
+
+In the DataHub 3 project we use the [C4 model](https://c4model.com/) to document the high-level software design.
+
+The [DataHub 3 base model](https://github.com/Energinet-DataHub/opengeh-arch-diagrams#datahub-3-base-model) describes elements like organizations, software systems and actors. In domain repositories we should `extend` on this model and add additional elements within the DataHub 3.0 Software System (`dh3`).
+
+The domain C4 model and rendered diagrams are located in the folder hierarchy [docs/diagrams/c4-model](./docs/diagrams/c4-model/) and consists of:
+
+- `model.dsl`: Structurizr DSL describing the domain C4 model.
+- `views.dsl`: Structurizr DSL extending the `dh3` software system by referencing domain C4 models using `!include`, and describing the views.
+- `views.json`: Structurizr layout information for views.
+- `/views/*.png`: A PNG file per view described in the Structurizr DSL.
+
+Maintenance of the C4 model should be performed using VS Code and a local version of Structurizr Lite running in Docker. See [DataHub 3 base model](https://github.com/Energinet-DataHub/opengeh-arch-diagrams#datahub-3-base-model) for a description of how to do this.
