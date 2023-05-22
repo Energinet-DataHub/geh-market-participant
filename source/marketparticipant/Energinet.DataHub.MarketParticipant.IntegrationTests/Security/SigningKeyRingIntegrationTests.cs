@@ -105,7 +105,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
     }
 
     [Fact]
-    public async Task GetKeysAsync_WithExpiredKey_ReturnsKey()
+    public async Task GetKeysAsync_WithExpiredKey_ReturnsNothing()
     {
         // Arrange
         var target = new SigningKeyRing(
@@ -125,7 +125,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         var keys = await target.GetKeysAsync();
 
         // Assert
-        Assert.Single(keys);
+        Assert.Empty(keys);
 
         // Cleanup
         await _keyClientFixture
