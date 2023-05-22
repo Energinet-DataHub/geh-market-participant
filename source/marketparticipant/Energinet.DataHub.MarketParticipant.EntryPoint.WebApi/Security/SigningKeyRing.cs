@@ -88,9 +88,16 @@ public sealed class SigningKeyRing : ISigningKeyRing
         var keyVersions = _keyClient.GetPropertiesOfKeyVersionsAsync(_keyName);
         var keys = new List<KeyVaultKey>();
 
+        var currentTime = _clock
+            .GetCurrentInstant()
+            .ToDateTimeOffset();
+
         await foreach (var keyDescription in keyVersions)
         {
             if (keyDescription.Enabled != true)
+                continue;
+
+            if (keyDescription.ExpiresOn < currentTime)
                 continue;
 
             var keyVersion = await _keyClient
