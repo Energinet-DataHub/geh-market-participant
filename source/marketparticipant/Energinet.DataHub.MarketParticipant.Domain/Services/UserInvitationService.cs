@@ -71,6 +71,8 @@ public sealed class UserInvitationService : IUserInvitationService
             invitedUser = new User(userIdentityId);
         }
 
+        invitedUser.SetUserInvitationExpiresAt(DateTimeOffset.UtcNow.AddHours(24));
+
         var userInviteRoleAssignments = new List<UserRoleAssignment>();
 
         foreach (var assignedRole in invitation.AssignedRoles)

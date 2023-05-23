@@ -31,21 +31,29 @@ public sealed class User
         UserId id,
         ExternalUserId externalId,
         IEnumerable<UserRoleAssignment> roleAssignments,
-        DateTimeOffset? mitIdSignupInitiatedAt)
+        DateTimeOffset? mitIdSignupInitiatedAt,
+        DateTimeOffset? invitationExpiresAt)
     {
         Id = id;
         ExternalId = externalId;
         RoleAssignments = roleAssignments.ToHashSet();
         MitIdSignupInitiatedAt = mitIdSignupInitiatedAt;
+        InvitationExpiresAt = invitationExpiresAt;
     }
 
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; }
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
     public DateTimeOffset? MitIdSignupInitiatedAt { get; private set;  }
+    public DateTimeOffset? InvitationExpiresAt { get; private set;  }
 
     public void InitiateMitIdSignup()
     {
         MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void SetUserInvitationExpiresAt(DateTimeOffset expiresAt)
+    {
+        InvitationExpiresAt = expiresAt;
     }
 }

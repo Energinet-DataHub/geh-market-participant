@@ -199,7 +199,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new UserId(Guid.Empty),
                 externalUserId,
                 new List<UserRoleAssignment>(),
-                mitIdInitiatedAt);
+                mitIdInitiatedAt,
+                null);
             return user;
         }
     }

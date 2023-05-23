@@ -194,6 +194,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 externalId,
                 Array.Empty<UserRoleAssignment>(),
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -245,6 +246,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -314,6 +316,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -357,6 +360,10 @@ public sealed class UserInvitationServiceTests
 
         userRepositoryMock.Verify(
             userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.RoleAssignments.Single() == expectedAssignment)),
+            Times.Once);
+
+        userRepositoryMock.Verify(
+            userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.InvitationExpiresAt != null && user.InvitationExpiresAt > DateTimeOffset.UtcNow)),
             Times.Once);
     }
 

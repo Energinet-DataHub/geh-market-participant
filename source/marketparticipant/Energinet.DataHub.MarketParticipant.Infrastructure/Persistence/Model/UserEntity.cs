@@ -24,4 +24,5 @@ public sealed class UserEntity
     public string Email { get; set; } = null!;
     public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; } = new();
     public DateTimeOffset? MitIdSignupInitiatedAt { get; set; }
+    public DateTimeOffset? InvitationExpiresAt { get; set; }
 }
