@@ -221,7 +221,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return externalUserId;
     }
 
-    public Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber)
+    public Task UpdateUserAsync(ExternalUserId externalUserId, string firstName, string lastName, PhoneNumber phoneNumber)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
         ArgumentNullException.ThrowIfNull(phoneNumber);
@@ -230,6 +230,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .Users[externalUserId.Value.ToString()]
             .PatchAsync(new User
             {
+                GivenName = firstName,
+                Surname = lastName,
                 MobilePhone = phoneNumber.Number
             });
     }

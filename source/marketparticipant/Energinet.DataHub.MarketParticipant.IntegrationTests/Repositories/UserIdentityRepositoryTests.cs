@@ -223,16 +223,20 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userIdentityAuthenticationService,
             userPasswordGenerator);
 
+        var newFirstName = "New First Name";
+        var newLastName = "New Last Name";
         var newPhoneNumber = new PhoneNumber("+45 70007777");
 
         // Act
         var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
-        await target.UpdateUserPhoneNumberAsync(externalId, newPhoneNumber);
+        await target.UpdateUserAsync(externalId, newFirstName, newLastName, newPhoneNumber);
 
         // Assert
         var actual = await target.GetAsync(externalId);
 
         Assert.NotNull(actual);
+        Assert.Equal(newFirstName, actual.FirstName);
+        Assert.Equal(newLastName, actual.LastName);
         Assert.Equal(newPhoneNumber, actual.PhoneNumber);
     }
 

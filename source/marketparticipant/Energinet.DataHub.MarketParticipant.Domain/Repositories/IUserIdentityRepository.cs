@@ -67,9 +67,11 @@ public interface IUserIdentityRepository
     /// <summary>
     /// Updates the phone number of a user identity.
     /// </summary>
-    /// <param name="externalUserId">external user id</param>
-    /// <param name="phoneNumber">new phone number</param>
-    Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber);
+    /// <param name="externalUserId">External user id</param>
+    /// <param name="firstName">Users first name</param>
+    /// <param name="lastName">Users last name</param>
+    /// <param name="phoneNumber">Users phone number</param>
+    Task UpdateUserAsync(ExternalUserId externalUserId, string firstName, string lastName, PhoneNumber phoneNumber);
 
     /// <summary>
     /// Assign user login identities

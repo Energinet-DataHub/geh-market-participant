@@ -144,7 +144,8 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
             mappedUsers.Add(new UserOverviewItemDto(
                 user.Id.Value,
                 user.Status,
-                user.Name,
+                user.FirstName,
+                user.LastName,
                 user.Email.Address,
                 user.PhoneNumber?.Number,
                 user.CreatedDate,

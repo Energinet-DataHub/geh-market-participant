@@ -37,7 +37,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232323");
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232323");
         var validUserId = Guid.NewGuid();
 
         var user = new User(new UserId(validUserId), new ExternalUserId(Guid.NewGuid()), new List<UserRoleAssignment>(), null);
@@ -63,7 +63,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 invalid");
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 invalid");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
@@ -83,7 +83,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232324");
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232324");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
