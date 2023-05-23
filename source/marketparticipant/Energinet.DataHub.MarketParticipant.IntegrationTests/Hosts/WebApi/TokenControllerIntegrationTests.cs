@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http;
@@ -28,6 +29,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Graph.Models;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
@@ -40,18 +42,24 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class TokenControllerIntegrationTests :
     WebApiIntegrationTestsBase,
-    IClassFixture<KeyClientFixture>
+    IClassFixture<KeyClientFixture>,
+    IAsyncLifetime
 {
+    private const string TestUserInviteOpenIdEmail = "invitation-openid-integration-test@datahub.dk";
+
     private readonly KeyClientFixture _keyClientFixture;
-    private readonly MarketParticipantDatabaseFixture _fixture;
+    private readonly MarketParticipantDatabaseFixture _marketParticipantDatabaseFixture;
+    private readonly GraphServiceClientFixture _graphServiceClientFixture;
 
     public TokenControllerIntegrationTests(
         KeyClientFixture keyClientFixture,
-        MarketParticipantDatabaseFixture fixture)
-        : base(fixture)
+        MarketParticipantDatabaseFixture marketParticipantDatabaseFixture,
+        GraphServiceClientFixture graphServiceClientFixture)
+        : base(marketParticipantDatabaseFixture)
     {
         _keyClientFixture = keyClientFixture;
-        _fixture = fixture;
+        _marketParticipantDatabaseFixture = marketParticipantDatabaseFixture;
+        _graphServiceClientFixture = graphServiceClientFixture;
     }
 
     [Fact]
@@ -119,7 +127,7 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _fixture.PrepareUserAsync();
+        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
         var actorId = Guid.NewGuid();
@@ -147,10 +155,11 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _fixture.PrepareUserAsync();
+        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync();
+        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
-        var actorId = Guid.NewGuid();
+        var actorId = testActor.Id;
         var request = new TokenRequest(actorId, externalToken);
 
         using var httpContent = new StringContent(
@@ -204,10 +213,11 @@ public sealed class TokenControllerIntegrationTests :
         // Arrange
         const string target = "token";
 
-        var testUser = await _fixture.PrepareUserAsync();
+        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync();
+        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
         var externalToken = CreateExternalTestToken(testUser.ExternalId);
 
-        var actorId = Guid.NewGuid();
+        var actorId = testActor.Id;
         var request = new TokenRequest(actorId, externalToken);
 
         using var httpContent = new StringContent(
@@ -249,6 +259,63 @@ public sealed class TokenControllerIntegrationTests :
 
         Assert.True(result.IsValid);
     }
+
+    [Fact]
+    public async Task Token_ValidOpenIdSetup_UserUpdatedWithOpenIdIdentity()
+    {
+        // Arrange
+        const string target = "token";
+
+        var openIdIdentity = new List<ObjectIdentity>()
+        {
+            new()
+            {
+                SignInType = "federated",
+                Issuer = Guid.NewGuid().ToString(),
+                IssuerAssignedId = Guid.NewGuid().ToString()
+            }
+        };
+
+        var invitedUserExternalId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail);
+        var openIdUserExternalUserId = await _graphServiceClientFixture.CreateUserAsync(TestUserInviteOpenIdEmail, openIdIdentity);
+
+        await _marketParticipantDatabaseFixture
+            .PrepareUserAsync(TestPreparationEntities
+                .UnconnectedUser.Patch(e =>
+                {
+                    e.ExternalId = invitedUserExternalId.Value;
+                    e.Email = TestUserInviteOpenIdEmail;
+                }));
+
+        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
+        var externalToken = CreateExternalTestToken(openIdUserExternalUserId.Value);
+
+        var actorId = testActor.Id;
+        var request = new TokenRequest(actorId, externalToken);
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        using var client = CreateClient();
+
+        // Act
+        using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
+        await response.Content.ReadAsStringAsync();
+
+        // Assert
+        var updatedUser = await _graphServiceClientFixture.TryFindExternalUserAsync(TestUserInviteOpenIdEmail);
+
+        Assert.NotNull(updatedUser);
+        Assert.NotNull(updatedUser.Identities);
+        Assert.Equal(3, updatedUser.Identities.Count);
+        Assert.Single(updatedUser.Identities, e => e.SignInType == "federated");
+    }
+
+    public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
+
+    public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

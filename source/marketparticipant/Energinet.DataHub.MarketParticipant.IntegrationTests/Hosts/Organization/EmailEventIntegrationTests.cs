@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -78,6 +79,7 @@ public sealed class EmailEventIntegrationTests
             "lastName",
             new PhoneNumber("23232323"),
             DateTimeOffset.Now,
-            AuthenticationMethod.Undetermined);
+            AuthenticationMethod.Undetermined,
+            new List<LoginIdentity>());
     }
 }

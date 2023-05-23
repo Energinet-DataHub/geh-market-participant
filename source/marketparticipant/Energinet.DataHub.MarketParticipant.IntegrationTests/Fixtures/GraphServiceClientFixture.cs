@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Graph.Models.ODataErrors;
 using Xunit;
 using User = Microsoft.Graph.Models.User;
 
@@ -71,6 +72,10 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                     .Users[externalUserId.ToString()]
                     .DeleteAsync();
             }
+            catch (ODataError dataError) when (dataError.ResponseStatusCode == 404)
+            {
+                // User already deleted.
+            }
 #pragma warning disable CA1508
             catch (Exception ex) when (firstException == null)
 #pragma warning restore CA1508
@@ -87,13 +92,81 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             throw firstException;
     }
 
+    public async Task<ExternalUserId> CreateUserAsync(
+        string testEmail,
+        IEnumerable<ObjectIdentity> identities)
+    {
+        var newUser = CreateTestUserModel(testEmail);
+        newUser.Identities!.Clear();
+        newUser.Identities!.AddRange(identities);
+        newUser.OtherMails = new List<string> { testEmail };
+
+        var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
+        return externalUserId;
+    }
+
     public async Task<ExternalUserId> CreateUserAsync(string testEmail)
     {
-        var newUser = new User
+        var newUser = CreateTestUserModel(testEmail);
+
+        var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
+        return externalUserId;
+    }
+
+    public async Task<User?> TryFindExternalUserAsync(string testEmail)
+    {
+        var usersRequest = await Client
+            .Users
+            .GetAsync(x =>
+            {
+                x.QueryParameters.Select = new[]
+                {
+                    "id",
+                    "identities"
+                };
+                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
+            })
+            .ConfigureAwait(false);
+
+        var users = await usersRequest!
+            .IteratePagesAsync<User>(Client)
+            .ConfigureAwait(false);
+
+        var user = users.SingleOrDefault();
+        return user;
+    }
+
+    public async Task CleanupExternalUserAsync(string testEmail)
+    {
+        var existingUser = await TryFindExternalUserAsync(testEmail);
+        if (existingUser == null)
+            return;
+
+        await Client
+            .Users[existingUser.Id]
+            .DeleteAsync();
+    }
+
+    private async Task<ExternalUserId> CreateUserAndAddToCleanUpListAsync(User newUser)
+    {
+        var createdUser = await Client
+            .Users
+            .PostAsync(newUser)
+            .ConfigureAwait(false);
+
+        var externalUserId = new ExternalUserId(createdUser!.Id!);
+        _createdUsers.Add(externalUserId);
+
+        return externalUserId;
+    }
+
+    private User CreateTestUserModel(string testEmail)
+    {
+        return new User
         {
             AccountEnabled = false,
             DisplayName = "User Integration Tests (Always safe to delete)",
-            GivenName = "Test Fist Name",
+            GivenName = "Test First Name",
             Surname = "Test Last Name",
             PasswordProfile = new PasswordProfile
             {
@@ -110,48 +183,5 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 }
             }
         };
-
-        var createdUser = await Client
-            .Users
-            .PostAsync(newUser)
-            .ConfigureAwait(false);
-
-        var externalUserId = new ExternalUserId(createdUser!.Id!);
-        _createdUsers.Add(externalUserId);
-
-        return externalUserId;
-    }
-
-    public async Task<string?> TryFindExternalUserAsync(string testEmail)
-    {
-        var usersRequest = await Client
-            .Users
-            .GetAsync(x =>
-            {
-                x.QueryParameters.Select = new[]
-                {
-                    "id"
-                };
-                x.QueryParameters.Filter = $"identities/any(id:id/issuer eq '{_integrationTestConfiguration.B2CSettings.Tenant}' and id/issuerAssignedId eq '{testEmail}')";
-            })
-            .ConfigureAwait(false);
-
-        var users = await usersRequest!
-            .IteratePagesAsync<User>(Client)
-            .ConfigureAwait(false);
-
-        var user = users.SingleOrDefault();
-        return user?.Id;
-    }
-
-    public async Task CleanupExternalUserAsync(string testEmail)
-    {
-        var existingUser = await TryFindExternalUserAsync(testEmail);
-        if (existingUser == null)
-            return;
-
-        await Client
-            .Users[existingUser]
-            .DeleteAsync();
     }
 }

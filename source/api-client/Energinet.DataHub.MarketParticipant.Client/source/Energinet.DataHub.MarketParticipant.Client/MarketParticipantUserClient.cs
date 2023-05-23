@@ -101,5 +101,16 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .PutJsonAsync(userIdentityUpdateDto))
                 .ConfigureAwait(false);
         }
+
+        public async Task InitiateMitIdSignupAsync()
+        {
+            await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user", "initiate-mitid-signup")
+                        .PostAsync())
+                .ConfigureAwait(false);
+        }
     }
 }

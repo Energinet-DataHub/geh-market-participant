@@ -49,5 +49,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="userId">user to update</param>
         /// <param name="userIdentityUpdateDto">update values</param>
         Task UpdateUserPhoneNumberAsync(Guid userId, UserIdentityUpdateDto userIdentityUpdateDto);
+
+        /// <summary>
+        /// Initiates MitID user signup
+        /// </summary>
+        Task InitiateMitIdSignupAsync();
     }
 }
