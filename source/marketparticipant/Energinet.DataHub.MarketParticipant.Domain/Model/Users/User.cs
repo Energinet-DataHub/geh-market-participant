@@ -66,7 +66,7 @@ public sealed class User
 
     public void ValidateLogonRequirements()
     {
-        if (InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow)
+        if (InvitationExpiresAt < DateTimeOffset.UtcNow)
         {
             throw new UnauthorizedAccessException("User invitation has expired");
         }
