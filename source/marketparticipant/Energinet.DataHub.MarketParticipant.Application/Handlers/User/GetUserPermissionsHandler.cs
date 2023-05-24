@@ -62,7 +62,7 @@ public sealed class GetUserPermissionsHandler
                 .ConfigureAwait(false);
         }
 
-        user!.ValidateLogonRequirements();
+        await ValidateOrClearLogonRequirementsAsync(user!).ConfigureAwait(false);
 
         var permissions = await _userQueryRepository
             .GetPermissionsAsync(new ActorId(request.ActorId), user!.ExternalId)
@@ -73,5 +73,12 @@ public sealed class GetUserPermissionsHandler
             .ConfigureAwait(false);
 
         return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions.Select(permission => permission.Claim));
+    }
+
+    private async Task ValidateOrClearLogonRequirementsAsync(Domain.Model.Users.User user)
+    {
+        user.ValidateLogonRequirements();
+        user.ClearUserInvitationExpiresAt();
+        await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
     }
 }

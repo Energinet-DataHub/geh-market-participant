@@ -59,9 +59,14 @@ public sealed class User
         InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours);
     }
 
+    public void ClearUserInvitationExpiresAt()
+    {
+        InvitationExpiresAt = null;
+    }
+
     public void ValidateLogonRequirements()
     {
-        if (InvitationExpiresAt < DateTimeOffset.UtcNow)
+        if (InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow)
         {
             throw new UnauthorizedAccessException("User invitation has expired");
         }
