@@ -20,6 +20,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class User
 {
+    private const int UserInvitationExpiresAtHours = 24;
+
     public User(ExternalUserId externalId)
     {
         Id = new UserId(Guid.Empty);
@@ -52,8 +54,16 @@ public sealed class User
         MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void SetUserInvitationExpiresAt(DateTimeOffset expiresAt)
+    public void SetUserInvitationExpiresAt()
     {
-        InvitationExpiresAt = expiresAt;
+        InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours);
+    }
+
+    public void ValidateLogonRequirements()
+    {
+        if (InvitationExpiresAt < DateTimeOffset.UtcNow)
+        {
+            throw new UnauthorizedAccessException("User invitation has expired");
+        }
     }
 }

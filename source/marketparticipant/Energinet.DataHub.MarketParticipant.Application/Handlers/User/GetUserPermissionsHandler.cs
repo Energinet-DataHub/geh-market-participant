@@ -62,7 +62,7 @@ public sealed class GetUserPermissionsHandler
                 .ConfigureAwait(false);
         }
 
-        ValidateUserInvitationExpiresAt(user!);
+        user!.ValidateLogonRequirements();
 
         var permissions = await _userQueryRepository
             .GetPermissionsAsync(new ActorId(request.ActorId), user!.ExternalId)
@@ -73,13 +73,5 @@ public sealed class GetUserPermissionsHandler
             .ConfigureAwait(false);
 
         return new GetUserPermissionsResponse(user.Id.Value, isFas, permissions.Select(permission => permission.Claim));
-    }
-
-    private static void ValidateUserInvitationExpiresAt(Domain.Model.Users.User user)
-    {
-        if (user.InvitationExpiresAt < DateTimeOffset.UtcNow)
-        {
-            throw new UnauthorizedAccessException("User invitation has expired");
-        }
     }
 }

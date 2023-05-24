@@ -183,7 +183,7 @@ public sealed class TokenControllerIntegrationTests :
     }
 
     [Fact]
-    public async Task Token_UserInvitationExpired()
+    public async Task Token_UserInvitationExpired_Returns401()
     {
         // Arrange
         const string target = "token";

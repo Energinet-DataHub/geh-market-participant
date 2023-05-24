@@ -23,7 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 public sealed class UserInvitationService : IUserInvitationService
 {
-    private const int UserInvitationExpiresAtHours = 24;
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
@@ -72,7 +71,7 @@ public sealed class UserInvitationService : IUserInvitationService
             invitedUser = new User(userIdentityId);
         }
 
-        invitedUser.SetUserInvitationExpiresAt(DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours));
+        invitedUser.SetUserInvitationExpiresAt();
 
         var userInviteRoleAssignments = new List<UserRoleAssignment>();
 
