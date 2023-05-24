@@ -183,6 +183,34 @@ public sealed class TokenControllerIntegrationTests :
     }
 
     [Fact]
+    public async Task Token_UserInvitationExpired()
+    {
+        // Arrange
+        const string target = "token";
+
+        var testUser = await _marketParticipantDatabaseFixture.PrepareUserAsync(
+            TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(-25)));
+        var testActor = await _marketParticipantDatabaseFixture.PrepareActorAsync();
+        var externalToken = CreateExternalTestToken(testUser.ExternalId);
+
+        var actorId = testActor.Id;
+        var request = new TokenRequest(actorId, externalToken);
+
+        using var httpContent = new StringContent(
+            JsonSerializer.Serialize(request),
+            Encoding.UTF8,
+            MediaTypeNames.Application.Json);
+
+        using var client = CreateClient();
+
+        // Act
+        using var response = await client.PostAsync(new Uri(target, UriKind.Relative), httpContent);
+
+        // Assert
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Token_ValidExternalTokenButUsersDoesNotExist_Returns401()
     {
         // Arrange
