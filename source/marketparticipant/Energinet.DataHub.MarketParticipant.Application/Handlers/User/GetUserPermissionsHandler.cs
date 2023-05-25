@@ -77,8 +77,15 @@ public sealed class GetUserPermissionsHandler
 
     private async Task ValidateOrClearLogonRequirementsAsync(Domain.Model.Users.User user)
     {
-        user.ValidateLogonRequirements();
-        user.ClearUserInvitationExpiresAt();
-        await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+        if (!user.ValidLogonRequirements)
+        {
+            throw new UnauthorizedAccessException("User invitation has expired");
+        }
+
+        if (user.InvitationExpiresAt.HasValue)
+        {
+            user.ClearUserInvitationExpiresAt();
+            await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
+        }
     }
 }
