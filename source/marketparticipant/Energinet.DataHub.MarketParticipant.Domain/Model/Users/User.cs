@@ -48,7 +48,7 @@ public sealed class User
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
     public DateTimeOffset? MitIdSignupInitiatedAt { get; private set;  }
     public DateTimeOffset? InvitationExpiresAt { get; private set;  }
-    public bool ValidLogonRequirements => InvitationExpiresAt >= DateTimeOffset.UtcNow;
+    public bool ValidLogonRequirements => !InvitationExpiresAt.HasValue || InvitationExpiresAt >= DateTimeOffset.UtcNow;
 
     public void InitiateMitIdSignup()
     {
