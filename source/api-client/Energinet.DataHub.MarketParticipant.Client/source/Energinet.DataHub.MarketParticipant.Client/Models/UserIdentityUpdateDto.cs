@@ -14,5 +14,5 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserIdentityUpdateDto(string PhoneNumber);
+    public sealed record UserIdentityUpdateDto(string FirstName, string LastName, string PhoneNumber);
 }

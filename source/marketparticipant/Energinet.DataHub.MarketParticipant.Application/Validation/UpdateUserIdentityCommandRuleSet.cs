@@ -26,7 +26,13 @@ public sealed class UpdateUserIdentityCommandRuleSet : AbstractValidator<UpdateU
             .ChildRules(updateRules =>
             {
                 updateRules
-                    .RuleFor(updatePhoneRules => updatePhoneRules.PhoneNumber)
+                    .RuleFor(x => x.FirstName)
+                    .NotEmpty();
+                updateRules
+                    .RuleFor(x => x.LastName)
+                    .NotEmpty();
+                updateRules
+                    .RuleFor(x => x.PhoneNumber)
                     .NotEmpty();
             });
 

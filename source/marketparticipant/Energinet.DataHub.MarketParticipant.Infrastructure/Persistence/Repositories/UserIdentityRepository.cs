@@ -221,16 +221,17 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return externalUserId;
     }
 
-    public Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber)
+    public Task UpdateUserAsync(UserIdentity userIdentity)
     {
-        ArgumentNullException.ThrowIfNull(externalUserId);
-        ArgumentNullException.ThrowIfNull(phoneNumber);
+        ArgumentNullException.ThrowIfNull(userIdentity);
 
         return _graphClient
-            .Users[externalUserId.Value.ToString()]
+            .Users[userIdentity.Id.Value.ToString()]
             .PatchAsync(new User
             {
-                MobilePhone = phoneNumber.Number
+                GivenName = userIdentity.FirstName,
+                Surname = userIdentity.LastName,
+                MobilePhone = userIdentity.PhoneNumber?.Number
             });
     }
 
