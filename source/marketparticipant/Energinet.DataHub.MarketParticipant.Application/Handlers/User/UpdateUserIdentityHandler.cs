@@ -41,10 +41,6 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var firstName = request.UserIdentityUpdate.FirstName;
-        var lastName = request.UserIdentityUpdate.LastName;
-        var phoneNumber = new PhoneNumber(request.UserIdentityUpdate.PhoneNumber);
-
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
 
         if (user == null)
@@ -52,7 +48,18 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
             throw new NotFoundValidationException($"The specified user {request.UserId} was not found.");
         }
 
-        await _userIdentityRepository.UpdateUserAsync(user.ExternalId, firstName, lastName, phoneNumber).ConfigureAwait(false);
+        var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+
+        if (userIdentity == null)
+        {
+            throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
+        }
+
+        userIdentity.PhoneNumber = new PhoneNumber(request.UserIdentityUpdate.PhoneNumber);
+        userIdentity.LastName = request.UserIdentityUpdate.LastName;
+        userIdentity.FirstName = request.UserIdentityUpdate.FirstName;
+
+        await _userIdentityRepository.UpdateUserAsync(userIdentity).ConfigureAwait(false);
 
         return Unit.Value;
     }

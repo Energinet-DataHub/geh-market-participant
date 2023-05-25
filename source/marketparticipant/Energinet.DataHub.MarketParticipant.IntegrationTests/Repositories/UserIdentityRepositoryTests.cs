@@ -229,7 +229,13 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 
         // Act
         var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
-        await target.UpdateUserAsync(externalId, newFirstName, newLastName, newPhoneNumber);
+        var user = (await target.GetAsync(externalId))!;
+
+        user.FirstName = newFirstName;
+        user.LastName = newLastName;
+        user.PhoneNumber = newPhoneNumber;
+
+        await target.UpdateUserAsync(user);
 
         // Assert
         var actual = await target.GetAsync(externalId);
