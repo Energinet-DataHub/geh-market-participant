@@ -72,10 +72,10 @@ public sealed class UserIdentity
     public ExternalUserId Id { get; }
     public EmailAddress Email { get; }
     public UserStatus Status { get; }
-    public string FirstName { get; }
-    public string LastName { get; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
     public string FullName => $"{FirstName} {LastName}";
-    public PhoneNumber? PhoneNumber { get; }
+    public PhoneNumber? PhoneNumber { get; set; }
     public DateTimeOffset CreatedDate { get; }
     public AuthenticationMethod Authentication { get; }
     public IReadOnlyCollection<LoginIdentity> LoginIdentities => _loginIdentities;
