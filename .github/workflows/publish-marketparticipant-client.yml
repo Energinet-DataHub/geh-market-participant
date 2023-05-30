@@ -47,7 +47,6 @@ jobs:
         with:
           solution_file_path: ./source/api-client/Energinet.DataHub.MarketParticipant.Libraries.sln
           code_coverage_flags: clientlibraries
-          dotnet_version: 7.0.200
 
       - name: Pack Client project
         uses: Energinet-DataHub/.github/.github/actions/nuget-project-pack@v11
