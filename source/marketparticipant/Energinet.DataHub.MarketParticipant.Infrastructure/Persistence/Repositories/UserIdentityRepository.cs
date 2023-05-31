@@ -210,12 +210,14 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .AddAuthenticationAsync(externalUserId, userIdentity.Authentication)
             .ConfigureAwait(false);
 
+        var employeeId = userIdentity.SharedId.ToString();
+
         await _graphClient
             .Users[createdUser.Id]
             .PatchAsync(new User
             {
                 AccountEnabled = true,
-                EmployeeId = userIdentity.SharedId.ToString()
+                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought is was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
             })
             .ConfigureAwait(false);
 
