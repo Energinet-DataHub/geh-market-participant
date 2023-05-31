@@ -72,6 +72,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -119,6 +120,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -144,6 +146,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new MockedEmailAddress(),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -190,6 +193,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",

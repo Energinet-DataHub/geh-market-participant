@@ -20,8 +20,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class User
 {
-    public User(ExternalUserId externalId)
+    private readonly SharedUserReferenceId? _sharedId;
+
+    public User(SharedUserReferenceId sharedId, ExternalUserId externalId)
     {
+        _sharedId = sharedId;
         Id = new UserId(Guid.Empty);
         ExternalId = externalId;
         RoleAssignments = new HashSet<UserRoleAssignment>();
@@ -33,6 +36,7 @@ public sealed class User
         IEnumerable<UserRoleAssignment> roleAssignments,
         DateTimeOffset? mitIdSignupInitiatedAt)
     {
+        _sharedId = null;
         Id = id;
         ExternalId = externalId;
         RoleAssignments = roleAssignments.ToHashSet();
@@ -41,8 +45,9 @@ public sealed class User
 
     public UserId Id { get; }
     public ExternalUserId ExternalId { get; }
+    public SharedUserReferenceId SharedId => _sharedId ?? throw new InvalidOperationException("The shared reference id is only available when creating the entity.");
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
-    public DateTimeOffset? MitIdSignupInitiatedAt { get; private set;  }
+    public DateTimeOffset? MitIdSignupInitiatedAt { get; private set; }
 
     public void InitiateMitIdSignup()
     {

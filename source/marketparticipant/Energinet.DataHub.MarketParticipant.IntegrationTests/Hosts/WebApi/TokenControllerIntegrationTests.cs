@@ -313,9 +313,14 @@ public sealed class TokenControllerIntegrationTests :
         Assert.Single(updatedUser.Identities, e => e.SignInType == "federated");
     }
 
-    public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
+    async Task IAsyncLifetime.InitializeAsync() => await _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
+    async Task IAsyncLifetime.DisposeAsync() => await DisposeAsync();
 
-    public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
+    public override async ValueTask DisposeAsync()
+    {
+        await base.DisposeAsync();
+        await _graphServiceClientFixture.CleanupExternalUserAsync(TestUserInviteOpenIdEmail);
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

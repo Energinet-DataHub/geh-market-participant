@@ -21,6 +21,7 @@ public sealed class UserEntity
 {
     public Guid Id { get; set; }
     public Guid ExternalId { get; set; }
+    public Guid SharedReferenceId { get; set; }
     public string Email { get; set; } = null!;
     public Collection<UserRoleAssignmentEntity> RoleAssignments { get; init; } = new();
     public DateTimeOffset? MitIdSignupInitiatedAt { get; set; }
