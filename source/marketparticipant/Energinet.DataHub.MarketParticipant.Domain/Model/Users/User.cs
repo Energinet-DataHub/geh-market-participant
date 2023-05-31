@@ -55,7 +55,7 @@ public sealed class User
         MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void SetUserInvitationExpiresAt()
+    public void SetUserInvitationExpiration()
     {
         InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours);
     }

@@ -71,7 +71,7 @@ public sealed class UserInvitationService : IUserInvitationService
             invitedUser = new User(userIdentityId);
         }
 
-        invitedUser.SetUserInvitationExpiresAt();
+        invitedUser.SetUserInvitationExpiration();
 
         var userInviteRoleAssignments = new List<UserRoleAssignment>();
 
