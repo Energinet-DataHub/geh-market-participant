@@ -16,7 +16,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public enum UserOverviewSortProperty
 {
-    Name,
+    FirstName,
+    LastName,
     Email,
     PhoneNumber,
     CreatedDate,
