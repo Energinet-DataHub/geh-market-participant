@@ -214,7 +214,8 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .Users[createdUser.Id]
             .PatchAsync(new User
             {
-                AccountEnabled = true
+                AccountEnabled = true,
+                EmployeeId = userIdentity.SharedId.ToString()
             })
             .ConfigureAwait(false);
 

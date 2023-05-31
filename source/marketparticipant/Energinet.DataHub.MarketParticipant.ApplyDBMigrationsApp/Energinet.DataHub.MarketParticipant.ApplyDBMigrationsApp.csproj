@@ -28,6 +28,15 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\B-001\Model\202305310820 Add SharedReferenceId to User.sql" />
+    <None Remove="Scripts\B-002\Model\202305310820 Add SharedReferenceId to User.sql" />
+    <None Remove="Scripts\LocalDB\202304241230 Add MitIdSetupInitiatedTimestamp to User table - Copy.sql" />
+    <None Remove="Scripts\T-001\Model\202305310820 Add SharedReferenceId to User.sql" />
+    <None Remove="Scripts\U-001\Model\202305310820 Add SharedReferenceId to User.sql" />
+    <None Remove="Scripts\U-002\Model\202305310820 Add SharedReferenceId to User.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DbUp.Reboot.SqlServer" Version="1.5.0" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
   </ItemGroup>

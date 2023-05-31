@@ -49,7 +49,11 @@ public sealed class UserRepository : IUserRepository
                 .GetAsync(user.ExternalId)
                 .ConfigureAwait(false);
 
-            destination = new UserEntity { Email = identity!.Email.Address };
+            destination = new UserEntity
+            {
+                Email = identity!.Email.Address,
+                SharedReferenceId = user.SharedId.Value
+            };
         }
         else
         {
