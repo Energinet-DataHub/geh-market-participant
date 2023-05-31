@@ -92,6 +92,17 @@ public sealed class UserRepository : IUserRepository
         return userEntities.Select(UserMapper.MapFromEntity);
     }
 
+    public async Task<IEnumerable<User>> FindUsersWithExpiredInvitationAsync()
+    {
+        var userEntities = await _marketParticipantDbContext
+            .Users
+            .Where(u => u.InvitationExpiresAt < DateTime.UtcNow)
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return userEntities.Select(UserMapper.MapFromEntity);
+    }
+
     private IQueryable<UserEntity> BuildUserQuery()
     {
         return _marketParticipantDbContext

@@ -60,7 +60,7 @@ public sealed class User
         InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours);
     }
 
-    public void ClearUserInvitationExpiresAt()
+    public void ClearUserInvitationExpiration()
     {
         InvitationExpiresAt = null;
     }

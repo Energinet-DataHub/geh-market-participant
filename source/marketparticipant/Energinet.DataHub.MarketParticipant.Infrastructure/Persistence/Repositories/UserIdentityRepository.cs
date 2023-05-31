@@ -261,6 +261,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .DeleteAsync();
     }
 
+    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                AccountEnabled = false
+            });
+    }
+
     private static UserIdentity Map(User user, string? emailAddress = null)
     {
         var userEmailAddress = emailAddress ?? user

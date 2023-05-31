@@ -84,7 +84,7 @@ public sealed class GetUserPermissionsHandler
 
         if (user.InvitationExpiresAt.HasValue)
         {
-            user.ClearUserInvitationExpiresAt();
+            user.ClearUserInvitationExpiration();
             await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
         }
     }
