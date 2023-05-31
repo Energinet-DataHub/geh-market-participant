@@ -112,6 +112,7 @@ public sealed class UpdateUserIdentityHandlerTests
     }
 
     private static UserIdentity CreateFakeUserIdentity() => new(
+        new SharedUserReferenceId(),
         new EmailAddress("fake@example.dk"),
         "first",
         "last",
