@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -169,6 +170,21 @@ public sealed class UserIdentityAuthenticationServiceTests
 
         // Act + Assert
         await Assert.ThrowsAnyAsync<Exception>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
+    }
+
+    [Fact]
+    public async Task PhoneNumber_IsInvalid_ThrowsValidationException()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var smsAuthMethod = new SmsAuthenticationMethod(new PhoneNumber("+45 12345678"));
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
     }
 
     private sealed class UnknownAuthenticationMethod : AuthenticationMethod

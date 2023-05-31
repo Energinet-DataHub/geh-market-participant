@@ -55,10 +55,11 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         }
         catch (ODataError ex) when (ex.ResponseStatusCode == (int)HttpStatusCode.BadRequest)
         {
-            // If there is a bad request with 'Mobile phone method is already registered for this account.', MFA is already configured.
-            // Check if MFA is equivalent to current authentication method, then ignore the error.
+            externalAuthenticationMethod.EnsureNoValidationException(ex);
+
+            // Check if the authentication method already exists.
             // Otherwise, the user is in an unknown state and exception is thrown.
-            if (!await externalAuthenticationMethod.VerifyAsync(_graphClient, authenticationBuilder).ConfigureAwait(false))
+            if (!await externalAuthenticationMethod.DoesAlreadyExistAsync(_graphClient, authenticationBuilder).ConfigureAwait(false))
                 throw;
         }
     }
