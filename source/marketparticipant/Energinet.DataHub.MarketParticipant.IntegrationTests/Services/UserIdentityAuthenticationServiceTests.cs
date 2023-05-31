@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
@@ -184,7 +185,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         var smsAuthMethod = new SmsAuthenticationMethod(new PhoneNumber("+45 12345678"));
 
         // Act + Assert
-        await Assert.ThrowsAsync<ValidationException>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
+        await Assert.ThrowsAsync<ErrorsValidationException>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
     }
 
     private sealed class UnknownAuthenticationMethod : AuthenticationMethod

@@ -46,6 +46,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions
 
             return source switch
             {
+                ErrorsValidationException e =>
+                    new BadRequestObjectResult(new ErrorResponse(new ErrorDescriptor(
+                        "VALIDATION_EXCEPTION",
+                        "See details",
+                        details: e.Errors.Select(x =>
+                            new ErrorDescriptor(
+                                x.Code,
+                                x.Message))))),
+
                 NotFoundValidationException =>
                    new NotFoundResult(),
                 FluentValidationException ve =>

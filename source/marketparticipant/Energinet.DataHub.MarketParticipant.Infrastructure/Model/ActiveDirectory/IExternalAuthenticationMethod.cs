@@ -40,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirecto
         /// <summary>
         /// Ensures that no validation exception can be extrapolated. If one is, it is thrown.
         /// </summary>
-        /// <param name="exception"></param>
         void EnsureNoValidationException(Exception exception);
     }
 }
