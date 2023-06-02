@@ -58,7 +58,10 @@ public sealed class UserInvitationService : IUserInvitationService
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
         if (invitedUser == null)
         {
+            var sharedId = new SharedUserReferenceId();
+
             var userIdentity = new UserIdentity(
+                sharedId,
                 invitation.Email,
                 invitation.FirstName,
                 invitation.LastName,
@@ -69,7 +72,7 @@ public sealed class UserInvitationService : IUserInvitationService
                 .CreateAsync(userIdentity)
                 .ConfigureAwait(false);
 
-            invitedUser = new User(userIdentityId);
+            invitedUser = new User(sharedId, userIdentityId);
 
             invitedUser.EnableUserExpiration();
         }
