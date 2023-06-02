@@ -18,8 +18,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using Microsoft.Graph.Models.ODataErrors;
 using Microsoft.Graph.Users.Item.Authentication;
 using Microsoft.Kiota.Abstractions;
 
@@ -52,7 +55,7 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
                 });
     }
 
-    public async Task<bool> VerifyAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder)
+    public async Task<bool> DoesAlreadyExistAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder)
     {
         ArgumentNullException.ThrowIfNull(authenticationBuilder);
 
@@ -72,5 +75,21 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
             .Any(method =>
                 method.PhoneType == AuthenticationPhoneType.Mobile &&
                 method.PhoneNumber == _smsAuthenticationMethod.PhoneNumber.Number);
+    }
+
+    public void EnsureNoValidationException(Exception exception)
+    {
+        if (exception is ODataError { Error: { Code: "invalidPhoneNumber", Message: { } } } error)
+        {
+            throw new ValidationException(
+                error.Error.Message,
+                new[]
+                {
+                    new ValidationFailure("phoneNumber", error.Error.Message)
+                    {
+                        ErrorCode = "invalidPhoneNumber"
+                    }
+                });
+        }
     }
 }
