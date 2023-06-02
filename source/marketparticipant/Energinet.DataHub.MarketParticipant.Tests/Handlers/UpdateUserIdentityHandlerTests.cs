@@ -122,5 +122,5 @@ public sealed class UpdateUserIdentityHandlerTests
     private static User CreateFakeUser(Guid userId) => new(
         new UserId(userId),
         new ExternalUserId(Guid.NewGuid()),
-        new List<UserRoleAssignment>(), null);
+        new List<UserRoleAssignment>(), null, null);
 }

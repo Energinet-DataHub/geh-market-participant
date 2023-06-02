@@ -338,6 +338,41 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         Assert.Single(userIdentity.LoginIdentities, e => e.SignInType == "federated");
     }
 
+    [Fact]
+    public async Task CreateAsync_DeactivateUser()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        await _graphServiceClientFixture
+            .Client
+            .Users[externalId.Value.ToString()]
+            .PatchAsync(new Microsoft.Graph.Models.User { AccountEnabled = true });
+
+        var userIdentity = await target.GetAsync(externalId);
+
+        // Act
+        await target.DisableUserAccountAsync(userIdentity.Id);
+
+        // Act
+        var userIdentityDisabled = await target.GetAsync(externalId);
+        Assert.NotNull(userIdentityDisabled);
+        Assert.True(userIdentityDisabled.Status == UserStatus.Inactive);
+    }
+
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
     public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
 }
