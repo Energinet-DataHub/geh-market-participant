@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Microsoft.Graph;
 using Microsoft.Graph.Users.Item.Authentication;
@@ -34,6 +35,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirecto
         /// </summary>
         /// <param name="client"><see cref="IBaseClient"/>.</param>
         /// <param name="authenticationBuilder">A configured authentication builder for the target user.</param>
-        Task<bool> VerifyAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder);
+        Task<bool> DoesAlreadyExistAsync(IBaseClient client, AuthenticationRequestBuilder authenticationBuilder);
+
+        /// <summary>
+        /// Ensures that no validation exception can be extrapolated. If one is, it is thrown.
+        /// </summary>
+        void EnsureNoValidationException(Exception exception);
     }
 }
