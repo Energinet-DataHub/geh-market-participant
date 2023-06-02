@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -72,6 +73,8 @@ public sealed class UserInvitationService : IUserInvitationService
                 .ConfigureAwait(false);
 
             invitedUser = new User(sharedId, userIdentityId);
+
+            invitedUser.EnableUserExpiration();
         }
 
         var userInviteRoleAssignments = new List<UserRoleAssignment>();

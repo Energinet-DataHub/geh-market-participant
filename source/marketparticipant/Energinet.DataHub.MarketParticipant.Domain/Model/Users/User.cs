@@ -20,6 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed class User
 {
+    private const int UserInvitationExpiresAtHours = 24;
     private readonly SharedUserReferenceId? _sharedId;
 
     public User(SharedUserReferenceId sharedId, ExternalUserId externalId)
@@ -34,13 +35,15 @@ public sealed class User
         UserId id,
         ExternalUserId externalId,
         IEnumerable<UserRoleAssignment> roleAssignments,
-        DateTimeOffset? mitIdSignupInitiatedAt)
+        DateTimeOffset? mitIdSignupInitiatedAt,
+        DateTimeOffset? invitationExpiresAt)
     {
         _sharedId = null;
         Id = id;
         ExternalId = externalId;
         RoleAssignments = roleAssignments.ToHashSet();
         MitIdSignupInitiatedAt = mitIdSignupInitiatedAt;
+        InvitationExpiresAt = invitationExpiresAt;
     }
 
     public UserId Id { get; }
@@ -48,9 +51,20 @@ public sealed class User
     public SharedUserReferenceId SharedId => _sharedId ?? throw new InvalidOperationException("The shared reference id is only available when creating the entity.");
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
     public DateTimeOffset? MitIdSignupInitiatedAt { get; private set; }
-
+    public DateTimeOffset? InvitationExpiresAt { get; private set;  }
+    public bool ValidLogonRequirements => !InvitationExpiresAt.HasValue || InvitationExpiresAt >= DateTimeOffset.UtcNow;
     public void InitiateMitIdSignup()
     {
         MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void EnableUserExpiration()
+    {
+        InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours);
+    }
+
+    public void DisableUserExpiration()
+    {
+        InvitationExpiresAt = null;
     }
 }

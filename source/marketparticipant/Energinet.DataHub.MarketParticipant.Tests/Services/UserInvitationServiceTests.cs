@@ -87,6 +87,7 @@ public sealed class UserInvitationServiceTests
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
         VerifyUserIdentityCreatedCorrectly(userIdentityRepositoryMock);
+        VerifyUserInvitationExpirationCorrectly(userRepositoryMock);
     }
 
     [Fact]
@@ -173,6 +174,7 @@ public sealed class UserInvitationServiceTests
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
         VerifyUserIdentityCreatedCorrectly(userIdentityRepositoryMock);
+        VerifyUserInvitationExpirationCorrectly(userRepositoryMock);
     }
 
     [Fact]
@@ -194,6 +196,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 externalId,
                 Array.Empty<UserRoleAssignment>(),
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -245,6 +248,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -314,6 +318,7 @@ public sealed class UserInvitationServiceTests
                 new UserId(Guid.NewGuid()),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -347,6 +352,13 @@ public sealed class UserInvitationServiceTests
             It.Is<EmailEvent>(emailEvent =>
                 emailEvent.Email == _validInvitation.Email &&
                 emailEvent.EmailEventType == EmailEventType.UserInvite)));
+    }
+
+    private static void VerifyUserInvitationExpirationCorrectly(Mock<IUserRepository> userRepositoryMock)
+    {
+        userRepositoryMock.Verify(
+            userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.InvitationExpiresAt != null && user.InvitationExpiresAt > DateTimeOffset.UtcNow)),
+            Times.Once);
     }
 
     private void VerifyUserCreatedCorrectly(Mock<IUserRepository> userRepositoryMock)

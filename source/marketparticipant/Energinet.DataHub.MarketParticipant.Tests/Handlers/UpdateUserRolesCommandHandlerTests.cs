@@ -56,6 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new UserId(userId),
                 new ExternalUserId(externalUserId),
                 userRoleAssignments,
+                null,
                 null);
 
             var role1 = new UserRole(
@@ -138,6 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new UserId(userId),
                 new ExternalUserId(externalUserId),
                 userRoleAssignments,
+                null,
                 null);
 
             var deactivatedUserRole = new UserRole(
@@ -191,6 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new UserId(userId),
                 new ExternalUserId(externalUserId),
                 userRoleAssignments,
+                null,
                 null);
 
             var deactivatedUserRole = new UserRole(
