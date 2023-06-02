@@ -87,6 +87,7 @@ public sealed class UserInvitationServiceTests
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
         VerifyUserIdentityCreatedCorrectly(userIdentityRepositoryMock);
+        VerifyUserInvitationExpirationCorrectly(userRepositoryMock);
     }
 
     [Fact]
@@ -173,6 +174,7 @@ public sealed class UserInvitationServiceTests
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
         VerifyUserIdentityCreatedCorrectly(userIdentityRepositoryMock);
+        VerifyUserInvitationExpirationCorrectly(userRepositoryMock);
     }
 
     [Fact]
@@ -352,6 +354,13 @@ public sealed class UserInvitationServiceTests
                 emailEvent.EmailEventType == EmailEventType.UserInvite)));
     }
 
+    private static void VerifyUserInvitationExpirationCorrectly(Mock<IUserRepository> userRepositoryMock)
+    {
+        userRepositoryMock.Verify(
+            userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.InvitationExpiresAt != null && user.InvitationExpiresAt > DateTimeOffset.UtcNow)),
+            Times.Once);
+    }
+
     private void VerifyUserCreatedCorrectly(Mock<IUserRepository> userRepositoryMock)
     {
         var expectedRole = _validInvitation.AssignedRoles.Single();
@@ -360,10 +369,6 @@ public sealed class UserInvitationServiceTests
 
         userRepositoryMock.Verify(
             userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.RoleAssignments.Single() == expectedAssignment)),
-            Times.Once);
-
-        userRepositoryMock.Verify(
-            userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.InvitationExpiresAt != null && user.InvitationExpiresAt > DateTimeOffset.UtcNow)),
             Times.Once);
     }
 
