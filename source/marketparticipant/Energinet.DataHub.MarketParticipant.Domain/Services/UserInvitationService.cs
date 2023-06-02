@@ -70,13 +70,9 @@ public sealed class UserInvitationService : IUserInvitationService
                 .ConfigureAwait(false);
 
             invitedUser = new User(userIdentityId);
-        }
-        else
-        {
-            throw new ValidationException("The user already exists.");
-        }
 
-        invitedUser.SetUserInvitationExpiration();
+            invitedUser.EnableUserExpiration();
+        }
 
         var userInviteRoleAssignments = new List<UserRoleAssignment>();
 
