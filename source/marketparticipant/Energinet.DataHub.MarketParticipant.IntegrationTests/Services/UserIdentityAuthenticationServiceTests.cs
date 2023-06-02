@@ -29,6 +29,7 @@ using Microsoft.Kiota.Abstractions;
 using Xunit;
 using Xunit.Categories;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
@@ -169,6 +170,21 @@ public sealed class UserIdentityAuthenticationServiceTests
 
         // Act + Assert
         await Assert.ThrowsAnyAsync<Exception>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
+    }
+
+    [Fact]
+    public async Task PhoneNumber_IsInvalid_ThrowsValidationException()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        var smsAuthMethod = new SmsAuthenticationMethod(new PhoneNumber("+45 12345678"));
+
+        // Act + Assert
+        await Assert.ThrowsAsync<ValidationException>(() => target.AddAuthenticationAsync(externalUserId, smsAuthMethod));
     }
 
     private sealed class UnknownAuthenticationMethod : AuthenticationMethod
