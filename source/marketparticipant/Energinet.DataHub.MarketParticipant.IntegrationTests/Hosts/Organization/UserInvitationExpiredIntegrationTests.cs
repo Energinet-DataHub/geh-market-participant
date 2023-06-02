@@ -70,7 +70,7 @@ public sealed class UserInvitationExpiredIntegrationTests
     }
 
     [Fact]
-    public async Task UserInvitationExpiredCommand_UsersAreExpextedToBeDisabled()
+    public async Task UserInvitationExpiredCommand_UsersAreExpectedToBeDisabled()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
