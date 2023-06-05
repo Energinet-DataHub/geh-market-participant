@@ -26,4 +26,5 @@ public sealed record UserOverviewItemDto(
     string Email,
     string? PhoneNumber,
     DateTimeOffset CreatedDate,
+    DateTimeOffset? InvitationExpiresAt,
     IEnumerable<AssignedActorDto> AssignedActors);
