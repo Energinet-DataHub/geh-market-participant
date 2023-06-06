@@ -41,6 +41,7 @@ internal static class DomainServiceRegistration
 
         container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
         container.Register<IOrganizationDomainValidationService, OrganizationDomainValidationService>(Lifestyle.Scoped);
+        container.Register<IUserStatusCalculator, UserStatusCalculator>(Lifestyle.Scoped);
 
         container.Register<IPasswordChecker, PasswordChecker>(Lifestyle.Scoped);
         container.Register<IPasswordGenerator, PasswordGenerator>(Lifestyle.Scoped);
