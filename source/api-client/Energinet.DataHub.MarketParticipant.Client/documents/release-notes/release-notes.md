@@ -2,6 +2,10 @@
 
 ## Version 2.31.2
 
+- Updated UserStatus Enum
+
+## Version 2.31.2
+
 - Adding endpoint for resend user invitation
 
 ## Version 2.31.1
