@@ -264,16 +264,14 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .DeleteAsync();
     }
 
+    public Task EnableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        return UpdateUserAccountStatusAsync(externalUserId, true);
+    }
+
     public Task DisableUserAccountAsync(ExternalUserId externalUserId)
     {
-        ArgumentNullException.ThrowIfNull(externalUserId);
-
-        return _graphClient
-            .Users[externalUserId.Value.ToString()]
-            .PatchAsync(new User
-            {
-                AccountEnabled = false
-            });
+        return UpdateUserAccountStatusAsync(externalUserId, false);
     }
 
     private static UserIdentity Map(User user, string? emailAddress = null)
@@ -308,6 +306,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         return user is { UserType: "Member", Identities: { } } &&
                user.Identities.Any(ident => ident.SignInType == "emailAddress");
+    }
+
+    private Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                AccountEnabled = enabled
+            });
     }
 
     private async Task<User?> GetBySignInEmailAsync(EmailAddress email)

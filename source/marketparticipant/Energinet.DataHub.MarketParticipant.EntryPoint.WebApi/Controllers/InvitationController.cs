@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -54,6 +56,29 @@ public sealed class InvitationController : ControllerBase
 
                 await _mediator
                     .Send(new InviteUserCommand(userInvitation, _userContext.CurrentUser.UserId))
+                    .ConfigureAwait(false);
+
+                return Ok();
+            },
+            _logger).ConfigureAwait(false);
+    }
+
+    [HttpPut("users/reinvite")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<IActionResult> ReInviteUserAsync(Guid userId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var user = await _mediator
+                    .Send(new GetAssociatedUserActorsCommand(userId))
+                    .ConfigureAwait(false);
+
+                if (!_userContext.CurrentUser.IsFas || user.ActorIds.All(actorId => actorId != _userContext.CurrentUser.ActorId))
+                    return Unauthorized();
+
+                await _mediator
+                    .Send(new ReInviteUserCommand(userId, _userContext.CurrentUser.UserId))
                     .ConfigureAwait(false);
 
                 return Ok();

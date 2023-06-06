@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
+using Energinet.DataHub.MarketParticipant.Tests.Handlers;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -77,7 +78,8 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var invitation = _validInvitation;
 
@@ -114,7 +116,8 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var invitation = _validInvitation;
 
@@ -164,7 +167,8 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var invitation = _validInvitation;
 
@@ -218,7 +222,8 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var invitation = _validInvitation;
 
@@ -270,7 +275,8 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var invitation = _validInvitation;
 
@@ -340,7 +346,8 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var invitation = _validInvitation;
 
