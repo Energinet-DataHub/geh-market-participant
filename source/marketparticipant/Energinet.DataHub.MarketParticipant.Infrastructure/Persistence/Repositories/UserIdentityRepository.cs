@@ -264,7 +264,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .DeleteAsync();
     }
 
-    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    public Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)
     {
         ArgumentNullException.ThrowIfNull(externalUserId);
 
@@ -272,8 +272,13 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .Users[externalUserId.Value.ToString()]
             .PatchAsync(new User
             {
-                AccountEnabled = false
+                AccountEnabled = enabled
             });
+    }
+
+    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        return UpdateUserAccountStatusAsync(externalUserId, false);
     }
 
     private static UserIdentity Map(User user, string? emailAddress = null)
