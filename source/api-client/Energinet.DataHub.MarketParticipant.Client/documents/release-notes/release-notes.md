@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.31.2
+
+- Adding endpoint for resend user invitation
+
 ## Version 2.31.1
 
 - No functional change.
