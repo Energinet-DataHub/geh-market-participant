@@ -15,7 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -30,6 +32,7 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
     private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public UserInvitationService(
         IUserRepository userRepository,
@@ -37,7 +40,8 @@ public sealed class UserInvitationService : IUserInvitationService
         IEmailEventRepository emailEventRepository,
         IOrganizationDomainValidationService organizationDomainValidationService,
         IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
-        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
@@ -45,6 +49,7 @@ public sealed class UserInvitationService : IUserInvitationService
         _organizationDomainValidationService = organizationDomainValidationService;
         _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId)
@@ -86,16 +91,75 @@ public sealed class UserInvitationService : IUserInvitationService
             userInviteRoleAssignments.Add(assignment);
         }
 
-        await _emailEventRepository
-            .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        var invitedUserId = await _userRepository
-            .AddOrUpdateAsync(invitedUser)
+        await using (uow.ConfigureAwait(false))
+        {
+            var invitedUserId = await _userRepository
+                .AddOrUpdateAsync(invitedUser)
+                .ConfigureAwait(false);
+
+            await _emailEventRepository
+                .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
+                .ConfigureAwait(false);
+
+            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation.AssignedActor.Id).ConfigureAwait(false);
+            await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, userInviteRoleAssignments, invitationSentByUserId).ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
+    }
+
+    public async Task ReInviteUserAsync(UserId userId, UserId invitationSentByUserId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        var user = await _userRepository.GetAsync(userId).ConfigureAwait(false);
+
+        if (user == null)
+        {
+            throw new NotFoundValidationException($"The specified user {userId} was not found.");
+        }
+
+        var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+
+        if (userIdentity == null)
+        {
+            throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
+        }
+
+        // TODO Use UserStatusCalculator
+        if (!user.UserInvitationExpired() && userIdentity.Status == UserStatus.Inactive)
+        {
+            throw new ValidationException($"The specified user {userId} is not expired and cannot be re-invited.");
+        }
+
+        user.EnableUserExpiration();
+
+        await _userIdentityRepository.EnableUserAccountAsync(userIdentity.Id).ConfigureAwait(false);
+
+        var assignedActor = user.RoleAssignments.First().ActorId;
+
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation).ConfigureAwait(false);
-        await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, userInviteRoleAssignments, invitationSentByUserId).ConfigureAwait(false);
+        await using (uow.ConfigureAwait(false))
+        {
+            var invitedUserId = await _userRepository
+                .AddOrUpdateAsync(user)
+                .ConfigureAwait(false);
+
+            await _emailEventRepository
+                .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
+                .ConfigureAwait(false);
+
+            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, assignedActor).ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
     }
 
     private async Task<User?> GetUserAsync(EmailAddress email)
@@ -128,12 +192,12 @@ public sealed class UserInvitationService : IUserInvitationService
         }
     }
 
-    private Task AuditLogUserInviteAsync(UserId toUserId, UserId invitationSentByUserId, UserInvitation invitation)
+    private Task AuditLogUserInviteAsync(UserId toUserId, UserId invitationSentByUserId, ActorId assignedActor)
     {
         var userInviteAuditLog = new UserInviteAuditLogEntry(
             toUserId,
             invitationSentByUserId,
-            invitation.AssignedActor.Id,
+            assignedActor,
             DateTimeOffset.UtcNow);
 
         return _userInviteAuditLogEntryRepository
