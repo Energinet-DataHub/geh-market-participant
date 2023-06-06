@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -69,7 +70,11 @@ public sealed class InvitationController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFas)
+                var user = await _mediator
+                    .Send(new GetAssociatedUserActorsCommand(userId))
+                    .ConfigureAwait(false);
+
+                if (!_userContext.CurrentUser.IsFas || user.ActorIds.All(actorId => actorId != _userContext.CurrentUser.ActorId))
                     return Unauthorized();
 
                 await _mediator
