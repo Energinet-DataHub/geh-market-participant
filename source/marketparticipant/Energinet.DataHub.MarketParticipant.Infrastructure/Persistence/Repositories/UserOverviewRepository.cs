@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +29,16 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserStatusCalculator _userStatusCalculator;
 
     public UserOverviewRepository(
         IMarketParticipantDbContext marketParticipantDbContext,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IUserStatusCalculator userStatusCalculator)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
         _userIdentityRepository = userIdentityRepository;
+        _userStatusCalculator = userStatusCalculator;
     }
 
     public Task<int> GetTotalUserCountAsync(ActorId? actorId)
@@ -95,7 +99,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .Select(x =>
                 new UserOverviewItem(
                     x.Id,
-                    x.Status,
+                    _userStatusCalculator.CalculateUserStatus(x.Status, x.InvitationExpiresAt),
                     x.FirstName,
                     x.LastName,
                     new EmailAddress(x.Email),
@@ -193,7 +197,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 var user = userLookup[userIdentity.Id.Value];
                 return new UserOverviewItem(
                     new UserId(user.Id),
-                    userIdentity.Status,
+                    _userStatusCalculator.CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt),
                     userIdentity.FirstName,
                     userIdentity.LastName,
                     new EmailAddress(userIdentity.Email),

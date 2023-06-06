@@ -236,8 +236,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var userInvitedSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(1));
         var userInvited = await _fixture.PrepareUserAsync(userInvitedSetup);
 
-        var userInvitedButExpiredSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1));
-        var userInvitedButExpired = await _fixture.PrepareUserAsync(userInvitedButExpiredSetup);
+        var userInvitedButExpiredInActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1));
+        var userInvitedButExpiredInActive = await _fixture.PrepareUserAsync(userInvitedButExpiredInActiveSetup);
+
+        var userInvitedButExpiredActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1));
+        var userInvitedButExpiredActive = await _fixture.PrepareUserAsync(userInvitedButExpiredActiveSetup);
 
         var userActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = null);
         var userActive = await _fixture.PrepareUserAsync(userActiveSetup);
@@ -248,7 +251,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         var actor = await _fixture.PrepareActorAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
         await _fixture.AssignUserRoleAsync(userInvited.Id, actor.Id, userRole.Id);
-        await _fixture.AssignUserRoleAsync(userInvitedButExpired.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userInvitedButExpiredActive.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userInvitedButExpiredInActive.Id, actor.Id, userRole.Id);
         await _fixture.AssignUserRoleAsync(userActive.Id, actor.Id, userRole.Id);
         await _fixture.AssignUserRoleAsync(userInActive.Id, actor.Id, userRole.Id);
 
@@ -273,7 +277,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .ReturnsAsync(new[]
             {
                 UserIdentity(userInvited, UserStatus.Active),
-                UserIdentity(userInvitedButExpired, UserStatus.Inactive),
+                UserIdentity(userInvitedButExpiredActive, UserStatus.Active),
+                UserIdentity(userInvitedButExpiredInActive, UserStatus.Inactive),
                 UserIdentity(userActive, UserStatus.Active),
                 UserIdentity(userInActive, UserStatus.Inactive)
             });
@@ -290,12 +295,16 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         // assert
         Assert.NotEmpty(actual.Users);
-        Assert.Equal(4, actual.TotalUserCount);
+        Assert.Equal(5, actual.TotalUserCount);
         Assert.NotNull(actual.Users.Single(x => x.Id == userInvited.Id));
         Assert.True(actual.Users.Single(x => x.Id == userInvited.Id).Status == UserStatus.Invited);
-        Assert.NotNull(actual.Users.Single(x => x.Id == userInvitedButExpired.Id));
-        Assert.True(actual.Users.Single(x => x.Id == userInvitedButExpired.Id).Status == UserStatus.Inactive);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInvitedButExpiredActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInvitedButExpiredActive.Id).Status == UserStatus.InviteExpired);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInvitedButExpiredInActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInvitedButExpiredInActive.Id).Status == UserStatus.InviteExpired);
         Assert.NotNull(actual.Users.Single(x => x.Id == userActive.Id));
         Assert.True(actual.Users.Single(x => x.Id == userActive.Id).Status == UserStatus.Active);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInActive.Id).Status == UserStatus.Inactive);
     }
 }

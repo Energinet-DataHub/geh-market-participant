@@ -99,18 +99,6 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
         return new GetUserOverviewResponse(mappedUsers, userCount);
     }
 
-    private static UserStatus CalculateUserStatus(UserStatus currentStatus, DateTimeOffset? invitationExpiresAt)
-    {
-        return currentStatus switch
-        {
-            UserStatus.Inactive => UserStatus.Inactive,
-            UserStatus.Active when invitationExpiresAt is null => UserStatus.Active,
-            UserStatus.Active when invitationExpiresAt > DateTimeOffset.UtcNow => UserStatus.Invited,
-            UserStatus.Active when invitationExpiresAt < DateTimeOffset.UtcNow => UserStatus.Inactive,
-            _ => currentStatus
-        };
-    }
-
     private async Task<IEnumerable<UserOverviewItemDto>> PopulateUsersWithUserRolesAsync(IEnumerable<UserOverviewItem> users)
     {
         var mappedUsers = new List<UserOverviewItemDto>();
@@ -155,7 +143,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
 
             mappedUsers.Add(new UserOverviewItemDto(
                 user.Id.Value,
-                CalculateUserStatus(user.Status, user.InvitationExpiresAt),
+                user.Status,
                 user.FirstName,
                 user.LastName,
                 user.Email.Address,
