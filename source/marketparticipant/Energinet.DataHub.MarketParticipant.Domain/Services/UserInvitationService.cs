@@ -31,6 +31,7 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
     private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public UserInvitationService(
         IUserRepository userRepository,
@@ -38,7 +39,8 @@ public sealed class UserInvitationService : IUserInvitationService
         IEmailEventRepository emailEventRepository,
         IOrganizationDomainValidationService organizationDomainValidationService,
         IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
-        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository)
+        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
@@ -46,6 +48,7 @@ public sealed class UserInvitationService : IUserInvitationService
         _organizationDomainValidationService = organizationDomainValidationService;
         _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId)
@@ -87,16 +90,25 @@ public sealed class UserInvitationService : IUserInvitationService
             userInviteRoleAssignments.Add(assignment);
         }
 
-        await _emailEventRepository
-            .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        var invitedUserId = await _userRepository
-            .AddOrUpdateAsync(invitedUser)
-            .ConfigureAwait(false);
+        await using (uow.ConfigureAwait(false))
+        {
+            var invitedUserId = await _userRepository
+                .AddOrUpdateAsync(invitedUser)
+                .ConfigureAwait(false);
 
-        await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation.AssignedActor.Id).ConfigureAwait(false);
-        await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, userInviteRoleAssignments, invitationSentByUserId).ConfigureAwait(false);
+            await _emailEventRepository
+                .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
+                .ConfigureAwait(false);
+
+            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation.AssignedActor.Id).ConfigureAwait(false);
+            await AuditLogUserInviteAndUserRoleAssignmentsAsync(invitedUserId, userInviteRoleAssignments, invitationSentByUserId).ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
     }
 
     public async Task ReInviteUserAsync(UserId userId, UserId invitationSentByUserId)
@@ -119,19 +131,28 @@ public sealed class UserInvitationService : IUserInvitationService
 
         user.EnableUserExpiration();
 
-        await _userIdentityRepository.UpdateUserAccountStatusAsync(userIdentity.Id, true).ConfigureAwait(false);
+        await _userIdentityRepository.EnableUserAccountAsync(userIdentity.Id).ConfigureAwait(false);
 
         var assignedActor = user.RoleAssignments.First().ActorId;
 
-        var invitedUserId = await _userRepository
-            .AddOrUpdateAsync(user)
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        await _emailEventRepository
-            .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
-            .ConfigureAwait(false);
+        await using (uow.ConfigureAwait(false))
+        {
+            var invitedUserId = await _userRepository
+                .AddOrUpdateAsync(user)
+                .ConfigureAwait(false);
 
-        await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, assignedActor).ConfigureAwait(false);
+            await _emailEventRepository
+                .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
+                .ConfigureAwait(false);
+
+            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, assignedActor).ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
     }
 
     private async Task<User?> GetUserAsync(EmailAddress email)

@@ -82,5 +82,5 @@ public interface IUserIdentityRepository
     /// <param name="externalUserId"></param>
     Task DeleteAsync(ExternalUserId externalUserId);
     Task DisableUserAccountAsync(ExternalUserId externalUserId);
-    Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled);
+    Task EnableUserAccountAsync(ExternalUserId externalUserId);
 }
