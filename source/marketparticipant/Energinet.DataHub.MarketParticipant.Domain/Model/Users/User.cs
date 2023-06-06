@@ -67,4 +67,9 @@ public sealed class User
     {
         InvitationExpiresAt = null;
     }
+
+    public bool UserInvitationExpired()
+    {
+        return InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow;
+    }
 }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -127,6 +128,12 @@ public sealed class UserInvitationService : IUserInvitationService
         if (userIdentity == null)
         {
             throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
+        }
+
+        // TODO Use UserStatusCalculator
+        if (!user.UserInvitationExpired() && userIdentity.Status == UserStatus.Inactive)
+        {
+            throw new ValidationException($"The specified user {userId} is not expired and cannot be re-invited.");
         }
 
         user.EnableUserExpiration();
