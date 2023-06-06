@@ -149,7 +149,6 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 user.Email.Address,
                 user.PhoneNumber?.Number,
                 user.CreatedDate,
-                user.InvitationExpiresAt,
                 assignedUserRoles));
         }
 
