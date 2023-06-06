@@ -1,6 +1,6 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
-## Version 2.31.2
+## Version 2.31.3
 
 - Updated UserStatus Enum
 
