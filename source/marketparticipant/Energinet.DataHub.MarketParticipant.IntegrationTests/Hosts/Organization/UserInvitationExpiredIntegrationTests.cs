@@ -13,13 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -94,19 +90,5 @@ public sealed class UserInvitationExpiredIntegrationTests
         // Assert
         userIdentityRepository.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(user1Expired.ExternalId)), Times.Once);
         userIdentityRepository.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(user2Expired.ExternalId)), Times.Once);
-    }
-
-    private static UserIdentity GetUserIdentityForTest(ExternalUserId externalUserId)
-    {
-        return new UserIdentity(
-            externalUserId,
-            new MockedEmailAddress(),
-            UserIdentityStatus.Active,
-            "firstName",
-            "lastName",
-            new PhoneNumber("23232323"),
-            DateTimeOffset.Now,
-            AuthenticationMethod.Undetermined,
-            new List<LoginIdentity>());
     }
 }
