@@ -59,7 +59,6 @@ public sealed class User
     public DateTimeOffset? InvitationExpiresAt { get; private set; }
 
     public bool ValidLogonRequirements => !InvitationExpiresAt.HasValue || InvitationExpiresAt >= DateTimeOffset.UtcNow;
-    public bool IsUserInvitationExpired => InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow;
 
     public void InitiateMitIdSignup()
     {
