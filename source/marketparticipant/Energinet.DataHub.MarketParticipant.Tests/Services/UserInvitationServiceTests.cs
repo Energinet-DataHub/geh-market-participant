@@ -378,37 +378,6 @@ public sealed class UserInvitationServiceTests
     }
 
     [Fact]
-    public async Task ReInviteUserAsync_NoUser_Throws()
-    {
-        // arrange
-        var userRepositoryMock = new Mock<IUserRepository>();
-        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
-        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
-        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
-        var userStatusCalculator = new UserStatusCalculator();
-
-        userRepositoryMock
-            .Setup(u => u.GetAsync(It.IsAny<UserId>()))
-            .ReturnsAsync((User?)null);
-
-        var target = new UserInvitationService(
-            userRepositoryMock.Object,
-            userIdentityRepositoryMock.Object,
-            emailEventRepositoryMock.Object,
-            organizationDomainValidationServiceMock.Object,
-            userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create(),
-            userStatusCalculator);
-
-        // act + assert
-        await Assert.ThrowsAsync<NotFoundValidationException>(() =>
-            target.ReInviteUserAsync(new UserId(Guid.NewGuid()), _validInvitedByUserId));
-    }
-
-    [Fact]
     public async Task ReInviteUserAsync_NoUserIdentity_Throws()
     {
         // arrange
@@ -421,9 +390,6 @@ public sealed class UserInvitationServiceTests
         var userStatusCalculator = new UserStatusCalculator();
 
         var mockedUser = TestPreparationModels.MockedUserWithRole(Guid.NewGuid(), new UserRoleId(Guid.NewGuid()), new ActorId(Guid.NewGuid()));
-        userRepositoryMock
-            .Setup(u => u.GetAsync(It.IsAny<UserId>()))
-            .ReturnsAsync(mockedUser);
 
         userIdentityRepositoryMock
             .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
@@ -441,7 +407,7 @@ public sealed class UserInvitationServiceTests
 
         // act + assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() =>
-            target.ReInviteUserAsync(new UserId(Guid.NewGuid()), _validInvitedByUserId));
+            target.ReInviteUserAsync(mockedUser, _validInvitedByUserId));
 
         userIdentityRepositoryMock.Verify(e => e.GetAsync(mockedUser.ExternalId), Times.Once);
     }
@@ -460,6 +426,7 @@ public sealed class UserInvitationServiceTests
 
         var user = new User(
             new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
             new ExternalUserId(Guid.NewGuid()),
             new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
             null,
@@ -468,17 +435,13 @@ public sealed class UserInvitationServiceTests
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             new EmailAddress("test@test.dk"),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             "FirstName",
             "LastName",
             new PhoneNumber("+45 12345678"),
             DateTimeOffset.UtcNow,
             AuthenticationMethod.Undetermined,
             new List<LoginIdentity>());
-
-        userRepositoryMock
-            .Setup(u => u.GetAsync(It.IsAny<UserId>()))
-            .ReturnsAsync(user);
 
         userIdentityRepositoryMock
             .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
@@ -496,7 +459,7 @@ public sealed class UserInvitationServiceTests
 
         // act + assert
         await Assert.ThrowsAsync<ValidationException>(() =>
-            target.ReInviteUserAsync(user.Id, _validInvitedByUserId));
+            target.ReInviteUserAsync(user, _validInvitedByUserId));
     }
 
     [Fact]
@@ -513,6 +476,7 @@ public sealed class UserInvitationServiceTests
 
         var user = new User(
             new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
             new ExternalUserId(Guid.NewGuid()),
             new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
             null,
@@ -521,7 +485,7 @@ public sealed class UserInvitationServiceTests
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             new EmailAddress("test@test.dk"),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             "FirstName",
             "LastName",
             new PhoneNumber("+45 12345678"),
@@ -547,7 +511,7 @@ public sealed class UserInvitationServiceTests
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
 
-        await target.ReInviteUserAsync(user.Id, _validInvitedByUserId).ConfigureAwait(false);
+        await target.ReInviteUserAsync(user, _validInvitedByUserId).ConfigureAwait(false);
 
         // act + assert
         userIdentityRepositoryMock
