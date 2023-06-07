@@ -13,15 +13,14 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
-public sealed record UserOverviewItem(
-    UserId Id,
-    UserStatus Status,
-    string FirstName,
-    string LastName,
-    EmailAddress Email,
-    PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate,
-    DateTimeOffset? InvitationExpiresAt);
+public interface IUserStatusCalculator
+{
+    /// <summary>
+    /// Calculates UserStatus from current state and user invitation.
+    /// </summary>
+    UserStatus CalculateUserStatus(UserStatus currentStatus, DateTimeOffset? invitationExpiresAt);
+}

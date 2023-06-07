@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +29,16 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserStatusCalculator _userStatusCalculator;
 
     public UserOverviewRepository(
         IMarketParticipantDbContext marketParticipantDbContext,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IUserStatusCalculator userStatusCalculator)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
         _userIdentityRepository = userIdentityRepository;
+        _userStatusCalculator = userStatusCalculator;
     }
 
     public Task<int> GetTotalUserCountAsync(ActorId? actorId)
@@ -52,7 +56,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         var users = await query
-            .Select(x => new { x.Id, x.ExternalId })
+            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -61,7 +65,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             y => new
             {
                 Id = new UserId(y.Id),
-                ExternalId = new ExternalUserId(y.ExternalId)
+                ExternalId = new ExternalUserId(y.ExternalId),
+                y.InvitationExpiresAt
             });
 
         var userIdentities = (await _userIdentityRepository
@@ -78,7 +83,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                         userIdentity.LastName,
                         Email = userIdentity.Email.Address,
                         PhoneNumber = userIdentity.PhoneNumber?.Number,
-                        userIdentity.CreatedDate
+                        userIdentity.CreatedDate,
+                        user.InvitationExpiresAt
                     };
                 });
 
@@ -93,12 +99,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .Select(x =>
                 new UserOverviewItem(
                     x.Id,
-                    x.Status,
+                    _userStatusCalculator.CalculateUserStatus(x.Status, x.InvitationExpiresAt),
                     x.FirstName,
                     x.LastName,
                     new EmailAddress(x.Email),
                     x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
-                    x.CreatedDate));
+                    x.CreatedDate,
+                    x.InvitationExpiresAt));
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
@@ -128,7 +135,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 actorId,
                 searchUserIdentities.Select(x => x.Id),
                 userRolesFilter)
-            .Select(y => new { y.Id, y.ExternalId })
+            .Select(y => new { y.Id, y.ExternalId, y.InvitationExpiresAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -139,7 +146,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
         var searchQuery = await BuildUsersSearchQuery(actorId, searchText, userRolesFilter)
-            .Select(x => new { x.Id, x.ExternalId })
+            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -190,12 +197,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 var user = userLookup[userIdentity.Id.Value];
                 return new UserOverviewItem(
                     new UserId(user.Id),
-                    userIdentity.Status,
+                    _userStatusCalculator.CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt),
                     userIdentity.FirstName,
                     userIdentity.LastName,
                     new EmailAddress(userIdentity.Email),
                     userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
-                    userIdentity.CreatedDate);
+                    userIdentity.CreatedDate,
+                    user.InvitationExpiresAt);
             });
 
         return (items, allIdentitiesEnumerated.Count);
