@@ -198,6 +198,7 @@ public sealed class UserInvitationServiceTests
             .Setup(userRepository => userRepository.GetAsync(externalId))
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
                 externalId,
                 Array.Empty<UserRoleAssignment>(),
                 null,
@@ -251,6 +252,7 @@ public sealed class UserInvitationServiceTests
             .Setup(userRepository => userRepository.GetAsync(externalId))
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
                 null,
@@ -322,6 +324,7 @@ public sealed class UserInvitationServiceTests
             .Setup(userRepository => userRepository.GetAsync(externalId))
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
                 null,

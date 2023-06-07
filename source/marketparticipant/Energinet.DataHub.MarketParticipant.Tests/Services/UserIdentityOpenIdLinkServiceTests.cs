@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -197,6 +198,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         {
             var user = new User(
                 new UserId(Guid.Empty),
+                new ActorId(Guid.Empty),
                 externalUserId,
                 new List<UserRoleAssignment>(),
                 mitIdInitiatedAt,

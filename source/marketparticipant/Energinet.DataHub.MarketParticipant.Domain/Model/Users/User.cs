@@ -23,16 +23,18 @@ public sealed class User
     private const int UserInvitationExpiresAtHours = 24;
     private readonly SharedUserReferenceId? _sharedId;
 
-    public User(SharedUserReferenceId sharedId, ExternalUserId externalId)
+    public User(ActorId administratedBy, SharedUserReferenceId sharedId, ExternalUserId externalId)
     {
         _sharedId = sharedId;
         Id = new UserId(Guid.Empty);
+        AdministratedBy = administratedBy;
         ExternalId = externalId;
         RoleAssignments = new HashSet<UserRoleAssignment>();
     }
 
     public User(
         UserId id,
+        ActorId administratedBy,
         ExternalUserId externalId,
         IEnumerable<UserRoleAssignment> roleAssignments,
         DateTimeOffset? mitIdSignupInitiatedAt,
@@ -40,6 +42,7 @@ public sealed class User
     {
         _sharedId = null;
         Id = id;
+        AdministratedBy = administratedBy;
         ExternalId = externalId;
         RoleAssignments = roleAssignments.ToHashSet();
         MitIdSignupInitiatedAt = mitIdSignupInitiatedAt;
@@ -47,29 +50,29 @@ public sealed class User
     }
 
     public UserId Id { get; }
+    public ActorId AdministratedBy { get; }
     public ExternalUserId ExternalId { get; }
     public SharedUserReferenceId SharedId => _sharedId ?? throw new InvalidOperationException("The shared reference id is only available when creating the entity.");
     public ICollection<UserRoleAssignment> RoleAssignments { get; }
+
     public DateTimeOffset? MitIdSignupInitiatedAt { get; private set; }
-    public DateTimeOffset? InvitationExpiresAt { get; private set;  }
+    public DateTimeOffset? InvitationExpiresAt { get; private set; }
+
     public bool ValidLogonRequirements => !InvitationExpiresAt.HasValue || InvitationExpiresAt >= DateTimeOffset.UtcNow;
+    public bool IsUserInvitationExpired => InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow;
+
     public void InitiateMitIdSignup()
     {
         MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
     }
 
-    public void EnableUserExpiration()
+    public void ActivateUserExpiration()
     {
         InvitationExpiresAt = DateTimeOffset.UtcNow.AddHours(UserInvitationExpiresAtHours);
     }
 
-    public void DisableUserExpiration()
+    public void DeactivateUserExpiration()
     {
         InvitationExpiresAt = null;
-    }
-
-    public bool UserInvitationExpired()
-    {
-        return InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow;
     }
 }

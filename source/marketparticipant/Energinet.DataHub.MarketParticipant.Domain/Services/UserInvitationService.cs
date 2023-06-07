@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -77,9 +76,8 @@ public sealed class UserInvitationService : IUserInvitationService
                 .CreateAsync(userIdentity)
                 .ConfigureAwait(false);
 
-            invitedUser = new User(sharedId, userIdentityId);
-
-            invitedUser.EnableUserExpiration();
+            invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
+            invitedUser.ActivateUserExpiration();
         }
 
         var userInviteRoleAssignments = new List<UserRoleAssignment>();
@@ -112,35 +110,29 @@ public sealed class UserInvitationService : IUserInvitationService
         }
     }
 
-    public async Task ReInviteUserAsync(UserId userId, UserId invitationSentByUserId)
+    public async Task ReInviteUserAsync(User user, UserId invitationSentByUserId)
     {
-        ArgumentNullException.ThrowIfNull(userId);
+        ArgumentNullException.ThrowIfNull(user);
 
-        var user = await _userRepository.GetAsync(userId).ConfigureAwait(false);
-
-        if (user == null)
-        {
-            throw new NotFoundValidationException($"The specified user {userId} was not found.");
-        }
-
-        var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+        var userIdentity = await _userIdentityRepository
+            .GetAsync(user.ExternalId)
+            .ConfigureAwait(false);
 
         if (userIdentity == null)
         {
             throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
         }
 
-        // TODO Use UserStatusCalculator
-        if (!user.UserInvitationExpired() && userIdentity.Status == UserStatus.Inactive)
+        if (!user.IsUserInvitationExpired && userIdentity.Status == UserStatus.Inactive)
         {
-            throw new ValidationException($"The specified user {userId} is not expired and cannot be re-invited.");
+            throw new ValidationException($"The specified user {user.Id} is not expired and cannot be re-invited.");
         }
 
-        user.EnableUserExpiration();
+        user.ActivateUserExpiration();
 
-        await _userIdentityRepository.EnableUserAccountAsync(userIdentity.Id).ConfigureAwait(false);
-
-        var assignedActor = user.RoleAssignments.First().ActorId;
+        await _userIdentityRepository
+            .EnableUserAccountAsync(userIdentity.Id)
+            .ConfigureAwait(false);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -156,7 +148,7 @@ public sealed class UserInvitationService : IUserInvitationService
                 .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
                 .ConfigureAwait(false);
 
-            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, assignedActor).ConfigureAwait(false);
+            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, user.AdministratedBy).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
@@ -175,7 +167,7 @@ public sealed class UserInvitationService : IUserInvitationService
 
     private async Task AuditLogUserInviteAndUserRoleAssignmentsAsync(
         UserId invitedUserId,
-        ICollection<UserRoleAssignment> invitedUserRoleAssignments,
+        IEnumerable<UserRoleAssignment> invitedUserRoleAssignments,
         UserId invitationSentByUserId)
     {
         foreach (var assignment in invitedUserRoleAssignments)

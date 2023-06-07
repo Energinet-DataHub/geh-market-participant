@@ -56,6 +56,7 @@ internal static class TestPreparationModels
 
     public static User MockedUserWithRole(Guid userId, UserRoleId userRoleId, ActorId actorId) => new(
             new UserId(userId),
+            actorId,
             new ExternalUserId(Guid.NewGuid()),
             new UserRoleAssignment[] { new(actorId, userRoleId) },
             null,
