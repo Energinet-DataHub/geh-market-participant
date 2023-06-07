@@ -389,7 +389,7 @@ public sealed class UserInvitationServiceTests
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
-        var mockedUser = TestPreparationModels.MockedUserWithRole(Guid.NewGuid(), new UserRoleId(Guid.NewGuid()), new ActorId(Guid.NewGuid()));
+        var mockedUser = TestPreparationModels.MockedUser(Guid.NewGuid());
 
         userIdentityRepositoryMock
             .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
