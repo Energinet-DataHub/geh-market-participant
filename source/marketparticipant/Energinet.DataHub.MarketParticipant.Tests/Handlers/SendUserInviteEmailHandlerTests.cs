@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
                 events[0].Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 "firstName",
                 "lastName",
                 new PhoneNumber("23232323"),
@@ -125,7 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
                 events[0].Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 "firstName",
                 "lastName",
                 new PhoneNumber("23232323"),

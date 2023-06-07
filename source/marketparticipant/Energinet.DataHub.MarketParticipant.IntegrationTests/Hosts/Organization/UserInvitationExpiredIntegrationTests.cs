@@ -101,7 +101,7 @@ public sealed class UserInvitationExpiredIntegrationTests
         return new UserIdentity(
             externalUserId,
             new MockedEmailAddress(),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             "firstName",
             "lastName",
             new PhoneNumber("23232323"),

@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(new UserIdentity(
                     externalUserId,
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     "first",
                     "last",
                     null,

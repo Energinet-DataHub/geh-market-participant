@@ -19,16 +19,16 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 
 public sealed class UserStatusCalculator : IUserStatusCalculator
 {
-    public UserStatus CalculateUserStatus(UserStatus currentStatus, DateTimeOffset? invitationExpiresAt)
+    public UserStatus CalculateUserStatus(UserIdentityStatus currentUserIdentityStatus, DateTimeOffset? invitationExpiresAt)
     {
-        return currentStatus switch
+        return currentUserIdentityStatus switch
         {
-            UserStatus.Inactive when invitationExpiresAt < DateTimeOffset.UtcNow => UserStatus.InviteExpired,
-            UserStatus.Inactive => UserStatus.Inactive,
-            UserStatus.Active when invitationExpiresAt is null => UserStatus.Active,
-            UserStatus.Active when invitationExpiresAt > DateTimeOffset.UtcNow => UserStatus.Invited,
-            UserStatus.Active when invitationExpiresAt < DateTimeOffset.UtcNow => UserStatus.InviteExpired,
-            _ => currentStatus
+            UserIdentityStatus.Inactive when invitationExpiresAt < DateTimeOffset.UtcNow => UserStatus.InviteExpired,
+            UserIdentityStatus.Inactive => UserStatus.Inactive,
+            UserIdentityStatus.Active when invitationExpiresAt is null => UserStatus.Active,
+            UserIdentityStatus.Active when invitationExpiresAt > DateTimeOffset.UtcNow => UserStatus.Invited,
+            UserIdentityStatus.Active when invitationExpiresAt < DateTimeOffset.UtcNow => UserStatus.InviteExpired,
+            _ => throw new ArgumentOutOfRangeException(nameof(currentUserIdentityStatus))
         };
     }
 }

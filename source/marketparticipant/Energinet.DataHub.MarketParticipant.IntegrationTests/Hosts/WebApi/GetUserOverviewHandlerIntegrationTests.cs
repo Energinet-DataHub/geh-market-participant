@@ -56,7 +56,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 x.Select(y => new UserIdentity(
                     y,
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     y.ToString(),
                     y.ToString(),
                     null,
@@ -110,7 +110,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new UserIdentity(
                     y,
                     new MockedEmailAddress(),
-                    UserStatus.Inactive,
+                    UserIdentityStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
                     null,
@@ -154,7 +154,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new UserIdentity(
                     new ExternalUserId(user.ExternalId),
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
                     null,
@@ -201,7 +201,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new UserIdentity(
                     new ExternalUserId(user.ExternalId),
                     new MockedEmailAddress(),
-                    UserStatus.Inactive,
+                    UserIdentityStatus.Inactive,
                     "fake_value",
                     "fake_value",
                     null,
@@ -258,7 +258,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
 
-        UserIdentity UserIdentity(UserEntity userEntity, UserStatus userStatus)
+        UserIdentity UserIdentity(UserEntity userEntity, UserIdentityStatus userStatus)
         {
             return new UserIdentity(
                 new ExternalUserId(userEntity.ExternalId),
@@ -276,11 +276,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(new[]
             {
-                UserIdentity(userInvited, UserStatus.Active),
-                UserIdentity(userInvitedButExpiredActive, UserStatus.Active),
-                UserIdentity(userInvitedButExpiredInActive, UserStatus.Inactive),
-                UserIdentity(userActive, UserStatus.Active),
-                UserIdentity(userInActive, UserStatus.Inactive)
+                UserIdentity(userInvited, UserIdentityStatus.Active),
+                UserIdentity(userInvitedButExpiredActive, UserIdentityStatus.Active),
+                UserIdentity(userInvitedButExpiredInActive, UserIdentityStatus.Inactive),
+                UserIdentity(userActive, UserIdentityStatus.Active),
+                UserIdentity(userInActive, UserIdentityStatus.Inactive)
             });
 
         scope.Container!.Register(() => userIdentityRepository.Object);

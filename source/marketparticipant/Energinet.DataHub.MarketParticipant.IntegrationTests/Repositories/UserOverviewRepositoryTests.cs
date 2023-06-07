@@ -226,7 +226,7 @@ public sealed class UserOverviewRepositoryTests
                 new UserIdentity(
                     externalId,
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
                     null,
@@ -276,7 +276,7 @@ public sealed class UserOverviewRepositoryTests
                 new UserIdentity(
                     externalId,
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
                     null,
@@ -379,7 +379,7 @@ public sealed class UserOverviewRepositoryTests
                     x.Select(y => new UserIdentity(
                         y,
                         new EmailAddress($"{y}@test.datahub.dk"),
-                        UserStatus.Inactive,
+                        UserIdentityStatus.Inactive,
                         y.ToString(),
                         y.ToString(),
                         null,
@@ -399,7 +399,7 @@ public sealed class UserOverviewRepositoryTests
                 new UserIdentity(
                     y,
                     new EmailAddress($"{y}@test.datahub.dk"),
-                    UserStatus.Inactive,
+                    UserIdentityStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
                     null,
@@ -415,7 +415,7 @@ public sealed class UserOverviewRepositoryTests
                         new UserIdentity(
                             y,
                             new EmailAddress($"{y}@test.datahub.dk"),
-                            UserStatus.Inactive,
+                            UserIdentityStatus.Inactive,
                             y.ToString(),
                             y.ToString(),
                             null,

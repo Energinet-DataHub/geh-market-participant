@@ -32,6 +32,7 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IUserStatusCalculator _userStatusCalculator;
 
     public UserInvitationService(
         IUserRepository userRepository,
@@ -40,7 +41,8 @@ public sealed class UserInvitationService : IUserInvitationService
         IOrganizationDomainValidationService organizationDomainValidationService,
         IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUnitOfWorkProvider unitOfWorkProvider)
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IUserStatusCalculator userStatusCalculator)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
@@ -49,6 +51,7 @@ public sealed class UserInvitationService : IUserInvitationService
         _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
+        _userStatusCalculator = userStatusCalculator;
     }
 
     public async Task InviteUserAsync(UserInvitation invitation, UserId invitationSentByUserId)
@@ -123,9 +126,9 @@ public sealed class UserInvitationService : IUserInvitationService
             throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
         }
 
-        if (!user.IsUserInvitationExpired && userIdentity.Status == UserStatus.Inactive)
+        if (_userStatusCalculator.CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt) != UserStatus.InviteExpired)
         {
-            throw new ValidationException($"The specified user {user.Id} is not expired and cannot be re-invited.");
+            throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.");
         }
 
         user.ActivateUserExpiration();

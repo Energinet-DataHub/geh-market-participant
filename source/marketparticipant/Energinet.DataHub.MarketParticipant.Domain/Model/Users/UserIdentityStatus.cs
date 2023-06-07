@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services;
-
-public interface IUserStatusCalculator
+public enum UserIdentityStatus
 {
-    /// <summary>
-    /// Calculates UserStatus from current state and user invitation.
-    /// </summary>
-    UserStatus CalculateUserStatus(UserIdentityStatus currentUserIdentityStatus, DateTimeOffset? invitationExpiresAt);
+    Active = 1,
+    Inactive = 2,
 }

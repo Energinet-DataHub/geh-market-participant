@@ -185,7 +185,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             return new UserIdentity(
                 externalUserId,
                 email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 "fake_value",
                 "fake_value",
                 null,

@@ -79,7 +79,8 @@ public sealed class UserInvitationServiceTests
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create());
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IUserStatusCalculator>().Object);
 
         var invitation = _validInvitation;
 
@@ -117,7 +118,8 @@ public sealed class UserInvitationServiceTests
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create());
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IUserStatusCalculator>().Object);
 
         var invitation = _validInvitation;
 
@@ -153,7 +155,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -168,7 +170,8 @@ public sealed class UserInvitationServiceTests
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create());
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IUserStatusCalculator>().Object);
 
         var invitation = _validInvitation;
 
@@ -209,7 +212,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 externalId,
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -224,7 +227,8 @@ public sealed class UserInvitationServiceTests
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create());
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IUserStatusCalculator>().Object);
 
         var invitation = _validInvitation;
 
@@ -263,7 +267,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 externalId,
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -278,7 +282,8 @@ public sealed class UserInvitationServiceTests
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create());
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IUserStatusCalculator>().Object);
 
         var invitation = _validInvitation;
 
@@ -335,7 +340,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 externalId,
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -350,7 +355,8 @@ public sealed class UserInvitationServiceTests
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
-            UnitOfWorkProviderMock.Create());
+            UnitOfWorkProviderMock.Create(),
+            new Mock<IUserStatusCalculator>().Object);
 
         var invitation = _validInvitation;
 
