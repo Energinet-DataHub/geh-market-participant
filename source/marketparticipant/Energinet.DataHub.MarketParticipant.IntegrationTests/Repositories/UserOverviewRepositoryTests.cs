@@ -436,6 +436,7 @@ public sealed class UserOverviewRepositoryTests
 
         var userEntity = new UserEntity
         {
+            AdministratedByActorId = actorEntity.Id,
             ExternalId = Guid.NewGuid(),
             Email = email,
             RoleAssignments = { roleAssignment }

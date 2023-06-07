@@ -28,17 +28,23 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection("IntegrationTest")]
 [IntegrationTest]
-public sealed class ReInviteUserHandlerIntegrationTests
+public sealed class ReInviteUserHandlerIntegrationTests : IClassFixture<GraphServiceClientFixture>, IAsyncLifetime
 {
-    private readonly MarketParticipantDatabaseFixture _databaseFixture;
+    private const string TestUserEmail = "re-invitation-integration-test@datahub.dk";
 
-    public ReInviteUserHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture)
+    private readonly MarketParticipantDatabaseFixture _databaseFixture;
+    private readonly GraphServiceClientFixture _graphServiceClientFixture;
+
+    public ReInviteUserHandlerIntegrationTests(
+        MarketParticipantDatabaseFixture databaseFixture,
+        GraphServiceClientFixture graphServiceClientFixture)
     {
         _databaseFixture = databaseFixture;
+        _graphServiceClientFixture = graphServiceClientFixture;
     }
 
     [Fact]
-    public async Task InviteUser_ValidInvitation_UserCreated()
+    public async Task ReInviteUser_ExpiredInvitation_UserInvitedAgain()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
@@ -46,17 +52,20 @@ public sealed class ReInviteUserHandlerIntegrationTests
         var mediator = scope.GetInstance<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "datahub.dk"),
+            TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "a.datahub.dk"),
             TestPreparationEntities.ValidActor,
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.DataHubAdministrator));
 
+        var externalUserId = await _graphServiceClientFixture.CreateUserAsync(TestUserEmail);
         var targetUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u =>
         {
             u.AdministratedByActorId = actor.Id;
-            u.Email = $"{Guid.NewGuid()}@datahub.dk";
+            u.Email = $"{Guid.NewGuid()}@a.datahub.dk";
+            u.ExternalId = externalUserId.Value;
+            u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1);
         });
 
-        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");
+        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@a.datahub.dk");
         var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
         var targetUser = await _databaseFixture.PrepareUserAsync(targetUserEntity);
 
@@ -75,4 +84,7 @@ public sealed class ReInviteUserHandlerIntegrationTests
         var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
     }
+
+    public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
+    public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
 }
