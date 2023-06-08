@@ -1,39 +1,42 @@
 ALTER TABLE [dbo].[User]
-    ADD [AdministratedByActorId] [uniqueidentifier] NOT NULL DEFAULT('00000000-0000-0000-0000-000000000000')
+ADD [AdministratedByActorId] [uniqueidentifier] NOT NULL
+CONSTRAINT DF_AdministratedByActorId DEFAULT('00000000-0000-0000-0000-000000000000')
 GO
 
-declare @u_id uniqueidentifier, @a_id uniqueidentifier;
+DECLARE @u_id uniqueidentifier, @a_id uniqueidentifier;
 
-declare user_cursor cursor for
-    select u.id, r.actorid
-    from [dbo].[user] as u
-        outer apply (
-            select top 1 r.actorid
-            from [dbo].[userroleassignment] r
-            where r.userid = u.id
-        ) as r
-    where u.administratedbyactorid = '00000000-0000-0000-0000-000000000000';
+DECLARE user_cursor CURSOR FOR
+    SELECT u.Id, r.ActordId
+    FROM [dbo].[User] AS u
+        OUTER APPLY (
+            SELECT TOP 1 r.ActorId
+            FROM [dbo].[UserRoleAssignment] r
+            WHERE r.userid = u.id
+        ) AS r
+    WHERE u.AdministratedByActorId = '00000000-0000-0000-0000-000000000000';
 
-open user_cursor;
+OPEN user_cursor;
+FETCH NEXT FROM user_cursor INTO @u_id, @a_id;
 
-fetch next from user_cursor into @u_id, @a_id;
-
-while @@fetch_status = 0
-begin
+WHILE @@fetch_status = 0
+BEGIN
     -- update user
-    update [dbo].[user]
-    set administratedbyactorid = @a_id
-    where id = @u_id and @a_id is not null;
+    UPDATE [dbo].[User]
+    SET AdministratedByActorId = @a_id
+    WHERE id = @u_id AND @a_id IS NOT NULL;
 
     -- fetch next
-    fetch next from user_cursor into @u_id, @a_id;
-end
+    FETCH NEXT FROM user_cursor INTO @u_id, @a_id;
+END
 
-close user_cursor;
-deallocate user_cursor;
-
+CLOSE user_cursor;
+DEALLOCATE user_cursor;
 GO
 
 ALTER TABLE [dbo].[User]
 ADD FOREIGN KEY (AdministratedByActorId) REFERENCES dbo.ActorInfoNew(Id)
+GO
+
+ALTER TABLE [dbo].[User]
+DROP CONSTRAINT DF_AdministratedByActorId
 GO

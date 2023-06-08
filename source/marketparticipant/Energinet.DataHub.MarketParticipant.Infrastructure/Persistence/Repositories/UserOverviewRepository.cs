@@ -119,16 +119,13 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var userRolesFilter = userRoles.ToList();
         var statusFilter = userStatus.ToHashSet();
-        var userIdentityFilter = statusFilter.Select(status =>
+        var userIdentityFilter = statusFilter.Select(status => status switch
         {
-            return status switch
-            {
-                UserStatus.Inactive => false,
-                UserStatus.InviteExpired => false,
-                UserStatus.Active => true,
-                UserStatus.Invited => true,
-                _ => (bool?)null
-            };
+            UserStatus.Inactive => false,
+            UserStatus.InviteExpired => false,
+            UserStatus.Active => true,
+            UserStatus.Invited => true,
+            _ => (bool?)null
         }).ToHashSet();
 
         var accountEnabledFilter = userIdentityFilter.Count is 0 or 2
