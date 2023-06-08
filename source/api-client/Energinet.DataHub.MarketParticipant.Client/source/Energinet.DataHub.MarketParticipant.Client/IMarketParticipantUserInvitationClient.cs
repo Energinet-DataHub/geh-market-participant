@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 
@@ -27,5 +28,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="userInvitation">An invitation for the user.</param>
         Task InviteUserAsync(UserInvitationDto userInvitation);
+
+        /// <summary>
+        /// Re-invites the specified user.
+        /// </summary>
+        /// <param name="userId">The id of the user to re-invite.</param>
+        Task ReInviteUserAsync(Guid userId);
     }
 }

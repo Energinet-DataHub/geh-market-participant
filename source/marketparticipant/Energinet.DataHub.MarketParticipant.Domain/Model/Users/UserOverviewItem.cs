@@ -19,7 +19,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 public sealed record UserOverviewItem(
     UserId Id,
     UserStatus Status,
-    string Name,
+    string FirstName,
+    string LastName,
     EmailAddress Email,
     PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate);
+    DateTimeOffset CreatedDate,
+    DateTimeOffset? InvitationExpiresAt);

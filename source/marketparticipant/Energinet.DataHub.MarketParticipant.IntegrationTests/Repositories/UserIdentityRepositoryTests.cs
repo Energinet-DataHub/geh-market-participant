@@ -72,6 +72,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -119,6 +120,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -144,6 +146,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new MockedEmailAddress(),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -190,6 +193,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userPasswordGenerator);
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
             new EmailAddress(TestUserEmail),
             "User Integration Tests",
             "(Always safe to delete)",
@@ -223,16 +227,26 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             userIdentityAuthenticationService,
             userPasswordGenerator);
 
+        var newFirstName = "New First Name";
+        var newLastName = "New Last Name";
         var newPhoneNumber = new PhoneNumber("+45 70007777");
 
         // Act
         var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
-        await target.UpdateUserPhoneNumberAsync(externalId, newPhoneNumber);
+        var user = (await target.GetAsync(externalId))!;
+
+        user.FirstName = newFirstName;
+        user.LastName = newLastName;
+        user.PhoneNumber = newPhoneNumber;
+
+        await target.UpdateUserAsync(user);
 
         // Assert
         var actual = await target.GetAsync(externalId);
 
         Assert.NotNull(actual);
+        Assert.Equal(newFirstName, actual.FirstName);
+        Assert.Equal(newLastName, actual.LastName);
         Assert.Equal(newPhoneNumber, actual.PhoneNumber);
     }
 
@@ -322,6 +336,41 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         Assert.Equal(externalId, userIdentity.Id);
         Assert.Equal(2, userIdentity.LoginIdentities.Count);
         Assert.Single(userIdentity.LoginIdentities, e => e.SignInType == "federated");
+    }
+
+    [Fact]
+    public async Task CreateAsync_DeactivateUser()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        var externalId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
+        await _graphServiceClientFixture
+            .Client
+            .Users[externalId.Value.ToString()]
+            .PatchAsync(new Microsoft.Graph.Models.User { AccountEnabled = true });
+
+        var userIdentity = await target.GetAsync(externalId);
+
+        // Act
+        await target.DisableUserAccountAsync(userIdentity.Id);
+
+        // Act
+        var userIdentityDisabled = await target.GetAsync(externalId);
+        Assert.NotNull(userIdentityDisabled);
+        Assert.True(userIdentityDisabled.Status == UserStatus.Inactive);
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);

@@ -58,5 +58,6 @@ internal static class TestPreparationModels
             new UserId(userId),
             new ExternalUserId(Guid.NewGuid()),
             new UserRoleAssignment[] { new(actorId, userRoleId) },
+            null,
             null);
 }

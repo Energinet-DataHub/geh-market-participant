@@ -50,4 +50,6 @@ public interface IUserRepository
     /// <param name="userRoleId">The id of the user role.</param>
     /// <returns>A List of user with the actual role; otherwise empty.</returns>
     Task<IEnumerable<User>> GetToUserRoleAsync(UserRoleId userRoleId);
+
+    Task<IEnumerable<User>> FindUsersWithExpiredInvitationAsync();
 }

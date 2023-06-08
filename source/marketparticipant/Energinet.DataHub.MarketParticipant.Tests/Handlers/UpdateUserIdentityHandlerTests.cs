@@ -19,7 +19,9 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
 using Xunit;
@@ -37,11 +39,17 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232323");
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232323");
         var validUserId = Guid.NewGuid();
 
-        var user = new User(new UserId(validUserId), new ExternalUserId(Guid.NewGuid()), new List<UserRoleAssignment>(), null);
-        userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
+        var user = CreateFakeUser(validUserId);
+        userRepositoryMock
+            .Setup(x => x.GetAsync(user.Id))
+            .ReturnsAsync(user);
+
+        userIdentityRepository
+            .Setup(x => x.GetAsync(user.ExternalId))
+            .ReturnsAsync(CreateFakeUserIdentity);
 
         var target = new UpdateUserIdentityHandler(
             userRepositoryMock.Object,
@@ -60,10 +68,17 @@ public sealed class UpdateUserIdentityHandlerTests
     public async Task Invalid_PhoneNumber_ValidationException()
     {
         // Arrange
-        var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
+        userRepositoryMock
+            .Setup(x => x.GetAsync(It.IsAny<UserId>()))
+            .ReturnsAsync(CreateFakeUser(Guid.NewGuid()));
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 invalid");
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
+            .Setup(x => x.GetAsync(It.IsAny<ExternalUserId>()))
+            .ReturnsAsync(CreateFakeUserIdentity());
+
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 invalid");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
@@ -83,7 +98,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
 
-        var userIdentityUpdateDto = new UserIdentityUpdateDto("+45 23232324");
+        var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232324");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
@@ -95,4 +110,17 @@ public sealed class UpdateUserIdentityHandlerTests
         // Act + Assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(updateUserIdentityCommand, default)).ConfigureAwait(false);
     }
+
+    private static UserIdentity CreateFakeUserIdentity() => new(
+        new SharedUserReferenceId(),
+        new EmailAddress("fake@example.dk"),
+        "first",
+        "last",
+        new PhoneNumber("+45 23232323"),
+        new SmsAuthenticationMethod(new PhoneNumber("+45 23232323")));
+
+    private static User CreateFakeUser(Guid userId) => new(
+        new UserId(userId),
+        new ExternalUserId(Guid.NewGuid()),
+        new List<UserRoleAssignment>(), null, null);
 }

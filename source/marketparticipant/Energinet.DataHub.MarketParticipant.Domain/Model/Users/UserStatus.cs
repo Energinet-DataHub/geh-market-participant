@@ -17,5 +17,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 public enum UserStatus
 {
     Active = 1,
-    Inactive = 2
+    Inactive = 2,
+    Invited = 3,
+    InviteExpired = 4,
 }

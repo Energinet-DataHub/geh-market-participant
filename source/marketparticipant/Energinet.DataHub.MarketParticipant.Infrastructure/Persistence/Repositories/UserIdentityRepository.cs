@@ -210,27 +210,31 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .AddAuthenticationAsync(externalUserId, userIdentity.Authentication)
             .ConfigureAwait(false);
 
+        var employeeId = userIdentity.SharedId.ToString();
+
         await _graphClient
             .Users[createdUser.Id]
             .PatchAsync(new User
             {
-                AccountEnabled = true
+                AccountEnabled = true,
+                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought is was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
             })
             .ConfigureAwait(false);
 
         return externalUserId;
     }
 
-    public Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber)
+    public Task UpdateUserAsync(UserIdentity userIdentity)
     {
-        ArgumentNullException.ThrowIfNull(externalUserId);
-        ArgumentNullException.ThrowIfNull(phoneNumber);
+        ArgumentNullException.ThrowIfNull(userIdentity);
 
         return _graphClient
-            .Users[externalUserId.Value.ToString()]
+            .Users[userIdentity.Id.Value.ToString()]
             .PatchAsync(new User
             {
-                MobilePhone = phoneNumber.Number
+                GivenName = userIdentity.FirstName,
+                Surname = userIdentity.LastName,
+                MobilePhone = userIdentity.PhoneNumber?.Number
             });
     }
 
@@ -258,6 +262,16 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return _graphClient
             .Users[externalUserId.Value.ToString()]
             .DeleteAsync();
+    }
+
+    public Task EnableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        return UpdateUserAccountStatusAsync(externalUserId, true);
+    }
+
+    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        return UpdateUserAccountStatusAsync(externalUserId, false);
     }
 
     private static UserIdentity Map(User user, string? emailAddress = null)
@@ -292,6 +306,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         return user is { UserType: "Member", Identities: { } } &&
                user.Identities.Any(ident => ident.SignInType == "emailAddress");
+    }
+
+    private Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                AccountEnabled = enabled
+            });
     }
 
     private async Task<User?> GetBySignInEmailAsync(EmailAddress email)

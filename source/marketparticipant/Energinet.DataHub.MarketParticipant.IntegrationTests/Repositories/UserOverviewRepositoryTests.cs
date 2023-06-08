@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -55,7 +56,7 @@ public sealed class UserOverviewRepositoryTests
         var (userId, _, _) = await CreateUserAndActor(context, false);
         var (otherUserId, _, _) = await CreateUserAndActor(context, false);
 
-        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object, new UserStatusCalculator());
 
         // Act
         var actual = (await target.GetUsersAsync(1, 1000, UserOverviewSortProperty.Email, SortDirection.Asc, null)).ToList();
@@ -76,7 +77,7 @@ public sealed class UserOverviewRepositoryTests
         var (userId, _, actorId) = await CreateUserAndActor(context, false);
         var (otherUserId, _, _) = await CreateUserAndActor(context, false);
 
-        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object, new UserStatusCalculator());
 
         // Act
         var actual = (await target.GetUsersAsync(1, 1000, UserOverviewSortProperty.Email, SortDirection.Asc, actorId)).ToList();
@@ -96,7 +97,7 @@ public sealed class UserOverviewRepositoryTests
 
         var (actorId, userIds) = await CreateUsersForSameActorAsync(context, 100);
 
-        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object, new UserStatusCalculator());
 
         // Act
         var userCount = await target.GetTotalUserCountAsync(actorId);
@@ -124,7 +125,8 @@ public sealed class UserOverviewRepositoryTests
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object,
+            new UserStatusCalculator());
 
         // Act
         var actual = await target.SearchUsersAsync(
@@ -155,7 +157,8 @@ public sealed class UserOverviewRepositoryTests
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId> { externalId }).Object,
+            new UserStatusCalculator());
 
         // Act
         var actual = await target.SearchUsersAsync(
@@ -186,7 +189,8 @@ public sealed class UserOverviewRepositoryTests
 
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>()).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>()).Object,
+            new UserStatusCalculator());
 
         // Act
         var actual = await target.SearchUsersAsync(
@@ -233,7 +237,8 @@ public sealed class UserOverviewRepositoryTests
 
         var target = new UserOverviewRepository(
             context,
-            userIdentityRepositoryMock.Object);
+            userIdentityRepositoryMock.Object,
+            new UserStatusCalculator());
 
         // Act
         var actual = await target.SearchUsersAsync(
@@ -282,7 +287,8 @@ public sealed class UserOverviewRepositoryTests
 
         var target = new UserOverviewRepository(
             context,
-            userIdentityRepositoryMock.Object);
+            userIdentityRepositoryMock.Object,
+            new UserStatusCalculator());
 
         // Act
         var actual = await target.SearchUsersAsync(
@@ -310,7 +316,8 @@ public sealed class UserOverviewRepositoryTests
         var userIdList = userIds.ToList();
         var target = new UserOverviewRepository(
             context,
-            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>(userIdList.Select(x => x.ExternalId).ToList())).Object);
+            CreateUserIdentityRepositoryForSearch(new Collection<ExternalUserId>(), new Collection<ExternalUserId>(userIdList.Select(x => x.ExternalId).ToList())).Object,
+            new UserStatusCalculator());
 
         // Act
         var actual = new List<UserOverviewItem>();
@@ -334,7 +341,7 @@ public sealed class UserOverviewRepositoryTests
 
         var (actorId, _) = await CreateUsersForSameActorAsync(context, userCount);
 
-        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object, new UserStatusCalculator());
 
         // Act
         var actual = await target.GetTotalUserCountAsync(actorId);
@@ -353,7 +360,7 @@ public sealed class UserOverviewRepositoryTests
 
         await CreateUsersForSameActorAsync(context, 1);
 
-        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object);
+        var target = new UserOverviewRepository(context, CreateUserIdentityRepository().Object, new UserStatusCalculator());
 
         // Act
         var actual = await target.GetTotalUserCountAsync(null);

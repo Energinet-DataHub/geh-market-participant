@@ -1,5 +1,21 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.31.3
+
+- Updated UserStatus Enum
+
+## Version 2.31.2
+
+- Adding endpoint for resend user invitation
+
+## Version 2.31.1
+
+- No functional change.
+
+## Version 2.31.0
+
+First name and last name replacing name in user overview.
+
 ## Version 2.30.3
 
 No function change
