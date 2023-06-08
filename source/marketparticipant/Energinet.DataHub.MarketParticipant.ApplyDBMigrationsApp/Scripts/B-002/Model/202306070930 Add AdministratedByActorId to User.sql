@@ -6,12 +6,12 @@ GO
 DECLARE @u_id uniqueidentifier, @a_id uniqueidentifier;
 
 DECLARE user_cursor CURSOR FOR
-    SELECT u.Id, r.ActordId
+    SELECT u.Id, r.ActorId
     FROM [dbo].[User] AS u
         OUTER APPLY (
             SELECT TOP 1 r.ActorId
             FROM [dbo].[UserRoleAssignment] r
-            WHERE r.userid = u.id
+            WHERE r.UserId = u.Id
         ) AS r
     WHERE u.AdministratedByActorId = '00000000-0000-0000-0000-000000000000';
 
