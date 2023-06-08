@@ -23,5 +23,4 @@ public sealed record UserOverviewItem(
     string LastName,
     EmailAddress Email,
     PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate,
-    DateTimeOffset? InvitationExpiresAt);
+    DateTimeOffset CreatedDate);

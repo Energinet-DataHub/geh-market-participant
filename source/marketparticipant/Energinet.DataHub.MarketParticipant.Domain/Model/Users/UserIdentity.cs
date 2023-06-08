@@ -28,7 +28,7 @@ public sealed class UserIdentity
     public UserIdentity(
         ExternalUserId id,
         EmailAddress email,
-        UserStatus status,
+        UserIdentityStatus status,
         string firstName,
         string lastName,
         PhoneNumber? phoneNumber,
@@ -62,7 +62,7 @@ public sealed class UserIdentity
         _sharedId = sharedUserReferenceId;
         Id = new ExternalUserId(Guid.Empty);
         Email = email;
-        Status = UserStatus.Active;
+        Status = UserIdentityStatus.Active;
         FirstName = firstName;
         LastName = lastName;
         PhoneNumber = phoneNumber;
@@ -76,7 +76,7 @@ public sealed class UserIdentity
     public SharedUserReferenceId SharedId => _sharedId ?? throw new InvalidOperationException("The shared reference id is only available when creating the entity.");
     public ExternalUserId Id { get; }
     public EmailAddress Email { get; }
-    public UserStatus Status { get; }
+    public UserIdentityStatus Status { get; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string FullName => $"{FirstName} {LastName}";

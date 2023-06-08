@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
                 events[0].Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 "firstName",
                 "lastName",
                 new PhoneNumber("23232323"),
@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock.Setup(e => e.GetAsync(events[0].Email)).ReturnsAsync(userIdentity);
 
-            var user = new User(new SharedUserReferenceId(), userIdentity.Id);
+            var user = new User(new ActorId(Guid.Empty), new SharedUserReferenceId(), userIdentity.Id);
 
             var userRepositoryMock = new Mock<IUserRepository>();
             userRepositoryMock.Setup(e => e.GetAsync(userIdentity.Id)).ReturnsAsync(user);
@@ -125,7 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
                 events[0].Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 "firstName",
                 "lastName",
                 new PhoneNumber("23232323"),

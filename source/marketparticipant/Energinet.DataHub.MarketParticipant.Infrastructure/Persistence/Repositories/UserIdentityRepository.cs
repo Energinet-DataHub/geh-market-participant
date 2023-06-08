@@ -285,7 +285,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return new UserIdentity(
             new ExternalUserId(user.Id!),
             new EmailAddress(userEmailAddress),
-            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
+            user.AccountEnabled == true ? UserIdentityStatus.Active : UserIdentityStatus.Inactive,
             user.GivenName ?? user.DisplayName!,
             user.Surname ?? string.Empty,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),

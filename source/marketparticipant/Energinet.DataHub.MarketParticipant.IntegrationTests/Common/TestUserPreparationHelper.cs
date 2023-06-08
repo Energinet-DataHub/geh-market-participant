@@ -32,6 +32,12 @@ internal static class TestUserPreparationHelper
     {
         await using var context = fixture.DatabaseManager.CreateDbContext();
 
+        if (userEntity.AdministratedByActorId == Guid.Empty)
+        {
+            var actor = await fixture.PrepareActorAsync();
+            userEntity.AdministratedByActorId = actor.Id;
+        }
+
         await context.Users.AddAsync(userEntity);
         await context.SaveChangesAsync();
 

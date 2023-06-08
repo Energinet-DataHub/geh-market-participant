@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Moq;
@@ -37,6 +38,7 @@ public sealed class InitiateMitIdSignupHandlerTests
         var userId = Guid.NewGuid();
         var user = new User(
             new UserId(userId),
+            new ActorId(Guid.Empty),
             new ExternalUserId(Guid.NewGuid()),
             Enumerable.Empty<UserRoleAssignment>(),
             null,
