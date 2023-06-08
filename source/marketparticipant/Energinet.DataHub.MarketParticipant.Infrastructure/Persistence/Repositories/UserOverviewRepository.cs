@@ -104,8 +104,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     x.LastName,
                     new EmailAddress(x.Email),
                     x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
-                    x.CreatedDate,
-                    x.InvitationExpiresAt));
+                    x.CreatedDate));
     }
 
     public async Task<(IEnumerable<UserOverviewItem> Items, int TotalCount)> SearchUsersAsync(
@@ -120,9 +119,18 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var userRolesFilter = userRoles.ToList();
         var statusFilter = userStatus.ToHashSet();
-        bool? accountEnabledFilter = statusFilter.Count is 0 or 2
+        var userIdentityFilter = statusFilter.Select(status => status switch
+        {
+            UserStatus.Inactive => false,
+            UserStatus.InviteExpired => false,
+            UserStatus.Active => true,
+            UserStatus.Invited => true,
+            _ => (bool?)null
+        }).ToHashSet();
+
+        var accountEnabledFilter = userIdentityFilter.Count is 0 or 2
             ? null
-            : statusFilter.First() == UserStatus.Active;
+            : userIdentityFilter.Single();
 
         // We need to do two searches and two lookup, since the queries in either our data or AD can return results not in the other, and we need AD data for both
         // Search and then Filter only users from the AD search that have an ID in our local data
@@ -157,12 +165,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Select(x => new ExternalUserId(x)))
             .ConfigureAwait(false);
 
-        if (accountEnabledFilter.HasValue)
-        {
-            localUserIdentitiesLookup = localUserIdentitiesLookup
-                .Where(ident => statusFilter.Contains(ident.Status));
-        }
-
         // Combine results and create final search result
         var userLookup = searchQuery
             .Union(knownLocalUsers)
@@ -170,6 +172,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
+            .Where(x =>
+            {
+                var user = userLookup[x.Id.Value];
+                var status = _userStatusCalculator.CalculateUserStatus(x.Status, user.InvitationExpiresAt);
+                return !statusFilter.Any() || statusFilter.Contains(status);
+            })
             .Select(x => new
             {
                 x.Id,
@@ -202,8 +210,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     userIdentity.LastName,
                     new EmailAddress(userIdentity.Email),
                     userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
-                    userIdentity.CreatedDate,
-                    user.InvitationExpiresAt);
+                    userIdentity.CreatedDate);
             });
 
         return (items, allIdentitiesEnumerated.Count);

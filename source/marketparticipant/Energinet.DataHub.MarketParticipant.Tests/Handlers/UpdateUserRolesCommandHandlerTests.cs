@@ -54,6 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
             var user = new User(
                 new UserId(userId),
+                new ActorId(actorId),
                 new ExternalUserId(externalUserId),
                 userRoleAssignments,
                 null,
@@ -137,6 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
             var user = new User(
                 new UserId(userId),
+                new ActorId(actorId),
                 new ExternalUserId(externalUserId),
                 userRoleAssignments,
                 null,
@@ -191,6 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
             var user = new User(
                 new UserId(userId),
+                new ActorId(actorId),
                 new ExternalUserId(externalUserId),
                 userRoleAssignments,
                 null,
