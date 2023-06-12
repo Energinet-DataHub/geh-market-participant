@@ -430,7 +430,7 @@ public sealed class UserInvitationServiceTests
             new ExternalUserId(Guid.NewGuid()),
             new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
             null,
-            DateTimeOffset.UtcNow.AddDays(1));
+            null);
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
