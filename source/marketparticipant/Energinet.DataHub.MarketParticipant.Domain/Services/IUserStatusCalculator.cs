@@ -20,6 +20,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services;
 public interface IUserStatusCalculator
 {
     /// <summary>
+    /// Calculates UserStatus from the given user and user identity.
+    /// </summary>
+    UserStatus CalculateUserStatus(User user, UserIdentity userIdentity)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+        ArgumentNullException.ThrowIfNull(userIdentity);
+
+        return CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt);
+    }
+
+    /// <summary>
     /// Calculates UserStatus from current state and user invitation.
     /// </summary>
     UserStatus CalculateUserStatus(UserIdentityStatus currentUserIdentityStatus, DateTimeOffset? invitationExpiresAt);
