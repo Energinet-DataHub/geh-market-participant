@@ -12,15 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record UserOverviewItem(
-    UserId Id,
-    UserStatus Status,
-    string FirstName,
-    string LastName,
-    EmailAddress Email,
-    PhoneNumber? PhoneNumber,
-    DateTimeOffset CreatedDate);
+public enum UserIdentityStatus
+{
+    Active = 1,
+    Inactive = 2,
+}

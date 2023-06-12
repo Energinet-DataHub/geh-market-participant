@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
 
@@ -23,19 +24,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 [UnitTest]
 public sealed class UserStatusCalculatorTests
 {
-    public static readonly object[][] TestData =
+    public static readonly object[][] _testData =
     {
-        new object[] { UserStatus.Active, DateTimeOffset.UtcNow.AddDays(1), UserStatus.Invited },
-        new object[] { UserStatus.Active, DateTimeOffset.UtcNow.AddDays(-1), UserStatus.InviteExpired },
-        new object[] { UserStatus.Active, DateTimeOffset.UtcNow.AddDays(1), UserStatus.Invited },
-        new object[] { UserStatus.Inactive, DateTimeOffset.UtcNow.AddDays(-1), UserStatus.InviteExpired },
-        new object[] { UserStatus.Inactive, default(DateTimeOffset), UserStatus.Inactive },
-        new object[] { UserStatus.Active, default(DateTimeOffset), UserStatus.Active }
+        new object[] { UserIdentityStatus.Active, DateTimeOffset.UtcNow.AddDays(1), UserStatus.Invited },
+        new object[] { UserIdentityStatus.Active, DateTimeOffset.UtcNow.AddDays(-1), UserStatus.InviteExpired },
+        new object[] { UserIdentityStatus.Active, DateTimeOffset.UtcNow.AddDays(1), UserStatus.Invited },
+        new object[] { UserIdentityStatus.Inactive, DateTimeOffset.UtcNow.AddDays(-1), UserStatus.InviteExpired },
+        new object[] { UserIdentityStatus.Inactive, default(DateTimeOffset), UserStatus.Inactive },
+        new object[] { UserIdentityStatus.Active, default(DateTimeOffset), UserStatus.Active }
     };
 
     [Theory]
-    [MemberData(nameof(TestData))]
-    public void CalculateUserStatus(UserStatus currentUserStatus, DateTimeOffset? invitationExpiresAt, UserStatus expected)
+    [MemberData(nameof(_testData))]
+    public void CalculateUserStatus(UserIdentityStatus currentUserStatus, DateTimeOffset? invitationExpiresAt, UserStatus expected)
     {
         // arrange
         var target = new UserStatusCalculator();

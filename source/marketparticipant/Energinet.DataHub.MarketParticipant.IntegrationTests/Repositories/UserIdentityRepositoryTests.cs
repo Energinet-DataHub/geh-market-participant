@@ -206,7 +206,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         // Assert
         var actual = await target.GetAsync(userIdentity.Email);
         Assert.NotNull(actual);
-        Assert.Equal(UserStatus.Inactive, actual.Status);
+        Assert.Equal(UserIdentityStatus.Inactive, actual.Status);
     }
 
     [Fact]
@@ -370,7 +370,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         // Act
         var userIdentityDisabled = await target.GetAsync(externalId);
         Assert.NotNull(userIdentityDisabled);
-        Assert.True(userIdentityDisabled.Status == UserStatus.Inactive);
+        Assert.True(userIdentityDisabled.Status == UserIdentityStatus.Inactive);
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);

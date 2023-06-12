@@ -54,10 +54,11 @@ internal static class TestPreparationModels
         Enumerable.Empty<PermissionId>(),
         EicFunction.BillingAgent);
 
-    public static User MockedUserWithRole(Guid userId, UserRoleId userRoleId, ActorId actorId) => new(
+    public static User MockedUser(Guid userId) => new(
             new UserId(userId),
+            new ActorId(Guid.NewGuid()),
             new ExternalUserId(Guid.NewGuid()),
-            new UserRoleAssignment[] { new(actorId, userRoleId) },
+            Array.Empty<UserRoleAssignment>(),
             null,
             null);
 }

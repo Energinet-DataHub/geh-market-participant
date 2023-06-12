@@ -25,6 +25,7 @@ internal static class UserMapper
     {
         to.Id = from.Id.Value;
         to.ExternalId = from.ExternalId.Value;
+        to.AdministratedByActorId = from.AdministratedBy.Value;
         to.MitIdSignupInitiatedAt = from.MitIdSignupInitiatedAt;
         to.InvitationExpiresAt = from.InvitationExpiresAt;
 
@@ -51,6 +52,7 @@ internal static class UserMapper
     {
         return new User(
             new UserId(from.Id),
+            new ActorId(from.AdministratedByActorId),
             new ExternalUserId(from.ExternalId),
             from.RoleAssignments.Select(MapFromEntity),
             from.MitIdSignupInitiatedAt,

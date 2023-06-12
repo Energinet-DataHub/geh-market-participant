@@ -53,7 +53,7 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentity = new UserIdentity(
             new ExternalUserId(user.ExternalId),
             new MockedEmailAddress(),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             "expected_name",
             "expected_name",
             null,
@@ -107,7 +107,7 @@ public sealed class GetUserHandlerIntegrationTests
         var userIdentity = new UserIdentity(
             new ExternalUserId(user.ExternalId),
             new MockedEmailAddress(),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             "expected_name",
             "expected_name",
             null,

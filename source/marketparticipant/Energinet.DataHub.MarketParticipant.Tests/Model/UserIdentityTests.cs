@@ -102,7 +102,7 @@ public sealed class UserIdentityTests
         var validUserIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             _validEmailAddress,
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
@@ -113,7 +113,7 @@ public sealed class UserIdentityTests
         var validUserIdentityToLink = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             _validEmailAddress,
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
@@ -137,7 +137,7 @@ public sealed class UserIdentityTests
         var validUserIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             _validEmailAddress,
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
@@ -148,7 +148,7 @@ public sealed class UserIdentityTests
         var validUserIdentityToLink = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             new EmailAddress("notsameemail@notsame.dk"),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
