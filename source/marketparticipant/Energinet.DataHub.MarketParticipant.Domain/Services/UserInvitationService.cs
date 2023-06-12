@@ -126,7 +126,8 @@ public sealed class UserInvitationService : IUserInvitationService
             throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
         }
 
-        if (_userStatusCalculator.CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt) != UserStatus.InviteExpired)
+        var userStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
+        if (userStatus != UserStatus.Invited && userStatus != UserStatus.InviteExpired)
         {
             throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.");
         }

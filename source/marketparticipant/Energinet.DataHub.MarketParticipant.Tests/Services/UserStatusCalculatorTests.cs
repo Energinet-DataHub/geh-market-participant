@@ -15,6 +15,7 @@
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
 
@@ -23,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services;
 [UnitTest]
 public sealed class UserStatusCalculatorTests
 {
-    public static readonly object[][] TestData =
+    public static readonly object[][] _testData =
     {
         new object[] { UserIdentityStatus.Active, DateTimeOffset.UtcNow.AddDays(1), UserStatus.Invited },
         new object[] { UserIdentityStatus.Active, DateTimeOffset.UtcNow.AddDays(-1), UserStatus.InviteExpired },
@@ -34,7 +35,7 @@ public sealed class UserStatusCalculatorTests
     };
 
     [Theory]
-    [MemberData(nameof(TestData))]
+    [MemberData(nameof(_testData))]
     public void CalculateUserStatus(UserIdentityStatus currentUserStatus, DateTimeOffset? invitationExpiresAt, UserStatus expected)
     {
         // arrange
