@@ -99,7 +99,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
                 .GetAsync(new UserRoleId(userRoleId))
                 .ConfigureAwait(false);
 
-            NotFoundValidationException.ThrowIfNull(userRole, $"The specified user role {userRole} was not found.");
+            NotFoundValidationException.ThrowIfNull(userRole, $"The specified user role with id {userRoleId} was not found.");
 
             assignedRoles.Add(userRole);
         }

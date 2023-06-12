@@ -15,8 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -75,12 +73,5 @@ public sealed class User
     public void DeactivateUserExpiration()
     {
         InvitationExpiresAt = null;
-    }
-
-    public async Task DeactivateAsync(IUserIdentityRepository userIdentityRepository)
-    {
-        ArgumentNullException.ThrowIfNull(userIdentityRepository);
-        await userIdentityRepository.DisableUserAccountAsync(ExternalId).ConfigureAwait(false);
-        RoleAssignments.Clear();
     }
 }

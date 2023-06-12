@@ -43,7 +43,9 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
         NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
-        await user.DeactivateAsync(_userIdentityRepository).ConfigureAwait(false);
+        await _userIdentityRepository.DisableUserAccountAsync(user.ExternalId).ConfigureAwait(false);
+
+        user.RoleAssignments.Clear();
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
         return Unit.Value;
