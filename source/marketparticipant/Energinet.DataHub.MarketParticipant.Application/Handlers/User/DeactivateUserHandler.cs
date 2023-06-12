@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
@@ -24,36 +23,31 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetUserHandler : IRequestHandler<GetUserCommand, GetUserResponse>
+// ReSharper disable once UnusedType.Global
+public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
 
-    public GetUserHandler(
-        IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository)
+    public DeactivateUserHandler(IUserRepository userRepository, IUserIdentityRepository userIdentityRepository)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
     }
 
-    public async Task<GetUserResponse> Handle(GetUserCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var user = await _userRepository
-            .GetAsync(new UserId(request.UserId))
-            .ConfigureAwait(false);
+        var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
 
         NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
-        var externalIdentities = await _userIdentityRepository
-            .GetUserIdentitiesAsync(new[] { user.ExternalId })
-            .ConfigureAwait(false);
+        await _userIdentityRepository.DisableUserAccountAsync(user.ExternalId).ConfigureAwait(false);
 
-        var externalIdentity = externalIdentities.SingleOrDefault();
-        NotFoundValidationException.ThrowIfNull(externalIdentity, $"No external identity found for id {user.Id}.");
+        user.RoleAssignments.Clear();
+        await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
 
-        return new GetUserResponse(externalIdentity.FullName);
+        return Unit.Value;
     }
 }

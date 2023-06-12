@@ -78,10 +78,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             .GetAsync(new ActorId(actorId))
             .ConfigureAwait(false);
 
-        if (actor == null)
-        {
-            throw new NotFoundValidationException($"The specified actor {actorId} was not found.");
-        }
+        NotFoundValidationException.ThrowIfNull(actor, $"The specified actor {actorId} was not found.");
 
         var organization = await _organizationRepository
             .GetAsync(actor.OrganizationId)
@@ -102,10 +99,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
                 .GetAsync(new UserRoleId(userRoleId))
                 .ConfigureAwait(false);
 
-            if (userRole == null)
-            {
-                throw new NotFoundValidationException($"The specified user role {userRole} was not found.");
-            }
+            NotFoundValidationException.ThrowIfNull(userRole, $"The specified user role with id {userRoleId} was not found.");
 
             assignedRoles.Add(userRole);
         }

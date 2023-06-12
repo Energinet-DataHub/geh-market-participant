@@ -365,7 +365,7 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         var userIdentity = await target.GetAsync(externalId);
 
         // Act
-        await target.DisableUserAccountAsync(userIdentity.Id);
+        await target.DisableUserAccountAsync(userIdentity!.Id);
 
         // Act
         var userIdentityDisabled = await target.GetAsync(externalId);

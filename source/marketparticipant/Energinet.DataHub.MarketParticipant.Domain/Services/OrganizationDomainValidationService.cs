@@ -39,10 +39,7 @@ public sealed class OrganizationDomainValidationService : IOrganizationDomainVal
             .GetAsync(actor.OrganizationId)
             .ConfigureAwait(false);
 
-        if (organization == null)
-        {
-            throw new NotFoundValidationException($"The specified organization {actor.OrganizationId} was not found.");
-        }
+        NotFoundValidationException.ThrowIfNull(organization, $"The specified organization {actor.OrganizationId} was not found.");
 
         if (!userInviteEmail.Address.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
         {

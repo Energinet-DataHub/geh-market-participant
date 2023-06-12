@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Exception
 {
@@ -37,6 +38,22 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Exception
         public NotFoundValidationException(Guid id)
             : base(CreateMessage(id))
         {
+        }
+
+        public static void ThrowIfNull([NotNull] object? value, Guid id)
+        {
+            if (value == null)
+            {
+                throw new NotFoundValidationException(id);
+            }
+        }
+
+        public static void ThrowIfNull([NotNull] object? value, string message)
+        {
+            if (value == null)
+            {
+                throw new NotFoundValidationException(message);
+            }
         }
 
         private static string CreateMessage(Guid id)

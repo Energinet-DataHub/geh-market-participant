@@ -81,6 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
             container.Register<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
             container.Register<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
+            container.Register<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
             container.Register<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2CService>(Lifestyle.Scoped);

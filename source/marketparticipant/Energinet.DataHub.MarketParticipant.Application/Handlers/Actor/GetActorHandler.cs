@@ -41,10 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
 
-            if (actor == null)
-            {
-                throw new NotFoundValidationException(request.ActorId);
-            }
+            NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
             return new GetSingleActorResponse(OrganizationMapper.Map(actor));
         }

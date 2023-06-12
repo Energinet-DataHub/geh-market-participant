@@ -48,8 +48,7 @@ public sealed class GetUserRoleHandler
             .GetAsync(new UserRoleId(request.UserRoleId))
             .ConfigureAwait(false);
 
-        if (userRole == null)
-            throw new NotFoundValidationException(request.UserRoleId);
+        NotFoundValidationException.ThrowIfNull(userRole, request.UserRoleId);
 
         var permissionDetailsLookup = (await _permissionRepository
             .GetForMarketRoleAsync(userRole.EicFunction)

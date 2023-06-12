@@ -37,8 +37,7 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
     {
         var identityUserOpenId = await _userIdentityRepository.FindIdentityReadyForOpenIdSetupAsync(requestExternalUserId).ConfigureAwait(false);
 
-        if (identityUserOpenId == null)
-            throw new NotFoundValidationException($"External user id {requestExternalUserId} not found for open id setup.");
+        NotFoundValidationException.ThrowIfNull(identityUserOpenId, $"External user id {requestExternalUserId} not found for open id setup.");
 
         var userIdentityInvitedOnEmail = await _userIdentityRepository.GetAsync(identityUserOpenId.Email).ConfigureAwait(false);
 
