@@ -57,10 +57,7 @@ public sealed class UpdateUserRolesHandler
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        if (user == null)
-        {
-            throw new NotFoundValidationException(request.UserId);
-        }
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         foreach (var addRequest in request.Assignments.Added)
         {

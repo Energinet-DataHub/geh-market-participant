@@ -37,9 +37,7 @@ public sealed class InitiateMitIdSignupHandler : IRequestHandler<InitiateMitIdSi
         ArgumentNullException.ThrowIfNull(request);
 
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
-
-        if (user is null)
-            throw new NotFoundValidationException(request.UserId);
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         user.InitiateMitIdSignup();
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);

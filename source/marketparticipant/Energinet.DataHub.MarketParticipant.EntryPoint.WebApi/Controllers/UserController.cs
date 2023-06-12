@@ -195,6 +195,24 @@ public class UserController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
+    [HttpPut("{userId:guid}/deactivate")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<IActionResult> DeactivateAsync(Guid userId)
+    {
+        return await this.ProcessAsync(
+            async () =>
+            {
+                var command = new DeactivateUserCommand(userId);
+
+                await _mediator
+                    .Send(command)
+                    .ConfigureAwait(false);
+
+                return Ok();
+            },
+            _logger).ConfigureAwait(false);
+    }
+
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);

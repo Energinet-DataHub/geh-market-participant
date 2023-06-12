@@ -15,6 +15,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -53,6 +55,7 @@ public sealed class User
     public DateTimeOffset? MitIdSignupInitiatedAt { get; private set; }
     public DateTimeOffset? InvitationExpiresAt { get; private set;  }
     public bool ValidLogonRequirements => !InvitationExpiresAt.HasValue || InvitationExpiresAt >= DateTimeOffset.UtcNow;
+
     public void InitiateMitIdSignup()
     {
         MitIdSignupInitiatedAt = DateTimeOffset.UtcNow;
@@ -71,5 +74,12 @@ public sealed class User
     public bool UserInvitationExpired()
     {
         return InvitationExpiresAt.HasValue && InvitationExpiresAt < DateTimeOffset.UtcNow;
+    }
+
+    public async Task DeactivateAsync(IUserIdentityRepository userIdentityRepository)
+    {
+        ArgumentNullException.ThrowIfNull(userIdentityRepository);
+        await userIdentityRepository.DisableUserAccountAsync(ExternalId).ConfigureAwait(false);
+        RoleAssignments.Clear();
     }
 }

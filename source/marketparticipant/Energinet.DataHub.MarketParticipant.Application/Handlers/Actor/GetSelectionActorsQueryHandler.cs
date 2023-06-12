@@ -56,8 +56,7 @@ public sealed class GetSelectionActorsQueryHandler
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        if (user == null)
-            throw new NotFoundValidationException(request.UserId);
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         var actorIds = await _userQueryRepository
             .GetActorsAsync(user.ExternalId)

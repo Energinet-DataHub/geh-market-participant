@@ -45,10 +45,8 @@ public sealed class UpdatePermissionHandler
         ArgumentNullException.ThrowIfNull(request);
 
         var permissionToUpdate = await _permissionRepository.GetAsync((PermissionId)request.PermissionId).ConfigureAwait(false);
-        if (permissionToUpdate == null)
-        {
-            throw new NotFoundValidationException($"Permission not found: {request.PermissionId}");
-        }
+
+        NotFoundValidationException.ThrowIfNull(permissionToUpdate, $"Permission not found: {request.PermissionId}");
 
         permissionToUpdate.Description = request.Description;
 

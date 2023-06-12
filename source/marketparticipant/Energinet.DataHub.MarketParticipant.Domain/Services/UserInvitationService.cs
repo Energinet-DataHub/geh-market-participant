@@ -120,18 +120,10 @@ public sealed class UserInvitationService : IUserInvitationService
         ArgumentNullException.ThrowIfNull(userId);
 
         var user = await _userRepository.GetAsync(userId).ConfigureAwait(false);
-
-        if (user == null)
-        {
-            throw new NotFoundValidationException($"The specified user {userId} was not found.");
-        }
+        NotFoundValidationException.ThrowIfNull(user, $"The specified user {userId} was not found.");
 
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
-
-        if (userIdentity == null)
-        {
-            throw new NotFoundValidationException($"The specified user identity {user.ExternalId} was not found.");
-        }
+        NotFoundValidationException.ThrowIfNull(userIdentity, $"The specified user identity {user.ExternalId} was not found.");
 
         if (_userStatusCalculator.CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt) != UserStatus.InviteExpired)
         {
