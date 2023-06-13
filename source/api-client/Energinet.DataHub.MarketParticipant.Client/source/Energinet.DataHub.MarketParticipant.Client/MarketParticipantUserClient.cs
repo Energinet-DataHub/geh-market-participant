@@ -112,5 +112,16 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .PostAsync())
                 .ConfigureAwait(false);
         }
+
+        public async Task DeactivateUserAsync(Guid userId)
+        {
+            await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user", userId, "deactivate")
+                        .PostAsync())
+                .ConfigureAwait(false);
+        }
     }
 }
