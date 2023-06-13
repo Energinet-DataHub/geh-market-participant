@@ -2,7 +2,7 @@
 
 ## Version 2.31.4
 
-- Deactivate API
+- Deactivate user API
 
 ## Version 2.31.3
 
