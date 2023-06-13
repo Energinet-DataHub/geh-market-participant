@@ -54,5 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// Initiates MitID user signup
         /// </summary>
         Task InitiateMitIdSignupAsync();
+
+        /// <summary>
+        /// Deactivate the user specified by the userId
+        /// </summary>
+        /// <param name="userId">Users id</param>
+        Task DeactivateUserAsync(Guid userId);
     }
 }
