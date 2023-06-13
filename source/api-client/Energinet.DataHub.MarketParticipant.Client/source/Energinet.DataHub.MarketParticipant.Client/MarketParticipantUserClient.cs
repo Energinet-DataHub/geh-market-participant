@@ -120,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
                     () => _clientFactory
                         .CreateClient()
                         .Request("user", userId, "deactivate")
-                        .PostAsync())
+                        .PutAsync())
                 .ConfigureAwait(false);
         }
     }
