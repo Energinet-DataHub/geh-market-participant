@@ -50,10 +50,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         ArgumentNullException.ThrowIfNull(request);
 
         var userRoleToUpdate = await _userRoleRepository.GetAsync(new UserRoleId(request.UserRoleId)).ConfigureAwait(false);
-        if (userRoleToUpdate == null)
-        {
-            throw new NotFoundValidationException(request.UserRoleId);
-        }
+        NotFoundValidationException.ThrowIfNull(userRoleToUpdate, request.UserRoleId);
 
         if (userRoleToUpdate.Status == UserRoleStatus.Inactive)
             throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} is deactivated and can't be updated");

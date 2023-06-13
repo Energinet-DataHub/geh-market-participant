@@ -38,17 +38,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 
             var gridArea = await _repository.GetAsync(new GridAreaId(request.Id)).ConfigureAwait(false);
 
-            return gridArea switch
-            {
-                null => throw new NotFoundValidationException(request.Id),
-                _ => new GetGridAreaResponse(new GridAreaDto(
-                    gridArea.Id.Value,
-                    gridArea.Code.Value,
-                    gridArea.Name.Value,
-                    gridArea.PriceAreaCode.ToString(),
-                    gridArea.ValidFrom,
-                    gridArea.ValidTo))
-            };
+            NotFoundValidationException.ThrowIfNull(gridArea, request.Id);
+
+            return new GetGridAreaResponse(new GridAreaDto(
+                gridArea.Id.Value,
+                gridArea.Code.Value,
+                gridArea.Name.Value,
+                gridArea.PriceAreaCode.ToString(),
+                gridArea.ValidFrom,
+                gridArea.ValidTo));
         }
     }
 }

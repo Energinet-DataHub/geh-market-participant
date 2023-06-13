@@ -65,10 +65,7 @@ public sealed class DeactivateUserRoleHandler
         var userRoleId = new UserRoleId(request.UserRoleId);
         var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
 
-        if (userRole == null)
-        {
-            throw new NotFoundValidationException($"User role with id: {userRoleId} was not found");
-        }
+        NotFoundValidationException.ThrowIfNull(userRole, $"User role with id: {userRoleId} was not found");
 
         var users = await _userRepository
             .GetToUserRoleAsync(userRoleId)
@@ -80,17 +77,14 @@ public sealed class DeactivateUserRoleHandler
 
         await using (uow.ConfigureAwait(false))
         {
-            if (users != null)
+            foreach (var user in users)
             {
-                foreach (var user in users)
-                {
-                    var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
-                    user.RoleAssignments.Remove(role);
+                var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
+                user.RoleAssignments.Remove(role);
 
-                    await AuditRoleAssignmentAsync(user, role, UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)
-                        .ConfigureAwait(false);
-                    await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
-                }
+                await AuditRoleAssignmentAsync(user, role, UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)
+                    .ConfigureAwait(false);
+                await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
             var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRole);

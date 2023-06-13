@@ -51,10 +51,7 @@ public sealed class GetUserRolesHandler
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        if (user == null)
-        {
-            throw new NotFoundValidationException(request.UserId);
-        }
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         var assignments = user
             .RoleAssignments
