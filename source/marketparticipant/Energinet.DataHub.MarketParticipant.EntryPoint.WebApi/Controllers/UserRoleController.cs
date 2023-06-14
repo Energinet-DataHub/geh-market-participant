@@ -122,7 +122,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("{userRoleId:guid}/auditlogentry")]
-    [AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> GetUserRoleAuditLogsAsync(Guid userRoleId)
     {
         return await this.ProcessAsync(
@@ -140,7 +140,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("permissions")]
-    [AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> GetPermissionDetailsAsync(EicFunction eicFunction)
     {
         return await this.ProcessAsync(
@@ -158,7 +158,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpGet("assignedtopermission")]
-    [AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> AssignedToPermissionAsync(int permissionId)
     {
         return await this.ProcessAsync(
@@ -176,7 +176,7 @@ public sealed class UserRoleController : ControllerBase
     }
 
     [HttpPut("{userRoleId:guid}/deactivate")]
-    [AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> DeactivateUserRoleAsync(Guid userRoleId)
     {
         return await this.ProcessAsync(
