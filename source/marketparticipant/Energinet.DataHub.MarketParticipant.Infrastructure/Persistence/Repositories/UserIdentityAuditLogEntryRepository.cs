@@ -21,49 +21,48 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public sealed class UserIdentityAuditLogEntryRepository : IUserIdentityAuditLogEntryRepository
 {
-    public sealed class UserIdentityAuditLogEntryRepository : IUserIdentityAuditLogEntryRepository
+    private readonly IMarketParticipantDbContext _context;
+
+    public UserIdentityAuditLogEntryRepository(IMarketParticipantDbContext context)
     {
-        private readonly IMarketParticipantDbContext _context;
+        _context = context;
+    }
 
-        public UserIdentityAuditLogEntryRepository(IMarketParticipantDbContext context)
+    public async Task<IEnumerable<UserIdentityAuditLogEntry>> GetAsync(UserId userId)
+    {
+        var logQuery =
+            from log in _context.UserIdentityAuditLogEntries
+            where log.UserId == userId.Value
+            select new UserIdentityAuditLogEntry(
+                new UserId(log.UserId),
+                new UserId(log.ChangedByUserId),
+                (UserIdentityAuditLogField)log.Field,
+                log.NewValue,
+                log.OldValue,
+                log.Timestamp);
+
+        return await logQuery.ToListAsync().ConfigureAwait(false);
+    }
+
+    public Task InsertAuditLogEntryAsync(UserIdentityAuditLogEntry logEntry)
+    {
+        ArgumentNullException.ThrowIfNull(logEntry);
+
+        var entity = new UserIdentityAuditLogEntryEntity
         {
-            _context = context;
-        }
+            UserId = logEntry.UserId.Value,
+            Timestamp = logEntry.Timestamp,
+            ChangedByUserId = logEntry.ChangedByUserId.Value,
+            Field = (int)logEntry.Field,
+            NewValue = logEntry.NewValue,
+            OldValue = logEntry.OldValue
+        };
 
-        public async Task<IEnumerable<UserIdentityAuditLogEntry>> GetAsync(UserId userId)
-        {
-            var logQuery =
-                from log in _context.UserIdentityAuditLogEntries
-                where log.UserId == userId.Value
-                select new UserIdentityAuditLogEntry(
-                    new UserId(log.UserId),
-                    new UserId(log.ChangedByUserId),
-                    (UserIdentityAuditLogField)log.Field,
-                    log.NewValue,
-                    log.OldValue,
-                    log.Timestamp);
-
-            return await logQuery.ToListAsync().ConfigureAwait(false);
-        }
-
-        public Task InsertAuditLogEntryAsync(UserIdentityAuditLogEntry logEntry)
-        {
-            ArgumentNullException.ThrowIfNull(logEntry);
-
-            var entity = new UserIdentityAuditLogEntryEntity
-            {
-                UserId = logEntry.UserId.Value,
-                Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
-                Field = (int)logEntry.Field,
-                NewValue = logEntry.NewValue,
-                OldValue = logEntry.OldValue
-            };
-
-            _context.UserIdentityAuditLogEntries.Add(entity);
-            return _context.SaveChangesAsync();
-        }
+        _context.UserIdentityAuditLogEntries.Add(entity);
+        return _context.SaveChangesAsync();
     }
 }

@@ -43,6 +43,10 @@ public sealed class UpdateUserIdentityHandlerTests
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
 
+        userContextFrontendUser
+            .Setup(x => x.CurrentUser)
+            .Returns(new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false));
+
         var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232323");
         var validUserId = Guid.NewGuid();
 
@@ -75,6 +79,10 @@ public sealed class UpdateUserIdentityHandlerTests
     {
         // Arrange
         var userContextFrontendUser = new Mock<IUserContext<FrontendUser>>();
+        userContextFrontendUser
+            .Setup(x => x.CurrentUser)
+            .Returns(new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false));
+
         var userRepositoryMock = new Mock<IUserRepository>();
         userRepositoryMock
             .Setup(x => x.GetAsync(It.IsAny<UserId>()))
@@ -110,6 +118,10 @@ public sealed class UpdateUserIdentityHandlerTests
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
         var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+
+        userContextFrontendUser
+            .Setup(x => x.CurrentUser)
+            .Returns(new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false));
 
         var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232324");
         var validUserId = Guid.NewGuid();
