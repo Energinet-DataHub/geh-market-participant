@@ -63,7 +63,7 @@ public sealed class InvitationController : ControllerBase
             _logger).ConfigureAwait(false);
     }
 
-    [HttpPut("users/reinvite")]
+    [HttpPut("users/{userId:guid}/reinvite")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> ReInviteUserAsync(Guid userId)
     {
