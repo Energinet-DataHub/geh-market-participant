@@ -45,9 +45,6 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
         await _userIdentityRepository.DisableUserAccountAsync(user.ExternalId).ConfigureAwait(false);
 
-        user.RoleAssignments.Clear();
-        await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
-
         return Unit.Value;
     }
 }
