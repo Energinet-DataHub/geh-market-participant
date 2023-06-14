@@ -157,7 +157,7 @@ public class UserController : ControllerBase
                     ? response.InviteAuditLogs
                     : response.InviteAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
-                return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs));
+                return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs, response.IdentityAuditLogs));
             },
             _logger).ConfigureAwait(false);
     }

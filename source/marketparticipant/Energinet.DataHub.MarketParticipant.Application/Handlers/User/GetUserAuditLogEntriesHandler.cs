@@ -28,13 +28,16 @@ public sealed class GetUserAuditLogEntriesHandler
 {
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
     private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
+    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
 
     public GetUserAuditLogEntriesHandler(
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository)
+        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
+        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository)
     {
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
         _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
+        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
     }
 
     public async Task<GetUserAuditLogResponse> Handle(
@@ -43,15 +46,24 @@ public sealed class GetUserAuditLogEntriesHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var userId = new UserId(request.UserId);
+
         var roleAssignmentAuditLogs = await _userRoleAssignmentAuditLogEntryRepository
-            .GetAsync(new UserId(request.UserId))
+            .GetAsync(userId)
             .ConfigureAwait(false);
 
         var userInviteLogs = await _userInviteAuditLogEntryRepository
-            .GetAsync(new UserId(request.UserId))
+            .GetAsync(userId)
             .ConfigureAwait(false);
 
-        return new GetUserAuditLogResponse(roleAssignmentAuditLogs.Select(Map), userInviteLogs.Select(MapInvites));
+        var userIdentityLogs = await _userIdentityAuditLogEntryRepository
+            .GetAsync(userId)
+            .ConfigureAwait(false);
+
+        return new GetUserAuditLogResponse(
+            roleAssignmentAuditLogs.Select(Map),
+            userInviteLogs.Select(MapInvites),
+            userIdentityLogs.Select(MapIdentity));
     }
 
     private static UserRoleAssignmentAuditLogEntryDto Map(UserRoleAssignmentAuditLogEntry auditLogEntry)
@@ -72,6 +84,17 @@ public sealed class GetUserAuditLogEntriesHandler
             auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.ActorId.Value,
             auditLogEntry.ActorName,
+            auditLogEntry.Timestamp);
+    }
+
+    private static UserIdentityAuditLogEntryDto MapIdentity(UserIdentityAuditLogEntry auditLogEntry)
+    {
+        return new UserIdentityAuditLogEntryDto(
+            auditLogEntry.UserId.Value,
+            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.Field,
+            auditLogEntry.NewValue,
+            auditLogEntry.OldValue,
             auditLogEntry.Timestamp);
     }
 }
