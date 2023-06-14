@@ -12,23 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public interface IUserInviteAuditLogEntryRepository
-{
-    /// <summary>
-    /// Inserts a <see cref="UserInviteAuditLogEntry"/>
-    /// </summary>
-    /// <param name="logEntry">The audit log entry.</param>
-    Task InsertAuditLogEntryAsync(UserInviteAuditLogEntry logEntry);
-
-    /// <summary>
-    /// Retrieves all log entries for a given user.
-    /// </summary>
-    /// <param name="userId">The user id to get the logs for.</param>
-    Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId);
-}
+public sealed record UserIdentityAuditLogEntryDto(
+    Guid UserId,
+    Guid ChangedByUserId,
+    UserIdentityAuditLogField Field,
+    string NewValue,
+    string OldValue,
+    DateTimeOffset Timestamp);

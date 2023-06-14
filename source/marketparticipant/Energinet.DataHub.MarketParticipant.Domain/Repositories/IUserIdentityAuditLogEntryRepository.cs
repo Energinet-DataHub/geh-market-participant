@@ -18,17 +18,9 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public interface IUserInviteAuditLogEntryRepository
+public interface IUserIdentityAuditLogEntryRepository
 {
-    /// <summary>
-    /// Inserts a <see cref="UserInviteAuditLogEntry"/>
-    /// </summary>
-    /// <param name="logEntry">The audit log entry.</param>
-    Task InsertAuditLogEntryAsync(UserInviteAuditLogEntry logEntry);
+    Task<IEnumerable<UserIdentityAuditLogEntry>> GetAsync(UserId userId);
 
-    /// <summary>
-    /// Retrieves all log entries for a given user.
-    /// </summary>
-    /// <param name="userId">The user id to get the logs for.</param>
-    Task<IEnumerable<UserInviteDetailsAuditLogEntry>> GetAsync(UserId userId);
+    Task InsertAuditLogEntryAsync(UserIdentityAuditLogEntry logEntry);
 }
