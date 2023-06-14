@@ -84,11 +84,18 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{userId:guid}")]
+    [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid userId)
     {
         return await this.ProcessAsync(
             async () =>
             {
+                if (!_userContext.CurrentUser.IsFas)
+                {
+                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
+                        return Unauthorized();
+                }
+
                 var command = new GetUserCommand(userId);
 
                 var response = await _mediator
@@ -164,16 +171,16 @@ public class UserController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
+                if (!_userContext.CurrentUser.IsFas)
+                {
+                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
+                        return Unauthorized();
+                }
+
                 var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
 
-                if (!_userContext.CurrentUser.IsFas)
-                    return Unauthorized();
-
-                var response = await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
-
-                return Ok(response);
+                await _mediator.Send(command).ConfigureAwait(false);
+                return Ok();
             },
             _logger).ConfigureAwait(false);
     }
@@ -202,6 +209,12 @@ public class UserController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
+                if (!_userContext.CurrentUser.IsFas)
+                {
+                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
+                        return Unauthorized();
+                }
+
                 var command = new DeactivateUserCommand(userId);
 
                 await _mediator
@@ -217,5 +230,14 @@ public class UserController : ControllerBase
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
         return Guid.Parse(userIdClaim.Value);
+    }
+
+    private async Task<bool> DoesUserBelongToActorAsync(Guid userId, Guid expectedActorId)
+    {
+        var associatedActors = await _mediator
+            .Send(new GetSelectionActorsQueryCommand(userId))
+            .ConfigureAwait(false);
+
+        return associatedActors.Actors.Any(actor => actor.Id == expectedActorId);
     }
 }
