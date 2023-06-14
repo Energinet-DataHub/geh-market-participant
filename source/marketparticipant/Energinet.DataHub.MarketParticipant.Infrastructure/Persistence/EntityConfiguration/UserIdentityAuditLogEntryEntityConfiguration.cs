@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
 
             builder.ToTable("UserIdentityAuditLogEntry");
             builder.HasKey(x => x.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
+            builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.Property(x => x.UserId);
             builder.Property(x => x.Field);
             builder.Property(x => x.NewValue);

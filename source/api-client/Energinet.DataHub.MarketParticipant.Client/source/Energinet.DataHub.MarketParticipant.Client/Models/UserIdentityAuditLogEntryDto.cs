@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record UserAuditLogsDto(
-        IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-        IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs,
-        IEnumerable<UserIdentityAuditLogEntryDto> IdentityAuditLogs);
+    public sealed record UserIdentityAuditLogEntryDto(
+        Guid UserId,
+        Guid ChangedByUserId,
+        UserIdentityAuditLogField Field,
+        string NewValue,
+        string OldValue,
+        DateTimeOffset Timestamp);
 }
