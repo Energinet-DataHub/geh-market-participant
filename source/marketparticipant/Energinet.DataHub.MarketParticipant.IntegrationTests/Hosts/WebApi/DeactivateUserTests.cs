@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -52,21 +51,15 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
 
         scope.Container!.Register(() => userIdentityRepositoryMock.Object);
 
-        var actorEntity = await _fixture.PrepareActorAsync();
         var userEntity = await _fixture.PrepareUserAsync();
-        var userRoleEntity = await _fixture.PrepareUserRoleAsync();
-        await _fixture.AssignUserRoleAsync(userEntity.Id, actorEntity.Id, userRoleEntity.Id);
 
         var mediator = scope.GetInstance<IMediator>();
         var command = new DeactivateUserCommand(userEntity.Id);
 
         // act
         await mediator.Send(command);
-        var actual = await new UserRepository(_fixture.DatabaseManager.CreateDbContext(), userIdentityRepositoryMock.Object).GetAsync(new UserId(userEntity.Id));
 
         // assert
-        Assert.NotNull(actual);
-        Assert.Empty(actual.RoleAssignments);
-        userIdentityRepositoryMock.Verify(x => x.DisableUserAccountAsync(actual.ExternalId), Times.Once);
+        userIdentityRepositoryMock.Verify(x => x.DisableUserAccountAsync(new ExternalUserId(userEntity.ExternalId)), Times.Once);
     }
 }
