@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record GetUserAuditLogResponse(
-    IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-    IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs,
-    IEnumerable<UserIdentityAuditLogEntryDto> IdentityAuditLogs);
+public sealed record UserIdentityAuditLogEntry(
+    UserId UserId,
+    UserId ChangedByUserId,
+    UserIdentityAuditLogField Field,
+    string NewValue,
+    string OldValue,
+    DateTimeOffset Timestamp);

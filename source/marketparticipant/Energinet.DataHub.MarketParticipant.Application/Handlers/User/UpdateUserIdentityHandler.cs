@@ -15,7 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -26,15 +28,21 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdentityCommand>
 {
+    private readonly IUserContext<FrontendUser> _userContext;
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
 
     public UpdateUserIdentityHandler(
+        IUserContext<FrontendUser> userContext,
         IUserRepository userRepository,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository)
     {
+        _userContext = userContext;
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
+        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
     }
 
     public async Task<Unit> Handle(UpdateUserIdentityCommand request, CancellationToken cancellationToken)
@@ -42,19 +50,50 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
         ArgumentNullException.ThrowIfNull(request);
 
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
-
         NotFoundValidationException.ThrowIfNull(user, $"The specified user {request.UserId} was not found.");
 
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
-
         NotFoundValidationException.ThrowIfNull(userIdentity, $"The specified user identity {user.ExternalId} was not found.");
+
+        await LogAuditEntryAsync(
+            user.Id,
+            UserIdentityAuditLogField.FirstName,
+            request.UserIdentityUpdate.FirstName,
+            userIdentity.FirstName).ConfigureAwait(false);
+
+        await LogAuditEntryAsync(
+            user.Id,
+            UserIdentityAuditLogField.LastName,
+            request.UserIdentityUpdate.LastName,
+            userIdentity.LastName).ConfigureAwait(false);
+
+        await LogAuditEntryAsync(
+            user.Id,
+            UserIdentityAuditLogField.PhoneNumber,
+            request.UserIdentityUpdate.PhoneNumber,
+            userIdentity.PhoneNumber?.Number ?? string.Empty).ConfigureAwait(false);
 
         userIdentity.PhoneNumber = new PhoneNumber(request.UserIdentityUpdate.PhoneNumber);
         userIdentity.LastName = request.UserIdentityUpdate.LastName;
         userIdentity.FirstName = request.UserIdentityUpdate.FirstName;
 
         await _userIdentityRepository.UpdateUserAsync(userIdentity).ConfigureAwait(false);
-
         return Unit.Value;
+    }
+
+    private Task LogAuditEntryAsync(UserId userId, UserIdentityAuditLogField field, string newValue, string oldValue)
+    {
+        if (newValue == oldValue)
+            return Task.CompletedTask;
+
+        var auditEntry = new UserIdentityAuditLogEntry(
+            userId,
+            new UserId(_userContext.CurrentUser.UserId),
+            field,
+            newValue,
+            oldValue,
+            DateTimeOffset.UtcNow);
+
+        return _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry);
     }
 }
