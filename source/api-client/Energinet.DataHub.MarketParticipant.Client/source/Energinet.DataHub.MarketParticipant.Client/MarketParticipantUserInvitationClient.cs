@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return ValidationExceptionHandler.HandleAsync(
                 () => _clientFactory
                     .CreateClient()
-                    .Request("users", "reinvite", userId)
+                    .Request("users", userId, "reinvite")
                     .PutAsync());
         }
     }
