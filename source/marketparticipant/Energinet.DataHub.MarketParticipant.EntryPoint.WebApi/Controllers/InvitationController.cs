@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -70,11 +71,11 @@ public sealed class InvitationController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                var user = await _mediator
-                    .Send(new GetAssociatedUserActorsCommand(userId))
+                var userActors = await _mediator
+                    .Send(new GetSelectionActorsQueryCommand(userId))
                     .ConfigureAwait(false);
 
-                if (!_userContext.CurrentUser.IsFas || user.ActorIds.All(actorId => actorId != _userContext.CurrentUser.ActorId))
+                if (!(_userContext.CurrentUser.IsFas || userActors.Actors.Any(actor => actor.Id == _userContext.CurrentUser.ActorId)))
                     return Unauthorized();
 
                 await _mediator
