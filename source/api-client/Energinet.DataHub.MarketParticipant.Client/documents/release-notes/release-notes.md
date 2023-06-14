@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.31.5
+
+- Made route to resend user invitation RESTful.
+
 ## Version 2.31.4
 
 - Deactivate user API
