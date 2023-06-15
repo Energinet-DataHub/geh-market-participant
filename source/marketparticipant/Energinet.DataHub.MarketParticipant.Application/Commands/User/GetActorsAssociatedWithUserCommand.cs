@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using FluentValidation;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed class GetActorsAssociatedWithUserCommandRuleSet : AbstractValidator<GetActorsAssociatedWithUserCommand>
-{
-    public GetActorsAssociatedWithUserCommandRuleSet()
-    {
-        RuleFor(command => command.UserId)
-            .NotEmpty();
-    }
-}
+public sealed record GetActorsAssociatedWithUserCommand(Guid UserId) : IRequest<GetActorsAssociatedWithUserResponse>;

@@ -19,7 +19,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -75,7 +74,7 @@ public class UserController : ControllerBase
                 var externalUserId = GetExternalUserId(externalJwt.Claims);
 
                 var associatedActors = await _mediator
-                    .Send(new GetAssociatedUserActorsCommand(externalUserId))
+                    .Send(new GetActorsAssociatedWithExternalUserIdCommand(externalUserId))
                     .ConfigureAwait(false);
 
                 return Ok(associatedActors);
@@ -90,11 +89,8 @@ public class UserController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
-                        return Unauthorized();
-                }
+                if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+                    return Unauthorized();
 
                 var command = new GetUserCommand(userId);
 
@@ -115,23 +111,21 @@ public class UserController : ControllerBase
             async () =>
             {
                 var associatedActors = await _mediator
-                    .Send(new GetSelectionActorsQueryCommand(userId))
+                    .Send(new GetActorsAssociatedWithUserCommand(userId))
                     .ConfigureAwait(false);
 
-                var associatedActorIds = associatedActors.Actors.Select(actor => actor.Id);
-
                 if (_userContext.CurrentUser.IsFas)
-                    return Ok(new GetAssociatedUserActorsResponse(associatedActorIds));
+                    return Ok(new GetActorsAssociatedWithUserResponse(associatedActors.ActorIds));
 
                 var allowedActors = new List<Guid>();
 
-                foreach (var actorId in associatedActorIds)
+                foreach (var actorId in associatedActors.ActorIds)
                 {
                     if (_userContext.CurrentUser.IsAssignedToActor(actorId))
                         allowedActors.Add(actorId);
                 }
 
-                return Ok(new GetAssociatedUserActorsResponse(allowedActors));
+                return Ok(new GetActorsAssociatedWithUserResponse(allowedActors));
             },
             _logger).ConfigureAwait(false);
     }
@@ -171,11 +165,8 @@ public class UserController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
-                        return Unauthorized();
-                }
+                if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+                    return Unauthorized();
 
                 var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
 
@@ -209,11 +200,8 @@ public class UserController : ControllerBase
         return await this.ProcessAsync(
             async () =>
             {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
-                        return Unauthorized();
-                }
+                if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+                    return Unauthorized();
 
                 var command = new DeactivateUserCommand(userId);
 
@@ -232,12 +220,15 @@ public class UserController : ControllerBase
         return Guid.Parse(userIdClaim.Value);
     }
 
-    private async Task<bool> DoesUserBelongToActorAsync(Guid userId, Guid expectedActorId)
+    private async Task<bool> HasCurrentUserAccessToUserAsync(Guid userId)
     {
+        if (_userContext.CurrentUser.IsFas)
+            return true;
+
         var associatedActors = await _mediator
-            .Send(new GetSelectionActorsQueryCommand(userId))
+            .Send(new GetActorsAssociatedWithUserCommand(userId))
             .ConfigureAwait(false);
 
-        return associatedActors.Actors.Any(actor => actor.Id == expectedActorId);
+        return associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor);
     }
 }

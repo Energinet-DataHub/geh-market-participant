@@ -17,11 +17,11 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class GetActorsAssociatedWithUserCommandRuleSet : AbstractValidator<GetActorsAssociatedWithUserCommand>
+public sealed class GetActorsAssociatedWithExternalUserIdCommandRuleSet : AbstractValidator<GetActorsAssociatedWithExternalUserIdCommand>
 {
-    public GetActorsAssociatedWithUserCommandRuleSet()
+    public GetActorsAssociatedWithExternalUserIdCommandRuleSet()
     {
-        RuleFor(command => command.UserId)
+        RuleFor(command => command.ExternalUserId)
             .NotEmpty();
     }
 }
