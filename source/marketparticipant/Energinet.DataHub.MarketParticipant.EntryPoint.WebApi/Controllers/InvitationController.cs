@@ -76,8 +76,11 @@ public sealed class InvitationController : ControllerBase
                         .Send(new GetActorsAssociatedWithUserCommand(userId))
                         .ConfigureAwait(false);
 
-                    if (!associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor))
+                    if (!_userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy) &&
+                        !associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor))
+                    {
                         return Unauthorized();
+                    }
                 }
 
                 await _mediator

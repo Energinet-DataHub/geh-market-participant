@@ -42,10 +42,7 @@ public sealed class ReInviteUserHandler : IRequestHandler<ReInviteUserCommand>
         ArgumentNullException.ThrowIfNull(request);
 
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
-        if (user == null)
-        {
-            throw new NotFoundValidationException(request.UserId);
-        }
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         await _userInvitationService
             .ReInviteUserAsync(user, new UserId(request.InvitedByUserId))

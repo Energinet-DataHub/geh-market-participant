@@ -115,17 +115,14 @@ public class UserController : ControllerBase
                     .ConfigureAwait(false);
 
                 if (_userContext.CurrentUser.IsFas)
-                    return Ok(new GetActorsAssociatedWithUserResponse(associatedActors.ActorIds));
+                    return Ok(associatedActors);
 
-                var allowedActors = new List<Guid>();
+                var allowedActors = associatedActors
+                    .ActorIds
+                    .Where(_userContext.CurrentUser.IsAssignedToActor)
+                    .ToList();
 
-                foreach (var actorId in associatedActors.ActorIds)
-                {
-                    if (_userContext.CurrentUser.IsAssignedToActor(actorId))
-                        allowedActors.Add(actorId);
-                }
-
-                return Ok(new GetActorsAssociatedWithUserResponse(allowedActors));
+                return Ok(associatedActors with { ActorIds = allowedActors });
             },
             _logger).ConfigureAwait(false);
     }
@@ -229,6 +226,7 @@ public class UserController : ControllerBase
             .Send(new GetActorsAssociatedWithUserCommand(userId))
             .ConfigureAwait(false);
 
-        return associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor);
+        return _userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy) ||
+               associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor);
     }
 }

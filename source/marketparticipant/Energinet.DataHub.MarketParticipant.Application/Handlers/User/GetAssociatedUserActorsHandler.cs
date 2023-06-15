@@ -51,6 +51,6 @@ public sealed class GetActorsAssociatedWithUserHandler
             .Select(roleAssignment => roleAssignment.ActorId.Value)
             .Distinct();
 
-        return new GetActorsAssociatedWithUserResponse(actorAssignments);
+        return new GetActorsAssociatedWithUserResponse(user.AdministratedBy.Value, actorAssignments);
     }
 }

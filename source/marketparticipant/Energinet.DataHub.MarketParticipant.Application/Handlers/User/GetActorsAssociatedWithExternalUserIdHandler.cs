@@ -24,7 +24,7 @@ using MediatR;
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetActorsAssociatedWithExternalUserIdHandler
-    : IRequestHandler<GetActorsAssociatedWithExternalUserIdCommand, GetActorsAssociatedWithUserResponse>
+    : IRequestHandler<GetActorsAssociatedWithExternalUserIdCommand, GetActorsAssociatedWithExternalUserIdResponse>
 {
     private readonly IUserQueryRepository _userQueryRepository;
 
@@ -33,7 +33,7 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandler
         _userQueryRepository = userQueryRepository;
     }
 
-    public async Task<GetActorsAssociatedWithUserResponse> Handle(
+    public async Task<GetActorsAssociatedWithExternalUserIdResponse> Handle(
         GetActorsAssociatedWithExternalUserIdCommand request,
         CancellationToken cancellationToken)
     {
@@ -43,6 +43,6 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandler
             .GetActorsAsync(new ExternalUserId(request.ExternalUserId))
             .ConfigureAwait(false);
 
-        return new GetActorsAssociatedWithUserResponse(actorIds.Select(id => id.Value));
+        return new GetActorsAssociatedWithExternalUserIdResponse(actorIds.Select(id => id.Value));
     }
 }
