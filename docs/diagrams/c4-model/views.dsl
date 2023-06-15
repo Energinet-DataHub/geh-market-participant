@@ -24,13 +24,13 @@ workspace extends https://raw.githubusercontent.com/Energinet-DataHub/opengeh-ar
             !include model.dsl
 
             # Include EDI model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-edi/main/docs/diagrams/c4-model/model.dsl
+            !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-edi/krmoos/doc-c4-reference-base-model/docs/diagrams/c4-model/model.dsl
 
             # Include Wholesale model
             !include https://raw.githubusercontent.com/Energinet-DataHub/opengeh-wholesale/main/docs/diagrams/c4-model/model.dsl
 
             # Include Frontend model
-            !include https://raw.githubusercontent.com/Energinet-DataHub/greenforce-frontend/dstenroejl/update-c4/docs/diagrams/c4-model/model.dsl # Update to main when possible
+            !include https://raw.githubusercontent.com/Energinet-DataHub/greenforce-frontend/dstenroejl/update-c4/docs/diagrams/c4-model/model.dsl
         }
     }
 
