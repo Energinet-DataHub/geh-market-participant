@@ -16,7 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -53,6 +55,9 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         scope.Container!.Register(() => userIdentityRepositoryMock.Object);
 
+        var userContext = new Mock<IUserContext<FrontendUser>>();
+        scope.Container!.Register(() => userContext.Object);
+
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             new MockedEmailAddress(),
@@ -66,12 +71,14 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
 
         var userEntity = await _fixture.PrepareUserAsync();
 
+        userContext.Setup(x => x.CurrentUser).Returns(new FrontendUser(userEntity.Id, Guid.NewGuid(), Guid.NewGuid(), true));
+
         userIdentityRepositoryMock
             .Setup(x => x.GetAsync(new ExternalUserId(userEntity.ExternalId)))
             .ReturnsAsync(userIdentity);
 
         var mediator = scope.GetInstance<IMediator>();
-        var command = new DeactivateUserCommand(userEntity.Id, userEntity.Id);
+        var command = new DeactivateUserCommand(userEntity.Id);
 
         // act
         await mediator.Send(command);

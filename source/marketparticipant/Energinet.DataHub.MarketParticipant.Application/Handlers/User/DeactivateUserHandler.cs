@@ -15,7 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -31,17 +33,20 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserStatusCalculator _userStatusCalculator;
     private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserContext<FrontendUser> _userContext;
 
     public DeactivateUserHandler(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
-        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository)
+        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
+        IUserContext<FrontendUser> userContext)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userStatusCalculator = userStatusCalculator;
         _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userContext = userContext;
     }
 
     public async Task<Unit> Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
@@ -64,7 +69,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
             var auditEntry = new UserIdentityAuditLogEntry(
                 user.Id,
-                new UserId(request.CurrentUserId),
+                new UserId(_userContext.CurrentUser.UserId),
                 UserIdentityAuditLogField.Status,
                 UserStatus.Inactive.ToString(),
                 currentStatus.ToString(),

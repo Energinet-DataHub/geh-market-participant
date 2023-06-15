@@ -215,7 +215,7 @@ public class UserController : ControllerBase
                         return Unauthorized();
                 }
 
-                var command = new DeactivateUserCommand(userId, _userContext.CurrentUser.UserId);
+                var command = new DeactivateUserCommand(userId);
 
                 await _mediator
                     .Send(command)
