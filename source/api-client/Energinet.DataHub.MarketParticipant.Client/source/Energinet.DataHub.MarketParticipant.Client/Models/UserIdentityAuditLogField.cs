@@ -18,6 +18,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
     {
         FirstName = 1,
         LastName = 2,
-        PhoneNumber = 3
+        PhoneNumber = 3,
+        Status = 4
     }
 }
