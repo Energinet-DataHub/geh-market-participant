@@ -18,5 +18,6 @@ public enum UserIdentityAuditLogField
 {
     FirstName = 1,
     LastName = 2,
-    PhoneNumber = 3
+    PhoneNumber = 3,
+    Status = 4,
 }
