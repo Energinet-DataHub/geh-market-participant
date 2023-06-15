@@ -17,9 +17,9 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class GetAssociatedUserActorsCommandRuleSet : AbstractValidator<GetAssociatedUserActorsCommand>
+public sealed class GetActorsAssociatedWithExternalUserIdCommandRuleSet : AbstractValidator<GetActorsAssociatedWithExternalUserIdCommand>
 {
-    public GetAssociatedUserActorsCommandRuleSet()
+    public GetActorsAssociatedWithExternalUserIdCommandRuleSet()
     {
         RuleFor(command => command.ExternalUserId)
             .NotEmpty();

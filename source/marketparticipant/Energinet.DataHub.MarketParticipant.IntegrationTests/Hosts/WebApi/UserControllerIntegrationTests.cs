@@ -82,7 +82,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
         Startup.EnableIntegrationTestKeys = false;
 
         // Assert
-        var response = JsonSerializer.Deserialize<GetAssociatedUserActorsResponse>(
+        var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
             responseJson,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -115,7 +115,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
         Startup.EnableIntegrationTestKeys = false;
 
         // Assert
-        var response = JsonSerializer.Deserialize<GetAssociatedUserActorsResponse>(
+        var response = JsonSerializer.Deserialize<GetActorsAssociatedWithExternalUserIdResponse>(
             responseJson,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 

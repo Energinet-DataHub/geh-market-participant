@@ -230,7 +230,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
             join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
-                (actorId == null || r.ActorId == actorId.Value)
+                (actorId == null || r.ActorId == actorId.Value || u.AdministratedByActorId == actorId.Value)
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
             select u;
 
@@ -250,7 +250,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
             where
-                (actorId == null || r.ActorId == actorId.Value)
+                (actorId == null || r.ActorId == actorId.Value || u.AdministratedByActorId == actorId.Value)
                 && externalUsers.Contains(u.ExternalId)
             select u;
 
