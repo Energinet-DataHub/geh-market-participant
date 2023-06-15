@@ -15,10 +15,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
@@ -28,11 +31,22 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserStatusCalculator _userStatusCalculator;
+    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserContext<FrontendUser> _userContext;
 
-    public DeactivateUserHandler(IUserRepository userRepository, IUserIdentityRepository userIdentityRepository)
+    public DeactivateUserHandler(
+        IUserRepository userRepository,
+        IUserIdentityRepository userIdentityRepository,
+        IUserStatusCalculator userStatusCalculator,
+        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
+        IUserContext<FrontendUser> userContext)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
+        _userStatusCalculator = userStatusCalculator;
+        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userContext = userContext;
     }
 
     public async Task<Unit> Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
@@ -43,7 +57,26 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
         NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
-        await _userIdentityRepository.DisableUserAccountAsync(user.ExternalId).ConfigureAwait(false);
+        var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
+
+        NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value);
+
+        var currentStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
+
+        if (userIdentity.Status != UserIdentityStatus.Inactive)
+        {
+            await _userIdentityRepository.DisableUserAccountAsync(userIdentity.Id).ConfigureAwait(false);
+
+            var auditEntry = new UserIdentityAuditLogEntry(
+                user.Id,
+                new UserId(_userContext.CurrentUser.UserId),
+                UserIdentityAuditLogField.Status,
+                UserStatus.Inactive.ToString(),
+                currentStatus.ToString(),
+                DateTimeOffset.UtcNow);
+
+            await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
+        }
 
         return Unit.Value;
     }
