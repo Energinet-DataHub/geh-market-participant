@@ -63,7 +63,8 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
             container.Register<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
-            container.Register<IValidator<GetAssociatedUserActorsCommand>, GetAssociatedUserActorsCommandRuleSet>();
+            container.Register<IValidator<GetActorsAssociatedWithUserCommand>, GetActorsAssociatedWithUserCommandRuleSet>();
+            container.Register<IValidator<GetActorsAssociatedWithExternalUserIdCommand>, GetActorsAssociatedWithExternalUserIdCommandRuleSet>();
             container.Register<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
             container.Register<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
             container.Register<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
