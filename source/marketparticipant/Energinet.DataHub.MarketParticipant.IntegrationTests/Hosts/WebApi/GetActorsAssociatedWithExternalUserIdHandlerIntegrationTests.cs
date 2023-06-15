@@ -70,7 +70,10 @@ public sealed class GetActorsAssociatedWithExternalUserIdHandlerIntegrationTests
 
         var command = new GetActorsAssociatedWithExternalUserIdCommand(Guid.NewGuid());
 
-        // Act + Assert
-        await Assert.ThrowsAsync<NotFoundValidationException>(() => mediator.Send(command));
+        // act
+        var actual = await mediator.Send(command);
+
+        // assert
+        Assert.Empty(actual.ActorIds);
     }
 }

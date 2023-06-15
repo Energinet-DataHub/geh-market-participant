@@ -58,7 +58,7 @@ public sealed class GetActorsAssociatedWithUserHandlerIntegrationTests
         // assert
         Assert.Single(actual.ActorIds);
         Assert.Equal(actor.Id, actual.ActorIds.Single());
-        Assert.Equal(actor.Id, actual.AdministratedBy);
+        Assert.Equal(user.AdministratedByActorId, actual.AdministratedBy);
     }
 
     [Fact]
