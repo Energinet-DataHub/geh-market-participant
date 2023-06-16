@@ -18,11 +18,9 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -30,13 +28,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     [Route("actor")]
     public class ActorController : ControllerBase
     {
-        private readonly ILogger<ActorController> _logger;
         private readonly IMediator _mediator;
         private readonly IUserContext<FrontendUser> _userContext;
 
-        public ActorController(ILogger<ActorController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
+        public ActorController(IMediator mediator, IUserContext<FrontendUser> userContext)
         {
-            _logger = logger;
             _mediator = mediator;
             _userContext = userContext;
         }
@@ -44,91 +40,71 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetActorsAsync()
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFas)
-                    {
-                        var getSingleActorCommand = new GetSingleActorCommand(_userContext.CurrentUser.ActorId);
+            if (!_userContext.CurrentUser.IsFas)
+            {
+                var getSingleActorCommand = new GetSingleActorCommand(_userContext.CurrentUser.ActorId);
 
-                        var singleResponse = await _mediator
-                            .Send(getSingleActorCommand)
-                            .ConfigureAwait(false);
+                var singleResponse = await _mediator
+                    .Send(getSingleActorCommand)
+                    .ConfigureAwait(false);
 
-                        return Ok(new[] { singleResponse.Actor });
-                    }
+                return Ok(new[] { singleResponse.Actor });
+            }
 
-                    var getAllActorsCommand = new GetAllActorsCommand();
+            var getAllActorsCommand = new GetAllActorsCommand();
 
-                    var response = await _mediator
-                        .Send(getAllActorsCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(getAllActorsCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response.Actors);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response.Actors);
         }
 
         [HttpGet("{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid actorId)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
 
-                    var getSingleActorCommand = new GetSingleActorCommand(actorId);
+            var getSingleActorCommand = new GetSingleActorCommand(actorId);
 
-                    var response = await _mediator
-                        .Send(getSingleActorCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(getSingleActorCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response.Actor);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response.Actor);
         }
 
         [HttpPost]
         [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFas)
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFas)
+                return Unauthorized();
 
-                    var createActorCommand = new CreateActorCommand(actorDto);
+            var createActorCommand = new CreateActorCommand(actorDto);
 
-                    var response = await _mediator
-                        .Send(createActorCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(createActorCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response.ActorId.ToString());
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response.ActorId.ToString());
         }
 
         [HttpPut("{actorId:guid}")]
         [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
 
-                    var updateActorCommand = new UpdateActorCommand(actorId, changeActor);
+            var updateActorCommand = new UpdateActorCommand(actorId, changeActor);
 
-                    var response = await _mediator
-                        .Send(updateActorCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(updateActorCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response);
         }
     }
 }

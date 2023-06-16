@@ -14,10 +14,8 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -25,26 +23,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     [Route("[controller]")]
     public sealed class GridAreaOverviewController : ControllerBase
     {
-        private readonly ILogger<GridAreaOverviewController> _logger;
         private readonly IMediator _mediator;
 
-        public GridAreaOverviewController(ILogger<GridAreaOverviewController> logger, IMediator mediator)
+        public GridAreaOverviewController(IMediator mediator)
         {
-            _logger = logger;
             _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetGridAreaOverviewAsync()
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetGridAreaOverviewCommand();
-                    var response = await _mediator.Send(command).ConfigureAwait(false);
-                    return Ok(response.GridAreas);
-                },
-                _logger).ConfigureAwait(false);
+            var command = new GetGridAreaOverviewCommand();
+            var response = await _mediator.Send(command).ConfigureAwait(false);
+            return Ok(response.GridAreas);
         }
     }
 }

@@ -18,27 +18,22 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
 public sealed class UserRoleAssignmentController : ControllerBase
 {
-    private readonly ILogger<UserRoleAssignmentController> _logger;
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
     public UserRoleAssignmentController(
-        ILogger<UserRoleAssignmentController> logger,
         IUserContext<FrontendUser> userContext,
         IMediator mediator)
     {
-        _logger = logger;
         _userContext = userContext;
         _mediator = mediator;
     }
@@ -47,42 +42,32 @@ public sealed class UserRoleAssignmentController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid actorId, Guid userId)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                    return Unauthorized();
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-                var command = new GetUserRolesCommand(actorId, userId);
+        var command = new GetUserRolesCommand(actorId, userId);
 
-                var response = await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                return Ok(response.Roles);
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(response.Roles);
     }
 
     [HttpGet("actors/{actorId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAssignableAsync(Guid actorId)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                    return Unauthorized();
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-                var command = new GetAvailableUserRolesForActorCommand(actorId);
+        var command = new GetAvailableUserRolesForActorCommand(actorId);
 
-                var response = await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                return Ok(response.Roles);
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(response.Roles);
     }
 
     [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
@@ -92,18 +77,13 @@ public sealed class UserRoleAssignmentController : ControllerBase
         Guid userId,
         UpdateUserRoleAssignmentsDto assignments)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                    return Unauthorized();
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+            return Unauthorized();
 
-                var result = await _mediator
-                    .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, assignments))
-                    .ConfigureAwait(false);
+        var result = await _mediator
+            .Send(new UpdateUserRoleAssignmentsCommand(actorId, userId, assignments))
+            .ConfigureAwait(false);
 
-                return Ok(result);
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(result);
     }
 }
