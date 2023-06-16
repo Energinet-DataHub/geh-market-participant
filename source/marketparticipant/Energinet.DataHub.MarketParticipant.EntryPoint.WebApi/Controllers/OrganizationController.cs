@@ -20,11 +20,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -32,13 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     [Route("[controller]")]
     public class OrganizationController : ControllerBase
     {
-        private readonly ILogger<OrganizationController> _logger;
         private readonly IMediator _mediator;
         private readonly IUserContext<FrontendUser> _userContext;
 
-        public OrganizationController(ILogger<OrganizationController> logger, IMediator mediator, IUserContext<FrontendUser> userContext)
+        public OrganizationController(IMediator mediator, IUserContext<FrontendUser> userContext)
         {
-            _logger = logger;
             _mediator = mediator;
             _userContext = userContext;
         }
@@ -46,60 +42,45 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> ListAllAsync()
         {
-            return await this.ProcessAsync(
-                async () =>
-                    {
-                        var organizationId = !_userContext.CurrentUser.IsFas ? _userContext.CurrentUser.OrganizationId : (Guid?)null;
-                        var getOrganizationsCommand = new GetOrganizationsCommand(organizationId);
+            var organizationId = !_userContext.CurrentUser.IsFas ? _userContext.CurrentUser.OrganizationId : (Guid?)null;
+            var getOrganizationsCommand = new GetOrganizationsCommand(organizationId);
 
-                        var response = await _mediator
-                            .Send(getOrganizationsCommand)
-                            .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(getOrganizationsCommand)
+                .ConfigureAwait(false);
 
-                        return Ok(response.Organizations);
-                    },
-                _logger).ConfigureAwait(false);
+            return Ok(response.Organizations);
         }
 
         [HttpGet("{organizationId:guid}")]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
+                return Unauthorized();
 
-                    var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
+            var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
-                    var response = await _mediator
-                        .Send(getSingleOrganizationCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(getSingleOrganizationCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response.Organization);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response.Organization);
         }
 
         [HttpPost]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
         public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFas)
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFas)
+                return Unauthorized();
 
-                    var createOrganizationCommand = new CreateOrganizationCommand(organization);
+            var createOrganizationCommand = new CreateOrganizationCommand(organization);
 
-                    var response = await _mediator
-                        .Send(createOrganizationCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(createOrganizationCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response.OrganizationId.ToString());
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response.OrganizationId.ToString());
         }
 
         [HttpPut("{organizationId:guid}")]
@@ -108,55 +89,45 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             Guid organizationId,
             ChangeOrganizationDto organization)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFas)
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFas)
+                return Unauthorized();
 
-                    var updateOrganizationCommand =
-                        new UpdateOrganizationCommand(organizationId, organization);
+            var updateOrganizationCommand =
+                new UpdateOrganizationCommand(organizationId, organization);
 
-                    var response = await _mediator
-                        .Send(updateOrganizationCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(updateOrganizationCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response);
         }
 
         [HttpGet("{organizationId:guid}/actor")]
         public async Task<IActionResult> GetActorsAsync(Guid organizationId)
         {
-            return await this.ProcessAsync(
-                async () =>
+            if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
+                return Unauthorized();
+
+            var getActorsCommand = new GetActorsCommand(organizationId);
+
+            var response = await _mediator
+                .Send(getActorsCommand)
+                .ConfigureAwait(false);
+
+            var filteredActors = response.Actors;
+
+            if (!_userContext.CurrentUser.IsFas)
+            {
+                filteredActors = filteredActors.Select(actor =>
                 {
-                    if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
-                        return Unauthorized();
+                    if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
+                        return actor;
 
-                    var getActorsCommand = new GetActorsCommand(organizationId);
+                    return actor with { Name = new ActorNameDto(string.Empty) };
+                });
+            }
 
-                    var response = await _mediator
-                        .Send(getActorsCommand)
-                        .ConfigureAwait(false);
-
-                    var filteredActors = response.Actors;
-
-                    if (!_userContext.CurrentUser.IsFas)
-                    {
-                        filteredActors = filteredActors.Select(actor =>
-                        {
-                            if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
-                                return actor;
-
-                            return actor with { Name = new ActorNameDto(string.Empty) };
-                        });
-                    }
-
-                    return Ok(filteredActors);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(filteredActors);
         }
     }
 }
