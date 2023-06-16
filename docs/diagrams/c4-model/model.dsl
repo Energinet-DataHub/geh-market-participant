@@ -10,7 +10,7 @@ markpartDomain = group "Market Participant" {
         tags "Intermediate Technology" "SaaS" "Microsoft Azure - SendGrid Accounts"
 
         # Base model relationships
-        this -> extUser "Sends invitation mail"
+        this -> dh3User "Sends invitation mail"
     }
     commonB2C = container "App Registrations" {
         description "Cloud identity directory"
@@ -61,7 +61,7 @@ markpartDomain = group "Market Participant" {
             tags "Microsoft Azure - Function Apps"
 
             # Base model relationships
-            this -> extUser "Sends invitation mail" {
+            this -> dh3User "Sends invitation mail" {
                 tags "Simple View"
             }
 
