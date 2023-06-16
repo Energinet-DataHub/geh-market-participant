@@ -31,6 +31,8 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
 
     public static string TestBackendAppId => "7C39AF16-AEA0-4B00-B4DB-D3E7B2D90A2E";
 
+    public bool AllowAllTokens { get; set; }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -41,5 +43,6 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         builder.UseSetting(Settings.BackendBffAppId.Key, TestBackendAppId);
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
+        builder.UseSetting(Settings.AllowAllTokens.Key, AllowAllTokens ? "true" : "false");
     }
 }

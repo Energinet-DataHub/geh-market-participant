@@ -25,6 +25,7 @@ using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
@@ -72,6 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCommonExceptionHandling();
 
             app.UseAuthentication();
             app.UseAuthorization();
