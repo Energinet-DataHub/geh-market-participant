@@ -2,7 +2,7 @@
   "id" : 1,
   "name" : "DataHub 3.0",
   "description" : "Description",
-  "lastModifiedDate" : "2023-06-15T22:24:52Z",
+  "lastModifiedDate" : "2023-06-16T08:00:35Z",
   "properties" : {
     "structurizr.dsl" : "IyBUaGUgJ3ZpZXdzLmRzbCcgZmlsZSBpcyBpbnRlbmRlZCBhcyBhIG1lYW4gZm9yIHZpZXdpbmcgYW5kIHZhbGlkYXRpbmcgdGhlIG1vZGVsCiMgaW4gdGhlIGRvbWFpbiByZXBvc2l0b3J5LiBJdCBzaG91bGQKIyAgICogRXh0ZW5kIHRoZSBiYXNlIG1vZGVsIGFuZCBvdmVycmlkZSB0aGUgJ2RoMycgc29mdHdhcmUgc3lzdGVtCiMgICAqIEluY2x1ZGUgb2YgdGhlIGBtb2RlbC5kc2xgIGZpbGVzIGZyb20gZWFjaCBkb21haW4gcmVwb3NpdG9yeSB1c2luZyBhbiBVUkwKIwojIFRoZSBgbW9kZWwuZHNsYCBmaWxlIG11c3QgY29udGFpbiB0aGUgYWN0dWFsIG1vZGVsLCBhbmQgaXMgdGhlIHBpZWNlIHRoYXQgbXVzdAojIGJlIHJldXNhYmxlIGFuZCBpbmNsdWRlZCBpbiBvdGhlciBTdHJ1Y3R1cml6ciBmaWxlcyBsaWtlIGB2aWV3cy5kc2xgIGFuZAojIGRlcGxveW1lbnQgZGlhZ3JhbSBmaWxlcy4KCndvcmtzcGFjZSBleHRlbmRzIGh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9FbmVyZ2luZXQtRGF0YUh1Yi9vcGVuZ2VoLWFyY2gtZGlhZ3JhbXMvbWFpbi9kb2NzL2RpYWdyYW1zL2M0LW1vZGVsL2RoLWJhc2UtbW9kZWwuZHNsIHsKCiAgICBtb2RlbCB7CiAgICAgICAgIwogICAgICAgICMgRGF0YUh1YiAzLjAgKGV4dGVuZHMpCiAgICAgICAgIwogICAgICAgICFyZWYgZGgzIHsKCiAgICAgICAgICAgICMgSU1QT1JUQU5UOgogICAgICAgICAgICAjIFRoZSBvcmRlciBieSB3aGljaCBtb2RlbHMgYXJlIGluY2x1ZGVkIGlzIGltcG9ydGFudCBmb3IgaG93IHRoZSBkb21haW4tdG8tZG9tYWluIHJlbGF0aW9uc2hpcHMgYXJlIHNwZWNpZmllZC4KICAgICAgICAgICAgIyBBIGRvbWFpbi10by1kb21haW4gcmVsYXRpb25zaGlwIHNob3VsZCBiZSBzcGVjaWZpZWQgaW4gdGhlICJjbGllbnQiIG9mIGEgImNsaWVudC0+c2VydmVyIiBkZXBlbmRlbmN5LCBhbmQKICAgICAgICAgICAgIyBoZW5jZSBkb21haW5zIHRoYXQgZG9lc24ndCBkZXBlbmQgb24gb3RoZXJzLCBzaG91bGQgYmUgbGlzdGVkIGZpcnN0LgoKICAgICAgICAgICAgIyBJbmNsdWRlIE1hcmtldCBQYXJ0aWNpcGFudCBtb2RlbAogICAgICAgICAgICAjIFJlYWQgZGVzY3JpcHRpb24gaW4gdGhlICd2aWV3cy5kc2wnIGZpbGUuCiAgICAgICAgICAgIAogICAgICAgICAgICBtYXJrcGFydERvbWFpbiA9IGdyb3VwICJNYXJrZXQgUGFydGljaXBhbnQiIHsKICAgICAgICAgICAgICAgICMKICAgICAgICAgICAgICAgICMgQ29tbW9uIChtYW5hZ2VkIGJ5IE1hcmtldCBQYXJ0aWNpcGFudCkKICAgICAgICAgICAgICAgICMKICAgICAgICAgICAgICAgIGNvbW1vblNlbmRHcmlkID0gY29udGFpbmVyICJTZW5kR3JpZCIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJFTWFpbCBkaXNwYXRjaGVyIgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIlR3aWxpbyBTZW5kR3JpZCIKICAgICAgICAgICAgICAgICAgICB0YWdzICJJbnRlcm1lZGlhdGUgVGVjaG5vbG9neSIgIlNhYVMiICJNaWNyb3NvZnQgQXp1cmUgLSBTZW5kR3JpZCBBY2NvdW50cyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgIyBCYXNlIG1vZGVsIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGRoM1VzZXIgIlNlbmRzIGludml0YXRpb24gbWFpbCIKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGNvbW1vbkIyQyA9IGNvbnRhaW5lciAiQXBwIFJlZ2lzdHJhdGlvbnMiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQ2xvdWQgaWRlbnRpdHkgZGlyZWN0b3J5IgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkF6dXJlIEFEIEIyQyIKICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBenVyZSBBRCBCMkMiCiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICMgQmFzZSBtb2RlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgYWN0b3JCMkJTeXN0ZW0gLT4gdGhpcyAiUmVxdWVzdCBPQXV0aCB0b2tlbiIgImh0dHBzIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk9BdXRoIgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAjCiAgICAgICAgICAgICAgICAjIERvbWFpbgogICAgICAgICAgICAgICAgIwogICAgICAgICAgICAgICAgbWFya3BhcnREYiA9IGNvbnRhaW5lciAiQWN0b3JzIERhdGFiYXNlIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlN0b3JlcyBkYXRhIHJlZ2FyZGluZyBhY3RvcnMsIHVzZXJzIGFuZCBwZXJtaXNzaW9ucy4iCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiU1FMIERhdGFiYXNlIFNjaGVtYSIKICAgICAgICAgICAgICAgICAgICB0YWdzICJEYXRhIFN0b3JhZ2UiICJNaWNyb3NvZnQgQXp1cmUgLSBTUUwgRGF0YWJhc2UiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBtYXJrcGFydEFwaSA9IGNvbnRhaW5lciAiTWFya2V0IFBhcnRpY2lwYW50IEFQSSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJNdWx0aS10ZW5hbnQgQVBJIGZvciBtYW5hZ2luZyBhY3RvcnMsIHVzZXJzIGFuZCBwZXJtaXNzaW9ucy4iCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQXNwLk5ldCBDb3JlIFdlYiBBUEkiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gQXBwIFNlcnZpY2VzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBtYXJrcGFydERiICJSZWFkcyBhbmQgd3JpdGVzIGFjdG9yL3VzZXIgZGF0YS4iICJFRiBDb3JlIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgbWFya3BhcnRPcmdhbml6YXRpb25NYW5hZ2VyID0gY29udGFpbmVyICJNYXJrZXQgUGFydGljaXBhbnQgPE9yZ2FuaXphdGlvbiBNYW5hZ2VyPiIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICI8YWRkIGRlc2NyaXB0aW9uPiIKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJBenVyZSBmdW5jdGlvbiwgQyMiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiTWljcm9zb2Z0IEF6dXJlIC0gRnVuY3Rpb24gQXBwcyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgbWFya3BhcnRFdmVudEFjdG9yU3luY2hyb25pemVyID0gY29tcG9uZW50ICJBY3RvciBTeW5jaHJvbml6ZXIiIHsKICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkNyZWF0ZXMgQjJDIGFwcGxpY2F0aW9uIHJlZ2lzdHJhdGlvbiBmb3IgbmV3bHkgY3JlYXRlZCBhY3RvcnMuIgogICAgICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJUaW1lciBUcmlnZ2VyIgogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGdW5jdGlvbiBBcHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIyBDb21tb24gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGNvbW1vbkIyQyAiQ3JlYXRlcyBCMkMgQXBwIFJlZ2lzdHJhdGlvbiIgIk1pY3Jvc29mdC5HcmFwaC9odHRwcyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICMgRG9tYWluIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBtYXJrcGFydERiICJVcGRhdGVzIGFjdG9ycyB3aXRoIGV4dGVybmFsIEIyQyBpZC4iICJFRiBDb3JlIgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBtYXJrcGFydE1haWxEaXNwYXRjaGVyID0gY29tcG9uZW50ICJNYWlsIERpc3BhdGNoZXIiIHsKICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIlJlc3BvbnNpYmxlIGZvciBzZW5kaW5nIHVzZXIgaW52aXRhdGlvbnMuIgogICAgICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJUaW1lciBUcmlnZ2VyIgogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGdW5jdGlvbiBBcHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIyBCYXNlIG1vZGVsIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBkaDNVc2VyICJTZW5kcyBpbnZpdGF0aW9uIG1haWwiIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIlNpbXBsZSBWaWV3IgogICAgICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAjIENvbW1vbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gY29tbW9uU2VuZEdyaWQgIlNlbmRzIGludml0YXRpb24gbWFpbCIgIlNlbmRHcmlkL2h0dHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIyBEb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IG1hcmtwYXJ0RGIgIlJlYWRzIGRhdGEgcmVnYXJkaW5nIG5ld2x5IGludml0ZWQgdXNlcnMuIiAiRUYgQ29yZSIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgICMgSW5jbHVkZSBFREkgbW9kZWwKICAgICAgICAgICAgIyBSZWFkIGRlc2NyaXB0aW9uIGluIHRoZSAndmlld3MuZHNsJyBmaWxlLgogICAgICAgICAgICAKICAgICAgICAgICAgZWRpRG9tYWluID0gZ3JvdXAgIkVESSIgewogICAgICAgICAgICAgICAgZWRpRGIgPSBjb250YWluZXIgIkVESSBEYXRhYmFzZSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdG9yZXMgaW5mb3JtYXRpb24gcmVsYXRlZCB0byBidXNpbmVzcyB0cmFuc2FjdGlvbnMgYW5kIG91dGdvaW5nIG1lc3NhZ2VzIgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIlNRTCBEYXRhYmFzZSBTY2hlbWEiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiRGF0YSBTdG9yYWdlLCBNaWNyb3NvZnQgQXp1cmUgLSBTUUwgRGF0YWJhc2UiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBlZGlBcGlBcHAgPSBjb250YWluZXIgIkVESSBXZWIgQVBJIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIjxhZGQgZGVzY3JpcHRpb24+IgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkF6dXJlIGZ1bmN0aW9uLCBDIyIKICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGdW5jdGlvbiBBcHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICBlZGlQZWVrQ29tcG9uZW50ID0gY29tcG9uZW50ICJQZWVrIGNvbXBvbmVudCIgewogICAgICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiSGFuZGxlcyBwZWVrIHJlcXVlc3RzIGZyb20gYWN0b3JzIgogICAgICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJIdHRwIFRyaWdnZXIiCiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEZ1bmN0aW9uIEFwcHMiCiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gZWRpRGIgIlJlYWRzIC8gZ2VuZXJhdGVzIG1lc3NhZ2VzIiAiRUYgQ29yZSIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgZWRpRGVxdWV1ZUNvbXBvbmVudCA9IGNvbXBvbmVudCAiRGVxdWV1ZSBjb21wb25lbnQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkhhbmRsZXMgZGVxdWV1ZSByZXF1ZXN0cyBmcm9tIGFjdG9ycyIKICAgICAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiSHR0cCBUcmlnZ2VyIgogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGdW5jdGlvbiBBcHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIyBEb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGVkaURiICJEZWxldGVzIG1lc3NhZ2VzIHRoYXQgaGF2ZSBiZWVuIHBlZWtlZCIgIkVGIENvcmUiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIGVkaVRpbWVTZXJpZXNSZXF1ZXN0ZXIgPSBjb21wb25lbnQgIlRpbWVTZXJpZXMgcmVxdWVzdCBjb21wb25lbnQiIHsKICAgICAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkZldGNoZXMgdGltZSBzZXJpZXMgZGF0YSBmcm9tIHJlbGV2YW50IGRvbWFpbiIKICAgICAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiPD8+IFRyaWdnZXIiCiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEZ1bmN0aW9uIEFwcHMiCiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gZWRpRGIgIldyaXRlcyB0aW1lIHNlcmllcyBkYXRhIHRvIGRhdGFiYXNlIiAiRUYgQ29yZSIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgZWRpVGltZVNlcmllc0xpc3RlbmVyID0gY29tcG9uZW50ICJUaW1lU2VyaWVzIGxpc3RlbmVyIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJMaXN0ZW5zIGZvciBpbnRlZ3JhdGlvbiBldmVudHMgaW5kaWNhdGluZyB0aW1lIHNlcmllcyBkYXRhIGlzIHJlYWR5IgogICAgICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJTZXJ2aWNlIEJ1cyBUcmlnZ2VyIgogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBGdW5jdGlvbiBBcHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgIyBCYXNlIG1vZGVsIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBkaDMuc2hhcmVkU2VydmljZUJ1cyAiSGFuZGxlcyBldmVudHMgaW5kaWNhdGluZyB0aW1lIHNlcmllcyBkYXRhIGlzIGF2YWlsYWJsZSIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICMgRG9tYWluIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBlZGlUaW1lU2VyaWVzUmVxdWVzdGVyICJUcmlnZ2VycyByZXF1ZXN0ZXIgdG8gZmV0Y2ggdGltZSBzZXJpZXMgZGF0YSIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICMgQmFzZSBtb2RlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgYWN0b3JCMkJTeXN0ZW0gLT4gdGhpcyAiUGVlay9EZXF1ZXVlIG1lc3NhZ2VzIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIlNpbXBsZSBWaWV3IgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGVkaUFwaSA9IGNvbnRhaW5lciAiRURJIEFQSSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJBUEkgR2F0ZXdheSB0byBFREkgV2ViIEFQSSIKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJBenVyZSBBUEkgTWFuYWdlbWVudCBTZXJ2aWNlIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkludGVybWVkaWF0ZSBUZWNobm9sb2d5IiAiTWljcm9zb2Z0IEF6dXJlIC0gQVBJIE1hbmFnZW1lbnQgU2VydmljZXMiCiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICMgQmFzZSBtb2RlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgYWN0b3JCMkJTeXN0ZW0gLT4gdGhpcyAiUGVlay9EZXF1ZXVlIG1lc3NhZ2VzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBlZGlQZWVrQ29tcG9uZW50ICJQZWVrIG1lc3NhZ2VzIgogICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gZWRpRGVxdWV1ZUNvbXBvbmVudCAiRGVxdWV1ZSBtZXNzYWdlcyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgIyBEb21haW4tdG8tZG9tYWluIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGNvbW1vbkIyQyAiVmFsaWRhdGUgT0F1dGggdG9rZW4iICJodHRwcyIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJPQXV0aCIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgICMgSW5jbHVkZSBXaG9sZXNhbGUgbW9kZWwKICAgICAgICAgICAgIyBSZWFkIGRlc2NyaXB0aW9uIGluIHRoZSAndmlld3MuZHNsJyBmaWxlLgogICAgICAgICAgICAKICAgICAgICAgICAgd2hvbGVzYWxlRG9tYWluID0gZ3JvdXAgIldob2xlc2FsZSIgewogICAgICAgICAgICAgICAgd2hvbGVzYWxlRGF0YUxha2UgPSBjb250YWluZXIgIkRhdGEgTGFrZSAoV2hvbGVzYWxlKSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJTdG9yZXMgYmF0Y2ggcmVzdWx0cyIKICAgICAgICAgICAgICAgICAgICB0ZWNobm9sb2d5ICJBenVyZSBEYXRhIExha2UgR2VuIDIiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiRGF0YSBTdG9yYWdlIiAiTWljcm9zb2Z0IEF6dXJlIC0gRGF0YSBMYWtlIFN0b3JlIEdlbjEiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB3aG9sZXNhbGVDYWxjdWxhdG9yID0gY29udGFpbmVyICJDYWxjdWxhdGlvbiBFbmdpbmUiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiPGFkZCBkZXNjcmlwdGlvbj4iCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQXp1cmUgRGF0YWJyaWNrcyIKICAgICAgICAgICAgICAgICAgICB0YWdzICJNaWNyb3NvZnQgQXp1cmUgLSBBenVyZSBEYXRhYnJpY2tzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiB3aG9sZXNhbGVEYXRhTGFrZSAid3JpdGUgdG8iCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB3aG9sZXNhbGVEYiA9IGNvbnRhaW5lciAiV2hvbGVzYWxlIERhdGFiYXNlIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIjxhZGQgZGVzY3JpcHRpb24+IgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIlNRTCBEYXRhYmFzZSBTY2hlbWEiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiRGF0YSBTdG9yYWdlIiAiTWljcm9zb2Z0IEF6dXJlIC0gU1FMIERhdGFiYXNlIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgd2hvbGVzYWxlQXBpID0gY29udGFpbmVyICJXaG9sZXNhbGUgQVBJIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIjxhZGQgZGVzY3JpcHRpb24+IgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkFzcC5OZXQgQ29yZSBXZWIgQVBJIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEFwcCBTZXJ2aWNlcyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgIyBCYXNlIG1vZGVsIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGRoMy5zaGFyZWRTZXJ2aWNlQnVzICJwdWJsaXNoZXMgZXZlbnRzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiB3aG9sZXNhbGVEYiAidXNlcyIgIkVGIENvcmUiCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiB3aG9sZXNhbGVDYWxjdWxhdG9yICJzZW5kcyByZXF1ZXN0cyB0byIKICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IHdob2xlc2FsZURhdGFMYWtlICJyZXRyaWV2ZXMgcmVzdWx0cyBmcm9tIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbi10by1kb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gZWRpVGltZVNlcmllc0xpc3RlbmVyICJub3RpZnkgb2YgPGV2ZW50PiIgIm1lc3NhZ2UvYW1xcCIgewogICAgICAgICAgICAgICAgICAgICAgICB0YWdzICJTaW1wbGUgVmlldyIKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgICMgSW5jbHVkZSBGcm9udGVuZCBtb2RlbAogICAgICAgICAgICAjIFJlYWQgZGVzY3JpcHRpb24gaW4gdGhlICd2aWV3cy5kc2wnIGZpbGUuCiAgICAgICAgICAgIAogICAgICAgICAgICBmcm9udGVuZERvbWFpbiA9IGdyb3VwICJGcm9udGVuZCIgewogICAgICAgICAgICAgICAgYmZmQXBwID0gY29udGFpbmVyICJCRkYgV2ViIEFQSSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJCYWNrZW5kIGZvciBmcm9udGVuZCAoQkZGKSBjb21iaW5lcyBkYXRhIGZvciBwcmVzZW50YXRpb24gb24gRGF0YUh1YiAzIFVJIgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkFzcC5OZXQgQ29yZSBXZWIgQVBJIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIk1pY3Jvc29mdCBBenVyZSAtIEFwcCBTZXJ2aWNlcyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgIyBEb21haW4tdG8tZG9tYWluIHJlbGF0aW9uc2hpcHMKICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IHdob2xlc2FsZUFwaSAidXNlcyIgImpzb24vaHR0cHMiCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBtYXJrcGFydEFwaSAiVXNlcyIgImpzb24vaHR0cHMiCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICBiZmZBcGkgPSBjb250YWluZXIgIkJGRiBBUEkiIHsKICAgICAgICAgICAgICAgICAgICBkZXNjcmlwdGlvbiAiQVBJIEdhdGV3YXkgdG8gQkZGIFdlYiBBUEkiCiAgICAgICAgICAgICAgICAgICAgdGVjaG5vbG9neSAiQXp1cmUgQVBJIE1hbmFnZW1lbnQgU2VydmljZSIKICAgICAgICAgICAgICAgICAgICB0YWdzICJJbnRlcm1lZGlhdGUgVGVjaG5vbG9neSIgIk1pY3Jvc29mdCBBenVyZSAtIEFQSSBNYW5hZ2VtZW50IFNlcnZpY2VzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbiByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgdGhpcyAtPiBiZmZBcHAgIlVzZXMiICJqc29uL2h0dHBzIgogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbi10by1kb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gY29tbW9uQjJDICJWYWxpZGF0ZSBPQXV0aCB0b2tlbiIgImh0dHBzIiB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRhZ3MgIk9BdXRoIgogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGZyb250ZW5kU2luZ2xlUGFnZUFwcGxpY2F0aW9uID0gY29udGFpbmVyICJVSSIgewogICAgICAgICAgICAgICAgICAgIGRlc2NyaXB0aW9uICJQcm92aWRlcyBESDMgZnVuY3Rpb25hbGl0eSB0byB1c2VycyB2aWEgdGhlaXIgd2ViIGJyb3dzZXIuIgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIkFuZ3VsYXIiCiAgICAgICAgICAgICAgICAgICAgdGFncyAiV2ViIEJyb3dzZXIiCiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICMgQmFzZSBtb2RlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgZGgzVXNlciAtPiB0aGlzICJVc2VzIgogICAgICAgICAgICAgICAgICAgIGRoU3lzdGVtQWRtaW4gLT4gdGhpcyAiVmlld3MgYW5kIG1hbmFnZXMgZGF0YSBhY3Jvc3MgYWxsIGFjdG9ycyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgIyBEb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gYmZmQXBpICJVc2VzIiAianNvbi9odHRwcyIKICAgICAgICAgICAgICAgICAgICB0aGlzIC0+IGJmZkFwcCAiVXNlcyIgImpzb24vaHR0cHMiIHsKICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiU2ltcGxlIFZpZXciCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAjIERvbWFpbi10by1kb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gY29tbW9uQjJDICJSZXF1ZXN0IE9BdXRoIHRva2VuIiAiaHR0cHMiIHsKICAgICAgICAgICAgICAgICAgICAgICAgdGFncyAiT0F1dGgiCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgZnJvbnRlbmRTdGF0aWNXZWJBcHAgPSBjb250YWluZXIgIlN0YXRpYyBXZWIgQXBwIiB7CiAgICAgICAgICAgICAgICAgICAgZGVzY3JpcHRpb24gIkRlbGl2ZXJzIHRoZSBzdGF0aWMgY29udGVudCBhbmQgdGhlIFVJIHNpbmdsZSBwYWdlIGFwcGxpY2F0aW9uIgogICAgICAgICAgICAgICAgICAgIHRlY2hub2xvZ3kgIlN0YXRpYyBXZWIgQXBwIgogICAgICAgICAgICAgICAgICAgIHRhZ3MgIkludGVybWVkaWF0ZSBUZWNobm9sb2d5IiAiTWljcm9zb2Z0IEF6dXJlIC0gU3RhdGljIEFwcHMiCiAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICMgQmFzZSBtb2RlbCByZWxhdGlvbnNoaXBzCiAgICAgICAgICAgICAgICAgICAgZGgzVXNlciAtPiB0aGlzICJWaXNpdHMgREgzIHVybCIgImh0dHBzIgogICAgICAgICAgICAgICAgICAgIGRoU3lzdGVtQWRtaW4gLT4gdGhpcyAiVmlzaXRzIERIMyB1cmwiICJodHRwcyIKICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgIyBEb21haW4gcmVsYXRpb25zaGlwcwogICAgICAgICAgICAgICAgICAgIHRoaXMgLT4gZnJvbnRlbmRTaW5nbGVQYWdlQXBwbGljYXRpb24gIkRlbGl2ZXJzIHRvIHVzZXJzIHdlYiBicm93c2VyIgogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIHZpZXdzIHsKICAgICAgICBjb250YWluZXIgZGgzICJNYXJrZXRQYXJ0aWNpcGFudCIgewogICAgICAgICAgICB0aXRsZSAiW0NvbnRhaW5lcl0gRGF0YUh1YiAzLjAgLSBNYXJrZXQgUGFydGljaXBhbnQgKFNpbXBsaWZpZWQpIgogICAgICAgICAgICBpbmNsdWRlIC0+bWFya3BhcnREb21haW4tPgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1PQXV0aCIKICAgICAgICAgICAgZXhjbHVkZSAiZWxlbWVudC50YWc9PUludGVybWVkaWF0ZSBUZWNobm9sb2d5IgogICAgICAgIH0KCiAgICAgICAgY29udGFpbmVyIGRoMyAiTWFya2V0UGFydGljaXBhbnREZXRhaWxlZCIgewogICAgICAgICAgICB0aXRsZSAiW0NvbnRhaW5lcl0gRGF0YUh1YiAzLjAgLSBNYXJrZXQgUGFydGljaXBhbnQgKERldGFpbGVkIHdpdGggT0F1dGgpIgogICAgICAgICAgICBpbmNsdWRlIC0+bWFya3BhcnREb21haW4tPgogICAgICAgICAgICBleGNsdWRlICJyZWxhdGlvbnNoaXAudGFnPT1TaW1wbGUgVmlldyIKICAgICAgICB9CiAgICB9Cn0K"
   },
@@ -357,6 +357,32 @@
       "group" : "Energinet Organization/DataHub Organization",
       "location" : "Unspecified",
       "containers" : [ {
+        "id" : "88",
+        "tags" : "Element,Container,Intermediate Technology,Microsoft Azure - API Management Services",
+        "properties" : {
+          "structurizr.dsl.identifier" : "bffapi"
+        },
+        "name" : "BFF API",
+        "description" : "API Gateway to BFF Web API",
+        "relationships" : [ {
+          "id" : "89",
+          "tags" : "Relationship",
+          "sourceId" : "88",
+          "destinationId" : "85",
+          "description" : "Uses",
+          "technology" : "json/https"
+        }, {
+          "id" : "90",
+          "tags" : "Relationship,OAuth",
+          "sourceId" : "88",
+          "destinationId" : "37",
+          "description" : "Validate OAuth token",
+          "technology" : "https"
+        } ],
+        "group" : "Frontend",
+        "technology" : "Azure API Management Service",
+        "documentation" : { }
+      }, {
         "id" : "91",
         "tags" : "Element,Container,Web Browser",
         "properties" : {
@@ -390,6 +416,24 @@
         "technology" : "Angular",
         "documentation" : { }
       }, {
+        "id" : "34",
+        "tags" : "Element,Container,Intermediate Technology,SaaS,Microsoft Azure - SendGrid Accounts",
+        "properties" : {
+          "structurizr.dsl.identifier" : "commonsendgrid"
+        },
+        "name" : "SendGrid",
+        "description" : "EMail dispatcher",
+        "relationships" : [ {
+          "id" : "35",
+          "tags" : "Relationship",
+          "sourceId" : "34",
+          "destinationId" : "1",
+          "description" : "Sends invitation mail"
+        } ],
+        "group" : "Market Participant",
+        "technology" : "Twilio SendGrid",
+        "documentation" : { }
+      }, {
         "id" : "17",
         "tags" : "Element,Container,Intermediate Technology,PaaS,Microsoft Azure - Azure Service Bus",
         "properties" : {
@@ -398,17 +442,6 @@
         "name" : "Message broker",
         "description" : "Message broker with message queues and publish-subscribe topics",
         "technology" : "Azure Service Bus",
-        "documentation" : { }
-      }, {
-        "id" : "39",
-        "tags" : "Element,Container,Data Storage,Microsoft Azure - SQL Database",
-        "properties" : {
-          "structurizr.dsl.identifier" : "markpartdb"
-        },
-        "name" : "Actors Database",
-        "description" : "Stores data regarding actors, users and permissions.",
-        "group" : "Market Participant",
-        "technology" : "SQL Database Schema",
         "documentation" : { }
       }, {
         "id" : "42",
@@ -507,71 +540,40 @@
         } ],
         "documentation" : { }
       }, {
-        "id" : "88",
-        "tags" : "Element,Container,Intermediate Technology,Microsoft Azure - API Management Services",
+        "id" : "97",
+        "tags" : "Element,Container,Intermediate Technology,Microsoft Azure - Static Apps",
         "properties" : {
-          "structurizr.dsl.identifier" : "bffapi"
+          "structurizr.dsl.identifier" : "frontendstaticwebapp"
         },
-        "name" : "BFF API",
-        "description" : "API Gateway to BFF Web API",
+        "name" : "Static Web App",
+        "description" : "Delivers the static content and the UI single page application",
         "relationships" : [ {
-          "id" : "89",
+          "id" : "100",
           "tags" : "Relationship",
-          "sourceId" : "88",
-          "destinationId" : "85",
-          "description" : "Uses",
-          "technology" : "json/https"
-        }, {
-          "id" : "90",
-          "tags" : "Relationship,OAuth",
-          "sourceId" : "88",
-          "destinationId" : "37",
-          "description" : "Validate OAuth token",
-          "technology" : "https"
+          "sourceId" : "97",
+          "destinationId" : "91",
+          "description" : "Delivers to users web browser"
         } ],
         "group" : "Frontend",
-        "technology" : "Azure API Management Service",
+        "technology" : "Static Web App",
         "documentation" : { }
       }, {
-        "id" : "40",
-        "tags" : "Element,Container,Microsoft Azure - App Services",
+        "id" : "75",
+        "tags" : "Element,Container,Microsoft Azure - Azure Databricks",
         "properties" : {
-          "structurizr.dsl.identifier" : "markpartapi"
+          "structurizr.dsl.identifier" : "wholesalecalculator"
         },
-        "name" : "Market Participant API",
-        "description" : "Multi-tenant API for managing actors, users and permissions.",
-        "relationships" : [ {
-          "id" : "41",
-          "tags" : "Relationship",
-          "sourceId" : "40",
-          "destinationId" : "39",
-          "description" : "Reads and writes actor/user data.",
-          "technology" : "EF Core"
-        } ],
-        "group" : "Market Participant",
-        "technology" : "Asp.Net Core Web API",
-        "documentation" : { }
-      }, {
-        "id" : "37",
-        "tags" : "Element,Container,Microsoft Azure - Azure AD B2C",
-        "properties" : {
-          "structurizr.dsl.identifier" : "commonb2c"
-        },
-        "name" : "App Registrations",
-        "description" : "Cloud identity directory",
-        "group" : "Market Participant",
-        "technology" : "Azure AD B2C",
-        "documentation" : { }
-      }, {
-        "id" : "77",
-        "tags" : "Element,Container,Data Storage,Microsoft Azure - SQL Database",
-        "properties" : {
-          "structurizr.dsl.identifier" : "wholesaledb"
-        },
-        "name" : "Wholesale Database",
+        "name" : "Calculation Engine",
         "description" : "<add description>",
+        "relationships" : [ {
+          "id" : "76",
+          "tags" : "Relationship",
+          "sourceId" : "75",
+          "destinationId" : "74",
+          "description" : "write to"
+        } ],
         "group" : "Wholesale",
-        "technology" : "SQL Database Schema",
+        "technology" : "Azure Databricks",
         "documentation" : { }
       }, {
         "id" : "85",
@@ -600,40 +602,196 @@
         "technology" : "Asp.Net Core Web API",
         "documentation" : { }
       }, {
-        "id" : "75",
-        "tags" : "Element,Container,Microsoft Azure - Azure Databricks",
+        "id" : "39",
+        "tags" : "Element,Container,Data Storage,Microsoft Azure - SQL Database",
         "properties" : {
-          "structurizr.dsl.identifier" : "wholesalecalculator"
+          "structurizr.dsl.identifier" : "markpartdb"
         },
-        "name" : "Calculation Engine",
-        "description" : "<add description>",
-        "relationships" : [ {
-          "id" : "76",
-          "tags" : "Relationship",
-          "sourceId" : "75",
-          "destinationId" : "74",
-          "description" : "write to"
-        } ],
-        "group" : "Wholesale",
-        "technology" : "Azure Databricks",
+        "name" : "Actors Database",
+        "description" : "Stores data regarding actors, users and permissions.",
+        "group" : "Market Participant",
+        "technology" : "SQL Database Schema",
         "documentation" : { }
       }, {
-        "id" : "97",
-        "tags" : "Element,Container,Intermediate Technology,Microsoft Azure - Static Apps",
+        "id" : "40",
+        "tags" : "Element,Container,Microsoft Azure - App Services",
         "properties" : {
-          "structurizr.dsl.identifier" : "frontendstaticwebapp"
+          "structurizr.dsl.identifier" : "markpartapi"
         },
-        "name" : "Static Web App",
-        "description" : "Delivers the static content and the UI single page application",
+        "name" : "Market Participant API",
+        "description" : "Multi-tenant API for managing actors, users and permissions.",
         "relationships" : [ {
-          "id" : "100",
+          "id" : "41",
           "tags" : "Relationship",
-          "sourceId" : "97",
-          "destinationId" : "91",
-          "description" : "Delivers to users web browser"
+          "sourceId" : "40",
+          "destinationId" : "39",
+          "description" : "Reads and writes actor/user data.",
+          "technology" : "EF Core"
         } ],
-        "group" : "Frontend",
-        "technology" : "Static Web App",
+        "group" : "Market Participant",
+        "technology" : "Asp.Net Core Web API",
+        "documentation" : { }
+      }, {
+        "id" : "68",
+        "tags" : "Element,Container,Intermediate Technology,Microsoft Azure - API Management Services",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ediapi"
+        },
+        "name" : "EDI API",
+        "description" : "API Gateway to EDI Web API",
+        "relationships" : [ {
+          "id" : "70",
+          "tags" : "Relationship",
+          "sourceId" : "68",
+          "destinationId" : "56",
+          "description" : "Peek messages"
+        }, {
+          "id" : "71",
+          "sourceId" : "68",
+          "destinationId" : "55",
+          "description" : "Peek messages",
+          "linkedRelationshipId" : "70"
+        }, {
+          "id" : "72",
+          "tags" : "Relationship",
+          "sourceId" : "68",
+          "destinationId" : "59",
+          "description" : "Dequeue messages"
+        }, {
+          "id" : "73",
+          "tags" : "Relationship,OAuth",
+          "sourceId" : "68",
+          "destinationId" : "37",
+          "description" : "Validate OAuth token",
+          "technology" : "https"
+        } ],
+        "group" : "EDI",
+        "technology" : "Azure API Management Service",
+        "documentation" : { }
+      }, {
+        "id" : "37",
+        "tags" : "Element,Container,Microsoft Azure - Azure AD B2C",
+        "properties" : {
+          "structurizr.dsl.identifier" : "commonb2c"
+        },
+        "name" : "App Registrations",
+        "description" : "Cloud identity directory",
+        "group" : "Market Participant",
+        "technology" : "Azure AD B2C",
+        "documentation" : { }
+      }, {
+        "id" : "55",
+        "tags" : "Element,Container,Microsoft Azure - Function Apps",
+        "properties" : {
+          "structurizr.dsl.identifier" : "ediapiapp"
+        },
+        "name" : "EDI Web API",
+        "description" : "<add description>",
+        "relationships" : [ {
+          "id" : "58",
+          "sourceId" : "55",
+          "destinationId" : "54",
+          "description" : "Reads / generates messages",
+          "technology" : "EF Core",
+          "linkedRelationshipId" : "57"
+        }, {
+          "id" : "65",
+          "sourceId" : "55",
+          "destinationId" : "17",
+          "description" : "Handles events indicating time series data is available",
+          "linkedRelationshipId" : "64"
+        } ],
+        "group" : "EDI",
+        "technology" : "Azure function, C#",
+        "components" : [ {
+          "id" : "56",
+          "tags" : "Element,Component,Microsoft Azure - Function Apps",
+          "properties" : {
+            "structurizr.dsl.identifier" : "edipeekcomponent"
+          },
+          "name" : "Peek component",
+          "description" : "Handles peek requests from actors",
+          "relationships" : [ {
+            "id" : "57",
+            "tags" : "Relationship",
+            "sourceId" : "56",
+            "destinationId" : "54",
+            "description" : "Reads / generates messages",
+            "technology" : "EF Core"
+          } ],
+          "technology" : "Http Trigger",
+          "documentation" : { }
+        }, {
+          "id" : "61",
+          "tags" : "Element,Component,Microsoft Azure - Function Apps",
+          "properties" : {
+            "structurizr.dsl.identifier" : "editimeseriesrequester"
+          },
+          "name" : "TimeSeries request component",
+          "description" : "Fetches time series data from relevant domain",
+          "relationships" : [ {
+            "id" : "62",
+            "tags" : "Relationship",
+            "sourceId" : "61",
+            "destinationId" : "54",
+            "description" : "Writes time series data to database",
+            "technology" : "EF Core"
+          } ],
+          "technology" : "<?> Trigger",
+          "documentation" : { }
+        }, {
+          "id" : "63",
+          "tags" : "Element,Component,Microsoft Azure - Function Apps",
+          "properties" : {
+            "structurizr.dsl.identifier" : "editimeserieslistener"
+          },
+          "name" : "TimeSeries listener",
+          "description" : "Listens for integration events indicating time series data is ready",
+          "relationships" : [ {
+            "id" : "64",
+            "tags" : "Relationship",
+            "sourceId" : "63",
+            "destinationId" : "17",
+            "description" : "Handles events indicating time series data is available"
+          }, {
+            "id" : "66",
+            "tags" : "Relationship",
+            "sourceId" : "63",
+            "destinationId" : "61",
+            "description" : "Triggers requester to fetch time series data"
+          } ],
+          "technology" : "Service Bus Trigger",
+          "documentation" : { }
+        }, {
+          "id" : "59",
+          "tags" : "Element,Component,Microsoft Azure - Function Apps",
+          "properties" : {
+            "structurizr.dsl.identifier" : "edidequeuecomponent"
+          },
+          "name" : "Dequeue component",
+          "description" : "Handles dequeue requests from actors",
+          "relationships" : [ {
+            "id" : "60",
+            "tags" : "Relationship",
+            "sourceId" : "59",
+            "destinationId" : "54",
+            "description" : "Deletes messages that have been peeked",
+            "technology" : "EF Core"
+          } ],
+          "technology" : "Http Trigger",
+          "documentation" : { }
+        } ],
+        "documentation" : { }
+      }, {
+        "id" : "74",
+        "tags" : "Element,Container,Data Storage,Microsoft Azure - Data Lake Store Gen1",
+        "properties" : {
+          "structurizr.dsl.identifier" : "wholesaledatalake"
+        },
+        "name" : "Data Lake (Wholesale)",
+        "description" : "Stores batch results",
+        "group" : "Wholesale",
+        "technology" : "Azure Data Lake Gen 2",
         "documentation" : { }
       }, {
         "id" : "78",
@@ -687,107 +845,15 @@
         "technology" : "Asp.Net Core Web API",
         "documentation" : { }
       }, {
-        "id" : "55",
-        "tags" : "Element,Container,Microsoft Azure - Function Apps",
+        "id" : "77",
+        "tags" : "Element,Container,Data Storage,Microsoft Azure - SQL Database",
         "properties" : {
-          "structurizr.dsl.identifier" : "ediapiapp"
+          "structurizr.dsl.identifier" : "wholesaledb"
         },
-        "name" : "EDI Web API",
+        "name" : "Wholesale Database",
         "description" : "<add description>",
-        "relationships" : [ {
-          "id" : "58",
-          "sourceId" : "55",
-          "destinationId" : "54",
-          "description" : "Reads / generates messages",
-          "technology" : "EF Core",
-          "linkedRelationshipId" : "57"
-        }, {
-          "id" : "65",
-          "sourceId" : "55",
-          "destinationId" : "17",
-          "description" : "Handles events indicating time series data is available",
-          "linkedRelationshipId" : "64"
-        } ],
-        "group" : "EDI",
-        "technology" : "Azure function, C#",
-        "components" : [ {
-          "id" : "61",
-          "tags" : "Element,Component,Microsoft Azure - Function Apps",
-          "properties" : {
-            "structurizr.dsl.identifier" : "editimeseriesrequester"
-          },
-          "name" : "TimeSeries request component",
-          "description" : "Fetches time series data from relevant domain",
-          "relationships" : [ {
-            "id" : "62",
-            "tags" : "Relationship",
-            "sourceId" : "61",
-            "destinationId" : "54",
-            "description" : "Writes time series data to database",
-            "technology" : "EF Core"
-          } ],
-          "technology" : "<?> Trigger",
-          "documentation" : { }
-        }, {
-          "id" : "56",
-          "tags" : "Element,Component,Microsoft Azure - Function Apps",
-          "properties" : {
-            "structurizr.dsl.identifier" : "edipeekcomponent"
-          },
-          "name" : "Peek component",
-          "description" : "Handles peek requests from actors",
-          "relationships" : [ {
-            "id" : "57",
-            "tags" : "Relationship",
-            "sourceId" : "56",
-            "destinationId" : "54",
-            "description" : "Reads / generates messages",
-            "technology" : "EF Core"
-          } ],
-          "technology" : "Http Trigger",
-          "documentation" : { }
-        }, {
-          "id" : "63",
-          "tags" : "Element,Component,Microsoft Azure - Function Apps",
-          "properties" : {
-            "structurizr.dsl.identifier" : "editimeserieslistener"
-          },
-          "name" : "TimeSeries listener",
-          "description" : "Listens for integration events indicating time series data is ready",
-          "relationships" : [ {
-            "id" : "64",
-            "tags" : "Relationship",
-            "sourceId" : "63",
-            "destinationId" : "17",
-            "description" : "Handles events indicating time series data is available"
-          }, {
-            "id" : "66",
-            "tags" : "Relationship",
-            "sourceId" : "63",
-            "destinationId" : "61",
-            "description" : "Triggers requester to fetch time series data"
-          } ],
-          "technology" : "Service Bus Trigger",
-          "documentation" : { }
-        }, {
-          "id" : "59",
-          "tags" : "Element,Component,Microsoft Azure - Function Apps",
-          "properties" : {
-            "structurizr.dsl.identifier" : "edidequeuecomponent"
-          },
-          "name" : "Dequeue component",
-          "description" : "Handles dequeue requests from actors",
-          "relationships" : [ {
-            "id" : "60",
-            "tags" : "Relationship",
-            "sourceId" : "59",
-            "destinationId" : "54",
-            "description" : "Deletes messages that have been peeked",
-            "technology" : "EF Core"
-          } ],
-          "technology" : "Http Trigger",
-          "documentation" : { }
-        } ],
+        "group" : "Wholesale",
+        "technology" : "SQL Database Schema",
         "documentation" : { }
       }, {
         "id" : "54",
@@ -800,72 +866,6 @@
         "group" : "EDI",
         "technology" : "SQL Database Schema",
         "documentation" : { }
-      }, {
-        "id" : "68",
-        "tags" : "Element,Container,Intermediate Technology,Microsoft Azure - API Management Services",
-        "properties" : {
-          "structurizr.dsl.identifier" : "ediapi"
-        },
-        "name" : "EDI API",
-        "description" : "API Gateway to EDI Web API",
-        "relationships" : [ {
-          "id" : "70",
-          "tags" : "Relationship",
-          "sourceId" : "68",
-          "destinationId" : "56",
-          "description" : "Peek messages"
-        }, {
-          "id" : "71",
-          "sourceId" : "68",
-          "destinationId" : "55",
-          "description" : "Peek messages",
-          "linkedRelationshipId" : "70"
-        }, {
-          "id" : "72",
-          "tags" : "Relationship",
-          "sourceId" : "68",
-          "destinationId" : "59",
-          "description" : "Dequeue messages"
-        }, {
-          "id" : "73",
-          "tags" : "Relationship,OAuth",
-          "sourceId" : "68",
-          "destinationId" : "37",
-          "description" : "Validate OAuth token",
-          "technology" : "https"
-        } ],
-        "group" : "EDI",
-        "technology" : "Azure API Management Service",
-        "documentation" : { }
-      }, {
-        "id" : "34",
-        "tags" : "Element,Container,Intermediate Technology,SaaS,Microsoft Azure - SendGrid Accounts",
-        "properties" : {
-          "structurizr.dsl.identifier" : "commonsendgrid"
-        },
-        "name" : "SendGrid",
-        "description" : "EMail dispatcher",
-        "relationships" : [ {
-          "id" : "35",
-          "tags" : "Relationship",
-          "sourceId" : "34",
-          "destinationId" : "1",
-          "description" : "Sends invitation mail"
-        } ],
-        "group" : "Market Participant",
-        "technology" : "Twilio SendGrid",
-        "documentation" : { }
-      }, {
-        "id" : "74",
-        "tags" : "Element,Container,Data Storage,Microsoft Azure - Data Lake Store Gen1",
-        "properties" : {
-          "structurizr.dsl.identifier" : "wholesaledatalake"
-        },
-        "name" : "Data Lake (Wholesale)",
-        "description" : "Stores batch results",
-        "group" : "Wholesale",
-        "technology" : "Azure Data Lake Gen 2",
-        "documentation" : { }
       } ],
       "documentation" : { }
     } ],
@@ -876,6 +876,87 @@
   "documentation" : { },
   "views" : {
     "systemLandscapeViews" : [ {
+      "key" : "SystemLandscape",
+      "order" : 1,
+      "title" : "[System Landscape] DataHub (Simplified)",
+      "description" : "'As-is' view of the DataHub company",
+      "paperSize" : "A3_Landscape",
+      "dimensions" : {
+        "width" : 4712,
+        "height" : 2408
+      },
+      "enterpriseBoundaryVisible" : true,
+      "elements" : [ {
+        "id" : "1",
+        "x" : 1079,
+        "y" : 433
+      }, {
+        "id" : "12",
+        "x" : 3325,
+        "y" : 433
+      }, {
+        "id" : "2",
+        "x" : 329,
+        "y" : 483
+      }, {
+        "id" : "13",
+        "x" : 1825,
+        "y" : 483
+      }, {
+        "id" : "3",
+        "x" : 1029,
+        "y" : 1133
+      }, {
+        "id" : "14",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "15",
+        "x" : 2575,
+        "y" : 483
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 3933,
+        "y" : 1133
+      }, {
+        "id" : "16",
+        "x" : 1825,
+        "y" : 1133
+      } ],
+      "relationships" : [ {
+        "id" : "29"
+      }, {
+        "id" : "27"
+      }, {
+        "id" : "25",
+        "vertices" : [ {
+          "x" : 929,
+          "y" : 937
+        }, {
+          "x" : 1658,
+          "y" : 1029
+        } ]
+      }, {
+        "id" : "24"
+      }, {
+        "id" : "23",
+        "vertices" : [ {
+          "x" : 3175,
+          "y" : 937
+        }, {
+          "x" : 2291,
+          "y" : 1029
+        } ]
+      }, {
+        "id" : "33"
+      }, {
+        "id" : "20"
+      } ]
+    }, {
       "key" : "SystemLandscapeDetailed",
       "order" : 2,
       "title" : "[System Landscape] DataHub (Detailed)",
@@ -979,87 +1060,6 @@
       }, {
         "id" : "19"
       } ]
-    }, {
-      "key" : "SystemLandscape",
-      "order" : 1,
-      "title" : "[System Landscape] DataHub (Simplified)",
-      "description" : "'As-is' view of the DataHub company",
-      "paperSize" : "A3_Landscape",
-      "dimensions" : {
-        "width" : 4712,
-        "height" : 2408
-      },
-      "enterpriseBoundaryVisible" : true,
-      "elements" : [ {
-        "id" : "1",
-        "x" : 1079,
-        "y" : 433
-      }, {
-        "id" : "12",
-        "x" : 3325,
-        "y" : 433
-      }, {
-        "id" : "2",
-        "x" : 329,
-        "y" : 483
-      }, {
-        "id" : "13",
-        "x" : 1825,
-        "y" : 483
-      }, {
-        "id" : "3",
-        "x" : 1029,
-        "y" : 1133
-      }, {
-        "id" : "14",
-        "x" : 0,
-        "y" : 0
-      }, {
-        "id" : "15",
-        "x" : 2575,
-        "y" : 483
-      }, {
-        "id" : "4",
-        "x" : 0,
-        "y" : 0
-      }, {
-        "id" : "5",
-        "x" : 3933,
-        "y" : 1133
-      }, {
-        "id" : "16",
-        "x" : 1825,
-        "y" : 1133
-      } ],
-      "relationships" : [ {
-        "id" : "29"
-      }, {
-        "id" : "27"
-      }, {
-        "id" : "25",
-        "vertices" : [ {
-          "x" : 929,
-          "y" : 937
-        }, {
-          "x" : 1658,
-          "y" : 1029
-        } ]
-      }, {
-        "id" : "24"
-      }, {
-        "id" : "23",
-        "vertices" : [ {
-          "x" : 3175,
-          "y" : 937
-        }, {
-          "x" : 2291,
-          "y" : 1029
-        } ]
-      }, {
-        "id" : "33"
-      }, {
-        "id" : "20"
-      } ]
     } ],
     "systemContextViews" : [ {
       "key" : "SystemContext",
@@ -1116,6 +1116,127 @@
       } ]
     } ],
     "containerViews" : [ {
+      "key" : "MarketParticipantDetailed",
+      "order" : 5,
+      "title" : "[Container] DataHub 3.0 - Market Participant (Detailed with OAuth)",
+      "softwareSystemId" : "16",
+      "paperSize" : "A2_Landscape",
+      "dimensions" : {
+        "width" : 4554,
+        "height" : 4058
+      },
+      "externalSoftwareSystemBoundariesVisible" : true,
+      "elements" : [ {
+        "id" : "88",
+        "x" : 3467,
+        "y" : 1033
+      }, {
+        "id" : "34",
+        "x" : 2937,
+        "y" : 2833
+      }, {
+        "id" : "1",
+        "x" : 1483,
+        "y" : 3433
+      }, {
+        "id" : "2",
+        "x" : 662,
+        "y" : 1633
+      }, {
+        "id" : "68",
+        "x" : 1425,
+        "y" : 2233
+      }, {
+        "id" : "37",
+        "x" : 2187,
+        "y" : 2833
+      }, {
+        "id" : "39",
+        "x" : 3687,
+        "y" : 2833
+      }, {
+        "id" : "91",
+        "x" : 3467,
+        "y" : 433
+      }, {
+        "id" : "40",
+        "x" : 3467,
+        "y" : 2233
+      }, {
+        "id" : "85",
+        "x" : 3467,
+        "y" : 1633
+      }, {
+        "id" : "42",
+        "x" : 2717,
+        "y" : 2233
+      } ],
+      "relationships" : [ {
+        "id" : "94"
+      }, {
+        "id" : "92",
+        "vertices" : [ {
+          "x" : 208,
+          "y" : 2387
+        }, {
+          "x" : 208,
+          "y" : 1779
+        }, {
+          "x" : 512,
+          "y" : 1633
+        } ]
+      }, {
+        "id" : "73"
+      }, {
+        "id" : "52"
+      }, {
+        "id" : "41"
+      }, {
+        "id" : "87"
+      }, {
+        "id" : "96",
+        "vertices" : [ {
+          "x" : 4067,
+          "y" : 1033
+        }, {
+          "x" : 4067,
+          "y" : 2637
+        }, {
+          "x" : 2787,
+          "y" : 2833
+        } ]
+      }, {
+        "id" : "90",
+        "vertices" : [ {
+          "x" : 2567,
+          "y" : 2129
+        } ]
+      }, {
+        "id" : "35",
+        "vertices" : [ {
+          "x" : 2787,
+          "y" : 3341
+        } ]
+      }, {
+        "id" : "45"
+      }, {
+        "id" : "69"
+      }, {
+        "id" : "47",
+        "vertices" : [ {
+          "x" : 3317,
+          "y" : 2637
+        } ]
+      }, {
+        "id" : "89"
+      }, {
+        "id" : "38",
+        "vertices" : [ {
+          "x" : 1246,
+          "y" : 2637
+        } ]
+      } ]
+    }, {
       "key" : "MarketParticipant",
       "order" : 4,
       "title" : "[Container] DataHub 3.0 - Market Participant (Simplified)",
@@ -1180,127 +1301,6 @@
         "id" : "45"
       }, {
         "id" : "47"
-      } ]
-    }, {
-      "key" : "MarketParticipantDetailed",
-      "order" : 5,
-      "title" : "[Container] DataHub 3.0 - Market Participant (Detailed with OAuth)",
-      "softwareSystemId" : "16",
-      "paperSize" : "A2_Landscape",
-      "dimensions" : {
-        "width" : 4554,
-        "height" : 4058
-      },
-      "externalSoftwareSystemBoundariesVisible" : true,
-      "elements" : [ {
-        "id" : "88",
-        "x" : 3467,
-        "y" : 1033
-      }, {
-        "id" : "1",
-        "x" : 1483,
-        "y" : 3433
-      }, {
-        "id" : "34",
-        "x" : 2937,
-        "y" : 2833
-      }, {
-        "id" : "2",
-        "x" : 662,
-        "y" : 1633
-      }, {
-        "id" : "68",
-        "x" : 1425,
-        "y" : 2233
-      }, {
-        "id" : "37",
-        "x" : 2187,
-        "y" : 2833
-      }, {
-        "id" : "39",
-        "x" : 3687,
-        "y" : 2833
-      }, {
-        "id" : "91",
-        "x" : 3467,
-        "y" : 433
-      }, {
-        "id" : "40",
-        "x" : 3467,
-        "y" : 2233
-      }, {
-        "id" : "85",
-        "x" : 3467,
-        "y" : 1633
-      }, {
-        "id" : "42",
-        "x" : 2717,
-        "y" : 2233
-      } ],
-      "relationships" : [ {
-        "id" : "94"
-      }, {
-        "id" : "92",
-        "vertices" : [ {
-          "x" : 208,
-          "y" : 2387
-        }, {
-          "x" : 208,
-          "y" : 1779
-        }, {
-          "x" : 512,
-          "y" : 1633
-        } ]
-      }, {
-        "id" : "73"
-      }, {
-        "id" : "41"
-      }, {
-        "id" : "52"
-      }, {
-        "id" : "87"
-      }, {
-        "id" : "96",
-        "vertices" : [ {
-          "x" : 4067,
-          "y" : 1033
-        }, {
-          "x" : 4067,
-          "y" : 2637
-        }, {
-          "x" : 2787,
-          "y" : 2833
-        } ]
-      }, {
-        "id" : "90",
-        "vertices" : [ {
-          "x" : 2567,
-          "y" : 2129
-        } ]
-      }, {
-        "id" : "35",
-        "vertices" : [ {
-          "x" : 2787,
-          "y" : 3341
-        } ]
-      }, {
-        "id" : "45"
-      }, {
-        "id" : "69"
-      }, {
-        "id" : "47",
-        "vertices" : [ {
-          "x" : 3317,
-          "y" : 2637
-        } ]
-      }, {
-        "id" : "89"
-      }, {
-        "id" : "38",
-        "vertices" : [ {
-          "x" : 1246,
-          "y" : 2637
-        } ]
       } ]
     } ],
     "configuration" : {
