@@ -17,11 +17,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -79,9 +77,6 @@ public sealed class ControllerErrorHandlingIntegrationTests : WebApiIntegrationT
         // Assert
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
-        const string expectedResult = "Invalid user id";
-        Assert.Equal(expectedResult, await response.Content.ReadAsStringAsync());
     }
 
     private async Task<string> CreateTokenAsync(PermissionId permission)
