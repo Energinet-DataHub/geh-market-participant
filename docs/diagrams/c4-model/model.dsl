@@ -7,15 +7,15 @@ markpartDomain = group "Market Participant" {
     commonSendGrid = container "SendGrid" {
         description "EMail dispatcher"
         technology "Twilio SendGrid"
-        tags "Intermediate Technology" "SaaS" "Microsoft Azure - SendGrid Accounts"
+        tags "Intermediate Technology" "SaaS" "Microsoft Azure - SendGrid Accounts" "deprecated"
 
         # Base model relationships
-        this -> dh3User "Sends invitation mail"
+        this -> dh3User "Sends invitation mail" "deprecated"
     }
     commonB2C = container "App Registrations" {
         description "Cloud identity directory"
         technology "Azure AD B2C"
-        tags "Microsoft Azure - Azure AD B2C"
+        tags "Microsoft Azure - Azure AD B2C" "deprecated"
 
         # Base model relationships
         actorB2BSystem -> this "Request OAuth token" "https" {
@@ -50,7 +50,7 @@ markpartDomain = group "Market Participant" {
             tags "Microsoft Azure - Function Apps"
 
             # Common relationships
-            this -> commonB2C "Creates B2C App Registration" "Microsoft.Graph/https"
+            this -> dh3.sharedB2C "Creates B2C App Registration" "Microsoft.Graph/https"
 
             # Domain relationships
             this -> markpartDb "Updates actors with external B2C id." "EF Core"
@@ -60,16 +60,12 @@ markpartDomain = group "Market Participant" {
             technology "Timer Trigger"
             tags "Microsoft Azure - Function Apps"
 
-            # Base model relationships
-            this -> dh3User "Sends invitation mail" {
-                tags "Simple View"
-            }
-
             # Common relationships
-            this -> commonSendGrid "Sends invitation mail" "SendGrid/https"
+            this -> dh3.sharedSendGrid "Sends invitation mail" "SendGrid/https"
 
             # Domain relationships
             this -> markpartDb "Reads data regarding newly invited users." "EF Core"
         }
     }
 }
+
