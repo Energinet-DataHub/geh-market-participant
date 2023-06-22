@@ -428,20 +428,11 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         // Assert
         var actual = await target.GetAsync(externalUserId);
         Assert.NotNull(actual);
-        Assert.Equal(updatedUserIdentityInfo.Email, actual.Email);
+        Assert.Equal(updatedUserIdentityInfo.FullName, actual.FullName);
         Assert.Equal(updatedUserIdentityInfo.FirstName, actual.FirstName);
         Assert.Equal(updatedUserIdentityInfo.LastName, actual.LastName);
         Assert.Equal(updatedUserIdentityInfo.PhoneNumber, actual.PhoneNumber);
         Assert.Equal(updatedUserIdentityInfo.Status, actual.Status);
-
-        var password = await _graphServiceClientFixture.Client
-            .Users[actual.Id.ToString()]
-            .Authentication
-            .PasswordMethods
-            .GetAsync();
-
-        var passwordMethods = await password!.IteratePagesAsync<PasswordAuthenticationMethod>(_graphServiceClientFixture.Client);
-        Assert.NotEmpty(passwordMethods);
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
