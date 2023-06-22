@@ -176,31 +176,15 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         var createdUser = await CheckCreatedUserAsync(userIdentity.Email).ConfigureAwait(false);
         if (createdUser == null)
         {
-            var newUser = new User
-            {
-                AccountEnabled = false,
-                DisplayName = userIdentity.FullName,
-                GivenName = userIdentity.FirstName,
-                Surname = userIdentity.LastName,
-                MobilePhone = userIdentity.PhoneNumber.Number,
-                PasswordProfile = new PasswordProfile
-                {
-                    ForceChangePasswordNextSignIn = true,
-                    Password = _passwordGenerator.GenerateRandomPassword()
-                },
-                Identities = new List<ObjectIdentity>
-                {
-                    new()
-                    {
-                        SignInType = "emailAddress",
-                        Issuer = _azureIdentityConfig.Issuer,
-                        IssuerAssignedId = userIdentity.Email.Address
-                    }
-                }
-            };
-
             createdUser = await _graphClient.Users
-                .PostAsync(newUser)
+                .PostAsync(CreateUserModel(userIdentity))
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            await _graphClient
+                .Users[createdUser.Id]
+                .PatchAsync(CreateUserModel(userIdentity))
                 .ConfigureAwait(false);
         }
 
@@ -349,5 +333,31 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             throw new NotSupportedException($"Found existing user for '{email}', but account is already enabled.");
 
         return user;
+    }
+
+    private User CreateUserModel(UserIdentity userIdentity)
+    {
+        return new User
+        {
+            AccountEnabled = false,
+            DisplayName = userIdentity.FullName,
+            GivenName = userIdentity.FirstName,
+            Surname = userIdentity.LastName,
+            MobilePhone = userIdentity.PhoneNumber!.Number,
+            PasswordProfile = new PasswordProfile
+            {
+                ForceChangePasswordNextSignIn = true,
+                Password = _passwordGenerator.GenerateRandomPassword()
+            },
+            Identities = new List<ObjectIdentity>
+            {
+                new()
+                {
+                    SignInType = "emailAddress",
+                    Issuer = _azureIdentityConfig.Issuer,
+                    IssuerAssignedId = userIdentity.Email.Address
+                }
+            }
+        };
     }
 }
