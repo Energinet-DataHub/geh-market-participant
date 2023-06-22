@@ -41,6 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 {
     private const string TestUserEmail = "invitation-integration-test@datahub.dk";
+    private const string DisabledTestUserEmail = "disabled-invitation-integration-test@datahub.dk";
 
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly GraphServiceClientFixture _graphServiceClientFixture;
@@ -360,7 +361,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await _graphServiceClientFixture
             .Client
             .Users[externalId.Value.ToString()]
-            .PatchAsync(new Microsoft.Graph.Models.User { AccountEnabled = true });
+            .PatchAsync(new Microsoft.Graph.Models.User
+            {
+                AccountEnabled = true
+            });
 
         var userIdentity = await target.GetAsync(externalId);
 
@@ -373,6 +377,78 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         Assert.True(userIdentityDisabled.Status == UserIdentityStatus.Inactive);
     }
 
+    [Fact]
+    public async Task CreateAsync_DataDiffersFromExisting_UpdatesWithNewData()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var scope = host.BeginScope();
+
+        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
+        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+
+        var target = new UserIdentityRepository(
+            graphServiceClient,
+            azureIdentityConfig,
+            userIdentityAuthenticationService,
+            userPasswordGenerator);
+
+        var userIdentityInfo = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
+            new EmailAddress(DisabledTestUserEmail),
+            "User Integration Tests",
+            "(Always safe to delete)",
+            new PhoneNumber("+45 70000000"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 12345678")));
+
+        try
+        {
+            await target.CreateAsync(userIdentityInfo);
+        }
+#pragma warning disable CA1031
+        catch
+#pragma warning restore CA1031
+        {
+            // Ignore
+        }
+
+        var updatedUserIdentityInfo = new Domain.Model.Users.UserIdentity(
+            new SharedUserReferenceId(),
+            new EmailAddress(DisabledTestUserEmail),
+            "A",
+            "B",
+            new PhoneNumber("+45 70000001"),
+            new SmsAuthenticationMethod(new PhoneNumber("+45 71000001")));
+
+        // Act
+        var externalUserId = await target.CreateAsync(updatedUserIdentityInfo);
+
+        // Assert
+        var actual = await target.GetAsync(externalUserId);
+        Assert.NotNull(actual);
+        Assert.Equal(updatedUserIdentityInfo.Email, actual.Email);
+        Assert.Equal(updatedUserIdentityInfo.FirstName, actual.FirstName);
+        Assert.Equal(updatedUserIdentityInfo.LastName, actual.LastName);
+        Assert.Equal(updatedUserIdentityInfo.PhoneNumber, actual.PhoneNumber);
+        Assert.Equal(updatedUserIdentityInfo.Status, actual.Status);
+
+        var password = await _graphServiceClientFixture.Client
+            .Users[actual.Id.ToString()]
+            .Authentication
+            .PasswordMethods
+            .GetAsync();
+
+        var passwordMethods = await password!.IteratePagesAsync<PasswordAuthenticationMethod>(_graphServiceClientFixture.Client);
+        Assert.NotEmpty(passwordMethods);
+    }
+
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
-    public Task DisposeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
+
+    public async Task DisposeAsync()
+    {
+        await _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);
+        await _graphServiceClientFixture.CleanupExternalUserAsync(DisabledTestUserEmail);
+    }
 }
