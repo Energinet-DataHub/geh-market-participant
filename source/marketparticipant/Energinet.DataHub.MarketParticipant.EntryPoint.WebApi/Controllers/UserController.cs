@@ -19,16 +19,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -36,18 +33,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 [Route("user")]
 public class UserController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
     public UserController(
-        ILogger<UserController> logger,
         IExternalTokenValidator externalTokenValidator,
         IUserContext<FrontendUser> userContext,
         IMediator mediator)
     {
-        _logger = logger;
         _externalTokenValidator = externalTokenValidator;
         _userContext = userContext;
         _mediator = mediator;
@@ -57,109 +51,81 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> GetAssociatedUserActorsAsync(string externalToken)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (string.IsNullOrWhiteSpace(externalToken))
-                    return BadRequest();
+        if (string.IsNullOrWhiteSpace(externalToken))
+            return BadRequest();
 
-                var externalJwt = new JwtSecurityToken(externalToken);
+        var externalJwt = new JwtSecurityToken(externalToken);
 
-                if (!await _externalTokenValidator
-                        .ValidateTokenAsync(externalToken)
-                        .ConfigureAwait(false))
-                {
-                    return Unauthorized();
-                }
+        if (!await _externalTokenValidator
+                .ValidateTokenAsync(externalToken)
+                .ConfigureAwait(false))
+        {
+            return Unauthorized();
+        }
 
-                var externalUserId = GetExternalUserId(externalJwt.Claims);
+        var externalUserId = GetExternalUserId(externalJwt.Claims);
 
-                var associatedActors = await _mediator
-                    .Send(new GetAssociatedUserActorsCommand(externalUserId))
-                    .ConfigureAwait(false);
+        var associatedActors = await _mediator
+            .Send(new GetActorsAssociatedWithExternalUserIdCommand(externalUserId))
+            .ConfigureAwait(false);
 
-                return Ok(associatedActors);
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(associatedActors);
     }
 
     [HttpGet("{userId:guid}")]
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
     public async Task<IActionResult> GetAsync(Guid userId)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
-                        return Unauthorized();
-                }
+        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+            return Unauthorized();
 
-                var command = new GetUserCommand(userId);
+        var command = new GetUserCommand(userId);
 
-                var response = await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                return Ok(response);
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(response);
     }
 
     [HttpGet("{userId:guid}/actors")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetUserActorsAsync(Guid userId)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                var associatedActors = await _mediator
-                    .Send(new GetSelectionActorsQueryCommand(userId))
-                    .ConfigureAwait(false);
+        var associatedActors = await _mediator
+            .Send(new GetActorsAssociatedWithUserCommand(userId))
+            .ConfigureAwait(false);
 
-                var associatedActorIds = associatedActors.Actors.Select(actor => actor.Id);
+        if (_userContext.CurrentUser.IsFas)
+            return Ok(associatedActors);
 
-                if (_userContext.CurrentUser.IsFas)
-                    return Ok(new GetAssociatedUserActorsResponse(associatedActorIds));
+        var allowedActors = associatedActors
+            .ActorIds
+            .Where(_userContext.CurrentUser.IsAssignedToActor)
+            .ToList();
 
-                var allowedActors = new List<Guid>();
-
-                foreach (var actorId in associatedActorIds)
-                {
-                    if (_userContext.CurrentUser.IsAssignedToActor(actorId))
-                        allowedActors.Add(actorId);
-                }
-
-                return Ok(new GetAssociatedUserActorsResponse(allowedActors));
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(associatedActors with { ActorIds = allowedActors });
     }
 
     [HttpGet("{userId:guid}/auditlogentry")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                var command = new GetUserAuditLogsCommand(userId);
+        var command = new GetUserAuditLogsCommand(userId);
 
-                var response = await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                var filteredUserRoleAssignmentAuditLogs = _userContext.CurrentUser.IsFas
-                    ? response.UserRoleAssignmentAuditLogs
-                    : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
+        var filteredUserRoleAssignmentAuditLogs = _userContext.CurrentUser.IsFas
+            ? response.UserRoleAssignmentAuditLogs
+            : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
-                var filteredUserInviteDetailsAuditLogs = _userContext.CurrentUser.IsFas
-                    ? response.InviteAuditLogs
-                    : response.InviteAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
+        var filteredUserInviteDetailsAuditLogs = _userContext.CurrentUser.IsFas
+            ? response.InviteAuditLogs
+            : response.InviteAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
 
-                return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs));
-            },
-            _logger).ConfigureAwait(false);
+        return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs, response.IdentityAuditLogs));
     }
 
     [HttpPut("{userId:guid}/useridentity")]
@@ -168,62 +134,41 @@ public class UserController : ControllerBase
         Guid userId,
         UserIdentityUpdateDto userIdentityUpdateDto)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
-                        return Unauthorized();
-                }
+        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+            return Unauthorized();
 
-                var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
+        var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
 
-                await _mediator.Send(command).ConfigureAwait(false);
-                return Ok();
-            },
-            _logger).ConfigureAwait(false);
+        await _mediator.Send(command).ConfigureAwait(false);
+        return Ok();
     }
 
     [HttpPost("initiate-mitid-signup")]
     public async Task<IActionResult> InitiateMitIdSignupAsync()
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                var command = new InitiateMitIdSignupCommand(_userContext.CurrentUser.UserId);
+        var command = new InitiateMitIdSignupCommand(_userContext.CurrentUser.UserId);
 
-                await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                return Ok();
-            },
-            _logger).ConfigureAwait(false);
+        return Ok();
     }
 
     [HttpPut("{userId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> DeactivateAsync(Guid userId)
     {
-        return await this.ProcessAsync(
-            async () =>
-            {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (!await DoesUserBelongToActorAsync(userId, _userContext.CurrentUser.ActorId).ConfigureAwait(false))
-                        return Unauthorized();
-                }
+        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+            return Unauthorized();
 
-                var command = new DeactivateUserCommand(userId);
+        var command = new DeactivateUserCommand(userId);
 
-                await _mediator
-                    .Send(command)
-                    .ConfigureAwait(false);
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                return Ok();
-            },
-            _logger).ConfigureAwait(false);
+        return Ok();
     }
 
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
@@ -232,12 +177,16 @@ public class UserController : ControllerBase
         return Guid.Parse(userIdClaim.Value);
     }
 
-    private async Task<bool> DoesUserBelongToActorAsync(Guid userId, Guid expectedActorId)
+    private async Task<bool> HasCurrentUserAccessToUserAsync(Guid userId)
     {
+        if (_userContext.CurrentUser.IsFas)
+            return true;
+
         var associatedActors = await _mediator
-            .Send(new GetSelectionActorsQueryCommand(userId))
+            .Send(new GetActorsAssociatedWithUserCommand(userId))
             .ConfigureAwait(false);
 
-        return associatedActors.Actors.Any(actor => actor.Id == expectedActorId);
+        return _userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy) ||
+               associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor);
     }
 }

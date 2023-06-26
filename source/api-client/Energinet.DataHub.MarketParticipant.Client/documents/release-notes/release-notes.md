@@ -1,5 +1,13 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.31.7
+
+- Add user identity audit logging for status changes.
+
+## Version 2.31.6
+
+- Add user identity audit logs.
+
 ## Version 2.31.5
 
 - Made route to resend user invitation RESTful.

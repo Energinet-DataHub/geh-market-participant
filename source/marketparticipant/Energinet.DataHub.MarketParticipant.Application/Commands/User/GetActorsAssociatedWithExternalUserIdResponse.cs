@@ -12,27 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Model
-{
-    public sealed record ErrorDescriptor
-    {
-        public ErrorDescriptor(
-            string code,
-            string message,
-            string? target = null,
-            IEnumerable<ErrorDescriptor>? details = null)
-        {
-            Code = code;
-            Message = message;
-            Target = target;
-            Details = details;
-        }
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-        public string Code { get; }
-        public string Message { get; }
-        public string? Target { get; }
-        public IEnumerable<ErrorDescriptor>? Details { get; }
-    }
-}
+public sealed record GetActorsAssociatedWithExternalUserIdResponse(IEnumerable<Guid> ActorIds);

@@ -16,10 +16,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -27,16 +25,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 [Route("query")]
 public sealed class ActorQueryController : ControllerBase
 {
-    private readonly ILogger<ActorContactController> _logger;
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;
 
     public ActorQueryController(
-        ILogger<ActorContactController> logger,
         IMediator mediator,
         IUserContext<FrontendUser> userContext)
     {
-        _logger = logger;
         _mediator = mediator;
         _userContext = userContext;
     }
@@ -44,17 +39,12 @@ public sealed class ActorQueryController : ControllerBase
     [HttpGet("selection-actors")]
     public async Task<IActionResult> GetSelectionActorsAsync()
     {
-        return await this.ProcessAsync(
-            async () =>
-                {
-                    var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.UserId);
+        var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.UserId);
 
-                    var response = await _mediator
-                        .Send(command)
-                        .ConfigureAwait(false);
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
 
-                    return Ok(response.Actors);
-                },
-            _logger).ConfigureAwait(false);
+        return Ok(response.Actors);
     }
 }

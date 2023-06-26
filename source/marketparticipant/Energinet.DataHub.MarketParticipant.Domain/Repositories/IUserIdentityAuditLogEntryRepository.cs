@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using FluentValidation;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed class GetAssociatedUserActorsCommandRuleSet : AbstractValidator<GetAssociatedUserActorsCommand>
+public interface IUserIdentityAuditLogEntryRepository
 {
-    public GetAssociatedUserActorsCommandRuleSet()
-    {
-        RuleFor(command => command.ExternalUserId)
-            .NotEmpty();
-    }
+    Task<IEnumerable<UserIdentityAuditLogEntry>> GetAsync(UserId userId);
+
+    Task InsertAuditLogEntryAsync(UserIdentityAuditLogEntry logEntry);
 }

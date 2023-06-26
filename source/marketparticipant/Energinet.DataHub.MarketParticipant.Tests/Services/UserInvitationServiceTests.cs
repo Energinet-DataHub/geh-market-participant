@@ -71,6 +71,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -80,6 +81,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -104,6 +106,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -120,6 +123,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -151,6 +155,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -173,6 +178,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -197,6 +203,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -231,6 +238,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -253,6 +261,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -287,6 +296,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -327,6 +337,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -361,6 +372,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -386,6 +398,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -401,6 +414,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -421,6 +435,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -453,6 +468,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
@@ -471,6 +487,7 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
@@ -507,6 +524,7 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
             userRoleAssignmentAuditLogEntryRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);

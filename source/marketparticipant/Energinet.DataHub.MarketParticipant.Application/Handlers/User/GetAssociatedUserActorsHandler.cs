@@ -17,31 +17,40 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetAssociatedUserActorsHandler : IRequestHandler<GetAssociatedUserActorsCommand, GetAssociatedUserActorsResponse>
+public sealed class GetActorsAssociatedWithUserHandler
+    : IRequestHandler<GetActorsAssociatedWithUserCommand, GetActorsAssociatedWithUserResponse>
 {
-    private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IUserRepository _userRepository;
 
-    public GetAssociatedUserActorsHandler(IUserQueryRepository userQueryRepository)
+    public GetActorsAssociatedWithUserHandler(IUserRepository userRepository)
     {
-        _userQueryRepository = userQueryRepository;
+        _userRepository = userRepository;
     }
 
-    public async Task<GetAssociatedUserActorsResponse> Handle(
-        GetAssociatedUserActorsCommand request,
+    public async Task<GetActorsAssociatedWithUserResponse> Handle(
+        GetActorsAssociatedWithUserCommand request,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var actorIds = await _userQueryRepository
-            .GetActorsAsync(new ExternalUserId(request.ExternalUserId))
+        var user = await _userRepository
+            .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        return new GetAssociatedUserActorsResponse(actorIds.Select(id => id.Value));
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
+
+        var actorAssignments = user
+            .RoleAssignments
+            .Select(roleAssignment => roleAssignment.ActorId.Value)
+            .Distinct();
+
+        return new GetActorsAssociatedWithUserResponse(user.AdministratedBy.Value, actorAssignments);
     }
 }
