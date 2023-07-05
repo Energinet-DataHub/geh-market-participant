@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Client.Models;
 using Flurl.Http;
@@ -34,6 +35,15 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .CreateClient()
                         .Request("users", "invite")
                         .PostJsonAsync(userInvitation));
+        }
+
+        public Task ReInviteUserAsync(Guid userId)
+        {
+            return ValidationExceptionHandler.HandleAsync(
+                () => _clientFactory
+                    .CreateClient()
+                    .Request("users", userId, "reinvite")
+                    .PutAsync());
         }
     }
 }

@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -55,7 +56,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 x.Select(y => new UserIdentity(
                     y,
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     y.ToString(),
                     y.ToString(),
                     null,
@@ -109,7 +110,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new UserIdentity(
                     y,
                     new MockedEmailAddress(),
-                    UserStatus.Inactive,
+                    UserIdentityStatus.Inactive,
                     y.ToString(),
                     y.ToString(),
                     null,
@@ -153,7 +154,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new UserIdentity(
                     new ExternalUserId(user.ExternalId),
                     new MockedEmailAddress(),
-                    UserStatus.Active,
+                    UserIdentityStatus.Active,
                     "fake_value",
                     "fake_value",
                     null,
@@ -200,7 +201,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new UserIdentity(
                     new ExternalUserId(user.ExternalId),
                     new MockedEmailAddress(),
-                    UserStatus.Inactive,
+                    UserIdentityStatus.Inactive,
                     "fake_value",
                     "fake_value",
                     null,
@@ -223,5 +224,87 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         Assert.NotEmpty(actual.Users);
         Assert.NotNull(actual.Users.First(x => x.Id == user.Id));
         Assert.Equal(1, actual.TotalUserCount);
+    }
+
+    [Fact]
+    public async Task GetUserOverview_CalculatedUserStatus_ReturnsUserOverviewWithExpectedUserStatus()
+    {
+        // arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+
+        var userInvitedSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(1));
+        var userInvited = await _fixture.PrepareUserAsync(userInvitedSetup);
+
+        var userInvitedButExpiredInActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1));
+        var userInvitedButExpiredInActive = await _fixture.PrepareUserAsync(userInvitedButExpiredInActiveSetup);
+
+        var userInvitedButExpiredActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1));
+        var userInvitedButExpiredActive = await _fixture.PrepareUserAsync(userInvitedButExpiredActiveSetup);
+
+        var userActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = null);
+        var userActive = await _fixture.PrepareUserAsync(userActiveSetup);
+
+        var userInActiveSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = null);
+        var userInActive = await _fixture.PrepareUserAsync(userInActiveSetup);
+
+        var actor = await _fixture.PrepareActorAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        await _fixture.AssignUserRoleAsync(userInvited.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userInvitedButExpiredActive.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userInvitedButExpiredInActive.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userActive.Id, actor.Id, userRole.Id);
+        await _fixture.AssignUserRoleAsync(userInActive.Id, actor.Id, userRole.Id);
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+
+        UserIdentity UserIdentity(UserEntity userEntity, UserIdentityStatus userStatus)
+        {
+            return new UserIdentity(
+                new ExternalUserId(userEntity.ExternalId),
+                new MockedEmailAddress(),
+                userStatus,
+                "fake_value",
+                "fake_value",
+                null,
+                DateTime.UtcNow,
+                AuthenticationMethod.Undetermined,
+                new List<LoginIdentity>());
+        }
+
+        userIdentityRepository
+            .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
+            .ReturnsAsync(new[]
+            {
+                UserIdentity(userInvited, UserIdentityStatus.Active),
+                UserIdentity(userInvitedButExpiredActive, UserIdentityStatus.Active),
+                UserIdentity(userInvitedButExpiredInActive, UserIdentityStatus.Inactive),
+                UserIdentity(userActive, UserIdentityStatus.Active),
+                UserIdentity(userInActive, UserIdentityStatus.Inactive)
+            });
+
+        scope.Container!.Register(() => userIdentityRepository.Object);
+
+        var mediator = scope.GetInstance<IMediator>();
+
+        var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
+        var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
+
+        // act
+        var actual = await mediator.Send(command);
+
+        // assert
+        Assert.NotEmpty(actual.Users);
+        Assert.Equal(5, actual.TotalUserCount);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInvited.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInvited.Id).Status == UserStatus.Invited);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInvitedButExpiredActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInvitedButExpiredActive.Id).Status == UserStatus.InviteExpired);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInvitedButExpiredInActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInvitedButExpiredInActive.Id).Status == UserStatus.InviteExpired);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userActive.Id).Status == UserStatus.Active);
+        Assert.NotNull(actual.Users.Single(x => x.Id == userInActive.Id));
+        Assert.True(actual.Users.Single(x => x.Id == userInActive.Id).Status == UserStatus.Inactive);
     }
 }

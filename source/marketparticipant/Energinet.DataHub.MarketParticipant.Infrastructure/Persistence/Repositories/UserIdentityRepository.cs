@@ -176,31 +176,15 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         var createdUser = await CheckCreatedUserAsync(userIdentity.Email).ConfigureAwait(false);
         if (createdUser == null)
         {
-            var newUser = new User
-            {
-                AccountEnabled = false,
-                DisplayName = userIdentity.FullName,
-                GivenName = userIdentity.FirstName,
-                Surname = userIdentity.LastName,
-                MobilePhone = userIdentity.PhoneNumber.Number,
-                PasswordProfile = new PasswordProfile
-                {
-                    ForceChangePasswordNextSignIn = true,
-                    Password = _passwordGenerator.GenerateRandomPassword()
-                },
-                Identities = new List<ObjectIdentity>
-                {
-                    new()
-                    {
-                        SignInType = "emailAddress",
-                        Issuer = _azureIdentityConfig.Issuer,
-                        IssuerAssignedId = userIdentity.Email.Address
-                    }
-                }
-            };
-
             createdUser = await _graphClient.Users
-                .PostAsync(newUser)
+                .PostAsync(CreateUserModel(userIdentity))
+                .ConfigureAwait(false);
+        }
+        else
+        {
+            await _graphClient
+                .Users[createdUser.Id]
+                .PatchAsync(CreateUserModel(userIdentity))
                 .ConfigureAwait(false);
         }
 
@@ -210,27 +194,31 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .AddAuthenticationAsync(externalUserId, userIdentity.Authentication)
             .ConfigureAwait(false);
 
+        var employeeId = userIdentity.SharedId.ToString();
+
         await _graphClient
             .Users[createdUser.Id]
             .PatchAsync(new User
             {
-                AccountEnabled = true
+                AccountEnabled = true,
+                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought is was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
             })
             .ConfigureAwait(false);
 
         return externalUserId;
     }
 
-    public Task UpdateUserPhoneNumberAsync(ExternalUserId externalUserId, PhoneNumber phoneNumber)
+    public Task UpdateUserAsync(UserIdentity userIdentity)
     {
-        ArgumentNullException.ThrowIfNull(externalUserId);
-        ArgumentNullException.ThrowIfNull(phoneNumber);
+        ArgumentNullException.ThrowIfNull(userIdentity);
 
         return _graphClient
-            .Users[externalUserId.Value.ToString()]
+            .Users[userIdentity.Id.Value.ToString()]
             .PatchAsync(new User
             {
-                MobilePhone = phoneNumber.Number
+                GivenName = userIdentity.FirstName,
+                Surname = userIdentity.LastName,
+                MobilePhone = userIdentity.PhoneNumber?.Number
             });
     }
 
@@ -260,6 +248,16 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .DeleteAsync();
     }
 
+    public Task EnableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        return UpdateUserAccountStatusAsync(externalUserId, true);
+    }
+
+    public Task DisableUserAccountAsync(ExternalUserId externalUserId)
+    {
+        return UpdateUserAccountStatusAsync(externalUserId, false);
+    }
+
     private static UserIdentity Map(User user, string? emailAddress = null)
     {
         var userEmailAddress = emailAddress ?? user
@@ -271,7 +269,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return new UserIdentity(
             new ExternalUserId(user.Id!),
             new EmailAddress(userEmailAddress),
-            user.AccountEnabled == true ? UserStatus.Active : UserStatus.Inactive,
+            user.AccountEnabled == true ? UserIdentityStatus.Active : UserIdentityStatus.Inactive,
             user.GivenName ?? user.DisplayName!,
             user.Surname ?? string.Empty,
             string.IsNullOrWhiteSpace(user.MobilePhone) ? null : new PhoneNumber(user.MobilePhone),
@@ -292,6 +290,18 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
     {
         return user is { UserType: "Member", Identities: { } } &&
                user.Identities.Any(ident => ident.SignInType == "emailAddress");
+    }
+
+    private Task UpdateUserAccountStatusAsync(ExternalUserId externalUserId, bool enabled)
+    {
+        ArgumentNullException.ThrowIfNull(externalUserId);
+
+        return _graphClient
+            .Users[externalUserId.Value.ToString()]
+            .PatchAsync(new User
+            {
+                AccountEnabled = enabled
+            });
     }
 
     private async Task<User?> GetBySignInEmailAsync(EmailAddress email)
@@ -323,5 +333,31 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             throw new NotSupportedException($"Found existing user for '{email}', but account is already enabled.");
 
         return user;
+    }
+
+    private User CreateUserModel(UserIdentity userIdentity)
+    {
+        return new User
+        {
+            AccountEnabled = false,
+            DisplayName = userIdentity.FullName,
+            GivenName = userIdentity.FirstName,
+            Surname = userIdentity.LastName,
+            MobilePhone = userIdentity.PhoneNumber!.Number,
+            PasswordProfile = new PasswordProfile
+            {
+                ForceChangePasswordNextSignIn = true,
+                Password = _passwordGenerator.GenerateRandomPassword()
+            },
+            Identities = new List<ObjectIdentity>
+            {
+                new()
+                {
+                    SignInType = "emailAddress",
+                    Issuer = _azureIdentityConfig.Issuer,
+                    IssuerAssignedId = userIdentity.Email.Address
+                }
+            }
+        };
     }
 }

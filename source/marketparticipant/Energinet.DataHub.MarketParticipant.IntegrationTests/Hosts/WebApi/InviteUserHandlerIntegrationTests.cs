@@ -86,6 +86,7 @@ public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServi
         var userRepository = scope.GetInstance<IUserRepository>();
         var createdUser = await userRepository.GetAsync(createdExternalUserId);
         Assert.NotNull(createdUser);
+        Assert.True(createdUser.InvitationExpiresAt > DateTime.UtcNow);
 
         var userIdentityRepository = scope.GetInstance<IUserIdentityRepository>();
         var createdUserIdentity = await userIdentityRepository.GetAsync(createdExternalUserId);

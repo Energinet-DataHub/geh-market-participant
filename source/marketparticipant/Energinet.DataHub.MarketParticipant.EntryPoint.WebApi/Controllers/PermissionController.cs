@@ -18,11 +18,9 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -30,16 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     [Route("[controller]")]
     public class PermissionController : ControllerBase
     {
-        private readonly ILogger<PermissionController> _logger;
         private readonly IUserContext<FrontendUser> _userContext;
         private readonly IMediator _mediator;
 
         public PermissionController(
-            ILogger<PermissionController> logger,
             IUserContext<FrontendUser> userContext,
             IMediator mediator)
         {
-            _logger = logger;
             _userContext = userContext;
             _mediator = mediator;
         }
@@ -47,77 +42,57 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{permissionId:int}")]
         public async Task<IActionResult> GetPermissionAsync(int permissionId)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var getPermissionCommand = new GetPermissionCommand(permissionId);
-                    var response = await _mediator
-                        .Send(getPermissionCommand)
-                        .ConfigureAwait(false);
-                    return Ok(response.Permission);
-                },
-                _logger).ConfigureAwait(false);
+            var getPermissionCommand = new GetPermissionCommand(permissionId);
+            var response = await _mediator
+                .Send(getPermissionCommand)
+                .ConfigureAwait(false);
+            return Ok(response.Permission);
         }
 
         [HttpGet]
         public async Task<IActionResult> ListAllAsync()
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var getPermissionsCommand = new GetPermissionsCommand();
-                    var response = await _mediator
-                        .Send(getPermissionsCommand)
-                        .ConfigureAwait(false);
-                    return Ok(response.Permissions);
-                },
-                _logger).ConfigureAwait(false);
+            var getPermissionsCommand = new GetPermissionsCommand();
+            var response = await _mediator
+                .Send(getPermissionsCommand)
+                .ConfigureAwait(false);
+            return Ok(response.Permissions);
         }
 
         [HttpPut]
         [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<IActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    if (!_userContext.CurrentUser.IsFas)
-                        return Unauthorized();
+            if (!_userContext.CurrentUser.IsFas)
+                return Unauthorized();
 
-                    var command = new UpdatePermissionCommand(_userContext.CurrentUser.UserId, updatePermissionDto.Id, updatePermissionDto.Description);
+            var command = new UpdatePermissionCommand(_userContext.CurrentUser.UserId, updatePermissionDto.Id, updatePermissionDto.Description);
 
-                    await _mediator
-                        .Send(command)
-                        .ConfigureAwait(false);
+            await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
 
-                    return Ok();
-                },
-                _logger).ConfigureAwait(false);
+            return Ok();
         }
 
         [HttpGet("{permissionId:int}/auditlogs")]
         [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetPermissionAuditLogsCommand(permissionId);
+            var command = new GetPermissionAuditLogsCommand(permissionId);
 
-                    var response = await _mediator
-                        .Send(command)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
 
-                    var logsFiltered = response.PermissionAuditLogs;
+            var logsFiltered = response.PermissionAuditLogs;
 
-                    if (!_userContext.CurrentUser.IsFas)
-                    {
-                        logsFiltered = logsFiltered.Where(u => u.ChangedByUserId == _userContext.CurrentUser.UserId);
-                    }
+            if (!_userContext.CurrentUser.IsFas)
+            {
+                logsFiltered = logsFiltered.Where(u => u.ChangedByUserId == _userContext.CurrentUser.UserId);
+            }
 
-                    return Ok(logsFiltered);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(logsFiltered);
         }
     }
 }

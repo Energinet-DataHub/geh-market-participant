@@ -10,11 +10,17 @@
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License.using System;
+// limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
-
-public sealed record GetAssociatedUserActorsResponse(IEnumerable<Guid> ActorIds);
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public sealed record UserIdentityAuditLogEntryDto(
+        Guid UserId,
+        Guid ChangedByUserId,
+        UserIdentityAuditLogField Field,
+        string NewValue,
+        string OldValue,
+        DateTimeOffset Timestamp);
+}

@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
-using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -44,6 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             {
                 return _activeDirectoryB2CRoles;
             }
+
+            _activeDirectoryB2CRoles.EicRolesMapped.Clear();
 
             var application = await _graphClient.Applications[_appObjectId]
                 .GetAsync(x =>
@@ -78,6 +78,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             // Verify that all EIC functions has a corresponding app role
             if (_activeDirectoryB2CRoles.EicRolesMapped.Count != Enum.GetNames(typeof(EicFunction)).Length)
                 throw new InvalidOperationException("Not all Eic Functions have an AppRole defined");
+
+            _activeDirectoryB2CRoles.IsLoaded = true;
 
             return _activeDirectoryB2CRoles;
         }

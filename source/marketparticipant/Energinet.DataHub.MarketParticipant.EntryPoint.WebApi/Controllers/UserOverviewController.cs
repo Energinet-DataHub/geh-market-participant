@@ -18,11 +18,9 @@ using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
@@ -30,22 +28,19 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 [Route("[controller]")]
 public sealed class UserOverviewController : ControllerBase
 {
-    private readonly ILogger<UserOverviewController> _logger;
     private readonly IMediator _mediator;
     private readonly IUserContext<FrontendUser> _userContext;
 
     public UserOverviewController(
-        ILogger<UserOverviewController> logger,
         IMediator mediator,
         IUserContext<FrontendUser> userContext)
     {
-        _logger = logger;
         _mediator = mediator;
         _userContext = userContext;
     }
 
     [HttpPost("users/search")]
-    [AuthorizeUser(PermissionId.UsersManage)]
+    [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
     public async Task<IActionResult> SearchUsersAsync(
         int pageNumber,
         int pageSize,
@@ -53,23 +48,18 @@ public sealed class UserOverviewController : ControllerBase
         SortDirection sortDirection,
         [FromBody] UserOverviewFilterDto filter)
     {
-        return await this.ProcessAsync(
-            async () =>
+        if (!_userContext.CurrentUser.IsFas)
+        {
+            if (filter.ActorId.HasValue && !_userContext.CurrentUser.IsAssignedToActor(filter.ActorId.Value))
             {
-                if (!_userContext.CurrentUser.IsFas)
-                {
-                    if (filter.ActorId.HasValue && !_userContext.CurrentUser.IsAssignedToActor(filter.ActorId.Value))
-                    {
-                        return Unauthorized();
-                    }
+                return Unauthorized();
+            }
 
-                    filter = filter with { ActorId = _userContext.CurrentUser.ActorId };
-                }
+            filter = filter with { ActorId = _userContext.CurrentUser.ActorId };
+        }
 
-                var command = new GetUserOverviewCommand(filter, pageNumber, pageSize, sortProperty, sortDirection);
-                var response = await _mediator.Send(command).ConfigureAwait(false);
-                return Ok(response);
-            },
-            _logger).ConfigureAwait(false);
+        var command = new GetUserOverviewCommand(filter, pageNumber, pageSize, sortProperty, sortDirection);
+        var response = await _mediator.Send(command).ConfigureAwait(false);
+        return Ok(response);
     }
 }

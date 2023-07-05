@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +29,16 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
     private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly IUserStatusCalculator _userStatusCalculator;
 
     public UserOverviewRepository(
         IMarketParticipantDbContext marketParticipantDbContext,
-        IUserIdentityRepository userIdentityRepository)
+        IUserIdentityRepository userIdentityRepository,
+        IUserStatusCalculator userStatusCalculator)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
         _userIdentityRepository = userIdentityRepository;
+        _userStatusCalculator = userStatusCalculator;
     }
 
     public Task<int> GetTotalUserCountAsync(ActorId? actorId)
@@ -52,7 +56,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var query = BuildUsersSearchQuery(actorId, null, Enumerable.Empty<UserRoleId>());
         var users = await query
-            .Select(x => new { x.Id, x.ExternalId })
+            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -61,7 +65,8 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             y => new
             {
                 Id = new UserId(y.Id),
-                ExternalId = new ExternalUserId(y.ExternalId)
+                ExternalId = new ExternalUserId(y.ExternalId),
+                y.InvitationExpiresAt
             });
 
         var userIdentities = (await _userIdentityRepository
@@ -74,10 +79,12 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                     {
                         user.Id,
                         userIdentity.Status,
-                        Name = userIdentity.FullName,
+                        userIdentity.FirstName,
+                        userIdentity.LastName,
                         Email = userIdentity.Email.Address,
                         PhoneNumber = userIdentity.PhoneNumber?.Number,
-                        userIdentity.CreatedDate
+                        userIdentity.CreatedDate,
+                        user.InvitationExpiresAt
                     };
                 });
 
@@ -92,8 +99,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             .Select(x =>
                 new UserOverviewItem(
                     x.Id,
-                    x.Status,
-                    x.Name,
+                    _userStatusCalculator.CalculateUserStatus(x.Status, x.InvitationExpiresAt),
+                    x.FirstName,
+                    x.LastName,
                     new EmailAddress(x.Email),
                     x.PhoneNumber != null ? new PhoneNumber(x.PhoneNumber) : null,
                     x.CreatedDate));
@@ -111,9 +119,18 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
     {
         var userRolesFilter = userRoles.ToList();
         var statusFilter = userStatus.ToHashSet();
-        bool? accountEnabledFilter = statusFilter.Count is 0 or 2
+        var userIdentityFilter = statusFilter.Select(status => status switch
+        {
+            UserStatus.Inactive => false,
+            UserStatus.InviteExpired => false,
+            UserStatus.Active => true,
+            UserStatus.Invited => true,
+            _ => (bool?)null
+        }).ToHashSet();
+
+        var accountEnabledFilter = userIdentityFilter.Count is 0 or 2
             ? null
-            : statusFilter.First() == UserStatus.Active;
+            : userIdentityFilter.Single();
 
         // We need to do two searches and two lookup, since the queries in either our data or AD can return results not in the other, and we need AD data for both
         // Search and then Filter only users from the AD search that have an ID in our local data
@@ -126,7 +143,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 actorId,
                 searchUserIdentities.Select(x => x.Id),
                 userRolesFilter)
-            .Select(y => new { y.Id, y.ExternalId })
+            .Select(y => new { y.Id, y.ExternalId, y.InvitationExpiresAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -137,7 +154,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         // Search local data and then fetch data from AD for results from our own data, that wasn't in the already found identities
         var searchQuery = await BuildUsersSearchQuery(actorId, searchText, userRolesFilter)
-            .Select(x => new { x.Id, x.ExternalId })
+            .Select(x => new { x.Id, x.ExternalId, x.InvitationExpiresAt })
             .ToListAsync()
             .ConfigureAwait(false);
 
@@ -148,12 +165,6 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 .Select(x => new ExternalUserId(x)))
             .ConfigureAwait(false);
 
-        if (accountEnabledFilter.HasValue)
-        {
-            localUserIdentitiesLookup = localUserIdentitiesLookup
-                .Where(ident => statusFilter.Contains(ident.Status));
-        }
-
         // Combine results and create final search result
         var userLookup = searchQuery
             .Union(knownLocalUsers)
@@ -161,11 +172,18 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
 
         var allIdentities = searchUserIdentities
             .Union(localUserIdentitiesLookup)
+            .Where(x =>
+            {
+                var user = userLookup[x.Id.Value];
+                var status = _userStatusCalculator.CalculateUserStatus(x.Status, user.InvitationExpiresAt);
+                return !statusFilter.Any() || statusFilter.Contains(status);
+            })
             .Select(x => new
             {
                 x.Id,
                 x.Status,
-                Name = x.FullName,
+                x.FirstName,
+                x.LastName,
                 Email = x.Email.Address,
                 PhoneNumber = x.PhoneNumber?.Number,
                 x.CreatedDate
@@ -187,8 +205,9 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
                 var user = userLookup[userIdentity.Id.Value];
                 return new UserOverviewItem(
                     new UserId(user.Id),
-                    userIdentity.Status,
-                    userIdentity.Name,
+                    _userStatusCalculator.CalculateUserStatus(userIdentity.Status, user.InvitationExpiresAt),
+                    userIdentity.FirstName,
+                    userIdentity.LastName,
                     new EmailAddress(userIdentity.Email),
                     userIdentity.PhoneNumber != null ? new PhoneNumber(userIdentity.PhoneNumber) : null,
                     userIdentity.CreatedDate);
@@ -211,7 +230,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join ur in _marketParticipantDbContext.UserRoles on r.UserRoleId equals ur.Id
             join actor in _marketParticipantDbContext.Actors on r.ActorId equals actor.Id
             where
-                (actorId == null || r.ActorId == actorId.Value)
+                (actorId == null || r.ActorId == actorId.Value || u.AdministratedByActorId == actorId.Value)
                 && (searchText == null || actor.Name.Contains(searchText) || actor.ActorNumber.Contains(searchText) || ur.Name.Contains(searchText))
             select u;
 
@@ -231,7 +250,7 @@ public sealed class UserOverviewRepository : IUserOverviewRepository
             join r in _marketParticipantDbContext.UserRoleAssignments on u.Id equals r.UserId
             where !userRoles.Any() || userRoles.Contains(r.UserRoleId)
             where
-                (actorId == null || r.ActorId == actorId.Value)
+                (actorId == null || r.ActorId == actorId.Value || u.AdministratedByActorId == actorId.Value)
                 && externalUsers.Contains(u.ExternalId)
             select u;
 

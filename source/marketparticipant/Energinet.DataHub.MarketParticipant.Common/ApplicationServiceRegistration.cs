@@ -63,7 +63,8 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
             container.Register<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
-            container.Register<IValidator<GetAssociatedUserActorsCommand>, GetAssociatedUserActorsCommandRuleSet>();
+            container.Register<IValidator<GetActorsAssociatedWithUserCommand>, GetActorsAssociatedWithUserCommandRuleSet>();
+            container.Register<IValidator<GetActorsAssociatedWithExternalUserIdCommand>, GetActorsAssociatedWithExternalUserIdCommandRuleSet>();
             container.Register<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
             container.Register<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
             container.Register<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
@@ -74,12 +75,15 @@ namespace Energinet.DataHub.MarketParticipant.Common
             container.Register<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
             container.Register<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
             container.Register<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
+            container.Register<IValidator<ReInviteUserCommand>, ReInviteUserCommandRuleSet>();
             container.Register<IValidator<SendUserInviteEmailCommand>, SendUserInviteEmailCommandRuleSet>();
             container.Register<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
             container.Register<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
             container.Register<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
             container.Register<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
             container.Register<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
+            container.Register<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
+            container.Register<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
 
             container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2CService>(Lifestyle.Scoped);
             container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);

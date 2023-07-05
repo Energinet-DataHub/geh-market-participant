@@ -37,8 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             ArgumentNullException.ThrowIfNull(updatedActor);
 
             var actor = await _actorRepository.GetAsync(updatedActor.Id).ConfigureAwait(false);
-            if (actor == null)
-                throw new NotFoundValidationException("Actor not found");
+            NotFoundValidationException.ThrowIfNull(actor, "Actor not found");
 
             if (actor.Status == ActorStatus.New)
                 return;

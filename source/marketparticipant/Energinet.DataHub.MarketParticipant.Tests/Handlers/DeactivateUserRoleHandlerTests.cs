@@ -141,7 +141,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             var actor = TestPreparationModels.MockedActor();
             var userRole = TestPreparationModels.MockedUserRole(userRoleId);
-            var user = TestPreparationModels.MockedUserWithRole(userId, userRole.Id, actor.Id);
+            var user = TestPreparationModels.MockedUser(userId);
+            user.RoleAssignments.Add(new UserRoleAssignment(actor.Id, userRole.Id));
+
             userRoleRepositoryMock
                 .Setup(userRoleRepository => userRoleRepository.GetAsync(new UserRoleId(userRoleId)))
                 .ReturnsAsync(userRole);

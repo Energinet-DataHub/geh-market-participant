@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetAssociatedUserActorsCommand(Guid ExternalUserId) : IRequest<GetAssociatedUserActorsResponse>;
+public sealed record DeactivateUserCommand(Guid UserId) : IRequest;

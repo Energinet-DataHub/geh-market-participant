@@ -56,8 +56,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
             await using (uow.ConfigureAwait(false))
             {
                 // Get from db
-                var gridArea = await _gridAreaRepository.GetAsync(new GridAreaId(request.Id)).ConfigureAwait(false) ??
-                    throw new NotFoundValidationException(request.Id);
+                var gridArea = await _gridAreaRepository.GetAsync(new GridAreaId(request.Id)).ConfigureAwait(false);
+                NotFoundValidationException.ThrowIfNull(gridArea, request.Id);
 
                 // Event should be sent
                 var nameChanged = gridArea.Name.Value != request.GridAreaDto.Name;

@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers;
 
 [ApiController]
 public sealed class InvitationController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IMediator _mediator;
 
     public InvitationController(
-        ILogger<UserController> logger,
         IUserContext<FrontendUser> userContext,
         IMediator mediator)
     {
-        _logger = logger;
         _userContext = userContext;
         _mediator = mediator;
     }
@@ -46,18 +43,37 @@ public sealed class InvitationController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<IActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
-        return await this.ProcessAsync(
-            async () =>
+        if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userInvitation.AssignedActor))
+            return Unauthorized();
+
+        await _mediator
+            .Send(new InviteUserCommand(userInvitation, _userContext.CurrentUser.UserId))
+            .ConfigureAwait(false);
+
+        return Ok();
+    }
+
+    [HttpPut("users/{userId:guid}/reinvite")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<IActionResult> ReInviteUserAsync(Guid userId)
+    {
+        if (!_userContext.CurrentUser.IsFas)
+        {
+            var associatedActors = await _mediator
+                .Send(new GetActorsAssociatedWithUserCommand(userId))
+                .ConfigureAwait(false);
+
+            if (!_userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy) &&
+                !associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor))
             {
-                if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userInvitation.AssignedActor))
-                    return Unauthorized();
+                return Unauthorized();
+            }
+        }
 
-                await _mediator
-                    .Send(new InviteUserCommand(userInvitation, _userContext.CurrentUser.UserId))
-                    .ConfigureAwait(false);
+        await _mediator
+            .Send(new ReInviteUserCommand(userId, _userContext.CurrentUser.UserId))
+            .ConfigureAwait(false);
 
-                return Ok();
-            },
-            _logger).ConfigureAwait(false);
+        return Ok();
     }
 }

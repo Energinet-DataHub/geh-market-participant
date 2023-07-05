@@ -16,11 +16,9 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -28,12 +26,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     [Route("[controller]")]
     public sealed class GridAreaController : ControllerBase
     {
-        private readonly ILogger<GridAreaController> _logger;
         private readonly IMediator _mediator;
 
-        public GridAreaController(ILogger<GridAreaController> logger, IMediator mediator)
+        public GridAreaController(IMediator mediator)
         {
-            _logger = logger;
             _mediator = mediator;
         }
 
@@ -41,76 +37,51 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.GridAreasManage)]
         public async Task<IActionResult> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
+            var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
 
-                    var response = await _mediator
-                        .Send(createGridAreaCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(createGridAreaCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response.GridAreaId.ToString());
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response.GridAreaId.ToString());
         }
 
         [HttpPut]
         [AuthorizeUser(PermissionId.GridAreasManage)]
         public async Task<IActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
+            var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
 
-                    var response = await _mediator
-                        .Send(updateGridAreaCommand)
-                        .ConfigureAwait(false);
+            var response = await _mediator
+                .Send(updateGridAreaCommand)
+                .ConfigureAwait(false);
 
-                    return Ok(response);
-                },
-                _logger).ConfigureAwait(false);
+            return Ok(response);
         }
 
         [HttpGet]
         public async Task<IActionResult> GetGridAreasAsync()
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetGridAreasCommand();
-                    var response = await _mediator.Send(command).ConfigureAwait(false);
-                    return Ok(response.GridAreas);
-                },
-                _logger).ConfigureAwait(false);
+            var command = new GetGridAreasCommand();
+            var response = await _mediator.Send(command).ConfigureAwait(false);
+            return Ok(response.GridAreas);
         }
 
         [HttpGet("{gridAreaId:guid}")]
         public async Task<IActionResult> GetGridAreaAsync(Guid gridAreaId)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetGridAreaCommand(gridAreaId);
-                    var response = await _mediator.Send(command).ConfigureAwait(false);
-                    return Ok(response.GridArea);
-                },
-                _logger).ConfigureAwait(false);
+            var command = new GetGridAreaCommand(gridAreaId);
+            var response = await _mediator.Send(command).ConfigureAwait(false);
+            return Ok(response.GridArea);
         }
 
         [HttpGet("{gridAreaId:guid}/auditlogentry")]
         [AuthorizeUser(PermissionId.GridAreasManage)]
         public async Task<IActionResult> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
-            return await this.ProcessAsync(
-                async () =>
-                {
-                    var command = new GetGridAreaAuditLogEntriesCommand(gridAreaId);
-                    var response = await _mediator.Send(command).ConfigureAwait(false);
-                    return Ok(response.GridAreaAuditLogEntries);
-                },
-                _logger).ConfigureAwait(false);
+            var command = new GetGridAreaAuditLogEntriesCommand(gridAreaId);
+            var response = await _mediator.Send(command).ConfigureAwait(false);
+            return Ok(response.GridAreaAuditLogEntries);
         }
     }
 }

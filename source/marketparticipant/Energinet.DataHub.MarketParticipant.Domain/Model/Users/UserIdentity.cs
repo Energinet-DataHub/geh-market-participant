@@ -23,11 +23,12 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 public sealed class UserIdentity
 {
     private readonly List<LoginIdentity> _loginIdentities;
+    private readonly SharedUserReferenceId? _sharedId;
 
     public UserIdentity(
         ExternalUserId id,
         EmailAddress email,
-        UserStatus status,
+        UserIdentityStatus status,
         string firstName,
         string lastName,
         PhoneNumber? phoneNumber,
@@ -35,6 +36,7 @@ public sealed class UserIdentity
         AuthenticationMethod authentication,
         IEnumerable<LoginIdentity> loginIdentities)
     {
+        _sharedId = null;
         Id = id;
         Email = email;
         Status = status;
@@ -47,6 +49,7 @@ public sealed class UserIdentity
     }
 
     public UserIdentity(
+        SharedUserReferenceId sharedUserReferenceId,
         EmailAddress email,
         string firstName,
         string lastName,
@@ -56,9 +59,10 @@ public sealed class UserIdentity
         if (authentication == AuthenticationMethod.Undetermined)
             throw new NotSupportedException("Cannot create a user without an authentication method.");
 
+        _sharedId = sharedUserReferenceId;
         Id = new ExternalUserId(Guid.Empty);
         Email = email;
-        Status = UserStatus.Active;
+        Status = UserIdentityStatus.Active;
         FirstName = firstName;
         LastName = lastName;
         PhoneNumber = phoneNumber;
@@ -69,13 +73,14 @@ public sealed class UserIdentity
         ValidateName();
     }
 
+    public SharedUserReferenceId SharedId => _sharedId ?? throw new InvalidOperationException("The shared reference id is only available when creating the entity.");
     public ExternalUserId Id { get; }
     public EmailAddress Email { get; }
-    public UserStatus Status { get; }
-    public string FirstName { get; }
-    public string LastName { get; }
+    public UserIdentityStatus Status { get; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
     public string FullName => $"{FirstName} {LastName}";
-    public PhoneNumber? PhoneNumber { get; }
+    public PhoneNumber? PhoneNumber { get; set; }
     public DateTimeOffset CreatedDate { get; }
     public AuthenticationMethod Authentication { get; }
     public IReadOnlyCollection<LoginIdentity> LoginIdentities => _loginIdentities;

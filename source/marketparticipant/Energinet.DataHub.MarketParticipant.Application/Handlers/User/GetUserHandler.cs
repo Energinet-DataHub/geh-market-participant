@@ -45,16 +45,14 @@ public sealed class GetUserHandler : IRequestHandler<GetUserCommand, GetUserResp
             .GetAsync(new UserId(request.UserId))
             .ConfigureAwait(false);
 
-        if (user == null)
-            throw new NotFoundValidationException(request.UserId);
+        NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         var externalIdentities = await _userIdentityRepository
             .GetUserIdentitiesAsync(new[] { user.ExternalId })
             .ConfigureAwait(false);
 
         var externalIdentity = externalIdentities.SingleOrDefault();
-        if (externalIdentity == null)
-            throw new NotFoundValidationException($"No external identity found for id {user.Id}.");
+        NotFoundValidationException.ThrowIfNull(externalIdentity, $"No external identity found for id {user.Id}.");
 
         return new GetUserResponse(externalIdentity.FullName);
     }

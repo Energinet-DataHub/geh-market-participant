@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Model
-{
-    public sealed record ErrorResponse
-    {
-        public ErrorResponse(ErrorDescriptor error)
-        {
-            Error = error;
-        }
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-        public ErrorDescriptor Error { get; }
-    }
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IUserIdentityAuditLogEntryRepository
+{
+    Task<IEnumerable<UserIdentityAuditLogEntry>> GetAsync(UserId userId);
+
+    Task InsertAuditLogEntryAsync(UserIdentityAuditLogEntry logEntry);
 }

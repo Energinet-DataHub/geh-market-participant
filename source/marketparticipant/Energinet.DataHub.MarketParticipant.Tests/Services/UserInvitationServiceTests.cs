@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -24,6 +25,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
+using Energinet.DataHub.MarketParticipant.Tests.Handlers;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -69,7 +71,9 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
 
         var target = new UserInvitationService(
             userRepositoryMock.Object,
@@ -77,7 +81,10 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
 
         var invitation = _validInvitation;
 
@@ -87,6 +94,7 @@ public sealed class UserInvitationServiceTests
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
         VerifyUserIdentityCreatedCorrectly(userIdentityRepositoryMock);
+        VerifyUserInvitationExpirationCorrectly(userRepositoryMock);
     }
 
     [Fact]
@@ -98,7 +106,9 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
 
         organizationDomainValidationServiceMock
             .Setup(organizationDomainValidationService =>
@@ -113,7 +123,10 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
 
         var invitation = _validInvitation;
 
@@ -142,14 +155,16 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
 
         userIdentityRepositoryMock
             .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
             .ReturnsAsync(new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -163,7 +178,10 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
 
         var invitation = _validInvitation;
 
@@ -173,6 +191,7 @@ public sealed class UserInvitationServiceTests
         // Assert
         VerifyUserCreatedCorrectly(userRepositoryMock);
         VerifyUserIdentityCreatedCorrectly(userIdentityRepositoryMock);
+        VerifyUserInvitationExpirationCorrectly(userRepositoryMock);
     }
 
     [Fact]
@@ -184,7 +203,9 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -192,8 +213,10 @@ public sealed class UserInvitationServiceTests
             .Setup(userRepository => userRepository.GetAsync(externalId))
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
                 externalId,
                 Array.Empty<UserRoleAssignment>(),
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -201,7 +224,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 externalId,
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -215,7 +238,10 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
 
         var invitation = _validInvitation;
 
@@ -235,7 +261,9 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -243,8 +271,10 @@ public sealed class UserInvitationServiceTests
             .Setup(userRepository => userRepository.GetAsync(externalId))
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -252,7 +282,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 externalId,
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -266,7 +296,10 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
 
         var invitation = _validInvitation;
 
@@ -304,7 +337,9 @@ public sealed class UserInvitationServiceTests
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
         var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
         var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
 
@@ -312,8 +347,10 @@ public sealed class UserInvitationServiceTests
             .Setup(userRepository => userRepository.GetAsync(externalId))
             .ReturnsAsync(new User(
                 new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
                 externalId,
                 new[] { new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+                null,
                 null));
 
         userIdentityRepositoryMock
@@ -321,7 +358,7 @@ public sealed class UserInvitationServiceTests
             .ReturnsAsync(new UserIdentity(
                 externalId,
                 _validInvitation.Email,
-                UserStatus.Active,
+                UserIdentityStatus.Active,
                 _validInvitation.FirstName,
                 _validInvitation.LastName,
                 _validInvitation.PhoneNumber,
@@ -335,7 +372,10 @@ public sealed class UserInvitationServiceTests
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
             userInviteAuditLogEntryRepository.Object,
-            userRoleAssignmentAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
 
         var invitation = _validInvitation;
 
@@ -347,6 +387,166 @@ public sealed class UserInvitationServiceTests
             It.Is<EmailEvent>(emailEvent =>
                 emailEvent.Email == _validInvitation.Email &&
                 emailEvent.EmailEventType == EmailEventType.UserInvite)));
+    }
+
+    [Fact]
+    public async Task ReInviteUserAsync_NoUserIdentity_Throws()
+    {
+        // arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
+
+        var mockedUser = TestPreparationModels.MockedUser(Guid.NewGuid());
+
+        userIdentityRepositoryMock
+            .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
+            .ReturnsAsync((UserIdentity?)null);
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
+
+        // act + assert
+        await Assert.ThrowsAsync<NotFoundValidationException>(() =>
+            target.ReInviteUserAsync(mockedUser, _validInvitedByUserId));
+
+        userIdentityRepositoryMock.Verify(e => e.GetAsync(mockedUser.ExternalId), Times.Once);
+    }
+
+    [Fact]
+    public async Task ReInviteUserAsync_UserStatusNotInviteExpired_Throws()
+    {
+        // arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
+
+        var user = new User(
+            new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
+            new ExternalUserId(Guid.NewGuid()),
+            new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+            null,
+            null);
+
+        var userIdentity = new UserIdentity(
+            new ExternalUserId(Guid.NewGuid()),
+            new EmailAddress("test@test.dk"),
+            UserIdentityStatus.Active,
+            "FirstName",
+            "LastName",
+            new PhoneNumber("+45 12345678"),
+            DateTimeOffset.UtcNow,
+            AuthenticationMethod.Undetermined,
+            new List<LoginIdentity>());
+
+        userIdentityRepositoryMock
+            .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
+            .ReturnsAsync(userIdentity);
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
+
+        // act + assert
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            target.ReInviteUserAsync(user, _validInvitedByUserId));
+    }
+
+    [Fact]
+    public async Task ReInviteUserAsync_CompleteReInvite_Success()
+    {
+        // arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = new Mock<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
+
+        var user = new User(
+            new UserId(Guid.NewGuid()),
+            new ActorId(Guid.NewGuid()),
+            new ExternalUserId(Guid.NewGuid()),
+            new UserRoleAssignment[] { new(new ActorId(Guid.NewGuid()), new UserRoleId(Guid.NewGuid())) },
+            null,
+            DateTimeOffset.UtcNow.AddDays(-1));
+
+        var userIdentity = new UserIdentity(
+            new ExternalUserId(Guid.NewGuid()),
+            new EmailAddress("test@test.dk"),
+            UserIdentityStatus.Active,
+            "FirstName",
+            "LastName",
+            new PhoneNumber("+45 12345678"),
+            DateTimeOffset.UtcNow,
+            AuthenticationMethod.Undetermined,
+            new List<LoginIdentity>());
+
+        userRepositoryMock
+            .Setup(u => u.GetAsync(It.IsAny<UserId>()))
+            .ReturnsAsync(user);
+
+        userIdentityRepositoryMock
+            .Setup(u => u.GetAsync(It.IsAny<ExternalUserId>()))
+            .ReturnsAsync(userIdentity);
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
+            userRoleAssignmentAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
+
+        await target.ReInviteUserAsync(user, _validInvitedByUserId).ConfigureAwait(false);
+
+        // act + assert
+        userIdentityRepositoryMock
+            .Verify(u => u.EnableUserAccountAsync(userIdentity.Id), Times.Once);
+        userRepositoryMock
+            .Verify(u => u.AddOrUpdateAsync(user), Times.Once);
+        emailEventRepositoryMock
+            .Verify(e => e.InsertAsync(It.IsAny<EmailEvent>()), Times.Once);
+        userInviteAuditLogEntryRepository
+            .Verify(a => a.InsertAuditLogEntryAsync(It.IsAny<UserInviteAuditLogEntry>()), Times.Once);
+    }
+
+    private static void VerifyUserInvitationExpirationCorrectly(Mock<IUserRepository> userRepositoryMock)
+    {
+        userRepositoryMock.Verify(
+            userRepository => userRepository.AddOrUpdateAsync(It.Is<User>(user => user.InvitationExpiresAt != null && user.InvitationExpiresAt > DateTimeOffset.UtcNow)),
+            Times.Once);
     }
 
     private void VerifyUserCreatedCorrectly(Mock<IUserRepository> userRepositoryMock)

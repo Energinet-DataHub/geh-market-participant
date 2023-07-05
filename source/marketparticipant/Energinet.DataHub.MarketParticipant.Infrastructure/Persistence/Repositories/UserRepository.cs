@@ -49,7 +49,11 @@ public sealed class UserRepository : IUserRepository
                 .GetAsync(user.ExternalId)
                 .ConfigureAwait(false);
 
-            destination = new UserEntity { Email = identity!.Email.Address };
+            destination = new UserEntity
+            {
+                Email = identity!.Email.Address,
+                SharedReferenceId = user.SharedId.Value
+            };
         }
         else
         {
@@ -86,6 +90,16 @@ public sealed class UserRepository : IUserRepository
     {
         var userEntities = await BuildUserQuery()
             .Where(x => x.RoleAssignments.Any(y => y.UserRoleId == userRoleId.Value))
+            .ToListAsync()
+            .ConfigureAwait(false);
+
+        return userEntities.Select(UserMapper.MapFromEntity);
+    }
+
+    public async Task<IEnumerable<User>> FindUsersWithExpiredInvitationAsync()
+    {
+        var userEntities = await BuildUserQuery()
+            .Where(u => u.InvitationExpiresAt < DateTimeOffset.UtcNow)
             .ToListAsync()
             .ConfigureAwait(false);
 

@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
-using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
 
@@ -39,6 +37,7 @@ public sealed class UserIdentityTests
     public void Ctor_UserIdentityTests_ValidatesAuthenticationMethod()
     {
         Assert.Throws<NotSupportedException>(() => new UserIdentity(
+            new SharedUserReferenceId(),
             _validEmailAddress,
             ValidFirstName,
             ValidLastName,
@@ -57,11 +56,12 @@ public sealed class UserIdentityTests
     {
         if (isValid)
         {
-            Assert.Equal(value, new UserIdentity(_validEmailAddress, value, ValidLastName, _validPhoneNumber, _validAuthentication).FirstName);
+            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, value, ValidLastName, _validPhoneNumber, _validAuthentication).FirstName);
         }
         else
         {
             Assert.Throws<ValidationException>(() => new UserIdentity(
+                new SharedUserReferenceId(),
                 _validEmailAddress,
                 value,
                 ValidLastName,
@@ -81,11 +81,12 @@ public sealed class UserIdentityTests
     {
         if (isValid)
         {
-            Assert.Equal(value, new UserIdentity(_validEmailAddress, ValidFirstName, value, _validPhoneNumber, _validAuthentication).LastName);
+            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, ValidFirstName, value, _validPhoneNumber, _validAuthentication).LastName);
         }
         else
         {
             Assert.Throws<ValidationException>(() => new UserIdentity(
+                new SharedUserReferenceId(),
                 _validEmailAddress,
                 ValidFirstName,
                 value,
@@ -101,7 +102,7 @@ public sealed class UserIdentityTests
         var validUserIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             _validEmailAddress,
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
@@ -112,7 +113,7 @@ public sealed class UserIdentityTests
         var validUserIdentityToLink = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             _validEmailAddress,
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
@@ -136,7 +137,7 @@ public sealed class UserIdentityTests
         var validUserIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             _validEmailAddress,
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
@@ -147,7 +148,7 @@ public sealed class UserIdentityTests
         var validUserIdentityToLink = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
             new EmailAddress("notsameemail@notsame.dk"),
-            UserStatus.Active,
+            UserIdentityStatus.Active,
             ValidFirstName,
             ValidLastName,
             _validPhoneNumber,
