@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         public void Configure(EntityTypeBuilder<GridAreaLinkEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("GridAreaLinkNew");
+            builder.ToTable("GridAreaLink");
             builder.HasKey(gridArea => gridArea.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
             builder.Property(p => p.GridAreaId);

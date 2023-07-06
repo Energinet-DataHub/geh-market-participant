@@ -24,13 +24,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         public void Configure(EntityTypeBuilder<ActorEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("ActorInfoNew");
+            builder.ToTable("Actor");
             builder.HasKey(actor => actor.Id);
             builder.Property(actor => actor.Id).ValueGeneratedOnAdd();
             builder
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()
-                .HasForeignKey(marketRole => marketRole.ActorInfoId);
+                .HasForeignKey(marketRole => marketRole.ActorId);
         }
     }
 }

@@ -34,7 +34,7 @@ DEALLOCATE user_cursor;
 GO
 
 ALTER TABLE [dbo].[User]
-ADD FOREIGN KEY (AdministratedByActorId) REFERENCES dbo.ActorInfoNew(Id)
+ADD FOREIGN KEY (AdministratedByActorId) REFERENCES dbo.Actor(Id)
 GO
 
 ALTER TABLE [dbo].[User]

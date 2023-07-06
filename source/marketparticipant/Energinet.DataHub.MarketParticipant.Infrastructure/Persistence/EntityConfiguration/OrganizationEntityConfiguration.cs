@@ -24,7 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
         public void Configure(EntityTypeBuilder<OrganizationEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ToTable("OrganizationInfo");
+            builder.ToTable("Organization");
             builder.HasKey(organization => organization.Id);
             builder.Property(organization => organization.Id).ValueGeneratedOnAdd();
             builder.OwnsOne(organization => organization.Address);
