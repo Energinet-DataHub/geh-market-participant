@@ -137,7 +137,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task GetAsync_MultipleMarketRolesAssignedToGridAreaAndGridAccessProviderIsNotAmongThem_ReturnsWithoutActorInfo()
+        public async Task GetAsync_MultipleMarketRolesAssignedToGridAreaAndGridAccessProviderIsNotAmongThem_ReturnsWithoutActor()
         {
             // arrange
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
