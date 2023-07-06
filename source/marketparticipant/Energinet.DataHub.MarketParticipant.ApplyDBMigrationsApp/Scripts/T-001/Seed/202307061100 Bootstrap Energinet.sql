@@ -1,5 +1,6 @@
 -- Create Grid Areas
 INSERT INTO [dbo].[GridArea] (
+    [Id],
     [Code],
     [Name],
     [PriceAreaCode],
@@ -8,11 +9,11 @@ INSERT INTO [dbo].[GridArea] (
     [FullFlexDate]
 )
 VALUES
-    ('533', 'Netområde 533', 1, '2000-01-01', NULL, NULL),
-    ('543', 'Netområde 543', 1, '2000-01-01', NULL, NULL),
-    ('584', 'Netområde 584', 1, '2000-01-01', NULL, NULL),
-    ('803', 'Netområde 803', 1, '2000-01-01', NULL, NULL),
-    ('804', 'Netområde 804', 1, '2000-01-01', NULL, NULL);
+    (NEWID(), '533', 'Netområde 533', 1, '2000-01-01', NULL, NULL),
+    (NEWID(), '543', 'Netområde 543', 1, '2000-01-01', NULL, NULL),
+    (NEWID(), '584', 'Netområde 584', 1, '2000-01-01', NULL, NULL),
+    (NEWID(), '803', 'Netområde 803', 1, '2000-01-01', NULL, NULL),
+    (NEWID(), '804', 'Netområde 804', 1, '2000-01-01', NULL, NULL);
 
 -- Create Energinet Organisation
 DECLARE @organisationId varchar(36) = '10000000-0000-0000-0000-000000000000'
