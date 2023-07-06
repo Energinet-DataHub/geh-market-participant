@@ -61,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
             catch (DbUpdateException ex) when (
                 ex.InnerException is SqlException inner &&
-                inner.Message.Contains("UQ_OrganizationInfo_Domain", StringComparison.InvariantCultureIgnoreCase))
+                inner.Message.Contains("UQ_Organization_Domain", StringComparison.InvariantCultureIgnoreCase))
             {
                 return new(OrganizationError.DomainConflict);
             }
