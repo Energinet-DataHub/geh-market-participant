@@ -47,7 +47,7 @@ VALUES
 -- Create Energinet Actor
 DECLARE @actorId varchar(36) = '00000000-0000-0000-0000-000000000001'
 
-INSERT INTO [dbo].[ActorInfo] (
+INSERT INTO [dbo].[Actor] (
     [Id],
     [OrganizationId],
     [ActorId],
@@ -69,7 +69,7 @@ VALUES
 -- Assign Market Role
 INSERT INTO [dbo].[MarketRole] (
 	[Id],
-    [ActorInfoId],
+    [ActorId],
     [Function],
     [Comment]
 )
