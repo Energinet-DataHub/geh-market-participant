@@ -60,7 +60,7 @@ VALUES
     (
         @actorId,
         @organisationId,
-        '00000000-0000-0000-0000-000000000001', -- INSERT B2C APP REGISTRATION GUID HERE
+        '4a2696e6-1d93-409f-bcf6-9ee88a1f0593',
         '5790001330583',
         2,
         'Energinet DataHub A/S (DataHub systemadministrator)',
@@ -91,7 +91,7 @@ INSERT INTO [dbo].[User] (
 VALUES
     (
         @userId,
-        '00000000-0000-1111-0000-000000000000', -- INSERT B2C USER GUID HERE
+        '891275d4-a8d0-474c-86bd-58871018e0b8',
         'bootstrap.datahub@energinet.dk',
         NULL,
         '00000000-0000-1111-0000-000000000000',
