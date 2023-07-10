@@ -21,14 +21,14 @@ on:
 jobs:
   # Build all projects within solution
   dotnet_ci_build:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v11
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-build-prerelease.yml@v12
     with:
       solution_file_path: source/marketparticipant/Energinet.DataHub.MarketParticipant.sln
       dotnet_version: 7.0.200
 
   # Run all tests in 'Tests.dll'
   unit_test:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v11
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
       tests_dll_file_path: \source\marketparticipant\Energinet.DataHub.MarketParticipant.Tests\bin\Release\net7.0\Energinet.DataHub.MarketParticipant.Tests.dll
       download_attempt_limit: 18
@@ -37,7 +37,7 @@ jobs:
 
   # Run tests in 'IntegrationTests.dll'
   integration_test:
-    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v11
+    uses: Energinet-DataHub/.github/.github/workflows/dotnet-postbuild-test.yml@v12
     with:
       tests_dll_file_path: \source\marketparticipant\Energinet.DataHub.MarketParticipant.IntegrationTests\bin\Release\net7.0\Energinet.DataHub.MarketParticipant.IntegrationTests.dll
       download_attempt_limit: 18
@@ -45,8 +45,8 @@ jobs:
       code_coverage_flags: business
       environment: AzureAuth
       dotnet_version: 7.0.200
-    secrets:
-      azure_tenant_id: ${{ vars.azure_tenant_id }}
-      azure_subscription_id: ${{ vars.azure_subscription_id }}
-      azure_spn_id: ${{ vars.azure_spn_id_oidc }}
+      run_integration_tests: true
+      azure_integrationtest_tenant_id: ${{ vars.azure_tenant_id }}
+      azure_integrationtest_subscription_id: ${{ vars.azure_subscription_id }}
+      azure_integrationtest_spn_id: ${{ vars.azure_spn_id_oidc }}
       azure_keyvault_url: ${{ vars.azure_keyvault_url }}
