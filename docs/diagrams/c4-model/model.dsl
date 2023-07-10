@@ -7,7 +7,7 @@ markpartDomain = group "Market Participant" {
     commonSendGrid = container "SendGrid" {
         description "EMail dispatcher"
         technology "Twilio SendGrid"
-        tags "Intermediate Technology" "SaaS" "Microsoft Azure - SendGrid Accounts" "deprecated" "Titans"
+        tags "Intermediate Technology" "SaaS" "Microsoft Azure - SendGrid Accounts" "deprecated" "Titans" "Outlaws"
 
         # Base model relationships
         this -> dh3User "Sends invitation mail" "deprecated"
