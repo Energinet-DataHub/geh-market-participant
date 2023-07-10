@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.31.8
+
+- Bumped .github to use v12
+
 ## Version 2.31.7
 
 - Add user identity audit logging for status changes.
