@@ -35,7 +35,7 @@ using UserIdentity = Energinet.DataHub.MarketParticipant.Domain.Model.Users.User
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class UserOverviewRepositoryTests
 {

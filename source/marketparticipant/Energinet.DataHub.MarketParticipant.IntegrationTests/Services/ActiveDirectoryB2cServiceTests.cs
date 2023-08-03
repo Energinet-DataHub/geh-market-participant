@@ -34,7 +34,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 {
-    [Collection("IntegrationTest")]
+    [Collection(nameof(IntegrationTestCollectionFixture))]
     [IntegrationTest]
     public sealed class ActiveDirectoryB2CServiceTests
     {
