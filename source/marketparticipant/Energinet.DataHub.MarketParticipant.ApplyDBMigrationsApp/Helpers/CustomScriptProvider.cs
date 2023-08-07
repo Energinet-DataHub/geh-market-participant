@@ -32,7 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
         public new IEnumerable<SqlScript> GetScripts(IConnectionManager connectionManager)
         {
             var sqlScripts = base.GetScripts(connectionManager).ToList();
-
+            Console.WriteLine($"Total scripts to upgrade: {sqlScripts.Count}");
+            Console.WriteLine($"All scripts to upgrade: {string.Join(Environment.NewLine, sqlScripts)}");
             foreach (var script in sqlScripts)
             {
                 if (!NamingConvention.Regex.IsMatch(script.Name))
