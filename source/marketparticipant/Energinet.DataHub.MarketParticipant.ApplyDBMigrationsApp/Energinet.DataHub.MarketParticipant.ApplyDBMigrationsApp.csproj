@@ -28,6 +28,17 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\D-001\Model\202304181530 Create DB.sql" />
+    <None Remove="Scripts\D-001\Model\202304241230 Add MitIdSetupInitiatedTimestamp to User table.sql" />
+    <None Remove="Scripts\D-001\Model\202305230936 Add UserInvitationExpiresAt to User table.sql" />
+    <None Remove="Scripts\D-001\Model\202305310820 Add SharedReferenceId to User.sql" />
+    <None Remove="Scripts\D-001\Model\202306070930 Add AdministratedByActorId to User.sql" />
+    <None Remove="Scripts\D-001\Model\202306141130 Add UserIdentityAuditLog Table.sql" />
+    <None Remove="Scripts\D-001\Seed\202301261045 Insert User Roles.sql" />
+    <None Remove="Scripts\D-001\Seed\202307061100 Bootstrap Energinet.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DbUp.Reboot.SqlServer" Version="1.5.0" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
   </ItemGroup>
