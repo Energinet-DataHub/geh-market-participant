@@ -4,25 +4,7 @@ markpartDomain = group "Market Participant" {
     #
     # Common (managed by Market Participant)
     #
-    commonSendGrid = container "SendGrid" {
-        description "EMail dispatcher"
-        technology "Twilio SendGrid"
-        tags "Intermediate Technology" "SaaS" "Microsoft Azure - SendGrid Accounts" "deprecated" "Titans" "Outlaws"
-
-        # Base model relationships
-        this -> dh3User "Sends invitation mail" "deprecated"
-    }
-    commonB2C = container "App Registrations" {
-        description "Cloud identity directory"
-        technology "Azure AD B2C"
-        tags "Microsoft Azure - Azure AD B2C" "deprecated" "Titans"
-
-        # Base model relationships
-        actorB2BSystem -> this "Request OAuth token" "https" {
-            tags "OAuth"
-        }
-    }
-
+    
     #
     # Domain
     #
