@@ -95,7 +95,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
         private async Task<Microsoft.Graph.Models.Application> EnsureAppAsync(Actor actor)
         {
             var app = await GetAppAsync(actor).ConfigureAwait(false);
-            if (app is not null) return app;
+            if (app is not null)
+                return app;
 
             app = await CreateAppRegistrationAsync(actor).ConfigureAwait(false);
             return app;
@@ -111,8 +112,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 })
                 .ConfigureAwait(false);
 
-            return (await applicationCollectionResponse!.IteratePagesAsync<Microsoft.Graph.Models.Application>(_graphClient).ConfigureAwait(false))
-                .FirstOrDefault();
+            var applications = await applicationCollectionResponse!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            return applications.FirstOrDefault();
         }
 
         private async Task<ServicePrincipal?> GetServicePrincipalToAppAsync(string appId)
@@ -124,7 +128,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                     x.QueryParameters.Filter = $"appId eq '{appId}'";
                 })
                 .ConfigureAwait(false);
-            return (await response!.IteratePagesAsync<ServicePrincipal>(_graphClient).ConfigureAwait(false)).FirstOrDefault();
+
+            var servicePrincipals = await response!
+                .IteratePagesAsync<ServicePrincipal, ServicePrincipalCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            return servicePrincipals.FirstOrDefault();
         }
 
         private async Task EnsureServicePrincipalToAppAsync(Microsoft.Graph.Models.Application app)
@@ -136,7 +145,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
                 })
                 .ConfigureAwait(false);
 
-            var servicePrincipal = (await response!.IteratePagesAsync<ServicePrincipal>(_graphClient).ConfigureAwait(false)).FirstOrDefault();
+            var servicePrincipals = await response!
+                .IteratePagesAsync<ServicePrincipal, ServicePrincipalCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            var servicePrincipal = servicePrincipals.FirstOrDefault();
 
             if (servicePrincipal is not null)
             {

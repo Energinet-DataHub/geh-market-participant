@@ -102,7 +102,10 @@ public sealed class UserIdentityAuthenticationServiceTests
             .PhoneMethods
             .GetAsync())!;
 
-        var actualMethods = (await actualResponse.IteratePagesAsync<PhoneAuthenticationMethod>(_graphServiceClientFixture.Client)).ToList();
+        var phoneAuthMethods = await actualResponse
+            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(_graphServiceClientFixture.Client);
+
+        var actualMethods = phoneAuthMethods.ToList();
 
         Assert.Single(actualMethods);
         Assert.Single(actualMethods, method =>
