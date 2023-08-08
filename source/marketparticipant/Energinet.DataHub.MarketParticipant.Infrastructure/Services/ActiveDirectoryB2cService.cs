@@ -96,7 +96,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     })
                     .ConfigureAwait(false);
 
-                var foundApp = (await applicationUsingAppId!.IteratePagesAsync<Microsoft.Graph.Models.Application>(_graphClient).ConfigureAwait(false)).SingleOrDefault();
+                var applications = await applicationUsingAppId!
+                    .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                    .ConfigureAwait(false);
+
+                var foundApp = applications.SingleOrDefault();
                 if (foundApp == null)
                 {
                     throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
@@ -170,7 +174,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     .GetAsync()
                     .ConfigureAwait(false);
 
-                var roles = await response!.IteratePagesAsync<AppRoleAssignment>(_graphClient).ConfigureAwait(false);
+                var roles = await response!
+                    .IteratePagesAsync<AppRoleAssignment, AppRoleAssignmentCollectionResponse>(_graphClient)
+                    .ConfigureAwait(false);
 
                 if (roles is null)
                 {

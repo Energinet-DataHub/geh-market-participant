@@ -15,16 +15,17 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Graph;
-using Microsoft.Graph.Models;
+using Microsoft.Kiota.Abstractions.Serialization;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 
 public static class BaseCollectionPaginationCountResponseExtensions
 {
-    public static async Task<IEnumerable<T>> IteratePagesAsync<T>(this BaseCollectionPaginationCountResponse collection, IBaseClient graphClient)
+    public static async Task<IEnumerable<T>> IteratePagesAsync<T, TCollectionPage>(this TCollectionPage collection, IBaseClient graphClient)
+        where TCollectionPage : IParsable, IAdditionalDataHolder, new()
     {
         var results = new List<T>();
-        var pageIterator = PageIterator<T, BaseCollectionPaginationCountResponse>
+        var pageIterator = PageIterator<T, TCollectionPage>
             .CreatePageIterator(
                 graphClient,
                 collection,

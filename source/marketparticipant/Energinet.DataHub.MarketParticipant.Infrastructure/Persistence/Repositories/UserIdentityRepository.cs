@@ -125,7 +125,11 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 })
                 .ConfigureAwait(false);
 
-            result.AddRange((await usersRequest!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(u => Map(u)));
+            var users = await usersRequest!
+                .IteratePagesAsync<User, UserCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            result.AddRange(users.Where(IsMember).Select(u => Map(u)));
         }
 
         return result;
@@ -149,7 +153,11 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
                 x.QueryParameters.Filter = string.Join(" and ", filters);
         }).ConfigureAwait(false);
 
-        var userIdentities = (await request!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).Where(IsMember).Select(u => Map(u));
+        var users = await request!
+            .IteratePagesAsync<User, UserCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
+
+        var userIdentities = users.Where(IsMember).Select(u => Map(u));
 
         if (!string.IsNullOrEmpty(searchText))
         {
@@ -317,7 +325,11 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             })
             .ConfigureAwait(false);
 
-        return (await usersRequest!.IteratePagesAsync<User>(_graphClient).ConfigureAwait(false)).SingleOrDefault();
+        var users = await usersRequest!
+            .IteratePagesAsync<User, UserCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
+
+        return users.SingleOrDefault();
     }
 
     private async Task<User?> CheckCreatedUserAsync(EmailAddress email)
