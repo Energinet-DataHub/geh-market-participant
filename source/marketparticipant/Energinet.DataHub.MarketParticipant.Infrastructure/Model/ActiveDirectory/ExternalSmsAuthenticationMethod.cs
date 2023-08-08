@@ -68,7 +68,7 @@ public sealed class ExternalSmsAuthenticationMethod : IExternalAuthenticationMet
             .ConfigureAwait(false);
 
         var phoneMethods = await collection!
-            .IteratePagesAsync<PhoneAuthenticationMethod>(client)
+            .IteratePagesAsync<PhoneAuthenticationMethod, PhoneAuthenticationMethodCollectionResponse>(client)
             .ConfigureAwait(false);
 
         return phoneMethods
