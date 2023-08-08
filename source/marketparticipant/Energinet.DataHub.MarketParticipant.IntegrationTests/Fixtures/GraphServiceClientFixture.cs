@@ -129,7 +129,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             .ConfigureAwait(false);
 
         var users = await usersRequest!
-            .IteratePagesAsync<User>(Client)
+            .IteratePagesAsync<User, UserCollectionResponse>(Client)
             .ConfigureAwait(false);
 
         var user = users.SingleOrDefault();
