@@ -98,7 +98,9 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
             .PasswordMethods
             .GetAsync();
 
-        var passwordMethods = await password!.IteratePagesAsync<PasswordAuthenticationMethod>(_graphServiceClientFixture.Client);
+        var passwordMethods = await password!
+            .IteratePagesAsync<PasswordAuthenticationMethod, PasswordAuthenticationMethodCollectionResponse>(_graphServiceClientFixture.Client);
+
         Assert.NotEmpty(passwordMethods);
     }
 
