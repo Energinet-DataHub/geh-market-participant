@@ -22,7 +22,7 @@ using Xunit;
 using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
-    [Collection("IntegrationTest")]
+    [Collection(nameof(IntegrationTestCollectionFixture))]
     [IntegrationTest]
     public sealed class OrganizationRepositoryTests
     {

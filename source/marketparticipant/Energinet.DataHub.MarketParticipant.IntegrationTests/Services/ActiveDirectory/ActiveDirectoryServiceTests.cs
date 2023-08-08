@@ -21,13 +21,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Graph;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDirectory
 {
-    [Collection("IntegrationTest")]
+    [Collection(nameof(IntegrationTestCollectionFixture))]
     [IntegrationTest]
     public sealed class ActiveDirectoryServiceTests
     {

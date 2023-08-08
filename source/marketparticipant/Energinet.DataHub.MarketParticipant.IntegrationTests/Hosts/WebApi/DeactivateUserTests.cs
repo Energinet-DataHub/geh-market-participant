@@ -31,7 +31,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 [SuppressMessage("Reliability", "CA2007:Consider calling ConfigureAwait on the awaited task", Justification = "Test code")]
 public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase

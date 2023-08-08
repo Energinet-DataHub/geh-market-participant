@@ -36,7 +36,7 @@ using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddre
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class UserIdentityRepositoryTests : IAsyncLifetime
 {

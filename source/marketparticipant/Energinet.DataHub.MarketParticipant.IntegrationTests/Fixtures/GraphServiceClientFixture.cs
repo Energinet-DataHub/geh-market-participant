@@ -39,20 +39,18 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        var integrationTestConfig = new IntegrationTestConfiguration();
-
         var clientSecretCredential = new ClientSecretCredential(
-            integrationTestConfig.B2CSettings.Tenant,
-            integrationTestConfig.B2CSettings.ServicePrincipalId,
-            integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+            _integrationTestConfiguration.B2CSettings.Tenant,
+            _integrationTestConfiguration.B2CSettings.ServicePrincipalId,
+            _integrationTestConfiguration.B2CSettings.ServicePrincipalSecret);
 
         _graphClient = new GraphServiceClient(
             clientSecretCredential,
             new[] { "https://graph.microsoft.com/.default" });
 
-        Environment.SetEnvironmentVariable(Settings.B2CTenant.Key, integrationTestConfig.B2CSettings.Tenant);
-        Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalId.Key, integrationTestConfig.B2CSettings.ServicePrincipalId);
-        Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalSecret.Key, integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+        Environment.SetEnvironmentVariable(Settings.B2CTenant.Key, _integrationTestConfiguration.B2CSettings.Tenant);
+        Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalId.Key, _integrationTestConfiguration.B2CSettings.ServicePrincipalId);
+        Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalSecret.Key, _integrationTestConfiguration.B2CSettings.ServicePrincipalSecret);
 
         return Task.CompletedTask;
     }

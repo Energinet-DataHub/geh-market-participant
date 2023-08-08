@@ -33,7 +33,7 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class UserIdentityAuthenticationServiceTests
 {
