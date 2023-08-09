@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Xunit;
 using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Security;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class ExternalTokenValidatorIntegrationTests
 {

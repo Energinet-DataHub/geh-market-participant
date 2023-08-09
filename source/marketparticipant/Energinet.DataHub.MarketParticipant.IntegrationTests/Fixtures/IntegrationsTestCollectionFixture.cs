@@ -16,8 +16,8 @@ using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
-    [CollectionDefinition("IntegrationTest")]
-    public sealed class IntegrationTestFixtureConfiguration :
+    [CollectionDefinition(nameof(IntegrationTestCollectionFixture))]
+    public sealed class IntegrationTestCollectionFixture :
         ICollectionFixture<MarketParticipantDatabaseFixture>,
         ICollectionFixture<GraphServiceClientFixture>
     {

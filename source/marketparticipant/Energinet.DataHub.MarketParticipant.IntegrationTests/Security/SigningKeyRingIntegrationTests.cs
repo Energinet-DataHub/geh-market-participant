@@ -26,7 +26,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Security;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixture>
 {

@@ -27,9 +27,9 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class InviteUserHandlerIntegrationTests : IClassFixture<GraphServiceClientFixture>, IAsyncLifetime
+public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
 {
     private const string TestUserEmail = "invitation-integration-test@datahub.dk";
 

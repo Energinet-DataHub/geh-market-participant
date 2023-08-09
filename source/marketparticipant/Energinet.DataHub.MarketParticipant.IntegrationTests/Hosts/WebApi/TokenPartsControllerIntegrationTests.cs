@@ -37,7 +37,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
-[Collection("IntegrationTest")]
+[Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class TokenPartsControllerIntegrationTests :
     WebApiIntegrationTestsBase,
