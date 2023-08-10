@@ -26,4 +26,6 @@ public interface IExternalTokenValidator
     /// </summary>
     /// <param name="token"></param>
     Task<bool> ValidateTokenAsync(string token);
+
+    Task<string?> ValidateReasonTokenAsync(string token);
 }
