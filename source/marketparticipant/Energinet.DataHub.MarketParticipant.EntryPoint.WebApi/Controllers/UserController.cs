@@ -56,11 +56,13 @@ public class UserController : ControllerBase
 
         var externalJwt = new JwtSecurityToken(externalToken);
 
-        if (!await _externalTokenValidator
-                .ValidateTokenAsync(externalToken)
-                .ConfigureAwait(false))
+        var result = await _externalTokenValidator
+            .ValidateReasonTokenAsync(externalToken)
+            .ConfigureAwait(false);
+
+        if (result != null)
         {
-            return Unauthorized();
+            return Unauthorized(result);
         }
 
         var externalUserId = GetExternalUserId(externalJwt.Claims);

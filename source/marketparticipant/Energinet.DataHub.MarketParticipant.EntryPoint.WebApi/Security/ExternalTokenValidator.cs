@@ -55,4 +55,17 @@ public sealed class ExternalTokenValidator : IExternalTokenValidator
 
         return result.IsValid;
     }
+
+    public async Task<string?> ValidateReasonTokenAsync(string token)
+    {
+        if (Startup.EnableIntegrationTestKeys)
+            return null;
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var result = await tokenHandler
+            .ValidateTokenAsync(token, _validationParameters)
+            .ConfigureAwait(false);
+
+        return result.IsValid ? null : result.Exception.ToString();
+    }
 }
