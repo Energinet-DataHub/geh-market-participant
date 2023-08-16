@@ -21,9 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -40,12 +38,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var actorRepositoryMock = new Mock<IActorRepository>();
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
-                actorFactory.Object,
-                actorRepositoryMock.Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
+                actorFactory.Object);
 
             var organization = TestPreparationModels.MockedOrganization();
             var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
@@ -84,12 +79,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             string actorGln = new MockedGln();
             var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
             var actorFactory = new Mock<IActorFactoryService>();
-            var actorRepositoryMock = new Mock<IActorRepository>();
             var target = new CreateActorHandler(
                 organizationExistsHelperService.Object,
-                actorFactory.Object,
-                actorRepositoryMock.Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
+                actorFactory.Object);
 
             var organization = TestPreparationModels.MockedOrganization();
             var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
@@ -121,51 +113,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             Assert.Equal(actor.Id.Value, response.ActorId);
-        }
-
-        [Fact]
-        public async Task Handle_NewActorWithMarketRoles_CallsUniqueMarketRoleGridAreaService()
-        {
-            // Arrange
-            var organizationExistsHelperService = new Mock<IOrganizationExistsHelperService>();
-            var actorFactory = new Mock<IActorFactoryService>();
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var uniqueService = new Mock<IUniqueMarketRoleGridAreaRuleService>();
-
-            var target = new CreateActorHandler(
-                organizationExistsHelperService.Object,
-                actorFactory.Object,
-                actorRepositoryMock.Object,
-                uniqueService.Object);
-
-            var organization = TestPreparationModels.MockedOrganization();
-            var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
-
-            organizationExistsHelperService
-                .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
-                .ReturnsAsync(organization);
-
-            actorFactory
-                .Setup(x => x.CreateAsync(
-                    organization,
-                    It.IsAny<ActorNumber>(),
-                    It.IsAny<ActorName>(),
-                    It.IsAny<IReadOnlyCollection<ActorMarketRole>>()))
-                .ReturnsAsync(actor);
-
-            var command = new CreateActorCommand(new CreateActorDto(
-                organization.Id.Value,
-                new ActorNameDto(string.Empty),
-                new ActorNumberDto("9958000453672"),
-                Enumerable.Empty<ActorMarketRoleDto>()));
-
-            // Act
-            await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
-
-            // Assert
-            uniqueService.Verify(x => x.ValidateAsync(actor), Times.Once);
         }
     }
 }

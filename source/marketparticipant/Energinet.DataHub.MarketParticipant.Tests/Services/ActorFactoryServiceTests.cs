@@ -52,6 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
@@ -85,6 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
@@ -121,6 +123,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IAllowedGridAreasRuleService>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
@@ -160,6 +163,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 allowedGridAreasRuleService.Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
@@ -184,6 +188,46 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             // Assert
             allowedGridAreasRuleService.Verify(
                 x => x.ValidateGridAreas(marketRoles),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateAsync_NewActor_EnsuresUniqueGridAreas()
+        {
+            // Arrange
+            var actorRepositoryMock = new Mock<IActorRepository>();
+            var uniqueMarketRoleGridAreaRuleService = new Mock<IUniqueMarketRoleGridAreaRuleService>();
+            var target = new ActorFactoryService(
+                actorRepositoryMock.Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                uniqueMarketRoleGridAreaRuleService.Object,
+                new Mock<IAllowedGridAreasRuleService>().Object);
+
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
+            var globalLocationNumber = new MockedGln();
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
+            var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
+            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
+
+            var updatedActor = new Actor(organization.Id, new MockedGln());
+            actorRepositoryMock
+                .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
+                .ReturnsAsync(updatedActor);
+
+            // Act
+            await target
+                .CreateAsync(
+                    organization,
+                    globalLocationNumber,
+                    new ActorName("fake_value"),
+                    marketRoles)
+                .ConfigureAwait(false);
+
+            // Assert
+            uniqueMarketRoleGridAreaRuleService.Verify(
+                x => x.ValidateAsync(updatedActor),
                 Times.Once);
         }
     }
