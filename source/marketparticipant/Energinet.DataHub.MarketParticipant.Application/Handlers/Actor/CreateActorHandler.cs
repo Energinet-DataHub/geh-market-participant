@@ -20,9 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -31,19 +29,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IActorFactoryService _actorFactoryService;
-        private readonly IActorRepository _actorRepository;
-        private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
 
         public CreateActorHandler(
             IOrganizationExistsHelperService organizationExistsHelperService,
-            IActorFactoryService actorFactoryService,
-            IActorRepository actorRepository,
-            IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService)
+            IActorFactoryService actorFactoryService)
         {
             _organizationExistsHelperService = organizationExistsHelperService;
             _actorFactoryService = actorFactoryService;
-            _actorRepository = actorRepository;
-            _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
         }
 
         public async Task<CreateActorResponse> Handle(CreateActorCommand request, CancellationToken cancellationToken)
@@ -61,8 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var actor = await _actorFactoryService
                 .CreateAsync(organization, actorNumber, actorName, marketRoles)
                 .ConfigureAwait(false);
-
-            await _uniqueMarketRoleGridAreaRuleService.ValidateAsync(actor).ConfigureAwait(false);
 
             return new CreateActorResponse(actor.Id.Value);
         }
