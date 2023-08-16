@@ -96,7 +96,7 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.SettlementsManage, "calculations:manage", InstantPattern.ExtendedIso.Parse("2023-08-16T12:00:00Z").Value, new[]
+        new(PermissionId.CalculationsManage, "calculations:manage", InstantPattern.ExtendedIso.Parse("2023-08-16T12:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),
