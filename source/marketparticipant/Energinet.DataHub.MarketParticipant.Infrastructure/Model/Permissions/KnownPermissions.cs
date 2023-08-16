@@ -96,8 +96,15 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.SettlementsManage, "settlements:manage", InstantPattern.ExtendedIso.Parse("2023-03-20T12:00:00Z").Value, new[]
+        new(PermissionId.SettlementsManage, "calculations:manage", InstantPattern.ExtendedIso.Parse("2023-08-16T12:00:00Z").Value, new[]
         {
+            EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.SettlementReportsManage, "settlement-reports:manage", InstantPattern.ExtendedIso.Parse("2023-08-16T00:00:00Z").Value, new[]
+        {
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.MeteredDataResponsible,
             EicFunction.DataHubAdministrator
         })
     };
