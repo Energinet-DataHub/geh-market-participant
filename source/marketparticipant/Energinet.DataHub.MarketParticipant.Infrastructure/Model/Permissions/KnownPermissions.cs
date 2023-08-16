@@ -96,11 +96,11 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.CalculationsManage, "calculations:manage", InstantPattern.ExtendedIso.Parse("2023-08-16T12:00:00Z").Value, new[]
+        new(PermissionId.CalculationsManage, "calculations:manage", InstantPattern.ExtendedIso.Parse("2023-08-15T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.SettlementReportsManage, "settlement-reports:manage", InstantPattern.ExtendedIso.Parse("2023-08-16T00:00:00Z").Value, new[]
+        new(PermissionId.SettlementReportsManage, "settlement-reports:manage", InstantPattern.ExtendedIso.Parse("2023-08-15T00:00:00Z").Value, new[]
         {
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
