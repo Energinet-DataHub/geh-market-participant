@@ -28,6 +28,7 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
+    private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
     private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
     public ActorFactoryService(
@@ -35,12 +36,14 @@ public sealed class ActorFactoryService : IActorFactoryService
         IUnitOfWorkProvider unitOfWorkProvider,
         IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
+        IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
         IAllowedGridAreasRuleService allowedGridAreasRuleService)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
         _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
+        _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
         _allowedGridAreasRuleService = allowedGridAreasRuleService;
     }
 
@@ -76,6 +79,10 @@ public sealed class ActorFactoryService : IActorFactoryService
             .ConfigureAwait(false);
 
         var savedActor = await SaveActorAsync(newActor).ConfigureAwait(false);
+
+        await _uniqueMarketRoleGridAreaRuleService
+            .ValidateAsync(savedActor)
+            .ConfigureAwait(false);
 
         await uow.CommitAsync().ConfigureAwait(false);
 
