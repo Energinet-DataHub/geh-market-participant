@@ -26,7 +26,6 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-// ReSharper disable once UnusedType.Global
 public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserCommand>
 {
     private readonly IUserRepository _userRepository;
@@ -54,29 +53,37 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         ArgumentNullException.ThrowIfNull(request);
 
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
-
         NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
-
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value);
 
         var currentStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
+        if (currentStatus == UserStatus.Inactive)
+            return Unit.Value;
 
-        if (userIdentity.Status != UserIdentityStatus.Inactive)
+        await _userIdentityRepository
+            .DisableUserAccountAsync(userIdentity.Id)
+            .ConfigureAwait(false);
+
+        if (user.InvitationExpiresAt.HasValue)
         {
-            await _userIdentityRepository.DisableUserAccountAsync(userIdentity.Id).ConfigureAwait(false);
+            user.DeactivateUserExpiration();
 
-            var auditEntry = new UserIdentityAuditLogEntry(
-                user.Id,
-                new UserId(_userContext.CurrentUser.UserId),
-                UserIdentityAuditLogField.Status,
-                UserStatus.Inactive.ToString(),
-                currentStatus.ToString(),
-                DateTimeOffset.UtcNow);
-
-            await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
+            await _userRepository
+                .AddOrUpdateAsync(user)
+                .ConfigureAwait(false);
         }
+
+        var auditEntry = new UserIdentityAuditLogEntry(
+            user.Id,
+            new UserId(_userContext.CurrentUser.UserId),
+            UserIdentityAuditLogField.Status,
+            UserStatus.Inactive.ToString(),
+            currentStatus.ToString(),
+            DateTimeOffset.UtcNow);
+
+        await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
 
         return Unit.Value;
     }
