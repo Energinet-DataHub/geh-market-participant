@@ -93,9 +93,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
         private static void UpdateAggregate(Domain.Model.Actor actor, ChangeActorDto changes)
         {
-            actor.Name = new ActorName(changes.Name.Value);
-            actor.Status = Enum.Parse<ActorStatus>(changes.Status, true);
-
             var incomingMarketRoles = MarketRoleMapper.Map(changes.MarketRoles);
             var existingMarketRoles = actor.MarketRoles;
 
@@ -117,6 +114,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     actor.AddMarketRole(incomingRole);
                 }
             }
+
+            actor.Name = new ActorName(changes.Name.Value);
+            actor.Status = Enum.Parse<ActorStatus>(changes.Status, true);
         }
 
         private async Task ValidateAggregateAsync(Domain.Model.Actor actor)

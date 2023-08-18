@@ -25,12 +25,12 @@ public sealed class Actor : IPublishDomainEvents
     private readonly List<DomainEvent> _domainEvents = new();
     private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
+    private ExternalActorId? _externalActorId;
 
     public Actor(OrganizationId organizationId, ActorNumber actorNumber)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
-        ExternalActorId = null;
         ActorNumber = actorNumber;
         Name = new ActorName(string.Empty);
         _actorStatusTransitioner = new ActorStatusTransitioner();
@@ -47,9 +47,9 @@ public sealed class Actor : IPublishDomainEvents
     {
         Id = id;
         OrganizationId = organizationId;
-        ExternalActorId = externalActorId;
         ActorNumber = actorNumber;
         Name = name;
+        _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
     }
@@ -67,7 +67,19 @@ public sealed class Actor : IPublishDomainEvents
     /// <summary>
     /// The external actor id for integrating Azure AD and domains.
     /// </summary>
-    public ExternalActorId? ExternalActorId { get; set; }
+    public ExternalActorId? ExternalActorId
+    {
+        get => _externalActorId;
+        set
+        {
+            if (value != null)
+            {
+                _domainEvents.Add(new ActorActivated(ActorNumber, value));
+            }
+
+            _externalActorId = value;
+        }
+    }
 
     /// <summary>
     /// The global location number of the current actor.
@@ -119,6 +131,11 @@ public sealed class Actor : IPublishDomainEvents
             throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
         }
 
+        if (_marketRoles.Any(role => role.Function == marketRole.Function))
+        {
+            throw new ValidationException("The market roles cannot contain duplicates.");
+        }
+
         _marketRoles.Add(marketRole);
     }
 
@@ -138,7 +155,7 @@ public sealed class Actor : IPublishDomainEvents
 
         if (!_marketRoles.Remove(marketRole))
         {
-            throw new InvalidOperationException($"Market role for {marketRole.Function} was not found.");
+            throw new ValidationException($"Market role for {marketRole.Function} was not found.");
         }
     }
 

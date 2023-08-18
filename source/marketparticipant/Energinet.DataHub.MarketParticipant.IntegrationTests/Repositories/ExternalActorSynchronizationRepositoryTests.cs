@@ -40,7 +40,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         await using var scope = host.BeginScope();
         var target = scope.GetInstance<IExternalActorSynchronizationRepository>();
 
-        // Act + Assert
+        // Act
         var next = await target.DequeueNextAsync();
 
         // Assert
@@ -59,7 +59,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
 
         await target.ScheduleAsync(actorId);
 
-        // Act + Assert
+        // Act
         var next = await target.DequeueNextAsync();
 
         // Assert
@@ -81,7 +81,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         await target.ScheduleAsync(actorId);
         await target.ScheduleAsync(actorId);
 
-        // Act + Assert
+        // Act
         var next1 = await target.DequeueNextAsync();
         var next2 = await target.DequeueNextAsync();
         var next3 = await target.DequeueNextAsync();

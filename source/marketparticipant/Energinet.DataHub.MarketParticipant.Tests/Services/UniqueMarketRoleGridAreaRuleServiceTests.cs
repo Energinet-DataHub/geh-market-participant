@@ -56,7 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         }
 
         [Fact]
-        public async Task Ensure_ActorSupplied_CallsTryAddForAllMarketRoleGridAreas()
+        public async Task Ensure_ActorSupplied_CallsTryAddForMarketRoleGridAreas()
         {
             // arrange
             var repository = new Mock<IMarketRoleAndGridAreaForActorReservationService>();
@@ -78,12 +78,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         EicFunction.GridAccessProvider,
                         new[]
                         {
-                            new ActorGridArea(
-                                new GridAreaId(Guid.NewGuid()),
-                                new[] { MeteringPointType.D02Analysis }),
-                            new ActorGridArea(
-                                new GridAreaId(Guid.NewGuid()),
-                                new[] { MeteringPointType.D02Analysis }),
                             new ActorGridArea(
                                 new GridAreaId(Guid.NewGuid()),
                                 new[] { MeteringPointType.D02Analysis })

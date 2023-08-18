@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -32,6 +34,7 @@ public sealed class DomainEventRepository : IDomainEventRepository
     public DomainEventRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+        _jsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
     }
 
     public async Task EnqueueAsync<T>(T aggregate)
@@ -43,6 +46,8 @@ public sealed class DomainEventRepository : IDomainEventRepository
             return;
 
         var aggregateId = aggregate.GetAggregateIdForDomainEvents();
+        if (aggregateId == Guid.Empty)
+            throw new InvalidOperationException("Cannot publish events for unsaved aggregate.");
 
         foreach (var domainEvent in aggregate.DomainEvents)
         {
@@ -67,7 +72,7 @@ public sealed class DomainEventRepository : IDomainEventRepository
             EntityType = aggregateType.Name,
             Timestamp = DateTimeOffset.UtcNow,
             EventTypeName = domainEvent.GetType().Name,
-            Event = JsonSerializer.Serialize(domainEvent, _jsonSerializerOptions)
+            Event = JsonSerializer.Serialize(domainEvent, domainEvent.GetType(), _jsonSerializerOptions)
         };
     }
 }
