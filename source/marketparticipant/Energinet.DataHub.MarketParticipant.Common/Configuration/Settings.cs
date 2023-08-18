@@ -60,4 +60,9 @@ public static class Settings
         = new("USER_INVITE_BCC_EMAIL");
     public static Setting<string> UserInviteFlow { get; }
         = new("USER_INVITE_FLOW");
+
+    public static Setting<string> ServiceBusTopicConnectionString { get; }
+        = new("SERVICE_BUS_CONNECTION_STRING");
+    public static Setting<string> ServiceBusTopicName { get; }
+        = new("SBT_INTEGRATION_EVENTS_NAME");
 }

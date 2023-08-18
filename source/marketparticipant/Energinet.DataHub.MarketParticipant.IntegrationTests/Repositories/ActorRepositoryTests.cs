@@ -81,7 +81,7 @@ public sealed class ActorRepositoryTests
         var organization = await _fixture.PrepareOrganizationAsync();
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln());
 
-        actor.MarketRoles.Add(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
+        actor.AddMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
         {
             new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction })
         }));

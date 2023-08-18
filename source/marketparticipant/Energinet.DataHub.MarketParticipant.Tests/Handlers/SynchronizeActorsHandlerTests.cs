@@ -38,7 +38,8 @@ public sealed class SynchronizeActorsHandlerTests
             UnitOfWorkProviderMock.Create(),
             new Mock<IActorRepository>().Object,
             new Mock<IExternalActorIdConfigurationService>().Object,
-            new Mock<IExternalActorSynchronizationRepository>().Object);
+            new Mock<IExternalActorSynchronizationRepository>().Object,
+            new Mock<IDomainEventRepository>().Object);
 
         // Act + Assert
         await target.Handle(new SynchronizeActorsCommand(), default);
@@ -75,7 +76,8 @@ public sealed class SynchronizeActorsHandlerTests
             UnitOfWorkProviderMock.Create(),
             actorRepositoryMock.Object,
             externalActorIdConfigurationService.Object,
-            externalActorSynchronizationRepository.Object);
+            externalActorSynchronizationRepository.Object,
+            new Mock<IDomainEventRepository>().Object);
 
         // Act
         await target.Handle(new SynchronizeActorsCommand(), default);

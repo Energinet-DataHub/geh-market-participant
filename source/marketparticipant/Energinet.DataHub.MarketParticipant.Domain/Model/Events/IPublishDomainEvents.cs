@@ -12,19 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 /// <summary>
-/// Validates market roles on a given actor
+/// Specifies that the aggregate publishes domain events.
 /// </summary>
-public interface IActorStatusMarketRolesRuleService
+public interface IPublishDomainEvents
 {
     /// <summary>
-    /// Validates market roles on a given actor
+    /// Gets the list of unpublished domain events.
     /// </summary>
-    /// <param name="updatedActor">Updated actor</param>
-    Task ValidateAsync(Actor updatedActor);
+    IReadOnlyList<DomainEvent> DomainEvents { get; }
+
+    /// <summary>
+    /// Marks the domain events as published.
+    /// The list of domain events will be cleared.
+    /// </summary>
+    void ClearPublishedDomainEvents();
+
+    /// <summary>
+    /// Gets the id of the aggregate.
+    /// </summary>
+    Guid GetAggregateIdForDomainEvents();
 }

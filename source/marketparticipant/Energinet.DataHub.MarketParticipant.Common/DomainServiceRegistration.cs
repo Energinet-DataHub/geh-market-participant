@@ -27,8 +27,6 @@ internal static class DomainServiceRegistration
         container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
         container.Register<IOverlappingEicFunctionsRuleService, OverlappingEicFunctionsRuleService>(Lifestyle.Scoped);
         container.Register<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>(Lifestyle.Scoped);
-        container.Register<IAllowedGridAreasRuleService, AllowedGridAreasRuleService>(Lifestyle.Scoped);
-        container.Register<IActorStatusMarketRolesRuleService, ActorStatusMarketRolesRuleService>(Lifestyle.Scoped);
 
         container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
         container.Register<IUniqueMarketRoleGridAreaRuleService, UniqueMarketRoleGridAreaRuleService>(Lifestyle.Scoped);

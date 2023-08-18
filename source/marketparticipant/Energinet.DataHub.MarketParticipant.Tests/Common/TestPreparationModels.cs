@@ -42,7 +42,7 @@ internal static class TestPreparationModels
         new OrganizationId(organizationId),
         new ExternalActorId(Guid.NewGuid()),
         new MockedGln(),
-        ActorStatus.Active,
+        ActorStatus.New,
         new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
         new ActorName("Sloth Power"));
 

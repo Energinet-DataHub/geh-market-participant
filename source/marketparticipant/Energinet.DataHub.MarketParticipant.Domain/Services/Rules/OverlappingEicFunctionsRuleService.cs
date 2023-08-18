@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             foreach (var actorsWithSameActorNumber in actors.GroupBy(x => x.ActorNumber))
             {
                 var setOfSets = actorsWithSameActorNumber
-                    .Select(x => AreRolesUnique(x.MarketRoles.Select(m => m.Function)))
+                    .Select(x => x.MarketRoles.Select(m => m.Function))
                     .ToList();
 
                 var usedMarketRoles = new HashSet<EicFunction>();
@@ -41,21 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
                         throw new ValidationException($"Cannot add '{marketRole}' as this market role is already assigned to another actor within the organization.");
                     }
                 }
-            }
-        }
-
-        private static IEnumerable<EicFunction> AreRolesUnique(IEnumerable<EicFunction> marketRoles)
-        {
-            var usedFunctions = new HashSet<EicFunction>();
-
-            foreach (var marketRole in marketRoles)
-            {
-                if (!usedFunctions.Add(marketRole))
-                {
-                    throw new ValidationException("The market roles cannot contain duplicates.");
-                }
-
-                yield return marketRole;
             }
         }
     }
