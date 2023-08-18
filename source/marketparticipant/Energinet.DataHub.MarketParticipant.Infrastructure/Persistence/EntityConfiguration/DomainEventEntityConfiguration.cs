@@ -13,27 +13,19 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public sealed class ActorGridArea
+public class DomainEventEntityConfiguration : IEntityTypeConfiguration<DomainEventEntity>
 {
-    public ActorGridArea(IEnumerable<MeteringPointType> meteringPointTypes)
+    public void Configure(EntityTypeBuilder<DomainEventEntity> builder)
     {
-        Id = new GridAreaId(Guid.Empty);
-        MeteringPointTypes = meteringPointTypes.ToList();
-    }
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
 
-    public ActorGridArea(
-        GridAreaId id,
-        IEnumerable<MeteringPointType> meteringPointTypes)
-    {
-        Id = id;
-        MeteringPointTypes = meteringPointTypes.ToList();
+        builder.ToTable("DomainEvent");
+        builder.HasKey(x => x.Id);
     }
-
-    public GridAreaId Id { get; }
-    public IReadOnlyCollection<MeteringPointType> MeteringPointTypes { get; }
 }

@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using Energinet.DataHub.MarketParticipant.Application.Extensions;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
@@ -33,27 +34,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IActorRepository _actorRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
-        private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
         private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
-        private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleRuleService;
-        private readonly IActorStatusMarketRolesRuleService _actorStatusMarketRolesRuleService;
+        private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
+        private readonly IDomainEventRepository _domainEventRepository;
 
         public UpdateActorHandler(
             IActorRepository actorRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
             IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
-            IAllowedGridAreasRuleService allowedGridAreasRuleService,
             IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
-            IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleRuleService,
-            IActorStatusMarketRolesRuleService actorStatusMarketRolesRuleService)
+            IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
+            IDomainEventRepository domainEventRepository)
         {
             _actorRepository = actorRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
-            _allowedGridAreasRuleService = allowedGridAreasRuleService;
             _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
-            _uniqueMarketRoleGridAreaRuleRuleService = uniqueMarketRoleGridAreaRuleRuleService;
-            _actorStatusMarketRolesRuleService = actorStatusMarketRolesRuleService;
+            _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
+            _domainEventRepository = domainEventRepository;
         }
 
         public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
@@ -66,12 +64,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            UpdateActorStatus(actor, request);
-            UpdateActorName(actor, request);
-            await UpdateActorMarketRolesAndChildrenAsync(actor, request).ConfigureAwait(false);
-
-            await _uniqueMarketRoleGridAreaRuleRuleService.ValidateAsync(actor).ConfigureAwait(false);
-            await _actorStatusMarketRolesRuleService.ValidateAsync(actor).ConfigureAwait(false);
+            UpdateAggregate(actor, request.ChangeActor);
+            await ValidateAggregateAsync(actor).ConfigureAwait(false);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -81,6 +75,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             {
                 await _actorRepository
                     .AddOrUpdateAsync(actor)
+                    .ConfigureAwait(false);
+
+                await _domainEventRepository
+                    .EnqueueAsync(actor)
                     .ConfigureAwait(false);
 
                 await _externalActorSynchronizationRepository
@@ -93,24 +91,37 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             return Unit.Value;
         }
 
-        private static void UpdateActorName(Domain.Model.Actor actor, UpdateActorCommand request)
+        private static void UpdateAggregate(Domain.Model.Actor actor, ChangeActorDto changes)
         {
-            actor.Name = new ActorName(request.ChangeActor.Name.Value);
-        }
+            actor.Name = new ActorName(changes.Name.Value);
+            actor.Status = Enum.Parse<ActorStatus>(changes.Status, true);
 
-        private static void UpdateActorStatus(Domain.Model.Actor actor, UpdateActorCommand request)
-        {
-            actor.Status = Enum.Parse<ActorStatus>(request.ChangeActor.Status, true);
-        }
+            var incomingMarketRoles = MarketRoleMapper.Map(changes.MarketRoles);
+            var existingMarketRoles = actor.MarketRoles;
 
-        private async Task UpdateActorMarketRolesAndChildrenAsync(Domain.Model.Actor actor, UpdateActorCommand request)
-        {
-            actor.MarketRoles.Clear();
+            var joinedMarketRoles = EnumerableExtensions
+                .FullOuterJoin(
+                    incomingMarketRoles,
+                    existingMarketRoles,
+                    (incomingRole, existingRole) => incomingRole.Function == existingRole.Function);
 
-            foreach (var marketRole in MarketRoleMapper.Map(request.ChangeActor.MarketRoles))
+            foreach (var (incomingRole, existingRole) in joinedMarketRoles)
             {
-                actor.MarketRoles.Add(marketRole);
+                if (existingRole is not null)
+                {
+                    actor.RemoveMarketRole(existingRole);
+                }
+
+                if (incomingRole is not null)
+                {
+                    actor.AddMarketRole(incomingRole);
+                }
             }
+        }
+
+        private async Task ValidateAggregateAsync(Domain.Model.Actor actor)
+        {
+            await _uniqueMarketRoleGridAreaRuleService.ValidateAsync(actor).ConfigureAwait(false);
 
             var allOrganizationActors = await _actorRepository
                 .GetActorsAsync(actor.OrganizationId)
@@ -121,7 +132,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .Append(actor)
                 .ToList();
 
-            _allowedGridAreasRuleService.ValidateGridAreas(actor.MarketRoles);
             _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(updatedActors);
         }
     }

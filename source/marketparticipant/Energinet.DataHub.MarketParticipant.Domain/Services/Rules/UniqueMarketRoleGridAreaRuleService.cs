@@ -24,6 +24,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 {
     public sealed class UniqueMarketRoleGridAreaRuleService : IUniqueMarketRoleGridAreaRuleService
     {
+        private static readonly IReadOnlySet<EicFunction> _marketRoleSet = new HashSet<EicFunction>
+        {
+            EicFunction.GridAccessProvider
+        };
+
         private readonly IMarketRoleAndGridAreaForActorReservationService _marketRoleAndGridAreaForActorReservationService;
 
         public UniqueMarketRoleGridAreaRuleService(IMarketRoleAndGridAreaForActorReservationService marketRoleAndGridAreaForActorReservationService)
@@ -31,16 +36,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             _marketRoleAndGridAreaForActorReservationService = marketRoleAndGridAreaForActorReservationService;
         }
 
-        private static HashSet<EicFunction> MarketRoleSet => new()
-        {
-            EicFunction.GridAccessProvider
-        };
-
         public async Task ValidateAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
-            var actorMarketRoles = actor.MarketRoles.Where(x => MarketRoleSet.Contains(x.Function));
+            var actorMarketRoles = actor.MarketRoles.Where(x => _marketRoleSet.Contains(x.Function));
 
             await _marketRoleAndGridAreaForActorReservationService
                 .RemoveAllReservationsAsync(actor.Id)
