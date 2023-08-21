@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using FluentValidation;
@@ -34,6 +36,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .RuleFor(x => x.Status)
                         .NotEmpty()
                         .IsEnumName(typeof(ActorStatus), false);
+
+                    changeActorValidator
+                        .RuleFor(actor => actor.MarketRoles)
+                        .Cascade(CascadeMode.Stop)
+                        .NotEmpty()
+                        .Must(marketRoles => marketRoles
+                            .Where(r => (ActorMarketRoleDto?)r != null)
+                            .Select(r => r.EicFunction)
+                            .Select(f => Enum.TryParse(f, true, out EicFunction result) ? result : 0)
+                            .Where(f => f != 0)
+                            .All(new HashSet<EicFunction>().Add))
+                        .WithMessage("Multiple market roles have the same EIC function.");
 
                     changeActorValidator
                         .RuleForEach(actor => actor.MarketRoles)

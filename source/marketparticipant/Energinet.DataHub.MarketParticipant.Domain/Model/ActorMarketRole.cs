@@ -12,40 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public class ActorMarketRole
+    public sealed class ActorMarketRole
     {
+        private static readonly HashSet<EicFunction> _rolesAllowingSingleGridAreaOnly = new()
+        {
+            EicFunction.GridAccessProvider
+        };
+
         public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas, string? comment)
         {
             GridAreas = gridAreas.ToList();
             Function = eic;
             Comment = comment;
-        }
 
-        public ActorMarketRole(EicFunction eic, string? comment)
-        {
-            Function = eic;
-            GridAreas = new List<ActorGridArea>();
-            Comment = comment;
+            var isSingleGridAreaRole = _rolesAllowingSingleGridAreaOnly.Contains(eic);
+            if (isSingleGridAreaRole && GridAreas.Count > 1)
+            {
+                throw new ValidationException($"Only one grid area can be assigned to role '{eic}'.");
+            }
         }
 
         public ActorMarketRole(EicFunction eic, IEnumerable<ActorGridArea> gridAreas)
+            : this(eic, gridAreas, null)
         {
-            GridAreas = gridAreas.ToList();
-            Function = eic;
         }
 
         public ActorMarketRole(EicFunction eic)
+            : this(eic, Array.Empty<ActorGridArea>(), null)
         {
-            Function = eic;
-            GridAreas = new List<ActorGridArea>();
         }
 
-        public ICollection<ActorGridArea> GridAreas { get; }
+        public IReadOnlyCollection<ActorGridArea> GridAreas { get; }
         public EicFunction Function { get; }
         public string? Comment { get; }
     }

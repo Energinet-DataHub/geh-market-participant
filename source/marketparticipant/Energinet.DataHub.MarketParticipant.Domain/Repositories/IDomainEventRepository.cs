@@ -12,20 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+/// <summary>
+/// Manages domain events.
+/// </summary>
+public interface IDomainEventRepository
 {
     /// <summary>
-    /// Ensures that grid areas are allowed for the given marked roles.
+    /// Enqueue domain events for publishing from the provided aggregate.
     /// </summary>
-    public interface IAllowedGridAreasRuleService
-    {
-        /// <summary>
-        /// Ensures that grid areas are allowed for the given market roles.
-        /// </summary>
-        /// <param name="marketRoles">The market roles applied to the given grid areas.</param>
-        void ValidateGridAreas(IEnumerable<ActorMarketRole> marketRoles);
-    }
+    /// <param name="aggregate">The aggregate containing the domain events.</param>
+    Task EnqueueAsync<T>(T aggregate)
+        where T : IPublishDomainEvents;
 }

@@ -14,23 +14,26 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed class Actor
+public sealed class Actor : IPublishDomainEvents
 {
+    private readonly List<DomainEvent> _domainEvents = new();
+    private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
+    private ExternalActorId? _externalActorId;
 
     public Actor(OrganizationId organizationId, ActorNumber actorNumber)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
-        ExternalActorId = null;
         ActorNumber = actorNumber;
         Name = new ActorName(string.Empty);
         _actorStatusTransitioner = new ActorStatusTransitioner();
-        MarketRoles = new Collection<ActorMarketRole>();
     }
 
     public Actor(
@@ -44,11 +47,11 @@ public sealed class Actor
     {
         Id = id;
         OrganizationId = organizationId;
-        ExternalActorId = externalActorId;
         ActorNumber = actorNumber;
         Name = name;
+        _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
-        MarketRoles = new List<ActorMarketRole>(marketRoles);
+        _marketRoles.AddRange(marketRoles);
     }
 
     /// <summary>
@@ -64,7 +67,19 @@ public sealed class Actor
     /// <summary>
     /// The external actor id for integrating Azure AD and domains.
     /// </summary>
-    public ExternalActorId? ExternalActorId { get; set; }
+    public ExternalActorId? ExternalActorId
+    {
+        get => _externalActorId;
+        set
+        {
+            if (value != null)
+            {
+                _domainEvents.Add(new ActorActivated(ActorNumber, value));
+            }
+
+            _externalActorId = value;
+        }
+    }
 
     /// <summary>
     /// The global location number of the current actor.
@@ -77,7 +92,17 @@ public sealed class Actor
     public ActorStatus Status
     {
         get => _actorStatusTransitioner.Status;
-        set => _actorStatusTransitioner.Status = value;
+        set
+        {
+            if (value == ActorStatus.Active && value != _actorStatusTransitioner.Status)
+            {
+                Activate();
+            }
+            else
+            {
+                _actorStatusTransitioner.Status = value;
+            }
+        }
     }
 
     /// <summary>
@@ -88,13 +113,71 @@ public sealed class Actor
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.
     /// </summary>
-    public ICollection<ActorMarketRole> MarketRoles { get; }
+    public IReadOnlyList<ActorMarketRole> MarketRoles => _marketRoles;
+
+    IReadOnlyList<DomainEvent> IPublishDomainEvents.DomainEvents => _domainEvents;
+
+    /// <summary>
+    /// Adds a new role from the current actor.
+    /// This is only allowed for 'New' actors.
+    /// </summary>
+    /// <param name="marketRole">The new market role to add.</param>
+    public void AddMarketRole(ActorMarketRole marketRole)
+    {
+        ArgumentNullException.ThrowIfNull(marketRole);
+
+        if (Status != ActorStatus.New)
+        {
+            throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
+        }
+
+        if (_marketRoles.Any(role => role.Function == marketRole.Function))
+        {
+            throw new ValidationException("The market roles cannot contain duplicates.");
+        }
+
+        _marketRoles.Add(marketRole);
+    }
+
+    /// <summary>
+    /// Removes an existing role from the current actor.
+    /// This is only allowed for 'New' actors.
+    /// </summary>
+    /// <param name="marketRole">The existing market role to remove.</param>
+    public void RemoveMarketRole(ActorMarketRole marketRole)
+    {
+        ArgumentNullException.ThrowIfNull(marketRole);
+
+        if (Status != ActorStatus.New)
+        {
+            throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
+        }
+
+        if (!_marketRoles.Remove(marketRole))
+        {
+            throw new ValidationException($"Market role for {marketRole.Function} was not found.");
+        }
+    }
 
     /// <summary>
     /// Activates the current actor, the status changes to Active.
     /// Only New actors can be activated.
     /// </summary>
-    public void Activate() => _actorStatusTransitioner.Activate();
+    public void Activate()
+    {
+        _actorStatusTransitioner.Activate();
+
+        foreach (var marketRole in _marketRoles.Where(role => role.Function == EicFunction.GridAccessProvider))
+        {
+            foreach (var gridArea in marketRole.GridAreas)
+            {
+                _domainEvents.Add(new GridAreaOwnershipAssigned(
+                    ActorNumber,
+                    marketRole.Function,
+                    gridArea.Id));
+            }
+        }
+    }
 
     /// <summary>
     /// Deactivates the current actor, the status changes to Inactive.
@@ -107,4 +190,14 @@ public sealed class Actor
     /// Only Active and New actors can be set to passive.
     /// </summary>
     public void SetAsPassive() => _actorStatusTransitioner.SetAsPassive();
+
+    void IPublishDomainEvents.ClearPublishedDomainEvents()
+    {
+        _domainEvents.Clear();
+    }
+
+    Guid IPublishDomainEvents.GetAggregateIdForDomainEvents()
+    {
+        return Id.Value;
+    }
 }

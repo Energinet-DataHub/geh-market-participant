@@ -120,6 +120,11 @@ public interface IMarketParticipantDbContext
     DbSet<PermissionAuditLogEntryEntity> PermissionAuditLogEntries { get; }
 
     /// <summary>
+    ///     Represent access to the DomainEvents database table
+    /// </summary>
+    DbSet<DomainEventEntity> DomainEvents { get; }
+
+    /// <summary>
     ///     Represent access to the EmailEventEntry database table
     /// </summary>
     DbSet<EmailEventEntity> EmailEventEntries { get; }

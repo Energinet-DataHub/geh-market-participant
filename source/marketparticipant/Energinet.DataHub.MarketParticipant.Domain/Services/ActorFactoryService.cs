@@ -29,22 +29,19 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
     private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
-    private readonly IAllowedGridAreasRuleService _allowedGridAreasRuleService;
 
     public ActorFactoryService(
         IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-        IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
-        IAllowedGridAreasRuleService allowedGridAreasRuleService)
+        IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
         _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
         _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
-        _allowedGridAreasRuleService = allowedGridAreasRuleService;
     }
 
     public async Task<Actor> CreateAsync(
@@ -61,12 +58,10 @@ public sealed class ActorFactoryService : IActorFactoryService
             .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
             .ConfigureAwait(false);
 
-        _allowedGridAreasRuleService.ValidateGridAreas(marketRoles);
-
         var newActor = new Actor(organization.Id, actorNumber) { Name = actorName };
 
         foreach (var marketRole in marketRoles)
-            newActor.MarketRoles.Add(marketRole);
+            newActor.AddMarketRole(marketRole);
 
         var existingActors = await _actorRepository
             .GetActorsAsync(organization.Id)
@@ -78,15 +73,18 @@ public sealed class ActorFactoryService : IActorFactoryService
             .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
 
-        var savedActor = await SaveActorAsync(newActor).ConfigureAwait(false);
+        await using (uow.ConfigureAwait(false))
+        {
+            var savedActor = await SaveActorAsync(newActor).ConfigureAwait(false);
 
-        await _uniqueMarketRoleGridAreaRuleService
-            .ValidateAsync(savedActor)
-            .ConfigureAwait(false);
+            await _uniqueMarketRoleGridAreaRuleService
+                .ValidateAsync(savedActor)
+                .ConfigureAwait(false);
 
-        await uow.CommitAsync().ConfigureAwait(false);
+            await uow.CommitAsync().ConfigureAwait(false);
 
-        return savedActor;
+            return savedActor;
+        }
     }
 
     private async Task<Actor> SaveActorAsync(Actor newActor)

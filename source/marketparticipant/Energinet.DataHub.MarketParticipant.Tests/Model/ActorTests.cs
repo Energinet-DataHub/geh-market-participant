@@ -13,9 +13,11 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Xunit;
 using Xunit.Categories;
@@ -94,6 +96,109 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             {
                 Assert.Throws<ValidationException>(() => target.SetAsPassive());
             }
+        }
+
+        [Fact]
+        public void AddMarketRole_AddsNewRole_IsAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New);
+            var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
+
+            // Act
+            target.AddMarketRole(role);
+
+            // Assert
+            Assert.Contains(role, target.MarketRoles);
+        }
+
+        [Fact]
+        public void AddMarketRole_StatusNotNew_NotAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active);
+            var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.AddMarketRole(role));
+        }
+
+        [Fact]
+        public void AddMarketRole_RoleAlreadyExists_NotAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New);
+            var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
+            target.AddMarketRole(role);
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.AddMarketRole(role));
+        }
+
+        [Fact]
+        public void RemoveMarketRole_RemovesRole_IsAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New);
+            var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
+            target.AddMarketRole(role);
+
+            // Act
+            target.RemoveMarketRole(role);
+
+            // Assert
+            Assert.DoesNotContain(role, target.MarketRoles);
+        }
+
+        [Fact]
+        public void RemoveMarketRole_StatusNotNew_NotAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active);
+            var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.RemoveMarketRole(role));
+        }
+
+        [Fact]
+        public void RemoveMarketRole_RoleDoesNotExist_NotAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New);
+            var role = new ActorMarketRole(EicFunction.GridAccessProvider, Array.Empty<ActorGridArea>());
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.RemoveMarketRole(role));
+        }
+
+        [Fact]
+        public void Activate_WithMarketRoles_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New);
+            var gridAreas = new[] { new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()) };
+
+            target.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, gridAreas));
+
+            // Act
+            target.Activate();
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is GridAreaOwnershipAssigned));
+        }
+
+        [Fact]
+        public void ExternalActorId_IsAssigned_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active);
+
+            // Act
+            target.ExternalActorId = new ExternalActorId(Guid.NewGuid());
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorActivated));
         }
 
         private static Actor CreateTestActor(ActorStatus status)

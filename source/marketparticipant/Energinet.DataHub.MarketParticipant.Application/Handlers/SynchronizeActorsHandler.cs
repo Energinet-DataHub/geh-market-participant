@@ -30,17 +30,20 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
     private readonly IActorRepository _actorRepository;
     private readonly IExternalActorIdConfigurationService _externalActorIdConfigurationService;
     private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
+    private readonly IDomainEventRepository _domainEventRepository;
 
     public SynchronizeActorsHandler(
         IUnitOfWorkProvider unitOfWorkProvider,
         IActorRepository actorRepository,
         IExternalActorIdConfigurationService externalActorIdConfigurationService,
-        IExternalActorSynchronizationRepository externalActorSynchronizationRepository)
+        IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
+        IDomainEventRepository domainEventRepository)
     {
         _unitOfWorkProvider = unitOfWorkProvider;
         _actorRepository = actorRepository;
         _externalActorIdConfigurationService = externalActorIdConfigurationService;
         _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
+        _domainEventRepository = domainEventRepository;
     }
 
     public async Task<Unit> Handle(SynchronizeActorsCommand request, CancellationToken cancellationToken)
@@ -68,6 +71,10 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
 
                 await _actorRepository
                     .AddOrUpdateAsync(actor)
+                    .ConfigureAwait(false);
+
+                await _domainEventRepository
+                    .EnqueueAsync(actor)
                     .ConfigureAwait(false);
             }
 

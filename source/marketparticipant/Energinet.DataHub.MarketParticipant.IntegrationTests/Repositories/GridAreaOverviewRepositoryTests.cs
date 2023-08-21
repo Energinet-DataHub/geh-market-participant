@@ -181,7 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
                 foreach (var marketRole in marketRoles)
                 {
-                    actor.MarketRoles.Add(new ActorMarketRole(marketRole, new[] { new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction }) }));
+                    actor.AddMarketRole(new ActorMarketRole(marketRole, new[] { new ActorGridArea(gridAreaId, new[] { MeteringPointType.D01VeProduction }) }));
                 }
 
                 var actorRepository = new ActorRepository(context);

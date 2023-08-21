@@ -207,6 +207,36 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Fact]
+        public async Task Validate_DuplicateMarketRoleFunctions_ValidatesProperty()
+        {
+            // Arrange
+            const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}";
+
+            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
+            var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
+            var validMarketRoles = new List<ActorMarketRoleDto>
+            {
+                new("GridAccessProvider", validGridAreas, string.Empty),
+                new("GridAccessProvider", validGridAreas, string.Empty),
+            };
+
+            var actorDto = new ChangeActorDto(
+                ValidStatus,
+                new ActorNameDto("fake_name"),
+                validMarketRoles);
+
+            var target = new UpdateActorCommandRuleSet();
+            var command = new UpdateActorCommand(_validActorId, actorDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            Assert.False(result.IsValid);
+            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+
+        [Fact]
         public async Task Validate_MeteringPoints_ValidatesProperty()
         {
             // Arrange
