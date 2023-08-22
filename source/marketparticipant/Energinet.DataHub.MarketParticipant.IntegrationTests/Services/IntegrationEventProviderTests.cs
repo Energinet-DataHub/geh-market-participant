@@ -42,7 +42,7 @@ public sealed class IntegrationEventProviderTests
     public async Task GetAsync_NoEvents_DoesNothing()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
         var target = scope.GetInstance<IIntegrationEventProvider>();
