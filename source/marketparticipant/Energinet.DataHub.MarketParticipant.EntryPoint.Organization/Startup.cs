@@ -32,16 +32,15 @@ internal sealed class Startup : StartupBase
 {
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
+        var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
+        services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
+
         // Health check
         services
             .AddHealthChecks()
             .AddLiveCheck()
-            .AddDbContextCheck<MarketParticipantDbContext>();
-
-        services.AddSendGrid(options =>
-        {
-            options.ApiKey = configuration.GetOptionalSetting(Settings.SendGridApiKey);
-        });
+            .AddDbContextCheck<MarketParticipantDbContext>()
+            .AddSendGrid(sendGridApiKey);
     }
 
     protected override void Configure(IConfiguration configuration, Container container)
