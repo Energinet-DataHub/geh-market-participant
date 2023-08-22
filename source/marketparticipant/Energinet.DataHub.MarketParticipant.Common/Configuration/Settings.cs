@@ -63,6 +63,8 @@ public static class Settings
 
     public static Setting<string> ServiceBusTopicConnectionString { get; }
         = new("SERVICE_BUS_CONNECTION_STRING");
+    public static Setting<string> ServiceBusHealthConnectionString { get; }
+        = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
     public static Setting<string> ServiceBusTopicName { get; }
         = new("SBT_INTEGRATION_EVENTS_NAME");
 }

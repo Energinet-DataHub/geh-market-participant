@@ -14,13 +14,18 @@
 
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SendGrid.Extensions.DependencyInjection;
@@ -32,16 +37,30 @@ internal sealed class Startup : StartupBase
 {
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
-        // Health check
-        services
-            .AddHealthChecks()
-            .AddLiveCheck()
-            .AddDbContextCheck<MarketParticipantDbContext>();
+        // TODO: These registrations should be removed when SimpleInjector is removed.
+        services.AddScoped<IMarketParticipantDbContext, MarketParticipantDbContext>();
+        services.AddScoped<IGridAreaRepository, GridAreaRepository>();
+        services.AddScoped<IIntegrationEventFactory, IntegrationEventFactory>();
+
+        services.AddPublisher<IntegrationEventProvider>(_ => new PublisherSettings
+        {
+            ServiceBusIntegrationEventWriteConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString),
+            IntegrationEventTopicName = configuration.GetSetting(Settings.ServiceBusTopicName),
+        });
 
         services.AddSendGrid(options =>
         {
             options.ApiKey = configuration.GetOptionalSetting(Settings.SendGridApiKey);
         });
+
+        // Health check
+        services
+            .AddHealthChecks()
+            .AddLiveCheck()
+            .AddDbContextCheck<MarketParticipantDbContext>()
+            .AddAzureServiceBusTopic(
+                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
+                _ => configuration.GetSetting(Settings.ServiceBusTopicName));
     }
 
     protected override void Configure(IConfiguration configuration, Container container)

@@ -12,19 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class ActorActivated : DomainEvent
+public sealed class ActorActivated : DomainEvent, IIntegrationEvent
 {
+    [JsonConstructor]
+    [Browsable(false)]
+    public ActorActivated(
+        Guid eventId,
+        ActorNumber actorNumber,
+        ExternalActorId externalActorId,
+        Instant validFrom)
+    {
+        EventId = eventId;
+        ActorNumber = actorNumber;
+        ExternalActorId = externalActorId;
+        ValidFrom = validFrom;
+    }
+
     public ActorActivated(ActorNumber actorNumber, ExternalActorId externalActorId)
     {
+        EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
         ExternalActorId = externalActorId;
         ValidFrom = SystemClock.Instance.GetCurrentInstant();
     }
 
+    public Guid EventId { get; }
     public ActorNumber ActorNumber { get; }
     public ExternalActorId ExternalActorId { get; }
     public Instant ValidFrom { get; }
