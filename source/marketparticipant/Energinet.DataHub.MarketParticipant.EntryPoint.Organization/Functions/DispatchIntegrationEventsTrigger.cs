@@ -29,7 +29,7 @@ public sealed class DispatchIntegrationEventsTrigger
     }
 
     [Function(nameof(DispatchIntegrationEventsTrigger))]
-    public Task RunAsync([TimerTrigger("* */1 * * * *")] FunctionContext context)
+    public Task RunAsync([TimerTrigger("* */1 * * *")] FunctionContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         return _publisher.PublishAsync(context.CancellationToken);

@@ -65,6 +65,8 @@ internal sealed class Startup : StartupBase
 
     protected override void Configure(IConfiguration configuration, Container container)
     {
+        Container.Options.EnableAutoVerification = false;
+
         Container.Register<SynchronizeActorsTimerTrigger>();
         Container.Register<EmailEventTimerTrigger>();
         Container.Register<UserInvitationExpiredTimerTrigger>();
