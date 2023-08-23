@@ -15,29 +15,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Graph;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
 public sealed class GraphApiHealthCheck : IHealthCheck
 {
-    private readonly IUserIdentityRepository _userIdentityRepository;
+    private readonly GraphServiceClient _graphServiceClient;
 
     public GraphApiHealthCheck(Container container)
     {
         ArgumentNullException.ThrowIfNull(container);
-        _userIdentityRepository = container.GetInstance<IUserIdentityRepository>();
+        _graphServiceClient = container.GetInstance<GraphServiceClient>();
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        // Check that it is possible to connect to the Graph API and see that a user does not exist.
-        await _userIdentityRepository
-           .GetAsync(new ExternalUserId(Guid.Empty))
-           .ConfigureAwait(false);
+        // Check that it is possible to connect to the Graph API and get current user.
+        await _graphServiceClient
+            .Me
+            .GetAsync(cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
 
         return HealthCheckResult.Healthy();
     }
