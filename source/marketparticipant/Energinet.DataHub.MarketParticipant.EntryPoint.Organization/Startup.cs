@@ -40,7 +40,8 @@ internal sealed class Startup : StartupBase
             .AddHealthChecks()
             .AddLiveCheck()
             .AddDbContextCheck<MarketParticipantDbContext>()
-            .AddSendGrid(sendGridApiKey);
+            .AddSendGrid(sendGridApiKey)
+            .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
 
     protected override void Configure(IConfiguration configuration, Container container)
