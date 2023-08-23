@@ -42,10 +42,11 @@ internal sealed class Startup : StartupBase
         services.AddScoped<IGridAreaRepository, GridAreaRepository>();
         services.AddScoped<IIntegrationEventFactory, IntegrationEventFactory>();
 
-        services.AddPublisher<IntegrationEventProvider>(_ => new PublisherSettings
+        services.AddPublisher<IntegrationEventProvider>();
+        services.Configure<PublisherOptions>(options =>
         {
-            ServiceBusIntegrationEventWriteConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString),
-            IntegrationEventTopicName = configuration.GetSetting(Settings.ServiceBusTopicName),
+            options.ServiceBusConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString);
+            options.TopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
         });
 
         services.AddSendGrid(options =>
