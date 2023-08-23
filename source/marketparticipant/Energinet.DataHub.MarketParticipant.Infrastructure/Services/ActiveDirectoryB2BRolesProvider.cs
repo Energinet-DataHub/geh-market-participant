@@ -44,7 +44,7 @@ public class ActiveDirectoryB2BRolesProvider : IActiveDirectoryB2BRolesProvider
         var eicFunctions = Enum.GetNames(typeof(EicFunction));
 
         if (roles.EicRolesMapped.Count != eicFunctions.Length)
-            throw new InvalidOperationException("Not all EIC functions has a corresponding app role.");
+            throw new InvalidOperationException("Some EIC functions are missing their corresponding app role.");
 
         return _roleCache = roles;
     }

@@ -32,7 +32,7 @@ public sealed class GraphApiHealthCheck : IHealthCheck
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        // Check that it is possible connect to the Graph API and see that this user does not exist.
+        // Check that it is possible to connect to the Graph API and see that a user does not exist.
         await _userIdentityRepository
            .GetAsync(new ExternalUserId(Guid.Empty))
            .ConfigureAwait(false);
