@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
@@ -25,9 +26,10 @@ public sealed class GraphApiHealthCheck : IHealthCheck
 {
     private readonly IUserIdentityRepository _userIdentityRepository;
 
-    public GraphApiHealthCheck(IUserIdentityRepository userIdentityRepository)
+    public GraphApiHealthCheck(Container container)
     {
-        _userIdentityRepository = userIdentityRepository;
+        ArgumentNullException.ThrowIfNull(container);
+        _userIdentityRepository = container.GetInstance<IUserIdentityRepository>();
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
