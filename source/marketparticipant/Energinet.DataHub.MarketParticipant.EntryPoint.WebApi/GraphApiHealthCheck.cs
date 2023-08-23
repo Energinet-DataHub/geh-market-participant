@@ -33,9 +33,9 @@ public sealed class GraphApiHealthCheck : IHealthCheck
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
     {
-        // Check that it is possible to connect to the Graph API and get current user.
+        // Check that it is possible to connect to the Graph API.
         await _graphServiceClient
-            .Me
+            .Admin
             .GetAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false);
 
