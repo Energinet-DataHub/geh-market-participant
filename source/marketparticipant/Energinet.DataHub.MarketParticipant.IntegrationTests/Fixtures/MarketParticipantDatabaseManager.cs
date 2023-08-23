@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
         /// </summary>
         protected override async Task<bool> CreateDatabaseSchemaAsync(MarketParticipantDbContext context)
         {
-            var upgradeEngine = await UpgradeFactory.GetUpgradeEngineAsync(ConnectionString, GetFilter()).ConfigureAwait(false);
+            var upgradeEngine = await UpgradeFactory.GetUpgradeEngineAsync(ConnectionString, GetFilter(), true).ConfigureAwait(false);
 
             // Transient errors can occur right after DB is created,
             // as it might not be instantly available, hence this retry loop.

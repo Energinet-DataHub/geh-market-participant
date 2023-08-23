@@ -15,15 +15,20 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using DbUp.Reboot;
-using DbUp.Reboot.Engine;
+using DbUp;
+using DbUp.Builder;
+using DbUp.Engine;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public static class UpgradeFactory
     {
-        public static async Task<UpgradeEngine> GetUpgradeEngineAsync(string connectionString, Func<string, bool> scriptFilter, bool isDryRun = false)
+        public static async Task<UpgradeEngine> GetUpgradeEngineAsync(
+            string connectionString,
+            Func<string, bool> scriptFilter,
+            bool isLocal,
+            bool isDryRun = false)
         {
             if (string.IsNullOrWhiteSpace(connectionString))
             {
@@ -32,11 +37,23 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 
             await EnsureSqlDatabaseAsync(connectionString).ConfigureAwait(false);
 
-            var builder = DeployChanges.To
-                .SqlDatabase(connectionString)
-                .WithScriptNameComparer(new ScriptComparer())
-                .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
-                .LogToConsole();
+            UpgradeEngineBuilder builder;
+            if (!isLocal)
+            {
+                builder = DeployChanges.To
+                    .AzureSqlDatabaseWithIntegratedSecurity(connectionString, null)
+                    .WithScriptNameComparer(new ScriptComparer())
+                    .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
+                    .LogToConsole();
+            }
+            else
+            {
+                builder = DeployChanges.To
+                    .SqlDatabase(connectionString)
+                    .WithScriptNameComparer(new ScriptComparer())
+                    .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
+                    .LogToConsole();
+            }
 
             if (isDryRun)
             {
