@@ -26,12 +26,12 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
     {
         public static void AddActiveDirectoryRoles(this Container container)
         {
-            container.RegisterSingleton<IActiveDirectoryB2CRolesProvider>(() =>
+            container.RegisterSingleton<IActiveDirectoryB2BRolesProvider>(() =>
             {
                 var configuration = container.GetService<IConfiguration>();
                 var graphClient = container.GetInstance<GraphServiceClient>();
                 var appObjectId = configuration.GetSetting(Settings.B2CBackendObjectId);
-                return new ActiveDirectoryB2CRolesProvider(graphClient, appObjectId);
+                return new ActiveDirectoryB2BRolesProvider(graphClient, appObjectId);
             });
         }
     }
