@@ -49,10 +49,8 @@ internal sealed class Startup : StartupBase
             options.TopicName = configuration.GetSetting(Settings.ServiceBusTopicName);
         });
 
-        services.AddSendGrid(options =>
-        {
-            options.ApiKey = configuration.GetOptionalSetting(Settings.SendGridApiKey);
-        });
+        var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
+        services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
 
         // Health check
         services
@@ -61,7 +59,9 @@ internal sealed class Startup : StartupBase
             .AddDbContextCheck<MarketParticipantDbContext>()
             .AddAzureServiceBusTopic(
                 _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
-                _ => configuration.GetSetting(Settings.ServiceBusTopicName));
+                _ => configuration.GetSetting(Settings.ServiceBusTopicName))
+            .AddSendGrid(sendGridApiKey)
+            .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
 
     protected override void Configure(IConfiguration configuration, Container container)

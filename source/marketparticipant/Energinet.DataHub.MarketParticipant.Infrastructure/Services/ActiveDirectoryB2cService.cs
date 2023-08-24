@@ -30,18 +30,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
     {
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
-        private readonly IActiveDirectoryB2CRolesProvider _activeDirectoryB2CRolesProvider;
+        private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
         private readonly ILogger<ActiveDirectoryB2CService> _logger;
 
         public ActiveDirectoryB2CService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
-            IActiveDirectoryB2CRolesProvider activeDirectoryB2CRolesProvider,
+            IActiveDirectoryB2BRolesProvider activeDirectoryB2BRolesProvider,
             ILogger<ActiveDirectoryB2CService> logger)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
-            _activeDirectoryB2CRolesProvider = activeDirectoryB2CRolesProvider;
+            _activeDirectoryB2BRolesProvider = activeDirectoryB2BRolesProvider;
             _logger = logger;
         }
 
@@ -153,7 +153,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)
         {
-            var mappedEicFunction = await _activeDirectoryB2CRolesProvider.GetB2CRolesAsync().ConfigureAwait(false);
+            var mappedEicFunction = await _activeDirectoryB2BRolesProvider.GetB2BRolesAsync().ConfigureAwait(false);
             var b2CIds = new List<Guid>();
 
             foreach (var eicFunction in eicFunctions)
