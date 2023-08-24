@@ -14,20 +14,9 @@
 
 using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+
+public interface IIntegrationEvent
 {
-    public sealed record ExternalActorId
-    {
-        public ExternalActorId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
-    }
+    Guid EventId { get; }
 }

@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.ComponentModel;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record UnknownActorNumber : ActorNumber
     {
-        internal UnknownActorNumber(string value)
+        [Browsable(false)]
+        public UnknownActorNumber(string value)
             : base(value) { }
 
         public override ActorNumberType Type => ActorNumberType.Unknown;

@@ -84,6 +84,14 @@ internal static class TestPreparationEntities
         Sent = null
     };
 
+    public static GridAreaEntity ValidGridArea => new()
+    {
+        Id = Guid.NewGuid(),
+        Code = "100",
+        Name = "Test Grid Area Name",
+        PriceAreaCode = PriceAreaCode.Dk1
+    };
+
     public static T Patch<T>(this T entity, Action<T> action)
     {
         action(entity);

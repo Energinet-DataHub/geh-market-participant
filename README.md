@@ -15,13 +15,18 @@ Welcome to the Market Participant domain of the [Green Energy Hub project](https
 
 ## Introduction
 
-Market Participant is where everything related to Organization, Actors, GridAreas and their relationships are handled.
+Market Participant is where everything related to Organization, Actors, Grid Areas and their relationships are handled.
 
 ## Communicating with Market Participant
 
 Interaction with the Market Participant domain is done in two different ways, depending on whether you are looking to get data updates or want use the API to interact with the domain.
 
 A [Client Nuget Package](https://www.nuget.org/packages/Energinet.DataHub.MarketParticipant.Client/), which is the recommended way to interact with the domain is available, and exposes all the API's currently available
+
+## Integration Events
+
+Market Participant publishes several integration events.
+A list of the integration event contracts and their documentation can be found at [/source/marketparticipant/Energinet.DataHub.MarketParticipant.Infrastructure/Model/Contracts](./source/marketparticipant/Energinet.DataHub.MarketParticipant.Infrastructure/Model/Contracts)
 
 ## API
 

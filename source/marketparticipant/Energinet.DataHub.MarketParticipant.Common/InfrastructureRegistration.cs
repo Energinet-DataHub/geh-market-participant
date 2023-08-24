@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using SimpleInjector;
 
@@ -22,5 +23,6 @@ internal static class InfrastructureRegistration
     public static void AddInfrastructureServices(this Container container)
     {
         container.Register<IUserIdentityAuthenticationService, UserIdentityAuthenticationService>(Lifestyle.Scoped);
+        container.Register<IIntegrationEventFactory, IntegrationEventFactory>(Lifestyle.Scoped);
     }
 }
