@@ -18,6 +18,9 @@ markpartDomain = group "Market Participant" {
         technology "Asp.Net Core Web API"
         tags "Microsoft Azure - App Services" "Titans"
 
+        # Common relationships
+        this -> dh3.sharedB2C "Creates and manages B2C users" "Microsoft.Graph/https"
+
         # Domain relationships
         this -> markpartDb "Reads and writes actor/user data." "EF Core"
     }
