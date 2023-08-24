@@ -12,20 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class GridAreaOwnershipAssigned : DomainEvent
+public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
 {
+    [JsonConstructor]
+    [Browsable(false)]
+    public GridAreaOwnershipAssigned(
+        Guid eventId,
+        ActorNumber actorNumber,
+        EicFunction actorRole,
+        GridAreaId gridAreaId,
+        Instant validFrom)
+    {
+        EventId = eventId;
+        ActorNumber = actorNumber;
+        ActorRole = actorRole;
+        GridAreaId = gridAreaId;
+        ValidFrom = validFrom;
+    }
+
     public GridAreaOwnershipAssigned(ActorNumber actorNumber, EicFunction actorRole, GridAreaId gridAreaId)
     {
+        EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
         ActorRole = actorRole;
         GridAreaId = gridAreaId;
         ValidFrom = SystemClock.Instance.GetCurrentInstant();
     }
 
+    public Guid EventId { get; }
     public ActorNumber ActorNumber { get; }
     public EicFunction ActorRole { get; }
     public GridAreaId GridAreaId { get; }

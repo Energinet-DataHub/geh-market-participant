@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -20,8 +21,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public sealed record EicActorNumber : ActorNumber
     {
-        private EicActorNumber(string value)
-            : base(value) { }
+        [Browsable(false)]
+        public EicActorNumber(string value)
+            : base(value)
+        {
+            if (!IsValid(value))
+                throw new ArgumentException($"The provided EIC '{value}' is not valid.", nameof(value));
+        }
 
         public override ActorNumberType Type => ActorNumberType.Eic;
 

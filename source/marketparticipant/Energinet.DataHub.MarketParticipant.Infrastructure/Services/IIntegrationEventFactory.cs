@@ -12,22 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+public interface IIntegrationEventFactory
 {
-    public sealed record ExternalActorId
-    {
-        public ExternalActorId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
-    }
+    Task<IntegrationEvent> CreateAsync(DomainEvent domainEvent);
 }

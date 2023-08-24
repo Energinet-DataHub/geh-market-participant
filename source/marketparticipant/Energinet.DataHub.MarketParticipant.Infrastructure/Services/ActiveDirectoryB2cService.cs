@@ -70,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 }
 
                 return new CreateAppRegistrationResponse(
-                    new ExternalActorId(app.AppId!),
+                    new ExternalActorId(Guid.Parse(app.AppId!)),
                     app.Id!,
                     servicePrincipal.Id!);
             }
