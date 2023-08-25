@@ -31,7 +31,7 @@ public sealed class ScopedLoggingMiddleware : IMiddleware, IFunctionsWorkerMiddl
     private static readonly RootLoggingScope _rootLoggingScope = new();
     private readonly ILogger _logger;
 
-    public ScopedLoggingMiddleware(ILogger logger)
+    public ScopedLoggingMiddleware(ILogger<ScopedLoggingMiddleware> logger)
     {
         _logger = logger;
     }
