@@ -24,6 +24,7 @@ using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Common.Logging;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
@@ -67,6 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 "/swagger/v1/swagger.json",
                 "Energinet.DataHub.MarketParticipant.EntryPoint.WebApi v1"));
 
+            app.UseMiddleware<ScopedLoggingMiddleware>();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCommonExceptionHandling();
@@ -111,6 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             }
 
             services.AddPermissionAuthorization();
+            services.AddScoped<ScopedLoggingMiddleware>();
 
             // Health check
             services

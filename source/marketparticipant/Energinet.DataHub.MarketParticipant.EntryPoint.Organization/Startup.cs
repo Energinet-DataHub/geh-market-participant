@@ -19,6 +19,7 @@ using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Common.Logging;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
@@ -51,6 +52,7 @@ internal sealed class Startup : StartupBase
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
         services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
+        services.AddScoped<ScopedLoggingMiddleware>();
 
         // Health check
         services
