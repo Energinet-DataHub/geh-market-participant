@@ -14,6 +14,7 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
+using Energinet.DataHub.MarketParticipant.Common.Logging;
 using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
 using Microsoft.Extensions.Hosting;
 using SimpleInjector;
@@ -31,7 +32,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
             await using (startup.ConfigureAwait(false))
             {
                 var host = new HostBuilder()
-                    .ConfigureFunctionsWorkerDefaults(options => options.UseMiddleware<SimpleInjectorScopedRequest>())
+                    .ConfigureFunctionsWorkerDefaults(options =>
+                    {
+                        options.UseMiddleware<SimpleInjectorScopedRequest>();
+                        options.UseMiddleware<ScopedLoggingMiddleware>();
+                    })
                     .ConfigureServices((context, services) =>
                     {
                         startup.Initialize(context.Configuration, services);
