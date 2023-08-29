@@ -24,6 +24,7 @@ using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
@@ -34,7 +35,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using NodaTime;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
@@ -171,7 +171,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 var tokenCredentials = new DefaultAzureCredential();
 
                 var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
-                return new SigningKeyRing(SystemClock.Instance, keyClient, tokenKeyName);
+                return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
             });
 
             container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();

@@ -43,7 +43,13 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
         ActorNumber = actorNumber;
         ActorRole = actorRole;
         GridAreaId = gridAreaId;
-        ValidFrom = SystemClock.Instance.GetCurrentInstant();
+
+        var currentInstant = Clock.Instance.GetCurrentInstant();
+
+        var localDate = currentInstant.InZone(TimeZone.Dk).Date;
+        var nextDate = localDate.PlusDays(1);
+
+        ValidFrom = nextDate.AtStartOfDayInZone(TimeZone.Dk).ToInstant();
     }
 
     public Guid EventId { get; }
