@@ -45,7 +45,7 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
         GridAreaId = gridAreaId;
 
         var currentInstant = Clock.Instance.GetCurrentInstant();
-        var denmarkZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+        var denmarkZone = Clock.TimeZoneDk;
 
         var localDate = currentInstant.InZone(denmarkZone).Date;
         var nextDate = localDate.PlusDays(1);

@@ -18,6 +18,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed class Clock : IClock
 {
+    public static DateTimeZone TimeZoneDk { get; } = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+
     public static IClock Instance { get; private set; } = new Clock();
 
     public Instant GetCurrentInstant()
