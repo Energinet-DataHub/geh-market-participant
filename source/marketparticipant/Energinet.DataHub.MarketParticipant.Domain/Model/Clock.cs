@@ -12,22 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed class Clock : IClock
 {
-    public sealed record ExternalActorId
+    public static IClock Instance { get; private set; } = new Clock();
+
+    public Instant GetCurrentInstant()
     {
-        public ExternalActorId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        return SystemClock.Instance.GetCurrentInstant();
     }
 }

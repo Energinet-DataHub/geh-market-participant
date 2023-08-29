@@ -12,22 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+/// <summary>
+/// Provides access to B2B roles known in Azure.
+/// </summary>
+public interface IActiveDirectoryB2BRolesProvider
 {
-    public sealed record ExternalActorId
-    {
-        public ExternalActorId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
-    }
+    Task<ActiveDirectoryB2BRoles> GetB2BRolesAsync();
 }

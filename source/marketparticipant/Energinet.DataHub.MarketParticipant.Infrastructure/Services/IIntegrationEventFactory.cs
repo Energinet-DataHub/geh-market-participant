@@ -12,20 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using System.Threading.Tasks;
+using Energinet.DataHub.Core.Messaging.Communication;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+
+public interface IIntegrationEventFactory
 {
-    public class ActiveDirectoryB2CRoles
-    {
-        public ActiveDirectoryB2CRoles()
-        {
-            EicRolesMapped = new Dictionary<EicFunction, Guid>();
-        }
-
-        public bool IsLoaded { get; set; }
-        public Dictionary<EicFunction, Guid> EicRolesMapped { get; }
-    }
+    Task<IntegrationEvent> CreateAsync(DomainEvent domainEvent);
 }

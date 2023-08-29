@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Net.Http;
 using System.Text.Json.Serialization;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
@@ -25,6 +24,7 @@ using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
@@ -35,7 +35,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using NodaTime;
 using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
@@ -55,10 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
         /// </summary>
         public static bool EnableIntegrationTestKeys { get; set; }
 
-        public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IHostApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -89,9 +85,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             });
 
             app.UseSimpleInjector(Container);
-
-            var internalOpenIdUrl = _configuration.GetSetting(Settings.InternalOpenIdUrl);
-            appLifetime?.ApplicationStarted.Register(() => OnApplicationStarted(internalOpenIdUrl));
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -123,7 +116,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services
                 .AddHealthChecks()
                 .AddLiveCheck()
-                .AddDbContextCheck<MarketParticipantDbContext>();
+                .AddDbContextCheck<MarketParticipantDbContext>()
+                .AddCheck<GraphApiHealthCheck>("Graph API Access")
+                .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access");
 
             services.AddSwaggerGen(c =>
             {
@@ -176,7 +171,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 var tokenCredentials = new DefaultAzureCredential();
 
                 var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
-                return new SigningKeyRing(SystemClock.Instance, keyClient, tokenKeyName);
+                return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
             });
 
             container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
@@ -194,27 +189,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             });
 
             services.UseSimpleInjectorAspNetRequestScoping(Container);
-        }
-
-#pragma warning disable VSTHRD100
-        private static async void OnApplicationStarted(string internalOpenIdUrl)
-#pragma warning restore VSTHRD100
-        {
-            try
-            {
-                using var httpClient = new HttpClient();
-
-                var uriOpenId = new Uri(internalOpenIdUrl);
-                var uriKeyGet = new Uri($"https://{uriOpenId.Authority}/token/cache");
-
-                await httpClient.GetAsync(uriKeyGet).ConfigureAwait(false);
-            }
-#pragma warning disable CA1031
-            catch
-#pragma warning restore CA1031
-            {
-                // ignored
-            }
         }
     }
 }

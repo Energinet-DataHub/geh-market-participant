@@ -13,21 +13,17 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
+
+public sealed class ActiveDirectoryB2BRoles
 {
-    public sealed record ExternalActorId
+    public ActiveDirectoryB2BRoles(IReadOnlyDictionary<EicFunction, Guid> eicRoles)
     {
-        public ExternalActorId(Guid value)
-        {
-            Value = value;
-        }
-
-        public Guid Value { get; }
-
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        EicRolesMapped = eicRoles;
     }
+
+    public IReadOnlyDictionary<EicFunction, Guid> EicRolesMapped { get; }
 }

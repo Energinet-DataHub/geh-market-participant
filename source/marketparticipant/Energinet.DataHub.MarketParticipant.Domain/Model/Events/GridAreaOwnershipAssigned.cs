@@ -12,20 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Text.Json.Serialization;
 using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class GridAreaOwnershipAssigned : DomainEvent
+public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
 {
-    public GridAreaOwnershipAssigned(ActorNumber actorNumber, EicFunction actorRole, GridAreaId gridAreaId)
+    [JsonConstructor]
+    [Browsable(false)]
+    public GridAreaOwnershipAssigned(
+        Guid eventId,
+        ActorNumber actorNumber,
+        EicFunction actorRole,
+        GridAreaId gridAreaId,
+        Instant validFrom)
     {
+        EventId = eventId;
         ActorNumber = actorNumber;
         ActorRole = actorRole;
         GridAreaId = gridAreaId;
-        ValidFrom = SystemClock.Instance.GetCurrentInstant();
+        ValidFrom = validFrom;
     }
 
+    public GridAreaOwnershipAssigned(ActorNumber actorNumber, EicFunction actorRole, GridAreaId gridAreaId)
+    {
+        EventId = Guid.NewGuid();
+        ActorNumber = actorNumber;
+        ActorRole = actorRole;
+        GridAreaId = gridAreaId;
+
+        var currentInstant = Clock.Instance.GetCurrentInstant();
+
+        var localDate = currentInstant.InZone(TimeZone.Dk).Date;
+        var nextDate = localDate.PlusDays(1);
+
+        ValidFrom = nextDate.AtStartOfDayInZone(TimeZone.Dk).ToInstant();
+    }
+
+    public Guid EventId { get; }
     public ActorNumber ActorNumber { get; }
     public EicFunction ActorRole { get; }
     public GridAreaId GridAreaId { get; }

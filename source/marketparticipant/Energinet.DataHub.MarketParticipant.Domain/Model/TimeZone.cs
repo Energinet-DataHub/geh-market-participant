@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-/// <summary>
-/// Provides access to B2C roles known in Azure.
-/// </summary>
-public interface IActiveDirectoryB2CRolesProvider
+public static class TimeZone
 {
-    /// <summary>
-    /// Returns B2C roles known in Azure.
-    /// </summary>
-    /// <returns>B2C roles known in Azure.</returns>
-    Task<ActiveDirectoryB2CRoles> GetB2CRolesAsync();
+    public static DateTimeZone Dk { get; } = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
 }
