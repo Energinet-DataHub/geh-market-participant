@@ -16,12 +16,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed class Clock : IClock
+public static class TimeZone
 {
-    public static IClock Instance { get; private set; } = new Clock();
-
-    public Instant GetCurrentInstant()
-    {
-        return SystemClock.Instance.GetCurrentInstant();
-    }
+    public static DateTimeZone Dk { get; } = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
 }

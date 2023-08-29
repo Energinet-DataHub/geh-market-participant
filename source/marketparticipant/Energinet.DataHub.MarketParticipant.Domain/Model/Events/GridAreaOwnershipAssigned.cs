@@ -46,10 +46,10 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
 
         var currentInstant = Clock.Instance.GetCurrentInstant();
 
-        var localDate = currentInstant.InZone(Clock.TimeZoneDk).Date;
+        var localDate = currentInstant.InZone(TimeZone.Dk).Date;
         var nextDate = localDate.PlusDays(1);
 
-        ValidFrom = nextDate.AtStartOfDayInZone(Clock.TimeZoneDk).ToInstant();
+        ValidFrom = nextDate.AtStartOfDayInZone(TimeZone.Dk).ToInstant();
     }
 
     public Guid EventId { get; }
