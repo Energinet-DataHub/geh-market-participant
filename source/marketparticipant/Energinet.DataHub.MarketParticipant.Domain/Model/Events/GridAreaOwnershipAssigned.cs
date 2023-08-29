@@ -45,12 +45,11 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
         GridAreaId = gridAreaId;
 
         var currentInstant = Clock.Instance.GetCurrentInstant();
-        var denmarkZone = Clock.TimeZoneDk;
 
-        var localDate = currentInstant.InZone(denmarkZone).Date;
+        var localDate = currentInstant.InZone(Clock.TimeZoneDk).Date;
         var nextDate = localDate.PlusDays(1);
 
-        ValidFrom = nextDate.AtStartOfDayInZone(denmarkZone).ToInstant();
+        ValidFrom = nextDate.AtStartOfDayInZone(Clock.TimeZoneDk).ToInstant();
     }
 
     public Guid EventId { get; }
