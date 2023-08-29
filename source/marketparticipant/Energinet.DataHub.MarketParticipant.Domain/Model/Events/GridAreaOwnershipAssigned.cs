@@ -43,7 +43,14 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
         ActorNumber = actorNumber;
         ActorRole = actorRole;
         GridAreaId = gridAreaId;
-        ValidFrom = SystemClock.Instance.GetCurrentInstant();
+
+        var currentInstant = Clock.Instance.GetCurrentInstant();
+        var denmarkZone = DateTimeZoneProviders.Tzdb["Europe/Copenhagen"];
+
+        var localDate = currentInstant.InZone(denmarkZone).Date;
+        var nextDate = localDate.PlusDays(1);
+
+        ValidFrom = nextDate.AtStartOfDayInZone(denmarkZone).ToInstant();
     }
 
     public Guid EventId { get; }

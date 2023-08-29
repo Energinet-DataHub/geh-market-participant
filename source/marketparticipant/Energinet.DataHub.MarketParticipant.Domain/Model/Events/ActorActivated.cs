@@ -40,7 +40,7 @@ public sealed class ActorActivated : DomainEvent, IIntegrationEvent
         EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
         ExternalActorId = externalActorId;
-        ValidFrom = SystemClock.Instance.GetCurrentInstant();
+        ValidFrom = Clock.Instance.GetCurrentInstant();
     }
 
     public Guid EventId { get; }

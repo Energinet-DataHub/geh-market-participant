@@ -88,17 +88,7 @@ public sealed class IntegrationEventProviderTests
         }
     }
 
-    private Task PrepareDomainEventAsync(Scope scope, Type domainEvent)
-    {
-        return domainEvent.Name switch
-        {
-            nameof(ActorActivated) => PrepareActorActivatedEventAsync(scope),
-            nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
-            _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
-        };
-    }
-
-    private async Task PrepareActorActivatedEventAsync(Scope scope)
+    private static async Task PrepareActorActivatedEventAsync(Scope scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -114,6 +104,16 @@ public sealed class IntegrationEventProviderTests
 
         var domainEventRepository = scope.GetInstance<IDomainEventRepository>();
         await domainEventRepository.EnqueueAsync(actor);
+    }
+
+    private Task PrepareDomainEventAsync(Scope scope, Type domainEvent)
+    {
+        return domainEvent.Name switch
+        {
+            nameof(ActorActivated) => PrepareActorActivatedEventAsync(scope),
+            nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
+            _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
+        };
     }
 
     private async Task PrepareGridAreaOwnershipAssignedEventAsync(Scope scope)
