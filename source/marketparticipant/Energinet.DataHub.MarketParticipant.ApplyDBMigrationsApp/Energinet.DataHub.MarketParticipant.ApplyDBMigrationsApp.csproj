@@ -28,6 +28,11 @@ limitations under the License.
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Scripts\LocalDB\202308291500 Add LittleBobbyTables.sql" />
+    <None Remove="Scripts\U-001\Model\202308291500 Add LittleBobbyTables.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dbup-sqlserver" Version="5.0.8" />
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
   </ItemGroup>
