@@ -18,6 +18,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -31,15 +32,18 @@ public sealed class GetUserPermissionsHandler
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserQueryRepository _userQueryRepository;
+    private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserIdentityOpenIdLinkService _userIdentityOpenIdLinkService;
 
     public GetUserPermissionsHandler(
         IUserRepository userRepository,
         IUserQueryRepository userQueryRepository,
+        IUserIdentityRepository userIdentityRepository,
         IUserIdentityOpenIdLinkService userIdentityOpenIdLinkService)
     {
         _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
+        _userIdentityRepository = userIdentityRepository;
         _userIdentityOpenIdLinkService = userIdentityOpenIdLinkService;
     }
 
@@ -49,20 +53,30 @@ public sealed class GetUserPermissionsHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
+        var externalUserId = new ExternalUserId(request.ExternalUserId);
         var user = await _userRepository
-            .GetAsync(new ExternalUserId(request.ExternalUserId))
+            .GetAsync(externalUserId)
             .ConfigureAwait(false);
 
         if (user == null)
         {
-            var userIdentity = await _userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(new ExternalUserId(request.ExternalUserId)).ConfigureAwait(false);
+            var mergedIdentity = await _userIdentityOpenIdLinkService
+                .ValidateAndSetupOpenIdAsync(externalUserId)
+                .ConfigureAwait(false);
 
             user = await _userRepository
-                .GetAsync(new ExternalUserId(userIdentity.Id.Value))
+                .GetAsync(new ExternalUserId(mergedIdentity.Id.Value))
                 .ConfigureAwait(false);
         }
 
         await ValidateOrClearLogonRequirementsAsync(user!).ConfigureAwait(false);
+
+        var userIdentity = await _userIdentityRepository
+            .GetAsync(externalUserId)
+            .ConfigureAwait(false);
+
+        if (userIdentity?.Status != UserIdentityStatus.Active)
+            throw new NotFoundValidationException(request.ExternalUserId);
 
         var permissions = await _userQueryRepository
             .GetPermissionsAsync(new ActorId(request.ActorId), user!.ExternalId)
