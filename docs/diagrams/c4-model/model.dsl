@@ -13,10 +13,10 @@ markpartDomain = group "Market Participant" {
         technology "SQL Database Schema"
         tags "Data Storage" "Microsoft Azure - SQL Database" "Titans"
     }
-    markpartKeyVault = container "Market Participant Internal KeyVault" {
+    markpartKeyVault = container "Market Participant Internal Key Vault" {
         description "Stores key used for signing tokens."
-        technology "Azure KeyVault"
-        tags "Microsoft Azure - KeyVault" "Titans"
+        technology "Azure Key Vault"
+        tags "Microsoft Azure - Key Vaults" "Titans"
     }
     markpartApi = container "Market Participant API" {
         description "Multi-tenant API for managing actors, users and permissions."
