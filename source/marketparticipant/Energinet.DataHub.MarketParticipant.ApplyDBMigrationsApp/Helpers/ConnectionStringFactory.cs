@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
@@ -20,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
     {
         private const string DefaultConnectionString = "Server=(local); Database=MeteringPointData; Trusted_connection=true";
 
-        public static string GetConnectionString(string[] args)
+        public static string GetConnectionString(IEnumerable<string> args)
         {
             return args.FirstOrDefault() ?? DefaultConnectionString;
         }
