@@ -140,18 +140,6 @@ INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'98458
 INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'902ff9bf-f306-4202-8843-e5578032b51e', N'Energistyrelsen - Se adgang til lovpligtige opgaver', 1)
 INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'902ff9bf-f306-4202-8843-e5578032b51e', 48)
 
--- ElOverblik
-INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'9c4bf5ac-49dd-4ec2-a329-ecfc0ae79c0d', N'ElOverblik - Basis adgang', 1)
-INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'9c4bf5ac-49dd-4ec2-a329-ecfc0ae79c0d', 49)
-INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'cc742c1a-8dbc-450a-86f9-535eb380b3dd', N'ElOverblik - Beskedudveksling (Webforms)', 1)
-INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'cc742c1a-8dbc-450a-86f9-535eb380b3dd', 49)
-INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'720f72b5-6168-4ce1-98ff-ef1578874586', N'ElOverblik - Sprogskift', 1)
-INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'720f72b5-6168-4ce1-98ff-ef1578874586', 49)
-INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'ba3e3950-2a14-4f4d-a823-dba773264ac8', N'ElOverblik - GUI nyheder', 1)
-INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'ba3e3950-2a14-4f4d-a823-dba773264ac8', 49)
-INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'a0ef4e15-7f02-4190-bcff-85e7afce4242', N'ElOverblik - Fuld adgang', 1)
-INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'a0ef4e15-7f02-4190-bcff-85e7afce4242', 49)
-
 -- Ubalanceafvikling Ansvarlig
 INSERT [dbo].[UserRole] ([Id], [Name], [Status]) VALUES (N'ee5c7ad7-dcd9-42c1-818c-25aac2de24b4', N'Ubalanceafvikling Ansvarlig - Basis adgang', 1)
 INSERT [dbo].[UserRoleEicFunction] ([UserRoleId], [EicFunction]) VALUES (N'ee5c7ad7-dcd9-42c1-818c-25aac2de24b4', 15)
