@@ -28,8 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp
             var isLocal = string.IsNullOrEmpty(EnvironmentFilter.GetEnvironmentArgument(args));
             var isDryRun = args.Contains("dryRun");
 
-            SqlAuthenticationProvider.SetProvider(SqlAuthenticationMethod.ActiveDirectoryInteractive, new SqlAppAuthenticationProvider());
-
             var upgrader = await UpgradeFactory.GetUpgradeEngineAsync(connectionString, filter, isDryRun, isLocal).ConfigureAwait(false);
 
             var result = upgrader.PerformUpgrade();

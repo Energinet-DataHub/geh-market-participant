@@ -35,7 +35,8 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
                 throw new ArgumentException("Connection string must have a value");
             }
 
-            await EnsureSqlDatabaseAsync(connectionString).ConfigureAwait(false);
+            // await EnsureSqlDatabaseAsync(connectionString).ConfigureAwait(false);
+            await Task.Delay(1).ConfigureAwait(false);
 
             UpgradeEngineBuilder builder;
             if (!isLocal)
