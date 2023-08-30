@@ -154,7 +154,7 @@ public sealed class UserInvitationTests
 
     [Theory]
     [InlineData(EicFunction.BillingAgent, false)]
-    [InlineData(EicFunction.ElOverblik, false)]
+    [InlineData(EicFunction.MeteredDataResponsible, false)]
     [InlineData(EicFunction.BalanceResponsibleParty, true)]
     public void Create_UserRoleEicFunction_IsVerified(EicFunction eicFunction, bool isValid)
     {

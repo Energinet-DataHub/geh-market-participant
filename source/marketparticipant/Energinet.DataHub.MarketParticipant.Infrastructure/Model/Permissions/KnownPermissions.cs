@@ -38,7 +38,6 @@ public static class KnownPermissions
             EicFunction.MeteringPointAdministrator,
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
-            EicFunction.ElOverblik,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
@@ -67,7 +66,6 @@ public static class KnownPermissions
             EicFunction.MeteringPointAdministrator,
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
-            EicFunction.ElOverblik,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
@@ -83,7 +81,6 @@ public static class KnownPermissions
             EicFunction.MeteringPointAdministrator,
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
-            EicFunction.ElOverblik,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader

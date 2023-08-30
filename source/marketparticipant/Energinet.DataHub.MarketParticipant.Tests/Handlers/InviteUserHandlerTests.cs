@@ -91,7 +91,7 @@ public sealed class InviteUserHandlerTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[] { new ActorMarketRole(EicFunction.ElOverblik) },
+                new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
                 new ActorName("fake_value")));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
@@ -129,7 +129,7 @@ public sealed class InviteUserHandlerTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[] { new ActorMarketRole(EicFunction.ElOverblik) },
+                new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
                 new ActorName("fake_value")));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
@@ -168,7 +168,7 @@ public sealed class InviteUserHandlerTests
                 null,
                 new MockedGln(),
                 ActorStatus.Active,
-                new[] { new ActorMarketRole(EicFunction.ElOverblik) },
+                new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
                 new ActorName("fake_value")));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
@@ -180,7 +180,7 @@ public sealed class InviteUserHandlerTests
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
-                EicFunction.ElOverblik));
+                EicFunction.MeteredDataResponsible));
 
         var target = new InviteUserHandler(
             userInvitationServiceMock.Object,
