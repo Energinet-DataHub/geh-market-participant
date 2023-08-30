@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
             if (!isLocal)
             {
                 builder = DeployChanges.To
-                    .AzureSqlDatabaseWithIntegratedSecurity(connectionString, null)
+                    .SqlDatabase(connectionString)
                     .WithScriptNameComparer(new ScriptComparer())
                     .WithScripts(new CustomScriptProvider(Assembly.GetExecutingAssembly(), scriptFilter))
                     .LogToConsole();
