@@ -13,6 +13,11 @@ markpartDomain = group "Market Participant" {
         technology "SQL Database Schema"
         tags "Data Storage" "Microsoft Azure - SQL Database" "Titans"
     }
+    markpartKeyVault = container "Market Participant Internal Key Vault" {
+        description "Stores key used for signing tokens."
+        technology "Azure Key Vault"
+        tags "Microsoft Azure - Key Vaults" "Titans"
+    }
     markpartApi = container "Market Participant API" {
         description "Multi-tenant API for managing actors, users and permissions."
         technology "Asp.Net Core Web API"
@@ -23,9 +28,10 @@ markpartDomain = group "Market Participant" {
 
         # Domain relationships
         this -> markpartDb "Reads and writes actor/user data." "EF Core"
+        this -> markpartKeyVault "Signs, and reads public key for, tokens." "Microsoft.Graph/https"
     }
     markpartOrganizationManager = container "Market Participant <Organization Manager>" {
-        description "<add description>"
+        description "Synchronizes Azure B2C user and actor state with the domain."
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps" "Titans"
 
