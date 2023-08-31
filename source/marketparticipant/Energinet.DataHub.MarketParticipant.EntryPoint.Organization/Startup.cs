@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Messaging.Communication;
@@ -26,6 +29,7 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SendGrid.Extensions.DependencyInjection;
@@ -52,16 +56,7 @@ internal sealed class Startup : StartupBase
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
         services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
 
-        // Health check
-        services
-            .AddHealthChecks()
-            .AddLiveCheck()
-            .AddDbContextCheck<MarketParticipantDbContext>()
-            .AddAzureServiceBusTopic(
-                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
-                _ => configuration.GetSetting(Settings.ServiceBusTopicName))
-            .AddSendGrid(sendGridApiKey)
-            .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
+        AddHealthChecks(configuration, services);
     }
 
     protected override void Configure(IConfiguration configuration, Container container)
@@ -78,5 +73,44 @@ internal sealed class Startup : StartupBase
         // Health check
         container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
         container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
+    }
+
+    private static void AddHealthChecks(IConfiguration configuration, IServiceCollection services)
+    {
+        static async Task<bool> CheckExpiredEvents(MarketParticipantDbContext context, CancellationToken cancellationToken)
+        {
+            var healthCutoff = DateTimeOffset.UtcNow.AddDays(-1);
+
+            var expiredDomainEvents = await context.DomainEvents
+                .AnyAsync(e => !e.IsSent && e.Timestamp < healthCutoff, cancellationToken)
+                .ConfigureAwait(false);
+
+            return !expiredDomainEvents;
+        }
+
+        static async Task<bool> CheckExpiredEmails(MarketParticipantDbContext context, CancellationToken cancellationToken)
+        {
+            var healthCutoff = DateTimeOffset.UtcNow.AddDays(-1);
+
+            var expiredEmails = await context.EmailEventEntries
+                .AnyAsync(e => e.Sent == null && e.Created < healthCutoff, cancellationToken)
+                .ConfigureAwait(false);
+
+            return !expiredEmails;
+        }
+
+        var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
+
+        services
+            .AddHealthChecks()
+            .AddLiveCheck()
+            .AddDbContextCheck<MarketParticipantDbContext>()
+            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEvents, name: "expired_events")
+            .AddDbContextCheck<MarketParticipantDbContext>(customTestQuery: CheckExpiredEmails, name: "expired_emails")
+            .AddAzureServiceBusTopic(
+                _ => configuration.GetSetting(Settings.ServiceBusHealthConnectionString),
+                _ => configuration.GetSetting(Settings.ServiceBusTopicName))
+            .AddSendGrid(sendGridApiKey)
+            .AddCheck<ActiveDirectoryB2BRolesHealthCheck>("AD B2B Roles Check");
     }
 }
