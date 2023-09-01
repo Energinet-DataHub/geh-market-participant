@@ -58,7 +58,9 @@ public static class UpgradeFactory
             ++tryCount;
             try
             {
+                Console.Write("Ensuring DB exists...");
                 EnsureDatabase.For.SqlDatabase(connectionString);
+                Console.WriteLine("Done");
                 return;
             }
             catch (SqlException)
