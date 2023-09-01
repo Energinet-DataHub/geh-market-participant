@@ -103,6 +103,10 @@ public static class KnownPermissions
             EicFunction.GridAccessProvider,
             EicFunction.MeteredDataResponsible,
             EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.ESettExchange, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator
         })
     };
 }
