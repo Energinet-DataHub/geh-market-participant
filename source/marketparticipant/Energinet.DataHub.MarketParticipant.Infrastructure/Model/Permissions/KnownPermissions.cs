@@ -38,7 +38,6 @@ public static class KnownPermissions
             EicFunction.MeteringPointAdministrator,
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
-            EicFunction.ElOverblik,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
@@ -67,7 +66,6 @@ public static class KnownPermissions
             EicFunction.MeteringPointAdministrator,
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
-            EicFunction.ElOverblik,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
@@ -83,7 +81,6 @@ public static class KnownPermissions
             EicFunction.MeteringPointAdministrator,
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
-            EicFunction.ElOverblik,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
@@ -105,6 +102,10 @@ public static class KnownPermissions
             EicFunction.EnergySupplier,
             EicFunction.GridAccessProvider,
             EicFunction.MeteredDataResponsible,
+            EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
+        {
             EicFunction.DataHubAdministrator
         })
     };
