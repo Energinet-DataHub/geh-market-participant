@@ -1,4 +1,4 @@
-// Copyright 2020 Energinet DataHub A/S
+﻿// Copyright 2020 Energinet DataHub A/S
 //
 // Licensed under the Apache License, Version 2.0 (the "License2");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using DbUp;
-using DbUp.Builder;
 using DbUp.Engine;
-using DbUp.SqlServer;
 using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
@@ -34,7 +32,7 @@ public static class UpgradeFactory
             throw new ArgumentException("Connection string must have a value");
 
         await EnsureSqlDatabaseAsync(connectionString).ConfigureAwait(false);
-
+        await Task.Delay(1).ConfigureAwait(false);
         var builder = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptNameComparer(new ScriptComparer())
@@ -60,7 +58,7 @@ public static class UpgradeFactory
             ++tryCount;
             try
             {
-                EnsureDatabase.For.SqlDatabase(connectionString, AzureDatabaseEdition.Premium);
+                EnsureDatabase.For.SqlDatabase(connectionString);
                 return;
             }
             catch (SqlException)
