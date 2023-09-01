@@ -32,7 +32,6 @@ public static class UpgradeFactory
             throw new ArgumentException("Connection string must have a value");
 
         await EnsureSqlDatabaseAsync(connectionString).ConfigureAwait(false);
-        await Task.Delay(1).ConfigureAwait(false);
         var builder = DeployChanges.To
             .SqlDatabase(connectionString)
             .WithScriptNameComparer(new ScriptComparer())
@@ -58,9 +57,9 @@ public static class UpgradeFactory
             ++tryCount;
             try
             {
-                Console.Write("Ensuring DB exists...");
+                Console.WriteLine("Ensuring DB exists...");
                 EnsureDatabase.For.SqlDatabase(connectionString);
-                Console.WriteLine("Done");
+                Console.WriteLine("DB was found to be existing.");
                 return;
             }
             catch (SqlException)
