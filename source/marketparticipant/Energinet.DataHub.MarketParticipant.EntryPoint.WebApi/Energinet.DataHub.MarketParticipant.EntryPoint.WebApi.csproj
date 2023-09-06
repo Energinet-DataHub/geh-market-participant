@@ -24,7 +24,7 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.10.0" />
     <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.5.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.6.0-alpha-382" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp.SimpleInjector" Version="7.6.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.10" />
     <PackageReference Include="SimpleInjector.Integration.AspNetCore.Mvc.Core" Version="5.4.0" />
