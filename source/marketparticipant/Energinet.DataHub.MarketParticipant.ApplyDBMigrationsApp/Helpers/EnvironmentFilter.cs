@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
                             file.Contains($".Scripts.{environment}.Model.", StringComparison.OrdinalIgnoreCase));
         }
 
-        public static string GetEnvironmentArgument(IReadOnlyList<string> args)
+        private static string GetEnvironmentArgument(IReadOnlyList<string> args)
         {
             ArgumentNullException.ThrowIfNull(args);
 
