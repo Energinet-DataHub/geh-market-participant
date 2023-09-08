@@ -15,7 +15,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
-using Microsoft.Data.SqlClient;
 
 namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp
 {
@@ -27,11 +26,9 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp
             var filter = EnvironmentFilter.GetFilter(args);
             var isDryRun = args.Contains("dryRun");
 
-            SqlAuthenticationProvider.SetProvider(SqlAuthenticationMethod.ActiveDirectoryInteractive, new SqlAppAuthenticationProvider());
+            var upgradeEngine = await UpgradeFactory.GetUpgradeEngineAsync(connectionString, filter, isDryRun).ConfigureAwait(false);
 
-            var upgrader = await UpgradeFactory.GetUpgradeEngineAsync(connectionString, filter, isDryRun).ConfigureAwait(false);
-
-            var result = upgrader.PerformUpgrade();
+            var result = upgradeEngine.PerformUpgrade();
 
             return ResultReporter.ReportResult(result);
         }
