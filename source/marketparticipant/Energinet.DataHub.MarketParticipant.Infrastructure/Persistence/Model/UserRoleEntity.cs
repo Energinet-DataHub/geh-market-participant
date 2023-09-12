@@ -24,6 +24,7 @@ public sealed class UserRoleEntity
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public UserRoleStatus Status { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
     public Collection<UserRoleEicFunctionEntity> EicFunctions { get; } = new();
     public Collection<UserRolePermissionEntity> Permissions { get; } = new();
 }

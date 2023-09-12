@@ -25,7 +25,8 @@ public sealed class UserRole
         string description,
         UserRoleStatus status,
         IEnumerable<PermissionId> permissions,
-        EicFunction eicFunction)
+        EicFunction eicFunction,
+        Guid changedByIdentityId)
     {
         Id = new UserRoleId(Guid.Empty);
         Name = name;
@@ -33,6 +34,7 @@ public sealed class UserRole
         Description = description;
         Status = status;
         EicFunction = eicFunction;
+        ChangedByIdentityId = changedByIdentityId;
     }
 
     public UserRole(
@@ -41,7 +43,8 @@ public sealed class UserRole
         string description,
         UserRoleStatus status,
         IEnumerable<PermissionId> permissions,
-        EicFunction eicFunction)
+        EicFunction eicFunction,
+        Guid changedByIdentityId)
     {
         Id = id;
         Name = name;
@@ -49,6 +52,7 @@ public sealed class UserRole
         Description = description;
         Status = status;
         EicFunction = eicFunction;
+        ChangedByIdentityId = changedByIdentityId;
     }
 
     public UserRoleId Id { get; }
@@ -57,4 +61,5 @@ public sealed class UserRole
     public UserRoleStatus Status { get; set; }
     public IEnumerable<PermissionId> Permissions { get; set; }
     public EicFunction EicFunction { get; }
+    public Guid ChangedByIdentityId { get; set; }
 }

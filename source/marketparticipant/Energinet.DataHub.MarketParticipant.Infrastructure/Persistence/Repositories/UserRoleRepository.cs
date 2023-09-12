@@ -84,7 +84,8 @@ public sealed class UserRoleRepository : IUserRoleRepository
         {
             Name = userRole.Name,
             Description = userRole.Description,
-            Status = userRole.Status
+            Status = userRole.Status,
+            ChangedByIdentityId = userRole.ChangedByIdentityId
         };
 
         foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }))
@@ -111,6 +112,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRoleEntity.Name = userRoleUpdate.Name;
             userRoleEntity.Description = userRoleUpdate.Description;
             userRoleEntity.Status = userRoleUpdate.Status;
+            userRoleEntity.ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId;
 
             userRoleEntity.Permissions.Clear();
             var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity { Permission = x });
@@ -147,7 +149,8 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRole.Description ?? string.Empty,
             userRole.Status,
             userRole.Permissions.Select(p => p.Permission).ToList(),
-            userRole.EicFunctions.First().EicFunction);
+            userRole.EicFunctions.First().EicFunction,
+            userRole.ChangedByIdentityId);
     }
 
     private IQueryable<UserRoleEntity> BuildUserRoleQuery()

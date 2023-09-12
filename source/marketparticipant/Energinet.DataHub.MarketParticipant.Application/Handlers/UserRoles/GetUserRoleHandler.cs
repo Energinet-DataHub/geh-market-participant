@@ -61,6 +61,7 @@ public sealed class GetUserRoleHandler
             userRole.Description,
             userRole.EicFunction,
             userRole.Status,
+            userRole.ChangedByIdentityId,
             userRole.Permissions
                 .Where(x => permissionDetailsLookup.ContainsKey(x))
                 .Select(x => MapPermission(permissionDetailsLookup[x]))));

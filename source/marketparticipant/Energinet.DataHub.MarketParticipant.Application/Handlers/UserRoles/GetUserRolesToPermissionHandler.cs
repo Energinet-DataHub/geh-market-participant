@@ -47,7 +47,8 @@ public sealed class GetUserRolesToPermissionHandler
                 userRole.Name,
                 userRole.Description,
                 userRole.EicFunction,
-                userRole.Status));
+                userRole.Status,
+                userRole.ChangedByIdentityId));
         }
 
         return new GetUserRolesToPermissionResponse(userRoles);

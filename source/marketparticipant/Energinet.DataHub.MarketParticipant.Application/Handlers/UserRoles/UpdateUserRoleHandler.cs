@@ -67,6 +67,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         userRoleToUpdate.Description = request.UserRoleUpdateDto.Description;
         userRoleToUpdate.Status = request.UserRoleUpdateDto.Status;
         userRoleToUpdate.Permissions = request.UserRoleUpdateDto.Permissions.Select(p => (PermissionId)p);
+        userRoleToUpdate.ChangedByIdentityId = request.ChangedByUserId;
 
         await _userRoleRepository
             .UpdateAsync(userRoleToUpdate)
@@ -86,6 +87,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             userRole.Description,
             userRole.Status,
             userRole.Permissions,
-            userRole.EicFunction);
+            userRole.EicFunction,
+            userRole.ChangedByIdentityId);
     }
 }

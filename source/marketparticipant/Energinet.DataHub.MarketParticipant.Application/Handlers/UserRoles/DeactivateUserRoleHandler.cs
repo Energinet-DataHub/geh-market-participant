@@ -113,7 +113,8 @@ public sealed class DeactivateUserRoleHandler
             userRole.Description,
             userRole.Status,
             userRole.Permissions,
-            userRole.EicFunction);
+            userRole.EicFunction,
+            userRole.ChangedByIdentityId);
     }
 
     private async Task AuditRoleAssignmentAsync(
