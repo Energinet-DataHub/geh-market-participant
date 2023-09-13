@@ -18,7 +18,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
 public sealed record UserRoleAuditLogEntryDto(
     Guid UserRoleId,
-    Guid ChangedByUserId,
-    DateTimeOffset Timestamp,
-    UserRoleChangeType UserRoleChangeType,
-    string ChangeDescriptionJson);
+    Guid ChangedByIdentityId,
+    string Name,
+    string? Description,
+    UserRoleStatus Status,
+    UserRoleChangeType ChangeType,
+    DateTimeOffset Timestamp);

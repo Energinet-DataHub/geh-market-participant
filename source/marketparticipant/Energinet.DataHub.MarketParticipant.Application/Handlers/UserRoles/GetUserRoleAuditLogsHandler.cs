@@ -54,6 +54,7 @@ public sealed class GetUserRoleAuditLogsHandler
             auditLogEntry.Name,
             auditLogEntry.Description,
             auditLogEntry.Status,
+            auditLogEntry.ChangeType,
             auditLogEntry.Timestamp);
     }
 }

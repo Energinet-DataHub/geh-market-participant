@@ -34,37 +34,73 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<UserRoleAuditLogEntry>> GetAsync(UserRoleId userRoleId)
         {
-            var userRoleAssignmentLogs = _context.UserRoleAuditLogEntries
-                .Where(e => e.UserRoleId == userRoleId.Value)
-                .Select(log => new UserRoleAuditLogEntry(
-                    new UserRoleId(log.UserRoleId),
-                    new UserId(log.ChangedByUserId),
-                    log.Timestamp,
-                    (UserRoleChangeType)log.UserRoleChangeType,
-                    log.ChangeDescriptionJson));
+            var userRoleAssignmentLogs = await _context.UserRoles
+                .TemporalAll()
+                .Where(e => e.Id == userRoleId.Value)
+                .OrderBy(o => EF.Property<DateTime>(o, "PeriodStart"))
+                .Select(log =>
+                    new UserRoleAuditLogEntry(
+                        new UserRoleId(log.Id),
+                        log.ChangedByIdentityId,
+                        log.Name,
+                        log.Description,
+                        log.Status,
+                        UserRoleChangeType.Created,
+                        EF.Property<DateTime>(log, "PeriodStart")))
+                .ToListAsync().ConfigureAwait(false);
 
-            return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
+            var userRoleCurrentState = _context.UserRoles
+                .Where(u => u.Id == userRoleId.Value)
+                .Select(log =>
+                    new UserRoleAuditLogEntry(
+                        new UserRoleId(log.Id),
+                        log.ChangedByIdentityId,
+                        log.Name,
+                        log.Description,
+                        log.Status,
+                        UserRoleChangeType.Created,
+                        EF.Property<DateTime>(log, "PeriodStart")));
+
+            userRoleAssignmentLogs.Add(userRoleCurrentState.Single());
+
+            return BuildDiffLogEntries(userRoleAssignmentLogs);
         }
 
-        public Task InsertAuditLogEntriesAsync(IEnumerable<UserRoleAuditLogEntry> logEntries)
+        private static IEnumerable<UserRoleAuditLogEntry> BuildDiffLogEntries(IReadOnlyList<UserRoleAuditLogEntry> logEntitiesOrdered)
         {
-            ArgumentNullException.ThrowIfNull(logEntries);
-
-            foreach (var logEntry in logEntries)
+            for (var index = 0; index < logEntitiesOrdered.Count; index++)
             {
-                var entity = new UserRoleAuditLogEntryEntity
+                var currentHistoryLog = logEntitiesOrdered[index];
+                if (index == 0)
                 {
-                    UserRoleId = logEntry.UserRoleId.Value,
-                    Timestamp = logEntry.Timestamp,
-                    ChangedByUserId = logEntry.ChangedByUserId.Value,
-                    UserRoleChangeType = (int)logEntry.UserRoleChangeType,
-                    ChangeDescriptionJson = logEntry.ChangeDescriptionJson
-                };
+                    yield return CreateAuditLogEntry(currentHistoryLog, UserRoleChangeType.Created);
+                    continue;
+                }
 
-                _context.UserRoleAuditLogEntries.Add(entity);
+                var previousHistoryLog = logEntitiesOrdered[index - 1];
+
+                if (currentHistoryLog.Name != previousHistoryLog.Name)
+                {
+                    yield return CreateAuditLogEntry(currentHistoryLog, UserRoleChangeType.NameChange);
+                }
+
+                if (currentHistoryLog.Description != previousHistoryLog.Description)
+                {
+                    yield return CreateAuditLogEntry(currentHistoryLog, UserRoleChangeType.DescriptionChange);
+                }
+
+                if (currentHistoryLog.Status != previousHistoryLog.Status)
+                {
+                    yield return CreateAuditLogEntry(currentHistoryLog, UserRoleChangeType.StatusChange);
+                }
             }
+        }
 
-            return _context.SaveChangesAsync();
+        private static UserRoleAuditLogEntry CreateAuditLogEntry(
+            UserRoleAuditLogEntry userRoleEntity,
+            UserRoleChangeType changeType)
+        {
+            return userRoleEntity with { ChangeType = changeType };
         }
     }
 }
