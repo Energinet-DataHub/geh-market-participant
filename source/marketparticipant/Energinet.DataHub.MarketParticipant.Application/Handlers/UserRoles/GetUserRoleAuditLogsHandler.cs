@@ -50,9 +50,10 @@ public sealed class GetUserRoleAuditLogsHandler
     {
         return new UserRoleAuditLogEntryDto(
             auditLogEntry.UserRoleId.Value,
-            auditLogEntry.ChangedByUserId.Value,
-            auditLogEntry.Timestamp,
-            auditLogEntry.UserRoleChangeType,
-            auditLogEntry.ChangeDescriptionJson);
+            auditLogEntry.ChangedByIdentityId,
+            auditLogEntry.Name,
+            auditLogEntry.Description,
+            auditLogEntry.Status,
+            auditLogEntry.Timestamp);
     }
 }

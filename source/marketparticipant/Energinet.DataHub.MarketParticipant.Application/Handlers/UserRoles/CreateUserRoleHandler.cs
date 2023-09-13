@@ -30,19 +30,13 @@ public sealed class CreateUserRoleHandler
     : IRequestHandler<CreateUserRoleCommand, CreateUserRoleResponse>
 {
     private readonly IUserRoleRepository _userRoleRepository;
-    private readonly IUserRoleAuditLogService _userRoleAuditLogService;
-    private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
     private readonly IEnsureUserRolePermissionsService _ensureUserRolePermissionsService;
 
     public CreateUserRoleHandler(
         IUserRoleRepository userRoleRepository,
-        IUserRoleAuditLogService userRoleAuditLogService,
-        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository,
         IEnsureUserRolePermissionsService userRoleHelperService)
     {
         _userRoleRepository = userRoleRepository;
-        _userRoleAuditLogService = userRoleAuditLogService;
-        _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
         _ensureUserRolePermissionsService = userRoleHelperService;
     }
 
@@ -72,9 +66,6 @@ public sealed class CreateUserRoleHandler
         var createdUserRoleId = await _userRoleRepository
             .AddAsync(userRole)
             .ConfigureAwait(false);
-
-        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleCreated(new UserId(request.EditingUserId), createdUserRoleId, userRole);
-        await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
 
         return new CreateUserRoleResponse(createdUserRoleId.Value);
     }
