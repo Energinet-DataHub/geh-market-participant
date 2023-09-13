@@ -52,7 +52,7 @@ markpartDomain = group "Market Participant" {
             tags "Microsoft Azure - Function Apps" "Titans"
 
             # Common relationships
-            this -> dh3.sharedSendGrid "Sends invitation mail" "SendGrid/https"
+            this -> dh3.sharedExternalSendGrid "Sends invitation mail" "SendGrid/https"
 
             # Domain relationships
             this -> markpartDb "Reads data regarding newly invited users." "EF Core"
