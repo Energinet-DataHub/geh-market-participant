@@ -24,13 +24,7 @@ public sealed class UserRoleEntityConfiguration : IEntityTypeConfiguration<UserR
     public void Configure(EntityTypeBuilder<UserRoleEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-        builder.ToTable("UserRole", u =>
-            u.IsTemporal(
-                b =>
-                {
-                    b.HasPeriodStart("ValidFrom");
-                    b.HasPeriodEnd("ValidTo");
-                }));
+        builder.ToTable("UserRole", u => u.IsTemporal());
         builder.Property(userRole => userRole.Id).ValueGeneratedOnAdd();
         builder
             .HasMany(userRole => userRole.Permissions)
