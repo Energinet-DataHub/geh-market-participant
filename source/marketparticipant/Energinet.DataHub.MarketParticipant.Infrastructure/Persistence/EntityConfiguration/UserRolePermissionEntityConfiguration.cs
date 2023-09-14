@@ -24,7 +24,7 @@ public sealed class UserRolePermissionEntityConfiguration : IEntityTypeConfigura
     public void Configure(EntityTypeBuilder<UserRolePermissionEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-        builder.ToTable("UserRolePermission");
+        builder.ToTable("UserRolePermission", t => t.IsTemporal());
         builder.Property(x => x.Permission).HasColumnName("PermissionId");
         builder.Property(x => x.UserRoleId);
         builder.HasKey(x => new { x.Permission, x.UserRoleId });

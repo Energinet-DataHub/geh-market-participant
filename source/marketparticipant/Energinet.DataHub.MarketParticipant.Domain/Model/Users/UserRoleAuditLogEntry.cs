@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 using System;
+using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -20,6 +22,7 @@ public sealed record UserRoleAuditLogEntry(
     Guid ChangedByIdentityId,
     string Name,
     string? Description,
+    IEnumerable<PermissionId> Permissions,
     UserRoleStatus Status,
     UserRoleChangeType ChangeType,
     DateTimeOffset Timestamp);

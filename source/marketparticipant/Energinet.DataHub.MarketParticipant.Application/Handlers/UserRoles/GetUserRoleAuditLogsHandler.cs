@@ -53,6 +53,7 @@ public sealed class GetUserRoleAuditLogsHandler
             auditLogEntry.ChangedByIdentityId,
             auditLogEntry.Name,
             auditLogEntry.Description,
+            auditLogEntry.Permissions,
             auditLogEntry.Status,
             auditLogEntry.ChangeType,
             auditLogEntry.Timestamp);
