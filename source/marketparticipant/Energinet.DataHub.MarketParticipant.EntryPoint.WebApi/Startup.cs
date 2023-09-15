@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
@@ -71,6 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseRouting();
             app.UseCommonExceptionHandling();
 
+            app.UseLoggingScope();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseUserMiddleware<FrontendUser>();
@@ -149,6 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 c.AddSecurityRequirement(securityRequirement);
             });
 
+            services.AddHttpLoggingScope("mark-part");
             services.AddTransient<IMiddlewareFactory>(_ => new SimpleInjectorMiddlewareFactory(Container));
         }
 
