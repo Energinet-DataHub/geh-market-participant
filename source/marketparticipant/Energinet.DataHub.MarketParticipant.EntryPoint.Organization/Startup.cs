@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Common;
@@ -55,6 +56,7 @@ internal sealed class Startup : StartupBase
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
         services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
+        services.AddFunctionLoggingScope("mark-part");
 
         AddHealthChecks(configuration, services);
     }
