@@ -193,7 +193,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         UserRoleChangeType.PermissionsChange,
                         g.Key));
 
-            var prevPermissions = createdWithPermissions?.ToList() ?? new List<PermissionId>();
+            /*var prevPermissions = createdWithPermissions?.ToList() ?? new List<PermissionId>();
 
             var tempList = new List<UserRoleAuditLogEntry>();
             foreach (var permissionChange in userRolePermissionChangesDic)
@@ -210,15 +210,15 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     UserRoleChangeType.PermissionsChange,
                     permissionChange.Key));
                 prevPermissions = permissionChange.Value.Permissions.ToList();
-            }
+            }*/
 
-            /*var permissionChanges = userRolePermissionChangesDic.Values
-                .OrderBy(d => d.Timestamp)
-                .ToList();*/
-
-            var permissionChanges = tempList
+            var permissionChanges = userRolePermissionChangesDic.Values
                 .OrderBy(d => d.Timestamp)
                 .ToList();
+
+            /*var permissionChanges = tempList
+                .OrderBy(d => d.Timestamp)
+                .ToList();*/
 
             if (createdPermissionState != null)
             {
