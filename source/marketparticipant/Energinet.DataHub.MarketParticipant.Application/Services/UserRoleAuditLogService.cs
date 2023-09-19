@@ -78,50 +78,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
         {
             return new UserRoleAuditLogEntry(
                 userRoleId,
-                currentUserId,
-                DateTimeOffset.UtcNow,
+                currentUserId.Value,
+                userRoleUpdate.Name,
+                userRoleUpdate.Description,
+                userRoleUpdate.Permissions,
+                userRoleUpdate.EicFunction,
+                userRoleUpdate.Status,
                 changeType,
-                BuildChangeDescriptionJson(
-                    changeType,
-                    userRoleUpdate));
-        }
-
-        private static string BuildChangeDescriptionJson(
-            UserRoleChangeType userRoleChangeType,
-            UserRole userRoleUpdate)
-        {
-            return userRoleChangeType switch
-            {
-                UserRoleChangeType.Created => SerializeObject(MapToUserRoleAuditLogSerialized(userRoleUpdate)),
-                UserRoleChangeType.NameChange => SerializeObject(new UserRoleAuditLogSerialized { Name = userRoleUpdate.Name }),
-                UserRoleChangeType.DescriptionChange => SerializeObject(new UserRoleAuditLogSerialized { Description = userRoleUpdate.Description }),
-                UserRoleChangeType.EicFunctionChange => SerializeObject(new UserRoleAuditLogSerialized { EicFunction = userRoleUpdate.EicFunction }),
-                UserRoleChangeType.StatusChange => SerializeObject(new UserRoleAuditLogSerialized { Status = userRoleUpdate.Status }),
-                UserRoleChangeType.PermissionsChange => SerializeObject(new UserRoleAuditLogSerialized { Permissions = userRoleUpdate.Permissions.Select(e => e.ToString()) }),
-                _ => throw new ArgumentOutOfRangeException(nameof(userRoleChangeType))
-            };
-        }
-
-        private static string SerializeObject(UserRoleAuditLogSerialized objectToSerialize)
-        {
-            return JsonSerializer.Serialize(
-                objectToSerialize,
-                new JsonSerializerOptions
-                {
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                });
-        }
-
-        private static UserRoleAuditLogSerialized MapToUserRoleAuditLogSerialized(UserRole from)
-        {
-            return new UserRoleAuditLogSerialized()
-            {
-                Name = from.Name,
-                Description = from.Description,
-                EicFunction = from.EicFunction,
-                Status = from.Status,
-                Permissions = from.Permissions.Select(e => e.ToString())
-            };
+                DateTimeOffset.UtcNow);
         }
     }
 }

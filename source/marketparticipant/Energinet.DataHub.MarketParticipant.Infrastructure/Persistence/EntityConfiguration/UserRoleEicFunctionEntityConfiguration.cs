@@ -24,7 +24,7 @@ public sealed class UserRoleEicFunctionEntityConfiguration : IEntityTypeConfigur
     public void Configure(EntityTypeBuilder<UserRoleEicFunctionEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-        builder.ToTable("UserRoleEicFunction");
+        builder.ToTable("UserRoleEicFunction", t => t.IsTemporal());
         builder.Property(x => x.UserRoleId);
         builder.HasKey(x => new { x.EicFunction, x.UserRoleId });
     }

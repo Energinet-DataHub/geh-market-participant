@@ -115,7 +115,12 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRoleEntity.ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId;
 
             userRoleEntity.Permissions.Clear();
-            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity { Permission = x });
+            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity
+            {
+                Permission = x,
+                ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId
+            });
+
             foreach (var permissionEntity in permissionsToAdd)
             {
                 userRoleEntity.Permissions.Add(permissionEntity);

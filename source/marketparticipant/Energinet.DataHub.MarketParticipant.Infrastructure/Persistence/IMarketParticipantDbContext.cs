@@ -92,7 +92,12 @@ public interface IMarketParticipantDbContext
     /// <summary>
     ///     Represent access to the UserRoles permissions relation database table
     /// </summary>
-    DbSet<UserRolePermissionEntity> UserRolePermissionsEntries { get; }
+    DbSet<UserRolePermissionEntity> UserRolePermissionEntries { get; }
+
+    /// <summary>
+    ///     Represent access to the UserRoles eic function relation database table
+    /// </summary>
+    DbSet<UserRoleEicFunctionEntity> UserRoleEicFunctionEntries { get; }
 
     /// <summary>
     ///     Represent access to the UserRoleAssignmentAuditLogEntry database table

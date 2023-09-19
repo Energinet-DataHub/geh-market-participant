@@ -13,6 +13,7 @@
 // limitations under the License.
 using System;
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
@@ -24,6 +25,7 @@ public sealed record UserRoleAuditLogEntryDto(
     string Name,
     string? Description,
     IEnumerable<PermissionId> Permissions,
+    EicFunction? EicFunction,
     UserRoleStatus Status,
     UserRoleChangeType ChangeType,
     DateTimeOffset Timestamp);

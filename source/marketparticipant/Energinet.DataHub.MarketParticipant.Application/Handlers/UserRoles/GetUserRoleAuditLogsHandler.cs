@@ -54,6 +54,7 @@ public sealed class GetUserRoleAuditLogsHandler
             auditLogEntry.Name,
             auditLogEntry.Description,
             auditLogEntry.Permissions,
+            auditLogEntry.EicFunction,
             auditLogEntry.Status,
             auditLogEntry.ChangeType,
             auditLogEntry.Timestamp);

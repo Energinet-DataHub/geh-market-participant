@@ -23,6 +23,7 @@ public sealed record UserRoleAuditLogEntry(
     string Name,
     string? Description,
     IEnumerable<PermissionId> Permissions,
+    EicFunction? EicFunction,
     UserRoleStatus Status,
     UserRoleChangeType ChangeType,
     DateTimeOffset Timestamp);
