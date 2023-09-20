@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
             var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
                 .UseSqlServer(ConnectionString);
 
-            return new MarketParticipantDbContext(optionsBuilder.Options);
+            return new MarketParticipantDbContext(optionsBuilder.Options, KnownAuditLogIdentityProvider.TestFramework);
         }
 
         /// <summary>

@@ -15,16 +15,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
-using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Domain.Model.GridAreaAuditLogEntryField;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 {
@@ -32,19 +28,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
     {
         private readonly IGridAreaRepository _gridAreaRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-        private readonly IGridAreaAuditLogEntryRepository _gridAreaAuditLogEntryRepository;
-        private readonly IUserContext<FrontendUser> _userContext;
 
-        public UpdateGridAreaHandler(
-            IGridAreaRepository gridAreaRepository,
-            IUnitOfWorkProvider unitOfWorkProvider,
-            IGridAreaAuditLogEntryRepository gridAreaAuditLogEntryRepository,
-            IUserContext<FrontendUser> userContext)
+        public UpdateGridAreaHandler(IGridAreaRepository gridAreaRepository, IUnitOfWorkProvider unitOfWorkProvider)
         {
             _gridAreaRepository = gridAreaRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
-            _gridAreaAuditLogEntryRepository = gridAreaAuditLogEntryRepository;
-            _userContext = userContext;
         }
 
         public async Task Handle(UpdateGridAreaCommand request, CancellationToken cancellationToken)
@@ -76,23 +64,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                         gridArea.ValidTo);
 
                     await _gridAreaRepository.AddOrUpdateAsync(updatedGridArea).ConfigureAwait(false);
-                    await CreateLogEntryAsync(gridArea.Id, GridAreaAuditLogEntryField.Name, gridArea.Name.Value, updatedGridArea.Name.Value).ConfigureAwait(false);
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
             }
-        }
-
-        private async Task CreateLogEntryAsync(GridAreaId gridAreaId, GridAreaAuditLogEntryField field, string oldValue, string newValue)
-        {
-            await _gridAreaAuditLogEntryRepository.InsertAsync(
-                new GridAreaAuditLogEntry(
-                    DateTimeOffset.UtcNow,
-                    new UserId(_userContext.CurrentUser.UserId),
-                    field,
-                    oldValue,
-                    newValue,
-                    gridAreaId)).ConfigureAwait(false);
         }
     }
 }

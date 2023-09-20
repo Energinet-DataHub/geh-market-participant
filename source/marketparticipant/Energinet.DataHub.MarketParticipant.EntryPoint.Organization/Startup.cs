@@ -38,6 +38,8 @@ internal sealed class Startup : StartupBase
 {
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
+        services.AddScoped<IAuditLogIdentityProvider>(_ => KnownAuditLogIdentityProvider.OrganizationBackgroundService);
+
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
         services.AddScoped<UserInvitationExpiredTimerTrigger>();

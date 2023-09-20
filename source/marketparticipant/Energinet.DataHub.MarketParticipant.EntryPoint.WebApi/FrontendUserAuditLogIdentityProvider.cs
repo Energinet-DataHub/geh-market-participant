@@ -13,18 +13,20 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed class GridAreaEntity
+public sealed class FrontendUserAuditLogIdentityProvider : IAuditLogIdentityProvider
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string Code { get; set; } = null!;
-    public PriceAreaCode PriceAreaCode { get; set; }
-    public DateTimeOffset ValidFrom { get; set; }
-    public DateTimeOffset? ValidTo { get; set; }
-    public DateTimeOffset? FullFlexDate { get; set; }
-    public Guid ChangedByIdentityId { get; set; }
+    private readonly IUserContext<FrontendUser> _userContext;
+
+    public FrontendUserAuditLogIdentityProvider(IUserContext<FrontendUser> userContext)
+    {
+        _userContext = userContext;
+    }
+
+    public Guid IdentityId => _userContext.CurrentUser.UserId;
 }

@@ -13,17 +13,18 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
-public sealed class GridAreaAuditLogEntryEntity
+public sealed class KnownAuditLogIdentityProvider : IAuditLogIdentityProvider
 {
-    public int Id { get; set; }
-    public Guid UserId { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
-    public GridAreaAuditLogEntryField Field { get; set; }
-    public string OldValue { get; set; } = null!;
-    public string NewValue { get; set; } = null!;
-    public Guid GridAreaId { get; set; }
+    public KnownAuditLogIdentityProvider(Guid identityId)
+    {
+        IdentityId = identityId;
+    }
+
+    public static KnownAuditLogIdentityProvider TestFramework { get; } = new(Guid.Parse("AAAAAAAA-BBBB-CCCC-DDDD-000000000000"));
+    public static KnownAuditLogIdentityProvider OrganizationBackgroundService { get; } = new(Guid.Parse("00000000-1111-0000-0001-000000000000"));
+
+    public Guid IdentityId { get; }
 }

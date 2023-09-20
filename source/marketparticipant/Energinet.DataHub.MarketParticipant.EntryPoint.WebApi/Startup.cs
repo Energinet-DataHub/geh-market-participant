@@ -125,6 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             services.AddPermissionAuthorization();
             services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+            services.AddScoped<IAuditLogIdentityProvider, FrontendUserAuditLogIdentityProvider>();
 
             // Health check
             services
