@@ -141,8 +141,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-
+        
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
@@ -168,6 +167,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
+        await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });

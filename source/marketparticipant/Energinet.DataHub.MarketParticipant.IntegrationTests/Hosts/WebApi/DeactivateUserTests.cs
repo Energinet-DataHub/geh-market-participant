@@ -148,7 +148,6 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
@@ -179,6 +178,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
             .Setup(x => x.GetAsync(new ExternalUserId(userEntity.ExternalId)))
             .ReturnsAsync(userIdentity);
 
+        await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new DeactivateUserCommand(userEntity.Id);
 
