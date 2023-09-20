@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -41,7 +42,7 @@ public sealed class GetUserRolesIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
@@ -61,7 +62,7 @@ public sealed class GetUserRolesIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _fixture.PrepareActorAsync();
 
@@ -86,7 +87,7 @@ public sealed class GetUserRolesIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor1 = await _fixture.PrepareActorAsync();
         var actor2 = await _fixture.PrepareActorAsync();

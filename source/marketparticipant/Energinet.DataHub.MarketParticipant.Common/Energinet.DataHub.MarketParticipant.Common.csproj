@@ -26,10 +26,8 @@ limitations under the License.
     <PackageReference Include="Energinet.DataHub.Core.App.Common" Version="7.6.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.19.0" />
     <PackageReference Include="FluentValidation" Version="11.7.1" />
-    <PackageReference Include="MediatR" Version="11.1.0" />
+    <PackageReference Include="MediatR" Version="12.1.1" />
     <PackageReference Include="SendGrid.Extensions.DependencyInjection" Version="1.0.1" />
-    <PackageReference Include="SimpleInjector" Version="5.4.1" />
-    <PackageReference Include="SimpleInjector.Integration.GenericHost" Version="5.4.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Energinet.DataHub.MarketParticipant.Application\Energinet.DataHub.MarketParticipant.Application.csproj" />

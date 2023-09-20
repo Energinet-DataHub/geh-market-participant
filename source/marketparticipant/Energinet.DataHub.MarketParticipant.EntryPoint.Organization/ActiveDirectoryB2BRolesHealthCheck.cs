@@ -18,7 +18,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 
@@ -26,10 +25,9 @@ public sealed class ActiveDirectoryB2BRolesHealthCheck : IHealthCheck
 {
     private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
 
-    public ActiveDirectoryB2BRolesHealthCheck(Container container)
+    public ActiveDirectoryB2BRolesHealthCheck(IActiveDirectoryB2BRolesProvider activeDirectoryB2BRolesProvider)
     {
-        ArgumentNullException.ThrowIfNull(container);
-        _activeDirectoryB2BRolesProvider = container.GetInstance<IActiveDirectoryB2BRolesProvider>();
+        _activeDirectoryB2BRolesProvider = activeDirectoryB2BRolesProvider;
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)

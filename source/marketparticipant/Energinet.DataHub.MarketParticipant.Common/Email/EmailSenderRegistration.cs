@@ -14,28 +14,26 @@
 
 using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SendGrid;
-using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
+namespace Energinet.DataHub.MarketParticipant.Common.Email;
 
 internal static class EmailSenderRegistration
 {
-    public static void AddSendGridEmailSenderClient(this Container container)
+    public static void AddSendGridEmailSenderClient(this IServiceCollection services)
     {
-        container.Register<IEmailSender>(
-            () =>
-            {
-                var configuration = container.GetInstance<InviteConfig>();
-                var senGridClient = container.GetInstance<ISendGridClient>();
-                var logger = container.GetInstance<ILogger<SendGridEmailSender>>();
+        services.AddScoped<IEmailSender>(provider =>
+        {
+            var configuration = provider.GetRequiredService<InviteConfig>();
+            var senGridClient = provider.GetRequiredService<ISendGridClient>();
+            var logger = provider.GetRequiredService<ILogger<SendGridEmailSender>>();
 
-                return new SendGridEmailSender(
-                    configuration,
-                    senGridClient,
-                    logger);
-            },
-            Lifestyle.Scoped);
+            return new SendGridEmailSender(
+                configuration,
+                senGridClient,
+                logger);
+        });
     }
 }

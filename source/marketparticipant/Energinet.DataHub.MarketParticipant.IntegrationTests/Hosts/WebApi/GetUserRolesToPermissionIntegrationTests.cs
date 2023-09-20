@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -44,7 +45,7 @@ public sealed class GetUserRolesToPermissionIntegrationTests
 
         var userRole = await _fixture.PrepareUserRoleAsync();
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var command = new GetUserRolesToPermissionCommand((int)PermissionId.UsersView);
 
@@ -64,7 +65,7 @@ public sealed class GetUserRolesToPermissionIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new GetUserRolesToPermissionCommand((int)PermissionId.UserRolesManage);
 
         // Act

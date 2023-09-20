@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -44,7 +45,7 @@ public sealed class InitiateMitIdSignupHandlerTests
 
         var user = await _fixture.PrepareUserAsync();
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new InitiateMitIdSignupCommand(user.Id);
 
         // act

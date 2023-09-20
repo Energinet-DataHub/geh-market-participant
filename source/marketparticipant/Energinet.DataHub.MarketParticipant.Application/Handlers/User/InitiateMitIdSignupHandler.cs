@@ -32,7 +32,7 @@ public sealed class InitiateMitIdSignupHandler : IRequestHandler<InitiateMitIdSi
         _userRepository = userRepository;
     }
 
-    public async Task<Unit> Handle(InitiateMitIdSignupCommand request, CancellationToken cancellationToken)
+    public async Task Handle(InitiateMitIdSignupCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -41,7 +41,5 @@ public sealed class InitiateMitIdSignupHandler : IRequestHandler<InitiateMitIdSi
 
         user.InitiateMitIdSignup();
         await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
-
-        return Unit.Value;
     }
 }

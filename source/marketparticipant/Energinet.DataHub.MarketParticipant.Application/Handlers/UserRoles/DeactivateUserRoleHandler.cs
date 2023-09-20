@@ -28,8 +28,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class DeactivateUserRoleHandler
-    : IRequestHandler<DeactivateUserRoleCommand>
+public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRoleCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
@@ -57,9 +56,7 @@ public sealed class DeactivateUserRoleHandler
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(
-        DeactivateUserRoleCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(DeactivateUserRoleCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var userRoleId = new UserRoleId(request.UserRoleId);
@@ -101,8 +98,6 @@ public sealed class DeactivateUserRoleHandler
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
-
-        return Unit.Value;
     }
 
     private static UserRole CopyUserRoleForAuditLog(UserRole userRole)

@@ -65,11 +65,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         {
             var deleteContactCommand = new DeleteActorContactCommand(actorId, contactId);
 
-            var response = await _mediator
+            await _mediator
                 .Send(deleteContactCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response);
+            return Ok();
         }
     }
 }

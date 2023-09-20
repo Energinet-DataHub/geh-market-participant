@@ -17,25 +17,24 @@ using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
 
 internal static class AzureAdConfigurationRegistration
 {
-    public static void AddAzureAdConfiguration(this Container container)
+    public static void AddAzureAdConfiguration(this IServiceCollection services)
     {
-        container.RegisterSingleton(() =>
+        services.AddSingleton(provider =>
         {
-            var configuration = container.GetService<IConfiguration>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
             var servicePrincipalObjectId = configuration.GetSetting(Settings.B2CBackendServicePrincipalNameObjectId);
             var backendAppId = configuration.GetSetting(Settings.B2CBackendId);
             return new AzureAdConfig(servicePrincipalObjectId, backendAppId);
         });
 
-        container.RegisterSingleton(() =>
+        services.AddSingleton(provider =>
         {
-            var configuration = container.GetService<IConfiguration>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
             var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
             return new AzureIdentityConfig(azureB2CTenant);
         });
