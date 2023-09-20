@@ -17,20 +17,21 @@ using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleInjector;
 
-namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
+namespace Energinet.DataHub.MarketParticipant.Common.Email;
 
 internal static class InviteConfigRegistration
 {
-    public static void AddInviteConfigRegistration(this Container container)
+    public static void AddInviteConfigRegistration(this IServiceCollection services)
     {
-        container.RegisterSingleton(() =>
+        services.AddSingleton(provider =>
         {
-            var configuration = container.GetService<IConfiguration>();
+            var configuration = provider.GetRequiredService<IConfiguration>();
+
             var from = configuration.GetSetting(Settings.UserInviteFromEmail);
             var bcc = configuration.GetSetting(Settings.UserInviteBccEmail);
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
+
             return new InviteConfig(from, bcc, userFlow);
         });
     }

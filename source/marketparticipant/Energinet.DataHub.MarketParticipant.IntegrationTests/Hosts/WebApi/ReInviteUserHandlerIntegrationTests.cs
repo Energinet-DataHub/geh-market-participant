@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -49,7 +50,7 @@ public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "a.datahub.dk"),
@@ -75,12 +76,12 @@ public sealed class ReInviteUserHandlerIntegrationTests : IAsyncLifetime
         await mediator.Send(command);
 
         // Assert
-        var userRepository = scope.GetInstance<IUserRepository>();
+        var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
         var createdUser = await userRepository.GetAsync(new UserId(targetUser.Id));
         Assert.NotNull(createdUser);
         Assert.True(createdUser.InvitationExpiresAt > DateTime.UtcNow);
 
-        var userInviteAuditLogEntryRepository = scope.GetInstance<IUserInviteAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserInviteAuditLogEntryRepository>();
         var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
     }

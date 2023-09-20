@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -45,7 +46,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var userExternalId = Guid.NewGuid();
 
@@ -65,7 +66,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -85,7 +86,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync();
@@ -110,7 +111,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         // Act
         var perms = await userRepository
@@ -127,7 +128,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -146,7 +147,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
@@ -177,7 +178,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
@@ -205,7 +206,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
@@ -235,7 +236,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
@@ -270,7 +271,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor1 = await _fixture.PrepareActorAsync(
@@ -319,7 +320,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
@@ -359,7 +360,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var user = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync(
@@ -392,7 +393,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
@@ -423,7 +424,7 @@ public sealed class UserQueryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRepository = new UserQueryRepository(context, scope.GetInstance<IPermissionRepository>());
+        var userRepository = new UserQueryRepository(context, scope.ServiceProvider.GetRequiredService<IPermissionRepository>());
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,

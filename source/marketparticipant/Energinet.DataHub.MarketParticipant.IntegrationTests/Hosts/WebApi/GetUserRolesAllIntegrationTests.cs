@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -39,7 +40,7 @@ public sealed class GetUserRolesAllIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Name = "Role1"));
         var userRole2 = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Name = "Role2"));

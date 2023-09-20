@@ -47,11 +47,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
             _userContext = userContext;
         }
 
-        public async Task<Unit> Handle(UpdateGridAreaCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateGridAreaCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            var uow = await _unitOfWorkProvider.NewUnitOfWorkAsync().ConfigureAwait(false);
+            var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
 
             await using (uow.ConfigureAwait(false))
             {
@@ -78,8 +80,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                 }
 
                 await uow.CommitAsync().ConfigureAwait(false);
-
-                return Unit.Value;
             }
         }
 

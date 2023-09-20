@@ -52,11 +52,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         {
             var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
 
-            var response = await _mediator
+            await _mediator
                 .Send(updateGridAreaCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response);
+            return Ok();
         }
 
         [HttpGet]

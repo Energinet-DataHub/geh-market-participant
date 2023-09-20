@@ -43,9 +43,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(
-        UpdateUserRoleCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -74,8 +72,6 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
 
         var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.ChangedByUserId), userRoleInitStateForAuditLog, userRoleToUpdate);
         await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
-
-        return Unit.Value;
     }
 
     private static UserRole CopyUserRoleForAuditLog(UserRole userRole)

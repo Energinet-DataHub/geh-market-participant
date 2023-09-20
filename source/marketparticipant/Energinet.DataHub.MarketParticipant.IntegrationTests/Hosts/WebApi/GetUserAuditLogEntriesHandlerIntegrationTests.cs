@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -46,7 +47,7 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
 
         var user = await _fixture.PrepareUserAsync();
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new GetUserAuditLogsCommand(user.Id);
 
         // Act
@@ -61,16 +62,16 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var frontendUser = await _fixture.PrepareUserAsync();
-        scope.Container.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync();
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Add some entries to the audit log.
         {

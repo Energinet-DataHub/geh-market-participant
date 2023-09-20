@@ -38,7 +38,7 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
         _logger = logger;
     }
 
-    public async Task<Unit> Handle(UserInvitationExpiredCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UserInvitationExpiredCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -49,7 +49,5 @@ public sealed class UserInvitationExpiredHandler : IRequestHandler<UserInvitatio
             await _userIdentityRepository.DisableUserAccountAsync(user.ExternalId).ConfigureAwait(false);
             _logger.LogInformation("User identity disabled for user with external id {ExternalId}", user.ExternalId);
         }
-
-        return Unit.Value;
     }
 }

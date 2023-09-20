@@ -20,8 +20,9 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
-using SimpleInjector;
 using Xunit;
 using Xunit.Categories;
 
@@ -43,7 +44,6 @@ public sealed class UserInvitationExpiredIntegrationTests
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var user1ExpiredSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(1));
         var user1Expired = await _fixture.PrepareUserAsync(user1ExpiredSetup);
@@ -52,12 +52,14 @@ public sealed class UserInvitationExpiredIntegrationTests
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
 
-        scope.Container!.Register(() => userIdentityRepository.Object, Lifestyle.Scoped);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
+        await using var scope = host.BeginScope();
 
         var command = new UserInvitationExpiredCommand();
 
         // Act
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         await mediator.Send(command);
 
         // Assert
@@ -70,7 +72,6 @@ public sealed class UserInvitationExpiredIntegrationTests
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var user1ExpiredSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(-1));
         var user1Expired = await _fixture.PrepareUserAsync(user1ExpiredSetup);
@@ -79,12 +80,14 @@ public sealed class UserInvitationExpiredIntegrationTests
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
 
-        scope.Container!.Register(() => userIdentityRepository.Object, Lifestyle.Scoped);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
+        await using var scope = host.BeginScope();
 
         var command = new UserInvitationExpiredCommand();
 
         // Act
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         await mediator.Send(command);
 
         // Assert
