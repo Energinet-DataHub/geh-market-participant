@@ -12,82 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application;
 using Energinet.DataHub.MarketParticipant.Common.ActiveDirectory;
-using Energinet.DataHub.MarketParticipant.Common.MediatR;
-using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
-using Microsoft.Azure.Functions.Worker;
+using Energinet.DataHub.MarketParticipant.Common.Email;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common
 {
-    public abstract class StartupBase : IAsyncDisposable
+    public abstract class StartupBase
     {
-        protected StartupBase()
-        {
-            Container = new Container();
-        }
-
-        public Container Container { get; }
-
-        public async ValueTask DisposeAsync()
-        {
-            await DisposeAsyncCore().ConfigureAwait(false);
-            GC.SuppressFinalize(this);
-        }
-
         public void Initialize(IConfiguration configuration, IServiceCollection services)
         {
-            services.AddDbContexts(Container);
+            services.AddDbContexts();
             services.AddLogging();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehaviour<,>));
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssemblyContaining<ApplicationAssemblyReference>();
+            });
 
             Configure(configuration, services);
-            ConfigureSimpleInjector(services);
 
-            Container.AddApplicationServices();
-            Container.AddInfrastructureServices();
-            Container.AddDbContextInterfaces();
-            Container.AddRepositories();
-            Container.AddDomainServices();
-            Container.AddUnitOfWorkProvider();
-            Container.AddAzureAdConfiguration();
-            Container.AddGraphServiceClient();
-            Container.AddActiveDirectoryRoles();
-
-            // Add MediatR
-            Container.BuildMediator(new[] { typeof(ApplicationAssemblyReference).Assembly });
-
-            Configure(configuration, Container);
-        }
-
-#pragma warning disable VSTHRD200
-        protected virtual ValueTask DisposeAsyncCore()
-#pragma warning restore VSTHRD200
-        {
-            return Container.DisposeAsync();
+            services.AddApplicationServices();
+            services.AddInfrastructureServices();
+            services.AddRepositories();
+            services.AddDomainServices();
+            services.AddUnitOfWorkProvider();
+            services.AddAzureAdConfiguration();
+            services.AddGraphServiceClient();
+            services.AddActiveDirectoryRoles();
+            services.AddSendGridEmailSenderClient();
+            services.AddInviteConfigRegistration();
         }
 
         protected abstract void Configure(IConfiguration configuration, IServiceCollection services);
-        protected abstract void Configure(IConfiguration configuration, Container container);
-
-        protected virtual void ConfigureSimpleInjector(IServiceCollection services)
-        {
-            var descriptor = new ServiceDescriptor(
-                typeof(IFunctionActivator),
-                typeof(SimpleInjectorActivator),
-                ServiceLifetime.Singleton);
-
-            services.Replace(descriptor);
-            services.AddSimpleInjector(Container, x =>
-            {
-                x.DisposeContainerWithServiceProvider = false;
-                x.AddLogging();
-            });
-        }
     }
 }

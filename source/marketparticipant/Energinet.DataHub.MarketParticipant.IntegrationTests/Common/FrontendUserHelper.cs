@@ -15,14 +15,14 @@
 using System;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class FrontendUserHelper
 {
-    public static void MockFrontendUser(this Container? container, Guid frontendUserId)
+    public static void MockFrontendUser(this IServiceCollection services, Guid frontendUserId)
     {
         var frontendUser = new FrontendUser(
             frontendUserId,
@@ -35,6 +35,6 @@ internal static class FrontendUserHelper
             .Setup(userContext => userContext.CurrentUser)
             .Returns(frontendUser);
 
-        container?.Register(() => userContextMock.Object);
+        services.AddScoped(_ => userContextMock.Object);
     }
 }

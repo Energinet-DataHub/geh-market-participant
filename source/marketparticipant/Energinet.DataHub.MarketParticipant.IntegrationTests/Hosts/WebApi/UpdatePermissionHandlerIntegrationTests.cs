@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -42,12 +43,12 @@ public sealed class UpdatePermissionHandlerIntegrationTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var frontendUser = await _fixture.PrepareUserAsync();
-        scope.Container.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRoleWithPermission = await _fixture.PrepareUserRoleAsync();
         var newPermissionDescription = Guid.NewGuid().ToString();
@@ -72,13 +73,13 @@ public sealed class UpdatePermissionHandlerIntegrationTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var frontendUser = await _fixture.PrepareUserAsync();
-        scope.Container.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var permissionRepo = new PermissionAuditLogEntryRepository(context);
 
         var userRoleWithPermission = await _fixture.PrepareUserRoleAsync();

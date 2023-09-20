@@ -15,8 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
@@ -24,8 +22,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using SimpleInjector;
-using SimpleInjector.Lifestyles;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 {
@@ -38,34 +34,31 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             _startup = new Startup();
         }
 
+        public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
+
         public static Task<OrganizationIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
         {
             ArgumentNullException.ThrowIfNull(databaseFixture);
 
-            var host = new OrganizationIntegrationTestHost();
-
             var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddSingleton(configuration);
-            host._startup.Initialize(configuration, serviceCollection);
-            serviceCollection
-                .BuildServiceProvider()
-                .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = true);
 
-            host._startup.Container.Options.AllowOverridingRegistrations = true;
-            InitUserIdProvider(host._startup.Container);
-            InitEmailSender(host._startup.Container);
+            var host = new OrganizationIntegrationTestHost();
+            host.ServiceCollection.AddSingleton(configuration);
+            host._startup.Initialize(configuration, host.ServiceCollection);
+            InitEmailSender(host.ServiceCollection);
+
             return Task.FromResult(host);
         }
 
-        public Scope BeginScope()
+        public AsyncServiceScope BeginScope()
         {
-            return AsyncScopedLifestyle.BeginScope(_startup.Container);
+            var serviceProvider = ServiceCollection.BuildServiceProvider();
+            return serviceProvider.CreateAsyncScope();
         }
 
-        public async ValueTask DisposeAsync()
+        public ValueTask DisposeAsync()
         {
-            await _startup.DisposeAsync().ConfigureAwait(false);
+            return ValueTask.CompletedTask;
         }
 
         private static IConfiguration BuildConfig(string dbConnectionString)
@@ -90,18 +83,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 .Build();
         }
 
-        private static void InitUserIdProvider(Container container)
-        {
-            var mockUser = new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false);
-            var userIdProvider = new Mock<IUserContext<FrontendUser>>();
-            userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-            container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
-        }
-
-        private static void InitEmailSender(Container container)
+        private static void InitEmailSender(IServiceCollection services)
         {
             var emailSender = new Mock<IEmailSender>();
-            container.Register(() => emailSender.Object, Lifestyle.Scoped);
+            services.AddScoped(_ => emailSender.Object);
         }
     }
 }

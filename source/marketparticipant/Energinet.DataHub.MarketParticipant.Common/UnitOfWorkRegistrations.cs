@@ -14,15 +14,15 @@
 
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common
 {
     internal static class UnitOfWorkRegistrations
     {
-        public static void AddUnitOfWorkProvider(this Container container)
+        public static void AddUnitOfWorkProvider(this IServiceCollection services)
         {
-            container.Register<IUnitOfWorkProvider, UnitOfWorkProvider>();
+            services.AddScoped<IUnitOfWorkProvider, UnitOfWorkProvider>();
         }
     }
 }

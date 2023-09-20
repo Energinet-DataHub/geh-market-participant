@@ -16,4 +16,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public sealed record SynchronizeActorsCommand : IRequest<Unit>;
+public sealed record SynchronizeActorsCommand : IRequest;

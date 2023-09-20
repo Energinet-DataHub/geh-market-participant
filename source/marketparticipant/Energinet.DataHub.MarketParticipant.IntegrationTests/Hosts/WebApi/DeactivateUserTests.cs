@@ -27,6 +27,8 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -93,14 +95,15 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
-        scope.Container!.Register(() => userIdentityRepositoryMock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepositoryMock.Object);
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
-        scope.Container!.Register(() => userContext.Object);
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
@@ -123,7 +126,8 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
             .Setup(x => x.GetAsync(new ExternalUserId(userEntity.ExternalId)))
             .ReturnsAsync(userIdentity);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new DeactivateUserCommand(userEntity.Id);
 
         // Act
@@ -147,10 +151,12 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
         await using var scope = host.BeginScope();
 
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
-        scope.Container!.Register(() => userIdentityRepositoryMock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepositoryMock.Object);
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
-        scope.Container!.Register(() => userContext.Object);
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
 
         var userIdentity = new UserIdentity(
             new ExternalUserId(Guid.NewGuid()),
@@ -173,7 +179,7 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
             .Setup(x => x.GetAsync(new ExternalUserId(userEntity.ExternalId)))
             .ReturnsAsync(userIdentity);
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new DeactivateUserCommand(userEntity.Id);
 
         // Act
@@ -193,8 +199,8 @@ public sealed class DeactivateUserHandlerTests : WebApiIntegrationTestsBase
             userIdentity.Authentication,
             userIdentity.LoginIdentities);
 
-        var userStatusCalculator = scope.GetInstance<IUserStatusCalculator>();
-        var userRepository = scope.GetInstance<IUserRepository>();
+        var userStatusCalculator = scope.ServiceProvider.GetRequiredService<IUserStatusCalculator>();
+        var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
         var user = await userRepository.GetAsync(new UserId(userEntity.Id));
         Assert.NotNull(user);

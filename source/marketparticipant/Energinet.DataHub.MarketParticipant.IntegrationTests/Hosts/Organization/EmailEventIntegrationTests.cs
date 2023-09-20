@@ -23,8 +23,9 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
-using SimpleInjector;
 using Xunit;
 using Xunit.Categories;
 
@@ -46,7 +47,6 @@ public sealed class EmailEventIntegrationTests
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -60,12 +60,14 @@ public sealed class EmailEventIntegrationTests
             .Setup(e => e.GetAsync(userIdentityMock.Email))
             .ReturnsAsync(userIdentityMock);
 
-        scope.Container!.Register(() => userIdentityRepository.Object, Lifestyle.Scoped);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
+        await using var scope = host.BeginScope();
         var command = new SendUserInviteEmailCommand();
 
         // Act + Assert
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         await mediator.Send(command);
     }
 

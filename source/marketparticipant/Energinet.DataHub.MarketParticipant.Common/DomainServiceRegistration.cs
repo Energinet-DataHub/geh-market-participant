@@ -13,36 +13,35 @@
 // limitations under the License.
 
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
 
 internal static class DomainServiceRegistration
 {
-    public static void AddDomainServices(this Container container)
+    public static void AddDomainServices(this IServiceCollection services)
     {
-        container.Register<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>(Lifestyle.Scoped);
-        container.Register<IOverlappingEicFunctionsRuleService, OverlappingEicFunctionsRuleService>(Lifestyle.Scoped);
-        container.Register<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>(Lifestyle.Scoped);
+        services.AddScoped<IUniqueGlobalLocationNumberRuleService, UniqueGlobalLocationNumberRuleService>();
+        services.AddScoped<IOverlappingEicFunctionsRuleService, OverlappingEicFunctionsRuleService>();
+        services.AddScoped<IOverlappingActorContactCategoriesRuleService, OverlappingActorContactCategoriesRuleService>();
 
-        container.Register<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>(Lifestyle.Scoped);
-        container.Register<IUniqueMarketRoleGridAreaRuleService, UniqueMarketRoleGridAreaRuleService>(Lifestyle.Scoped);
-        container.Register<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>(Lifestyle.Scoped);
-        container.Register<IEnsureUserRolePermissionsService, EnsureUserRolePermissionsService>();
+        services.AddScoped<IExternalActorIdConfigurationService, ExternalActorIdConfigurationService>();
+        services.AddScoped<IUniqueMarketRoleGridAreaRuleService, UniqueMarketRoleGridAreaRuleService>();
+        services.AddScoped<IUniqueOrganizationBusinessRegisterIdentifierService, UniqueOrganizationBusinessRegisterIdentifierService>();
+        services.AddScoped<IEnsureUserRolePermissionsService, EnsureUserRolePermissionsService>();
 
-        container.Register<IActorFactoryService, ActorFactoryService>(Lifestyle.Scoped);
-        container.Register<IOrganizationFactoryService, OrganizationFactoryService>(Lifestyle.Scoped);
-        container.Register<IGridAreaFactoryService, GridAreaFactoryService>(Lifestyle.Scoped);
+        services.AddScoped<IActorFactoryService, ActorFactoryService>();
+        services.AddScoped<IOrganizationFactoryService, OrganizationFactoryService>();
+        services.AddScoped<IGridAreaFactoryService, GridAreaFactoryService>();
 
-        container.Register<IUserInvitationService, UserInvitationService>(Lifestyle.Scoped);
-        container.Register<IOrganizationDomainValidationService, OrganizationDomainValidationService>(Lifestyle.Scoped);
-        container.Register<IUserStatusCalculator, UserStatusCalculator>(Lifestyle.Scoped);
+        services.AddScoped<IUserInvitationService, UserInvitationService>();
+        services.AddScoped<IOrganizationDomainValidationService, OrganizationDomainValidationService>();
+        services.AddScoped<IUserStatusCalculator, UserStatusCalculator>();
 
-        container.Register<IPasswordChecker, PasswordChecker>(Lifestyle.Scoped);
-        container.Register<IPasswordGenerator, PasswordGenerator>(Lifestyle.Scoped);
-        container.Register<IUserPasswordGenerator, UserPasswordGenerator>(Lifestyle.Scoped);
+        services.AddScoped<IPasswordChecker, PasswordChecker>();
+        services.AddScoped<IPasswordGenerator, PasswordGenerator>();
+        services.AddScoped<IUserPasswordGenerator, UserPasswordGenerator>();
     }
 }
