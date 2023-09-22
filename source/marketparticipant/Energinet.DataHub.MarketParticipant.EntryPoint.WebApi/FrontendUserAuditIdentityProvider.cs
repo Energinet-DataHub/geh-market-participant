@@ -12,15 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed record GridAreaAuditLogEntry(
-    DateTimeOffset Timestamp,
-    AuditIdentity AuditIdentity,
-    GridAreaAuditLogEntryField Field,
-    string OldValue,
-    string NewValue,
-    GridAreaId GridAreaId);
+public sealed class FrontendUserAuditIdentityProvider : IAuditIdentityProvider
+{
+    private readonly IUserContext<FrontendUser> _userContext;
+
+    public FrontendUserAuditIdentityProvider(IUserContext<FrontendUser> userContext)
+    {
+        _userContext = userContext;
+    }
+
+    public AuditIdentity IdentityId => new(_userContext.CurrentUser.UserId);
+}

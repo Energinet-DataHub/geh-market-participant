@@ -53,7 +53,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             GridAreaMapper.MapToEntity(gridArea, destination);
             _marketParticipantDbContext.GridAreas.Update(destination);
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await _marketParticipantDbContext
+                .SaveChangesAsync()
+                .ConfigureAwait(false);
 
             return new GridAreaId(destination.Id);
         }
@@ -71,12 +73,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<GridArea>> GetAsync()
         {
-            var query = from gridArea in _marketParticipantDbContext.GridAreas
-                        select gridArea;
+            var entities = await _marketParticipantDbContext
+                .GridAreas
+                .ToListAsync()
+                .ConfigureAwait(false);
 
-            var entites = await query.ToListAsync().ConfigureAwait(false);
-
-            return entites.Select(GridAreaMapper.MapFromEntity);
+            return entities.Select(GridAreaMapper.MapFromEntity);
         }
     }
 }

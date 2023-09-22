@@ -20,6 +20,7 @@ using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
@@ -38,6 +39,8 @@ internal sealed class Startup : StartupBase
 {
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
+        services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
+
         services.AddScoped<SynchronizeActorsTimerTrigger>();
         services.AddScoped<EmailEventTimerTrigger>();
         services.AddScoped<UserInvitationExpiredTimerTrigger>();

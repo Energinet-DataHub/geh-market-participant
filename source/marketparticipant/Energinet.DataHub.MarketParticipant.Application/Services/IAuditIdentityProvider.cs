@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-public sealed class GridAreaAuditLogEntryEntity
+public interface IAuditIdentityProvider
 {
-    public int Id { get; set; }
-    public Guid UserId { get; set; }
-    public DateTimeOffset Timestamp { get; set; }
-    public GridAreaAuditLogEntryField Field { get; set; }
-    public string OldValue { get; set; } = null!;
-    public string NewValue { get; set; } = null!;
-    public Guid GridAreaId { get; set; }
+    public AuditIdentity IdentityId { get; }
 }
