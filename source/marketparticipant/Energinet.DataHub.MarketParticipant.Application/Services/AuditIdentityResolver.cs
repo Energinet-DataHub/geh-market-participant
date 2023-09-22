@@ -27,6 +27,7 @@ public sealed class AuditIdentityResolver : IAuditIdentityResolver
     private static readonly IReadOnlyDictionary<AuditIdentity, KnownAuditIdentityProvider> _knownAuditIdentities
         = new Dictionary<AuditIdentity, KnownAuditIdentityProvider>
     {
+        { KnownAuditIdentityProvider.Migration.IdentityId, KnownAuditIdentityProvider.Migration },
         { KnownAuditIdentityProvider.TestFramework.IdentityId, KnownAuditIdentityProvider.TestFramework },
         { KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId, KnownAuditIdentityProvider.OrganizationBackgroundService },
     };
