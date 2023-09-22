@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Database;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
             var optionsBuilder = new DbContextOptionsBuilder<MarketParticipantDbContext>()
                 .UseSqlServer(ConnectionString);
 
-            return new MarketParticipantDbContext(optionsBuilder.Options, KnownAuditLogIdentityProvider.TestFramework);
+            return new MarketParticipantDbContext(optionsBuilder.Options, KnownAuditIdentityProvider.TestFramework);
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
 public sealed record GridAreaAuditLogEntry(
     DateTimeOffset Timestamp,
-    UserId UserId,
+    AuditIdentity AuditIdentity,
     GridAreaAuditLogEntryField Field,
     string OldValue,
     string NewValue,

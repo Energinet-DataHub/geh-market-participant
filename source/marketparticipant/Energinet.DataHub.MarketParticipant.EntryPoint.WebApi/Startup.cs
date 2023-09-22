@@ -21,6 +21,7 @@ using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -125,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
             services.AddPermissionAuthorization();
             services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
-            services.AddScoped<IAuditLogIdentityProvider, FrontendUserAuditLogIdentityProvider>();
+            services.AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
 
             // Health check
             services

@@ -12,21 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed class FrontendUserAuditLogIdentityProvider : IAuditLogIdentityProvider
+public sealed class FrontendUserAuditIdentityProvider : IAuditIdentityProvider
 {
     private readonly IUserContext<FrontendUser> _userContext;
 
-    public FrontendUserAuditLogIdentityProvider(IUserContext<FrontendUser> userContext)
+    public FrontendUserAuditIdentityProvider(IUserContext<FrontendUser> userContext)
     {
         _userContext = userContext;
     }
 
-    public Guid IdentityId => _userContext.CurrentUser.UserId;
+    public AuditIdentity IdentityId => new(_userContext.CurrentUser.UserId);
 }

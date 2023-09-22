@@ -17,6 +17,7 @@ using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
 namespace Energinet.DataHub.MarketParticipant.Tests.Common;
 
@@ -61,4 +62,23 @@ internal static class TestPreparationModels
             Array.Empty<UserRoleAssignment>(),
             null,
             null);
+
+    public static User MockedUser(Guid userId, Guid externalId) => new(
+        new UserId(userId),
+        new ActorId(Guid.NewGuid()),
+        new ExternalUserId(externalId),
+        Array.Empty<UserRoleAssignment>(),
+        null,
+        null);
+
+    public static UserIdentity MockedUserIdentity(Guid externalUserId) => new(
+        new ExternalUserId(externalUserId),
+        new MockedEmailAddress(),
+        UserIdentityStatus.Active,
+        "Mocked First Name",
+        "Mocked Last Name",
+        null,
+        DateTimeOffset.UtcNow,
+        AuthenticationMethod.Undetermined,
+        Array.Empty<LoginIdentity>());
 }

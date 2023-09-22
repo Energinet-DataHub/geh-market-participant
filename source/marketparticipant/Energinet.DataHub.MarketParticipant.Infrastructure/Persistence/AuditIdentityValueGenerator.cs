@@ -13,10 +13,20 @@
 // limitations under the License.
 
 using System;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
-public interface IAuditLogIdentityProvider
+public sealed class AuditIdentityValueGenerator : ValueGenerator
 {
-    public Guid IdentityId { get; }
+    public override bool GeneratesTemporaryValues => false;
+
+    protected override object NextValue(EntityEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+
+        var dbContext = (MarketParticipantDbContext)entry.Context;
+        return dbContext.AuditIdentityProvider.IdentityId.Value;
+    }
 }

@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-public sealed class KnownAuditLogIdentityProvider : IAuditLogIdentityProvider
+public interface IAuditIdentityProvider
 {
-    public KnownAuditLogIdentityProvider(Guid identityId)
-    {
-        IdentityId = identityId;
-    }
-
-    public static KnownAuditLogIdentityProvider TestFramework { get; } = new(Guid.Parse("AAAAAAAA-BBBB-CCCC-DDDD-000000000000"));
-    public static KnownAuditLogIdentityProvider OrganizationBackgroundService { get; } = new(Guid.Parse("00000000-1111-0000-0001-000000000000"));
-
-    public Guid IdentityId { get; }
+    public AuditIdentity IdentityId { get; }
 }

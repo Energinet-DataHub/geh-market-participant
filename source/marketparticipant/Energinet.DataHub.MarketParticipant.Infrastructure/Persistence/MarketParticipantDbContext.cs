@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -24,19 +25,19 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
     public MarketParticipantDbContext(
         DbContextOptions<MarketParticipantDbContext> options,
-        IAuditLogIdentityProvider auditLogIdentityProvider)
+        IAuditIdentityProvider auditIdentityProvider)
         : base(options)
     {
-        AuditLogIdentityProvider = auditLogIdentityProvider;
+        AuditIdentityProvider = auditIdentityProvider;
     }
 
     // Used for mocking.
     protected MarketParticipantDbContext()
     {
-        AuditLogIdentityProvider = KnownAuditLogIdentityProvider.TestFramework;
+        AuditIdentityProvider = KnownAuditIdentityProvider.TestFramework;
     }
 
-    public IAuditLogIdentityProvider AuditLogIdentityProvider { get; }
+    public IAuditIdentityProvider AuditIdentityProvider { get; }
 
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
     public DbSet<ActorEntity> Actors { get; private set; } = null!;

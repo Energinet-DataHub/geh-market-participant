@@ -12,20 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-public sealed class AuditLogIdentityValueGenerator : ValueGenerator
+public interface IAuditIdentityResolver
 {
-    public override bool GeneratesTemporaryValues => false;
-
-    protected override object NextValue(EntityEntry entry)
-    {
-        ArgumentNullException.ThrowIfNull(entry);
-        var dbContext = (MarketParticipantDbContext)entry.Context;
-        return dbContext.AuditLogIdentityProvider.IdentityId;
-    }
+    Task<UserIdentity> ResolveAsync(AuditIdentity identityId);
 }

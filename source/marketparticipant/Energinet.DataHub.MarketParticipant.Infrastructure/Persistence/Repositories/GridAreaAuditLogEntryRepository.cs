@@ -14,23 +14,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
     public sealed class GridAreaAuditLogEntryRepository : IGridAreaAuditLogEntryRepository
     {
-        private static readonly (GridAreaAuditLogEntryField Field, Func<GridAreaEntity, object?> GetValue)[] _auditedProperties =
-        {
-            (GridAreaAuditLogEntryField.Name, entity => entity.Name)
-        };
-
         private readonly IMarketParticipantDbContext _context;
 
         public GridAreaAuditLogEntryRepository(IMarketParticipantDbContext context)
@@ -40,36 +34,33 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<GridAreaAuditLogEntry>> GetAsync(GridAreaId gridAreaId)
         {
-            var allHistory = await _context.GridAreas
-                .TemporalAll()
-                .Where(entity => entity.Id == gridAreaId.Value)
-                .Select(entity => new
-                {
-                    Entity = entity,
-                    PeriodStart = EF.Property<DateTimeOffset>(entity, "PeriodStart")
-                })
-                .OrderBy(entity => entity.PeriodStart)
-                .ToListAsync()
+            var historicEntities = await _context.GridAreas
+                .ReadAllHistoryForAsync(entity => entity.Id == gridAreaId.Value)
                 .ConfigureAwait(false);
+
+            var auditedProperties = new[]
+            {
+                new { Property = GridAreaAuditLogEntryField.Name, ReadValue = new Func<GridAreaEntity, object?>(entity => entity.Name) },
+            };
 
             var auditEntries = new List<GridAreaAuditLogEntry>();
 
-            for (var i = 1; i < allHistory.Count; i++)
+            for (var i = 1; i < historicEntities.Count; i++)
             {
-                var current = allHistory[i];
-                var previous = allHistory[i - 1];
+                var current = historicEntities[i];
+                var previous = historicEntities[i - 1];
 
-                foreach (var (field, getValue) in _auditedProperties)
+                foreach (var auditedProperty in auditedProperties)
                 {
-                    var currentValue = getValue(current.Entity);
-                    var previousValue = getValue(previous.Entity);
+                    var currentValue = auditedProperty.ReadValue(current.Entity);
+                    var previousValue = auditedProperty.ReadValue(previous.Entity);
 
                     if (!Equals(currentValue, previousValue))
                     {
                         auditEntries.Add(new GridAreaAuditLogEntry(
                             current.PeriodStart,
-                            new UserId(current.Entity.ChangedByIdentityId),
-                            field,
+                            new AuditIdentity(current.Entity.ChangedByIdentityId),
+                            auditedProperty.Property,
                             previousValue?.ToString() ?? string.Empty,
                             currentValue?.ToString() ?? string.Empty,
                             new GridAreaId(current.Entity.Id)));

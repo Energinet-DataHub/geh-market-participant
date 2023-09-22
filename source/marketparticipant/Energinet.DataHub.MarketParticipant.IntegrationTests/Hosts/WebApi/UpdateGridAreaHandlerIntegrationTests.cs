@@ -83,9 +83,15 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
         var updateCommand2 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(gridArea.Id, "NewGridAreaName2"));
         await mediator.Send(updateCommand2);
 
+        var updateCommand3 = new UpdateGridAreaCommand(gridArea.Id, new ChangeGridAreaDto(gridArea.Id, "NewGridAreaName3"));
+        await mediator.Send(updateCommand3);
+
         // Assert
         var response = await mediator.Send(new GetGridAreaAuditLogEntriesCommand(gridArea.Id));
-        Assert.Equal("NewGridAreaName1", response.GridAreaAuditLogEntries.First().NewValue);
-        Assert.Equal("NewGridAreaName2", response.GridAreaAuditLogEntries.Last().NewValue);
+        var auditLogs = response.GridAreaAuditLogEntries.ToList();
+
+        Assert.Equal("NewGridAreaName1", auditLogs[0].NewValue);
+        Assert.Equal("NewGridAreaName2", auditLogs[1].NewValue);
+        Assert.Equal("NewGridAreaName3", auditLogs[2].NewValue);
     }
 }

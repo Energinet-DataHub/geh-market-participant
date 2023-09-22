@@ -29,7 +29,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.HasKey(gridArea => gridArea.Id);
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
             builder.Property(p => p.PriceAreaCode);
-            builder.Property(p => p.ChangedByIdentityId).HasValueGenerator<AuditLogIdentityValueGenerator>();
+            builder.Property(p => p.ChangedByIdentityId).HasValueGenerator<AuditIdentityValueGenerator>();
         }
     }
 }
