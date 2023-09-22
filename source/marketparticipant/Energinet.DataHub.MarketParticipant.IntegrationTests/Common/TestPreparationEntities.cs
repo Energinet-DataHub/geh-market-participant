@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -89,7 +90,8 @@ internal static class TestPreparationEntities
         Id = Guid.NewGuid(),
         Code = "100",
         Name = "Test Grid Area Name",
-        PriceAreaCode = PriceAreaCode.Dk1
+        PriceAreaCode = PriceAreaCode.Dk1,
+        ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value
     };
 
     public static T Patch<T>(this T entity, Action<T> action)
