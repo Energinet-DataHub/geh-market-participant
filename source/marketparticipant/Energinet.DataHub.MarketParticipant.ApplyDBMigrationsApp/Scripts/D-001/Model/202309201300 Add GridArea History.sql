@@ -6,7 +6,7 @@ ALTER TABLE [dbo].[GridArea] ADD
     PERIOD FOR SYSTEM_TIME(PeriodStart, PeriodEnd),
     
     ChangedByIdentityId uniqueidentifier NOT NULL
-	CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-0000-0000-0000-000000000000');
+	CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000');
 GO
 
 ALTER TABLE [dbo].[GridArea]
