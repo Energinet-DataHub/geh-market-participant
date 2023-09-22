@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class UserRolePermissionEntity
+public sealed class UserRolePermissionHistoryEntity
 {
     public Guid UserRoleId { get; set; }
     public PermissionId Permission { get; set; }

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -28,10 +29,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 public sealed class UserRoleRepository : IUserRoleRepository
 {
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-    public UserRoleRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public UserRoleRepository(
+        IMarketParticipantDbContext marketParticipantDbContext,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task<IEnumerable<UserRole>> GetAllAsync()
@@ -88,7 +93,11 @@ public sealed class UserRoleRepository : IUserRoleRepository
             ChangedByIdentityId = userRole.ChangedByIdentityId
         };
 
-        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }))
+        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity
+                 {
+                     Permission = x,
+                     CreatedByIdentityId = userRole.ChangedByIdentityId
+                 }))
         {
             role.Permissions.Add(permissionEntity);
         }
@@ -109,24 +118,57 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
         if (userRoleEntity != null)
         {
+            if (userRoleEntity.Name != userRoleUpdate.Name ||
+                userRoleEntity.Description != userRoleUpdate.Description ||
+                userRoleEntity.Status != userRoleUpdate.Status)
+            {
+                userRoleEntity.ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId;
+            }
+
             userRoleEntity.Name = userRoleUpdate.Name;
             userRoleEntity.Description = userRoleUpdate.Description;
             userRoleEntity.Status = userRoleUpdate.Status;
-            userRoleEntity.ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId;
 
-            userRoleEntity.Permissions.Clear();
-            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity
-            {
-                Permission = x,
-                ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId
-            });
+            var permissionsDeleted = userRoleEntity.Permissions
+                .Where(x => !userRoleUpdate.Permissions.Contains(x.Permission))
+                .ToList();
 
-            foreach (var permissionEntity in permissionsToAdd)
+            var permissionsCreated = userRoleUpdate.Permissions
+                .Where(x => !userRoleEntity.Permissions.Select(p => p.Permission).Contains(x))
+                .Select(x => new UserRolePermissionEntity
+                {
+                    Permission = x,
+                    CreatedByIdentityId = userRoleUpdate.ChangedByIdentityId
+                })
+                .ToList();
+
+            foreach (var permissionEntity in permissionsCreated)
             {
                 userRoleEntity.Permissions.Add(permissionEntity);
             }
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
+
+            await using (uow.ConfigureAwait(false))
+            {
+                foreach (var permissionEntity in permissionsDeleted)
+                {
+                    permissionEntity.DeletedByIdentityId = userRoleUpdate.ChangedByIdentityId;
+                }
+
+                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+                foreach (var permissionEntity in permissionsDeleted)
+                {
+                    userRoleEntity.Permissions.Remove(permissionEntity);
+                }
+
+                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+                await uow.CommitAsync().ConfigureAwait(false);
+            }
         }
         else
         {

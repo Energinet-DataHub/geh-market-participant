@@ -48,6 +48,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; private set; } = null!;
     public DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; private set; } = null!;
     public DbSet<UserRolePermissionEntity> UserRolePermissionEntries { get; private set; } = null!;
+    public DbSet<UserRolePermissionHistoryEntity> UserRolePermissionHistoryEntries { get; private set; } = null!;
     public DbSet<UserRoleEicFunctionEntity> UserRoleEicFunctionEntries { get; private set; } = null!;
 
     public DbSet<UserInviteAuditLogEntryEntity> UserInviteAuditLogEntries { get; private set; } = null!;
@@ -80,6 +81,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UserRoleEicFunctionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRolePermissionEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRolePermissionHistoryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserInviteAuditLogEntryEntityConfiguration());

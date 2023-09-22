@@ -25,8 +25,9 @@ ALTER TABLE [UserRolePermission]
     PeriodEnd DATETIME2 GENERATED ALWAYS AS ROW END HIDDEN
     CONSTRAINT DF_UserRolePermission_PeriodEnd DEFAULT CONVERT(DATETIME2, '9999-12-31 23:59:59.9999999'),
     PERIOD FOR SYSTEM_TIME(PeriodStart, PeriodEnd),
-	ChangedByIdentityId uniqueidentifier NOT NULL
+	CreatedByIdentityId uniqueidentifier NOT NULL
 	CONSTRAINT DF_ChangedByIdentityId_defaultvalue DEFAULT('00000000-0000-0000-0000-000000000000');
+    DeletedByIdentityId uniqueidentifier NULL                                   
 GO
 
 ALTER TABLE [UserRolePermission]
@@ -34,23 +35,4 @@ ALTER TABLE [UserRolePermission]
 GO
 
 ALTER TABLE [UserRolePermission] DROP CONSTRAINT DF_ChangedByIdentityId_defaultvalue
-GO
-
-/* UserRoleEicFunction Temporal table setup */
-ALTER TABLE [UserRoleEicFunction]
-    ADD
-    PeriodStart DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN
-    CONSTRAINT DF_UserRoleEicFunction_PeriodStart DEFAULT SYSUTCDATETIME(),
-    PeriodEnd DATETIME2 GENERATED ALWAYS AS ROW END HIDDEN
-    CONSTRAINT DF_UserRoleEicFunction_PeriodEnd DEFAULT CONVERT(DATETIME2, '9999-12-31 23:59:59.9999999'),
-    PERIOD FOR SYSTEM_TIME(PeriodStart, PeriodEnd),
-	ChangedByIdentityId uniqueidentifier NOT NULL
-	CONSTRAINT DF_ChangedByIdentityId_defaultvalue DEFAULT('00000000-0000-0000-0000-000000000000');
-GO
-
-ALTER TABLE [UserRoleEicFunction]
-    SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.[UserRoleEicFunctionHistory]));
-GO
-
-ALTER TABLE [UserRoleEicFunction] DROP CONSTRAINT DF_ChangedByIdentityId_defaultvalue
 GO

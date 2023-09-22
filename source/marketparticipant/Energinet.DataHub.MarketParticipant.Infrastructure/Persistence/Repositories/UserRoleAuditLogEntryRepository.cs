@@ -16,10 +16,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -38,17 +38,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             ArgumentNullException.ThrowIfNull(userRoleId);
 
             // Build audit logs for user roles
-            var userRoleAuditLogs = await GetUserRoleChangesAndStateAsync(userRoleId).ConfigureAwait(false);
-            var createdUserRoleLog = userRoleAuditLogs.First(e => e.ChangeType == UserRoleChangeType.Created);
+            var userRoleChangesAuditLogs = await GetUserRoleChangesAndStateAsync(userRoleId).ConfigureAwait(false);
+            var createdUserRoleLog = userRoleChangesAuditLogs.First(e => e.ChangeType == UserRoleChangeType.Created);
 
             // GetPermission changes
             var permissionsChanges = await GetPermissionChangesAsync(userRoleId, createdUserRoleLog).ConfigureAwait(false);
 
-            // Get EicFunction changes
-            var eicFunctionChanges = await GetEicFunctionChangesAsync(userRoleId).ConfigureAwait(false);
+            // Get EicFunction for userRole
+            var readOnlyEicFunction = await GetEicFunctionForUserRoleAsync(userRoleId).ConfigureAwait(false);
 
             // Set permissions for created user role
-            var auditLogs = MergeCreatedStateAndLists(userRoleAuditLogs, permissionsChanges, eicFunctionChanges);
+            var auditLogs = MergeCreatedStateAndLists(userRoleChangesAuditLogs, permissionsChanges, readOnlyEicFunction);
 
             return auditLogs
                 .OrderBy(a => a.Timestamp)
@@ -58,31 +58,24 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         private static IEnumerable<UserRoleAuditLogEntry> MergeCreatedStateAndLists(
             List<UserRoleAuditLogEntry> userRoleAuditLogs,
             ICollection<UserRoleAuditLogEntry> permissionsChanges,
-            ICollection<UserRoleAuditLogEntry> eicFunctionChanges)
+            EicFunction readOnlyEicFunction)
         {
             var createdUserRoleLog = userRoleAuditLogs.Find(u => u.ChangeType == UserRoleChangeType.Created)!;
             var createdWithPermissions = permissionsChanges.FirstOrDefault(l => l.ChangeType == UserRoleChangeType.Created);
-            var createdWithEicFunction = eicFunctionChanges.MinBy(l => l.EicFunction);
 
             if (permissionsChanges.Any() && createdWithPermissions != null)
             {
                 permissionsChanges.Remove(createdWithPermissions);
             }
 
-            if (eicFunctionChanges.Any() && createdWithEicFunction != null)
-            {
-                eicFunctionChanges.Remove(createdWithEicFunction);
-            }
-
             var createdUserRoleLogWithPermissions = createdUserRoleLog with
             {
                 Permissions = createdWithPermissions?.Permissions ?? Enumerable.Empty<PermissionId>(),
-                EicFunction = createdWithEicFunction?.EicFunction,
+                EicFunction = readOnlyEicFunction,
             };
 
             userRoleAuditLogs[0] = createdUserRoleLogWithPermissions;
             userRoleAuditLogs.AddRange(permissionsChanges);
-            userRoleAuditLogs.AddRange(eicFunctionChanges);
 
             return userRoleAuditLogs;
         }
@@ -111,7 +104,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         EF.Property<DateTime>(log, "PeriodStart")))
                 .ToListAsync().ConfigureAwait(false);
 
-            // TODO Timestamp in changes should be EndDate ?
             var logs = new List<UserRoleAuditLogEntry>();
 
             for (var index = 0; index < userRoleAssignmentLogsOrdered.Count; index++)
@@ -146,14 +138,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         private async Task<List<UserRoleAuditLogEntry>> GetPermissionChangesAsync(UserRoleId userRoleId, UserRoleAuditLogEntry userRoleCreatedLogEntry)
         {
-            var userRolePermissionChangesEntities = await _context
-                .UserRolePermissionEntries
-                .TemporalAll()
+            var userRolePermissionHistoryEntities = await _context
+                .UserRolePermissionHistoryEntries
                 .Where(up => up.UserRoleId == userRoleId.Value)
                 .Select(d => new
                 {
                     d.UserRoleId,
-                    d.ChangedByIdentityId,
+                    d.CreatedByIdentityId,
+                    d.DeletedByIdentityId,
                     PeriodStart = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodStart"), DateTimeKind.Utc),
                     PeriodEnd = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodEnd"), DateTimeKind.Utc),
                     d.Permission,
@@ -161,12 +153,31 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ToListAsync()
                 .ConfigureAwait(false);
 
-            var createdStateElements = userRolePermissionChangesEntities
+            var userRolePermissionEntities = await _context
+                .UserRolePermissionEntries
+                .Where(up => up.UserRoleId == userRoleId.Value)
+                .Select(d => new
+                {
+                    d.UserRoleId,
+                    d.CreatedByIdentityId,
+                    d.DeletedByIdentityId,
+                    PeriodStart = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodStart"), DateTimeKind.Utc),
+                    PeriodEnd = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodEnd"), DateTimeKind.Utc),
+                    d.Permission,
+                })
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            var userRolePermissionHistoryList = userRolePermissionHistoryEntities
+                .Concat(userRolePermissionEntities)
+                .ToList();
+
+            var createdStateElements = userRolePermissionHistoryList
                 .Where(e => userRoleCreatedLogEntry.Timestamp.Equals(DateTime.SpecifyKind(e.PeriodStart, DateTimeKind.Utc)))
                 .ToList();
             var createdPermissionState = createdStateElements.Any() ? new UserRoleAuditLogEntry(
                 new UserRoleId(userRoleId.Value),
-                createdStateElements.First().ChangedByIdentityId,
+                createdStateElements.First().CreatedByIdentityId,
                 string.Empty,
                 string.Empty,
                 createdStateElements.Select(p => p.Permission),
@@ -175,50 +186,61 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 UserRoleChangeType.Created,
                 createdStateElements.First().PeriodStart) : null;
 
-            var createdWithPermissions = createdPermissionState?.Permissions.Select(e => e);
+            var addedChanges = userRolePermissionHistoryList
+                .Where(e => e.DeletedByIdentityId == null && e.PeriodStart != userRoleCreatedLogEntry.Timestamp)
+                .Select(d => new
+                {
+                    d.CreatedByIdentityId,
+                    d.DeletedByIdentityId,
+                    Timestamp = d.PeriodStart,
+                    d.Permission,
+                }).ToList();
+            var deletedChanges = userRolePermissionHistoryList
+                .Where(e => e.DeletedByIdentityId != null)
+                .Select(d => new
+                {
+                    d.CreatedByIdentityId,
+                    d.DeletedByIdentityId,
+                    Timestamp = d.PeriodEnd,
+                    d.Permission,
+                }).ToList();
 
-            var userRolePermissionChangesDic = userRolePermissionChangesEntities
-                .GroupBy(up => up.PeriodEnd)
-                .OrderBy(d => d.Key)
-                //.Where(e => e.Key < DateTimeOffset.MaxValue.AddDays(-1000))
-                .ToDictionary(g => g.Key, g =>
-                    new UserRoleAuditLogEntry(
+            var changes = addedChanges.Concat(deletedChanges).ToList();
+            var groupChangesByTimestamp = changes
+                .GroupBy(e => e.Timestamp)
+                .OrderBy(e => e.Key);
+
+            var prevState = createdPermissionState?.Permissions.ToList() ?? new List<PermissionId>();
+
+            var result = new List<UserRoleAuditLogEntry>();
+            foreach (var permissionChange in groupChangesByTimestamp)
+            {
+                var prevStateCopy = new List<PermissionId>(prevState);
+
+                var deletedPermissionsIds = permissionChange.Where(e => e.DeletedByIdentityId != null).Select(e => e.Permission).ToList();
+                var addedPermissionsIds = permissionChange.Where(e => e.DeletedByIdentityId == null).Select(e => e.Permission).ToList();
+
+                prevStateCopy.RemoveAll(e => deletedPermissionsIds.Contains(e));
+                prevStateCopy.AddRange(addedPermissionsIds);
+
+                var userRoleAuditLogEntry = new UserRoleAuditLogEntry(
                         new UserRoleId(userRoleId.Value),
-                        g.First().ChangedByIdentityId,
+                        permissionChange.First().CreatedByIdentityId,
                         string.Empty,
                         string.Empty,
-                        g.Select(p => p.Permission),
+                        prevStateCopy,
                         null,
                         UserRoleStatus.Active,
                         UserRoleChangeType.PermissionsChange,
-                        g.Key));
+                        permissionChange.Key);
 
-            /*var prevPermissions = createdWithPermissions?.ToList() ?? new List<PermissionId>();
+                prevState = prevStateCopy;
+                result.Add(userRoleAuditLogEntry);
+            }
 
-            var tempList = new List<UserRoleAuditLogEntry>();
-            foreach (var permissionChange in userRolePermissionChangesDic)
-            {
-                var tt = prevPermissions.Except(permissionChange.Value.Permissions);
-                tempList.Add(new UserRoleAuditLogEntry(
-                    new UserRoleId(userRoleId.Value),
-                    permissionChange.Value.ChangedByIdentityId,
-                    string.Empty,
-                    string.Empty,
-                    tt,
-                    null,
-                    UserRoleStatus.Active,
-                    UserRoleChangeType.PermissionsChange,
-                    permissionChange.Key));
-                prevPermissions = permissionChange.Value.Permissions.ToList();
-            }*/
-
-            var permissionChanges = userRolePermissionChangesDic.Values
+            var permissionChanges = result
                 .OrderBy(d => d.Timestamp)
                 .ToList();
-
-            /*var permissionChanges = tempList
-                .OrderBy(d => d.Timestamp)
-                .ToList();*/
 
             if (createdPermissionState != null)
             {
@@ -228,27 +250,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return permissionChanges;
         }
 
-        private async Task<List<UserRoleAuditLogEntry>> GetEicFunctionChangesAsync(UserRoleId userRoleId)
+        private async Task<Domain.Model.EicFunction> GetEicFunctionForUserRoleAsync(UserRoleId userRoleId)
         {
-            var emptyPermissions = Enumerable.Empty<PermissionId>();
-            var userRoleEicFunctionChanges = await _context
-                .UserRoleEicFunctionEntries
-                .TemporalAll()
-                .Where(up => up.UserRoleId == userRoleId.Value)
-                .Select(log => new UserRoleAuditLogEntry(
-                    new UserRoleId(userRoleId.Value),
-                    log.ChangedByIdentityId,
-                    string.Empty,
-                    string.Empty,
-                    emptyPermissions,
-                    log.EicFunction,
-                    UserRoleStatus.Active,
-                    UserRoleChangeType.EicFunctionChange,
-                    EF.Property<DateTime>(log, "PeriodStart")))
-                .ToListAsync()
+            var userRole = await _context
+                .UserRoles
+                .FirstAsync(up => up.Id == userRoleId.Value)
                 .ConfigureAwait(false);
 
-            return userRoleEicFunctionChanges;
+            return userRole.EicFunctions.First().EicFunction;
         }
     }
 }
