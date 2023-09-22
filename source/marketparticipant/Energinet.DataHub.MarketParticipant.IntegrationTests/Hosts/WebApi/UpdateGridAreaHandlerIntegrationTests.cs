@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -64,12 +66,9 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
     [Fact]
     public async Task UpdateGridArea_NewGridAreaName_ChangeAudited()
     {
-        // Create context user
-        var frontendUser = await _fixture.PrepareUserAsync();
-
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+        host.ServiceCollection.MockFrontendUser(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -91,7 +90,10 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
         var auditLogs = response.GridAreaAuditLogEntries.ToList();
 
         Assert.Equal("NewGridAreaName1", auditLogs[0].NewValue);
+        Assert.True(auditLogs[0].UserDisplayName?.Contains(KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName, StringComparison.Ordinal));
         Assert.Equal("NewGridAreaName2", auditLogs[1].NewValue);
+        Assert.True(auditLogs[1].UserDisplayName?.Contains(KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName, StringComparison.Ordinal));
         Assert.Equal("NewGridAreaName3", auditLogs[2].NewValue);
+        Assert.True(auditLogs[2].UserDisplayName?.Contains(KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName, StringComparison.Ordinal));
     }
 }

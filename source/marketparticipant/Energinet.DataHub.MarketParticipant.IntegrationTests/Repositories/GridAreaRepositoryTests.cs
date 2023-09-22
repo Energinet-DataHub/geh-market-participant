@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -40,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var gridAreaRepository = new GridAreaRepository(context);
+            var gridAreaRepository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
 
             // Act
             var testOrg = await gridAreaRepository
@@ -57,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var gridRepository = new GridAreaRepository(context);
+            var gridRepository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
             var validFrom = DateTimeOffset.Now;
             var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(
@@ -88,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var gridRepository = new GridAreaRepository(context);
+            var gridRepository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
             var validFrom = DateTimeOffset.Now;
             var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(
@@ -130,8 +131,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
-            var gridRepository = new GridAreaRepository(context);
-            var gridRepository2 = new GridAreaRepository(context2);
+            var gridRepository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
+            var gridRepository2 = new GridAreaRepository(context2, KnownAuditIdentityProvider.TestFramework);
             var validFrom = DateTimeOffset.Now;
             var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(
@@ -172,7 +173,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var repository = new GridAreaRepository(context);
+            var repository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
             var validFrom = DateTimeOffset.Now;
             var validTo = validFrom.AddYears(15);
             var testGrid = new GridArea(

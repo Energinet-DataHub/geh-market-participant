@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -69,7 +70,7 @@ public sealed class ActorRepositoryTests
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var actorRepository = new ActorRepository(context);
         var actorRepository2 = new ActorRepository(context2);
-        var gridAreaRepository = new GridAreaRepository(context2);
+        var gridAreaRepository = new GridAreaRepository(context2, KnownAuditIdentityProvider.TestFramework);
 
         var gridAreaId = await gridAreaRepository.AddOrUpdateAsync(new GridArea(
             new GridAreaName("fake_value"),
