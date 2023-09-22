@@ -13,18 +13,20 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
-public sealed class GridAreaEntity
+public sealed class AuditIdentityValueGenerator : ValueGenerator
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string Code { get; set; } = null!;
-    public PriceAreaCode PriceAreaCode { get; set; }
-    public DateTimeOffset ValidFrom { get; set; }
-    public DateTimeOffset? ValidTo { get; set; }
-    public DateTimeOffset? FullFlexDate { get; set; }
-    public Guid ChangedByIdentityId { get; set; }
+    public override bool GeneratesTemporaryValues => false;
+
+    protected override object NextValue(EntityEntry entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+
+        var dbContext = (MarketParticipantDbContext)entry.Context;
+        return dbContext.AuditIdentityProvider.IdentityId.Value;
+    }
 }

@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -22,15 +23,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
 public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
-    public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
+    public MarketParticipantDbContext(
+        DbContextOptions<MarketParticipantDbContext> options,
+        IAuditIdentityProvider auditIdentityProvider)
         : base(options)
     {
+        AuditIdentityProvider = auditIdentityProvider;
     }
 
     // Used for mocking.
     protected MarketParticipantDbContext()
     {
+        AuditIdentityProvider = KnownAuditIdentityProvider.TestFramework;
     }
+
+    public IAuditIdentityProvider AuditIdentityProvider { get; }
 
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
     public DbSet<ActorEntity> Actors { get; private set; } = null!;
@@ -40,7 +47,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
     public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
     public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
-    public DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; private set; } = null!;
     public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
     public DbSet<UserEntity> Users { get; private set; } = null!;
     public DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; private set; } = null!;
@@ -70,7 +76,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new GridAreaAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorSynchronizationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentEntityConfiguration());

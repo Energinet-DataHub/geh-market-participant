@@ -90,6 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IUserRoleAuditLogService, UserRoleAuditLogService>();
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
+            services.AddScoped<IAuditIdentityResolver, AuditIdentityResolver>();
         }
     }
 }

@@ -16,10 +16,8 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 using Xunit.Categories;
 
@@ -37,69 +35,39 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
         }
 
         [Fact]
-        public async Task Insert_CreatesNewLogEntry()
-        {
-            // arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
-            await using var scope = host.BeginScope();
-            await using var context = _fixture.DatabaseManager.CreateDbContext();
-
-            var gridAreaRepo = new GridAreaRepository(context);
-            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
-                new GridAreaName("name"),
-                new GridAreaCode("1234"),
-                PriceAreaCode.Dk1,
-                DateTimeOffset.MinValue,
-                null));
-
-            var userId = new UserId(Guid.NewGuid());
-
-            var target = new GridAreaAuditLogEntryRepository(context);
-            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId);
-
-            // act
-            await target.InsertAsync(entry);
-
-            var actual = await (from l in context.GridAreaAuditLogEntries.AsQueryable()
-                                where l.UserId == userId.Value
-                                select l).SingleAsync();
-
-            // assert
-            Assert.Equal(entry.Timestamp, actual.Timestamp);
-            Assert.Equal(entry.UserId.Value, actual.UserId);
-            Assert.Equal(entry.Field, actual.Field);
-            Assert.Equal(entry.OldValue, actual.OldValue);
-            Assert.Equal(entry.NewValue, actual.NewValue);
-            Assert.Equal(entry.GridAreaId.Value, actual.GridAreaId);
-        }
-
-        [Fact]
         public async Task Get_GridAreaIdProvided_ReturnsLogEntriesForGridArea()
         {
-            // arrange
-            await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
+            // Arrange
+            await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-            var gridAreaRepo = new GridAreaRepository(context);
-            var gridAreaId = await gridAreaRepo.AddOrUpdateAsync(new GridArea(
+            var gridArea = new GridArea(
                 new GridAreaName("name"),
-                new GridAreaCode("1234"),
+                new GridAreaCode("100"),
                 PriceAreaCode.Dk1,
                 DateTimeOffset.MinValue,
-                null));
+                null);
 
-            var userId = new UserId(Guid.NewGuid());
+            var gridAreaRepository = new GridAreaRepository(context);
+            var gridAreaId = await gridAreaRepository.AddOrUpdateAsync(gridArea);
+
+            var changedGridArea = new GridArea(
+                gridAreaId,
+                new GridAreaName("different name"),
+                new GridAreaCode("100"),
+                PriceAreaCode.Dk1,
+                DateTimeOffset.MinValue,
+                null);
+
+            await gridAreaRepository.AddOrUpdateAsync(changedGridArea);
 
             var target = new GridAreaAuditLogEntryRepository(context);
-            var entry = new GridAreaAuditLogEntry(DateTimeOffset.UtcNow, userId, GridAreaAuditLogEntryField.Name, "old_val", "new_val", gridAreaId);
 
-            await target.InsertAsync(entry);
-
-            // act
+            // Act
             var actual = (await target.GetAsync(gridAreaId)).ToList();
 
-            // assert
+            // Assert
             Assert.Single(actual);
             Assert.Equal(gridAreaId, actual.Single().GridAreaId);
         }
