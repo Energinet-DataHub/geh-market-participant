@@ -15,6 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
@@ -102,15 +103,17 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 
     private void OnEntityStateChanged(EntityEntry entityEntry)
     {
-        if (entityEntry.Entity is not ITrackChangedByIdentity changedByIdentity)
+        if (entityEntry.Entity is not IAuditedEntity changedByIdentity)
             return;
 
         switch (entityEntry.State)
         {
             case EntityState.Modified:
+                changedByIdentity.Version++;
                 changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
                 break;
             case EntityState.Added:
+                changedByIdentity.Version++;
                 changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
                 break;
         }

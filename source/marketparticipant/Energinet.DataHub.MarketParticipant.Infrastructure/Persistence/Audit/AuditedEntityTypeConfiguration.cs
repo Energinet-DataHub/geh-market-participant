@@ -13,22 +13,24 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
-{
-    public class GridAreaEntityConfiguration : AuditedEntityTypeConfiguration<GridAreaEntity>
-    {
-        protected override void ConfigureEntity(EntityTypeBuilder<GridAreaEntity> builder)
-        {
-            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
-            builder.ToTable("GridArea");
-            builder.HasKey(gridArea => gridArea.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
-        }
+public abstract class AuditedEntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
+    where TEntity : class, IAuditedEntity
+{
+    public void Configure(EntityTypeBuilder<TEntity> builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+
+        builder.ToTable(t => t.IsTemporal());
+        builder.Property(e => e.Version).IsConcurrencyToken();
+        builder.Property(e => e.ChangedByIdentityId).IsRequired();
+
+        ConfigureEntity(builder);
     }
+
+    protected abstract void ConfigureEntity(EntityTypeBuilder<TEntity> builder);
 }
