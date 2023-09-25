@@ -24,7 +24,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 
-public static class HistoryAuditExtensions
+public static class AuditExtensions
 {
     public static async Task<IReadOnlyList<(T Entity, DateTimeOffset PeriodStart)>> ReadAllHistoryForAsync<T>(this DbSet<T> target, Expression<Func<T, bool>> entitySelector)
         where T : class, IAuditedEntity
@@ -45,7 +45,7 @@ public static class HistoryAuditExtensions
                 Entity = entity,
                 PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
             })
-            .SingleAsync()
+            .SingleOrDefaultAsync()
             .ConfigureAwait(false);
 
         var allHistory = await target
@@ -61,8 +61,11 @@ public static class HistoryAuditExtensions
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return allHistory
-            .Append(latest)
+        var combined = latest != null
+            ? allHistory.Append(latest)
+            : allHistory;
+
+        return combined
             .Select(entity => (entity.Entity, new DateTimeOffset(entity.PeriodStart, TimeSpan.Zero)))
             .ToList();
     }

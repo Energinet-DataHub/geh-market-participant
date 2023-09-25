@@ -18,49 +18,34 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
-public sealed class UpdatePermissionHandler
-    : IRequestHandler<UpdatePermissionCommand, Unit>
+public sealed class UpdatePermissionHandler : IRequestHandler<UpdatePermissionCommand>
 {
     private readonly IPermissionRepository _permissionRepository;
-    private readonly IPermissionAuditLogEntryRepository _permissionAuditLogEntryRepository;
 
-    public UpdatePermissionHandler(
-        IPermissionRepository permissionRepository,
-        IPermissionAuditLogEntryRepository permissionAuditLogEntryRepository)
+    public UpdatePermissionHandler(IPermissionRepository permissionRepository)
     {
         _permissionRepository = permissionRepository;
-        _permissionAuditLogEntryRepository = permissionAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(
-        UpdatePermissionCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(UpdatePermissionCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var permissionToUpdate = await _permissionRepository.GetAsync((PermissionId)request.PermissionId).ConfigureAwait(false);
+        var permissionToUpdate = await _permissionRepository
+            .GetAsync((PermissionId)request.PermissionId)
+            .ConfigureAwait(false);
 
         NotFoundValidationException.ThrowIfNull(permissionToUpdate, $"Permission not found: {request.PermissionId}");
 
         permissionToUpdate.Description = request.Description;
 
-        await _permissionRepository.UpdatePermissionAsync(permissionToUpdate).ConfigureAwait(false);
-
-        await _permissionAuditLogEntryRepository
-            .InsertAuditLogEntryAsync(new PermissionAuditLogEntry(
-                permissionToUpdate.Id,
-                new UserId(request.ChangedByUserId),
-                PermissionChangeType.DescriptionChange,
-                DateTimeOffset.UtcNow,
-                request.Description))
+        await _permissionRepository
+            .UpdatePermissionAsync(permissionToUpdate)
             .ConfigureAwait(false);
-
-        return Unit.Value;
     }
 }
