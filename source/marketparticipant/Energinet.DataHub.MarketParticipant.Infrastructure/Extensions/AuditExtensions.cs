@@ -24,7 +24,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 
-public static class HistoryAuditExtensions
+public static class AuditExtensions
 {
     public static async Task<IReadOnlyList<(T Entity, DateTimeOffset PeriodStart)>> ReadAllHistoryForAsync<T>(this DbSet<T> target, Expression<Func<T, bool>> entitySelector)
         where T : class, IAuditedEntity
