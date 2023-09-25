@@ -13,10 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 public interface ITrackChangedByIdentity
 {
+    [ConcurrencyCheck]
+    public int Version { get; set; }
+
     public Guid ChangedByIdentityId { get; set; }
 }

@@ -108,9 +108,11 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         switch (entityEntry.State)
         {
             case EntityState.Modified:
+                changedByIdentity.Version++;
                 changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
                 break;
             case EntityState.Added:
+                changedByIdentity.Version++;
                 changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
                 break;
         }

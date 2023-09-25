@@ -42,7 +42,8 @@ public static class HistoryAuditExtensions
             .Select(entity => new
             {
                 Entity = entity,
-                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart")
+                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
+                Version = EF.Property<int>(entity, "Version")
             })
             .SingleAsync()
             .ConfigureAwait(false);
@@ -54,9 +55,10 @@ public static class HistoryAuditExtensions
             .Select(entity => new
             {
                 Entity = entity,
-                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart")
+                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
+                Version = EF.Property<int>(entity, "Version")
             })
-            .OrderBy(entity => entity.PeriodStart)
+            .OrderBy(entity => entity.Version)
             .ToListAsync()
             .ConfigureAwait(false);
 

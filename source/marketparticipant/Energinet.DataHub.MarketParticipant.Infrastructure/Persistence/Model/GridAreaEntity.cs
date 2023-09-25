@@ -26,5 +26,7 @@ public sealed class GridAreaEntity : ITrackChangedByIdentity
     public DateTimeOffset ValidFrom { get; set; }
     public DateTimeOffset? ValidTo { get; set; }
     public DateTimeOffset? FullFlexDate { get; set; }
+
+    public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }
