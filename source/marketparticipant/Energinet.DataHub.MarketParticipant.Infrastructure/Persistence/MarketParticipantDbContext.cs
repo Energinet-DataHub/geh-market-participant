@@ -107,9 +107,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 
         switch (entityEntry.State)
         {
-            case EntityState.Deleted:
-                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
-                break;
             case EntityState.Modified:
                 changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
                 break;
