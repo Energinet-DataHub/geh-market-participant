@@ -14,22 +14,36 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
 public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
-    public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
+
+    public MarketParticipantDbContext(
+        DbContextOptions<MarketParticipantDbContext> options,
+        IAuditIdentityProvider auditIdentityProvider)
         : base(options)
     {
+        _auditIdentityProvider = auditIdentityProvider;
+
+        ChangeTracker.Tracked += (s, e) => OnEntityStateChanged(e.Entry);
+        ChangeTracker.StateChanged += (s, e) => OnEntityStateChanged(e.Entry);
     }
 
     // Used for mocking.
     protected MarketParticipantDbContext()
     {
+        _auditIdentityProvider = KnownAuditIdentityProvider.TestFramework;
+
+        ChangeTracker.Tracked += (s, e) => OnEntityStateChanged(e.Entry);
+        ChangeTracker.StateChanged += (s, e) => OnEntityStateChanged(e.Entry);
     }
 
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
@@ -84,5 +98,24 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         base.OnModelCreating(modelBuilder);
+    }
+
+    private void OnEntityStateChanged(EntityEntry entityEntry)
+    {
+        if (entityEntry.Entity is not ITrackChangedByIdentity changedByIdentity)
+            return;
+
+        switch (entityEntry.State)
+        {
+            case EntityState.Deleted:
+                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                break;
+            case EntityState.Modified:
+                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                break;
+            case EntityState.Added:
+                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                break;
+        }
     }
 }

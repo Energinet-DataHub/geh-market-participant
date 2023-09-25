@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -59,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var linkRepository = new GridAreaLinkRepository(context);
-            var gridRepository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
+            var gridRepository = new GridAreaRepository(context);
             var testGrid = new GridArea(
                 new GridAreaName("Test Grid Area"),
                 new GridAreaCode("801"),

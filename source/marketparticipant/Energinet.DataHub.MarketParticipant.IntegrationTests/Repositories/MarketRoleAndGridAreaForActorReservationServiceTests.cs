@@ -14,7 +14,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -120,7 +119,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 DateTimeOffset.MinValue,
                 null);
 
-            var repository = new GridAreaRepository(context, KnownAuditIdentityProvider.TestFramework);
+            var repository = new GridAreaRepository(context);
             var id = await repository.AddOrUpdateAsync(domain);
             return (await repository.GetAsync(id))!;
         }
