@@ -8,7 +8,7 @@ ALTER TABLE [dbo].[Permission] ADD
     
     Version             int              NOT NULL DEFAULT 0,
     ChangedByIdentityId uniqueidentifier NOT NULL
-	CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000');
+    CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000');
 GO
 
 ALTER TABLE [dbo].[Permission]
