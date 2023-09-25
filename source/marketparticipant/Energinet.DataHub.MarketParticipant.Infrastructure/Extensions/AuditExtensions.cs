@@ -45,8 +45,11 @@ public static class AuditExtensions
                 Entity = entity,
                 PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
             })
-            .SingleAsync()
+            .SingleOrDefaultAsync()
             .ConfigureAwait(false);
+
+        if (latest == null)
+            return Array.Empty<(T Entity, DateTimeOffset PeriodStart)>();
 
         var allHistory = await target
             .FromSqlRaw($"SELECT * FROM dbo.{historyTableName}")
