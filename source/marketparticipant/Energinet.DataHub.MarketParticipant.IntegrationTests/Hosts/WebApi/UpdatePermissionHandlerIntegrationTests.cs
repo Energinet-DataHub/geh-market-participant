@@ -54,7 +54,6 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
-            frontendUser.Id,
             (int)userRoleWithPermission.Permissions[0].Permission,
             newPermissionDescription);
 
@@ -82,11 +81,10 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var permissionRepo = new PermissionAuditLogEntryRepository(context);
 
-        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync();
+        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
-            frontendUser.Id,
             (int)userRoleWithPermission.Permissions[0].Permission,
             newPermissionDescription);
 
