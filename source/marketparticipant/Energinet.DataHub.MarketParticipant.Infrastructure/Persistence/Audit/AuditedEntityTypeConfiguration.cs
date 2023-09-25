@@ -19,7 +19,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 public abstract class AuditedEntityTypeConfiguration<TEntity> : IEntityTypeConfiguration<TEntity>
-    where TEntity : class, ITrackChangedByIdentity
+    where TEntity : class, IAuditedEntity
 {
     public void Configure(EntityTypeBuilder<TEntity> builder)
     {

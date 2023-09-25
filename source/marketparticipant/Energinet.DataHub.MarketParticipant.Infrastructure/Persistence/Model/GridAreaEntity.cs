@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class GridAreaEntity : ITrackChangedByIdentity
+public sealed class GridAreaEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

@@ -103,7 +103,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 
     private void OnEntityStateChanged(EntityEntry entityEntry)
     {
-        if (entityEntry.Entity is not ITrackChangedByIdentity changedByIdentity)
+        if (entityEntry.Entity is not IAuditedEntity changedByIdentity)
             return;
 
         switch (entityEntry.State)
