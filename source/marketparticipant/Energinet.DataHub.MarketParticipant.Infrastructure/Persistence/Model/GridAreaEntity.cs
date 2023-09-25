@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
@@ -28,7 +28,6 @@ public sealed class GridAreaEntity : ITrackChangedByIdentity
     public DateTimeOffset? ValidTo { get; set; }
     public DateTimeOffset? FullFlexDate { get; set; }
 
-    [ConcurrencyCheck]
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }
