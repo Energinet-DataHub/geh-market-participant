@@ -13,18 +13,10 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class GridAreaEntity : ITrackChangedByIdentity
+public interface ITrackChangedByIdentity
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; } = null!;
-    public string Code { get; set; } = null!;
-    public PriceAreaCode PriceAreaCode { get; set; }
-    public DateTimeOffset ValidFrom { get; set; }
-    public DateTimeOffset? ValidTo { get; set; }
-    public DateTimeOffset? FullFlexDate { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }

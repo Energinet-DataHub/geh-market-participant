@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -28,14 +27,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
     public class GridAreaRepository : IGridAreaRepository
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
-        private readonly IAuditIdentityProvider _auditIdentityProvider;
 
-        public GridAreaRepository(
-            IMarketParticipantDbContext marketParticipantDbContext,
-            IAuditIdentityProvider auditIdentityProvider)
+        public GridAreaRepository(IMarketParticipantDbContext marketParticipantDbContext)
         {
             _marketParticipantDbContext = marketParticipantDbContext;
-            _auditIdentityProvider = auditIdentityProvider;
         }
 
         public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
@@ -56,7 +51,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
 
             GridAreaMapper.MapToEntity(gridArea, destination);
-            destination.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
             _marketParticipantDbContext.GridAreas.Update(destination);
 
             await _marketParticipantDbContext
