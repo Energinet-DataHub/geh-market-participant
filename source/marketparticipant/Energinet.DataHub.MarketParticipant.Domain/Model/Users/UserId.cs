@@ -16,15 +16,8 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public record UserId
+public sealed record UserId(Guid Value)
 {
-    public UserId(Guid value)
-    {
-        Value = value;
-    }
-
-    public Guid Value { get; }
-
     public override string ToString()
     {
         return Value.ToString();

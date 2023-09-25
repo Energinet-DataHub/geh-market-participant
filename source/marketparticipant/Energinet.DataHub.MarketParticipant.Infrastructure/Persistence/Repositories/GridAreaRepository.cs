@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -27,10 +28,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
     public class GridAreaRepository : IGridAreaRepository
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+        private readonly IAuditIdentityProvider _auditIdentityProvider;
 
-        public GridAreaRepository(IMarketParticipantDbContext marketParticipantDbContext)
+        public GridAreaRepository(
+            IMarketParticipantDbContext marketParticipantDbContext,
+            IAuditIdentityProvider auditIdentityProvider)
         {
             _marketParticipantDbContext = marketParticipantDbContext;
+            _auditIdentityProvider = auditIdentityProvider;
         }
 
         public async Task<GridAreaId> AddOrUpdateAsync(GridArea gridArea)
@@ -51,9 +56,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
 
             GridAreaMapper.MapToEntity(gridArea, destination);
+            destination.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
             _marketParticipantDbContext.GridAreas.Update(destination);
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            await _marketParticipantDbContext
+                .SaveChangesAsync()
+                .ConfigureAwait(false);
 
             return new GridAreaId(destination.Id);
         }
@@ -71,12 +79,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<GridArea>> GetAsync()
         {
-            var query = from gridArea in _marketParticipantDbContext.GridAreas
-                        select gridArea;
+            var entities = await _marketParticipantDbContext
+                .GridAreas
+                .ToListAsync()
+                .ConfigureAwait(false);
 
-            var entites = await query.ToListAsync().ConfigureAwait(false);
-
-            return entites.Select(GridAreaMapper.MapFromEntity);
+            return entities.Select(GridAreaMapper.MapFromEntity);
         }
     }
 }

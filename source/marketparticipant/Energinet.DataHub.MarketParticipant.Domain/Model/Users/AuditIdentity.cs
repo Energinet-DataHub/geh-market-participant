@@ -12,19 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR;
-using MediatR.Pipeline;
+using System;
 
-namespace Energinet.DataHub.MarketParticipant.Common.MediatR
-{
-    public class EmptyRequestPostProcessor<TRequest, TResponse> : IRequestPostProcessor<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
-    {
-        public Task Process(TRequest request, TResponse response, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+
+public sealed record AuditIdentity(Guid Value);

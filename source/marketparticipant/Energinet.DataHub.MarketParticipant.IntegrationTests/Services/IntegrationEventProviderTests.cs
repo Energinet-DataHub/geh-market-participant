@@ -21,7 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -45,7 +45,7 @@ public sealed class IntegrationEventProviderTests
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
 
-        var target = scope.GetInstance<IIntegrationEventProvider>();
+        var target = scope.ServiceProvider.GetRequiredService<IIntegrationEventProvider>();
 
         // Act + Assert
         var integrationEvents = target.GetAsync();
@@ -72,9 +72,9 @@ public sealed class IntegrationEventProviderTests
 
         foreach (var (eventName, eventType) in allIntegrationEvents)
         {
-            await PrepareDomainEventAsync(scope, eventType);
+            await PrepareDomainEventAsync(scope.ServiceProvider, eventType);
 
-            var target = scope.GetInstance<IIntegrationEventProvider>();
+            var target = scope.ServiceProvider.GetRequiredService<IIntegrationEventProvider>();
 
             // Act
             var integrationEvents = target
@@ -88,7 +88,7 @@ public sealed class IntegrationEventProviderTests
         }
     }
 
-    private static async Task PrepareActorActivatedEventAsync(Scope scope)
+    private static async Task PrepareActorActivatedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -102,11 +102,11 @@ public sealed class IntegrationEventProviderTests
         actor.Activate();
         actor.ExternalActorId = new ExternalActorId(Guid.NewGuid());
 
-        var domainEventRepository = scope.GetInstance<IDomainEventRepository>();
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
         await domainEventRepository.EnqueueAsync(actor);
     }
 
-    private Task PrepareDomainEventAsync(Scope scope, Type domainEvent)
+    private Task PrepareDomainEventAsync(IServiceProvider scope, Type domainEvent)
     {
         return domainEvent.Name switch
         {
@@ -116,7 +116,7 @@ public sealed class IntegrationEventProviderTests
         };
     }
 
-    private async Task PrepareGridAreaOwnershipAssignedEventAsync(Scope scope)
+    private async Task PrepareGridAreaOwnershipAssignedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -136,7 +136,7 @@ public sealed class IntegrationEventProviderTests
 
         actor.Activate();
 
-        var domainEventRepository = scope.GetInstance<IDomainEventRepository>();
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
         await domainEventRepository.EnqueueAsync(actor);
     }
 }

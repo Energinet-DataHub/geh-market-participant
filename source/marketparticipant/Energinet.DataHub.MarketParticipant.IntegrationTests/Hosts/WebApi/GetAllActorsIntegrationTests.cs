@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -42,7 +43,7 @@ public sealed class GetAllActorsIntegrationTests
 
         var actor = await _fixture.PrepareActorAsync();
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var command = new GetAllActorsCommand();
 

@@ -17,23 +17,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.FunctionApp.Diagnostics.HealthChecks;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Email;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Functions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.Organization.Monitor;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SendGrid.Extensions.DependencyInjection;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization;
 
@@ -41,10 +39,12 @@ internal sealed class Startup : StartupBase
 {
     protected override void Configure(IConfiguration configuration, IServiceCollection services)
     {
-        // TODO: These registrations should be removed when SimpleInjector is removed.
-        services.AddScoped<IMarketParticipantDbContext, MarketParticipantDbContext>();
-        services.AddScoped<IGridAreaRepository, GridAreaRepository>();
-        services.AddScoped<IIntegrationEventFactory, IntegrationEventFactory>();
+        services.AddScoped<IAuditIdentityProvider>(_ => KnownAuditIdentityProvider.OrganizationBackgroundService);
+
+        services.AddScoped<SynchronizeActorsTimerTrigger>();
+        services.AddScoped<EmailEventTimerTrigger>();
+        services.AddScoped<UserInvitationExpiredTimerTrigger>();
+        services.AddScoped<DispatchIntegrationEventsTrigger>();
 
         services.AddPublisher<IntegrationEventProvider>();
         services.Configure<PublisherOptions>(options =>
@@ -55,24 +55,9 @@ internal sealed class Startup : StartupBase
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
         services.AddSendGrid(options => options.ApiKey = sendGridApiKey);
+        services.AddFunctionLoggingScope("mark-part");
 
         AddHealthChecks(configuration, services);
-    }
-
-    protected override void Configure(IConfiguration configuration, Container container)
-    {
-        Container.Options.EnableAutoVerification = false;
-
-        Container.Register<SynchronizeActorsTimerTrigger>();
-        Container.Register<EmailEventTimerTrigger>();
-        Container.Register<UserInvitationExpiredTimerTrigger>();
-        Container.Register<DispatchIntegrationEventsTrigger>();
-        Container.AddInviteConfigRegistration();
-        Container.AddSendGridEmailSenderClient();
-
-        // Health check
-        container.Register<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>(Lifestyle.Scoped);
-        container.Register<HealthCheckEndpoint>(Lifestyle.Scoped);
     }
 
     private static void AddHealthChecks(IConfiguration configuration, IServiceCollection services)
@@ -100,6 +85,9 @@ internal sealed class Startup : StartupBase
         }
 
         var sendGridApiKey = configuration.GetSetting(Settings.SendGridApiKey);
+
+        services.AddScoped<IHealthCheckEndpointHandler, HealthCheckEndpointHandler>();
+        services.AddScoped<HealthCheckEndpoint>();
 
         services
             .AddHealthChecks()

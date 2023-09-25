@@ -26,6 +26,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -52,7 +53,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -87,7 +88,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync();
@@ -128,7 +129,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -166,7 +167,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
         var userRoleRepository = new UserRoleRepository(context);
 
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var user = await _fixture.PrepareUserAsync();
 

@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -50,7 +51,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _databaseFixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization.Patch(t => t.Domain = "datahub.dk"),
@@ -83,20 +84,20 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
 
         var createdExternalUserId = new ExternalUserId(createdExternalUser.Id!);
 
-        var userRepository = scope.GetInstance<IUserRepository>();
+        var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
         var createdUser = await userRepository.GetAsync(createdExternalUserId);
         Assert.NotNull(createdUser);
         Assert.True(createdUser.InvitationExpiresAt > DateTime.UtcNow);
 
-        var userIdentityRepository = scope.GetInstance<IUserIdentityRepository>();
+        var userIdentityRepository = scope.ServiceProvider.GetRequiredService<IUserIdentityRepository>();
         var createdUserIdentity = await userIdentityRepository.GetAsync(createdExternalUserId);
         Assert.NotNull(createdUserIdentity);
 
-        var userInviteAuditLogEntryRepository = scope.GetInstance<IUserInviteAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserInviteAuditLogEntryRepository>();
         var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
 
-        var userRoleAssignmentAuditLogEntryRepository = scope.GetInstance<IUserRoleAssignmentAuditLogEntryRepository>();
+        var userRoleAssignmentAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAssignmentAuditLogEntryRepository>();
         var assignmentAuditLogEntries = await userRoleAssignmentAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(assignmentAuditLogEntries, e =>
             e.ChangedByUserId.Value == invitedByUser.Id &&

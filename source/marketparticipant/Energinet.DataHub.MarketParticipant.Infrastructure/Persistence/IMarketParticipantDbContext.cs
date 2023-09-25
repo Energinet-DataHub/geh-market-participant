@@ -65,11 +65,6 @@ public interface IMarketParticipantDbContext
     DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
 
     /// <summary>
-    ///     Represent access to the GridAreaAuditLogEntry database table
-    /// </summary>
-    DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; }
-
-    /// <summary>
     ///     Represent access to the ActorSynchronization database table
     /// </summary>
     DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }

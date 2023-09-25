@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Graph;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
@@ -25,10 +23,9 @@ public sealed class GraphApiHealthCheck : IHealthCheck
 {
     private readonly GraphServiceClient _graphServiceClient;
 
-    public GraphApiHealthCheck(Container container)
+    public GraphApiHealthCheck(GraphServiceClient graphServiceClient)
     {
-        ArgumentNullException.ThrowIfNull(container);
-        _graphServiceClient = container.GetInstance<GraphServiceClient>();
+        _graphServiceClient = graphServiceClient;
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)

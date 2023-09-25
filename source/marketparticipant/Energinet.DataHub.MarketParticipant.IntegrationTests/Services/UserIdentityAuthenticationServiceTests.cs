@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph.Models;
 using Microsoft.Kiota.Abstractions;
 using Xunit;
@@ -56,7 +57,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var externalUserId = new ExternalUserId(Guid.NewGuid());
 
@@ -71,7 +72,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var externalUserId = new ExternalUserId(Guid.NewGuid());
 
@@ -86,7 +87,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
@@ -119,7 +120,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
@@ -150,7 +151,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(_validPhoneNumber);
@@ -181,7 +182,7 @@ public sealed class UserIdentityAuthenticationServiceTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var target = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var externalUserId = await _graphServiceClientFixture.CreateUserAsync(new MockedEmailAddress());
         var smsAuthMethod = new SmsAuthenticationMethod(new PhoneNumber("+45 12345678"));

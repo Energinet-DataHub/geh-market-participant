@@ -17,14 +17,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using SimpleInjector;
-using SimpleInjector.Lifestyles;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
 
@@ -37,33 +36,31 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         _startup = new Startup(configuration);
     }
 
+    public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
+
     public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
     {
         ArgumentNullException.ThrowIfNull(databaseFixture);
 
         var configuration = BuildConfig(databaseFixture.DatabaseManager.ConnectionString);
+
         var host = new WebApiIntegrationTestHost(configuration);
+        host.ServiceCollection.AddSingleton(configuration);
+        host._startup.ConfigureServices(host.ServiceCollection);
+        InitUserIdProvider(host.ServiceCollection);
 
-        var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton(configuration);
-        host._startup.ConfigureServices(serviceCollection);
-        serviceCollection
-            .BuildServiceProvider()
-            .UseSimpleInjector(host._startup.Container, o => o.Container.Options.EnableAutoVerification = false);
-
-        host._startup.Container.Options.AllowOverridingRegistrations = true;
-        InitUserIdProvider(host._startup.Container);
         return Task.FromResult(host);
     }
 
-    public Scope BeginScope()
+    public AsyncServiceScope BeginScope()
     {
-        return AsyncScopedLifestyle.BeginScope(_startup.Container);
+        var serviceProvider = ServiceCollection.BuildServiceProvider();
+        return serviceProvider.CreateAsyncScope();
     }
 
-    public async ValueTask DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        await _startup.DisposeAsync().ConfigureAwait(false);
+        return ValueTask.CompletedTask;
     }
 
     private static IConfiguration BuildConfig(string dbConnectionString)
@@ -82,11 +79,16 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             .Build();
     }
 
-    private static void InitUserIdProvider(Container container)
+    private static void InitUserIdProvider(IServiceCollection services)
     {
-        var mockUser = new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false);
+        var mockUser = new FrontendUser(
+            KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            false);
+
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        container.Register(() => userIdProvider.Object, Lifestyle.Singleton);
+        services.AddSingleton(() => userIdProvider.Object);
     }
 }

@@ -26,4 +26,5 @@ public sealed class GridAreaEntity
     public DateTimeOffset ValidFrom { get; set; }
     public DateTimeOffset? ValidTo { get; set; }
     public DateTimeOffset? FullFlexDate { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }

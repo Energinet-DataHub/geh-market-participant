@@ -23,6 +23,8 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -45,7 +47,6 @@ public sealed class GetUserHandlerIntegrationTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -65,9 +66,11 @@ public sealed class GetUserHandlerIntegrationTests
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
             .ReturnsAsync(new[] { userIdentity });
 
-        scope.Container!.Register(() => userIdentityMock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityMock.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new GetUserCommand(user.Id);
 
         // Act
@@ -82,12 +85,13 @@ public sealed class GetUserHandlerIntegrationTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var userIdentityMock = new Mock<IUserIdentityRepository>();
-        scope.Container!.Register(() => userIdentityMock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityMock.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new GetUserCommand(Guid.NewGuid());
 
         // Act + Assert
@@ -99,7 +103,6 @@ public sealed class GetUserHandlerIntegrationTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -119,9 +122,11 @@ public sealed class GetUserHandlerIntegrationTests
             .Setup(repository => repository.GetUserIdentitiesAsync(new[] { userIdentity.Id }))
             .ReturnsAsync(Array.Empty<UserIdentity>());
 
-        scope.Container!.Register(() => userIdentityMock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityMock.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var command = new GetUserCommand(user.Id);
 
         // Act + Assert

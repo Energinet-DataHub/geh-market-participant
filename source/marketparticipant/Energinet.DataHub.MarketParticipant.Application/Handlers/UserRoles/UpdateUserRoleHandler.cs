@@ -35,9 +35,7 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<Unit> Handle(
-        UpdateUserRoleCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -62,7 +60,5 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         await _userRoleRepository
             .UpdateAsync(userRoleToUpdate)
             .ConfigureAwait(false);
-
-        return Unit.Value;
     }
 }

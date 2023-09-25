@@ -18,31 +18,28 @@ using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
 {
     internal static class GraphServiceClientRegistration
     {
-        public static void AddGraphServiceClient(this Container container)
+        public static void AddGraphServiceClient(this IServiceCollection services)
         {
-            container.Register(
-                () =>
-                {
-                    var configuration = container.GetService<IConfiguration>();
+            services.AddScoped(provider =>
+            {
+                var configuration = provider.GetRequiredService<IConfiguration>();
 
-                    var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
-                    var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
-                    var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
+                var azureB2CTenant = configuration.GetSetting(Settings.B2CTenant);
+                var azureB2CSpnId = configuration.GetSetting(Settings.B2CServicePrincipalId);
+                var azureB2CSpnSecret = configuration.GetSetting(Settings.B2CServicePrincipalSecret);
 
-                    var clientSecretCredential = new ClientSecretCredential(
-                        azureB2CTenant,
-                        azureB2CSpnId,
-                        azureB2CSpnSecret);
+                var clientSecretCredential = new ClientSecretCredential(
+                    azureB2CTenant,
+                    azureB2CSpnId,
+                    azureB2CSpnSecret);
 
-                    return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
-                },
-                Lifestyle.Scoped);
+                return new GraphServiceClient(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
+            });
         }
     }
 }

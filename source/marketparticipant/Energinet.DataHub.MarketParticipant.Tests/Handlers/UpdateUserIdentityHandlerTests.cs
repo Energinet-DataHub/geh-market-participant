@@ -67,11 +67,8 @@ public sealed class UpdateUserIdentityHandlerTests
 
         var updateUserIdentityCommand = new UpdateUserIdentityCommand(userIdentityUpdateDto, validUserId);
 
-        // Act
-        var result = await target.Handle(updateUserIdentityCommand, default);
-
-        // Assert
-        Assert.Equal(MediatR.Unit.Value, result);
+        // Act + Assert
+        await target.Handle(updateUserIdentityCommand, default);
     }
 
     [Fact]

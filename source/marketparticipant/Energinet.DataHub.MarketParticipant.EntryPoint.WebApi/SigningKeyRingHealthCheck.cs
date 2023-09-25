@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
@@ -26,10 +24,9 @@ public sealed class SigningKeyRingHealthCheck : IHealthCheck
 {
     private readonly ISigningKeyRing _signingKeyRing;
 
-    public SigningKeyRingHealthCheck(Container container)
+    public SigningKeyRingHealthCheck(ISigningKeyRing signingKeyRing)
     {
-        ArgumentNullException.ThrowIfNull(container);
-        _signingKeyRing = container.GetInstance<ISigningKeyRing>();
+        _signingKeyRing = signingKeyRing;
     }
 
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)

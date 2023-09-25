@@ -42,6 +42,7 @@ markpartDomain = group "Market Participant" {
 
             # Common relationships
             this -> dh3.sharedB2C "Creates B2C App Registration" "Microsoft.Graph/https"
+            this -> dh3.sharedServiceBus "Sends market participant events" "integration event/amqp"
 
             # Domain relationships
             this -> markpartDb "Updates actors with external B2C id." "EF Core"
@@ -52,7 +53,7 @@ markpartDomain = group "Market Participant" {
             tags "Microsoft Azure - Function Apps" "Titans"
 
             # Common relationships
-            this -> dh3.sharedSendGrid "Sends invitation mail" "SendGrid/https"
+            this -> dh3.sharedExternalSendGrid "Sends invitation mail" "SendGrid/https"
 
             # Domain relationships
             this -> markpartDb "Reads data regarding newly invited users." "EF Core"

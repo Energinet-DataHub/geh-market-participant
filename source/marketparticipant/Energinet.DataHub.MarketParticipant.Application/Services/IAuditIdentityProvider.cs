@@ -12,18 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading;
-using System.Threading.Tasks;
-using MediatR.Pipeline;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-namespace Energinet.DataHub.MarketParticipant.Common.MediatR
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
+
+public interface IAuditIdentityProvider
 {
-    public class EmptyRequestPreProcessor<TRequest> : IRequestPreProcessor<TRequest>
-        where TRequest : notnull
-    {
-        public Task Process(TRequest request, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-    }
+    public AuditIdentity IdentityId { get; }
 }
