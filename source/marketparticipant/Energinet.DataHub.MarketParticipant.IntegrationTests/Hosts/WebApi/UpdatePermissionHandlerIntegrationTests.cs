@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -81,7 +80,7 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         var permissionRepo = new PermissionAuditLogEntryRepository(context);
 
-        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.ActorsManage);
+        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
@@ -92,8 +91,11 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         await mediator.Send(updateCommand);
 
         // Assert
-        var logs = await permissionRepo.GetAsync(userRoleWithPermission.Permissions[0].Permission).ConfigureAwait(false);
-        Assert.Single(logs.ToList(), p =>
+        var logs = await permissionRepo
+            .GetAsync(userRoleWithPermission.Permissions[0].Permission)
+            .ConfigureAwait(false);
+
+        Assert.Single(logs, p =>
             p.Permission == userRoleWithPermission.Permissions[0].Permission &&
             p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
             p.ChangedByUserId.Value == frontendUser.Id);
