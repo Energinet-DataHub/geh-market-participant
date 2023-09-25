@@ -72,15 +72,15 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(context);
 
         var frontendUser = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var permissionRepo = new PermissionAuditLogEntryRepository(context);
 
-        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
+        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
@@ -91,7 +91,7 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         await mediator.Send(updateCommand);
 
         // Assert
-        var logs = await permissionRepo
+        var logs = await permissionAuditLogEntryRepository
             .GetAsync(userRoleWithPermission.Permissions[0].Permission)
             .ConfigureAwait(false);
 

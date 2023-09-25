@@ -48,9 +48,6 @@ public static class AuditExtensions
             .SingleOrDefaultAsync()
             .ConfigureAwait(false);
 
-        if (latest == null)
-            return Array.Empty<(T Entity, DateTimeOffset PeriodStart)>();
-
         var allHistory = await target
             .FromSqlRaw($"SELECT * FROM dbo.{historyTableName}")
             .AsNoTracking()
@@ -64,8 +61,11 @@ public static class AuditExtensions
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return allHistory
-            .Append(latest)
+        var combined = latest != null
+            ? allHistory.Append(latest)
+            : allHistory;
+
+        return combined
             .Select(entity => (entity.Entity, new DateTimeOffset(entity.PeriodStart, TimeSpan.Zero)))
             .ToList();
     }
