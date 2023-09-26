@@ -40,7 +40,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var auditedProperties = new[]
             {
-                new { Property = GridAreaAuditLogEntryField.Name, ReadValue = new Func<GridAreaEntity, object?>(entity => entity.Name) },
+                new
+                {
+                    Property = GridAreaAuditLogEntryField.Name,
+                    ReadValue = new Func<GridAreaEntity, object?>(entity => entity.Name)
+                },
             };
 
             var auditEntries = new List<GridAreaAuditLogEntry>();

@@ -14,22 +14,37 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 
 public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
-    public MarketParticipantDbContext(DbContextOptions<MarketParticipantDbContext> options)
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
+
+    public MarketParticipantDbContext(
+        DbContextOptions<MarketParticipantDbContext> options,
+        IAuditIdentityProvider auditIdentityProvider)
         : base(options)
     {
+        _auditIdentityProvider = auditIdentityProvider;
+
+        ChangeTracker.Tracked += (s, e) => OnEntityStateChanged(e.Entry);
+        ChangeTracker.StateChanged += (s, e) => OnEntityStateChanged(e.Entry);
     }
 
     // Used for mocking.
     protected MarketParticipantDbContext()
     {
+        _auditIdentityProvider = KnownAuditIdentityProvider.TestFramework;
+
+        ChangeTracker.Tracked += (s, e) => OnEntityStateChanged(e.Entry);
+        ChangeTracker.StateChanged += (s, e) => OnEntityStateChanged(e.Entry);
     }
 
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
@@ -53,7 +68,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UserInviteAuditLogEntryEntity> UserInviteAuditLogEntries { get; private set; } = null!;
     public DbSet<UserIdentityAuditLogEntryEntity> UserIdentityAuditLogEntries { get; private set; } = null!;
     public DbSet<PermissionEntity> Permissions { get; private set; } = null!;
-    public DbSet<PermissionAuditLogEntryEntity> PermissionAuditLogEntries { get; private set; } = null!;
     public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
     public DbSet<EmailEventEntity> EmailEventEntries { get; private set; } = null!;
 
@@ -85,9 +99,26 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new UserInviteAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserIdentityAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new PermissionAuditLogEntryEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
         base.OnModelCreating(modelBuilder);
+    }
+
+    private void OnEntityStateChanged(EntityEntry entityEntry)
+    {
+        if (entityEntry.Entity is not IAuditedEntity changedByIdentity)
+            return;
+
+        switch (entityEntry.State)
+        {
+            case EntityState.Modified:
+                changedByIdentity.Version++;
+                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                break;
+            case EntityState.Added:
+                changedByIdentity.Version++;
+                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                break;
+        }
     }
 }

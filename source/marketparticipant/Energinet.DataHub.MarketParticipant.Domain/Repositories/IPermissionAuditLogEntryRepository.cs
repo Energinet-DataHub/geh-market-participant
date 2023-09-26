@@ -24,12 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IPermissionAuditLogEntryRepository
 {
     /// <summary>
-    /// Inserts a <see cref="PermissionAuditLogEntry"/>
-    /// </summary>
-    /// <param name="logEntry">The audit log entry.</param>
-    Task InsertAuditLogEntryAsync(PermissionAuditLogEntry logEntry);
-
-    /// <summary>
     /// Retrieves all log entries for a given permission.
     /// </summary>
     /// <param name="permission">The permission to get the logs for.</param>

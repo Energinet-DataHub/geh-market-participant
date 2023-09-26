@@ -17,16 +17,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 
-public static class HistoryAuditExtensions
+public static class AuditExtensions
 {
     public static async Task<IReadOnlyList<(T Entity, DateTimeOffset PeriodStart)>> ReadAllHistoryForAsync<T>(this DbSet<T> target, Expression<Func<T, bool>> entitySelector)
-        where T : class
+        where T : class, IAuditedEntity
     {
         ArgumentNullException.ThrowIfNull(target);
         ArgumentNullException.ThrowIfNull(entitySelector);
@@ -42,9 +43,9 @@ public static class HistoryAuditExtensions
             .Select(entity => new
             {
                 Entity = entity,
-                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart")
+                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
             })
-            .SingleAsync()
+            .SingleOrDefaultAsync()
             .ConfigureAwait(false);
 
         var allHistory = await target
@@ -54,14 +55,17 @@ public static class HistoryAuditExtensions
             .Select(entity => new
             {
                 Entity = entity,
-                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart")
+                PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
             })
-            .OrderBy(entity => entity.PeriodStart)
+            .OrderBy(entity => entity.Entity.Version)
             .ToListAsync()
             .ConfigureAwait(false);
 
-        return allHistory
-            .Append(latest)
+        var combined = latest != null
+            ? allHistory.Append(latest)
+            : allHistory;
+
+        return combined
             .Select(entity => (entity.Entity, new DateTimeOffset(entity.PeriodStart, TimeSpan.Zero)))
             .ToList();
     }
