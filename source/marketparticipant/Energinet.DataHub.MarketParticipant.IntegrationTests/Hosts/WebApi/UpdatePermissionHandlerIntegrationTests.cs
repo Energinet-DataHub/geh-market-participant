@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -54,7 +53,6 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
-            frontendUser.Id,
             (int)userRoleWithPermission.Permissions[0].Permission,
             newPermissionDescription);
 
@@ -74,19 +72,18 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(context);
 
         var frontendUser = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(frontendUser.Id);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var permissionRepo = new PermissionAuditLogEntryRepository(context);
 
-        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync();
+        var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
         var newPermissionDescription = Guid.NewGuid().ToString();
 
         var updateCommand = new UpdatePermissionCommand(
-            frontendUser.Id,
             (int)userRoleWithPermission.Permissions[0].Permission,
             newPermissionDescription);
 
@@ -94,8 +91,11 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         await mediator.Send(updateCommand);
 
         // Assert
-        var logs = await permissionRepo.GetAsync(userRoleWithPermission.Permissions[0].Permission).ConfigureAwait(false);
-        Assert.Single(logs.ToList(), p =>
+        var logs = await permissionAuditLogEntryRepository
+            .GetAsync(userRoleWithPermission.Permissions[0].Permission)
+            .ConfigureAwait(false);
+
+        Assert.Single(logs, p =>
             p.Permission == userRoleWithPermission.Permissions[0].Permission &&
             p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
             p.ChangedByUserId.Value == frontendUser.Id);

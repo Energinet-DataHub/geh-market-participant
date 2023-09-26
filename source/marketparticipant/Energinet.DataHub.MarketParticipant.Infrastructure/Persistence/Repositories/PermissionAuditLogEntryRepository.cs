@@ -14,13 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -35,34 +34,45 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<PermissionAuditLogEntry>> GetAsync(PermissionId permission)
         {
-            var permissions = _context.PermissionAuditLogEntries
-                .Where(p => p.PermissionId == permission);
+            var historicEntities = await _context.Permissions
+                .ReadAllHistoryForAsync(entity => entity.Id == permission)
+                .ConfigureAwait(false);
 
-            return await permissions
-                .Select(p =>
-                    new PermissionAuditLogEntry(
-                        p.PermissionId,
-                        new UserId(p.ChangedByUserId),
-                        p.PermissionChangeType,
-                        p.Timestamp,
-                        p.Value)).ToListAsync().ConfigureAwait(false);
-        }
-
-        public Task InsertAuditLogEntryAsync(PermissionAuditLogEntry logEntry)
-        {
-            ArgumentNullException.ThrowIfNull(logEntry);
-
-            var entity = new PermissionAuditLogEntryEntity
+            var auditedProperties = new[]
             {
-                PermissionId = logEntry.Permission,
-                PermissionChangeType = logEntry.PermissionChangeType,
-                Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
-                Value = logEntry.Value
+                new
+                {
+                    Property = PermissionChangeType.DescriptionChange,
+                    ReadValue = new Func<PermissionEntity, object?>(entity => entity.Description)
+                },
             };
 
-            _context.PermissionAuditLogEntries.Add(entity);
-            return _context.SaveChangesAsync();
+            var auditEntries = new List<PermissionAuditLogEntry>();
+
+            for (var i = 0; i < historicEntities.Count; i++)
+            {
+                var isFirst = i == 0;
+                var current = historicEntities[i];
+                var previous = isFirst ? current : historicEntities[i - 1];
+
+                foreach (var auditedProperty in auditedProperties)
+                {
+                    var currentValue = auditedProperty.ReadValue(current.Entity);
+                    var previousValue = auditedProperty.ReadValue(previous.Entity);
+
+                    if (!Equals(currentValue, previousValue) || isFirst)
+                    {
+                        auditEntries.Add(new PermissionAuditLogEntry(
+                            permission,
+                            new AuditIdentity(current.Entity.ChangedByIdentityId),
+                            auditedProperty.Property,
+                            current.PeriodStart,
+                            currentValue?.ToString() ?? string.Empty));
+                    }
+                }
+            }
+
+            return auditEntries;
         }
     }
 }
