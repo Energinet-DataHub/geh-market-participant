@@ -20,6 +20,6 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
     {
         // Matches                                                  {type} {timestamp } {name}
         // Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Scripts.Model.202103021434 First.sql
-        public static readonly Regex Regex = new Regex(@".*Scripts\.(?<environment>T_001|T_002|U_001|U_002|B_001|B_002|P_001|D_001|D_002|LocalDB)(\.(?<type>Model|Seed|Test))?\.(?<timestamp>\d{12}) (?<name>\D*).sql");
+        public static readonly Regex Regex = new Regex(@".*Scripts\.(?<environment>T_001|TEST_001|TEST_002|U_001|U_002|B_001|B_002|PREPROD_001|PREPROD_002|PROD_001|DEV_001|DEV_002|LocalDB)(\.(?<type>Model|Seed|Test))?\.(?<timestamp>\d{12}) (?<name>\D*).sql");
     }
 }
