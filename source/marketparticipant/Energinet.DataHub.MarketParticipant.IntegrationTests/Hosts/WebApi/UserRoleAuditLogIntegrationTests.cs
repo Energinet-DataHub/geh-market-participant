@@ -18,9 +18,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -43,6 +45,26 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
     {
         _fixture = fixture;
     }
+
+    private static UserRoleEntity ValidUserRole => new()
+    {
+        Name = "Integration Test User Role - Audit Log",
+        Description = "Integration Test User Role Description",
+        Status = UserRoleStatus.Active,
+        ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
+        EicFunctions =
+        {
+            new UserRoleEicFunctionEntity { EicFunction = EicFunction.DataHubAdministrator }
+        },
+        Permissions =
+        {
+            new UserRolePermissionEntity
+            {
+                Permission = PermissionId.ActorsManage,
+                ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
+            }
+        }
+    };
 
     [Fact]
     public async Task Create_UserRole_AuditLogSaved()
@@ -97,8 +119,8 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync();
 
-        const string nameUpdate = "UpdateUserRole_NameChangedAuditLog_Updated";
-        const string descriptionUpdate = "UpdateUserRole_DescriptionChangedAuditLog_Updated";
+        const string nameUpdate = "Update_UserRole_AllChanges_NameChangedAuditLog";
+        const string descriptionUpdate = "Update_UserRole_AllChanges_DescriptionChangedAuditLog";
         const UserRoleStatus userRoleStatusUpdate = UserRoleStatus.Inactive;
         var userRolePermissionsUpdate = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
 
@@ -142,7 +164,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var user = await _fixture.PrepareUserAsync().ConfigureAwait(false);
-        var userRole = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.ActorsManage }, EicFunction.DataHubAdministrator).ConfigureAwait(false);
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
 
         var userRolePermissionsUpdates = new List<Collection<int>>
         {
