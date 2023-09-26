@@ -156,7 +156,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
     [Fact]
     public async Task Update_UserRole_PermissionChanges_FiveTimes()
     {
-                // Arrange
+        // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
