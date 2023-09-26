@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 {
     public static class EnvironmentFilter
     {
-        private static readonly string[] _validEnvironments = { "U-001", "U-002", "T-001", "B-001", "B-002", "P-001", "D-001" };
+        private static readonly string[] _validEnvironments = { "U-001", "U-002", "T-001", "T-002", "B-001", "B-002", "P-001", "D-001", "D-002" };
 
         public static Func<string, bool> GetFilter(string[] args)
         {

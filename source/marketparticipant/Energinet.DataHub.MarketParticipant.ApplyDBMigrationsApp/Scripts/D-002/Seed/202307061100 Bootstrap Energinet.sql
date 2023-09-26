@@ -61,7 +61,7 @@ VALUES
     (
         @actorId,
         @organisationId,
-        '23b17b7f-2927-4714-8a88-2a26291c3921',
+        '39e8ef5a-f492-47fa-bf82-4aa39bdc641c',
         '5790001330583',
         2,
         'Energinet DataHub A/S (DataHub systemadministrator)',
@@ -92,7 +92,7 @@ INSERT INTO [dbo].[User] (
 VALUES
     (
         @userId,
-        '21f352ee-7308-4bfe-b9bf-ad8a3cb362ae',
+        '3ce71fbd-89ad-428d-bd0e-a69291f54e58',
         'bootstrap.datahub@energinet.dk',
         NULL,
         '00000000-0000-1111-0000-000000000000',
