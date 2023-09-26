@@ -201,7 +201,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 {
                     d.ChangedByIdentityId,
                     d.DeletedByIdentityId,
-                    Timestamp = d.PeriodEnd,
+                    Timestamp = d.PeriodStart,
                     d.Permission,
                 }).ToList();
 
