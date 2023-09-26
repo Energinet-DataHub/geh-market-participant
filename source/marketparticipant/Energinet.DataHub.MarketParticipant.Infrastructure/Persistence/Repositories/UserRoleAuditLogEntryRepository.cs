@@ -144,7 +144,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Select(d => new
                 {
                     d.UserRoleId,
-                    d.CreatedByIdentityId,
+                    d.ChangedByIdentityId,
                     d.DeletedByIdentityId,
                     PeriodStart = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodStart"), DateTimeKind.Utc),
                     PeriodEnd = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodEnd"), DateTimeKind.Utc),
@@ -159,7 +159,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Select(d => new
                 {
                     d.UserRoleId,
-                    d.CreatedByIdentityId,
+                    d.ChangedByIdentityId,
                     d.DeletedByIdentityId,
                     PeriodStart = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodStart"), DateTimeKind.Utc),
                     PeriodEnd = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodEnd"), DateTimeKind.Utc),
@@ -177,7 +177,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ToList();
             var createdPermissionState = createdStateElements.Any() ? new UserRoleAuditLogEntry(
                 new UserRoleId(userRoleId.Value),
-                createdStateElements.First().CreatedByIdentityId,
+                createdStateElements.First().ChangedByIdentityId,
                 string.Empty,
                 string.Empty,
                 createdStateElements.Select(p => p.Permission),
@@ -190,7 +190,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Where(e => e.DeletedByIdentityId == null && e.PeriodStart != userRoleCreatedLogEntry.Timestamp)
                 .Select(d => new
                 {
-                    d.CreatedByIdentityId,
+                    d.ChangedByIdentityId,
                     d.DeletedByIdentityId,
                     Timestamp = d.PeriodStart,
                     d.Permission,
@@ -199,7 +199,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .Where(e => e.DeletedByIdentityId != null)
                 .Select(d => new
                 {
-                    d.CreatedByIdentityId,
+                    d.ChangedByIdentityId,
                     d.DeletedByIdentityId,
                     Timestamp = d.PeriodEnd,
                     d.Permission,
@@ -225,7 +225,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
                 var userRoleAuditLogEntry = new UserRoleAuditLogEntry(
                         new UserRoleId(userRoleId.Value),
-                        permissionChange.First().CreatedByIdentityId,
+                        permissionChange.First().ChangedByIdentityId,
                         string.Empty,
                         string.Empty,
                         prevStateCopy,
@@ -250,10 +250,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return permissionChanges;
         }
 
-        private async Task<Domain.Model.EicFunction> GetEicFunctionForUserRoleAsync(UserRoleId userRoleId)
+        private async Task<EicFunction> GetEicFunctionForUserRoleAsync(UserRoleId userRoleId)
         {
             var userRole = await _context
                 .UserRoles
+                .Include(u => u.EicFunctions)
                 .FirstAsync(up => up.Id == userRoleId.Value)
                 .ConfigureAwait(false);
 

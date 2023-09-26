@@ -21,5 +21,4 @@ public sealed class UserRoleEicFunctionEntity
 {
     public Guid UserRoleId { get; set; }
     public EicFunction EicFunction { get; set; }
-    public Guid ChangedByIdentityId { get; set; }
 }

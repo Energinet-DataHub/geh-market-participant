@@ -48,7 +48,8 @@ public sealed class UserInvitationTests
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
-                EicFunction.BalanceResponsibleParty)
+                EicFunction.BalanceResponsibleParty,
+                Guid.NewGuid())
         });
 
     [Fact]
@@ -123,7 +124,8 @@ public sealed class UserInvitationTests
             "fake_value",
             status,
             Array.Empty<PermissionId>(),
-            EicFunction.BalanceResponsibleParty);
+            EicFunction.BalanceResponsibleParty,
+            Guid.NewGuid());
 
         // Act + Assert
         if (isValid)
@@ -164,7 +166,8 @@ public sealed class UserInvitationTests
             "fake_value",
             UserRoleStatus.Active,
             Array.Empty<PermissionId>(),
-            eicFunction);
+            eicFunction,
+            Guid.NewGuid());
 
         // Act + Assert
         if (isValid)

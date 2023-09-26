@@ -57,7 +57,8 @@ public sealed class UserInvitationServiceTests
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
-                EicFunction.BalanceResponsibleParty)
+                EicFunction.BalanceResponsibleParty,
+                Guid.NewGuid())
         });
 
     private readonly UserId _validInvitedByUserId = new UserId(Guid.NewGuid());

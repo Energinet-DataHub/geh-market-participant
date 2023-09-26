@@ -42,12 +42,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var userRepository = new Mock<IUserRepository>();
             var target = new DeactivateUserRoleHandler(
                 userRepository.Object,
-                new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IUserRoleAuditLogService>().Object,
-                new Mock<IUserRoleAuditLogEntryRepository>().Object);
+                UnitOfWorkProviderMock.Create());
 
             var userRoleId = Guid.NewGuid();
             var changedByUserId = Guid.NewGuid();
@@ -80,12 +76,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
-                new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
-                userContextMock.Object,
                 userRoleRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IUserRoleAuditLogService>().Object,
-                new Mock<IUserRoleAuditLogEntryRepository>().Object);
+                UnitOfWorkProviderMock.Create());
 
             var changedByUserId = Guid.NewGuid();
             var command = new DeactivateUserRoleCommand(userAndRole.UserRole.Id.Value, changedByUserId);
@@ -114,12 +106,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var numberOfRolesBeforeCommand = userAndRole.User.RoleAssignments.Count;
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
-                new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
-                userContextMock.Object,
                 userRoleRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IUserRoleAuditLogService>().Object,
-                new Mock<IUserRoleAuditLogEntryRepository>().Object);
+                UnitOfWorkProviderMock.Create());
 
             var changedByUserId = Guid.NewGuid();
             var command = new DeactivateUserRoleCommand(userAndRole.UserRole.Id.Value, changedByUserId);

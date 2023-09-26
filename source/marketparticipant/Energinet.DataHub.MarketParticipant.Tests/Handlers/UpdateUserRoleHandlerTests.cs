@@ -42,9 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
-            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
+            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
             var roleId = Guid.NewGuid();
             userRoleRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
@@ -66,9 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
-            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
+            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
 
             var existingUserRoleWithSameName = new UserRole(
                 new UserRoleId(Guid.NewGuid()),
@@ -76,7 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent);
+                EicFunction.BillingAgent,
+                Guid.NewGuid());
 
             userRoleRepositoryMock
                 .Setup(x => x.GetByNameInMarketRoleAsync(It.IsAny<string>(), existingUserRoleWithSameName.EicFunction))
@@ -88,7 +85,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent);
+                EicFunction.BillingAgent,
+                Guid.NewGuid());
 
             var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
                 "UserRoleNameNew",
@@ -110,9 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
-            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object, userRoleAuditLogServiceMock.Object, userRoleAuditLogEntryRepositoryMock.Object);
+            var target = new UpdateUserRoleHandler(userRoleRepositoryMock.Object);
             var roleId = Guid.NewGuid();
             var existingUserRoleWithSameName = new UserRole(
                 new UserRoleId(Guid.NewGuid()),
@@ -120,7 +116,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Inactive,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent);
+                EicFunction.BillingAgent,
+                Guid.NewGuid());
 
             userRoleRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))

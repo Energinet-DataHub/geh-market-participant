@@ -41,13 +41,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
             var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
             var target = new CreateUserRoleHandler(
                 userRoleRepositoryMock.Object,
-                userRoleAuditLogServiceMock.Object,
-                userRoleAuditLogEntryRepositoryMock.Object,
                 userRoleHelperServiceMock.Object);
 
             var roleId = Guid.NewGuid();
@@ -57,7 +53,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent);
+                EicFunction.BillingAgent,
+                Guid.NewGuid());
 
             userRoleRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<UserRole>()))
@@ -88,13 +85,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
             var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
             var target = new CreateUserRoleHandler(
                 userRoleRepositoryMock.Object,
-                userRoleAuditLogServiceMock.Object,
-                userRoleAuditLogEntryRepositoryMock.Object,
                 userRoleHelperServiceMock.Object);
 
             var roleId = Guid.NewGuid();
@@ -104,7 +97,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent);
+                EicFunction.BillingAgent,
+                Guid.NewGuid());
 
             userRoleRepositoryMock
                 .Setup(x => x.AddAsync(It.IsAny<UserRole>()))

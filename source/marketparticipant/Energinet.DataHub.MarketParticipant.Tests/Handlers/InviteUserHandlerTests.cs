@@ -180,7 +180,8 @@ public sealed class InviteUserHandlerTests
                 "fake_value",
                 UserRoleStatus.Active,
                 Array.Empty<PermissionId>(),
-                EicFunction.MeteredDataResponsible));
+                EicFunction.MeteredDataResponsible,
+                Guid.NewGuid()));
 
         var target = new InviteUserHandler(
             userInvitationServiceMock.Object,

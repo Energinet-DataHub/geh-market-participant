@@ -96,7 +96,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
         foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity
                  {
                      Permission = x,
-                     CreatedByIdentityId = userRole.ChangedByIdentityId
+                     ChangedByIdentityId = userRole.ChangedByIdentityId
                  }))
         {
             role.Permissions.Add(permissionEntity);
@@ -138,7 +138,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
                 .Select(x => new UserRolePermissionEntity
                 {
                     Permission = x,
-                    CreatedByIdentityId = userRoleUpdate.ChangedByIdentityId
+                    ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId
                 })
                 .ToList();
 
