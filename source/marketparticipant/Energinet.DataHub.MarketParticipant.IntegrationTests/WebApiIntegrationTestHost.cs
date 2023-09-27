@@ -89,6 +89,6 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
         var userIdProvider = new Mock<IUserContext<FrontendUser>>();
         userIdProvider.Setup(x => x.CurrentUser).Returns(mockUser);
-        services.AddSingleton(() => userIdProvider.Object);
+        services.AddSingleton(userIdProvider.Object);
     }
 }
