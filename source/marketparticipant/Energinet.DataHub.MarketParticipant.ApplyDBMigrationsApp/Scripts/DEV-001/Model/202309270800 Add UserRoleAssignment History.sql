@@ -8,8 +8,8 @@ ALTER TABLE [dbo].[UserRoleAssignment] ADD
     
     Version             int              NOT NULL DEFAULT 0,
     ChangedByIdentityId uniqueidentifier NOT NULL,
-    DeletedByIdentityId uniqueidentifier     NULL
-    CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000');
+    CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000'),
+    DeletedByIdentityId uniqueidentifier     NULL;
 GO
 
 ALTER TABLE [dbo].[UserRoleAssignment]
