@@ -87,7 +87,6 @@ namespace Energinet.DataHub.MarketParticipant.Common
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
-            services.AddScoped<IUserRoleAuditLogService, UserRoleAuditLogService>();
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
             services.AddScoped<IAuditIdentityResolver, AuditIdentityResolver>();
