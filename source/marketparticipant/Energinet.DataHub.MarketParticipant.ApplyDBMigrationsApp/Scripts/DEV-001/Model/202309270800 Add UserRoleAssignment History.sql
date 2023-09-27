@@ -7,7 +7,7 @@ ALTER TABLE [dbo].[UserRoleAssignment] ADD
     PERIOD FOR SYSTEM_TIME(PeriodStart, PeriodEnd),
     
     Version             int              NOT NULL DEFAULT 0,
-    ChangedByIdentityId uniqueidentifier NOT NULL,
+    ChangedByIdentityId uniqueidentifier NOT NULL
     CONSTRAINT DF_ChangedByIdentityId DEFAULT('00000000-FFFF-FFFF-FFFF-000000000000'),
     DeletedByIdentityId uniqueidentifier     NULL;
 GO
