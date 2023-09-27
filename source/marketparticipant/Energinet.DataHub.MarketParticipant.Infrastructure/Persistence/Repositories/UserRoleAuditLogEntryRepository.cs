@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             // Get EicFunction for userRole
             var readOnlyEicFunction = await GetEicFunctionForUserRoleAsync(userRoleId).ConfigureAwait(false);
 
-            // Set permissions for created user role
+            // Set permissions for created user role and merge logs
             var auditLogs = MergeCreatedStateAndLists(userRoleChangesAuditLogs, permissionsChanges, readOnlyEicFunction);
 
             return auditLogs
