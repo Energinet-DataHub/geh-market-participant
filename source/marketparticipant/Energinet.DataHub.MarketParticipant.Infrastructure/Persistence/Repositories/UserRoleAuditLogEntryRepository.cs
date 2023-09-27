@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -87,54 +88,45 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ReadAllHistoryForAsync(entity => entity.Id == userRoleId.Value)
                 .ConfigureAwait(false);
 
-            var emptyPermissions = Enumerable.Empty<PermissionId>();
-
-            UserRoleAuditLogEntry CopyAndSetChangeType(UserRoleAuditLogEntry userRoleEntity, UserRoleChangeType changeType) => userRoleEntity with { ChangeType = changeType };
-
-            var userRoleAssignmentLogsOrdered = await _context
-                .UserRoles
-                .TemporalAll()
-                .Where(e => e.Id == userRoleId.Value)
-                .OrderBy(o => EF.Property<DateTime>(o, "PeriodStart"))
-                .Select(log =>
-                    new UserRoleAuditLogEntry(
-                        new UserRoleId(log.Id),
-                        log.ChangedByIdentityId,
-                        log.Name,
-                        log.Description,
-                        emptyPermissions,
-                        null,
-                        log.Status,
-                        UserRoleChangeType.Created,
-                        EF.Property<DateTime>(log, "PeriodStart")))
-                .ToListAsync().ConfigureAwait(false);
+            UserRoleAuditLogEntry CopyAndSetChangeType(UserRoleEntity userRoleEntity, DateTimeOffset changeTimeStamp, UserRoleChangeType changeType) => new(
+                new UserRoleId(userRoleEntity.Id),
+                userRoleEntity.ChangedByIdentityId,
+                userRoleEntity.Name,
+                userRoleEntity.Description,
+                Enumerable.Empty<PermissionId>(),
+                null,
+                userRoleEntity.Status,
+                changeType,
+                changeTimeStamp);
 
             var logs = new List<UserRoleAuditLogEntry>();
 
-            for (var index = 0; index < userRoleAssignmentLogsOrdered.Count; index++)
+            for (var index = 0; index < historicEntities.Count; index++)
             {
-                var currentHistoryLog = userRoleAssignmentLogsOrdered[index];
+                var currentHistoryLog = historicEntities[index].Entity;
+                var currentPeriodStart = historicEntities[index].PeriodStart;
+
                 if (index == 0)
                 {
-                    logs.Add(CopyAndSetChangeType(currentHistoryLog, UserRoleChangeType.Created));
+                    logs.Add(CopyAndSetChangeType(currentHistoryLog, currentPeriodStart, UserRoleChangeType.Created));
                     continue;
                 }
 
-                var previousHistoryLog = userRoleAssignmentLogsOrdered[index - 1];
+                var previousHistoryLog = historicEntities[index - 1].Entity;
 
                 if (currentHistoryLog.Name != previousHistoryLog.Name)
                 {
-                    logs.Add(CopyAndSetChangeType(currentHistoryLog, UserRoleChangeType.NameChange));
+                    logs.Add(CopyAndSetChangeType(currentHistoryLog, currentPeriodStart, UserRoleChangeType.NameChange));
                 }
 
                 if (currentHistoryLog.Description != previousHistoryLog.Description)
                 {
-                    logs.Add(CopyAndSetChangeType(currentHistoryLog, UserRoleChangeType.DescriptionChange));
+                    logs.Add(CopyAndSetChangeType(currentHistoryLog, currentPeriodStart, UserRoleChangeType.DescriptionChange));
                 }
 
                 if (currentHistoryLog.Status != previousHistoryLog.Status)
                 {
-                    logs.Add(CopyAndSetChangeType(currentHistoryLog, UserRoleChangeType.StatusChange));
+                    logs.Add(CopyAndSetChangeType(currentHistoryLog, currentPeriodStart, UserRoleChangeType.StatusChange));
                 }
             }
 
