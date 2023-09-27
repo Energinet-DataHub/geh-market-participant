@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -49,7 +50,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
 
     private static UserRoleEntity ValidUserRole => new()
     {
-        Name = "Integration Test User Role - Audit Log",
+        Name = "Integration Test User Role - Audit Log - " + Guid.NewGuid(),
         Description = "Integration Test User Role Description",
         Status = UserRoleStatus.Active,
         ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
@@ -154,7 +155,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
     }
 
     [Fact]
-    public async Task Update_UserRole_PermissionChanges_FiveTimes()
+    public async Task Update_UserRole_PermissionChanges_FiveUpdates()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -187,15 +188,32 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
 
         // Assert
         var resultList = auditLogs.ToList();
-        resultList.Should().HaveCount(6);
-        resultList.Where(e => e.ChangeType == UserRoleChangeType.PermissionsChange).Should().HaveCount(5);
-        resultList.Where(e => e.ChangeType == UserRoleChangeType.Created).Should().HaveCount(1);
-        var permissionChanges = resultList.Where(e => e.ChangeType == UserRoleChangeType.PermissionsChange).ToList();
-        for (var i = 0; i < userRolePermissionsUpdates.Count; i++)
-        {
-            permissionChanges[i].Permissions
-                .Select(e => (int)e).OrderBy(e => e).Should()
-                .BeEquivalentTo(userRolePermissionsUpdates[i].OrderBy(e => e));
-        }
+        resultList.Should().HaveCount(22);
+        resultList.Where(e => e.ChangeType is UserRoleChangeType.PermissionAdded or UserRoleChangeType.PermissionRemoved).Should().HaveCount(21);
+        resultList.Where(e => e.ChangeType is UserRoleChangeType.Created).Should().HaveCount(1);
+        var permissionChanges = resultList
+            .Where(e => e.ChangeType is UserRoleChangeType.PermissionAdded or UserRoleChangeType.PermissionRemoved)
+            .OrderBy(p => p.Timestamp)
+            .ToList();
+        Assert.Single(permissionChanges, e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.OrganizationsView);
+        Assert.Single(permissionChanges, e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.OrganizationsManage);
+
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.UsersView));
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionRemoved && e.Permissions.First() == PermissionId.UsersView));
+
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.UsersManage));
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionRemoved && e.Permissions.First() == PermissionId.UsersManage));
+
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.PermissionsManage));
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionRemoved && e.Permissions.First() == PermissionId.PermissionsManage));
+
+        Assert.Equal(1, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.ActorsManage));
+        Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionRemoved && e.Permissions.First() == PermissionId.ActorsManage));
+
+        Assert.Equal(1, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.SettlementReportsManage));
+        Assert.Equal(1, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionRemoved && e.Permissions.First() == PermissionId.SettlementReportsManage));
+
+        Assert.Equal(1, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.GridAreasManage));
+        Assert.Equal(1, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionRemoved && e.Permissions.First() == PermissionId.GridAreasManage));
     }
 }

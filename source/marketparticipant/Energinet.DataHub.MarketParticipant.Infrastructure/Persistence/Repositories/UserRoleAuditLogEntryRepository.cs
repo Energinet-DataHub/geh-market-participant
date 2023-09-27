@@ -185,57 +185,30 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var addedChanges = userRolePermissionHistoryList
                 .Where(e => e.DeletedByIdentityId == null && e.PeriodStart != userRoleCreatedLogEntry.Timestamp)
-                .Select(d => new
-                {
+                .Select(d => new UserRoleAuditLogEntry(
+                    new UserRoleId(userRoleId.Value),
                     d.ChangedByIdentityId,
-                    d.DeletedByIdentityId,
-                    Timestamp = d.PeriodStart,
-                    d.Permission,
-                }).ToList();
+                    string.Empty,
+                    string.Empty,
+                    new List<PermissionId>() { d.Permission },
+                    null,
+                    UserRoleStatus.Active,
+                    UserRoleChangeType.PermissionAdded,
+                    d.PeriodStart)).ToList();
             var deletedChanges = userRolePermissionHistoryList
                 .Where(e => e.DeletedByIdentityId != null)
-                .Select(d => new
-                {
+                .Select(d => new UserRoleAuditLogEntry(
+                    new UserRoleId(userRoleId.Value),
                     d.ChangedByIdentityId,
-                    d.DeletedByIdentityId,
-                    Timestamp = d.PeriodStart,
-                    d.Permission,
-                }).ToList();
+                    string.Empty,
+                    string.Empty,
+                    new List<PermissionId>() { d.Permission },
+                    null,
+                    UserRoleStatus.Active,
+                    UserRoleChangeType.PermissionRemoved,
+                    d.PeriodStart)).ToList();
 
-            var changes = addedChanges.Concat(deletedChanges).ToList();
-            var groupChangesByTimestamp = changes
-                .GroupBy(e => e.Timestamp)
-                .OrderBy(e => e.Key);
-
-            var prevState = createdPermissionState?.Permissions.ToList() ?? new List<PermissionId>();
-
-            var result = new List<UserRoleAuditLogEntry>();
-            foreach (var permissionChange in groupChangesByTimestamp)
-            {
-                var prevStateCopy = new List<PermissionId>(prevState);
-
-                var deletedPermissionsIds = permissionChange.Where(e => e.DeletedByIdentityId != null).Select(e => e.Permission).ToList();
-                var addedPermissionsIds = permissionChange.Where(e => e.DeletedByIdentityId == null).Select(e => e.Permission).ToList();
-
-                prevStateCopy.RemoveAll(e => deletedPermissionsIds.Contains(e));
-                prevStateCopy.AddRange(addedPermissionsIds);
-
-                var userRoleAuditLogEntry = new UserRoleAuditLogEntry(
-                        new UserRoleId(userRoleId.Value),
-                        permissionChange.First().ChangedByIdentityId,
-                        string.Empty,
-                        string.Empty,
-                        prevStateCopy,
-                        null,
-                        UserRoleStatus.Active,
-                        UserRoleChangeType.PermissionsChange,
-                        permissionChange.Key);
-
-                prevState = prevStateCopy;
-                result.Add(userRoleAuditLogEntry);
-            }
-
-            var permissionChanges = result
+            var permissionChanges = addedChanges.Concat(deletedChanges)
                 .OrderBy(d => d.Timestamp)
                 .ToList();
 
