@@ -71,7 +71,7 @@ public sealed class UserRoleController : ControllerBase
     [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> CreateAsync(CreateUserRoleDto userRole)
     {
-        var command = new CreateUserRoleCommand(_userContext.CurrentUser.UserId, userRole);
+        var command = new CreateUserRoleCommand(userRole);
 
         var response = await _mediator
             .Send(command)

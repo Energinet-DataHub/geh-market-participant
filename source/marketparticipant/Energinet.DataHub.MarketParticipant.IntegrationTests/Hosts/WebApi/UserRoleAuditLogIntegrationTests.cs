@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -73,11 +74,11 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
-
+        //var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
+        var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var user = await _fixture.PrepareUserAsync().ConfigureAwait(false);
+        await _fixture.PrepareUserAsync().ConfigureAwait(false);
 
         const string name = "Create_UserRole_AuditLogSaved";
         var createUserRoleDto = new CreateUserRoleDto(
@@ -87,7 +88,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             EicFunction.DataHubAdministrator,
             new Collection<int> { (int)PermissionId.OrganizationsView, (int)PermissionId.UsersManage });
 
-        var createUserRoleCommand = new CreateUserRoleCommand(user.Id, createUserRoleDto);
+        var createUserRoleCommand = new CreateUserRoleCommand(createUserRoleDto);
 
         // Act
         var response = await mediator.Send(createUserRoleCommand).ConfigureAwait(false);

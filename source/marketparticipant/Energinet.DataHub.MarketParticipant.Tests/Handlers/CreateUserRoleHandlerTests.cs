@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
                 .ReturnsAsync(true);
 
-            var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(
+            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
@@ -106,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
                 .ReturnsAsync(false);
 
-            var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(
+            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
