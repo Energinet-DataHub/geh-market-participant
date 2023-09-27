@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -53,12 +54,18 @@ public sealed class UserRepository : IUserRepository
         entity.MitIdSignupInitiatedAt = user.MitIdSignupInitiatedAt;
         entity.InvitationExpiresAt = user.InvitationExpiresAt;
 
-        var transaction = await ((DbContext)_marketParticipantDbContext)
-            .Database
-            .BeginTransactionAsync()
-            .ConfigureAwait(false);
+        var currentDbContext = (DbContext)_marketParticipantDbContext;
+        IDbContextTransaction? currentTransaction = null;
 
-        await using (transaction.ConfigureAwait(false))
+        if (currentDbContext.Database.CurrentTransaction == null)
+        {
+            currentTransaction = await currentDbContext
+                .Database
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+        }
+
+        try
         {
             await UpdateUserRoleAssignmentsAsync(user.RoleAssignments, entity).ConfigureAwait(false);
 
@@ -68,7 +75,15 @@ public sealed class UserRepository : IUserRepository
                 .SaveChangesAsync()
                 .ConfigureAwait(false);
 
-            await transaction.CommitAsync().ConfigureAwait(false);
+            if (currentTransaction != null)
+                await currentTransaction.CommitAsync().ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            if (currentTransaction != null)
+                await currentTransaction.DisposeAsync().ConfigureAwait(false);
+
+            throw;
         }
 
         return new UserId(entity.Id);
