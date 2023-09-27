@@ -63,8 +63,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; private set; } = null!;
     public DbSet<UserRolePermissionEntity> UserRolePermissionEntries { get; private set; } = null!;
     public DbSet<UserRolePermissionHistoryEntity> UserRolePermissionHistoryEntries { get; private set; } = null!;
-    public DbSet<UserRoleEicFunctionEntity> UserRoleEicFunctionEntries { get; private set; } = null!;
-
     public DbSet<UserInviteAuditLogEntryEntity> UserInviteAuditLogEntries { get; private set; } = null!;
     public DbSet<UserIdentityAuditLogEntryEntity> UserIdentityAuditLogEntries { get; private set; } = null!;
     public DbSet<PermissionEntity> Permissions { get; private set; } = null!;

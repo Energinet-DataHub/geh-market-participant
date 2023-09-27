@@ -95,11 +95,6 @@ public interface IMarketParticipantDbContext
     DbSet<UserRolePermissionHistoryEntity> UserRolePermissionHistoryEntries { get; }
 
     /// <summary>
-    ///     Represent access to the UserRoles eic function relation database table
-    /// </summary>
-    DbSet<UserRoleEicFunctionEntity> UserRoleEicFunctionEntries { get; }
-
-    /// <summary>
     ///     Represent access to the UserRoleAssignmentAuditLogEntry database table
     /// </summary>
     DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; }
