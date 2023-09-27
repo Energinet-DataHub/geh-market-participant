@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -28,13 +29,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
 public sealed class UserRoleRepository : IUserRoleRepository
 {
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public UserRoleRepository(
+        IAuditIdentityProvider auditIdentityProvider,
         IMarketParticipantDbContext marketParticipantDbContext,
         IUnitOfWorkProvider unitOfWorkProvider)
     {
+        _auditIdentityProvider = auditIdentityProvider;
         _marketParticipantDbContext = marketParticipantDbContext;
         _unitOfWorkProvider = unitOfWorkProvider;
     }
@@ -90,13 +94,12 @@ public sealed class UserRoleRepository : IUserRoleRepository
             Name = userRole.Name,
             Description = userRole.Description,
             Status = userRole.Status,
-            ChangedByIdentityId = userRole.ChangedByIdentityId
         };
 
         foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity
                  {
                      Permission = x,
-                     ChangedByIdentityId = userRole.ChangedByIdentityId
+                     ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value
                  }))
         {
             role.Permissions.Add(permissionEntity);
@@ -118,13 +121,6 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
         if (userRoleEntity != null)
         {
-            if (userRoleEntity.Name != userRoleUpdate.Name ||
-                userRoleEntity.Description != userRoleUpdate.Description ||
-                userRoleEntity.Status != userRoleUpdate.Status)
-            {
-                userRoleEntity.ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId;
-            }
-
             userRoleEntity.Name = userRoleUpdate.Name;
             userRoleEntity.Description = userRoleUpdate.Description;
             userRoleEntity.Status = userRoleUpdate.Status;
@@ -138,7 +134,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
                 .Select(x => new UserRolePermissionEntity
                 {
                     Permission = x,
-                    ChangedByIdentityId = userRoleUpdate.ChangedByIdentityId
+                    ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value
                 })
                 .ToList();
 
@@ -155,7 +151,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             {
                 foreach (var permissionEntity in permissionsDeleted)
                 {
-                    permissionEntity.DeletedByIdentityId = userRoleUpdate.ChangedByIdentityId;
+                    permissionEntity.DeletedByIdentityId = _auditIdentityProvider.IdentityId.Value;
                 }
 
                 await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -196,8 +192,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRole.Description ?? string.Empty,
             userRole.Status,
             userRole.Permissions.Select(p => p.Permission).ToList(),
-            userRole.EicFunctions.First().EicFunction,
-            userRole.ChangedByIdentityId);
+            userRole.EicFunctions.First().EicFunction);
     }
 
     private IQueryable<UserRoleEntity> BuildUserRoleQuery()

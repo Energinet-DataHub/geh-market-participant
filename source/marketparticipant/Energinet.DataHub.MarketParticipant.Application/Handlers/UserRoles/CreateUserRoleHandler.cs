@@ -60,8 +60,7 @@ public sealed class CreateUserRoleHandler
             request.UserRoleDto.Description,
             request.UserRoleDto.Status,
             request.UserRoleDto.Permissions.Select(x => (PermissionId)x),
-            request.UserRoleDto.EicFunction,
-            request.EditingUserId);
+            request.UserRoleDto.EicFunction);
 
         var createdUserRoleId = await _userRoleRepository
             .AddAsync(userRole)

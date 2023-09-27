@@ -42,7 +42,7 @@ public sealed class GetAllUserRolesHandler
             .GetAllAsync()
             .ConfigureAwait(false);
 
-        var userRolesList = userRoles.Select(role => new UserRoleDto(role.Id.Value, role.Name, role.Description, role.EicFunction, role.Status, role.ChangedByIdentityId));
+        var userRolesList = userRoles.Select(role => new UserRoleDto(role.Id.Value, role.Name, role.Description, role.EicFunction, role.Status));
 
         return new GetAllUserRolesResponse(userRolesList);
     }

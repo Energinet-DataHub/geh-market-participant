@@ -26,5 +26,4 @@ public sealed record UserRoleWithPermissionsDto(
     string Description,
     EicFunction EicFunction,
     UserRoleStatus Status,
-    Guid ChangedByIdentityId,
     IEnumerable<PermissionDetailsDto> Permissions);

@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
                 .ReturnsAsync((UserRole?)null);
 
-            var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), roleId, new UpdateUserRoleDto(
+            var updateUserRoleCommand = new UpdateUserRoleCommand(roleId, new UpdateUserRoleDto(
                 "newName",
                 "newDescription",
                 UserRoleStatus.Active,
@@ -72,8 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                Guid.NewGuid());
+                EicFunction.BillingAgent);
 
             userRoleRepositoryMock
                 .Setup(x => x.GetByNameInMarketRoleAsync(It.IsAny<string>(), existingUserRoleWithSameName.EicFunction))
@@ -85,10 +84,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                Guid.NewGuid());
+                EicFunction.BillingAgent);
 
-            var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
+            var updateUserRoleCommand = new UpdateUserRoleCommand(userRoleToUpdate.Id.Value, new UpdateUserRoleDto(
                 "UserRoleNameNew",
                 "fake_value",
                 UserRoleStatus.Active,
@@ -116,14 +114,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "fake_value",
                 UserRoleStatus.Inactive,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                Guid.NewGuid());
+                EicFunction.BillingAgent);
 
             userRoleRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<UserRoleId>()))
                 .ReturnsAsync(existingUserRoleWithSameName);
 
-            var updateUserRoleCommand = new UpdateUserRoleCommand(Guid.NewGuid(), roleId, new UpdateUserRoleDto(
+            var updateUserRoleCommand = new UpdateUserRoleCommand(roleId, new UpdateUserRoleDto(
                 "newName",
                 "newDescription",
                 UserRoleStatus.Active,

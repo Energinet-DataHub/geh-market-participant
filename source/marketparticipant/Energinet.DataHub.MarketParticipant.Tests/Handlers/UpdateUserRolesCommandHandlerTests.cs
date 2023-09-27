@@ -66,8 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "test",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                userContextMock.CurrentUser.UserId);
+                EicFunction.BillingAgent);
 
             var role2 = new UserRole(
                 addedRole2Id,
@@ -75,8 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "test",
                 UserRoleStatus.Active,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                userContextMock.CurrentUser.UserId);
+                EicFunction.BillingAgent);
 
             userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
             userRoleRepositoryMock.Setup(x => x
@@ -152,8 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "test",
                 UserRoleStatus.Inactive,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                userContextMock.CurrentUser.UserId);
+                EicFunction.BillingAgent);
 
             userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
             userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);
@@ -208,8 +205,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "test",
                 (UserRoleStatus)255,
                 new List<PermissionId>(),
-                EicFunction.BillingAgent,
-                userContextMock.CurrentUser.UserId);
+                EicFunction.BillingAgent);
 
             userRepositoryMock.Setup(x => x.GetAsync(user.Id)).ReturnsAsync(user);
             userRoleRepositoryMock.Setup(x => x.GetAsync(deactivatedUserRoleId)).ReturnsAsync(deactivatedUserRole);

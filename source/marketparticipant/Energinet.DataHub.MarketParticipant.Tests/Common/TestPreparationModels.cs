@@ -53,8 +53,7 @@ internal static class TestPreparationModels
         "Test User Role",
         UserRoleStatus.Active,
         Enumerable.Empty<PermissionId>(),
-        EicFunction.BillingAgent,
-        Guid.NewGuid());
+        EicFunction.BillingAgent);
 
     public static User MockedUser(Guid userId) => new(
             new UserId(userId),

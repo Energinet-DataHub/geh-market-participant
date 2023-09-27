@@ -87,7 +87,7 @@ public sealed class UserRoleController : ControllerBase
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
 
-        var command = new UpdateUserRoleCommand(_userContext.CurrentUser.UserId, userRoleId, userRole);
+        var command = new UpdateUserRoleCommand(userRoleId, userRole);
 
         await _mediator.Send(command).ConfigureAwait(false);
 

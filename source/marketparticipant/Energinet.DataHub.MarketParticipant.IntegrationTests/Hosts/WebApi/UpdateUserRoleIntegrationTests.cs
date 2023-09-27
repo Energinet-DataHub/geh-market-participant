@@ -62,7 +62,6 @@ public sealed class UpdateUserRoleIntegrationTests
         existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier });
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -95,7 +94,6 @@ public sealed class UpdateUserRoleIntegrationTests
         var newName = "TestNameU1";
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRoleToUpdate.Id,
             new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -120,7 +118,6 @@ public sealed class UpdateUserRoleIntegrationTests
         var newDescription = "UserRoleDescription updated";
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -153,7 +150,6 @@ public sealed class UpdateUserRoleIntegrationTests
         var userRole = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Status = userRoleStatusToUpdate));
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -184,7 +180,6 @@ public sealed class UpdateUserRoleIntegrationTests
         var newUserRolePermissions = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, newUserRolePermissions));
 

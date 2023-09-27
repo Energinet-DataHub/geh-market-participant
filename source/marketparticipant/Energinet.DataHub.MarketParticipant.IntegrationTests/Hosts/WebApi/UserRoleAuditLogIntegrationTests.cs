@@ -116,7 +116,6 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
 
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync();
 
         const string nameUpdate = "Update_UserRole_AllChanges_NameChangedAuditLog";
@@ -130,7 +129,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             userRoleStatusUpdate,
             userRolePermissionsUpdate);
 
-        var updateUserRoleCommand = new UpdateUserRoleCommand(user.Id, userRole.Id, updateUserRoleDto);
+        var updateUserRoleCommand = new UpdateUserRoleCommand(userRole.Id, updateUserRoleDto);
 
         // Act
         await mediator.Send(updateUserRoleCommand);
@@ -163,7 +162,6 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var user = await _fixture.PrepareUserAsync().ConfigureAwait(false);
         var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
 
         var userRolePermissionsUpdates = new List<Collection<int>>
@@ -180,7 +178,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         // Act
         foreach (var permissions in userRolePermissionsUpdates)
         {
-            var updateUserRoleCommand = new UpdateUserRoleCommand(user.Id, userRole.Id, updateUserRoleDto with { Permissions = permissions });
+            var updateUserRoleCommand = new UpdateUserRoleCommand(userRole.Id, updateUserRoleDto with { Permissions = permissions });
             await mediator.Send(updateUserRoleCommand);
         }
 

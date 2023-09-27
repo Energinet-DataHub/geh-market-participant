@@ -66,7 +66,6 @@ public sealed class GetAvailableUserRolesForActorHandler
                 t.Name,
                 t.Description,
                 t.EicFunction,
-                t.Status,
-                t.ChangedByIdentityId)));
+                t.Status)));
     }
 }

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -49,7 +50,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         // Act
         var user = await userRoleRepository.GetAsync(new UserRoleId(Guid.Empty));
@@ -66,7 +68,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         var userRole = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
 
@@ -88,7 +91,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
 
@@ -107,7 +111,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
         var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
@@ -128,7 +133,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BillingAgent);
         var userRole2 = await _fixture.PrepareUserRoleAsync(new[] { PermissionId.UsersManage }, EicFunction.BalanceResponsibleParty);
@@ -148,7 +154,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         var userRole = await _fixture.PrepareUserRoleAsync(
             new[] { PermissionId.UsersManage },
@@ -171,8 +178,9 @@ public sealed class UserRoleRepositoryTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         await using var context2 = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
-        var userRoleRepository2 = new UserRoleRepository(context2, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
+        var userRoleRepository2 = new UserRoleRepository(auditIdentityProvider, context2, uowProvider);
 
         var userRole = new UserRole(
             new UserRoleId(Guid.Empty),
@@ -180,8 +188,7 @@ public sealed class UserRoleRepositoryTests
             "fake_value",
             UserRoleStatus.Active,
             new List<PermissionId>(),
-            EicFunction.IndependentAggregator,
-            Guid.NewGuid());
+            EicFunction.IndependentAggregator);
 
         await context2.SaveChangesAsync();
 
@@ -207,7 +214,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         var userRoleNameForUpdate = "Access1";
 
@@ -235,7 +243,8 @@ public sealed class UserRoleRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
-        var userRoleRepository = new UserRoleRepository(context, uowProvider);
+        var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
+        var userRoleRepository = new UserRoleRepository(auditIdentityProvider, context, uowProvider);
 
         var existingUserRole = TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "Access1");
         existingUserRole.EicFunctions.Clear();

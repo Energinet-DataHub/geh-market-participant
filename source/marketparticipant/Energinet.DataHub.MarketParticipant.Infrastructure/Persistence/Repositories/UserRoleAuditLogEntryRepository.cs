@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
@@ -82,6 +83,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         private async Task<List<UserRoleAuditLogEntry>> GetUserRoleChangesAndStateAsync(UserRoleId userRoleId)
         {
+            var historicEntities = await _context.UserRoles
+                .ReadAllHistoryForAsync(entity => entity.Id == userRoleId.Value)
+                .ConfigureAwait(false);
+
             var emptyPermissions = Enumerable.Empty<PermissionId>();
 
             UserRoleAuditLogEntry CopyAndSetChangeType(UserRoleAuditLogEntry userRoleEntity, UserRoleChangeType changeType) => userRoleEntity with { ChangeType = changeType };
