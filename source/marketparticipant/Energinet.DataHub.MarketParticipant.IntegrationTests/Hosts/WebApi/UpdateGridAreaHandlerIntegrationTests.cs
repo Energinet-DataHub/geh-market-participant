@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
@@ -90,10 +89,10 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
         var auditLogs = response.GridAreaAuditLogEntries.ToList();
 
         Assert.Equal("NewGridAreaName1", auditLogs[0].NewValue);
-        Assert.True(auditLogs[0].UserDisplayName?.Contains(KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName, StringComparison.Ordinal));
         Assert.Equal("NewGridAreaName2", auditLogs[1].NewValue);
-        Assert.True(auditLogs[1].UserDisplayName?.Contains(KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName, StringComparison.Ordinal));
         Assert.Equal("NewGridAreaName3", auditLogs[2].NewValue);
-        Assert.True(auditLogs[2].UserDisplayName?.Contains(KnownAuditIdentityProvider.OrganizationBackgroundService.FriendlyName, StringComparison.Ordinal));
+        Assert.Equal(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value, auditLogs[0].AuditIdentityId);
+        Assert.Equal(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value, auditLogs[1].AuditIdentityId);
+        Assert.Equal(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value, auditLogs[2].AuditIdentityId);
     }
 }

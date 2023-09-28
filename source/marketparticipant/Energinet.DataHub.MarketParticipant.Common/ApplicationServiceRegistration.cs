@@ -84,13 +84,13 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
             services.AddScoped<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
             services.AddScoped<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
+            services.AddScoped<IValidator<GetAuditIdentityCommand>, GetAuditIdentityCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
             services.AddScoped<IUserRoleAuditLogService, UserRoleAuditLogService>();
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
-            services.AddScoped<IAuditIdentityResolver, AuditIdentityResolver>();
         }
     }
 }

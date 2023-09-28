@@ -13,14 +13,8 @@
 // limitations under the License.
 
 using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record UserIdentityAuditLogEntryDto(
-    Guid UserId,
-    string NewValue,
-    string OldValue,
-    Guid AuditIdentityId,
-    DateTimeOffset Timestamp,
-    UserIdentityAuditLogField Field);
+public sealed record GetAuditIdentityCommand(Guid AuditIdentityId) : IRequest<GetAuditIdentityResponse>;
