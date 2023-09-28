@@ -181,7 +181,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 null,
                 UserRoleStatus.Active,
                 UserRoleChangeType.Created,
-                createdStateElements.First().PeriodStart) : null;
+                userRoleCreatedLogEntry.Timestamp) : null;
 
             var addedChanges = userRolePermissionHistoryList
                 .Where(e => e.DeletedByIdentityId == null && e.PeriodStart != userRoleCreatedLogEntry.Timestamp)

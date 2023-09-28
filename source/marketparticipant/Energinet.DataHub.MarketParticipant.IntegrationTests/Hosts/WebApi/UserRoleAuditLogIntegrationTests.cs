@@ -23,9 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using FluentAssertions;
@@ -75,7 +73,6 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        //var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -114,11 +111,10 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
-
+        var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync();
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
 
         const string nameUpdate = "Update_UserRole_AllChanges_NameChangedAuditLog";
         const string descriptionUpdate = "Update_UserRole_AllChanges_DescriptionChangedAuditLog";
@@ -143,15 +139,48 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.NameChange);
         Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.DescriptionChange);
         Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.StatusChange);
-        Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.PermissionsChange);
-        resultList.Single(e => e.ChangeType == UserRoleChangeType.NameChange).Name.Should().Be(nameUpdate);
-        resultList.Single(e => e.ChangeType == UserRoleChangeType.DescriptionChange).Description.Should().Be(descriptionUpdate);
-        resultList.Single(e => e.ChangeType == UserRoleChangeType.StatusChange).Status.Should().Be(userRoleStatusUpdate);
-        resultList.Single(e => e.ChangeType == UserRoleChangeType.PermissionsChange).Permissions.Should().HaveCount(2);
-        resultList.Single(e => e.ChangeType == UserRoleChangeType.PermissionsChange)
-            .Permissions
-            .Select(e => (int)e).OrderBy(e => e).Should()
-            .BeEquivalentTo(userRolePermissionsUpdate.OrderBy(e => e));
+        Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.PermissionRemoved);
+        var addedCount = resultList.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded);
+        Assert.Equal(2, addedCount);
+    }
+
+    [Fact]
+    public async Task Update_UserRole_SortingValidation()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
+
+        const string nameUpdate = "Update_UserRole_SortingValidation_NameChangedAuditLog";
+        const string descriptionUpdate = "Update_UserRole_SortingValidation_DescriptionChangedAuditLog";
+        const UserRoleStatus userRoleStatusUpdate = UserRoleStatus.Inactive;
+        var userRolePermissionsUpdate = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
+
+        var updateUserRoleInitDto = new UpdateUserRoleDto(userRole.Name, userRole.Description ?? string.Empty, userRole.Status, new Collection<int> { (int)PermissionId.ActorsManage });
+
+        var updateUserRoleCommandNameChange = new UpdateUserRoleCommand(userRole.Id, updateUserRoleInitDto with { Name = nameUpdate });
+        var updateUserRoleCommandDescriptionChange = new UpdateUserRoleCommand(userRole.Id, updateUserRoleInitDto with { Name = nameUpdate, Description = descriptionUpdate });
+        var updateUserRoleCommandPermissionChange = new UpdateUserRoleCommand(userRole.Id, updateUserRoleInitDto with { Name = nameUpdate, Description = descriptionUpdate, Permissions = userRolePermissionsUpdate });
+        var updateUserRoleCommandStatusChange = new UpdateUserRoleCommand(userRole.Id, new UpdateUserRoleDto(Name: nameUpdate, Description: descriptionUpdate, Permissions: userRolePermissionsUpdate, Status: userRoleStatusUpdate));
+
+        // Act
+        await mediator.Send(updateUserRoleCommandNameChange);
+        await mediator.Send(updateUserRoleCommandDescriptionChange);
+        await mediator.Send(updateUserRoleCommandPermissionChange);
+        await mediator.Send(updateUserRoleCommandStatusChange);
+
+        var auditLogs = await userRoleAuditLogEntryRepository.GetAsync(new UserRoleId(userRole.Id));
+
+        // Assert
+        var resultList = auditLogs.ToList();
+        resultList.Count.Should().Be(7);
+        resultList.First().ChangeType.Should().Be(UserRoleChangeType.Created);
+        resultList.Last().ChangeType.Should().Be(UserRoleChangeType.StatusChange);
     }
 
     [Fact]
@@ -161,7 +190,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var userRoleAuditLogEntryRepository = new UserRoleAuditLogEntryRepository(context);
+        var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
