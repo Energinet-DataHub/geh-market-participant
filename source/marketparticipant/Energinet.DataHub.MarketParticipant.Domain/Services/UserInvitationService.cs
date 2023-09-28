@@ -102,8 +102,10 @@ public sealed class UserInvitationService : IUserInvitationService
                 .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
                 .ConfigureAwait(false);
 
-            await AuditLogUserIdentityAsync(invitedUserId, invitationSentByUserId, invitation).ConfigureAwait(false);
-            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, invitation.AssignedActor.Id).ConfigureAwait(false);
+            var auditIdentity = new AuditIdentity(invitationSentByUserId);
+
+            await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
+            await AuditLogUserInviteAsync(invitedUserId, auditIdentity, invitation.AssignedActor.Id).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
@@ -142,7 +144,7 @@ public sealed class UserInvitationService : IUserInvitationService
                 .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
                 .ConfigureAwait(false);
 
-            await AuditLogUserInviteAsync(invitedUserId, invitationSentByUserId, user.AdministratedBy).ConfigureAwait(false);
+            await AuditLogUserInviteAsync(invitedUserId, new AuditIdentity(invitationSentByUserId), user.AdministratedBy).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
@@ -159,48 +161,48 @@ public sealed class UserInvitationService : IUserInvitationService
             : null;
     }
 
-    private Task AuditLogUserInviteAsync(UserId toUserId, UserId invitationSentByUserId, ActorId assignedActor)
+    private Task AuditLogUserInviteAsync(UserId toUserId, AuditIdentity invitationSentBy, ActorId assignedActor)
     {
         var userInviteAuditLog = new UserInviteAuditLogEntry(
             toUserId,
-            invitationSentByUserId,
             assignedActor,
+            invitationSentBy,
             DateTimeOffset.UtcNow);
 
         return _userInviteAuditLogEntryRepository
             .InsertAuditLogEntryAsync(userInviteAuditLog);
     }
 
-    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, UserId invitationSentByUserId, UserInvitation invitation)
+    private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, UserInvitation invitation)
     {
         await _userIdentityAuditLogEntryRepository
             .InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
                 invitedUserId,
-                invitationSentByUserId,
-                UserIdentityAuditLogField.FirstName,
                 invitation.FirstName,
                 string.Empty,
-                DateTimeOffset.UtcNow))
+                invitationSentBy,
+                DateTimeOffset.UtcNow,
+                UserIdentityAuditLogField.FirstName))
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogEntryRepository
             .InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
                 invitedUserId,
-                invitationSentByUserId,
-                UserIdentityAuditLogField.LastName,
                 invitation.LastName,
                 string.Empty,
-                DateTimeOffset.UtcNow))
+                invitationSentBy,
+                DateTimeOffset.UtcNow,
+                UserIdentityAuditLogField.LastName))
             .ConfigureAwait(false);
 
         await _userIdentityAuditLogEntryRepository
             .InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
                 invitedUserId,
-                invitationSentByUserId,
-                UserIdentityAuditLogField.PhoneNumber,
                 invitation.PhoneNumber.Number,
                 string.Empty,
-                DateTimeOffset.UtcNow))
+                invitationSentBy,
+                DateTimeOffset.UtcNow,
+                UserIdentityAuditLogField.PhoneNumber))
             .ConfigureAwait(false);
     }
 }

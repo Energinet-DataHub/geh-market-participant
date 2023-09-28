@@ -102,7 +102,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
         var userRoleAssignmentAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAssignmentAuditLogEntryRepository>();
         var assignmentAuditLogEntries = await userRoleAssignmentAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(assignmentAuditLogEntries, e =>
-            e.ChangedByUserId.Value == invitedByUser.Id &&
+            e.AuditIdentity.Value == invitedByUser.Id &&
             e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added &&
             e.ActorId.Value == actor.Id &&
             e.UserId == createdUser.Id);

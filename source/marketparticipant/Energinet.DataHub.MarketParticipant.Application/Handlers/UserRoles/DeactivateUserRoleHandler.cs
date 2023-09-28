@@ -118,7 +118,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
                 user.Id,
                 userRoleAssignment.ActorId,
                 userRoleAssignment.UserRoleId,
-                new UserId(_userContext.CurrentUser.UserId),
+                new AuditIdentity(_userContext.CurrentUser.UserId),
                 DateTimeOffset.UtcNow,
                 UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)).ConfigureAwait(false);
     }

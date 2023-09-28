@@ -39,11 +39,11 @@ public sealed class UserIdentityAuditLogEntryRepository : IUserIdentityAuditLogE
             where log.UserId == userId.Value
             select new UserIdentityAuditLogEntry(
                 new UserId(log.UserId),
-                new UserId(log.ChangedByUserId),
-                (UserIdentityAuditLogField)log.Field,
                 log.NewValue,
                 log.OldValue,
-                log.Timestamp);
+                new AuditIdentity(log.ChangedByUserId),
+                log.Timestamp,
+                (UserIdentityAuditLogField)log.Field);
 
         return await logQuery.ToListAsync().ConfigureAwait(false);
     }
@@ -56,7 +56,7 @@ public sealed class UserIdentityAuditLogEntryRepository : IUserIdentityAuditLogE
         {
             UserId = logEntry.UserId.Value,
             Timestamp = logEntry.Timestamp,
-            ChangedByUserId = logEntry.ChangedByUserId.Value,
+            ChangedByUserId = logEntry.AuditIdentity.Value,
             Field = (int)logEntry.Field,
             NewValue = logEntry.NewValue,
             OldValue = logEntry.OldValue

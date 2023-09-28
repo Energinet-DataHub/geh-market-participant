@@ -47,7 +47,7 @@ public sealed class GetPermissionAuditLogsHandler
             new PermissionAuditLogDto(
                 (int)auditLogEntry.Permission,
                 auditLogEntry.Value,
-                auditLogEntry.ChangedByUserId.Value,
+                auditLogEntry.AuditIdentity.Value,
                 auditLogEntry.Timestamp,
                 auditLogEntry.PermissionChangeType)));
     }

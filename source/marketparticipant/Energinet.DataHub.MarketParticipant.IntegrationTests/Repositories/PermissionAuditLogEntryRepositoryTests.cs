@@ -82,7 +82,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         // Assert
         var permissionAuditLogs = actual.ToList();
         Assert.Single(permissionAuditLogs);
-        Assert.Equal(user.Id, permissionAuditLogs[0].ChangedByUserId.Value);
+        Assert.Equal(user.Id, permissionAuditLogs[0].AuditIdentity.Value);
         Assert.Equal(PermissionChangeType.DescriptionChange, permissionAuditLogs[0].PermissionChangeType);
         Assert.Equal(PermissionId.UsersManage, permissionAuditLogs[0].Permission);
     }

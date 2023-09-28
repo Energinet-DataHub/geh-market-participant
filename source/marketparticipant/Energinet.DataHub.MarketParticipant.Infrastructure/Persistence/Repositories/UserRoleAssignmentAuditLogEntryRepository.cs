@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         new UserId(entity.UserId),
                         new ActorId(entity.ActorId),
                         new UserRoleId(entity.UserRoleId),
-                        new UserId(entity.ChangedByIdentityId),
+                        new AuditIdentity(entity.ChangedByIdentityId),
                         periodStart,
                         UserRoleAssignmentTypeAuditLog.Added));
                 }
@@ -60,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         new UserId(entity.UserId),
                         new ActorId(entity.ActorId),
                         new UserRoleId(entity.UserRoleId),
-                        new UserId(entity.DeletedByIdentityId.Value),
+                        new AuditIdentity(entity.DeletedByIdentityId.Value),
                         periodStart,
                         UserRoleAssignmentTypeAuditLog.Removed));
                 }
@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     new UserId(extendedEntry.UserId),
                     new ActorId(extendedEntry.ActorId),
                     new UserRoleId(extendedEntry.UserRoleId),
-                    new UserId(extendedEntry.ChangedByUserId),
+                    new AuditIdentity(extendedEntry.ChangedByUserId),
                     extendedEntry.Timestamp,
                     (UserRoleAssignmentTypeAuditLog)extendedEntry.AssignmentType));
             }
@@ -97,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 ActorId = logEntry.ActorId.Value,
                 UserRoleId = logEntry.UserRoleId.Value,
                 Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
+                ChangedByUserId = logEntry.AuditIdentity.Value,
                 AssignmentType = (int)logEntry.AssignmentType
             };
 
