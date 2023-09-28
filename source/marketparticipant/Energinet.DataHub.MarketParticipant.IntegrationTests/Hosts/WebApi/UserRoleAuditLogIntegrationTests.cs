@@ -114,6 +114,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var auditIdentity = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
         Thread.Sleep(100); // Wait time for simulate real scenario
@@ -142,8 +143,10 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.DescriptionChange);
         Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.StatusChange);
         Assert.Single(resultList, e => e.ChangeType == UserRoleChangeType.PermissionRemoved);
-        var addedCount = resultList.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded);
-        Assert.Equal(2, addedCount);
+        var addedPermissionCount = resultList.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded);
+        Assert.Equal(2, addedPermissionCount);
+        var removedPermission = resultList.First(e => e.ChangeType == UserRoleChangeType.PermissionRemoved);
+        removedPermission.AuditIdentityId.Should().Be(auditIdentity.IdentityId.Value);
     }
 
     [Fact]
