@@ -1,9 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.32.1
+
+- Added /audit-identity controller.
+
 ## Version 2.32.0
 
 - Changed ChangedByUserId to AuditIdentityId for audited types.
-- Added /audit-identity controller.
 
 ## Version 2.31.8
 
