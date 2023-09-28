@@ -12,15 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record GridAreaAuditLogEntryDto(
-        DateTimeOffset Timestamp,
-        string OldValue,
-        string NewValue,
-        Guid GridAreaId,
-        Guid AuditIdentityId,
-        GridAreaAuditLogEntryField Field);
+    public sealed record GetAuditIdentityResponseDto(string DisplayName);
 }
