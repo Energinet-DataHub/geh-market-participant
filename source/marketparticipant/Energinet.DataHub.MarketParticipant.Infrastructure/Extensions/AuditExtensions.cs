@@ -38,14 +38,14 @@ public static class AuditExtensions
             .FindEntityType(typeof(T))!
             .GetHistoryTableName();
 
-        var latest = await target
+        var allCurrent = await target
             .Where(entitySelector)
             .Select(entity => new
             {
                 Entity = entity,
                 PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
             })
-            .SingleOrDefaultAsync()
+            .ToListAsync()
             .ConfigureAwait(false);
 
         var allHistory = await target
@@ -61,11 +61,8 @@ public static class AuditExtensions
             .ToListAsync()
             .ConfigureAwait(false);
 
-        var combined = latest != null
-            ? allHistory.Append(latest)
-            : allHistory;
-
-        return combined
+        return allHistory
+            .Concat(allCurrent)
             .Select(entity => (entity.Entity, new DateTimeOffset(entity.PeriodStart, TimeSpan.Zero)))
             .ToList();
     }

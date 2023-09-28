@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,17 +36,54 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         public async Task<IEnumerable<UserRoleAssignmentAuditLogEntry>> GetAsync(UserId userId)
         {
-            var userRoleAssignmentLogs = _context.UserRoleAssignmentAuditLogEntries
-                .Where(e => e.UserId == userId.Value)
-                .Select(log => new UserRoleAssignmentAuditLogEntry(
-                    new UserId(log.UserId),
-                    new ActorId(log.ActorId),
-                    new UserRoleId(log.UserRoleId),
-                    new UserId(log.ChangedByUserId),
-                    log.Timestamp,
-                    (UserRoleAssignmentTypeAuditLog)log.AssignmentType));
+            var allHistory = await _context.UserRoleAssignments
+                .ReadAllHistoryForAsync(ura => ura.UserId == userId.Value)
+                .ConfigureAwait(false);
 
-            return await userRoleAssignmentLogs.ToListAsync().ConfigureAwait(false);
+            var userRoleAssignmentLogs = new List<UserRoleAssignmentAuditLogEntry>();
+
+            foreach (var (entity, periodStart) in allHistory)
+            {
+                if (entity.DeletedByIdentityId == null)
+                {
+                    userRoleAssignmentLogs.Add(new UserRoleAssignmentAuditLogEntry(
+                        new UserId(entity.UserId),
+                        new ActorId(entity.ActorId),
+                        new UserRoleId(entity.UserRoleId),
+                        new AuditIdentity(entity.ChangedByIdentityId),
+                        periodStart,
+                        UserRoleAssignmentTypeAuditLog.Added));
+                }
+                else
+                {
+                    userRoleAssignmentLogs.Add(new UserRoleAssignmentAuditLogEntry(
+                        new UserId(entity.UserId),
+                        new ActorId(entity.ActorId),
+                        new UserRoleId(entity.UserRoleId),
+                        new AuditIdentity(entity.DeletedByIdentityId.Value),
+                        periodStart,
+                        UserRoleAssignmentTypeAuditLog.Removed));
+                }
+            }
+
+            var extendedAudit = await _context
+                .UserRoleAssignmentAuditLogEntries
+                .Where(log => log.UserId == userId.Value)
+                .ToListAsync()
+                .ConfigureAwait(false);
+
+            foreach (var extendedEntry in extendedAudit)
+            {
+                userRoleAssignmentLogs.Add(new UserRoleAssignmentAuditLogEntry(
+                    new UserId(extendedEntry.UserId),
+                    new ActorId(extendedEntry.ActorId),
+                    new UserRoleId(extendedEntry.UserRoleId),
+                    new AuditIdentity(extendedEntry.ChangedByUserId),
+                    extendedEntry.Timestamp,
+                    (UserRoleAssignmentTypeAuditLog)extendedEntry.AssignmentType));
+            }
+
+            return userRoleAssignmentLogs.OrderBy(log => log.Timestamp);
         }
 
         public Task InsertAuditLogEntryAsync(UserId userId, UserRoleAssignmentAuditLogEntry logEntry)
@@ -59,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 ActorId = logEntry.ActorId.Value,
                 UserRoleId = logEntry.UserRoleId.Value,
                 Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
+                ChangedByUserId = logEntry.AuditIdentity.Value,
                 AssignmentType = (int)logEntry.AssignmentType
             };
 

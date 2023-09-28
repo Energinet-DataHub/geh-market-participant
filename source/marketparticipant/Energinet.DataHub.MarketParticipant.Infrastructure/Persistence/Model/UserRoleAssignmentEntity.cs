@@ -13,12 +13,17 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class UserRoleAssignmentEntity
+public sealed class UserRoleAssignmentEntity : IAuditedEntity
 {
     public Guid UserId { get; set; }
     public Guid ActorId { get; set; }
     public Guid UserRoleId { get; set; }
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
+    public Guid? DeletedByIdentityId { get; set; }
 }

@@ -72,7 +72,7 @@ public sealed class GetUserAuditLogEntriesHandler
             auditLogEntry.UserId.Value,
             auditLogEntry.ActorId.Value,
             auditLogEntry.UserRoleId.Value,
-            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.AuditIdentity.Value,
             auditLogEntry.Timestamp,
             auditLogEntry.AssignmentType);
     }
@@ -83,7 +83,7 @@ public sealed class GetUserAuditLogEntriesHandler
             auditLogEntry.UserId.Value,
             auditLogEntry.ActorId.Value,
             auditLogEntry.ActorName,
-            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.AuditIdentity.Value,
             auditLogEntry.Timestamp);
     }
 
@@ -93,7 +93,7 @@ public sealed class GetUserAuditLogEntriesHandler
             auditLogEntry.UserId.Value,
             auditLogEntry.NewValue,
             auditLogEntry.OldValue,
-            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.AuditIdentity.Value,
             auditLogEntry.Timestamp,
             auditLogEntry.Field);
     }

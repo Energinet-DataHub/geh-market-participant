@@ -49,7 +49,12 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
     public async Task InviteUser_ValidInvitation_UserCreated()
     {
         // Arrange
+        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");
+        var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
+
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        host.ServiceCollection.MockFrontendUser(invitedByUser.Id);
+
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -61,9 +66,6 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
         var userRole = await _databaseFixture.PrepareUserRoleAsync(
             new[] { PermissionId.ActorsManage },
             EicFunction.DataHubAdministrator);
-
-        var invitedByUserEntity = TestPreparationEntities.UnconnectedUser.Patch(u => u.Email = $"{Guid.NewGuid()}@datahub.dk");
-        var invitedByUser = await _databaseFixture.PrepareUserAsync(invitedByUserEntity);
 
         var invitation = new UserInvitationDto(
             TestUserEmail,
@@ -100,7 +102,7 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
         var userRoleAssignmentAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAssignmentAuditLogEntryRepository>();
         var assignmentAuditLogEntries = await userRoleAssignmentAuditLogEntryRepository.GetAsync(createdUser.Id);
         Assert.Single(assignmentAuditLogEntries, e =>
-            e.ChangedByUserId.Value == invitedByUser.Id &&
+            e.AuditIdentity.Value == invitedByUser.Id &&
             e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added &&
             e.ActorId.Value == actor.Id &&
             e.UserId == createdUser.Id);
