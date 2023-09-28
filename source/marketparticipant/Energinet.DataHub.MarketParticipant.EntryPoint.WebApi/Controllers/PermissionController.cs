@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
@@ -85,14 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            var logsFiltered = response.PermissionAuditLogs;
-
-            if (!_userContext.CurrentUser.IsFas)
-            {
-                logsFiltered = logsFiltered.Where(u => u.ChangedByUserId == _userContext.CurrentUser.UserId);
-            }
-
-            return Ok(logsFiltered);
+            return Ok(response.PermissionAuditLogs);
         }
     }
 }
