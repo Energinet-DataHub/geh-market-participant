@@ -194,23 +194,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     null,
                     UserRoleStatus.Active,
                     UserRoleChangeType.PermissionAdded,
-                    d.PeriodStart)).ToList();
+                    d.PeriodStart));
             var deletedChanges = userRolePermissionHistoryList
                 .Where(e => e.DeletedByIdentityId != null)
                 .Select(d => new UserRoleAuditLogEntry(
                     new UserRoleId(userRoleId.Value),
-                    d.ChangedByIdentityId,
+                    d.DeletedByIdentityId ?? d.ChangedByIdentityId,
                     string.Empty,
                     string.Empty,
                     new List<PermissionId>() { d.Permission },
                     null,
                     UserRoleStatus.Active,
                     UserRoleChangeType.PermissionRemoved,
-                    d.PeriodStart)).ToList();
+                    d.PeriodStart));
 
-            var permissionChanges = addedChanges.Concat(deletedChanges)
-                .OrderBy(d => d.Timestamp)
-                .ToList();
+            var permissionChanges = addedChanges.Concat(deletedChanges).ToList();
 
             if (createdPermissionState != null)
             {

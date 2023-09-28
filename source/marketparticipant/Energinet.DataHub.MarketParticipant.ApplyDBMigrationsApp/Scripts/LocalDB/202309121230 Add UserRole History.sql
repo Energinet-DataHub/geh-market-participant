@@ -45,3 +45,7 @@ GO
 ALTER TABLE [dbo].[UserRolePermission]
     ADD CONSTRAINT CHK_UserRolePermission_ChangedByIdentityId_NotEmpty CHECK (ChangedByIdentityId <> '00000000-0000-0000-0000-000000000000');
 GO
+
+ALTER TABLE [dbo].[UserRolePermission]
+    ADD CONSTRAINT CHK_UserRolePermission_DeletedByIdentityId_NotEmpty CHECK (DeletedByIdentityId <> '00000000-0000-0000-0000-000000000000');
+GO
