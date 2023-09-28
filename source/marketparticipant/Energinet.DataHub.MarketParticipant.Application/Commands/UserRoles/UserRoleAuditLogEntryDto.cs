@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
 public sealed record UserRoleAuditLogEntryDto(
     Guid UserRoleId,
-    Guid ChangedByIdentityId,
+    Guid AuditIdentityId,
     string Name,
     string? Description,
     IEnumerable<PermissionId> Permissions,

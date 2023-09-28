@@ -50,7 +50,7 @@ public sealed class GetUserRoleAuditLogsHandler
     {
         return new UserRoleAuditLogEntryDto(
             auditLogEntry.UserRoleId.Value,
-            auditLogEntry.ChangedByIdentityId,
+            auditLogEntry.AuditIdentityId,
             auditLogEntry.Name,
             auditLogEntry.Description,
             auditLogEntry.Permissions,

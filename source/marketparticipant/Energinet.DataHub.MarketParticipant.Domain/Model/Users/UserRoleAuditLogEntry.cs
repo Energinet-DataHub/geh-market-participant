@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed record UserRoleAuditLogEntry(
     UserRoleId UserRoleId,
-    Guid ChangedByIdentityId,
+    Guid AuditIdentityId,
     string Name,
     string? Description,
     IEnumerable<PermissionId> Permissions,
