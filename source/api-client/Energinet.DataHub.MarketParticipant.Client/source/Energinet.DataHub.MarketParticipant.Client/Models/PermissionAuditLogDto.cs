@@ -18,8 +18,8 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public record PermissionAuditLogDto(
         int PermissionId,
-        PermissionChangeType PermissionChangeType,
-        Guid ChangedByUserId,
+        string Value,
+        Guid AuditIdentityId,
         DateTimeOffset Timestamp,
-        string Value);
+        PermissionChangeType PermissionChangeType);
 }

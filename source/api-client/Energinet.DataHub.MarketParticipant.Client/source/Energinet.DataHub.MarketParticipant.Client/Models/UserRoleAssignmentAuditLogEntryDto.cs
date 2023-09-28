@@ -20,7 +20,7 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         Guid UserId,
         Guid ActorId,
         Guid UserRoleId,
-        Guid ChangedByUserId,
+        Guid AuditIdentityId,
         DateTimeOffset Timestamp,
         UserRoleAssignmentTypeAuditLog AssignmentType);
 }
