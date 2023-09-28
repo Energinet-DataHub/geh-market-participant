@@ -117,15 +117,7 @@ public class UserController : ControllerBase
             .Send(command)
             .ConfigureAwait(false);
 
-        var filteredUserRoleAssignmentAuditLogs = _userContext.CurrentUser.IsFas
-            ? response.UserRoleAssignmentAuditLogs
-            : response.UserRoleAssignmentAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
-
-        var filteredUserInviteDetailsAuditLogs = _userContext.CurrentUser.IsFas
-            ? response.InviteAuditLogs
-            : response.InviteAuditLogs.Where(log => log.ActorId == _userContext.CurrentUser.ActorId);
-
-        return Ok(new GetUserAuditLogResponse(filteredUserRoleAssignmentAuditLogs, filteredUserInviteDetailsAuditLogs, response.IdentityAuditLogs));
+        return Ok(response);
     }
 
     [HttpPut("{userId:guid}/useridentity")]
