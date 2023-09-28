@@ -69,11 +69,11 @@ public sealed class UserIdentityAuditLogEntryRepositoryTests
 
         var entry = new UserIdentityAuditLogEntry(
              new UserId(user.Id),
-             new UserId(userChangedBy.Id),
-             UserIdentityAuditLogField.FirstName,
              Guid.NewGuid().ToString(),
              Guid.NewGuid().ToString(),
-             DateTimeOffset.UtcNow);
+             new AuditIdentity(userChangedBy.Id),
+             DateTimeOffset.UtcNow,
+             UserIdentityAuditLogField.FirstName);
 
         // Insert an audit log.
         await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();
@@ -91,7 +91,7 @@ public sealed class UserIdentityAuditLogEntryRepositoryTests
         Assert.Single(userIdentityAuditLogs);
         Assert.Equal(entry.UserId, userIdentityAuditLogs[0].UserId);
         Assert.Equal(entry.Timestamp, userIdentityAuditLogs[0].Timestamp);
-        Assert.Equal(entry.ChangedByUserId, userIdentityAuditLogs[0].ChangedByUserId);
+        Assert.Equal(entry.AuditIdentity, userIdentityAuditLogs[0].AuditIdentity);
         Assert.Equal(entry.Field, userIdentityAuditLogs[0].Field);
         Assert.Equal(entry.NewValue, userIdentityAuditLogs[0].NewValue);
         Assert.Equal(entry.OldValue, userIdentityAuditLogs[0].OldValue);

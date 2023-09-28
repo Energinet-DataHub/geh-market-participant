@@ -87,11 +87,11 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
 
         var auditEntry = new UserIdentityAuditLogEntry(
             userId,
-            new UserId(_userContext.CurrentUser.UserId),
-            field,
             newValue,
             oldValue,
-            DateTimeOffset.UtcNow);
+            new AuditIdentity(_userContext.CurrentUser.UserId),
+            DateTimeOffset.UtcNow,
+            field);
 
         return _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry);
     }
