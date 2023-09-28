@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -115,8 +116,9 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
+        Thread.Sleep(100); // Wait time for simulate real scenario
 
-        const string nameUpdate = "Update_UserRole_AllChanges_NameChangedAuditLog";
+        var nameUpdate = "Update_UserRole_AllChanges_NameChangedAuditLog" + Guid.NewGuid();
         const string descriptionUpdate = "Update_UserRole_AllChanges_DescriptionChangedAuditLog";
         const UserRoleStatus userRoleStatusUpdate = UserRoleStatus.Inactive;
         var userRolePermissionsUpdate = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
@@ -194,6 +196,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
+        Thread.Sleep(100); // Wait time for simulate real scenario
 
         var userRolePermissionsUpdates = new List<Collection<int>>
         {
