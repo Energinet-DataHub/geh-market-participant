@@ -49,7 +49,7 @@ jobs:
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
     needs:
-      [ci_base, ci_codeql, ci_dotnet, ci_client_package, render_c4model_views]
+      [ci_base, ci_dotnet, ci_client_package, render_c4model_views]
     if: |
       always()
     steps:
