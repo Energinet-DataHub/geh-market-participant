@@ -81,9 +81,9 @@ public sealed class GetUserAuditLogEntriesHandler
     {
         return new UserInviteAuditLogEntryDto(
             auditLogEntry.UserId.Value,
-            auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.ActorId.Value,
             auditLogEntry.ActorName,
+            auditLogEntry.ChangedByUserId.Value,
             auditLogEntry.Timestamp);
     }
 
@@ -91,10 +91,10 @@ public sealed class GetUserAuditLogEntriesHandler
     {
         return new UserIdentityAuditLogEntryDto(
             auditLogEntry.UserId.Value,
-            auditLogEntry.ChangedByUserId.Value,
-            auditLogEntry.Field,
             auditLogEntry.NewValue,
             auditLogEntry.OldValue,
-            auditLogEntry.Timestamp);
+            auditLogEntry.ChangedByUserId.Value,
+            auditLogEntry.Timestamp,
+            auditLogEntry.Field);
     }
 }
