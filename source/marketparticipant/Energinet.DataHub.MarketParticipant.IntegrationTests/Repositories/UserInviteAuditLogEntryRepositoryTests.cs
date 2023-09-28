@@ -71,8 +71,8 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
 
         var entry = new UserInviteAuditLogEntry(
              new UserId(user.Id),
-             new UserId(userChangedBy.Id),
              new ActorId(actor.Id),
+             new AuditIdentity(userChangedBy.Id),
              DateTimeOffset.UtcNow);
 
         // Insert an audit log.
@@ -92,7 +92,7 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
         Assert.Equal(entry.UserId, userInviteDetailsAuditLogs[0].UserId);
         Assert.Equal(entry.ActorId, userInviteDetailsAuditLogs[0].ActorId);
         Assert.Equal(entry.Timestamp, userInviteDetailsAuditLogs[0].Timestamp);
-        Assert.Equal(entry.ChangedByUserId, userInviteDetailsAuditLogs[0].ChangedByUserId);
+        Assert.Equal(entry.AuditIdentity, userInviteDetailsAuditLogs[0].AuditIdentity);
         Assert.Equal(actor.Name, userInviteDetailsAuditLogs[0].ActorName);
     }
 }

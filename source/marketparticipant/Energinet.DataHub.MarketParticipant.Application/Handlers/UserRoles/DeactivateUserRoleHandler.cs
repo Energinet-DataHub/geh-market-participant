@@ -79,8 +79,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
                 var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
                 user.RoleAssignments.Remove(role);
 
-                await AuditRoleAssignmentAsync(user, role, UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)
-                    .ConfigureAwait(false);
+                await AuditRoleAssignmentAsync(user, role).ConfigureAwait(false);
                 await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
@@ -111,10 +110,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
             userRole.EicFunction);
     }
 
-    private async Task AuditRoleAssignmentAsync(
-        Domain.Model.Users.User user,
-        UserRoleAssignment userRoleAssignment,
-        UserRoleAssignmentTypeAuditLog userRoleAssignmentTypeAuditLog)
+    private async Task AuditRoleAssignmentAsync(Domain.Model.Users.User user, UserRoleAssignment userRoleAssignment)
     {
         await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
             user.Id,
@@ -122,8 +118,8 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
                 user.Id,
                 userRoleAssignment.ActorId,
                 userRoleAssignment.UserRoleId,
-                new UserId(_userContext.CurrentUser.UserId),
+                new AuditIdentity(_userContext.CurrentUser.UserId),
                 DateTimeOffset.UtcNow,
-                userRoleAssignmentTypeAuditLog)).ConfigureAwait(false);
+                UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)).ConfigureAwait(false);
     }
 }

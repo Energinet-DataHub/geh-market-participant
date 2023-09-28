@@ -77,11 +77,11 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
         var auditEntry = new UserIdentityAuditLogEntry(
             user.Id,
-            new UserId(_userContext.CurrentUser.UserId),
-            UserIdentityAuditLogField.Status,
             UserStatus.Inactive.ToString(),
             currentStatus.ToString(),
-            DateTimeOffset.UtcNow);
+            new AuditIdentity(_userContext.CurrentUser.UserId),
+            DateTimeOffset.UtcNow,
+            UserIdentityAuditLogField.Status);
 
         await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
     }

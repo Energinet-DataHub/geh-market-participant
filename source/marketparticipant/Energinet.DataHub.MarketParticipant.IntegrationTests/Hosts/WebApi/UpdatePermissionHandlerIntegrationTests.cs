@@ -98,6 +98,6 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         Assert.Single(logs, p =>
             p.Permission == userRoleWithPermission.Permissions[0].Permission &&
             p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
-            p.ChangedByUserId.Value == frontendUser.Id);
+            p.AuditIdentity.Value == frontendUser.Id);
     }
 }
