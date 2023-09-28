@@ -34,6 +34,7 @@ public sealed class AuditIdentityController : ControllerBase
     [HttpGet("{auditIdentityId:guid}")]
     public async Task<IActionResult> GetAsync(Guid auditIdentityId)
     {
+        // NOTE: There is no permission attribute, as command itself filters results.
         var response = await _mediator
             .Send(new GetAuditIdentityCommand(auditIdentityId))
             .ConfigureAwait(false);

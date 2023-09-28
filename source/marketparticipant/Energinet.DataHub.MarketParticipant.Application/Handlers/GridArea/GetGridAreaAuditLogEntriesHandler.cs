@@ -49,8 +49,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                      entry.Timestamp,
                      entry.OldValue,
                      entry.NewValue,
-                     entry.AuditIdentity.Value,
                      entry.GridAreaId.Value,
+                     entry.AuditIdentity.Value,
                      (GridAreaAuditLogEntryField)entry.Field));
             }
 
