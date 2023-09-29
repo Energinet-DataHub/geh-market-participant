@@ -14,10 +14,11 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class UserRolePermissionEntity
+public sealed class UserRolePermissionEntity : IAuditedEntity
 {
     public Guid UserRoleId { get; set; }
     public PermissionId Permission { get; set; }

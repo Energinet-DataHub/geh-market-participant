@@ -135,74 +135,44 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
         private async Task<List<UserRoleAuditLogEntry>> GetPermissionChangesAsync(UserRoleId userRoleId, UserRoleAuditLogEntry userRoleCreatedLogEntry)
         {
-            var userRolePermissionHistoryEntities = await _context
-                .UserRolePermissionHistoryEntries
-                .Where(up => up.UserRoleId == userRoleId.Value)
-                .Select(d => new
-                {
-                    d.UserRoleId,
-                    d.ChangedByIdentityId,
-                    d.DeletedByIdentityId,
-                    PeriodStart = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodStart"), DateTimeKind.Utc),
-                    PeriodEnd = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodEnd"), DateTimeKind.Utc),
-                    d.Permission,
-                })
-                .ToListAsync()
+            var userRolePermissionHistoryList = await _context.UserRolePermissionEntries
+                .ReadAllHistoryForAsync(entity => entity.UserRoleId == userRoleId.Value)
                 .ConfigureAwait(false);
-
-            var userRolePermissionEntities = await _context
-                .UserRolePermissionEntries
-                .Where(up => up.UserRoleId == userRoleId.Value)
-                .Select(d => new
-                {
-                    d.UserRoleId,
-                    d.ChangedByIdentityId,
-                    d.DeletedByIdentityId,
-                    PeriodStart = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodStart"), DateTimeKind.Utc),
-                    PeriodEnd = DateTime.SpecifyKind(EF.Property<DateTime>(d, "PeriodEnd"), DateTimeKind.Utc),
-                    d.Permission,
-                })
-                .ToListAsync()
-                .ConfigureAwait(false);
-
-            var userRolePermissionHistoryList = userRolePermissionHistoryEntities
-                .Concat(userRolePermissionEntities)
-                .ToList();
 
             var createdStateElements = userRolePermissionHistoryList
-                .Where(e => userRoleCreatedLogEntry.Timestamp.Equals(DateTime.SpecifyKind(e.PeriodStart, DateTimeKind.Utc)))
+                .Where(e => userRoleCreatedLogEntry.Timestamp.Equals(e.PeriodStart))
                 .ToList();
             var createdPermissionState = createdStateElements.Any() ? new UserRoleAuditLogEntry(
                 new UserRoleId(userRoleId.Value),
-                createdStateElements.First().ChangedByIdentityId,
+                createdStateElements.First().Entity.ChangedByIdentityId,
                 string.Empty,
                 string.Empty,
-                createdStateElements.Select(p => p.Permission),
+                createdStateElements.Select(p => p.Entity.Permission),
                 null,
                 UserRoleStatus.Active,
                 UserRoleChangeType.Created,
                 userRoleCreatedLogEntry.Timestamp) : null;
 
             var addedChanges = userRolePermissionHistoryList
-                .Where(e => e.DeletedByIdentityId == null && e.PeriodStart != userRoleCreatedLogEntry.Timestamp)
+                .Where(e => e.Entity.DeletedByIdentityId == null && e.PeriodStart != userRoleCreatedLogEntry.Timestamp)
                 .Select(d => new UserRoleAuditLogEntry(
                     new UserRoleId(userRoleId.Value),
-                    d.ChangedByIdentityId,
+                    d.Entity.ChangedByIdentityId,
                     string.Empty,
                     string.Empty,
-                    new List<PermissionId>() { d.Permission },
+                    new List<PermissionId>() { d.Entity.Permission },
                     null,
                     UserRoleStatus.Active,
                     UserRoleChangeType.PermissionAdded,
                     d.PeriodStart));
             var deletedChanges = userRolePermissionHistoryList
-                .Where(e => e.DeletedByIdentityId != null)
+                .Where(e => e.Entity.DeletedByIdentityId != null)
                 .Select(d => new UserRoleAuditLogEntry(
                     new UserRoleId(userRoleId.Value),
-                    d.DeletedByIdentityId ?? d.ChangedByIdentityId,
+                    d.Entity.DeletedByIdentityId ?? d.Entity.ChangedByIdentityId,
                     string.Empty,
                     string.Empty,
-                    new List<PermissionId>() { d.Permission },
+                    new List<PermissionId>() { d.Entity.Permission },
                     null,
                     UserRoleStatus.Active,
                     UserRoleChangeType.PermissionRemoved,
