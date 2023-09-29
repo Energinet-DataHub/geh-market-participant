@@ -85,14 +85,14 @@ public interface IMarketParticipantDbContext
     DbSet<UserRoleEntity> UserRoles { get; }
 
     /// <summary>
+    ///     Represent access to the UserRoles permissions relation database table
+    /// </summary>
+    DbSet<UserRolePermissionEntity> UserRolePermissionEntries { get; }
+
+    /// <summary>
     ///     Represent access to the UserRoleAssignmentAuditLogEntry database table
     /// </summary>
     DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; }
-
-    /// <summary>
-    ///     Represent access to the UserRoleAuditLogEntry database table
-    /// </summary>
-    DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; }
 
     /// <summary>
     ///     Represent access to the UserInviteAuditLogEntry database table

@@ -24,12 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 public interface IUserRoleAuditLogEntryRepository
 {
     /// <summary>
-    /// Inserts a <see cref="UserRoleAuditLogEntry"/>
-    /// </summary>
-    /// <param name="logEntries">The audit log entries.</param>
-    Task InsertAuditLogEntriesAsync(IEnumerable<UserRoleAuditLogEntry> logEntries);
-
-    /// <summary>
     /// Retrieves all log entries for a given user.
     /// </summary>
     /// <param name="userRoleId">The user role id to get the logs for.</param>

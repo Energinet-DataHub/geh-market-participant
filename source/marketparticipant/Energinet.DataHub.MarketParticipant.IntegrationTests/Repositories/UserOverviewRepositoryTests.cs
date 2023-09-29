@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -495,8 +496,9 @@ public sealed class UserOverviewRepositoryTests
         var userRoleTemplate = new UserRoleEntity
         {
             Name = "Template name",
-            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.OrganizationsManage } },
-            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } }
+            Permissions = { new UserRolePermissionEntity { Permission = PermissionId.OrganizationsManage, ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value } },
+            EicFunctions = { new UserRoleEicFunctionEntity { EicFunction = eicFunction } },
+            ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value
         };
 
         await context.UserRoles.AddAsync(userRoleTemplate);
