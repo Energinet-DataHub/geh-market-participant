@@ -21,6 +21,7 @@ public sealed class UserRolePermissionEntity
 {
     public Guid UserRoleId { get; set; }
     public PermissionId Permission { get; set; }
+    public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
     public Guid? DeletedByIdentityId { get; set; }
 }
