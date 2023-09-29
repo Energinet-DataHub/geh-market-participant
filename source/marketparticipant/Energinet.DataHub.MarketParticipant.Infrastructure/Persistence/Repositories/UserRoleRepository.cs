@@ -98,8 +98,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
         foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity
                  {
-                     Permission = x,
-                     ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value
+                     Permission = x
                  }))
         {
             role.Permissions.Add(permissionEntity);
@@ -133,8 +132,7 @@ public sealed class UserRoleRepository : IUserRoleRepository
                 .Where(x => !userRoleEntity.Permissions.Select(p => p.Permission).Contains(x))
                 .Select(x => new UserRolePermissionEntity
                 {
-                    Permission = x,
-                    ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value
+                    Permission = x
                 })
                 .ToList();
 
