@@ -34,8 +34,6 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IUserRoleAuditLogService _userRoleAuditLogService;
-    private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
     private readonly IUserContext<FrontendUser> _userContext;
 
     public DeactivateUserRoleHandler(
@@ -43,17 +41,13 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
         IUserContext<FrontendUser> userContext,
         IUserRoleRepository userRoleRepository,
-        IUnitOfWorkProvider unitOfWorkProvider,
-        IUserRoleAuditLogService userRoleAuditLogService,
-        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository)
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
         _userContext = userContext;
         _userRoleRepository = userRoleRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
-        _userRoleAuditLogService = userRoleAuditLogService;
-        _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
     public async Task Handle(DeactivateUserRoleCommand request, CancellationToken cancellationToken)
@@ -83,31 +77,11 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
                 await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
-            var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRole);
-
             userRole.Status = UserRoleStatus.Inactive;
             await _userRoleRepository.UpdateAsync(userRole).ConfigureAwait(false);
 
-            var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
-                new UserId(request.ChangedByUserId),
-                userRoleInitStateForAuditLog,
-                userRole);
-
-            await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
-
             await uow.CommitAsync().ConfigureAwait(false);
         }
-    }
-
-    private static UserRole CopyUserRoleForAuditLog(UserRole userRole)
-    {
-        return new UserRole(
-            userRole.Id,
-            userRole.Name,
-            userRole.Description,
-            userRole.Status,
-            userRole.Permissions,
-            userRole.EicFunction);
     }
 
     private async Task AuditRoleAssignmentAsync(Domain.Model.Users.User user, UserRoleAssignment userRoleAssignment)

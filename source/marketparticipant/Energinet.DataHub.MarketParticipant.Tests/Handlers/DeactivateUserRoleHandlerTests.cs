@@ -39,9 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRepository = new Mock<IUserRepository>();
+            var userRepositoryMock = new Mock<IUserRepository>();
             var target = new DeactivateUserRoleHandler(
-                userRepository.Object,
+                userRepositoryMock.Object,
+                new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
+                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create());
 
@@ -76,6 +78,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
+                new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
+                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create());
 
@@ -106,6 +110,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var numberOfRolesBeforeCommand = userAndRole.User.RoleAssignments.Count;
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
+                new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
+                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create());
 
