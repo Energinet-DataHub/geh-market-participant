@@ -40,12 +40,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
             var userRepositoryMock = new Mock<IUserRepository>();
+            var auditIdentityProviderMock = new Mock<IAuditIdentityProvider>();
+
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
                 new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                auditIdentityProviderMock.Object);
 
             var userRoleId = Guid.NewGuid();
             var changedByUserId = Guid.NewGuid();
@@ -68,20 +70,21 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
             var userRepositoryMock = new Mock<IUserRepository>();
-            var userContextMock = new Mock<IUserContext<FrontendUser>>();
+            var auditIdentityProviderMock = new Mock<IAuditIdentityProvider>();
+
             var userAndRole = MockUserRoleWithUserAssigned(
                 userRoleRepositoryMock,
                 userRepositoryMock,
-                userContextMock,
+                auditIdentityProviderMock,
                 Guid.NewGuid(),
                 Guid.NewGuid());
 
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
                 new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                auditIdentityProviderMock.Object);
 
             var changedByUserId = Guid.NewGuid();
             var command = new DeactivateUserRoleCommand(userAndRole.UserRole.Id.Value, changedByUserId);
@@ -99,11 +102,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
             var userRepositoryMock = new Mock<IUserRepository>();
-            var userContextMock = new Mock<IUserContext<FrontendUser>>();
+            var auditIdentityProviderMock = new Mock<IAuditIdentityProvider>();
             var userAndRole = MockUserRoleWithUserAssigned(
                 userRoleRepositoryMock,
                 userRepositoryMock,
-                userContextMock,
+                auditIdentityProviderMock,
                 Guid.NewGuid(),
                 Guid.NewGuid());
 
@@ -111,9 +114,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new DeactivateUserRoleHandler(
                 userRepositoryMock.Object,
                 new Mock<IUserRoleAssignmentAuditLogEntryRepository>().Object,
-                new Mock<IUserContext<FrontendUser>>().Object,
                 userRoleRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create());
+                UnitOfWorkProviderMock.Create(),
+                auditIdentityProviderMock.Object);
 
             var changedByUserId = Guid.NewGuid();
             var command = new DeactivateUserRoleCommand(userAndRole.UserRole.Id.Value, changedByUserId);
@@ -129,7 +132,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         private static (UserRole UserRole, User User) MockUserRoleWithUserAssigned(
             Mock<IUserRoleRepository> userRoleRepositoryMock,
             Mock<IUserRepository> userRepositoryMock,
-            Mock<IUserContext<FrontendUser>> userContextMock,
+            Mock<IAuditIdentityProvider> auditIdentityProviderMock,
             Guid userRoleId,
             Guid userId)
         {
@@ -144,9 +147,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             userRepositoryMock
                 .Setup(userRepository => userRepository.GetToUserRoleAsync(userRole.Id))
                 .ReturnsAsync(new List<User>() { user });
-            userContextMock
-                .Setup(context => context.CurrentUser)
-                .Returns(new FrontendUser(userId, Guid.NewGuid(), actor.Id.Value, false));
+            auditIdentityProviderMock
+                .Setup(context => context.IdentityId)
+                .Returns(KnownAuditIdentityProvider.TestFramework.IdentityId);
 
             return (userRole, user);
         }

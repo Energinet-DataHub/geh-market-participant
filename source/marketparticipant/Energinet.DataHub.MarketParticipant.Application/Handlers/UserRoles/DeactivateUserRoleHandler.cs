@@ -16,9 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -34,20 +32,20 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public DeactivateUserRoleHandler(
         IUserRepository userRepository,
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUserContext<FrontendUser> userContext,
         IUserRoleRepository userRoleRepository,
-        IUnitOfWorkProvider unitOfWorkProvider)
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
-        _userContext = userContext;
         _userRoleRepository = userRoleRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
+        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task Handle(DeactivateUserRoleCommand request, CancellationToken cancellationToken)
@@ -92,7 +90,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
                 user.Id,
                 userRoleAssignment.ActorId,
                 userRoleAssignment.UserRoleId,
-                new AuditIdentity(_userContext.CurrentUser.UserId),
+                _auditIdentityProvider.IdentityId,
                 DateTimeOffset.UtcNow,
                 UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)).ConfigureAwait(false);
     }
