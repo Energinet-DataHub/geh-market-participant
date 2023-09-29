@@ -16,4 +16,11 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-public sealed record AuditIdentity(Guid Value);
+public sealed record AuditIdentity(Guid Value)
+{
+    // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
+    public AuditIdentity(UserId userId)
+        : this(userId?.Value ?? throw new ArgumentNullException(nameof(userId)))
+    {
+    }
+}

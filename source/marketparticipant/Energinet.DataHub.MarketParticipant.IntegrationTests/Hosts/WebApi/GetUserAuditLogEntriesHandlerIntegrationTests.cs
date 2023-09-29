@@ -105,11 +105,11 @@ public sealed class GetUserAuditLogEntriesHandlerIntegrationTests
         Assert.Equal(UserRoleAssignmentTypeAuditLog.Added, assignmentAuditLogs[0].AssignmentType);
         Assert.Equal(actor.Id, assignmentAuditLogs[0].ActorId);
         Assert.Equal(userRole.Id, assignmentAuditLogs[0].UserRoleId);
-        Assert.Equal(frontendUser.Id, assignmentAuditLogs[0].ChangedByUserId);
+        Assert.Equal(frontendUser.Id, assignmentAuditLogs[0].AuditIdentityId);
 
         Assert.Equal(UserRoleAssignmentTypeAuditLog.Removed, assignmentAuditLogs[1].AssignmentType);
         Assert.Equal(actor.Id, assignmentAuditLogs[1].ActorId);
         Assert.Equal(userRole.Id, assignmentAuditLogs[1].UserRoleId);
-        Assert.Equal(frontendUser.Id, assignmentAuditLogs[1].ChangedByUserId);
+        Assert.Equal(frontendUser.Id, assignmentAuditLogs[1].AuditIdentityId);
     }
 }

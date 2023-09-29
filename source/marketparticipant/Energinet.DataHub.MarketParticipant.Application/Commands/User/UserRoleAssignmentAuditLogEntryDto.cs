@@ -21,6 +21,6 @@ public sealed record UserRoleAssignmentAuditLogEntryDto(
     Guid UserId,
     Guid ActorId,
     Guid UserRoleId,
-    Guid ChangedByUserId,
+    Guid AuditIdentityId,
     DateTimeOffset Timestamp,
     UserRoleAssignmentTypeAuditLog AssignmentType);

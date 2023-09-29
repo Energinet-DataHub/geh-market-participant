@@ -21,33 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
 
 internal static class UserMapper
 {
-    public static void MapToEntity(User from, UserEntity to)
-    {
-        to.Id = from.Id.Value;
-        to.ExternalId = from.ExternalId.Value;
-        to.AdministratedByActorId = from.AdministratedBy.Value;
-        to.MitIdSignupInitiatedAt = from.MitIdSignupInitiatedAt;
-        to.InvitationExpiresAt = from.InvitationExpiresAt;
-
-        var newAssignments = from
-            .RoleAssignments
-            .Select(newRa =>
-            {
-                var existing = to.RoleAssignments
-                    .FirstOrDefault(oldRa => oldRa.ActorId == newRa.ActorId.Value && oldRa.UserRoleId == newRa.UserRoleId.Value);
-
-                return existing ?? MapToEntity(newRa, from.Id);
-            })
-            .ToList();
-
-        to.RoleAssignments.Clear();
-
-        foreach (var userRoleAssignment in newAssignments)
-        {
-            to.RoleAssignments.Add(userRoleAssignment);
-        }
-    }
-
     public static User MapFromEntity(UserEntity from)
     {
         return new User(
@@ -57,16 +30,6 @@ internal static class UserMapper
             from.RoleAssignments.Select(MapFromEntity),
             from.MitIdSignupInitiatedAt,
             from.InvitationExpiresAt);
-    }
-
-    private static UserRoleAssignmentEntity MapToEntity(UserRoleAssignment fromRoleAssignment, UserId fromId)
-    {
-        return new UserRoleAssignmentEntity
-        {
-            ActorId = fromRoleAssignment.ActorId.Value,
-            UserId = fromId.Value,
-            UserRoleId = fromRoleAssignment.UserRoleId.Value
-        };
     }
 
     private static UserRoleAssignment MapFromEntity(UserRoleAssignmentEntity from)

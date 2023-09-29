@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public interface IAuditIdentityResolver
+public sealed class GetAuditIdentityCommandRuleSet : AbstractValidator<GetAuditIdentityCommand>
 {
-    Task<UserIdentity> ResolveAsync(AuditIdentity identityId);
+    public GetAuditIdentityCommandRuleSet()
+    {
+        RuleFor(command => command.AuditIdentityId)
+            .NotEmpty();
+    }
 }

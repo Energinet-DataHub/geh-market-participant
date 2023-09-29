@@ -189,12 +189,11 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
     public async Task UpdateUserRoleAssignments_AddNewUserRoleToEmptyCollection_ThreeAuditLogsAdded_OneRemoved()
     {
         // Create context user
-        var frontendUser = await _fixture.PrepareUserAsync();
+        var frontendUser1 = await _fixture.PrepareUserAsync();
+        var frontendUser2 = await _fixture.PrepareUserAsync();
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
-
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -213,8 +212,19 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var getCommand = new GetUserAuditLogsCommand(updateCommand1.UserId);
 
         // Act
-        await mediator.Send(updateCommand1);
-        await mediator.Send(updateCommand2);
+        await using var hostUpdate1 = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        hostUpdate1.ServiceCollection.MockFrontendUser(frontendUser1.Id);
+
+        await using var scopeUpdate1 = hostUpdate1.BeginScope();
+        var mediatorUpdate1 = scopeUpdate1.ServiceProvider.GetRequiredService<IMediator>();
+        await mediatorUpdate1.Send(updateCommand1);
+
+        await using var hostUpdate2 = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        hostUpdate2.ServiceCollection.MockFrontendUser(frontendUser2.Id);
+
+        await using var scopeUpdate2 = hostUpdate2.BeginScope();
+        var mediatorUpdate2 = scopeUpdate2.ServiceProvider.GetRequiredService<IMediator>();
+        await mediatorUpdate2.Send(updateCommand2);
 
         var response = await mediator.Send(getCommand);
 
