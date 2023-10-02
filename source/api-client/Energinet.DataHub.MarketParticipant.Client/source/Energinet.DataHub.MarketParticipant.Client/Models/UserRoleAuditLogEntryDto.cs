@@ -13,13 +13,18 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record UserRoleAuditLogEntryDto(
         Guid UserRoleId,
-        Guid ChangedByUserId,
-        DateTimeOffset Timestamp,
-        UserRoleChangeType UserRoleChangeType,
-        string ChangeDescriptionJson);
+        Guid AuditIdentityId,
+        string Name,
+        string? Description,
+        IEnumerable<int> Permissions,
+        EicFunction? EicFunction,
+        UserRoleStatus Status,
+        UserRoleChangeType ChangeType,
+        DateTimeOffset Timestamp);
 }
