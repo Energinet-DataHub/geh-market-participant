@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.32.2
+
+- Updated audit log model for user roles
+
 ## Version 2.32.1
 
 - Added /audit-identity controller.
