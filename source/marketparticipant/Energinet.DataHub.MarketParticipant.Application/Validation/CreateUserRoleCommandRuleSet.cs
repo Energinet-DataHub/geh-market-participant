@@ -23,10 +23,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
     {
         public CreateUserRoleCommandRuleSet()
         {
-            RuleFor(command => command.EditingUserId)
-                .NotNull()
-                .NotEmpty();
-
             RuleFor(command => command.UserRoleDto)
                 .NotNull()
                 .ChildRules(validator =>

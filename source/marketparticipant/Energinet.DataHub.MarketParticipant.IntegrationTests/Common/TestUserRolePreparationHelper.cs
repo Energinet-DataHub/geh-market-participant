@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -39,7 +40,8 @@ internal static class TestUserRolePreparationHelper
         {
             localUserRole.Permissions.Add(new UserRolePermissionEntity
             {
-                Permission = permission
+                Permission = permission,
+                ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
             });
         }
 
@@ -59,7 +61,8 @@ internal static class TestUserRolePreparationHelper
         {
             localUserRole.Permissions.Add(new UserRolePermissionEntity
             {
-                Permission = permission
+                Permission = permission,
+                ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
             });
         }
 

@@ -67,13 +67,18 @@ internal static class TestPreparationEntities
         Name = "Integration Test User Role",
         Description = "Integration Test User Role Description",
         Status = UserRoleStatus.Active,
+        ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
         EicFunctions =
         {
             new UserRoleEicFunctionEntity { EicFunction = EicFunction.GridAccessProvider }
         },
         Permissions =
         {
-            new UserRolePermissionEntity { Permission = PermissionId.UsersView }
+            new UserRolePermissionEntity
+            {
+                Permission = PermissionId.UsersView,
+                ChangedByIdentityId = KnownAuditIdentityProvider.TestFramework.IdentityId.Value,
+            }
         }
     };
 
