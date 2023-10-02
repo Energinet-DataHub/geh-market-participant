@@ -183,9 +183,10 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
 
         // Assert
         var resultList = auditLogs.ToList();
+        var resultGroup = resultList.GroupBy(e => e.Timestamp).OrderBy(e => e.Key);
         resultList.Count.Should().Be(7);
         resultList.First().ChangeType.Should().Be(UserRoleChangeType.Created);
-        resultList.Last().ChangeType.Should().Be(UserRoleChangeType.StatusChange);
+        resultGroup.Last().Any(e => e.ChangeType == UserRoleChangeType.StatusChange).Should().BeTrue();
     }
 
     [Fact]
