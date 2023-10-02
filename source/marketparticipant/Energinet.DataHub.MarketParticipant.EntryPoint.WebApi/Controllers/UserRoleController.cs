@@ -71,7 +71,7 @@ public sealed class UserRoleController : ControllerBase
     [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<IActionResult> CreateAsync(CreateUserRoleDto userRole)
     {
-        var command = new CreateUserRoleCommand(_userContext.CurrentUser.UserId, userRole);
+        var command = new CreateUserRoleCommand(userRole);
 
         var response = await _mediator
             .Send(command)
@@ -87,7 +87,7 @@ public sealed class UserRoleController : ControllerBase
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
 
-        var command = new UpdateUserRoleCommand(_userContext.CurrentUser.UserId, userRoleId, userRole);
+        var command = new UpdateUserRoleCommand(userRoleId, userRole);
 
         await _mediator.Send(command).ConfigureAwait(false);
 

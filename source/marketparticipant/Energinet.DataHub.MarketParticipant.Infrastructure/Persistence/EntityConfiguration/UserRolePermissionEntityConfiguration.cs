@@ -13,15 +13,16 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public sealed class UserRolePermissionEntityConfiguration : IEntityTypeConfiguration<UserRolePermissionEntity>
+public sealed class UserRolePermissionEntityConfiguration : AuditedEntityTypeConfiguration<UserRolePermissionEntity>
 {
-    public void Configure(EntityTypeBuilder<UserRolePermissionEntity> builder)
+    protected override void ConfigureEntity(EntityTypeBuilder<UserRolePermissionEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         builder.ToTable("UserRolePermission");

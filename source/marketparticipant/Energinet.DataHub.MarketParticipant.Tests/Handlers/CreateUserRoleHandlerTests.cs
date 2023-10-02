@@ -41,13 +41,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
             var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
             var target = new CreateUserRoleHandler(
                 userRoleRepositoryMock.Object,
-                userRoleAuditLogServiceMock.Object,
-                userRoleAuditLogEntryRepositoryMock.Object,
                 userRoleHelperServiceMock.Object);
 
             var roleId = Guid.NewGuid();
@@ -67,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
                 .ReturnsAsync(true);
 
-            var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(
+            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,
@@ -88,13 +84,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         {
             // Arrange
             var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
-            var userRoleAuditLogServiceMock = new Mock<IUserRoleAuditLogService>();
-            var userRoleAuditLogEntryRepositoryMock = new Mock<IUserRoleAuditLogEntryRepository>();
             var userRoleHelperServiceMock = new Mock<IEnsureUserRolePermissionsService>();
             var target = new CreateUserRoleHandler(
                 userRoleRepositoryMock.Object,
-                userRoleAuditLogServiceMock.Object,
-                userRoleAuditLogEntryRepositoryMock.Object,
                 userRoleHelperServiceMock.Object);
 
             var roleId = Guid.NewGuid();
@@ -114,7 +106,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.EnsurePermissionsSelectedAreValidForMarketRoleAsync(It.IsAny<IEnumerable<PermissionId>>(), It.IsAny<EicFunction>()))
                 .ReturnsAsync(false);
 
-            var command = new CreateUserRoleCommand(userRole.Id.Value, new CreateUserRoleDto(
+            var command = new CreateUserRoleCommand(new CreateUserRoleDto(
                 "fake_value",
                 "fake_value",
                 UserRoleStatus.Active,

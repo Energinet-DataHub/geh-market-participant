@@ -21,5 +21,7 @@ public enum UserRoleChangeType
     DescriptionChange = 3,
     EicFunctionChange = 4,
     StatusChange = 5,
-    PermissionsChange = 6
+    PermissionsChange = 6,
+    PermissionAdded = 7,
+    PermissionRemoved = 8
 }

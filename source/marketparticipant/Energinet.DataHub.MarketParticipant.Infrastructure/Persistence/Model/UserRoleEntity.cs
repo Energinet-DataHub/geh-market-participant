@@ -15,15 +15,18 @@
 using System;
 using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class UserRoleEntity
+public sealed class UserRoleEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
     public string? Description { get; set; }
     public UserRoleStatus Status { get; set; }
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
     public Collection<UserRoleEicFunctionEntity> EicFunctions { get; } = new();
     public Collection<UserRolePermissionEntity> Permissions { get; } = new();
 }
