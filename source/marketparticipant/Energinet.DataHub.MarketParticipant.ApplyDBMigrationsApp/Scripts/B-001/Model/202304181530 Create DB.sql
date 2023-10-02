@@ -87,25 +87,6 @@ CREATE TABLE [dbo].[GridArea](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[GridAreaAuditLogEntry]    Script Date: 19/04/2023 11.05.55 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[GridAreaAuditLogEntry](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[UserId] [uniqueidentifier] NOT NULL,
-	[Timestamp] [datetimeoffset](7) NOT NULL,
-	[Field] [int] NOT NULL,
-	[OldValue] [nvarchar](max) NOT NULL,
-	[NewValue] [nvarchar](max) NOT NULL,
-	[GridAreaId] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_AuditLog_Id] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
 /****** Object:  Table [dbo].[GridAreaLink]    Script Date: 19/04/2023 11.05.55 ******/
 SET ANSI_NULLS ON
 GO
@@ -210,24 +191,6 @@ CREATE TABLE [dbo].[Permission](
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
-GO
-/****** Object:  Table [dbo].[PermissionAuditLogEntry]    Script Date: 19/04/2023 11.05.55 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[PermissionAuditLogEntry](
-	[EntryId] [int] IDENTITY(1,1) NOT NULL,
-	[PermissionId] [int] NOT NULL,
-	[ChangedByUserId] [uniqueidentifier] NOT NULL,
-	[PermissionChangeType] [int] NOT NULL,
-	[Timestamp] [datetimeoffset](7) NOT NULL,
-	[Value] [nvarchar](max) NOT NULL,
- CONSTRAINT [PK_PermissionAuditLogEntry] PRIMARY KEY CLUSTERED 
-(
-	[EntryId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 /****** Object:  Table [dbo].[UniqueActorMarketRoleGridArea]    Script Date: 19/04/2023 11.05.55 ******/
 SET ANSI_NULLS ON
@@ -334,24 +297,6 @@ CREATE TABLE [dbo].[UserRoleAssignmentAuditLogEntry](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserRoleAuditLogEntry]    Script Date: 19/04/2023 11.05.55 ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [dbo].[UserRoleAuditLogEntry](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[UserRoleId] [uniqueidentifier] NOT NULL,
-	[ChangedByUserId] [uniqueidentifier] NOT NULL,
-	[UserRoleChangeType] [int] NOT NULL,
-	[ChangeDescriptionJson] [nvarchar](max) NULL,
-	[Timestamp] [datetimeoffset](7) NOT NULL,
- CONSTRAINT [PK_UserRoleAuditLogEntry] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
 /****** Object:  Table [dbo].[UserRoleEicFunction]    Script Date: 19/04/2023 11.05.55 ******/
 SET ANSI_NULLS ON
 GO
@@ -392,11 +337,6 @@ REFERENCES [dbo].[Actor] ([Id])
 GO
 ALTER TABLE [dbo].[ActorContact] CHECK CONSTRAINT [FK_ActorContact_Actor]
 GO
-ALTER TABLE [dbo].[GridAreaAuditLogEntry]  WITH CHECK ADD  CONSTRAINT [FK_GridAreaAuditLogEntry_GridAreaId_GridArea] FOREIGN KEY([GridAreaId])
-REFERENCES [dbo].[GridArea] ([Id])
-GO
-ALTER TABLE [dbo].[GridAreaAuditLogEntry] CHECK CONSTRAINT [FK_GridAreaAuditLogEntry_GridAreaId_GridArea]
-GO
 ALTER TABLE [dbo].[GridAreaLink]  WITH CHECK ADD  CONSTRAINT [FK_GridAreaLink_GridAreaId_GridArea] FOREIGN KEY([GridAreaId])
 REFERENCES [dbo].[GridArea] ([Id])
 GO
@@ -421,11 +361,6 @@ ALTER TABLE [dbo].[MarketRoleGridArea]  WITH CHECK ADD  CONSTRAINT [FK_MarketRol
 REFERENCES [dbo].[MarketRole] ([Id])
 GO
 ALTER TABLE [dbo].[MarketRoleGridArea] CHECK CONSTRAINT [FK_MarketRoleId_MarketRole]
-GO
-ALTER TABLE [dbo].[PermissionAuditLogEntry]  WITH CHECK ADD  CONSTRAINT [FK_PermissionAuditLogEntry_ChangedByUserId_User] FOREIGN KEY([ChangedByUserId])
-REFERENCES [dbo].[User] ([Id])
-GO
-ALTER TABLE [dbo].[PermissionAuditLogEntry] CHECK CONSTRAINT [FK_PermissionAuditLogEntry_ChangedByUserId_User]
 GO
 ALTER TABLE [dbo].[UniqueActorMarketRoleGridArea]  WITH CHECK ADD  CONSTRAINT [FK_UniqueActorMarketRoleGridArea_Actor] FOREIGN KEY([ActorId])
 REFERENCES [dbo].[Actor] ([Id])
@@ -467,14 +402,3 @@ REFERENCES [dbo].[UserRole] ([Id])
 GO
 ALTER TABLE [dbo].[UserRoleAssignmentAuditLogEntry] CHECK CONSTRAINT [FK_UserRoleId_MarketRoleGridArea]
 GO
-ALTER TABLE [dbo].[UserRoleAuditLogEntry]  WITH CHECK ADD  CONSTRAINT [FK_UserRoleAuditLogEntry_ChangedByUserId_User] FOREIGN KEY([ChangedByUserId])
-REFERENCES [dbo].[User] ([Id])
-GO
-ALTER TABLE [dbo].[UserRoleAuditLogEntry] CHECK CONSTRAINT [FK_UserRoleAuditLogEntry_ChangedByUserId_User]
-GO
-ALTER TABLE [dbo].[UserRoleAuditLogEntry]  WITH CHECK ADD  CONSTRAINT [FK_UserRoleAuditLogEntry_UserRoleId_UserRole] FOREIGN KEY([UserRoleId])
-REFERENCES [dbo].[UserRole] ([Id])
-GO
-ALTER TABLE [dbo].[UserRoleAuditLogEntry] CHECK CONSTRAINT [FK_UserRoleAuditLogEntry_UserRoleId_UserRole]
-GO
-
