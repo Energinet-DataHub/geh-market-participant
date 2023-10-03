@@ -74,21 +74,24 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(context);
 
-        var frontendUser = await _fixture.PrepareUserAsync();
-        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
-
-        await using var scope = host.BeginScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var frontendFirstUser = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(frontendFirstUser.Id);
 
         var userRoleWithPermission = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
-        var newPermissionDescription = Guid.NewGuid().ToString();
+        var targetPermission = (int)userRoleWithPermission.Permissions[0].Permission;
 
-        var updateCommand = new UpdatePermissionCommand(
-            (int)userRoleWithPermission.Permissions[0].Permission,
-            newPermissionDescription);
+        await using var scopeFirstUser = host.BeginScope();
+        var mediatorFirstUser = scopeFirstUser.ServiceProvider.GetRequiredService<IMediator>();
+
+        var frontendSecondUser = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(frontendSecondUser);
+
+        await using var scopeSecondUser = host.BeginScope();
+        var mediatorSecondUser = scopeSecondUser.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        await mediator.Send(updateCommand);
+        await mediatorFirstUser.Send(new UpdatePermissionCommand(targetPermission, Guid.NewGuid().ToString()));
+        await mediatorSecondUser.Send(new UpdatePermissionCommand(targetPermission, Guid.NewGuid().ToString()));
 
         // Assert
         var logs = await permissionAuditLogEntryRepository
@@ -98,6 +101,11 @@ public sealed class UpdatePermissionHandlerIntegrationTests
         Assert.Single(logs, p =>
             p.Permission == userRoleWithPermission.Permissions[0].Permission &&
             p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
-            p.AuditIdentity.Value == frontendUser.Id);
+            p.AuditIdentity.Value == frontendFirstUser.Id);
+
+        Assert.Single(logs, p =>
+            p.Permission == userRoleWithPermission.Permissions[0].Permission &&
+            p.PermissionChangeType == PermissionChangeType.DescriptionChange &&
+            p.AuditIdentity.Value == frontendSecondUser.Id);
     }
 }
