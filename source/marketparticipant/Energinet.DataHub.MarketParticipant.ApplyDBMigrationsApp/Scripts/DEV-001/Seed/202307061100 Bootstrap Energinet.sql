@@ -6,14 +6,15 @@ INSERT INTO [dbo].[GridArea] (
     [PriceAreaCode],
     [ValidFrom],
     [ValidTo],
-    [FullFlexDate]
+    [FullFlexDate],
+    [ChangedByIdentityId]
 )
 VALUES
-    (NEWID(), '533', 'Netområde 533', 1, '2000-01-01', NULL, NULL),
-    (NEWID(), '543', 'Netområde 543', 1, '2000-01-01', NULL, NULL),
-    (NEWID(), '584', 'Netområde 584', 1, '2000-01-01', NULL, NULL),
-    (NEWID(), '803', 'Netområde 803', 1, '2000-01-01', NULL, NULL),
-    (NEWID(), '804', 'Netområde 804', 1, '2000-01-01', NULL, NULL);
+    (NEWID(), '533', 'Netområde 533', 1, '2000-01-01', NULL, NULL, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '543', 'Netområde 543', 1, '2000-01-01', NULL, NULL, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '584', 'Netområde 584', 1, '2000-01-01', NULL, NULL, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '803', 'Netområde 803', 1, '2000-01-01', NULL, NULL, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (NEWID(), '804', 'Netområde 804', 1, '2000-01-01', NULL, NULL, '00000000-FFFF-FFFF-FFFF-000000000000');
 
 -- Create Energinet Organisation
 DECLARE @organisationId varchar(36) = '10000000-0000-0000-0000-000000000000'
@@ -105,17 +106,19 @@ DECLARE @userAdminRoleId varchar(36) = 'f3df856f-bd11-4174-97cb-fb6bc54c300a'
 INSERT INTO [dbo].[UserRoleAssignment] (
     [UserId],
     [ActorId],
-    [UserRoleId]
+    [UserRoleId],
+    [ChangedByIdentityId]
 )
 VALUES
-    (@userId, @actorId, @userAdminRoleId);
+    (@userId, @actorId, @userAdminRoleId, '00000000-FFFF-FFFF-FFFF-000000000000');
 
 INSERT INTO [dbo].[UserRolePermission] (
     [UserRoleId],
-    [PermissionId]
+    [PermissionId],
+    [ChangedByIdentityId]
 )
 VALUES
-    (@userAdminRoleId, 5),
-    (@userAdminRoleId, 6),
-    (@userAdminRoleId, 7),
-    (@userAdminRoleId, 8);
+    (@userAdminRoleId, 5, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (@userAdminRoleId, 6, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (@userAdminRoleId, 7, '00000000-FFFF-FFFF-FFFF-000000000000'),
+    (@userAdminRoleId, 8, '00000000-FFFF-FFFF-FFFF-000000000000');
