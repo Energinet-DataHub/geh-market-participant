@@ -14,7 +14,6 @@
 using System;
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
@@ -24,7 +23,7 @@ public sealed record UserRoleAuditLogEntryDto(
     Guid AuditIdentityId,
     string Name,
     string? Description,
-    IEnumerable<PermissionId> Permissions,
+    IEnumerable<int> Permissions,
     EicFunction? EicFunction,
     UserRoleStatus Status,
     UserRoleChangeType ChangeType,
