@@ -32,8 +32,4 @@ limitations under the License.
     <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.6.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions" />
-  </ItemGroup>
-
 </Project>

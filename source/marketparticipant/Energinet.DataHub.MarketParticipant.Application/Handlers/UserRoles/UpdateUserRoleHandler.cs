@@ -18,7 +18,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -30,22 +29,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleCommand>
 {
     private readonly IUserRoleRepository _userRoleRepository;
-    private readonly IUserRoleAuditLogService _userRoleAuditLogService;
-    private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
 
-    public UpdateUserRoleHandler(
-        IUserRoleRepository userRoleRepository,
-        IUserRoleAuditLogService userRoleAuditLogService,
-        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository)
+    public UpdateUserRoleHandler(IUserRoleRepository userRoleRepository)
     {
         _userRoleRepository = userRoleRepository;
-        _userRoleAuditLogService = userRoleAuditLogService;
-        _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(
-        UpdateUserRoleCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(UpdateUserRoleCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -61,8 +51,6 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
             throw new ValidationException($"User role with name {request.UserRoleUpdateDto.Name} already exists in market role");
         }
 
-        var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRoleToUpdate);
-
         userRoleToUpdate.Name = request.UserRoleUpdateDto.Name;
         userRoleToUpdate.Description = request.UserRoleUpdateDto.Description;
         userRoleToUpdate.Status = request.UserRoleUpdateDto.Status;
@@ -71,21 +59,5 @@ public sealed class UpdateUserRoleHandler : IRequestHandler<UpdateUserRoleComman
         await _userRoleRepository
             .UpdateAsync(userRoleToUpdate)
             .ConfigureAwait(false);
-
-        var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(new UserId(request.ChangedByUserId), userRoleInitStateForAuditLog, userRoleToUpdate);
-        await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
-
-        return Unit.Value;
-    }
-
-    private static UserRole CopyUserRoleForAuditLog(UserRole userRole)
-    {
-        return new UserRole(
-            userRole.Id,
-            userRole.Name,
-            userRole.Description,
-            userRole.Status,
-            userRole.Permissions,
-            userRole.EicFunction);
     }
 }

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Text.Json.Serialization;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
@@ -20,8 +19,9 @@ using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
 using Energinet.DataHub.Core.App.WebApp.Diagnostics.HealthChecks;
-using Energinet.DataHub.Core.App.WebApp.SimpleInjector;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Extensions;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -30,12 +30,10 @@ using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 {
@@ -59,7 +57,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                Container.Options.EnableAutoVerification = false;
             }
 
             app.UseSwagger();
@@ -71,6 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             app.UseRouting();
             app.UseCommonExceptionHandling();
 
+            app.UseLoggingScope();
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseUserMiddleware<FrontendUser>();
@@ -83,8 +81,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 endpoints.MapLiveHealthChecks();
                 endpoints.MapReadyHealthChecks();
             });
-
-            app.UseSimpleInjector(Container);
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -97,6 +93,24 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services
                 .AddControllers()
                 .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+            services.AddSingleton<IExternalTokenValidator>(_ =>
+            {
+                var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
+                var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
+                return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
+            });
+
+            services.AddSingleton<ISigningKeyRing>(_ =>
+            {
+                var tokenKeyVaultUri = configuration.GetSetting(Settings.TokenKeyVault);
+                var tokenKeyName = configuration.GetSetting(Settings.TokenKeyName);
+
+                var tokenCredentials = new DefaultAzureCredential();
+
+                var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
+                return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
+            });
 
             if (_configuration.GetSetting(Settings.AllowAllTokens))
             {
@@ -111,6 +125,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             }
 
             services.AddPermissionAuthorization();
+            services.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
+            services.AddScoped<IAuditIdentityProvider, FrontendUserAuditIdentityProvider>();
 
             // Health check
             services
@@ -120,6 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddCheck<GraphApiHealthCheck>("Graph API Access")
                 .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access");
 
+            services.AddHttpLoggingScope("mark-part");
             services.AddSwaggerGen(c =>
             {
                 c.SupportNonNullableReferenceTypes();
@@ -148,47 +165,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
                 c.AddSecurityRequirement(securityRequirement);
             });
-
-            services.AddTransient<IMiddlewareFactory>(_ => new SimpleInjectorMiddlewareFactory(Container));
-        }
-
-        protected override void Configure(IConfiguration configuration, Container container)
-        {
-            ArgumentNullException.ThrowIfNull(container);
-
-            container.RegisterSingleton<IExternalTokenValidator>(() =>
-            {
-                var externalOpenIdUrl = configuration.GetSetting(Settings.ExternalOpenIdUrl);
-                var backendAppId = configuration.GetSetting(Settings.BackendBffAppId);
-                return new ExternalTokenValidator(externalOpenIdUrl, backendAppId);
-            });
-
-            container.RegisterSingleton<ISigningKeyRing>(() =>
-            {
-                var tokenKeyVaultUri = configuration.GetSetting(Settings.TokenKeyVault);
-                var tokenKeyName = configuration.GetSetting(Settings.TokenKeyName);
-
-                var tokenCredentials = new DefaultAzureCredential();
-
-                var keyClient = new KeyClient(tokenKeyVaultUri, tokenCredentials);
-                return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
-            });
-
-            container.AddUserAuthentication<FrontendUser, FrontendUserProvider>();
-        }
-
-        protected override void ConfigureSimpleInjector(IServiceCollection services)
-        {
-            services.AddSimpleInjector(Container, options =>
-            {
-                options
-                    .AddAspNetCore()
-                    .AddControllerActivation();
-
-                options.AddLogging();
-            });
-
-            services.UseSimpleInjectorAspNetRequestScoping(Container);
         }
     }
 }

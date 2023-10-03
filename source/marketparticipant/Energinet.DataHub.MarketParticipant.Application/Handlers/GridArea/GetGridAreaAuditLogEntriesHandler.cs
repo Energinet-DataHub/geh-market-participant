@@ -18,28 +18,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
 using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Application.Commands.GridArea.GridAreaAuditLogEntryField;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 {
-    public sealed class GetGridAreaAuditLogEntriesHandler
-        : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
+    public sealed class GetGridAreaAuditLogEntriesHandler : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
     {
         private readonly IGridAreaAuditLogEntryRepository _repository;
-        private readonly IUserRepository _userRepository;
-        private readonly IUserIdentityRepository _userIdentityRepository;
 
-        public GetGridAreaAuditLogEntriesHandler(
-            IGridAreaAuditLogEntryRepository repository,
-            IUserRepository userRepository,
-            IUserIdentityRepository userIdentityRepository)
+        public GetGridAreaAuditLogEntriesHandler(IGridAreaAuditLogEntryRepository repository)
         {
             _repository = repository;
-            _userRepository = userRepository;
-            _userIdentityRepository = userIdentityRepository;
         }
 
         public async Task<GetGridAreaAuditLogEntriesResponse> Handle(GetGridAreaAuditLogEntriesCommand request, CancellationToken cancellationToken)
@@ -51,32 +42,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                 .ConfigureAwait(false);
 
             var entriesDto = new List<GridAreaAuditLogEntryDto>();
-            var userNameLookup = new Dictionary<UserId, string?>();
 
             foreach (var entry in entries)
             {
-                if (!userNameLookup.TryGetValue(entry.UserId, out var userName))
-                {
-                    var user = await _userRepository.GetAsync(entry.UserId).ConfigureAwait(false);
-                    if (user != null)
-                    {
-                        var userIdentity = await _userIdentityRepository
-                            .GetAsync(user.ExternalId)
-                            .ConfigureAwait(false);
-
-                        userName = userIdentity?.FullName;
-                    }
-
-                    userNameLookup[entry.UserId] = userName;
-                }
-
                 entriesDto.Add(new GridAreaAuditLogEntryDto(
-                    entry.Timestamp,
-                    userName,
-                    (GridAreaAuditLogEntryField)entry.Field,
-                    entry.OldValue,
-                    entry.NewValue,
-                    entry.GridAreaId.Value));
+                     entry.Timestamp,
+                     entry.OldValue,
+                     entry.NewValue,
+                     entry.GridAreaId.Value,
+                     entry.AuditIdentity.Value,
+                     (GridAreaAuditLogEntryField)entry.Field));
             }
 
             return new GetGridAreaAuditLogEntriesResponse(entriesDto);

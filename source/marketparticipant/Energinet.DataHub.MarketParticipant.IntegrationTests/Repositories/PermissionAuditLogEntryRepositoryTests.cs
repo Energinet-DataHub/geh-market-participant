@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -59,25 +59,20 @@ public sealed class PermissionAuditLogEntryRepositoryTests
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        var user = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
         await using var scope = host.BeginScope();
-        await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(contextGet);
+        var permissionRepository = scope.ServiceProvider.GetRequiredService<IPermissionRepository>();
 
-        var userChangedBy = await _fixture.PrepareUserAsync();
-        var userRoleWithCreatedPermission = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(context);
 
-        var entry = new PermissionAuditLogEntry(
-            userRoleWithCreatedPermission.Permissions[0].Permission,
-            new UserId(userChangedBy.Id),
-            PermissionChangeType.DescriptionChange,
-            DateTimeOffset.UtcNow,
-            "Description");
-
-        // Insert an audit log.
-        await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();
-
-        var insertAuditLogEntryRepository = new PermissionAuditLogEntryRepository(contextInsert);
-        await insertAuditLogEntryRepository.InsertAuditLogEntryAsync(entry);
+        // Make an audited change.
+        var permission = await permissionRepository.GetAsync(PermissionId.UsersManage);
+        permission.Description = "New description";
+        await permissionRepository.UpdatePermissionAsync(permission);
 
         // Act
         var actual = await permissionAuditLogEntryRepository
@@ -87,9 +82,8 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         // Assert
         var permissionAuditLogs = actual.ToList();
         Assert.Single(permissionAuditLogs);
-        Assert.Equal(entry.ChangedByUserId, permissionAuditLogs[0].ChangedByUserId);
-        Assert.Equal(entry.Timestamp, permissionAuditLogs[0].Timestamp);
-        Assert.Equal(entry.PermissionChangeType, permissionAuditLogs[0].PermissionChangeType);
-        Assert.Equal(entry.Permission, permissionAuditLogs[0].Permission);
+        Assert.Equal(user.Id, permissionAuditLogs[0].AuditIdentity.Value);
+        Assert.Equal(PermissionChangeType.DescriptionChange, permissionAuditLogs[0].PermissionChangeType);
+        Assert.Equal(PermissionId.UsersManage, permissionAuditLogs[0].Permission);
     }
 }

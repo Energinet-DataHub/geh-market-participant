@@ -14,15 +14,15 @@
 
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common;
 
 internal static class InfrastructureRegistration
 {
-    public static void AddInfrastructureServices(this Container container)
+    public static void AddInfrastructureServices(this IServiceCollection services)
     {
-        container.Register<IUserIdentityAuthenticationService, UserIdentityAuthenticationService>(Lifestyle.Scoped);
-        container.Register<IIntegrationEventFactory, IntegrationEventFactory>(Lifestyle.Scoped);
+        services.AddScoped<IUserIdentityAuthenticationService, UserIdentityAuthenticationService>();
+        services.AddScoped<IIntegrationEventFactory, IntegrationEventFactory>();
     }
 }

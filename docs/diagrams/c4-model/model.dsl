@@ -42,6 +42,7 @@ markpartDomain = group "Market Participant" {
 
             # Common relationships
             this -> dh3.sharedB2C "Creates B2C App Registration" "Microsoft.Graph/https"
+            this -> dh3.sharedServiceBus "Sends market participant events" "integration event/amqp"
 
             # Domain relationships
             this -> markpartDb "Updates actors with external B2C id." "EF Core"

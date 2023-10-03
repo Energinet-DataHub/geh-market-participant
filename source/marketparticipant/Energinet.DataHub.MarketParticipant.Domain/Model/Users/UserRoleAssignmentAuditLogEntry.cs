@@ -19,6 +19,6 @@ public sealed record UserRoleAssignmentAuditLogEntry(
     UserId UserId,
     ActorId ActorId,
     UserRoleId UserRoleId,
-    UserId ChangedByUserId,
+    AuditIdentity AuditIdentity,
     DateTimeOffset Timestamp,
     UserRoleAssignmentTypeAuditLog AssignmentType);

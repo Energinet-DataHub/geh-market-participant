@@ -12,12 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class PermissionEntity
+public sealed class PermissionEntity : IAuditedEntity
 {
     public PermissionId Id { get; set; }
     public string Description { get; set; } = null!;
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }

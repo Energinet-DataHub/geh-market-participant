@@ -15,26 +15,43 @@
 using System;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
 internal static class FrontendUserHelper
 {
-    public static void MockFrontendUser(this Container? container, Guid frontendUserId)
+    public static void MockFrontendUser(this IServiceCollection services, Guid frontendUserId, bool isFas = false)
     {
         var frontendUser = new FrontendUser(
             frontendUserId,
             Guid.NewGuid(),
             Guid.NewGuid(),
-            false);
+            isFas);
 
         var userContextMock = new Mock<IUserContext<FrontendUser>>();
         userContextMock
             .Setup(userContext => userContext.CurrentUser)
             .Returns(frontendUser);
 
-        container?.Register(() => userContextMock.Object);
+        services.AddScoped(_ => userContextMock.Object);
+    }
+
+    public static void MockFrontendUser(this IServiceCollection services, UserEntity frontendUserEntity, bool isFas = false)
+    {
+        var frontendUser = new FrontendUser(
+            frontendUserEntity.Id,
+            Guid.NewGuid(),
+            frontendUserEntity.AdministratedByActorId,
+            isFas);
+
+        var userContextMock = new Mock<IUserContext<FrontendUser>>();
+        userContextMock
+            .Setup(userContext => userContext.CurrentUser)
+            .Returns(frontendUser);
+
+        services.AddScoped(_ => userContextMock.Object);
     }
 }

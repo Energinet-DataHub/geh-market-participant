@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -38,7 +39,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IExternalActorSynchronizationRepository>();
+        var target = scope.ServiceProvider.GetRequiredService<IExternalActorSynchronizationRepository>();
 
         // Act
         var next = await target.DequeueNextAsync();
@@ -53,7 +54,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IExternalActorSynchronizationRepository>();
+        var target = scope.ServiceProvider.GetRequiredService<IExternalActorSynchronizationRepository>();
 
         var actorId = Guid.NewGuid();
 
@@ -73,7 +74,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
-        var target = scope.GetInstance<IExternalActorSynchronizationRepository>();
+        var target = scope.ServiceProvider.GetRequiredService<IExternalActorSynchronizationRepository>();
 
         var actorId = Guid.NewGuid();
 

@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public sealed record CreateUserRoleCommand(Guid EditingUserId, CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;
+public sealed record CreateUserRoleCommand(CreateUserRoleDto UserRoleDto) : IRequest<CreateUserRoleResponse>;

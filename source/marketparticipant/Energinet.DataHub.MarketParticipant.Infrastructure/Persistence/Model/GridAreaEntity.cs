@@ -14,10 +14,11 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class GridAreaEntity
+public sealed class GridAreaEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;
@@ -26,4 +27,7 @@ public sealed class GridAreaEntity
     public DateTimeOffset ValidFrom { get; set; }
     public DateTimeOffset? ValidTo { get; set; }
     public DateTimeOffset? FullFlexDate { get; set; }
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }

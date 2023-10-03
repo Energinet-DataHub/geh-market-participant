@@ -18,25 +18,19 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.Common
 {
     internal static class DbContextRegistration
     {
-        public static void AddDbContexts(this IServiceCollection services, Container container)
+        public static void AddDbContexts(this IServiceCollection services)
         {
-            services.AddDbContext<MarketParticipantDbContext>(options =>
+            services.AddDbContext<IMarketParticipantDbContext, MarketParticipantDbContext>((provider, options) =>
             {
-                var config = container.GetService<IConfiguration>();
+                var config = provider.GetRequiredService<IConfiguration>();
                 var connectionString = config.GetSetting(Settings.SqlDbConnectionString);
                 options.UseSqlServer(connectionString);
             });
-        }
-
-        public static void AddDbContextInterfaces(this Container container)
-        {
-            container.Register<IMarketParticipantDbContext, MarketParticipantDbContext>(Lifestyle.Scoped);
         }
     }
 }

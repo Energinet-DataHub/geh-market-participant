@@ -48,7 +48,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         _userContext = userContext;
     }
 
-    public async Task<Unit> Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
+    public async Task Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -60,7 +60,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
         var currentStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
         if (currentStatus == UserStatus.Inactive)
-            return Unit.Value;
+            return;
 
         await _userIdentityRepository
             .DisableUserAccountAsync(userIdentity.Id)
@@ -77,14 +77,12 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
 
         var auditEntry = new UserIdentityAuditLogEntry(
             user.Id,
-            new UserId(_userContext.CurrentUser.UserId),
-            UserIdentityAuditLogField.Status,
             UserStatus.Inactive.ToString(),
             currentStatus.ToString(),
-            DateTimeOffset.UtcNow);
+            new AuditIdentity(_userContext.CurrentUser.UserId),
+            DateTimeOffset.UtcNow,
+            UserIdentityAuditLogField.Status);
 
         await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
-
-        return Unit.Value;
     }
 }

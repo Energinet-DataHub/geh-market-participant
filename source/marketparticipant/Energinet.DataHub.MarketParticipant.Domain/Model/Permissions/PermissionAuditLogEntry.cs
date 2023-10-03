@@ -19,7 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 public sealed record PermissionAuditLogEntry(
     PermissionId Permission,
-    UserId ChangedByUserId,
+    AuditIdentity AuditIdentity,
     PermissionChangeType PermissionChangeType,
     DateTimeOffset Timestamp,
     string Value);

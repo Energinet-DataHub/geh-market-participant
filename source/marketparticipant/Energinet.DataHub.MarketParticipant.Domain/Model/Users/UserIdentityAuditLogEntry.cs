@@ -18,8 +18,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 public sealed record UserIdentityAuditLogEntry(
     UserId UserId,
-    UserId ChangedByUserId,
-    UserIdentityAuditLogField Field,
     string NewValue,
     string OldValue,
-    DateTimeOffset Timestamp);
+    AuditIdentity AuditIdentity,
+    DateTimeOffset Timestamp,
+    UserIdentityAuditLogField Field);

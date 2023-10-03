@@ -28,68 +28,68 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using FluentValidation;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common
 {
     internal static class ApplicationServiceRegistration
     {
-        public static void AddApplicationServices(this Container container)
+        public static void AddApplicationServices(this IServiceCollection services)
         {
-            container.Register<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetPermissionsCommand>, GetPermissionsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetPermissionCommand>, GetPermissionCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>(Lifestyle.Scoped);
-            container.Register<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
-            container.Register<IValidator<GetGridAreaAuditLogEntriesCommand>, GetGridAreaAuditLogEntriesCommandRuleSet>();
-            container.Register<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
-            container.Register<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
-            container.Register<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
-            container.Register<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
-            container.Register<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
-            container.Register<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
-            container.Register<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
-            container.Register<IValidator<GetActorsAssociatedWithUserCommand>, GetActorsAssociatedWithUserCommandRuleSet>();
-            container.Register<IValidator<GetActorsAssociatedWithExternalUserIdCommand>, GetActorsAssociatedWithExternalUserIdCommandRuleSet>();
-            container.Register<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
-            container.Register<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
-            container.Register<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
-            container.Register<IValidator<GetUserRoleCommand>, GetUserRoleCommandRuleSet>();
-            container.Register<IValidator<CreateUserRoleCommand>, CreateUserRoleCommandRuleSet>();
-            container.Register<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandRuleSet>();
-            container.Register<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
-            container.Register<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
-            container.Register<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
-            container.Register<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
-            container.Register<IValidator<ReInviteUserCommand>, ReInviteUserCommandRuleSet>();
-            container.Register<IValidator<SendUserInviteEmailCommand>, SendUserInviteEmailCommandRuleSet>();
-            container.Register<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
-            container.Register<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
-            container.Register<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
-            container.Register<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
-            container.Register<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
-            container.Register<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
-            container.Register<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
+            services.AddScoped<IValidator<GetOrganizationsCommand>, GetOrganizationsCommandRuleSet>();
+            services.AddScoped<IValidator<GetPermissionsCommand>, GetPermissionsCommandRuleSet>();
+            services.AddScoped<IValidator<GetPermissionCommand>, GetPermissionCommandRuleSet>();
+            services.AddScoped<IValidator<CreateOrganizationCommand>, CreateOrganizationCommandRuleSet>();
+            services.AddScoped<IValidator<CreateActorCommand>, CreateActorCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateOrganizationCommand>, UpdateOrganizationCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateActorCommand>, UpdateActorCommandRuleSet>();
+            services.AddScoped<IValidator<GetSingleOrganizationCommand>, GetSingleOrganizationCommandRuleSet>();
+            services.AddScoped<IValidator<GetSingleActorCommand>, GetSingleActorCommandRuleSet>();
+            services.AddScoped<IValidator<GetActorsCommand>, GetActorsCommandRuleSet>();
+            services.AddScoped<IValidator<GetAllActorsCommand>, GetAllActorsCommandRuleSet>();
+            services.AddScoped<IValidator<GetActorContactsCommand>, GetActorContactsCommandRuleSet>();
+            services.AddScoped<IValidator<CreateActorContactCommand>, CreateActorContactCommandRuleSet>();
+            services.AddScoped<IValidator<DeleteActorContactCommand>, DeleteActorContactCommandRuleSet>();
+            services.AddScoped<IValidator<CreateGridAreaCommand>, CreateGridAreaCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateGridAreaCommand>, UpdateGridAreaCommandRuleSet>();
+            services.AddScoped<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>();
+            services.AddScoped<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>();
+            services.AddScoped<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
+            services.AddScoped<IValidator<GetGridAreaAuditLogEntriesCommand>, GetGridAreaAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
+            services.AddScoped<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
+            services.AddScoped<IValidator<GetActorsAssociatedWithUserCommand>, GetActorsAssociatedWithUserCommandRuleSet>();
+            services.AddScoped<IValidator<GetActorsAssociatedWithExternalUserIdCommand>, GetActorsAssociatedWithExternalUserIdCommandRuleSet>();
+            services.AddScoped<IValidator<GetAllUserRolesCommand>, GetAllUserRolesCommandRuleSet>();
+            services.AddScoped<IValidator<GetAvailableUserRolesForActorCommand>, GetAvailableUserRolesForActorCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateUserRoleAssignmentsCommand>, UpdateUserRoleAssignmentsCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserRoleCommand>, GetUserRoleCommandRuleSet>();
+            services.AddScoped<IValidator<CreateUserRoleCommand>, CreateUserRoleCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateUserRoleCommand>, UpdateUserRoleCommandRuleSet>();
+            services.AddScoped<IValidator<GetSelectionActorsQueryCommand>, GetSelectionActorsQueryCommandRuleSet>();
+            services.AddScoped<IValidator<SynchronizeActorsCommand>, SynchronizeActorsCommandRuleSet>();
+            services.AddScoped<IValidator<GetPermissionDetailsCommand>, GetPermissionDetailsCommandRuleSet>();
+            services.AddScoped<IValidator<InviteUserCommand>, InviteUserCommandRuleSet>();
+            services.AddScoped<IValidator<ReInviteUserCommand>, ReInviteUserCommandRuleSet>();
+            services.AddScoped<IValidator<SendUserInviteEmailCommand>, SendUserInviteEmailCommandRuleSet>();
+            services.AddScoped<IValidator<GetPermissionAuditLogsCommand>, GetPermissionAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserRolesToPermissionCommand>, GetUserRolesToPermissionCommandRuleSet>();
+            services.AddScoped<IValidator<DeactivateUserRoleCommand>, DeactivateUserRoleCommandRuleSet>();
+            services.AddScoped<IValidator<UpdateUserIdentityCommand>, UpdateUserIdentityCommandRuleSet>();
+            services.AddScoped<IValidator<InitiateMitIdSignupCommand>, InitiateMitIdSignupCommandRuleSet>();
+            services.AddScoped<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
+            services.AddScoped<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
+            services.AddScoped<IValidator<GetAuditIdentityCommand>, GetAuditIdentityCommandRuleSet>();
 
-            container.Register<IActiveDirectoryB2CService, ActiveDirectoryB2CService>(Lifestyle.Scoped);
-            container.Register<IOrganizationExistsHelperService, OrganizationExistsHelperService>(Lifestyle.Scoped);
-            container.Register<IUserRoleAuditLogService, UserRoleAuditLogService>(Lifestyle.Scoped);
-            container.Register<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>(Lifestyle.Scoped);
-            container.Register<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>(Lifestyle.Scoped);
+            services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
+            services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
+            services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
+            services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
         }
     }
 }

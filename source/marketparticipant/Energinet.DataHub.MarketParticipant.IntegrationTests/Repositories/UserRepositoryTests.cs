@@ -15,6 +15,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -45,8 +46,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         // Act
         var user = await userRepository.GetAsync(new ExternalUserId(Guid.NewGuid()));
@@ -63,8 +65,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -85,8 +88,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
@@ -112,8 +116,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         // Act
         var user = await userRepository.GetAsync(new UserId(Guid.NewGuid()));
@@ -130,8 +135,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         var user = await _fixture.PrepareUserAsync();
 
@@ -151,8 +157,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
@@ -175,8 +182,9 @@ public sealed class UserRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
+        var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
         var userIdentityRepository = new Mock<IUserIdentityRepository>().Object;
-        var userRepository = new UserRepository(context, userIdentityRepository);
+        var userRepository = new UserRepository(auditIdentityProvider, context, userIdentityRepository);
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();

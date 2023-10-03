@@ -45,7 +45,7 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
         _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
     }
 
-    public async Task<Unit> Handle(UpdateUserIdentityCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateUserIdentityCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -78,7 +78,6 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
         userIdentity.FirstName = request.UserIdentityUpdate.FirstName;
 
         await _userIdentityRepository.UpdateUserAsync(userIdentity).ConfigureAwait(false);
-        return Unit.Value;
     }
 
     private Task LogAuditEntryAsync(UserId userId, UserIdentityAuditLogField field, string newValue, string oldValue)
@@ -88,11 +87,11 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
 
         var auditEntry = new UserIdentityAuditLogEntry(
             userId,
-            new UserId(_userContext.CurrentUser.UserId),
-            field,
             newValue,
             oldValue,
-            DateTimeOffset.UtcNow);
+            new AuditIdentity(_userContext.CurrentUser.UserId),
+            DateTimeOffset.UtcNow,
+            field);
 
         return _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry);
     }

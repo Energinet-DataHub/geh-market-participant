@@ -37,7 +37,7 @@ public sealed class ReInviteUserHandler : IRequestHandler<ReInviteUserCommand>
         _userRepository = userRepository;
     }
 
-    public async Task<Unit> Handle(ReInviteUserCommand request, CancellationToken cancellationToken)
+    public async Task Handle(ReInviteUserCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -47,7 +47,5 @@ public sealed class ReInviteUserHandler : IRequestHandler<ReInviteUserCommand>
         await _userInvitationService
             .ReInviteUserAsync(user, new UserId(request.InvitedByUserId))
             .ConfigureAwait(false);
-
-        return Unit.Value;
     }
 }

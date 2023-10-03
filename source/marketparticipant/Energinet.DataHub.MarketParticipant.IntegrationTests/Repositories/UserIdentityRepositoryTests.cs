@@ -26,6 +26,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Moq;
@@ -61,10 +62,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,
@@ -111,10 +112,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,
@@ -143,10 +144,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var userIdentity = new Domain.Model.Users.UserIdentity(
             new SharedUserReferenceId(),
@@ -178,9 +179,9 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var userIdentityAuthenticationServiceMock = new Mock<IUserIdentityAuthenticationService>();
         userIdentityAuthenticationServiceMock
@@ -219,10 +220,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,
@@ -260,10 +261,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,
@@ -308,10 +309,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,
@@ -348,10 +349,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,
@@ -386,10 +387,10 @@ public sealed class UserIdentityRepositoryTests : IAsyncLifetime
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         await using var scope = host.BeginScope();
 
-        var graphServiceClient = scope.GetInstance<GraphServiceClient>();
-        var azureIdentityConfig = scope.GetInstance<AzureIdentityConfig>();
-        var userIdentityAuthenticationService = scope.GetInstance<IUserIdentityAuthenticationService>();
-        var userPasswordGenerator = scope.GetInstance<IUserPasswordGenerator>();
+        var graphServiceClient = scope.ServiceProvider.GetRequiredService<GraphServiceClient>();
+        var azureIdentityConfig = scope.ServiceProvider.GetRequiredService<AzureIdentityConfig>();
+        var userIdentityAuthenticationService = scope.ServiceProvider.GetRequiredService<IUserIdentityAuthenticationService>();
+        var userPasswordGenerator = scope.ServiceProvider.GetRequiredService<IUserPasswordGenerator>();
 
         var target = new UserIdentityRepository(
             graphServiceClient,

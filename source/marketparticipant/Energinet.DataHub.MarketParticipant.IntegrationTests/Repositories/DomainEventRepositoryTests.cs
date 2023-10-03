@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -43,7 +44,7 @@ public sealed class DomainEventRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var target = scope.GetInstance<IDomainEventRepository>();
+        var target = scope.ServiceProvider.GetRequiredService<IDomainEventRepository>();
 
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -69,7 +70,7 @@ public sealed class DomainEventRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
 
-        var target = scope.GetInstance<IDomainEventRepository>();
+        var target = scope.ServiceProvider.GetRequiredService<IDomainEventRepository>();
 
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),

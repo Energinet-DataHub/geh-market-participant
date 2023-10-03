@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             _domainEventRepository = domainEventRepository;
         }
 
-        public async Task<Unit> Handle(UpdateActorCommand request, CancellationToken cancellationToken)
+        public async Task Handle(UpdateActorCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -87,8 +87,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
                 await uow.CommitAsync().ConfigureAwait(false);
             }
-
-            return Unit.Value;
         }
 
         private static void UpdateAggregate(Domain.Model.Actor actor, ChangeActorDto changes)

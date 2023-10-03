@@ -65,11 +65,6 @@ public interface IMarketParticipantDbContext
     DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
 
     /// <summary>
-    ///     Represent access to the GridAreaAuditLogEntry database table
-    /// </summary>
-    DbSet<GridAreaAuditLogEntryEntity> GridAreaAuditLogEntries { get; }
-
-    /// <summary>
     ///     Represent access to the ActorSynchronization database table
     /// </summary>
     DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }
@@ -90,14 +85,14 @@ public interface IMarketParticipantDbContext
     DbSet<UserRoleEntity> UserRoles { get; }
 
     /// <summary>
+    ///     Represent access to the UserRoles permissions relation database table
+    /// </summary>
+    DbSet<UserRolePermissionEntity> UserRolePermissionEntries { get; }
+
+    /// <summary>
     ///     Represent access to the UserRoleAssignmentAuditLogEntry database table
     /// </summary>
     DbSet<UserRoleAssignmentAuditLogEntryEntity> UserRoleAssignmentAuditLogEntries { get; }
-
-    /// <summary>
-    ///     Represent access to the UserRoleAuditLogEntry database table
-    /// </summary>
-    DbSet<UserRoleAuditLogEntryEntity> UserRoleAuditLogEntries { get; }
 
     /// <summary>
     ///     Represent access to the UserInviteAuditLogEntry database table
@@ -113,11 +108,6 @@ public interface IMarketParticipantDbContext
     ///     Represent access to the Permission database table
     /// </summary>
     DbSet<PermissionEntity> Permissions { get; }
-
-    /// <summary>
-    ///     Represent access to the PermissionAuditLogEntry database table
-    /// </summary>
-    DbSet<PermissionAuditLogEntryEntity> PermissionAuditLogEntries { get; }
 
     /// <summary>
     ///     Represent access to the DomainEvents database table

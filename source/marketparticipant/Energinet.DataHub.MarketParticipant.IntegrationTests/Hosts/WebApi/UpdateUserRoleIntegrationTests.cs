@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -48,11 +49,10 @@ public sealed class UpdateUserRoleIntegrationTests
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
-
-        scope.Container.MockFrontendUser(frontendUser.Id);
-
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync();
         var newName = "NewUserRoleNameTestsRunIntegration";
@@ -62,7 +62,6 @@ public sealed class UpdateUserRoleIntegrationTests
         existingUserRoleWithSameNameInOtherMarketRoleScope.EicFunctions.Add(new UserRoleEicFunctionEntity() { EicFunction = EicFunction.EnergySupplier });
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -84,11 +83,10 @@ public sealed class UpdateUserRoleIntegrationTests
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
-
-        scope.Container.MockFrontendUser(frontendUser.Id);
-
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "TestNameU1"));
         var userRoleToUpdate = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(e => e.Name = "TestNameU2"));
@@ -96,7 +94,6 @@ public sealed class UpdateUserRoleIntegrationTests
         var newName = "TestNameU1";
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRoleToUpdate.Id,
             new UpdateUserRoleDto(newName, "Description", UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -112,17 +109,15 @@ public sealed class UpdateUserRoleIntegrationTests
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
-
-        scope.Container.MockFrontendUser(frontendUser.Id);
-
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync();
         var newDescription = "UserRoleDescription updated";
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserRoleDescription", newDescription, UserRoleStatus.Active, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -144,11 +139,10 @@ public sealed class UpdateUserRoleIntegrationTests
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
-
-        scope.Container.MockFrontendUser(frontendUser.Id);
-
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRoleStatusToUpdate = UserRoleStatus.Active;
         var newUserRoleStatus = UserRoleStatus.Inactive;
@@ -156,7 +150,6 @@ public sealed class UpdateUserRoleIntegrationTests
         var userRole = await _fixture.PrepareUserRoleAsync(TestPreparationEntities.ValidUserRole.Patch(t => t.Status = userRoleStatusToUpdate));
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserRoleStatus", string.Empty, newUserRoleStatus, new Collection<int> { (int)PermissionId.UsersView }));
 
@@ -178,17 +171,15 @@ public sealed class UpdateUserRoleIntegrationTests
 
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        host.ServiceCollection.MockFrontendUser(frontendUser.Id);
+
         await using var scope = host.BeginScope();
-
-        scope.Container.MockFrontendUser(frontendUser.Id);
-
-        var mediator = scope.GetInstance<IMediator>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersView);
         var newUserRolePermissions = new Collection<int> { (int)PermissionId.UsersView, (int)PermissionId.UsersManage };
 
         var updateCommand = new UpdateUserRoleCommand(
-            frontendUser.Id,
             userRole.Id,
             new UpdateUserRoleDto("UpdateUserPermissionsStatus", string.Empty, UserRoleStatus.Active, newUserRolePermissions));
 

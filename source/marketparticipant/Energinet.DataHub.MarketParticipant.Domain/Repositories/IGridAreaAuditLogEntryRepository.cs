@@ -24,12 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
     public interface IGridAreaAuditLogEntryRepository
     {
         /// <summary>
-        /// Inserts a <see cref="GridAreaAuditLogEntry"/>
-        /// </summary>
-        /// <param name="logEntry"></param>
-        Task InsertAsync(GridAreaAuditLogEntry logEntry);
-
-        /// <summary>
         /// Retrieves all log entries for a given grid area
         /// </summary>
         /// <param name="gridAreaId"></param>

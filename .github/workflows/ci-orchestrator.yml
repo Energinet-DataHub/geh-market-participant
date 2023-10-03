@@ -15,12 +15,6 @@ jobs:
       pat_token: ${{ secrets.PAT_TOKEN_REPO_WORKFLOW }}
 
   #
-  # CodeQL Check
-  #
-  ci_codeql:
-    uses: ./.github/workflows/codeql.yml
-
-  #
   # Detect changes to start relevant workflows
   #
   changes:
@@ -55,7 +49,7 @@ jobs:
   allow_merge_ci_orchestrator:
     runs-on: ubuntu-latest
     needs:
-      [ci_base, ci_codeql, ci_dotnet, ci_client_package, render_c4model_views]
+      [ci_base, ci_dotnet, ci_client_package, render_c4model_views]
     if: |
       always()
     steps:

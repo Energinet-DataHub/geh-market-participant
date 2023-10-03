@@ -16,6 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -27,11 +29,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
 public sealed class UserRoleRepository : IUserRoleRepository
 {
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
-    public UserRoleRepository(IMarketParticipantDbContext marketParticipantDbContext)
+    public UserRoleRepository(
+        IAuditIdentityProvider auditIdentityProvider,
+        IMarketParticipantDbContext marketParticipantDbContext,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
+        _auditIdentityProvider = auditIdentityProvider;
         _marketParticipantDbContext = marketParticipantDbContext;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task<IEnumerable<UserRole>> GetAllAsync()
@@ -84,10 +93,13 @@ public sealed class UserRoleRepository : IUserRoleRepository
         {
             Name = userRole.Name,
             Description = userRole.Description,
-            Status = userRole.Status
+            Status = userRole.Status,
         };
 
-        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity { Permission = x }))
+        foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity
+                 {
+                     Permission = x
+                 }))
         {
             role.Permissions.Add(permissionEntity);
         }
@@ -112,14 +124,45 @@ public sealed class UserRoleRepository : IUserRoleRepository
             userRoleEntity.Description = userRoleUpdate.Description;
             userRoleEntity.Status = userRoleUpdate.Status;
 
-            userRoleEntity.Permissions.Clear();
-            var permissionsToAdd = userRoleUpdate.Permissions.Select(x => new UserRolePermissionEntity { Permission = x });
-            foreach (var permissionEntity in permissionsToAdd)
+            var permissionsDeleted = userRoleEntity.Permissions
+                .Where(x => !userRoleUpdate.Permissions.Contains(x.Permission))
+                .ToList();
+
+            var permissionsCreated = userRoleUpdate.Permissions
+                .Where(x => !userRoleEntity.Permissions.Select(p => p.Permission).Contains(x))
+                .Select(x => new UserRolePermissionEntity
+                {
+                    Permission = x
+                })
+                .ToList();
+
+            foreach (var permissionEntity in permissionsCreated)
             {
                 userRoleEntity.Permissions.Add(permissionEntity);
             }
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+            var uow = await _unitOfWorkProvider
+                .NewUnitOfWorkAsync()
+                .ConfigureAwait(false);
+
+            await using (uow.ConfigureAwait(false))
+            {
+                foreach (var permissionEntity in permissionsDeleted)
+                {
+                    permissionEntity.DeletedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                }
+
+                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+                foreach (var permissionEntity in permissionsDeleted)
+                {
+                    userRoleEntity.Permissions.Remove(permissionEntity);
+                }
+
+                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+
+                await uow.CommitAsync().ConfigureAwait(false);
+            }
         }
         else
         {

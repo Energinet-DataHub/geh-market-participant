@@ -19,6 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using Xunit.Categories;
 
@@ -44,8 +45,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
 
-            var repository = scope.GetInstance<IOrganizationRepository>();
-            var uowProvider = scope.GetInstance<IUnitOfWorkProvider>();
+            var repository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
+            var uowProvider = scope.ServiceProvider.GetRequiredService<IUnitOfWorkProvider>();
 
             var entity = CreateEntity();
             OrganizationId id = null!;
@@ -58,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
 
             // assert
             await using var newScope = host.BeginScope();
-            var newRepository = newScope.GetInstance<IOrganizationRepository>();
+            var newRepository = newScope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
             var actualEntityCreated = await newRepository.GetAsync(id) != null;
             Assert.Equal(entityCreated, actualEntityCreated);
         }

@@ -15,35 +15,35 @@
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
-using SimpleInjector;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Energinet.DataHub.MarketParticipant.Common
 {
     internal static class RepositoryRegistration
     {
-        public static void AddRepositories(this Container container)
+        public static void AddRepositories(this IServiceCollection services)
         {
-            container.Register<IActorContactRepository, ActorContactRepository>(Lifestyle.Scoped);
-            container.Register<IGridAreaRepository, GridAreaRepository>(Lifestyle.Scoped);
-            container.Register<IOrganizationRepository, OrganizationRepository>(Lifestyle.Scoped);
-            container.Register<IGridAreaLinkRepository, GridAreaLinkRepository>(Lifestyle.Scoped);
-            container.Register<IMarketRoleAndGridAreaForActorReservationService, MarketRoleAndGridAreaForActorReservationService>(Lifestyle.Scoped);
-            container.Register<IGridAreaOverviewRepository, GridAreaOverviewRepository>(Lifestyle.Scoped);
-            container.Register<IUserOverviewRepository, UserOverviewRepository>(Lifestyle.Scoped);
-            container.Register<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IUserRepository, UserRepository>(Lifestyle.Scoped);
-            container.Register<IUserRoleRepository, UserRoleRepository>(Lifestyle.Scoped);
-            container.Register<IActorRepository, ActorRepository>(Lifestyle.Scoped);
-            container.Register<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>(Lifestyle.Scoped);
-            container.Register<IUserIdentityRepository, UserIdentityRepository>(Lifestyle.Scoped);
-            container.Register<IUserRoleAssignmentAuditLogEntryRepository, UserRoleAssignmentAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IUserRoleAuditLogEntryRepository, UserRoleAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IUserInviteAuditLogEntryRepository, UserInviteAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IUserIdentityAuditLogEntryRepository, UserIdentityAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IPermissionAuditLogEntryRepository, PermissionAuditLogEntryRepository>(Lifestyle.Scoped);
-            container.Register<IPermissionRepository, PermissionRepository>();
-            container.Register<IDomainEventRepository, DomainEventRepository>(Lifestyle.Scoped);
-            container.Register<IEmailEventRepository, EmailEventRepository>(Lifestyle.Scoped);
+            services.AddScoped<IActorContactRepository, ActorContactRepository>();
+            services.AddScoped<IGridAreaRepository, GridAreaRepository>();
+            services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            services.AddScoped<IGridAreaLinkRepository, GridAreaLinkRepository>();
+            services.AddScoped<IMarketRoleAndGridAreaForActorReservationService, MarketRoleAndGridAreaForActorReservationService>();
+            services.AddScoped<IGridAreaOverviewRepository, GridAreaOverviewRepository>();
+            services.AddScoped<IUserOverviewRepository, UserOverviewRepository>();
+            services.AddScoped<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+            services.AddScoped<IActorRepository, ActorRepository>();
+            services.AddScoped<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>();
+            services.AddScoped<IUserIdentityRepository, UserIdentityRepository>();
+            services.AddScoped<IUserRoleAssignmentAuditLogEntryRepository, UserRoleAssignmentAuditLogEntryRepository>();
+            services.AddScoped<IUserRoleAuditLogEntryRepository, UserRoleAuditLogEntryRepository>();
+            services.AddScoped<IUserInviteAuditLogEntryRepository, UserInviteAuditLogEntryRepository>();
+            services.AddScoped<IUserIdentityAuditLogEntryRepository, UserIdentityAuditLogEntryRepository>();
+            services.AddScoped<IPermissionAuditLogEntryRepository, PermissionAuditLogEntryRepository>();
+            services.AddScoped<IPermissionRepository, PermissionRepository>();
+            services.AddScoped<IDomainEventRepository, DomainEventRepository>();
+            services.AddScoped<IEmailEventRepository, EmailEventRepository>();
         }
     }
 }

@@ -16,9 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -28,38 +26,29 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 
-public sealed class DeactivateUserRoleHandler
-    : IRequestHandler<DeactivateUserRoleCommand>
+public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRoleCommand>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
-    private readonly IUserRoleAuditLogService _userRoleAuditLogService;
-    private readonly IUserRoleAuditLogEntryRepository _userRoleAuditLogEntryRepository;
-    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public DeactivateUserRoleHandler(
         IUserRepository userRepository,
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUserContext<FrontendUser> userContext,
         IUserRoleRepository userRoleRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
-        IUserRoleAuditLogService userRoleAuditLogService,
-        IUserRoleAuditLogEntryRepository userRoleAuditLogEntryRepository)
+        IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
         _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
-        _userContext = userContext;
         _userRoleRepository = userRoleRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
-        _userRoleAuditLogService = userRoleAuditLogService;
-        _userRoleAuditLogEntryRepository = userRoleAuditLogEntryRepository;
+        _auditIdentityProvider = auditIdentityProvider;
     }
 
-    public async Task<Unit> Handle(
-        DeactivateUserRoleCommand request,
-        CancellationToken cancellationToken)
+    public async Task Handle(DeactivateUserRoleCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         var userRoleId = new UserRoleId(request.UserRoleId);
@@ -82,44 +71,18 @@ public sealed class DeactivateUserRoleHandler
                 var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
                 user.RoleAssignments.Remove(role);
 
-                await AuditRoleAssignmentAsync(user, role, UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)
-                    .ConfigureAwait(false);
+                await AuditRoleAssignmentAsync(user, role).ConfigureAwait(false);
                 await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
-
-            var userRoleInitStateForAuditLog = CopyUserRoleForAuditLog(userRole);
 
             userRole.Status = UserRoleStatus.Inactive;
             await _userRoleRepository.UpdateAsync(userRole).ConfigureAwait(false);
 
-            var auditLogs = _userRoleAuditLogService.BuildAuditLogsForUserRoleChanged(
-                new UserId(request.ChangedByUserId),
-                userRoleInitStateForAuditLog,
-                userRole);
-
-            await _userRoleAuditLogEntryRepository.InsertAuditLogEntriesAsync(auditLogs).ConfigureAwait(false);
-
             await uow.CommitAsync().ConfigureAwait(false);
         }
-
-        return Unit.Value;
     }
 
-    private static UserRole CopyUserRoleForAuditLog(UserRole userRole)
-    {
-        return new UserRole(
-            userRole.Id,
-            userRole.Name,
-            userRole.Description,
-            userRole.Status,
-            userRole.Permissions,
-            userRole.EicFunction);
-    }
-
-    private async Task AuditRoleAssignmentAsync(
-        Domain.Model.Users.User user,
-        UserRoleAssignment userRoleAssignment,
-        UserRoleAssignmentTypeAuditLog userRoleAssignmentTypeAuditLog)
+    private async Task AuditRoleAssignmentAsync(Domain.Model.Users.User user, UserRoleAssignment userRoleAssignment)
     {
         await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
             user.Id,
@@ -127,8 +90,8 @@ public sealed class DeactivateUserRoleHandler
                 user.Id,
                 userRoleAssignment.ActorId,
                 userRoleAssignment.UserRoleId,
-                new UserId(_userContext.CurrentUser.UserId),
+                _auditIdentityProvider.IdentityId,
                 DateTimeOffset.UtcNow,
-                userRoleAssignmentTypeAuditLog)).ConfigureAwait(false);
+                UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)).ConfigureAwait(false);
     }
 }

@@ -18,7 +18,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
 public sealed record UserInviteAuditLogEntryDto(
     Guid UserId,
-    Guid ChangedByUserId,
     Guid ActorId,
     string ActorName,
+    Guid AuditIdentityId,
     DateTimeOffset Timestamp);

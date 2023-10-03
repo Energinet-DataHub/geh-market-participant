@@ -18,8 +18,8 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
     public sealed record UserInviteAuditLogEntryDto(
         Guid UserId,
-        Guid ChangedByUserId,
         Guid ActorId,
         string ActorName,
+        Guid AuditIdentityId,
         DateTimeOffset Timestamp);
 }

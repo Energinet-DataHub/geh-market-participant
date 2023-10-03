@@ -14,9 +14,8 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.FunctionApp.Extensions.DependencyInjection;
-using Energinet.DataHub.MarketParticipant.Common.SimpleInjector;
+using Energinet.DataHub.Core.Logging.LoggingScopeMiddleware;
 using Microsoft.Extensions.Hosting;
-using SimpleInjector;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
 {
@@ -24,24 +23,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.Organization
     {
         public static async Task Main()
         {
-#pragma warning disable CA2000 // Dispose objects before losing scope
             var startup = new Startup();
-#pragma warning restore CA2000 // Dispose objects before losing scope
 
-            await using (startup.ConfigureAwait(false))
-            {
-                var host = new HostBuilder()
-                    .ConfigureFunctionsWorkerDefaults(options => options.UseMiddleware<SimpleInjectorScopedRequest>())
-                    .ConfigureServices((context, services) =>
-                    {
-                        startup.Initialize(context.Configuration, services);
-                        services.AddApplicationInsights();
-                    })
-                    .Build()
-                    .UseSimpleInjector(startup.Container);
+            var host = new HostBuilder()
+                .ConfigureFunctionsWorkerDefaults(options => options.UseLoggingScope())
+                .ConfigureServices((context, services) =>
+                {
+                    startup.Initialize(context.Configuration, services);
+                    services.AddApplicationInsights();
+                })
+                .Build();
 
-                await host.RunAsync().ConfigureAwait(false);
-            }
+            await host.RunAsync().ConfigureAwait(false);
         }
     }
 }

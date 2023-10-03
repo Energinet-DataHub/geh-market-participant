@@ -41,9 +41,9 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 where log.UserId == userId.Value
                 select new UserInviteDetailsAuditLogEntry(
                     new UserId(log.UserId),
-                    new UserId(log.ChangedByUserId),
                     new ActorId(log.ActorId),
                     actor.Name,
+                    new AuditIdentity(log.ChangedByUserId),
                     log.Timestamp);
 
             return await logQuery.ToListAsync().ConfigureAwait(false);
@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             {
                 UserId = logEntry.UserId.Value,
                 Timestamp = logEntry.Timestamp,
-                ChangedByUserId = logEntry.ChangedByUserId.Value,
+                ChangedByUserId = logEntry.AuditIdentity.Value,
                 ActorId = logEntry.ActorId.Value
             };
 

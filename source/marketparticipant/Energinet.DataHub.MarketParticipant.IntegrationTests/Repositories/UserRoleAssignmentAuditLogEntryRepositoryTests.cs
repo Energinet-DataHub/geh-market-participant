@@ -69,9 +69,9 @@ public sealed class UserRoleAssignmentAuditLogEntryRepositoryTests
             new UserId(user.Id),
             new ActorId(Guid.NewGuid()),
             new UserRoleId(userRole.Id),
-            new UserId(user.Id),
+            new AuditIdentity(user.Id),
             DateTimeOffset.UtcNow,
-            UserRoleAssignmentTypeAuditLog.Added);
+            UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation);
 
         // Insert an audit log.
         {

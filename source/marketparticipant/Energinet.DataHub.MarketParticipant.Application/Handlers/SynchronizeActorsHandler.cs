@@ -46,7 +46,7 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
         _domainEventRepository = domainEventRepository;
     }
 
-    public async Task<Unit> Handle(SynchronizeActorsCommand request, CancellationToken cancellationToken)
+    public async Task Handle(SynchronizeActorsCommand request, CancellationToken cancellationToken)
     {
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -80,7 +80,5 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
-
-        return Unit.Value;
     }
 }

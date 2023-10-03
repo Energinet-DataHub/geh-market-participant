@@ -25,6 +25,8 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -47,11 +49,9 @@ public sealed class GetUserOverviewHandlerIntegrationTests
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
-        var mock = new Mock<IUserIdentityRepository>();
-
-        mock.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository.Setup(x => x.GetUserIdentitiesAsync(It.IsAny<IEnumerable<ExternalUserId>>()))
             .ReturnsAsync((IEnumerable<ExternalUserId> x) =>
                 x.Select(y => new UserIdentity(
                     y,
@@ -64,9 +64,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     AuthenticationMethod.Undetermined,
                     new List<LoginIdentity>())));
 
-        scope.Container!.Register(() => mock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
@@ -89,9 +91,6 @@ public sealed class GetUserOverviewHandlerIntegrationTests
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
-
-        var mock = new Mock<IUserIdentityRepository>();
 
         var actor = await _fixture.PrepareActorAsync();
 
@@ -104,7 +103,8 @@ public sealed class GetUserOverviewHandlerIntegrationTests
            new(user.ExternalId)
         };
 
-        mock
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+        userIdentityRepository
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(userIdsToReturn.Select(y =>
                 new UserIdentity(
@@ -118,9 +118,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     AuthenticationMethod.Undetermined,
                     new List<LoginIdentity>())));
 
-        scope.Container!.Register(() => mock.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), Array.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
@@ -139,11 +141,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
+
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
@@ -163,9 +165,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     new List<LoginIdentity>())
             });
 
-        scope.Container!.Register(() => userIdentityRepository.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), new[] { UserStatus.Active });
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
@@ -184,7 +188,6 @@ public sealed class GetUserOverviewHandlerIntegrationTests
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
@@ -210,9 +213,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                     new List<LoginIdentity>())
             });
 
-        scope.Container!.Register(() => userIdentityRepository.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", new[] { userRoleA.Id }, Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
@@ -231,7 +236,6 @@ public sealed class GetUserOverviewHandlerIntegrationTests
     {
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-        await using var scope = host.BeginScope();
 
         var userInvitedSetup = TestPreparationEntities.UnconnectedUser.Patch(u => u.InvitationExpiresAt = DateTimeOffset.UtcNow.AddDays(1));
         var userInvited = await _fixture.PrepareUserAsync(userInvitedSetup);
@@ -256,8 +260,6 @@ public sealed class GetUserOverviewHandlerIntegrationTests
         await _fixture.AssignUserRoleAsync(userActive.Id, actor.Id, userRole.Id);
         await _fixture.AssignUserRoleAsync(userInActive.Id, actor.Id, userRole.Id);
 
-        var userIdentityRepository = new Mock<IUserIdentityRepository>();
-
         UserIdentity UserIdentity(UserEntity userEntity, UserIdentityStatus userStatus)
         {
             return new UserIdentity(
@@ -272,6 +274,7 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 new List<LoginIdentity>());
         }
 
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
         userIdentityRepository
             .Setup(x => x.SearchUserIdentitiesAsync(It.IsAny<string>(), null))
             .ReturnsAsync(new[]
@@ -283,9 +286,11 @@ public sealed class GetUserOverviewHandlerIntegrationTests
                 UserIdentity(userInActive, UserIdentityStatus.Inactive)
             });
 
-        scope.Container!.Register(() => userIdentityRepository.Object);
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
 
-        var mediator = scope.GetInstance<IMediator>();
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var filter = new UserOverviewFilterDto(actor.Id, "test", Enumerable.Empty<Guid>(), Enumerable.Empty<UserStatus>());
         var command = new GetUserOverviewCommand(filter, 1, 100, Application.Commands.Query.User.UserOverviewSortProperty.Email, Application.Commands.SortDirection.Asc);
