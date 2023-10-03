@@ -103,15 +103,15 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         if (entityEntry.Entity is not IAuditedEntity changedByIdentity)
             return;
 
+        // How to do: https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/events
+        // But it does not work: https://github.com/dotnet/EntityFramework.Docs/issues/3267
+        // But there is a workaround: https://github.com/dotnet/EntityFramework.Docs/issues/3888
         switch (entityEntry.State)
         {
             case EntityState.Modified:
-                changedByIdentity.Version++;
-                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
-                break;
             case EntityState.Added:
-                changedByIdentity.Version++;
-                changedByIdentity.ChangedByIdentityId = _auditIdentityProvider.IdentityId.Value;
+                entityEntry.Property(nameof(IAuditedEntity.Version)).CurrentValue = changedByIdentity.Version + 1;
+                entityEntry.Property(nameof(IAuditedEntity.ChangedByIdentityId)).CurrentValue = _auditIdentityProvider.IdentityId.Value;
                 break;
         }
     }
