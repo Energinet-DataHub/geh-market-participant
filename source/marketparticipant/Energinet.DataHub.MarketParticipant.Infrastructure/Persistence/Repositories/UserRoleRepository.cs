@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -31,16 +31,13 @@ public sealed class UserRoleRepository : IUserRoleRepository
 {
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
-    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public UserRoleRepository(
         IAuditIdentityProvider auditIdentityProvider,
-        IMarketParticipantDbContext marketParticipantDbContext,
-        IUnitOfWorkProvider unitOfWorkProvider)
+        IMarketParticipantDbContext marketParticipantDbContext)
     {
         _auditIdentityProvider = auditIdentityProvider;
         _marketParticipantDbContext = marketParticipantDbContext;
-        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task<IEnumerable<UserRole>> GetAllAsync()
@@ -97,9 +94,9 @@ public sealed class UserRoleRepository : IUserRoleRepository
         };
 
         foreach (var permissionEntity in userRole.Permissions.Select(x => new UserRolePermissionEntity
-                 {
-                     Permission = x
-                 }))
+        {
+            Permission = x
+        }))
         {
             role.Permissions.Add(permissionEntity);
         }
@@ -141,11 +138,18 @@ public sealed class UserRoleRepository : IUserRoleRepository
                 userRoleEntity.Permissions.Add(permissionEntity);
             }
 
-            var uow = await _unitOfWorkProvider
-                .NewUnitOfWorkAsync()
-                .ConfigureAwait(false);
+            var currentDbContext = (DbContext)_marketParticipantDbContext;
+            IDbContextTransaction? currentTransaction = null;
 
-            await using (uow.ConfigureAwait(false))
+            if (currentDbContext.Database.CurrentTransaction == null)
+            {
+                currentTransaction = await currentDbContext
+                    .Database
+                    .BeginTransactionAsync()
+                    .ConfigureAwait(false);
+            }
+
+            try
             {
                 foreach (var permissionEntity in permissionsDeleted)
                 {
@@ -161,7 +165,15 @@ public sealed class UserRoleRepository : IUserRoleRepository
 
                 await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
 
-                await uow.CommitAsync().ConfigureAwait(false);
+                if (currentTransaction != null)
+                    await currentTransaction.CommitAsync().ConfigureAwait(false);
+            }
+            catch (Exception)
+            {
+                if (currentTransaction != null)
+                    await currentTransaction.DisposeAsync().ConfigureAwait(false);
+
+                throw;
             }
         }
         else
