@@ -107,6 +107,12 @@ public static class KnownPermissions
         new(PermissionId.ESettExchangeManage, "esett-exchange:manage", InstantPattern.ExtendedIso.Parse("2023-09-01T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
+        }),
+        new(PermissionId.RequestAggregatedMeasureData, "request-aggregated-measured-data:view", InstantPattern.ExtendedIso.Parse("2023-10-04T00:00:00Z").Value, new[]
+        {
+            EicFunction.GridAccessProvider,
+            EicFunction.EnergySupplier,
+            EicFunction.BalanceResponsibleParty,
         })
     };
 }
