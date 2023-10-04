@@ -32,16 +32,22 @@ namespace Energinet.DataHub.MarketParticipant.ApplyDBMigrationsApp.Helpers
 
             if (string.IsNullOrEmpty(environment))
             {
-                return file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-                               ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
-                                (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
-                                file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase));
+                return file => (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                                ((file.Contains(".Scripts.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                                 (file.Contains(".Scripts.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                                 file.Contains(".Scripts.Model.", StringComparison.OrdinalIgnoreCase))) || (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                    ((file.Contains(".Scripts.ALL.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                     (file.Contains(".Scripts.ALL.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                     file.Contains(".Scripts.ALL.Model.", StringComparison.OrdinalIgnoreCase)));
             }
 
-            return file => file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
-                           ((file.Contains($".Scripts.{environment}.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
-                            (file.Contains($".Scripts.{environment}.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
-                            file.Contains($".Scripts.{environment}.Model.", StringComparison.OrdinalIgnoreCase));
+            return file => (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                            ((file.Contains($".Scripts.{environment}.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                             (file.Contains($".Scripts.{environment}.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                             file.Contains($".Scripts.{environment}.Model.", StringComparison.OrdinalIgnoreCase))) || (file.EndsWith(".sql", StringComparison.OrdinalIgnoreCase) &&
+                ((file.Contains(".Scripts.ALL.Seed.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeSeedData")) ||
+                 (file.Contains(".Scripts.ALL.Test.", StringComparison.OrdinalIgnoreCase) && args.Contains("includeTestData")) ||
+                 file.Contains(".Scripts.ALL.Model.", StringComparison.OrdinalIgnoreCase)));
         }
 
         private static string GetEnvironmentArgument(IReadOnlyList<string> args)
