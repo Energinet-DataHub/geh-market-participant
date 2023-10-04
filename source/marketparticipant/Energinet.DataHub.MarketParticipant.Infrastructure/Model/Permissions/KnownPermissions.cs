@@ -110,7 +110,7 @@ public static class KnownPermissions
         }),
         new(PermissionId.RequestAggregatedMeasureData, "request-aggregated-measured-data:view", InstantPattern.ExtendedIso.Parse("2023-10-04T00:00:00Z").Value, new[]
         {
-            EicFunction.GridAccessProvider,
+            EicFunction.MeteredDataResponsible,
             EicFunction.EnergySupplier,
             EicFunction.BalanceResponsibleParty,
         })
