@@ -33,6 +33,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .NotEmpty();
 
                     validator
+                        .RuleFor(actor => actor.Name)
+                        .NotNull()
+                        .ChildRules(nameValidator =>
+                        {
+                            nameValidator
+                                .RuleFor(actorNameDto => actorNameDto.Value)
+                                .NotEmpty()
+                                .Length(1, 255);
+                        });
+
+                    validator
                         .RuleFor(actor => actor.ActorNumber)
                         .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>())
                         .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length <= 13);

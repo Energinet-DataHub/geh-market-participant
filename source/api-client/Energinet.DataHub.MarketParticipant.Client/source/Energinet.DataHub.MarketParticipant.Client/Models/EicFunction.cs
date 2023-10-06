@@ -26,7 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         MeteringPointAdministrator = 27,
         SystemOperator = 45,
         DanishEnergyAgency = 48,
-        ElOverblik = 49,
         DataHubAdministrator = 50,
         IndependentAggregator = 51,
         SerialEnergyTrader = 52

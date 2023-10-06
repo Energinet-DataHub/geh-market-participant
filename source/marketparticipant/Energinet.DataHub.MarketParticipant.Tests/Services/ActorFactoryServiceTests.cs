@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln()));
+                .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
 
             // Act
             var response = await target
@@ -93,7 +93,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln()));
+                .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
 
             // Act
             await target
@@ -129,7 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
-            var actor = new Actor(organization.Id, new MockedGln());
+            var actor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(actor);
@@ -168,7 +168,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
-            var updatedActor = new Actor(organization.Id, new MockedGln());
+            var updatedActor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(updatedActor);

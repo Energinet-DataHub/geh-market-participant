@@ -52,13 +52,14 @@ public sealed class ActorFactoryService : IActorFactoryService
     {
         ArgumentNullException.ThrowIfNull(organization);
         ArgumentNullException.ThrowIfNull(actorNumber);
+        ArgumentNullException.ThrowIfNull(actorName);
         ArgumentNullException.ThrowIfNull(marketRoles);
 
         await _uniqueGlobalLocationNumberRuleService
             .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
             .ConfigureAwait(false);
 
-        var newActor = new Actor(organization.Id, actorNumber) { Name = actorName };
+        var newActor = new Actor(organization.Id, actorNumber, actorName);
 
         foreach (var marketRole in marketRoles)
             newActor.AddMarketRole(marketRole);

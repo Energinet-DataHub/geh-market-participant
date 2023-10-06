@@ -41,7 +41,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
 
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln)
+        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
         {
             ExternalActorId = externalActorId
         };
@@ -88,7 +88,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
 
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln)
+        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
         {
             ExternalActorId = null
         };
