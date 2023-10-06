@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("Mock"));
             try
             {
                 // Act
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln)) { Name = new ActorName("Test Actor") };
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("Test Actor"));
             try
             {
                 // Act
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln)) { Name = new ActorName("1kfNaVkHBJ2sAsueCm0ghQoRRC6cdsDTjRBjGPDs48dSpJrgBsgJ2HwkEr5lENidVen61rajkDDZaleGbgtjWDMMA5UNJyWgPBOvm9Z1vUrWS0") };
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("1kfNaVkHBJ2sAsueCm0ghQoRRC6cdsDTjRBjGPDs48dSpJrgBsgJ2HwkEr5lENidVen61rajkDDZaleGbgtjWDMMA5UNJyWgPBOvm9Z1vUrWS0"));
             var lengthForActorName = $"Actor_{actor.ActorNumber.Value}__{Guid.Empty}".Length;
             var totalNameLength = actor.Name.Value.Length + lengthForActorName;
             var actorName = totalNameLength > 120
@@ -117,11 +117,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         }
 
         [Fact]
-        public async Task CreateActor_IsIdemPotent_Success()
+        public async Task CreateActor_IsIdempotent_Success()
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("Mock"));
             try
             {
                 // Act
@@ -151,7 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         public async Task DeleteActor_Success()
         {
             // Arrange
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()), new ActorName("Mock"));
 
             // Create actor to delete
             await _sut
@@ -173,7 +173,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         public async Task DeleteActor_CalledMultipleTimesForSameActor_DontThrow()
         {
             // Arrange
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()), new ActorName("Mock"));
 
             // Create actor to delete
             await _sut
