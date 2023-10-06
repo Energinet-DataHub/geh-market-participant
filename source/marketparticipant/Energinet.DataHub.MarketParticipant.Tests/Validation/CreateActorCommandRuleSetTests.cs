@@ -28,6 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
     {
         private const string ValidId = "6AF7D019-06A7-465B-AF9E-983BF0C7A907";
         private const string ValidGln = "5790000555550";
+
         [Fact]
         public async Task Validate_ActorDto_ValidatesProperty()
         {
@@ -58,6 +59,45 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
 
             var actorDto = new CreateActorDto(Guid.Parse(value), new ActorNameDto("fake_name"), new ActorNumberDto(ValidGln), marketRole);
+
+            var target = new CreateActorCommandRuleSet();
+            var command = new CreateActorCommand(actorDto);
+
+            // Act
+            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        [InlineData("  ", false)]
+        [InlineData("Actor Name", true)]
+        public async Task Validate_Name_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.Name)}.{nameof(ActorNameDto.Value)}";
+
+            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
+            var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), validMeteringPointTypes) };
+            var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
+
+            var actorDto = new CreateActorDto(
+                Guid.Parse(ValidId),
+                new ActorNameDto(value),
+                new ActorNumberDto(ValidGln),
+                marketRole);
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(actorDto);

@@ -1,8 +1,12 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.32.3
+
+- Remove ElOverblik from market roles.
+
 ## Version 2.32.2
 
-- Updated audit log model for user roles
+- Updated audit log model for user roles.
 
 ## Version 2.32.1
 

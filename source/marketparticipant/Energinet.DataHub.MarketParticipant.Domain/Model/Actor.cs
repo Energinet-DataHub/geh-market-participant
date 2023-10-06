@@ -27,12 +27,15 @@ public sealed class Actor : IPublishDomainEvents
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
 
-    public Actor(OrganizationId organizationId, ActorNumber actorNumber)
+    public Actor(
+        OrganizationId organizationId,
+        ActorNumber actorNumber,
+        ActorName actorName)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
-        Name = new ActorName(string.Empty);
+        Name = actorName;
         _actorStatusTransitioner = new ActorStatusTransitioner();
     }
 

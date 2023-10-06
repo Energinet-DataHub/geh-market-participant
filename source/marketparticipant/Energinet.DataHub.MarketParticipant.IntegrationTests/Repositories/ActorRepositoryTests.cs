@@ -47,7 +47,7 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln());
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         // Act
         var actorId = await actorRepository.AddOrUpdateAsync(actor);
@@ -79,7 +79,7 @@ public sealed class ActorRepositoryTests
             DateTimeOffset.MaxValue));
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln());
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         actor.AddMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
         {
