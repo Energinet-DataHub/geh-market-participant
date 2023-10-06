@@ -53,7 +53,7 @@ public sealed class GetUserRoleAuditLogsHandler
             auditLogEntry.AuditIdentityId,
             auditLogEntry.Name,
             auditLogEntry.Description,
-            auditLogEntry.Permissions,
+            auditLogEntry.Permissions.Select(p => (int)p),
             auditLogEntry.EicFunction,
             auditLogEntry.Status,
             auditLogEntry.ChangeType,
