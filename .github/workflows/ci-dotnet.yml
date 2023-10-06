@@ -17,6 +17,7 @@ name: CI dotnet
 
 on:
   workflow_call: {}
+  workflow_dispatch: {}
 
 jobs:
   # Build all projects within solution
