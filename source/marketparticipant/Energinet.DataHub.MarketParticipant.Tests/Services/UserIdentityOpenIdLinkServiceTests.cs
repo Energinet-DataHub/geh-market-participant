@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 userIdentityRepository.Object);
 
             // Act
-            var userIdentity = await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId).ConfigureAwait(false);
+            var userIdentity = await userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId);
 
             // Assert
             Assert.NotNull(userIdentity);

@@ -45,9 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetSingleOrganizationCommand(orgId);
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotNull(response.Organization);

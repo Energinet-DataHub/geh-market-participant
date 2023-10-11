@@ -83,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new DeleteActorContactCommand(actor.Id.Value, contactId.Value);
 
             // Act + Assert
-            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new DeleteActorContactCommand(actor.Id.Value, contactId.Value);
 
             // Act
-            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
 
             // Assert
             contactRepository.Verify(x => x.RemoveAsync(contactToDelete), Times.Once);

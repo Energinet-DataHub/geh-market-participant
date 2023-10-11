@@ -44,8 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new GridAreaName("fake_value"),
                 PriceAreaCode.Dk1,
                 DateTimeOffset.MinValue,
-                null))
-                .ConfigureAwait(false);
+                null));
         }
 
         [Fact]
@@ -65,8 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     null!,
                     PriceAreaCode.Dk1,
                     DateTimeOffset.MinValue,
-                    null))
-                .ConfigureAwait(false);
+                    null));
         }
 
         [Fact]
@@ -115,8 +113,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     new GridAreaName("fake_value"),
                     PriceAreaCode.Dk1,
                     DateTimeOffset.MinValue,
-                    null)
-                .ConfigureAwait(false);
+                    null);
 
             // Assert
             Assert.NotNull(response);

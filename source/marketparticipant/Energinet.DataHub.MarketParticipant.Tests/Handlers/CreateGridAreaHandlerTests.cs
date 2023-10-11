@@ -56,9 +56,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Dk1"));
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.Equal(gridArea.Id.Value, response.GridAreaId.Value);

@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new GetGridAreaOverviewHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetGridAreaOverviewCommand(), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetGridAreaOverviewCommand(), CancellationToken.None);
 
             // assert
             Assert.NotEmpty(actual.GridAreas);

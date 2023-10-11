@@ -71,9 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Collection<int> { ValidPermission }));
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.Equal(userRole.Id.Value, response.UserRoleId);
@@ -114,9 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Collection<int> { ValidPermission }));
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
         }
     }
 }

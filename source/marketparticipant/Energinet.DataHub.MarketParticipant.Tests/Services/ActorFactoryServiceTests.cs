@@ -67,8 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     new MockedGln(),
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             Assert.NotNull(response);
@@ -101,8 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     globalLocationNumber,
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             globalLocationNumberUniquenessService.Verify(
@@ -140,8 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     globalLocationNumber,
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             overlappingBusinessRolesService.Verify(
@@ -179,8 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     globalLocationNumber,
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             uniqueMarketRoleGridAreaRuleService.Verify(

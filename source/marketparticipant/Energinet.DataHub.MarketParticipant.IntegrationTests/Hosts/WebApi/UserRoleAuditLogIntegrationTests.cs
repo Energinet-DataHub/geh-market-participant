@@ -77,7 +77,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await _fixture.PrepareUserAsync().ConfigureAwait(false);
+        await _fixture.PrepareUserAsync();
 
         const string name = "Create_UserRole_AuditLogSaved";
         var createUserRoleDto = new CreateUserRoleDto(
@@ -90,8 +90,8 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var createUserRoleCommand = new CreateUserRoleCommand(createUserRoleDto);
 
         // Act
-        var response = await mediator.Send(createUserRoleCommand).ConfigureAwait(false);
-        var result = await userRoleAuditLogEntryRepository.GetAsync(new UserRoleId(response.UserRoleId)).ConfigureAwait(false);
+        var response = await mediator.Send(createUserRoleCommand);
+        var result = await userRoleAuditLogEntryRepository.GetAsync(new UserRoleId(response.UserRoleId));
 
         // Assert
         var resultList = result.ToList();
@@ -159,7 +159,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
 
         const string nameUpdate = "Update_UserRole_SortingValidation_NameChangedAuditLog";
         const string descriptionUpdate = "Update_UserRole_SortingValidation_DescriptionChangedAuditLog";
@@ -199,7 +199,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
         Thread.Sleep(100); // Wait time for simulate real scenario
 
         var userRolePermissionsUpdates = new List<Collection<int>>

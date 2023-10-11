@@ -22,12 +22,12 @@ limitations under the License.
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="4.3.5" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.10" />
+      <PackageReference Include="Energinet.DataHub.Core.FunctionApp.TestCommon" Version="4.4.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.12" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-      <PackageReference Include="xunit" Version="2.5.0" />
+      <PackageReference Include="xunit" Version="2.5.1" />
       <PackageReference Include="xunit.categories" Version="2.0.8" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.5.0">
+      <PackageReference Include="xunit.runner.visualstudio" Version="2.5.1">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>

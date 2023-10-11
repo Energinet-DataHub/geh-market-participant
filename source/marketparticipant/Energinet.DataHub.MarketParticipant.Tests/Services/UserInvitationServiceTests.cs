@@ -501,7 +501,7 @@ public sealed class UserInvitationServiceTests
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
 
-        await target.ReInviteUserAsync(user, _validInvitedByUserId).ConfigureAwait(false);
+        await target.ReInviteUserAsync(user, _validInvitedByUserId);
 
         // act + assert
         userIdentityRepositoryMock
