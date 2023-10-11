@@ -85,8 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             // assert
             var emailEventRepository3 = new EmailEventRepository(context3);
             var savedEventsSent = (await emailEventRepository3
-                    .GetAllEmailEventByTypeAsync(EmailEventType.UserInvite)
-)
+                    .GetAllEmailEventByTypeAsync(EmailEventType.UserInvite))
                 .ToList();
             Assert.Single(savedEventsSent, e => e.Email.Equals(emailRandom) && e.Sent != null);
         }
