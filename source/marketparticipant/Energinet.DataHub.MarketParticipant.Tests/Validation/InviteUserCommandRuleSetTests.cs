@@ -45,7 +45,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(null!, Guid.Empty);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         Assert.False(result.IsValid);
@@ -72,7 +72,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         if (isValid)
@@ -105,7 +105,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         if (isValid)
@@ -138,7 +138,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         if (isValid)
@@ -179,7 +179,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         if (isValid)
@@ -206,7 +206,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         Assert.False(result.IsValid);
@@ -225,7 +225,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         Assert.False(result.IsValid);
@@ -244,7 +244,7 @@ public sealed class InviteUserCommandRuleSetTests
         var command = new InviteUserCommand(invitation, _validInvitedByUserId);
 
         // Act
-        var result = await target.ValidateAsync(command).ConfigureAwait(false);
+        var result = await target.ValidateAsync(command);
 
         // Assert
         Assert.False(result.IsValid);

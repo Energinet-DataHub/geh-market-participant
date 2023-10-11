@@ -112,9 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new CreateActorContactDto("fake_value", "Default", "fake@value", null));
 
             // Act
-            await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
 
             // Assert
             overlappingContactCategoriesRuleService.Verify(x => x.ValidateCategoriesAcrossContacts(It.Is<IEnumerable<ActorContact>>(y => y.Count() == 4)), Times.Once);
@@ -154,9 +152,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new CreateActorContactDto("fake_value", "Default", "fake@value", null));
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.Equal(contact.Id.Value, response.ContactId);

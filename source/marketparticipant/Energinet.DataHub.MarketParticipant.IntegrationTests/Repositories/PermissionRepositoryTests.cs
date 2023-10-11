@@ -119,8 +119,7 @@ public sealed class PermissionRepositoryTests
 
         // Act
         var actual = (await permissionRepository
-            .GetForMarketRoleAsync(EicFunction.DataHubAdministrator)
-            .ConfigureAwait(false))
+            .GetForMarketRoleAsync(EicFunction.DataHubAdministrator))
             .ToList();
 
         // Assert

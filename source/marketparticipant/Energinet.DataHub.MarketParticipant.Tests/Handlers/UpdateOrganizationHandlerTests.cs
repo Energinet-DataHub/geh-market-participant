@@ -83,9 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
             // Act + Assert
-            await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
         }
 
         [Fact]
@@ -140,9 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
         }
     }
 }

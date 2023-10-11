@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userIdentityRepositoryMock.Object);
 
             // act
-            await target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None);
 
             // assert
             emailSenderMock.Verify(c => c.SendEmailAsync(events[0].Email, events[0]), Times.Exactly(1));
@@ -105,9 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userIdentityRepositoryMock.Object);
 
             // act + assert
-            await Assert
-                .ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None));
         }
 
         [Fact]
@@ -148,9 +146,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userIdentityRepositoryMock.Object);
 
             // act + assert
-            await Assert
-                .ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None));
         }
     }
 }

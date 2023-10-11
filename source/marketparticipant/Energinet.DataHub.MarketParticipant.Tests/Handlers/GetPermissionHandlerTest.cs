@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new GetPermissionsHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetPermissionsCommand(), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetPermissionsCommand(), CancellationToken.None);
 
             // assert
             Assert.NotNull(actual.Permissions);

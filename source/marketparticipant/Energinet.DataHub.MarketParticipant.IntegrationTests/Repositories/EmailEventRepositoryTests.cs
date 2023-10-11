@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
 
             // act
-            await emailEventRepository.InsertAsync(newEmailEvent).ConfigureAwait(false);
+            await emailEventRepository.InsertAsync(newEmailEvent);
 
             // assert
             var emailEventRepository2 = new EmailEventRepository(context2);
@@ -73,20 +73,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var newEmailEvent = new EmailEvent(emailRandom, EmailEventType.UserInvite);
 
             // act
-            await emailEventRepository1.InsertAsync(newEmailEvent).ConfigureAwait(false);
+            await emailEventRepository1.InsertAsync(newEmailEvent);
 
             var emailEventRepository2 = new EmailEventRepository(context2);
             var savedEvents = (await emailEventRepository2
-                .GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite).ConfigureAwait(false))
+                .GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite))
                 .ToList();
             var elementToMarkAsSent = savedEvents.Single(e => e.Email.Equals(emailRandom));
-            await emailEventRepository2.MarkAsSentAsync(elementToMarkAsSent).ConfigureAwait(false);
+            await emailEventRepository2.MarkAsSentAsync(elementToMarkAsSent);
 
             // assert
             var emailEventRepository3 = new EmailEventRepository(context3);
             var savedEventsSent = (await emailEventRepository3
                     .GetAllEmailEventByTypeAsync(EmailEventType.UserInvite)
-                    .ConfigureAwait(false))
+)
                 .ToList();
             Assert.Single(savedEventsSent, e => e.Email.Equals(emailRandom) && e.Sent != null);
         }

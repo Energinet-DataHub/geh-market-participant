@@ -35,7 +35,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new GetActorContactsCommand(Guid.Empty);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);

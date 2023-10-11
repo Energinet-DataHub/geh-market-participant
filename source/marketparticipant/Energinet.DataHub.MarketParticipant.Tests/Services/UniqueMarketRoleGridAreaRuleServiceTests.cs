@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new ActorName("fake_value"));
 
             // act
-            await target.ValidateAsync(actor).ConfigureAwait(false);
+            await target.ValidateAsync(actor);
 
             // assert
             repository.Verify(x => x.RemoveAllReservationsAsync(actor.Id), Times.Exactly(1));
@@ -86,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new ActorName("fake_value"));
 
             // act
-            await target.ValidateAsync(actor).ConfigureAwait(false);
+            await target.ValidateAsync(actor);
 
             // assert
             foreach (var mr in actor.MarketRoles)
@@ -127,7 +127,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     new ActorName("fake_value"));
 
                 // act
-                await target.ValidateAsync(actor).ConfigureAwait(false);
+                await target.ValidateAsync(actor);
 
                 // assert
                 repository.Verify(x => x.TryReserveAsync(It.IsAny<ActorId>(), It.IsAny<EicFunction>(), It.IsAny<GridAreaId>()), Times.Never);

@@ -79,7 +79,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Act + Assert
             var ex = await Assert.ThrowsAsync<ValidationException>(() =>
-                target.Handle(command, CancellationToken.None)).ConfigureAwait(false);
+                target.Handle(command, CancellationToken.None));
             Assert.Contains("is not in active status and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
@@ -130,7 +130,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Act + Assert
             var ex = await Assert.ThrowsAsync<ValidationException>(() =>
-                target.Handle(command, CancellationToken.None)).ConfigureAwait(false);
+                target.Handle(command, CancellationToken.None));
             Assert.Contains("does not exist and can't be added as a role", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
     }

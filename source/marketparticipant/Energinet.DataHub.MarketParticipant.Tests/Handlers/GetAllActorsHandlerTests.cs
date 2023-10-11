@@ -38,7 +38,7 @@ public sealed class GetAllActorsHandlerTests
         var command = new GetAllActorsCommand();
 
         // Act
-        var actual = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+        var actual = await target.Handle(command, CancellationToken.None);
 
         // Assert
         Assert.NotNull(actual.Actors);
@@ -66,7 +66,7 @@ public sealed class GetAllActorsHandlerTests
         var command = new GetAllActorsCommand();
 
         // Act
-        var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+        var response = await target.Handle(command, CancellationToken.None);
 
         // Assert
         Assert.NotEmpty(response.Actors);
