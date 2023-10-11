@@ -56,22 +56,20 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 // Act
                 var response = await _sut
-                    .CreateAppRegistrationAsync(new MockedGln(), roles)
-                    .ConfigureAwait(false);
+                    .CreateAppRegistrationAsync(new MockedGln(), roles);
 
                 cleanupId = response.ExternalActorId;
 
                 // Assert
                 var app = await _sut.GetExistingAppRegistrationAsync(
                         new AppRegistrationObjectId(Guid.Parse(response.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId))
-                    .ConfigureAwait(false);
+                        new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId));
 
                 Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
             }
             finally
             {
-                await CleanupAsync(cleanupId).ConfigureAwait(false);
+                await CleanupAsync(cleanupId);
             }
         }
 
@@ -90,16 +88,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 };
 
                 var createAppRegistrationResponse = await _sut
-                    .CreateAppRegistrationAsync(new MockedGln(), roles)
-                    .ConfigureAwait(false);
+                    .CreateAppRegistrationAsync(new MockedGln(), roles);
 
                 cleanupId = createAppRegistrationResponse.ExternalActorId;
 
                 // Act
                 var app = await _sut.GetExistingAppRegistrationAsync(
                         new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
-                    .ConfigureAwait(false);
+                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
 
                 // Assert
                 Assert.Equal("d82c211d-cce0-e95e-bd80-c2aedf99f32b", app.AppRoles.First().RoleId);
@@ -107,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             }
             finally
             {
-                await CleanupAsync(cleanupId).ConfigureAwait(false);
+                await CleanupAsync(cleanupId);
             }
         }
 
@@ -126,15 +122,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
                         new MockedGln(),
-                        roles)
-                    .ConfigureAwait(false);
+                        roles);
 
                 cleanupId = createAppRegistrationResponse.ExternalActorId;
 
                 // Act
                 await _sut
-                    .DeleteAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId)
-                    .ConfigureAwait(false);
+                    .DeleteAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
 
                 cleanupId = null;
 
@@ -142,15 +136,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 var ex = await Assert.ThrowsAsync<ODataError>(async () => await _sut
                         .GetExistingAppRegistrationAsync(
                             new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                            new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
-                        .ConfigureAwait(false))
-                    .ConfigureAwait(false);
+                            new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId)));
 
                 Assert.Equal((int)HttpStatusCode.NotFound, ex.ResponseStatusCode);
             }
             finally
             {
-                await CleanupAsync(cleanupId).ConfigureAwait(false);
+                await CleanupAsync(cleanupId);
             }
         }
 

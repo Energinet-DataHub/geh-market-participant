@@ -58,9 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new CreateOrganizationCommand(new CreateOrganizationDto(orgName, validCvr, validAddressDto, "energinet.dk", "Test Comment"));
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotEqual(Guid.Empty, response.OrganizationId);

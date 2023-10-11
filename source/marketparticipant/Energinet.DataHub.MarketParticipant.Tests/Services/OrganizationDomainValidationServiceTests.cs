@@ -43,8 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await organizationDomainValidationService
-                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail)
-                .ConfigureAwait(false);
+                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail);
         }
 
         [Fact]
@@ -63,8 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail))
-                .ConfigureAwait(false);
+                .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
         }
 
         [Fact]
@@ -83,8 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail))
-                .ConfigureAwait(false);
+                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
         }
 
         [Fact]
@@ -102,8 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             // Act + Assert
             await Assert.ThrowsAsync<ValidationException>(() => organizationDomainValidationService
-                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail))
-                .ConfigureAwait(false);
+                    .ValidateUserEmailInsideOrganizationDomainsAsync(actor, actorEmail));
         }
 
         private static void SetupOrganizationMock(

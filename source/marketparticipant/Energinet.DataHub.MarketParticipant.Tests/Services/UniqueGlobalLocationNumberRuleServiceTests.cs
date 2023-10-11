@@ -53,9 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(Enumerable.Empty<Organization>());
 
             // Act + Assert
-            await target
-                .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
-                .ConfigureAwait(false);
+            await target.ValidateGlobalLocationNumberAvailableAsync(organization, gln);
         }
 
         [Fact]
@@ -73,9 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(new[] { organization });
 
             // Act + Assert
-            await target
-                .ValidateGlobalLocationNumberAvailableAsync(organization, gln)
-                .ConfigureAwait(false);
+            await target.ValidateGlobalLocationNumberAvailableAsync(organization, gln);
         }
 
         [Fact]
@@ -100,9 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(new[] { organization });
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null), gln))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null), gln));
         }
     }
 }

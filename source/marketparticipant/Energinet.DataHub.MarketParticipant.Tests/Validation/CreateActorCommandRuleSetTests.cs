@@ -39,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(null!);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(actorDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -103,7 +103,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(actorDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -138,7 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(actorDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -165,7 +165,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(createActorDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -184,7 +184,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(createActorDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -216,7 +216,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -250,7 +250,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -276,7 +276,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -302,7 +302,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(organizationRoleDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -336,7 +336,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateActorCommand(createActorDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)

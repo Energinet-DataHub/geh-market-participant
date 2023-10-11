@@ -48,7 +48,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetActorsCommand(organization.Id.Value);
 
             // Act + Assert
-            var actual = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(command, CancellationToken.None);
             Assert.NotNull(actual.Actors);
             Assert.Empty(actual.Actors);
         }
@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetActorsCommand(orgId);
 
             // Act
-            var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotEmpty(response.Actors);

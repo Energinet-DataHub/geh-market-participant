@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new GetUserRolesToPermissionCommand(-1);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new GetUserRolesToPermissionCommand(1);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.True(result.IsValid);

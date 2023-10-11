@@ -97,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetActorContactsCommand(actor.Id.Value);
 
             // Act
-            var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotEmpty(response.Contacts);

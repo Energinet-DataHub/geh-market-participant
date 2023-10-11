@@ -58,9 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
         }
 
         [Fact]
@@ -84,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
-            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
 
             // Assert
             overlappingEicFunctionsService.Verify(
@@ -114,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
-            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
 
             // Assert
             externalActorSynchronizationService.Verify(
@@ -144,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
 
             // Act
-            await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
 
             // Assert
             domainEventRepository.Verify(

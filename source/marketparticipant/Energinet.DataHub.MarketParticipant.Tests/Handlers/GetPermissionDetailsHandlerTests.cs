@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new GetPermissionDetailsHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetPermissionDetailsCommand(EicFunction.BillingAgent), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetPermissionDetailsCommand(EicFunction.BillingAgent), CancellationToken.None);
 
             // assert
             Assert.NotNull(actual.Permissions);

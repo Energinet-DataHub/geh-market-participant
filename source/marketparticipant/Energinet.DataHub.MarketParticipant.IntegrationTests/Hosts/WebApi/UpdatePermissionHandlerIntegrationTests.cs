@@ -95,8 +95,7 @@ public sealed class UpdatePermissionHandlerIntegrationTests
 
         // Assert
         var logs = await permissionAuditLogEntryRepository
-            .GetAsync(userRoleWithPermission.Permissions[0].Permission)
-            .ConfigureAwait(false);
+            .GetAsync(userRoleWithPermission.Permissions[0].Permission);
 
         Assert.Single(logs, p =>
             p.Permission == userRoleWithPermission.Permissions[0].Permission &&

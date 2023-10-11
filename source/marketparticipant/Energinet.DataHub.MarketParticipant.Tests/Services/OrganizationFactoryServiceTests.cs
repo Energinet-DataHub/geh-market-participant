@@ -54,8 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
                 _validDomain,
-                "Test Comment"))
-                .ConfigureAwait(false);
+                "Test Comment"));
         }
 
         [Fact]
@@ -74,8 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     null!,
                     _validAddress,
                     _validDomain,
-                    "Test Comment"))
-                .ConfigureAwait(false);
+                    "Test Comment"));
         }
 
         [Fact]
@@ -94,8 +92,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     _validCvrBusinessRegisterIdentifier,
                     null!,
                     _validDomain,
-                    "Test Comment"))
-                .ConfigureAwait(false);
+                    "Test Comment"));
         }
 
         [Fact]
@@ -133,8 +130,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     _validCvrBusinessRegisterIdentifier,
                     _validAddress,
                     _validDomain,
-                    "Test Comment")
-                .ConfigureAwait(false);
+                    "Test Comment");
 
             // Assert
             Assert.NotNull(response);

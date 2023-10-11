@@ -52,7 +52,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         // Act
-        await target.AssignExternalActorIdAsync(actor).ConfigureAwait(false);
+        await target.AssignExternalActorIdAsync(actor);
 
         // Assert
         if (shouldDelete)
@@ -103,7 +103,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
             .ReturnsAsync(new CreateAppRegistrationResponse(externalActorId, "fake_value", "fake_value"));
 
         // Act
-        await target.AssignExternalActorIdAsync(actor).ConfigureAwait(false);
+        await target.AssignExternalActorIdAsync(actor);
 
         // Assert
         if (shouldCreate)

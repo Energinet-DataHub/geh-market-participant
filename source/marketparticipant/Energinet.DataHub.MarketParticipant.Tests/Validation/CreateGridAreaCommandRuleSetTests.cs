@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateGridAreaCommand(null!);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateGridAreaCommand(createGridAreaDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateGridAreaCommand(createGridAreaDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -150,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new CreateGridAreaCommand(createGridAreaDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
