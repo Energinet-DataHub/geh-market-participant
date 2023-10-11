@@ -56,16 +56,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 // Act
                 var response = await _sut
-                    .CreateAppRegistrationAsync(new MockedGln(), roles)
-;
+                    .CreateAppRegistrationAsync(new MockedGln(), roles);
 
                 cleanupId = response.ExternalActorId;
 
                 // Assert
                 var app = await _sut.GetExistingAppRegistrationAsync(
                         new AppRegistrationObjectId(Guid.Parse(response.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId))
-;
+                        new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId));
 
                 Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
             }
@@ -90,16 +88,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 };
 
                 var createAppRegistrationResponse = await _sut
-                    .CreateAppRegistrationAsync(new MockedGln(), roles)
-;
+                    .CreateAppRegistrationAsync(new MockedGln(), roles);
 
                 cleanupId = createAppRegistrationResponse.ExternalActorId;
 
                 // Act
                 var app = await _sut.GetExistingAppRegistrationAsync(
                         new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId))
-;
+                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
 
                 // Assert
                 Assert.Equal("d82c211d-cce0-e95e-bd80-c2aedf99f32b", app.AppRoles.First().RoleId);
@@ -126,15 +122,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
                         new MockedGln(),
-                        roles)
-;
+                        roles);
 
                 cleanupId = createAppRegistrationResponse.ExternalActorId;
 
                 // Act
                 await _sut
-                    .DeleteAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId)
-;
+                    .DeleteAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
 
                 cleanupId = null;
 

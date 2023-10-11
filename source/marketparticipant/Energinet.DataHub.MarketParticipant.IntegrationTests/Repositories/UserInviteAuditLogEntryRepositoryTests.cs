@@ -49,8 +49,7 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
 
         // Act
         var actual = await userInviteAuditLogEntryRepository
-            .GetAsync(userId)
-;
+            .GetAsync(userId);
 
         // Assert
         Assert.Empty(actual);
@@ -83,8 +82,7 @@ public sealed class UserInviteAuditLogEntryRepositoryTests
 
         // Act
         var actual = await userInviteAuditLogEntryRepository
-            .GetAsync(new UserId(user.Id))
-;
+            .GetAsync(new UserId(user.Id));
 
         // Assert
         var userInviteDetailsAuditLogs = actual.ToList();
