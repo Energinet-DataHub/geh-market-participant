@@ -19,6 +19,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         DomainChange = 1,
         Name = 2,
         BusinessRegisterIdentifier = 3,
-        Address = 4,
+        AddressCity = 4,
+        AddressCountry = 5,
+        AddressNumber = 6,
+        AddressStreetName = 7,
+        AddressZipCode = 8,
     }
 }

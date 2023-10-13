@@ -56,6 +56,31 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     Property = OrganizationChangeType.BusinessRegisterIdentifier,
                     ReadValue = new Func<OrganizationEntity, object?>(entity => entity.BusinessRegisterIdentifier)
                 },
+                new
+                {
+                    Property = OrganizationChangeType.AddressCountry,
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.Country ?? string.Empty)
+                },
+                new
+                {
+                    Property = OrganizationChangeType.AddressCity,
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.City ?? string.Empty)
+                },
+                new
+                {
+                    Property = OrganizationChangeType.AddressNumber,
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.Number ?? string.Empty)
+                },
+                new
+                {
+                    Property = OrganizationChangeType.AddressStreetName,
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.StreetName ?? string.Empty)
+                },
+                new
+                {
+                    Property = OrganizationChangeType.AddressZipCode,
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.ZipCode ?? string.Empty)
+                },
             };
 
             var auditEntries = new List<OrganizationAuditLogEntry>();

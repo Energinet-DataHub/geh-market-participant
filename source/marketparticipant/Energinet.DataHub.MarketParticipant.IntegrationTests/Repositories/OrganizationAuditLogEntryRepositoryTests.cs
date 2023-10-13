@@ -66,6 +66,11 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
     [InlineData(OrganizationChangeType.Name, "New Name")]
     [InlineData(OrganizationChangeType.DomainChange, "NewDomain.dk")]
     [InlineData(OrganizationChangeType.BusinessRegisterIdentifier, "1234567890")]
+    [InlineData(OrganizationChangeType.AddressCountry, "Test Country 2")]
+    [InlineData(OrganizationChangeType.AddressCity, "Test City 2")]
+    [InlineData(OrganizationChangeType.AddressNumber, "12")]
+    [InlineData(OrganizationChangeType.AddressStreetName, "test Street2")]
+    [InlineData(OrganizationChangeType.AddressZipCode, "2222")]
     public async Task GetAsync_WithAuditLogs_CanBeReadBack(OrganizationChangeType changeType, string newValue)
     {
         // Arrange
@@ -96,6 +101,23 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
             case OrganizationChangeType.BusinessRegisterIdentifier:
                 organization!.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(newValue);
                 break;
+            case OrganizationChangeType.AddressCity:
+                organization!.Address = _validAddress with { City = newValue };
+                break;
+            case OrganizationChangeType.AddressCountry:
+                organization!.Address = _validAddress with { Country = newValue };
+                break;
+            case OrganizationChangeType.AddressNumber:
+                organization!.Address = _validAddress with { Number = newValue };
+                break;
+            case OrganizationChangeType.AddressStreetName:
+                organization!.Address = _validAddress with { StreetName = newValue };
+                break;
+            case OrganizationChangeType.AddressZipCode:
+                organization!.Address = _validAddress with { ZipCode = newValue };
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
         }
 
         await organizationRepository.AddOrUpdateAsync(organization!);
@@ -106,7 +128,7 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
 
         // Assert
         var organizationAuditLogs = actual.ToList();
-        Assert.Equal(4, organizationAuditLogs.Count); // 4 because of the initial add and 1 for the actual change
+        Assert.Equal(Enum.GetValues(typeof(OrganizationChangeType)).Length + 1, organizationAuditLogs.Count); // +1 for the changed value
         Assert.Contains(organizationAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(organizationAuditLogs, o => o.OrganizationChangeType == changeType);
         Assert.Contains(organizationAuditLogs, o => o.Value == newValue);
