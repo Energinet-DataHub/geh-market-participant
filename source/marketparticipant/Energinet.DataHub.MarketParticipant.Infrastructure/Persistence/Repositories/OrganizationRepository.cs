@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -29,7 +30,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-        public OrganizationRepository(IMarketParticipantDbContext marketParticipantDbContext)
+        public OrganizationRepository(
+            IMarketParticipantDbContext marketParticipantDbContext)
         {
             _marketParticipantDbContext = marketParticipantDbContext;
         }
