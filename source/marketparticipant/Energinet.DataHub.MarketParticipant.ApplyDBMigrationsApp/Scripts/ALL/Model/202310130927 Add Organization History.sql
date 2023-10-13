@@ -12,11 +12,11 @@ ALTER TABLE [dbo].[Organization] ADD
 GO
 
 ALTER TABLE [dbo].[Organization]
-    SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.[Organization]));
+    SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE = dbo.[OrganizationHistory]));
 GO
 
 ALTER TABLE [dbo].[Organization]
-    DROP CONSTRAINT DF_ChangedByIdentityId
+DROP CONSTRAINT DF_ChangedByIdentityId
 GO
 
 ALTER TABLE [dbo].[Organization]
