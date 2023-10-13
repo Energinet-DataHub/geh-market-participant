@@ -58,7 +58,7 @@ public sealed class Organization
     public string Name { get; set; }
     public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; }
     public Address Address { get; set; }
-    public OrganizationDomain Domain { get; }
+    public OrganizationDomain Domain { get; set; }
     public string? Comment { get; set; }
 
     public OrganizationStatus Status

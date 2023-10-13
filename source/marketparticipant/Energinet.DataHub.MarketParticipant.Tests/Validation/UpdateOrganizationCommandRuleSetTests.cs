@@ -46,7 +46,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(Guid.Empty, organizationDto);
@@ -98,7 +99,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -143,7 +145,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                status);
+                status,
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -185,7 +188,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -227,7 +231,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -269,7 +274,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     value,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -311,7 +317,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     value),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -353,7 +360,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
@@ -395,7 +403,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
