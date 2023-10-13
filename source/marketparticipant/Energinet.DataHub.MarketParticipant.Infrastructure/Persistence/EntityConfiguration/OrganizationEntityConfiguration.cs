@@ -28,11 +28,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("Organization");
             builder.HasKey(organization => organization.Id);
             builder.Property(organization => organization.Id).ValueGeneratedOnAdd();
-            builder.OwnsOne(organization => organization.Address).ToTable(t => t.IsTemporal(t1 =>
-            {
-                t1.HasPeriodStart("PeriodStart");
-                t1.HasPeriodEnd("PeriodEnd");
-            }));
+            builder.OwnsOne(
+                organization => organization.Address,
+                ownedBuilder => ownedBuilder.ToTable("Organization", t => t.IsTemporal(t1 =>
+                {
+                    t1.HasPeriodStart("PeriodStart");
+                    t1.HasPeriodEnd("PeriodEnd");
+                })));
         }
     }
 }
