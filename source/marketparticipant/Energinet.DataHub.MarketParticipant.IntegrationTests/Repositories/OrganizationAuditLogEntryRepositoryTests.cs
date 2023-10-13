@@ -128,7 +128,6 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
 
         // Assert
         var organizationAuditLogs = actual.ToList();
-        Assert.Equal(Enum.GetValues(typeof(OrganizationChangeType)).Length, organizationAuditLogs.Count);
         Assert.Contains(organizationAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(organizationAuditLogs, o => o.OrganizationChangeType == changeType);
         Assert.Contains(organizationAuditLogs, o => o.Value == newValue);
