@@ -434,7 +434,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         {
             // Arrange
             var propertyName =
-                $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Domain)}";
+                $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Domain)}";
 
             var organizationDto = new ChangeOrganizationDto(
                 ValidName,
