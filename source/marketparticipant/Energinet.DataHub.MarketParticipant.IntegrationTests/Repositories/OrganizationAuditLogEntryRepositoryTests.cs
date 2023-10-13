@@ -62,8 +62,11 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         Assert.Empty(actual);
     }
 
-    [Fact]
-    public async Task GetAsync_WithAuditLogs_CanBeReadBack()
+    [Theory]
+    [InlineData(OrganizationChangeType.Name, "New Name")]
+    [InlineData(OrganizationChangeType.DomainChange, "NewDomain.dk")]
+    [InlineData(OrganizationChangeType.BusinessRegisterIdentifier, "1234567890")]
+    public async Task GetAsync_WithAuditLogs_CanBeReadBack(OrganizationChangeType changeType, string newValue)
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -82,8 +85,20 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
-        organization.Name = "New Name";
-        await organizationRepository.AddOrUpdateAsync(organization);
+        switch (changeType)
+        {
+            case OrganizationChangeType.Name:
+                organization!.Name = newValue;
+                break;
+            case OrganizationChangeType.DomainChange:
+                organization!.Domain = new OrganizationDomain(newValue);
+                break;
+            case OrganizationChangeType.BusinessRegisterIdentifier:
+                organization!.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(newValue);
+                break;
+        }
+
+        await organizationRepository.AddOrUpdateAsync(organization!);
 
         // Act
         var actual = await organizationAuditLogEntryRepository
@@ -91,10 +106,10 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
 
         // Assert
         var organizationAuditLogs = actual.ToList();
-        Assert.Single(organizationAuditLogs);
-        Assert.Equal(user.Id, organizationAuditLogs[0].AuditIdentity.Value);
-        Assert.Equal(OrganizationChangeType.Name, organizationAuditLogs[0].OrganizationChangeType);
-        Assert.Equal("New Name", organizationAuditLogs[0].Value);
-        Assert.Equal(orgId.Value, organizationAuditLogs[0].OrganizationId);
+        Assert.Equal(4, organizationAuditLogs.Count); // 4 because of the initial add and 1 for the actual change
+        Assert.Contains(organizationAuditLogs, o => o.AuditIdentity.Value == user.Id);
+        Assert.Contains(organizationAuditLogs, o => o.OrganizationChangeType == changeType);
+        Assert.Contains(organizationAuditLogs, o => o.Value == newValue);
+        Assert.Contains(organizationAuditLogs, o => o.OrganizationId == orgId.Value);
     }
 }
