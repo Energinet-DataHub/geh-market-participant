@@ -65,7 +65,7 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
     [Theory]
     [InlineData(OrganizationChangeType.Name, "New Name")]
     [InlineData(OrganizationChangeType.DomainChange, "NewDomain.dk")]
-    [InlineData(OrganizationChangeType.BusinessRegisterIdentifier, "1234567890")]
+    [InlineData(OrganizationChangeType.BusinessRegisterIdentifier, "12345678")]
     [InlineData(OrganizationChangeType.AddressCountry, "Test Country 2")]
     [InlineData(OrganizationChangeType.AddressCity, "Test City 2")]
     [InlineData(OrganizationChangeType.AddressNumber, "12")]
