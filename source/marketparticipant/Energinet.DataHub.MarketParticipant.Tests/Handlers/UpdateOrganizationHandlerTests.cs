@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active", "TestDomain");
+            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active", "TestDomain.dk");
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
