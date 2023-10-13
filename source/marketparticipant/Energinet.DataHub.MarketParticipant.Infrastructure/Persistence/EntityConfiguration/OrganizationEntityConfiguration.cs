@@ -32,8 +32,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
                 organization => organization.Address,
                 ownedBuilder => ownedBuilder.ToTable("Organization", t => t.IsTemporal(t1 =>
                 {
-                    t1.HasPeriodStart("PeriodStart");
-                    t1.HasPeriodEnd("PeriodEnd");
+                    t1.HasPeriodStart("PeriodStart").HasColumnName("PeriodStart");
+                    t1.HasPeriodEnd("PeriodEnd").HasColumnName("PeriodEnd");
                 })));
         }
     }
