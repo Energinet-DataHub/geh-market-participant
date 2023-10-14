@@ -30,13 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.Property(organization => organization.Id).ValueGeneratedOnAdd();
             builder.Property("PeriodStart").HasColumnName("PeriodStart");
             builder.Property("PeriodEnd").HasColumnName("PeriodEnd");
-            builder.OwnsOne(
-                organization => organization.Address,
-                ownedBuilder => ownedBuilder.ToTable("Organization", t => t.IsTemporal(t1 =>
-                {
-                    t1.HasPeriodStart("PeriodStart").HasColumnName("PeriodStart");
-                    t1.HasPeriodEnd("PeriodEnd").HasColumnName("PeriodEnd");
-                })));
+            builder.Property(organization => organization.City).HasColumnName("Address_City");
+            builder.Property(organization => organization.StreetName).HasColumnName("Address_StreetName");
+            builder.Property(organization => organization.Number).HasColumnName("Address_Number");
+            builder.Property(organization => organization.ZipCode).HasColumnName("Address_ZipCode");
+            builder.Property(organization => organization.Country).HasColumnName("Address_Country");
         }
     }
 }

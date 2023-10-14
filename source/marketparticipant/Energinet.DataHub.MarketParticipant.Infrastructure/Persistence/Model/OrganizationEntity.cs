@@ -24,8 +24,12 @@ public sealed class OrganizationEntity : IAuditedEntity
     public string BusinessRegisterIdentifier { get; set; } = null!;
     public string? Comment { get; set; }
     public int Status { get; set; }
-    public AddressEntity Address { get; set; } = new();
     public string Domain { get; set; } = null!;
+    public string? StreetName { get; set; }
+    public string? ZipCode { get; set; }
+    public string? City { get; set; }
+    public string Country { get; set; } = null!;
+    public string? Number { get; set; }
 
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }

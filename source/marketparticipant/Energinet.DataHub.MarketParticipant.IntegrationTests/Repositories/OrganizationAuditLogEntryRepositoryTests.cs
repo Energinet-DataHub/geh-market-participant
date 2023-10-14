@@ -16,7 +16,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -90,30 +89,39 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
+        var orgValue = string.Empty;
         switch (changeType)
         {
             case OrganizationChangeType.Name:
+                orgValue = organization!.Name;
                 organization!.Name = newValue;
                 break;
             case OrganizationChangeType.DomainChange:
+                orgValue = organization!.Domain.Value;
                 organization!.Domain = new OrganizationDomain(newValue);
                 break;
             case OrganizationChangeType.BusinessRegisterIdentifier:
+                orgValue = organization!.BusinessRegisterIdentifier.Identifier;
                 organization!.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(newValue);
                 break;
             case OrganizationChangeType.AddressCity:
+                orgValue = organization!.Address.City;
                 organization!.Address = _validAddress with { City = newValue };
                 break;
             case OrganizationChangeType.AddressCountry:
+                orgValue = organization!.Address.Country;
                 organization!.Address = _validAddress with { Country = newValue };
                 break;
             case OrganizationChangeType.AddressNumber:
+                orgValue = organization!.Address.Number;
                 organization!.Address = _validAddress with { Number = newValue };
                 break;
             case OrganizationChangeType.AddressStreetName:
+                orgValue = organization!.Address.StreetName;
                 organization!.Address = _validAddress with { StreetName = newValue };
                 break;
             case OrganizationChangeType.AddressZipCode:
+                orgValue = organization!.Address.ZipCode;
                 organization!.Address = _validAddress with { ZipCode = newValue };
                 break;
             default:
@@ -128,9 +136,11 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
 
         // Assert
         var organizationAuditLogs = actual.ToList();
+        Assert.Equal(Enum.GetValues<OrganizationChangeType>().Length + 1, organizationAuditLogs.Count); // +1 as it should contain all the original values as well as the changed one.
         Assert.Contains(organizationAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(organizationAuditLogs, o => o.OrganizationChangeType == changeType);
         Assert.Contains(organizationAuditLogs, o => o.Value == newValue);
+        Assert.Contains(organizationAuditLogs, o => o.Value == orgValue);
         Assert.Contains(organizationAuditLogs, o => o.OrganizationId == orgId.Value);
     }
 }

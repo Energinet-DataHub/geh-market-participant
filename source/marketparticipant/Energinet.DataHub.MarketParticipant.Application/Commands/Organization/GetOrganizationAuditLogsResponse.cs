@@ -12,13 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using System.Collections.Generic;
 
-public sealed class AddressEntity
-{
-    public string? StreetName { get; set; }
-    public string? ZipCode { get; set; }
-    public string? City { get; set; }
-    public string Country { get; set; } = null!;
-    public string? Number { get; set; }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+
+public sealed record GetOrganizationAuditLogsResponse(IEnumerable<OrganizationAuditLogDto> OrganizationAuditLogs);

@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
@@ -59,27 +58,27 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 new
                 {
                     Property = OrganizationChangeType.AddressCountry,
-                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.Country ?? string.Empty)
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Country ?? string.Empty)
                 },
                 new
                 {
                     Property = OrganizationChangeType.AddressCity,
-                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.City ?? string.Empty)
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.City ?? string.Empty)
                 },
                 new
                 {
                     Property = OrganizationChangeType.AddressNumber,
-                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.Number ?? string.Empty)
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Number ?? string.Empty)
                 },
                 new
                 {
                     Property = OrganizationChangeType.AddressStreetName,
-                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.StreetName ?? string.Empty)
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.StreetName ?? string.Empty)
                 },
                 new
                 {
                     Property = OrganizationChangeType.AddressZipCode,
-                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.Address?.ZipCode ?? string.Empty)
+                    ReadValue = new Func<OrganizationEntity, object?>(entity => entity.ZipCode ?? string.Empty)
                 },
             };
 
