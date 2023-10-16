@@ -24,6 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.Client
     {
         private const string OrganizationsBaseUrl = "Organization";
         private const string ActorBaseUrl = "Actor";
+        private const string AuditLogBaseUrl = "auditlogs";
 
         private readonly IMarketParticipantClientFactory _clientFactory;
 
@@ -108,6 +109,23 @@ namespace Energinet.DataHub.MarketParticipant.Client
                 .ConfigureAwait(false);
 
             return actors;
+        }
+
+        public async Task<IEnumerable<OrganizationAuditLogDto>> GetAuditLogEntriesAsync(Guid organizationId)
+        {
+            var response = await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request(OrganizationsBaseUrl, organizationId, AuditLogBaseUrl)
+                        .GetAsync())
+                .ConfigureAwait(false);
+
+            var auditLogEntries = await response
+                .GetJsonAsync<IEnumerable<OrganizationAuditLogDto>>()
+                .ConfigureAwait(false);
+
+            return auditLogEntries;
         }
     }
 }

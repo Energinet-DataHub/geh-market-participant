@@ -69,6 +69,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantOrganizationClient.GetActorsAsync(organizationId);
         }
 
+        public Task<IEnumerable<OrganizationAuditLogDto>> GetAuditLogEntriesAsync(Guid organizationId)
+        {
+            return _marketParticipantOrganizationClient.GetAuditLogEntriesAsync(organizationId);
+        }
+
         public Task<ActorDto> GetActorAsync(Guid actorId)
         {
             return _marketParticipantActorClient.GetActorAsync(actorId);
