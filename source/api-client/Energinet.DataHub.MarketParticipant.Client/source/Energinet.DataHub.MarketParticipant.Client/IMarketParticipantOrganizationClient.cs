@@ -57,5 +57,12 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="organizationId">The id of the organization to get the actors for.</param>
         /// <returns>A list of actors <see cref="ActorDto"/> belonging to the organization.</returns>
         Task<IEnumerable<ActorDto>> GetActorsAsync(Guid organizationId);
+
+        /// <summary>
+        /// Lists all audit log entries for an organization.
+        /// </summary>
+        /// <param name="organizationId">The id of the organization.</param>
+        /// <returns>A list of <see cref="OrganizationAuditLogDto"/> belonging to the organization.</returns>
+        Task<IEnumerable<OrganizationAuditLogDto>> GetAuditLogEntriesAsync(Guid organizationId);
     }
 }
