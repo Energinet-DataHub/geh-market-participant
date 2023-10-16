@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 
 public record OrganizationAuditLogDto(
-    OrganizationId OrganizationId,
+    Guid OrganizationId,
     string Value,
     Guid AuditIdentityId,
     DateTimeOffset Timestamp,

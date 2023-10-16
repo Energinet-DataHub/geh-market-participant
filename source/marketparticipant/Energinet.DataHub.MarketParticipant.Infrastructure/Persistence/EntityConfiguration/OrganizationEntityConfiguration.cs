@@ -28,8 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
             builder.ToTable("Organization");
             builder.HasKey(organization => organization.Id);
             builder.Property(organization => organization.Id).ValueGeneratedOnAdd();
-            builder.Property("PeriodStart").HasColumnName("PeriodStart");
-            builder.Property("PeriodEnd").HasColumnName("PeriodEnd");
             builder.Property(organization => organization.City).HasColumnName("Address_City");
             builder.Property(organization => organization.StreetName).HasColumnName("Address_StreetName");
             builder.Property(organization => organization.Number).HasColumnName("Address_Number");

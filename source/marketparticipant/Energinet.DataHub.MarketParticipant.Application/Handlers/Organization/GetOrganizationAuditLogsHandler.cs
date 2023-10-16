@@ -45,7 +45,7 @@ public sealed class GetOrganizationAuditLogsHandler
 
         return new GetOrganizationAuditLogsResponse(organizationAuditLogs.Select(auditLogEntry =>
             new OrganizationAuditLogDto(
-                auditLogEntry.OrganizationId,
+                auditLogEntry.OrganizationId.Value,
                 auditLogEntry.Value,
                 auditLogEntry.AuditIdentity.Value,
                 auditLogEntry.Timestamp,
