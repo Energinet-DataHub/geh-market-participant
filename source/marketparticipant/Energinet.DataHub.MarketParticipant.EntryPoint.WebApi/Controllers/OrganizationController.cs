@@ -129,5 +129,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
             return Ok(filteredActors);
         }
+
+        [HttpGet("{organizationId:guid}/auditlogs")]
+        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        public async Task<IActionResult> GetAuditLogsAsync(Guid organizationId)
+        {
+            var command = new GetOrganizationAuditLogsCommand(organizationId);
+
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            return Ok(response.OrganizationAuditLogs);
+        }
     }
 }

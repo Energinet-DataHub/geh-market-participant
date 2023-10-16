@@ -29,7 +29,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
     {
         private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-        public OrganizationRepository(IMarketParticipantDbContext marketParticipantDbContext)
+        public OrganizationRepository(
+            IMarketParticipantDbContext marketParticipantDbContext)
         {
             _marketParticipantDbContext = marketParticipantDbContext;
         }
