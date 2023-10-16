@@ -12,13 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-
-public sealed class AddressEntity
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
-    public string? StreetName { get; set; }
-    public string? ZipCode { get; set; }
-    public string? City { get; set; }
-    public string Country { get; set; } = null!;
-    public string? Number { get; set; }
+    public enum OrganizationChangeType
+    {
+        DomainChange = 1,
+        Name = 2,
+        BusinessRegisterIdentifier = 3,
+        AddressCity = 4,
+        AddressCountry = 5,
+        AddressNumber = 6,
+        AddressStreetName = 7,
+        AddressZipCode = 8,
+    }
 }
