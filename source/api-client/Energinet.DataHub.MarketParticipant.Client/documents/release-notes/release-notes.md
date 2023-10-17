@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.32.5
+
+- Added domain to OrganizationChangeDto
+
 ## Version 2.32.4
 
 - Organization audit log API.
