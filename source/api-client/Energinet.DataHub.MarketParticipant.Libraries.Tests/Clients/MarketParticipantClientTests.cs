@@ -288,7 +288,7 @@ public sealed class MarketParticipantClientTests
 
         // Act
         await target
-            .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2", OrganizationStatus.Active))
+            .UpdateOrganizationAsync(orgId, new ChangeOrganizationDto("unit test 2", _validBusinessRegisterIdentifier, changedAddress, "Test Comment 2",  OrganizationStatus.Active, "New Domain"))
             .ConfigureAwait(false);
 
         var changedOrg = await target
