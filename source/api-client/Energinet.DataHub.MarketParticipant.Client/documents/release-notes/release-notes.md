@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.32.6
+
+- API for resetting users 2FA.
+
 ## Version 2.32.5
 
 - Added domain to OrganizationChangeDto
