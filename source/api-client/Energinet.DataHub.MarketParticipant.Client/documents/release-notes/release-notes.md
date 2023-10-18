@@ -2,7 +2,7 @@
 
 ## Version 2.32.6
 
-- API for resetting users TOTP 2FA.
+- API for resetting users 2FA.
 
 ## Version 2.32.5
 

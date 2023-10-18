@@ -163,9 +163,9 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpPut("{userId:guid}/reset-totp-2fa")]
+    [HttpPut("{userId:guid}/reset-2fa")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> ResetTotpTwoFactorAuthenticationAsync(Guid userId)
+    public async Task<IActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
     {
         if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
             return Unauthorized();

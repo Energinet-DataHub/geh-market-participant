@@ -169,9 +169,9 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantUserClient.DeactivateUserAsync(userId);
         }
 
-        public Task ResetTotpTwoFactorAuthenticationAsync(Guid userId)
+        public Task ResetTwoFactorAuthenticationAsync(Guid userId)
         {
-            return _marketParticipantUserClient.ResetTotpTwoFactorAuthenticationAsync(userId);
+            return _marketParticipantUserClient.ResetTwoFactorAuthenticationAsync(userId);
         }
 
         public Task<UserOverviewResultDto> SearchUsersAsync(
