@@ -19,13 +19,13 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Repository for querying organization audit logs
+/// Repository for querying actor audit logs
 /// </summary>
-public interface IOrganizationAuditLogEntryRepository
+public interface IActorAuditLogEntryRepository
 {
     /// <summary>
-    /// Retrieves all log entries for a given organization.
+    /// Retrieves all log entries for a given actor.
     /// </summary>
-    /// <param name="organization">The organization to get the logs for.</param>
-    Task<IEnumerable<OrganizationAuditLogEntry>> GetAsync(OrganizationId organization);
+    /// <param name="actor">The actor to get the logs for.</param>
+    Task<IEnumerable<ActorAuditLogEntry>> GetAsync(ActorId actor);
 }

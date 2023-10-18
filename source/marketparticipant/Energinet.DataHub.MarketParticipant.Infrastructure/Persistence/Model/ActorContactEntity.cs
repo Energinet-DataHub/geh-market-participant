@@ -14,10 +14,11 @@
 
 using System;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class ActorContactEntity
+public sealed class ActorContactEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
     public Guid ActorId { get; set; }
@@ -25,4 +26,6 @@ public sealed class ActorContactEntity
     public string Name { get; set; } = null!;
     public string Email { get; set; } = null!;
     public string? Phone { get; set; }
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }
