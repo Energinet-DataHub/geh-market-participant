@@ -68,7 +68,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                         };
                     });
 
-                return Ok(new GetActorsResponse(filteredActors));
+                return Ok(filteredActors);
             }
 
             return Ok(response.Actors);
