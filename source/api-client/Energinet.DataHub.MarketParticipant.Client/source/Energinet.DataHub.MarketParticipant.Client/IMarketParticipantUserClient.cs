@@ -60,5 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// </summary>
         /// <param name="userId">Users id</param>
         Task DeactivateUserAsync(Guid userId);
+
+        /// <summary>
+        /// Resets the users TOTP 2FA
+        /// </summary>
+        /// <param name="userId">Users id</param>
+        Task ResetTotpTwoFactorAuthenticationAsync(Guid userId);
     }
 }
