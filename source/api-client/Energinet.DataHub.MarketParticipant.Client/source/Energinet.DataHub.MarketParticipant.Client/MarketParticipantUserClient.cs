@@ -123,5 +123,16 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .PutAsync())
                 .ConfigureAwait(false);
         }
+
+        public async Task ResetTwoFactorAuthenticationAsync(Guid userId)
+        {
+            await ValidationExceptionHandler
+                .HandleAsync(
+                    () => _clientFactory
+                        .CreateClient()
+                        .Request("user", userId, "reset-2fa")
+                        .PutAsync())
+                .ConfigureAwait(false);
+        }
     }
 }
