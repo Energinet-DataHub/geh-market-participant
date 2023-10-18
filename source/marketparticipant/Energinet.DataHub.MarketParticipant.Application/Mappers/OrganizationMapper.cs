@@ -39,8 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
             return new ActorDto(
-                actor.Id.ToString(),
-                actor.OrganizationId.ToString(),
+                actor.Id.Value,
+                actor.OrganizationId.Value,
                 actor.ExternalActorId?.ToString(),
                 new ActorNumberDto(actor.ActorNumber.Value),
                 actor.Status.ToString(),
