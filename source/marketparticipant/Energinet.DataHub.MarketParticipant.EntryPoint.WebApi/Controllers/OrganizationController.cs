@@ -120,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             {
                 filteredActors = filteredActors.Select(actor =>
                 {
-                    if (actor.ActorId == _userContext.CurrentUser.ActorId.ToString())
+                    if (actor.ActorId == _userContext.CurrentUser.ActorId)
                         return actor;
 
                     return actor with { Name = new ActorNameDto(string.Empty) };
