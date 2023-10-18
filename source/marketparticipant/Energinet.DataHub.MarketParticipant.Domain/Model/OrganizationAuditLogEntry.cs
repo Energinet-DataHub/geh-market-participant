@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment,
-        OrganizationStatus Status,
-        string Domain);
-}
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+
+public sealed record OrganizationAuditLogEntry(
+    OrganizationId OrganizationId,
+    AuditIdentity AuditIdentity,
+    OrganizationChangeType OrganizationChangeType,
+    DateTimeOffset Timestamp,
+    string Value);

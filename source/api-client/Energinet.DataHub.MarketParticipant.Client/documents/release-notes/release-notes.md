@@ -1,5 +1,17 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.32.6
+
+- API for resetting users 2FA.
+
+## Version 2.32.5
+
+- Added domain to OrganizationChangeDto
+
+## Version 2.32.4
+
+- Organization audit log API.
+
 ## Version 2.32.3
 
 - Remove ElOverblik from market roles.

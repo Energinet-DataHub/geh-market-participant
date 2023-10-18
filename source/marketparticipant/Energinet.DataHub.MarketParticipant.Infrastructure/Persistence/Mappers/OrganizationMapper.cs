@@ -27,7 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Comment = from.Comment;
             to.Status = (int)from.Status;
             to.Domain = from.Domain.Value;
-            MapAddressToEntity(from.Address, to.Address);
+            MapAddressToEntity(from.Address, to);
         }
 
         public static Organization MapFromEntity(OrganizationEntity from)
@@ -36,13 +36,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 new OrganizationId(from.Id),
                 from.Name,
                 new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
-                MapAddress(from.Address),
+                MapAddress(from),
                 new OrganizationDomain(from.Domain),
                 from.Comment,
                 (OrganizationStatus)from.Status);
         }
 
-        private static Address MapAddress(AddressEntity from)
+        private static Address MapAddress(OrganizationEntity from)
         {
             return new Address(
                 from.StreetName,
@@ -52,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 from.Country);
         }
 
-        private static void MapAddressToEntity(Address from, AddressEntity to)
+        private static void MapAddressToEntity(Address from, OrganizationEntity to)
         {
             to.StreetName = from.StreetName;
             to.Number = from.Number;

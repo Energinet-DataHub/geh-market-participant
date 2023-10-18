@@ -12,13 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+/// <summary>
+/// Repository for inserting and querying organization audit logs
+/// </summary>
+public interface IOrganizationAuditLogEntryRepository
 {
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment,
-        OrganizationStatus Status,
-        string Domain);
+    /// <summary>
+    /// Retrieves all log entries for a given organization.
+    /// </summary>
+    /// <param name="organization">The organization to get the logs for.</param>
+    Task<IEnumerable<OrganizationAuditLogEntry>> GetAsync(OrganizationId organization);
 }

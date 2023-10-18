@@ -69,6 +69,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
             return _marketParticipantOrganizationClient.GetActorsAsync(organizationId);
         }
 
+        public Task<IEnumerable<OrganizationAuditLogDto>> GetAuditLogEntriesAsync(Guid organizationId)
+        {
+            return _marketParticipantOrganizationClient.GetAuditLogEntriesAsync(organizationId);
+        }
+
         public Task<ActorDto> GetActorAsync(Guid actorId)
         {
             return _marketParticipantActorClient.GetActorAsync(actorId);
@@ -162,6 +167,11 @@ namespace Energinet.DataHub.MarketParticipant.Client
         public Task DeactivateUserAsync(Guid userId)
         {
             return _marketParticipantUserClient.DeactivateUserAsync(userId);
+        }
+
+        public Task ResetTwoFactorAuthenticationAsync(Guid userId)
+        {
+            return _marketParticipantUserClient.ResetTwoFactorAuthenticationAsync(userId);
         }
 
         public Task<UserOverviewResultDto> SearchUsersAsync(

@@ -163,6 +163,16 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpPut("{userId:guid}/reset-2fa")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<IActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
+    {
+        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+            return Unauthorized();
+
+        return Ok();
+    }
+
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);

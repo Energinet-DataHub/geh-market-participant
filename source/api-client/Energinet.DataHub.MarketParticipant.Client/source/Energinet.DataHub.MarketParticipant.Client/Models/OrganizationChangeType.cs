@@ -14,11 +14,15 @@
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment,
-        OrganizationStatus Status,
-        string Domain);
+    public enum OrganizationChangeType
+    {
+        DomainChange = 1,
+        Name = 2,
+        BusinessRegisterIdentifier = 3,
+        AddressCity = 4,
+        AddressCountry = 5,
+        AddressNumber = 6,
+        AddressStreetName = 7,
+        AddressZipCode = 8,
+    }
 }

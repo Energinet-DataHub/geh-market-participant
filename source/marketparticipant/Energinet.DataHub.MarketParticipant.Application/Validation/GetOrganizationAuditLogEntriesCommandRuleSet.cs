@@ -12,13 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class GetOrganizationAuditLogEntriesCommandRuleSet : AbstractValidator<GetOrganizationAuditLogsCommand>
 {
-    public sealed record ChangeOrganizationDto(
-        string Name,
-        string BusinessRegisterIdentifier,
-        AddressDto Address,
-        string? Comment,
-        OrganizationStatus Status,
-        string Domain);
+    public GetOrganizationAuditLogEntriesCommandRuleSet()
+    {
+        RuleFor(command => command.OrganizationId)
+            .NotEmpty();
+    }
 }

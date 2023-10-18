@@ -30,14 +30,11 @@ internal static class TestPreparationEntities
         Comment = "Test Organization Comment",
         Domain = new MockedDomain(),
         Status = 1,
-        Address = new AddressEntity
-        {
-            StreetName = "Vej Allé",
-            Number = "7",
-            City = "Vejle",
-            Country = "Denmark",
-            ZipCode = "7100"
-        }
+        StreetName = "Vej Allé",
+        Number = "7",
+        City = "Vejle",
+        Country = "Denmark",
+        ZipCode = "7100"
     };
 
     public static ActorEntity ValidActor => new()
