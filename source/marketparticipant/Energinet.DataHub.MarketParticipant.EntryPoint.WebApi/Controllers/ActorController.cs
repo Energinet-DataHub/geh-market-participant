@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                     .Actors
                     .Select(a =>
                     {
-                        if (_userContext.CurrentUser.IsAssignedToActor(Guid.Parse(a.ActorId)))
+                        if (_userContext.CurrentUser.IsAssignedToActor(a.ActorId))
                             return a;
 
                         return a with
