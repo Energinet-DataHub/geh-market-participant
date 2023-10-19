@@ -15,9 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -32,20 +31,20 @@ public sealed class ResetUserTwoFactorAuthenticationHandler : IRequestHandler<Re
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserStatusCalculator _userStatusCalculator;
     private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
-    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public ResetUserTwoFactorAuthenticationHandler(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
         IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
-        IUserContext<FrontendUser> userContext)
+        IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userStatusCalculator = userStatusCalculator;
         _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
-        _userContext = userContext;
+        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task Handle(ResetUserTwoFactorAuthenticationCommand request, CancellationToken cancellationToken)
@@ -63,21 +62,21 @@ public sealed class ResetUserTwoFactorAuthenticationHandler : IRequestHandler<Re
         if (currentStatus == UserStatus.Inactive)
             return;
 
-        await _userIdentityRepository
-            .RemoveUserTwoFactorAuthenticationAsync(userIdentity.Id)
-            .ConfigureAwait(false);
-
         user.ActivateUserExpiration();
 
         await _userRepository
             .AddOrUpdateAsync(user)
             .ConfigureAwait(false);
 
+        await _userIdentityRepository
+            .RemoveUserTwoFactorAuthenticationAsync(userIdentity.Id)
+            .ConfigureAwait(false);
+
         await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
             user.Id,
             UserStatus.Invited.ToString(),
             currentStatus.ToString(),
-            new AuditIdentity(_userContext.CurrentUser.UserId),
+            _auditIdentityProvider.IdentityId,
             DateTimeOffset.UtcNow,
             UserIdentityAuditLogField.Status)).ConfigureAwait(false);
     }
