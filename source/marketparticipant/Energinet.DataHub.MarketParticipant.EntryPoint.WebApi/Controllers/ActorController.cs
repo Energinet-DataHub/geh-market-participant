@@ -40,17 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetActorsAsync()
         {
-            if (!_userContext.CurrentUser.IsFas)
-            {
-                var getSingleActorCommand = new GetSingleActorCommand(_userContext.CurrentUser.ActorId);
-
-                var singleResponse = await _mediator
-                    .Send(getSingleActorCommand)
-                    .ConfigureAwait(false);
-
-                return Ok(new[] { singleResponse.Actor });
-            }
-
             var getAllActorsCommand = new GetAllActorsCommand();
 
             var response = await _mediator
@@ -63,9 +52,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{actorId:guid}")]
         public async Task<IActionResult> GetSingleActorAsync(Guid actorId)
         {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
-
             var getSingleActorCommand = new GetSingleActorCommand(actorId);
 
             var response = await _mediator
