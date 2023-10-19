@@ -26,7 +26,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         {
             ArgumentNullException.ThrowIfNull(organization, nameof(organization));
             return new OrganizationDto(
-                organization.Id.ToString(),
+                organization.Id.Value,
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
                 organization.Domain.Value,
