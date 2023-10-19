@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 
 /// <summary>
 /// Manages authentication methods for the specified user.
@@ -35,4 +35,10 @@ public interface IUserIdentityAuthenticationService
     /// </summary>
     /// <param name="userId">The external id of the user.</param>
     Task RemoveTwoFactorAuthenticationAsync(ExternalUserId userId);
+
+    /// <summary>
+    /// Checks wether user has two factor authentication.
+    /// </summary>
+    /// <param name="userId">The external id of the user.</param>
+    Task<bool> HasTwoFactorAuthenticationAsync(ExternalUserId userId);
 }

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Extensions.DependencyInjection;

@@ -17,6 +17,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
+using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
 using Microsoft.Graph.Models.ODataErrors;
@@ -76,6 +77,15 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         {
             await builder.SoftwareOathMethods[method.Id].DeleteAsync().ConfigureAwait(false);
         }
+    }
+
+    public async Task<bool> HasTwoFactorAuthenticationAsync(ExternalUserId userId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        var builder = GetUserAuthenticationBuilder(userId);
+        var methods = await builder.SoftwareOathMethods.GetAsync().ConfigureAwait(false);
+        return methods?.Value?.Count > 0;
     }
 
     private static IExternalAuthenticationMethod ChooseExternalMethod(AuthenticationMethod authenticationMethod)
