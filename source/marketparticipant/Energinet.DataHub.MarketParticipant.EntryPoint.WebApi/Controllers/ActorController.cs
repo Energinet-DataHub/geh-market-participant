@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -47,30 +46,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(getAllActorsCommand)
                 .ConfigureAwait(false);
 
-            if (!_userContext.CurrentUser.IsFas)
-            {
-                var filteredActors = response
-                    .Actors
-                    .Select(a =>
-                    {
-                        if (_userContext.CurrentUser.IsAssignedToActor(a.ActorId))
-                            return a;
-
-                        return a with
-                        {
-                            MarketRoles = a
-                                .MarketRoles
-                                .Select(mr => mr with
-                                {
-                                    Comment = null,
-                                    GridAreas = Array.Empty<ActorGridAreaDto>()
-                                })
-                        };
-                    });
-
-                return Ok(filteredActors);
-            }
-
             return Ok(response.Actors);
         }
 
@@ -82,21 +57,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             var response = await _mediator
                 .Send(getSingleActorCommand)
                 .ConfigureAwait(false);
-
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-            {
-                return Ok(new GetSingleActorResponse(response.Actor with
-                {
-                    MarketRoles = response
-                        .Actor
-                        .MarketRoles
-                        .Select(mr => mr with
-                        {
-                            Comment = null,
-                            GridAreas = Array.Empty<ActorGridAreaDto>()
-                        })
-                }));
-            }
 
             return Ok(response.Actor);
         }

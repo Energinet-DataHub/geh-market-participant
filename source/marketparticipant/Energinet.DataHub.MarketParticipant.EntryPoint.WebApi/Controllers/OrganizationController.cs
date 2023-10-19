@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -42,8 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> ListAllAsync()
         {
-            var organizationId = !_userContext.CurrentUser.IsFas ? _userContext.CurrentUser.OrganizationId : (Guid?)null;
-            var getOrganizationsCommand = new GetOrganizationsCommand(organizationId);
+            var getOrganizationsCommand = new GetOrganizationsCommand(null);
 
             var response = await _mediator
                 .Send(getOrganizationsCommand)
@@ -55,9 +53,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}")]
         public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
         {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
-                return Unauthorized();
-
             var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
             var response = await _mediator
@@ -105,29 +100,13 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [HttpGet("{organizationId:guid}/actor")]
         public async Task<IActionResult> GetActorsAsync(Guid organizationId)
         {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToOrganization(organizationId))
-                return Unauthorized();
-
             var getActorsCommand = new GetActorsCommand(organizationId);
 
             var response = await _mediator
                 .Send(getActorsCommand)
                 .ConfigureAwait(false);
 
-            var filteredActors = response.Actors;
-
-            if (!_userContext.CurrentUser.IsFas)
-            {
-                filteredActors = filteredActors.Select(actor =>
-                {
-                    if (actor.ActorId == _userContext.CurrentUser.ActorId)
-                        return actor;
-
-                    return actor with { Name = new ActorNameDto(string.Empty) };
-                });
-            }
-
-            return Ok(filteredActors);
+            return Ok(response.Actors);
         }
 
         [HttpGet("{organizationId:guid}/auditlogs")]
