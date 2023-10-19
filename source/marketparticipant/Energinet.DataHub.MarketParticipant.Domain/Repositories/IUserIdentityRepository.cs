@@ -83,4 +83,10 @@ public interface IUserIdentityRepository
     Task DeleteAsync(ExternalUserId externalUserId);
     Task DisableUserAccountAsync(ExternalUserId externalUserId);
     Task EnableUserAccountAsync(ExternalUserId externalUserId);
+
+    /// <summary>
+    /// Removes 2FA from user identity
+    /// </summary>
+    /// <param name="externalUserId"></param>
+    Task RemoveUserTwoFactorAuthenticationAsync(ExternalUserId externalUserId);
 }

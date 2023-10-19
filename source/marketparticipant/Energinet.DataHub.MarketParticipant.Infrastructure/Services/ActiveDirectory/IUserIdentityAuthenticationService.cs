@@ -29,4 +29,10 @@ public interface IUserIdentityAuthenticationService
     /// <param name="userId">The external id of the user to add authentication method to.</param>
     /// <param name="authenticationMethod">The authentication method to add.</param>
     Task AddAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod);
+
+    /// <summary>
+    /// Removes the specified authentication method for the given user.
+    /// </summary>
+    /// <param name="userId">The external id of the user.</param>
+    Task RemoveTwoFactorAuthenticationAsync(ExternalUserId userId);
 }

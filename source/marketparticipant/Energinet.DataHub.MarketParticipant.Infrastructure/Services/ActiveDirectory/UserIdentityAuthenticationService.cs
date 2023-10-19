@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Model.ActiveDirectory;
 using Microsoft.Graph;
 using Microsoft.Graph.Models.ODataErrors;
+using Microsoft.Graph.Users.Item.Authentication;
 using AuthenticationMethod = Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication.AuthenticationMethod;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
@@ -41,10 +42,7 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         if (authenticationMethod == AuthenticationMethod.Undetermined)
             throw new ArgumentOutOfRangeException(nameof(authenticationMethod));
 
-        var authenticationBuilder = _graphClient
-            .Users[userId.ToString()]
-            .Authentication!;
-
+        var authenticationBuilder = GetUserAuthenticationBuilder(userId);
         var externalAuthenticationMethod = ChooseExternalMethod(authenticationMethod);
 
         try
@@ -64,6 +62,22 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         }
     }
 
+    public async Task RemoveTwoFactorAuthenticationAsync(ExternalUserId userId)
+    {
+        ArgumentNullException.ThrowIfNull(userId);
+
+        var builder = GetUserAuthenticationBuilder(userId);
+        var methods = await builder.SoftwareOathMethods.GetAsync().ConfigureAwait(false);
+
+        if (methods?.Value == null)
+            return;
+
+        foreach (var method in methods.Value)
+        {
+            await builder.SoftwareOathMethods[method.Id].DeleteAsync().ConfigureAwait(false);
+        }
+    }
+
     private static IExternalAuthenticationMethod ChooseExternalMethod(AuthenticationMethod authenticationMethod)
     {
         return authenticationMethod switch
@@ -71,5 +85,12 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
             SmsAuthenticationMethod smsAuthenticationMethod => new ExternalSmsAuthenticationMethod(smsAuthenticationMethod),
             _ => throw new ArgumentOutOfRangeException(nameof(authenticationMethod))
         };
+    }
+
+    private AuthenticationRequestBuilder GetUserAuthenticationBuilder(ExternalUserId userId)
+    {
+        return _graphClient
+            .Users[userId.ToString()]
+            .Authentication!;
     }
 }
