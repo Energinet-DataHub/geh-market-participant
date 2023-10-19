@@ -14,7 +14,9 @@
 
 using System;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -27,10 +29,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
     public sealed class ActorContactController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IUserContext<FrontendUser> _userContext;
 
-        public ActorContactController(IMediator mediator)
+        public ActorContactController(IMediator mediator, IUserContext<FrontendUser> userContext)
         {
             _mediator = mediator;
+            _userContext = userContext;
         }
 
         [HttpGet("{actorId:guid}/contact")]
@@ -50,6 +54,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
             var createContactCommand = new CreateActorContactCommand(actorId, contactDto);
 
             var response = await _mediator
@@ -63,6 +70,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
         {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
             var deleteContactCommand = new DeleteActorContactCommand(actorId, contactId);
 
             await _mediator
