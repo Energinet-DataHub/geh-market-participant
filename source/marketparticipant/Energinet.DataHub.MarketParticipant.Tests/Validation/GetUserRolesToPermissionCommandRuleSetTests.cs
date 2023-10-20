@@ -16,6 +16,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Validation;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Xunit;
 using Xunit.Categories;
 
@@ -46,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         {
             // Arrange
             var target = new GetUserRolesToPermissionCommandRuleSet();
-            var command = new GetUserRolesToPermissionCommand(1);
+            var command = new GetUserRolesToPermissionCommand((int)PermissionId.OrganizationsManage);
 
             // Act
             var result = await target.ValidateAsync(command);

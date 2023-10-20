@@ -168,7 +168,7 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(perms);
-        Assert.Equal(PermissionId.OrganizationsManage, perms.First().Id);
+        Assert.Equal(PermissionId.UsersManage, perms.First().Id);
     }
 
     [Fact]
@@ -309,7 +309,7 @@ public sealed class UserQueryRepositoryTests
         Assert.NotEmpty(permsActor2);
         Assert.Single(permsActor);
         Assert.Single(permsActor2);
-        Assert.Equal(PermissionId.OrganizationsManage, permsActor.First().Id);
+        Assert.Equal(PermissionId.UsersManage, permsActor.First().Id);
         Assert.Equal(PermissionId.UsersView, permsActor2.First().Id);
     }
 
