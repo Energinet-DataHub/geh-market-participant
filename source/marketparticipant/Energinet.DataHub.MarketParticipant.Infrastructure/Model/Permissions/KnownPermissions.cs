@@ -26,22 +26,6 @@ public static class KnownPermissions
 {
     public static IReadOnlyCollection<KnownPermission> All { get; } = new KnownPermission[]
     {
-        new(PermissionId.OrganizationsView, "organizations:view", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
-        {
-            EicFunction.BalanceResponsibleParty,
-            EicFunction.BillingAgent,
-            EicFunction.EnergySupplier,
-            EicFunction.GridAccessProvider,
-            EicFunction.ImbalanceSettlementResponsible,
-            EicFunction.MeteredDataAdministrator,
-            EicFunction.MeteredDataResponsible,
-            EicFunction.MeteringPointAdministrator,
-            EicFunction.SystemOperator,
-            EicFunction.DanishEnergyAgency,
-            EicFunction.DataHubAdministrator,
-            EicFunction.IndependentAggregator,
-            EicFunction.SerialEnergyTrader
-        }),
         new(PermissionId.OrganizationsManage, "organizations:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
