@@ -170,6 +170,12 @@ public class UserController : ControllerBase
         if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
             return Unauthorized();
 
+        var command = new ResetUserTwoFactorAuthenticationCommand(userId);
+
+        await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
         return Ok();
     }
 

@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories.Query;
+using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
@@ -32,15 +33,18 @@ public sealed class GetUserPermissionsHandler
     private readonly IUserRepository _userRepository;
     private readonly IUserQueryRepository _userQueryRepository;
     private readonly IUserIdentityOpenIdLinkService _userIdentityOpenIdLinkService;
+    private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
 
     public GetUserPermissionsHandler(
         IUserRepository userRepository,
         IUserQueryRepository userQueryRepository,
-        IUserIdentityOpenIdLinkService userIdentityOpenIdLinkService)
+        IUserIdentityOpenIdLinkService userIdentityOpenIdLinkService,
+        IUserIdentityAuthenticationService userIdentityAuthenticationService)
     {
         _userRepository = userRepository;
         _userQueryRepository = userQueryRepository;
         _userIdentityOpenIdLinkService = userIdentityOpenIdLinkService;
+        _userIdentityAuthenticationService = userIdentityAuthenticationService;
     }
 
     public async Task<GetUserPermissionsResponse> Handle(
@@ -82,7 +86,8 @@ public sealed class GetUserPermissionsHandler
             throw new UnauthorizedAccessException("User invitation has expired");
         }
 
-        if (user.InvitationExpiresAt.HasValue)
+        if (user.InvitationExpiresAt.HasValue &&
+            await _userIdentityAuthenticationService.HasTwoFactorAuthenticationAsync(user.ExternalId).ConfigureAwait(false))
         {
             user.DeactivateUserExpiration();
             await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
