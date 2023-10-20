@@ -266,11 +266,6 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
         return UpdateUserAccountStatusAsync(externalUserId, false);
     }
 
-    public Task RemoveUserTwoFactorAuthenticationAsync(ExternalUserId externalUserId)
-    {
-        return _userIdentityAuthenticationService.RemoveTwoFactorAuthenticationAsync(externalUserId);
-    }
-
     private static UserIdentity Map(User user, string? emailAddress = null)
     {
         var userEmailAddress = emailAddress ?? user

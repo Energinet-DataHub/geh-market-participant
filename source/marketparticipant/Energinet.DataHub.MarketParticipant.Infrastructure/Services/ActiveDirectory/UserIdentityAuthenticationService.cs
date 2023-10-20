@@ -63,7 +63,7 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
         }
     }
 
-    public async Task RemoveTwoFactorAuthenticationAsync(ExternalUserId userId)
+    public async Task RemoveAllSoftwareTwoFactorAuthenticationMethodsAsync(ExternalUserId userId)
     {
         ArgumentNullException.ThrowIfNull(userId);
 

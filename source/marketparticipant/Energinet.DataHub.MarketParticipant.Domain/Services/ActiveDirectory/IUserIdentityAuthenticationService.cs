@@ -31,13 +31,13 @@ public interface IUserIdentityAuthenticationService
     Task AddAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod);
 
     /// <summary>
-    /// Removes the specified authentication method for the given user.
+    /// Removes all software 2FA authentication methods for the given user.
     /// </summary>
     /// <param name="userId">The external id of the user.</param>
-    Task RemoveTwoFactorAuthenticationAsync(ExternalUserId userId);
+    Task RemoveAllSoftwareTwoFactorAuthenticationMethodsAsync(ExternalUserId userId);
 
     /// <summary>
-    /// Checks wether user has two factor authentication.
+    /// Checks whether user has two factor authentication.
     /// </summary>
     /// <param name="userId">The external id of the user.</param>
     Task<bool> HasTwoFactorAuthenticationAsync(ExternalUserId userId);

@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -101,6 +102,10 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityRepositoryMock.Object);
 
+        var userAuthenticationService = new Mock<IUserIdentityAuthenticationService>();
+        host.ServiceCollection.RemoveAll<IUserIdentityAuthenticationService>();
+        host.ServiceCollection.AddScoped(_ => userAuthenticationService.Object);
+
         var userContext = new Mock<IUserContext<FrontendUser>>();
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
         host.ServiceCollection.AddScoped(_ => userContext.Object);
@@ -153,6 +158,10 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
         host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
         host.ServiceCollection.AddScoped(_ => userIdentityRepositoryMock.Object);
 
+        var userAuthenticationService = new Mock<IUserIdentityAuthenticationService>();
+        host.ServiceCollection.RemoveAll<IUserIdentityAuthenticationService>();
+        host.ServiceCollection.AddScoped(_ => userAuthenticationService.Object);
+
         var userContext = new Mock<IUserContext<FrontendUser>>();
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
         host.ServiceCollection.AddScoped(_ => userContext.Object);
@@ -186,7 +195,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandlerTests : WebApiIntegra
         await mediator.Send(command);
 
         // Assert
-        userIdentityRepositoryMock.Verify(x => x.RemoveUserTwoFactorAuthenticationAsync(userIdentity.Id), Times.Once);
+        userAuthenticationService.Verify(x => x.RemoveAllSoftwareTwoFactorAuthenticationMethodsAsync(userIdentity.Id), Times.Once);
 
         var userIdentityAfter2FaReset = new UserIdentity(
             userIdentity.Id,
