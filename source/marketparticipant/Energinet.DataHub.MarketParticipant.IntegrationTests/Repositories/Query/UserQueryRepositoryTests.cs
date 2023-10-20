@@ -156,7 +156,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BillingAgent));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsView },
+            new[] { PermissionId.UsersManage },
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -168,7 +168,7 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(perms);
-        Assert.Equal(PermissionId.OrganizationsView, perms.First().Id);
+        Assert.Equal(PermissionId.OrganizationsManage, perms.First().Id);
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.IndependentAggregator));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsView },
+            new[] { PermissionId.UsersManage },
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -250,7 +250,7 @@ public sealed class UserQueryRepositoryTests
 
         var user = await _fixture.PrepareUserAsync();
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsView },
+            new[] { PermissionId.UsersManage },
             EicFunction.BillingAgent);
 
         await _fixture.AssignUserRoleAsync(user.Id, doNotReturnActor.Id, userRole.Id);
@@ -285,7 +285,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsView },
+            new[] { PermissionId.UsersManage },
             EicFunction.BillingAgent);
 
         var userRole2 = await _fixture.PrepareUserRoleAsync(
@@ -309,7 +309,7 @@ public sealed class UserQueryRepositoryTests
         Assert.NotEmpty(permsActor2);
         Assert.Single(permsActor);
         Assert.Single(permsActor2);
-        Assert.Equal(PermissionId.OrganizationsView, permsActor.First().Id);
+        Assert.Equal(PermissionId.OrganizationsManage, permsActor.First().Id);
         Assert.Equal(PermissionId.UsersView, permsActor2.First().Id);
     }
 
@@ -330,7 +330,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.GridAccessProvider));
 
         var userRole1 = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsManage, PermissionId.OrganizationsView },
+            new[] { PermissionId.OrganizationsManage, PermissionId.UsersManage },
             EicFunction.DataHubAdministrator);
 
         var userRole2 = await _fixture.PrepareUserRoleAsync(
@@ -349,7 +349,7 @@ public sealed class UserQueryRepositoryTests
         Assert.NotEmpty(permsActor);
         Assert.Equal(3, permsActor.Count);
         Assert.Contains(PermissionId.OrganizationsManage, permsActor.Select(p => p.Id));
-        Assert.Contains(PermissionId.OrganizationsView, permsActor.Select(p => p.Id));
+        Assert.Contains(PermissionId.UsersManage, permsActor.Select(p => p.Id));
         Assert.Contains(PermissionId.UsersView, permsActor.Select(p => p.Id));
     }
 
@@ -369,7 +369,7 @@ public sealed class UserQueryRepositoryTests
             TestPreparationEntities.ValidMarketRole.Patch(t => t.Function = EicFunction.BalanceResponsibleParty));
 
         var userRole = await _fixture.PrepareUserRoleAsync(
-            new[] { PermissionId.OrganizationsManage, PermissionId.OrganizationsView },
+            new[] { PermissionId.OrganizationsManage, PermissionId.UsersManage },
             EicFunction.BalanceResponsibleParty);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
@@ -381,7 +381,7 @@ public sealed class UserQueryRepositoryTests
 
         // Assert
         Assert.NotEmpty(perms);
-        Assert.Equal(PermissionId.OrganizationsView, perms.Single().Id);
+        Assert.Equal(PermissionId.UsersManage, perms.Single().Id);
     }
 
     [Theory]

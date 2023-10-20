@@ -98,7 +98,7 @@ public sealed class UserControllerIntegrationTests : WebApiIntegrationTestsBase
 
         var actor = await _fixture.PrepareActorAsync();
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsView);
+        var userRole = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var testToken = new JwtSecurityToken();

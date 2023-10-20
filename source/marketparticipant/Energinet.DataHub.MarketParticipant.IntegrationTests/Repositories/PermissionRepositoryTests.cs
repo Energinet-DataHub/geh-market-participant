@@ -72,10 +72,10 @@ public sealed class PermissionRepositoryTests
         var permissionRepository = new PermissionRepository(context);
 
         // Act
-        var actual = await permissionRepository.GetAsync(PermissionId.OrganizationsView);
+        var actual = await permissionRepository.GetAsync(PermissionId.OrganizationsManage);
 
         // Assert
-        var organizationViewPermission = KnownPermissions.All.Single(kp => kp.Id == PermissionId.OrganizationsView);
+        var organizationViewPermission = KnownPermissions.All.Single(kp => kp.Id == PermissionId.OrganizationsManage);
         Assert.Equal(organizationViewPermission.Id, actual.Id);
         Assert.Equal(organizationViewPermission.Claim, actual.Claim);
         Assert.Equal(organizationViewPermission.Created, actual.Created);

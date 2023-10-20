@@ -120,7 +120,7 @@ public sealed class TokenPartsControllerIntegrationTests :
     public async Task Token_Role_IsKnown()
     {
         // Arrange
-        var organizationView = PermissionId.OrganizationsView;
+        var organizationsManage = PermissionId.OrganizationsManage;
 
         var actor = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
@@ -128,7 +128,7 @@ public sealed class TokenPartsControllerIntegrationTests :
             TestPreparationEntities.ValidMarketRole);
 
         var user = await _fixture.PrepareUserAsync();
-        var userRole = await _fixture.PrepareUserRoleAsync(organizationView);
+        var userRole = await _fixture.PrepareUserRoleAsync(organizationsManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRole.Id);
 
         var externalToken = CreateExternalTestToken(user.ExternalId);
@@ -137,7 +137,7 @@ public sealed class TokenPartsControllerIntegrationTests :
         var internalToken = await FetchTokenAsync(externalToken, actor.Id);
 
         // Assert
-        var organizationViewClaim = KnownPermissions.All.Single(kp => kp.Id == organizationView).Claim;
+        var organizationViewClaim = KnownPermissions.All.Single(kp => kp.Id == organizationsManage).Claim;
         Assert.NotEmpty(internalToken.Claims.Where(c => c.Type == "role" && c.Value == organizationViewClaim));
     }
 
