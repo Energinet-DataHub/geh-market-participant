@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -42,6 +43,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
             var historicEntitiesContacts = await _context.ActorContacts
                 .ReadAllHistoryForAsync(entity => entity.ActorId == actor.Value && entity.Category == ContactCategory.Default)
+                .ConfigureAwait(false);
+
+            var currentContacts = await _context.ActorContacts
+                .Where(entity => entity.ActorId == actor.Value && entity.Category == ContactCategory.Default)
+                .ToDictionaryAsync(x => x.Id)
                 .ConfigureAwait(false);
 
             var auditedProperties = new[]

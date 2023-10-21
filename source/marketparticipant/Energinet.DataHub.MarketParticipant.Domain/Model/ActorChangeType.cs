@@ -20,7 +20,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         ContactName = 2,
         ContactEmail = 3,
         ContactPhone = 4,
-        Creation = 5,
-        Status = 6
+        ContactDeleted = 5,
+        Creation = 6,
+        Status = 7,
     }
 }
