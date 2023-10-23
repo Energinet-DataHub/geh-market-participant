@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListAllAsync()
+        public async Task<ActionResult<IEnumerable<OrganizationDto>>> ListAllAsync()
         {
             var getOrganizationsCommand = new GetOrganizationsCommand(null);
 
@@ -51,7 +52,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}")]
-        public async Task<IActionResult> GetSingleOrganizationAsync(Guid organizationId)
+        public async Task<ActionResult<OrganizationDto>> GetSingleOrganizationAsync(Guid organizationId)
         {
             var getSingleOrganizationCommand = new GetSingleOrganizationCommand(organizationId);
 
@@ -64,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
-        public async Task<IActionResult> CreateOrganizationAsync(CreateOrganizationDto organization)
+        public async Task<ActionResult<string>> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
@@ -80,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut("{organizationId:guid}")]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
-        public async Task<IActionResult> UpdateOrganizationAsync(
+        public async Task<ActionResult> UpdateOrganizationAsync(
             Guid organizationId,
             ChangeOrganizationDto organization)
         {
@@ -98,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{organizationId:guid}/actor")]
-        public async Task<IActionResult> GetActorsAsync(Guid organizationId)
+        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync(Guid organizationId)
         {
             var getActorsCommand = new GetActorsCommand(organizationId);
 
@@ -111,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{organizationId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
-        public async Task<IActionResult> GetAuditLogsAsync(Guid organizationId)
+        public async Task<ActionResult<IEnumerable<OrganizationAuditLogDto>>> GetAuditLogsAsync(Guid organizationId)
         {
             var command = new GetOrganizationAuditLogsCommand(organizationId);
 
