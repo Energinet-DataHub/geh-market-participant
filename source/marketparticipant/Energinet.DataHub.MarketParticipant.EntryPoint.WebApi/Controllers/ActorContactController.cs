@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Contact;
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{actorId:guid}/contact")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> ListAllAsync(Guid actorId)
+        public async Task<ActionResult<IEnumerable<ActorContactDto>>> ListAllAsync(Guid actorId)
         {
             var getOrganizationsCommand = new GetActorContactsCommand(actorId);
 
@@ -52,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost("{actorId:guid}/contact")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
+        public async Task<ActionResult<string>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
@@ -68,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
+        public async Task<ActionResult> DeleteContactAsync(Guid actorId, Guid contactId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();

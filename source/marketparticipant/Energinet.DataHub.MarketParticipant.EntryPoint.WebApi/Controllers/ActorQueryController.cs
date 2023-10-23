@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Query.Actor;
@@ -37,7 +38,7 @@ public sealed class ActorQueryController : ControllerBase
     }
 
     [HttpGet("selection-actors")]
-    public async Task<IActionResult> GetSelectionActorsAsync()
+    public async Task<ActionResult<IEnumerable<SelectionActorDto>>> GetSelectionActorsAsync()
     {
         var command = new GetSelectionActorsQueryCommand(_userContext.CurrentUser.UserId);
 
