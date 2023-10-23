@@ -49,7 +49,7 @@ public class UserController : ControllerBase
 
     [HttpGet("actors")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAssociatedUserActorsAsync(string externalToken)
+    public async Task<ActionResult<GetActorsAssociatedWithExternalUserIdResponse>> GetAssociatedUserActorsAsync(string externalToken)
     {
         if (string.IsNullOrWhiteSpace(externalToken))
             return BadRequest();
@@ -74,7 +74,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}")]
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
-    public async Task<IActionResult> GetAsync(Guid userId)
+    public async Task<ActionResult<GetUserResponse>> GetAsync(Guid userId)
     {
         if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
             return Unauthorized();
@@ -90,7 +90,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}/actors")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> GetUserActorsAsync(Guid userId)
+    public async Task<ActionResult<GetActorsAssociatedWithUserResponse>> GetUserActorsAsync(Guid userId)
     {
         var associatedActors = await _mediator
             .Send(new GetActorsAssociatedWithUserCommand(userId))
@@ -109,7 +109,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}/auditlogentry")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> GetAuditLogsAsync(Guid userId)
+    public async Task<ActionResult<GetUserAuditLogResponse>> GetAuditLogsAsync(Guid userId)
     {
         var command = new GetUserAuditLogsCommand(userId);
 
@@ -122,7 +122,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/useridentity")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> UpdateUserIdentityAsync(
+    public async Task<ActionResult> UpdateUserIdentityAsync(
         Guid userId,
         UserIdentityUpdateDto userIdentityUpdateDto)
     {
@@ -136,7 +136,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("initiate-mitid-signup")]
-    public async Task<IActionResult> InitiateMitIdSignupAsync()
+    public async Task<ActionResult> InitiateMitIdSignupAsync()
     {
         var command = new InitiateMitIdSignupCommand(_userContext.CurrentUser.UserId);
 
@@ -149,7 +149,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> DeactivateAsync(Guid userId)
+    public async Task<ActionResult> DeactivateAsync(Guid userId)
     {
         if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
             return Unauthorized();
@@ -165,7 +165,7 @@ public class UserController : ControllerBase
 
     [HttpPut("{userId:guid}/reset-2fa")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
+    public async Task<ActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
     {
         if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
             return Unauthorized();
