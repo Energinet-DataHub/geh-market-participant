@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using MediatR;
@@ -31,7 +32,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGridAreaOverviewAsync()
+        public async Task<ActionResult<IEnumerable<GridAreaOverviewItemDto>>> GetGridAreaOverviewAsync()
         {
             var command = new GetGridAreaOverviewCommand();
             var response = await _mediator.Send(command).ConfigureAwait(false);
