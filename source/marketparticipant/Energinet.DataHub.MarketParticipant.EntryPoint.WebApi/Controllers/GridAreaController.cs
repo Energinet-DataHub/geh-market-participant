@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -35,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.GridAreasManage)]
-        public async Task<IActionResult> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
+        public async Task<ActionResult<string>> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
         {
             var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
 
@@ -48,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut]
         [AuthorizeUser(PermissionId.GridAreasManage)]
-        public async Task<IActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
+        public async Task<ActionResult> UpdateGridAreaAsync(ChangeGridAreaDto gridAreaDto)
         {
             var updateGridAreaCommand = new UpdateGridAreaCommand(gridAreaDto.Id, gridAreaDto);
 
@@ -60,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetGridAreasAsync()
+        public async Task<ActionResult<IEnumerable<GridAreaDto>>> GetGridAreasAsync()
         {
             var command = new GetGridAreasCommand();
             var response = await _mediator.Send(command).ConfigureAwait(false);
@@ -68,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{gridAreaId:guid}")]
-        public async Task<IActionResult> GetGridAreaAsync(Guid gridAreaId)
+        public async Task<ActionResult<GridAreaDto>> GetGridAreaAsync(Guid gridAreaId)
         {
             var command = new GetGridAreaCommand(gridAreaId);
             var response = await _mediator.Send(command).ConfigureAwait(false);
@@ -77,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{gridAreaId:guid}/auditlogentry")]
         [AuthorizeUser(PermissionId.GridAreasManage)]
-        public async Task<IActionResult> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
+        public async Task<ActionResult<IEnumerable<GridAreaAuditLogEntryDto>>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
             var command = new GetGridAreaAuditLogEntriesCommand(gridAreaId);
             var response = await _mediator.Send(command).ConfigureAwait(false);
