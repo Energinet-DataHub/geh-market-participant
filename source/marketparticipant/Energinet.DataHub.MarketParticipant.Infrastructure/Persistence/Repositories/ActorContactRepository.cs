@@ -14,81 +14,95 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public sealed class ActorContactRepository : IActorContactRepository
 {
-    public sealed class ActorContactRepository : IActorContactRepository
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
+    private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+
+    public ActorContactRepository(
+        IMarketParticipantDbContext marketParticipantDbContext,
+        IAuditIdentityProvider auditIdentityProvider)
     {
-        private readonly IMarketParticipantDbContext _marketParticipantDbContext;
+        _marketParticipantDbContext = marketParticipantDbContext;
+        _auditIdentityProvider = auditIdentityProvider;
+    }
 
-        public ActorContactRepository(IMarketParticipantDbContext marketParticipantDbContext)
-        {
-            _marketParticipantDbContext = marketParticipantDbContext;
-        }
+    public async Task<ActorContact?> GetAsync(ContactId contactId)
+    {
+        ArgumentNullException.ThrowIfNull(contactId, nameof(contactId));
 
-        public async Task<ActorContact?> GetAsync(ContactId contactId)
-        {
-            ArgumentNullException.ThrowIfNull(contactId, nameof(contactId));
+        var contact = await _marketParticipantDbContext.ActorContacts
+            .FindAsync(contactId.Value)
+            .ConfigureAwait(false);
 
-            var contact = await _marketParticipantDbContext.ActorContacts
-                .FindAsync(contactId.Value)
-                .ConfigureAwait(false);
+        return contact is null ? null : ActorContactMapper.MapFromEntity(contact);
+    }
 
-            return contact is null ? null : ActorContactMapper.MapFromEntity(contact);
-        }
+    public async Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId)
+    {
+        ArgumentNullException.ThrowIfNull(actorId);
 
-        public async Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId)
-        {
-            ArgumentNullException.ThrowIfNull(actorId);
+        var query =
+            from contact in _marketParticipantDbContext.ActorContacts
+            where contact.ActorId == actorId.Value
+            select contact;
 
-            var query =
-                from contact in _marketParticipantDbContext.ActorContacts
-                where contact.ActorId == actorId.Value
-                select contact;
+        var entities = await query
+            .ToListAsync()
+            .ConfigureAwait(false);
 
-            var entities = await query
-                .ToListAsync()
-                .ConfigureAwait(false);
+        return entities.Select(ActorContactMapper.MapFromEntity);
+    }
 
-            return entities.Select(ActorContactMapper.MapFromEntity);
-        }
+    public async Task<ContactId> AddAsync(ActorContact contact)
+    {
+        ArgumentNullException.ThrowIfNull(contact, nameof(contact));
 
-        public async Task<ContactId> AddAsync(ActorContact contact)
-        {
-            ArgumentNullException.ThrowIfNull(contact, nameof(contact));
+        var destination = new ActorContactEntity();
+        ActorContactMapper.MapToEntity(contact, destination);
+        _marketParticipantDbContext.ActorContacts.Update(destination);
 
-            var destination = new ActorContactEntity();
-            ActorContactMapper.MapToEntity(contact, destination);
-            _marketParticipantDbContext.ActorContacts.Update(destination);
+        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+        return new ContactId(destination.Id);
+    }
 
-            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-            return new ContactId(destination.Id);
-        }
+    public async Task RemoveAsync(ActorContact contact)
+    {
+        ArgumentNullException.ThrowIfNull(contact, nameof(contact));
 
-        public async Task RemoveAsync(ActorContact contact)
-        {
-            ArgumentNullException.ThrowIfNull(contact, nameof(contact));
+        var entity = await _marketParticipantDbContext
+            .ActorContacts
+            .FindAsync(contact.Id.Value)
+            .ConfigureAwait(false);
 
-            var entity = await _marketParticipantDbContext
-                 .ActorContacts
-                 .FindAsync(contact.Id.Value)
-                 .ConfigureAwait(false);
+        if (entity == null)
+            return;
 
-            if (entity == null)
-                return;
+        await _marketParticipantDbContext
+            .ActorContacts
+            .Where(ac => ac.Id == entity.Id)
+            .ExecuteUpdateAsync(props => props.SetProperty(
+                ace =>
+                    entity.DeletedByIdentityId,
+                _auditIdentityProvider.IdentityId.Value))
+            .ConfigureAwait(false);
 
-            _marketParticipantDbContext.ActorContacts.Remove(entity);
+        _marketParticipantDbContext.ActorContacts.Remove(entity);
 
-            await _marketParticipantDbContext
-                .SaveChangesAsync()
-                .ConfigureAwait(false);
-        }
+        await _marketParticipantDbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
     }
 }

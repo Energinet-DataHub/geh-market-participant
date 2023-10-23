@@ -41,15 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 .ReadAllHistoryForAsync(entity => entity.Id == actor.Value)
                 .ConfigureAwait(false);
 
-            var historicEntitiesContacts = await _context.ActorContacts
-                .ReadAllHistoryForAsync(entity => entity.ActorId == actor.Value && entity.Category == ContactCategory.Default)
-                .ConfigureAwait(false);
-
-            var currentContacts = await _context.ActorContacts
-                .Where(entity => entity.ActorId == actor.Value && entity.Category == ContactCategory.Default)
-                .ToDictionaryAsync(x => x.Id)
-                .ConfigureAwait(false);
-
             var auditedProperties = new[]
             {
                 new
@@ -61,25 +52,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 {
                     Property = ActorChangeType.Status,
                     ReadValue = new Func<ActorEntity, object?>(entity => entity.Status)
-                },
-            };
-
-            var auditedPropertiesContacts = new[]
-            {
-                new
-                {
-                    Property = ActorChangeType.ContactName,
-                    ReadValue = new Func<ActorContactEntity, object?>(entity => entity.Name ?? string.Empty)
-                },
-                new
-                {
-                    Property = ActorChangeType.ContactEmail,
-                    ReadValue = new Func<ActorContactEntity, object?>(entity => entity.Email ?? string.Empty)
-                },
-                new
-                {
-                    Property = ActorChangeType.ContactPhone,
-                    ReadValue = new Func<ActorContactEntity, object?>(entity => entity.Phone ?? string.Empty)
                 },
             };
 
@@ -103,30 +75,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                             new AuditIdentity(current.Entity.ChangedByIdentityId),
                             auditedProperty.Property,
                             current.PeriodStart,
-                            currentValue?.ToString() ?? string.Empty));
-                    }
-                }
-            }
-
-            for (var i = 0; i < historicEntitiesContacts.Count; i++)
-            {
-                var isFirst = i == 0;
-                var current = historicEntitiesContacts[i];
-                var previous = isFirst ? current : historicEntitiesContacts[i - 1];
-
-                foreach (var auditedProperty in auditedPropertiesContacts)
-                {
-                    var currentValue = auditedProperty.ReadValue(current.Entity);
-                    var previousValue = auditedProperty.ReadValue(previous.Entity);
-
-                    if (!Equals(currentValue, previousValue) || isFirst)
-                    {
-                        auditEntries.Add(new ActorAuditLogEntry(
-                            actor,
-                            new AuditIdentity(current.Entity.ChangedByIdentityId),
-                            auditedProperty.Property,
-                            current.PeriodStart,
-                            currentValue?.ToString() ?? string.Empty));
+                            currentValue?.ToString() ?? string.Empty,
+                            previousValue?.ToString() ?? string.Empty));
                     }
                 }
             }
