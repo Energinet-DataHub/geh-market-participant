@@ -12,15 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
-
-public sealed record ActorAuditLogEntry(
-    ActorId ActorId,
-    AuditIdentity AuditIdentity,
-    ActorChangeType ActorChangeType,
-    DateTimeOffset Timestamp,
-    string CurrentValue,
-    string PreviousValue);
+namespace Energinet.DataHub.MarketParticipant.Domain.Model
+{
+    public enum ActorContactChangeType
+    {
+        Name = 1,
+        Email = 2,
+        Phone = 3,
+        Created = 4,
+        Deleted = 5
+    }
+}

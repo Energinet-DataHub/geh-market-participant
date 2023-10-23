@@ -28,4 +28,5 @@ public sealed class ActorContactEntity : IAuditedEntity
     public string? Phone { get; set; }
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
+    public Guid? DeletedByIdentityId { get; set; }
 }

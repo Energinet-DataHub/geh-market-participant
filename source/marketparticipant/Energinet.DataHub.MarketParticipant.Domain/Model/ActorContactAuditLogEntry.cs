@@ -17,10 +17,10 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed record ActorAuditLogEntry(
+public sealed record ActorContactAuditLogEntry(
     ActorId ActorId,
     AuditIdentity AuditIdentity,
-    ActorChangeType ActorChangeType,
+    ActorContactChangeType ActorChangeType,
+    ContactCategory? ContactCategory,
     DateTimeOffset Timestamp,
-    string CurrentValue,
-    string PreviousValue);
+    string CurrentValue);

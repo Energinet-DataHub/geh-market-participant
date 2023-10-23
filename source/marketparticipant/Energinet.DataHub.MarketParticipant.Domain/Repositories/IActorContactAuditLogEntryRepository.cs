@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed record ActorAuditLogEntry(
-    ActorId ActorId,
-    AuditIdentity AuditIdentity,
-    ActorChangeType ActorChangeType,
-    DateTimeOffset Timestamp,
-    string CurrentValue,
-    string PreviousValue);
+/// <summary>
+/// Repository for querying actor contact audit logs
+/// </summary>
+public interface IActorContactAuditLogEntryRepository
+{
+    /// <summary>
+    /// Retrieves all log entries for a given actor.
+    /// </summary>
+    /// <param name="actor">The actor to get the contact logs for.</param>
+    Task<IEnumerable<ActorContactAuditLogEntry>> GetAsync(ActorId actor);
+}
