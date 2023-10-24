@@ -20,9 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
 {
@@ -35,10 +33,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             _context = context;
         }
 
-        public async Task<IEnumerable<ActorContactAuditLogEntry>> GetAsync(ActorId actor)
+        public async Task<IEnumerable<ActorContactAuditLogEntry>> GetAsync(ActorId actorId)
         {
             var historicEntities = await _context.ActorContacts
-                .ReadAllHistoryForAsync(entity => entity.ActorId == actor.Value && entity.Category == ContactCategory.Default)
+                .ReadAllHistoryForAsync(entity => entity.ActorId == actorId.Value)
                 .ConfigureAwait(false);
 
             var auditedProperties = new[]
@@ -70,16 +68,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 var previous = isFirst ? current : FindPreviousForCategory(current.Entity, i, historicEntities) ?? current;
                 var next = FindNextForCategory(current.Entity, i, historicEntities);
 
+                // If this is the first time we see this category, we need to add the created entries
                 if (!categoriesSeen.Contains(current.Entity.Category))
                 {
                     categoriesSeen.Add(current.Entity.Category);
-                    AddCreatedEntries(actor, auditEntries, current);
+                    AddCreatedEntries(actorId, auditEntries, current);
                 }
 
+                // Check if the current entity is deleted, this can be done by verifying that we have no more entries for this category, and then add a deleted entry
                 if (current.Entity.DeletedByIdentityId != null && next == null)
                 {
                     auditEntries.Add(new ActorContactAuditLogEntry(
-                        actor,
+                        actorId,
                         new AuditIdentity(current.Entity.ChangedByIdentityId),
                         ActorContactChangeType.Deleted,
                         current.Entity.Category,
@@ -94,10 +94,10 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                         var currentValue = auditedProperty.ReadValue(current.Entity);
                         var previousValue = auditedProperty.ReadValue(previous.Entity);
 
-                        if (!Equals(currentValue, previousValue) || isFirst)
+                        if (!Equals(currentValue, previousValue))
                         {
                             auditEntries.Add(new ActorContactAuditLogEntry(
-                                actor,
+                                actorId,
                                 new AuditIdentity(current.Entity.ChangedByIdentityId),
                                 auditedProperty.Property,
                                 current.Entity.Category,
@@ -113,12 +113,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
         }
 
         private static void AddCreatedEntries(
-            ActorId actor,
+            ActorId actorId,
             ICollection<ActorContactAuditLogEntry> auditEntries,
             (ActorContactEntity Entity, DateTimeOffset PeriodStart) current)
         {
             auditEntries.Add(new ActorContactAuditLogEntry(
-                actor,
+                actorId,
                 new AuditIdentity(current.Entity.ChangedByIdentityId),
                 ActorContactChangeType.Created,
                 current.Entity.Category,
@@ -126,7 +126,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 string.Empty,
                 string.Empty));
             auditEntries.Add(new ActorContactAuditLogEntry(
-                actor,
+                actorId,
                 new AuditIdentity(current.Entity.ChangedByIdentityId),
                 ActorContactChangeType.Name,
                 current.Entity.Category,
@@ -134,7 +134,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 current.Entity.Name,
                 string.Empty));
             auditEntries.Add(new ActorContactAuditLogEntry(
-                actor,
+                actorId,
                 new AuditIdentity(current.Entity.ChangedByIdentityId),
                 ActorContactChangeType.Email,
                 current.Entity.Category,
@@ -142,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 current.Entity.Email,
                 string.Empty));
             auditEntries.Add(new ActorContactAuditLogEntry(
-                actor,
+                actorId,
                 new AuditIdentity(current.Entity.ChangedByIdentityId),
                 ActorContactChangeType.Phone,
                 current.Entity.Category,
