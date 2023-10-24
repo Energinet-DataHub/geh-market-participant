@@ -16,4 +16,4 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-public sealed record AssignedActorDto(ActorDisplayNameDto ActorDisplayName, IEnumerable<string> UserRoleNames);
+public sealed record AssignedActorDto(ActorDisplayNameDto Actor, IEnumerable<string> UserRoleNames);
