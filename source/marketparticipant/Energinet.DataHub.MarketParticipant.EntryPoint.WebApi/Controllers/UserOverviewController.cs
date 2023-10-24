@@ -41,7 +41,7 @@ public sealed class UserOverviewController : ControllerBase
 
     [HttpPost("users/search")]
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
-    public async Task<IActionResult> SearchUsersAsync(
+    public async Task<ActionResult<GetUserOverviewResponse>> SearchUsersAsync(
         int pageNumber,
         int pageSize,
         UserOverviewSortProperty sortProperty,

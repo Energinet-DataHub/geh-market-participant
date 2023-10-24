@@ -32,7 +32,7 @@ public sealed class AuditIdentityController : ControllerBase
     }
 
     [HttpGet("{auditIdentityId:guid}")]
-    public async Task<IActionResult> GetAsync(Guid auditIdentityId)
+    public async Task<ActionResult<GetAuditIdentityResponse>> GetAsync(Guid auditIdentityId)
     {
         // NOTE: There is no permission attribute, as command itself filters results.
         var response = await _mediator

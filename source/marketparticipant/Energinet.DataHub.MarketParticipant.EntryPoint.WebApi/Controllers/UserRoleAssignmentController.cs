@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
@@ -40,7 +42,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
 
     [HttpGet("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> GetAsync(Guid actorId, Guid userId)
+    public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAsync(Guid actorId, Guid userId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
             return Unauthorized();
@@ -56,7 +58,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
 
     [HttpGet("actors/{actorId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> GetAssignableAsync(Guid actorId)
+    public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAssignableAsync(Guid actorId)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
             return Unauthorized();
@@ -72,7 +74,7 @@ public sealed class UserRoleAssignmentController : ControllerBase
 
     [HttpPut("actors/{actorId:guid}/users/{userId:guid}/roles")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> UpdateUserRoleAssignmentsAsync(
+    public async Task<ActionResult> UpdateUserRoleAssignmentsAsync(
         Guid actorId,
         Guid userId,
         UpdateUserRoleAssignmentsDto assignments)

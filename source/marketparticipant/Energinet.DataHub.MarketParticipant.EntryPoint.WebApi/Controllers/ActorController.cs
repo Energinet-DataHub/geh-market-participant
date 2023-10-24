@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -38,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetActorsAsync()
+        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync()
         {
             var getAllActorsCommand = new GetAllActorsCommand();
 
@@ -50,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{actorId:guid}")]
-        public async Task<IActionResult> GetSingleActorAsync(Guid actorId)
+        public async Task<ActionResult<ActorDto>> GetSingleActorAsync(Guid actorId)
         {
             var getSingleActorCommand = new GetSingleActorCommand(actorId);
 
@@ -63,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
+        public async Task<ActionResult<string>> CreateActorAsync(CreateActorDto actorDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
@@ -79,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut("{actorId:guid}")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
+        public async Task<ActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
