@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
 
-public sealed record ActorDto(string ActorNumber, string Name, string OrganizationName);
+public sealed record ActorDisplayNameDto(string ActorNumber, string Name, string OrganizationName);
