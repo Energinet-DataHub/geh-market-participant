@@ -12,7 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
+
+public sealed class ResetUserTwoFactorAuthenticationRuleSet : AbstractValidator<ResetUserTwoFactorAuthenticationCommand>
 {
-    public sealed record UserOverviewItemActorDto(string ActorNumber, string Name, string OrganizationName);
+    public ResetUserTwoFactorAuthenticationRuleSet()
+    {
+        RuleFor(command => command.UserId)
+            .NotEmpty();
+    }
 }

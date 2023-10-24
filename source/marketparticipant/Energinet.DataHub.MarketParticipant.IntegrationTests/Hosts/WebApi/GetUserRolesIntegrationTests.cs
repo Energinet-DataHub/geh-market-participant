@@ -68,7 +68,7 @@ public sealed class GetUserRolesIntegrationTests
 
         var user = await _fixture.PrepareUserAsync();
         var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsView);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleA.Id);
         await _fixture.AssignUserRoleAsync(user.Id, actor.Id, userRoleB.Id);
 
@@ -94,7 +94,7 @@ public sealed class GetUserRolesIntegrationTests
 
         var user = await _fixture.PrepareUserAsync();
         var userRoleA = await _fixture.PrepareUserRoleAsync(PermissionId.UsersManage);
-        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsView);
+        var userRoleB = await _fixture.PrepareUserRoleAsync(PermissionId.OrganizationsManage);
         var userRoleC = await _fixture.PrepareUserRoleAsync(PermissionId.GridAreasManage);
 
         await _fixture.AssignUserRoleAsync(user.Id, actor1.Id, userRoleA.Id);

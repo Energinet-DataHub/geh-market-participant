@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record AssignedActorDto(ActorDto Actor, IEnumerable<string> UserRoleNames);
+public sealed class CheckEmailExistsCommandRuleSet : AbstractValidator<CheckEmailExistsCommand>
+{
+    public CheckEmailExistsCommandRuleSet()
+    {
+        RuleFor(command => command.EmailAddress)
+            .EmailAddress();
+    }
+}

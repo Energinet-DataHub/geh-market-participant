@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record AssignedActorDto(UserOverviewItemActorDto Actor, IEnumerable<string> UserRoleNames);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+
+public sealed record ResetUserTwoFactorAuthenticationCommand(Guid UserId) : IRequest;

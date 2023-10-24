@@ -52,6 +52,6 @@ public sealed class GetAllActorsIntegrationTests
 
         // Assert
         Assert.NotEmpty(response.Actors);
-        Assert.Contains(response.Actors, a => a.ActorId == actor.Id.ToString());
+        Assert.Contains(response.Actors, a => a.ActorId == actor.Id);
     }
 }

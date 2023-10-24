@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
@@ -39,7 +40,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{permissionId:int}")]
-        public async Task<IActionResult> GetPermissionAsync(int permissionId)
+        public async Task<ActionResult<PermissionDto>> GetPermissionAsync(int permissionId)
         {
             var getPermissionCommand = new GetPermissionCommand(permissionId);
             var response = await _mediator
@@ -49,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListAllAsync()
+        public async Task<ActionResult<IEnumerable<PermissionDto>>> ListAllAsync()
         {
             var getPermissionsCommand = new GetPermissionsCommand();
             var response = await _mediator
@@ -60,7 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut]
         [AuthorizeUser(PermissionId.UserRolesManage)]
-        public async Task<IActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
+        public async Task<ActionResult> UpdateAsync(UpdatePermissionDto updatePermissionDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
@@ -76,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{permissionId:int}/auditlogs")]
         [AuthorizeUser(PermissionId.UserRolesManage)]
-        public async Task<IActionResult> GetAuditLogsAsync(int permissionId)
+        public async Task<ActionResult<IEnumerable<PermissionAuditLogDto>>> GetAuditLogsAsync(int permissionId)
         {
             var command = new GetPermissionAuditLogsCommand(permissionId);
 

@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Query.User;
+using MediatR;
 
-public sealed record ActorDto(string ActorNumber, string Name, string OrganizationName);
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
+{
+    public sealed record CheckEmailExistsCommand(string EmailAddress) : IRequest<bool>;
+}

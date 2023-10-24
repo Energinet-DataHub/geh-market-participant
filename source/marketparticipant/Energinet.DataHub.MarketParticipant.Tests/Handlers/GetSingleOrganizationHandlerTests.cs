@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             Assert.NotNull(response.Organization);
 
             var actualOrganization = response.Organization;
-            Assert.Equal(organization.Id.ToString(), actualOrganization.OrganizationId);
+            Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
         }
     }
 }

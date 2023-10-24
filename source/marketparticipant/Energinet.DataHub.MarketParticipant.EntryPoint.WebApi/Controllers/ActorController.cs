@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -38,19 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetActorsAsync()
+        public async Task<ActionResult<IEnumerable<ActorDto>>> GetActorsAsync()
         {
-            if (!_userContext.CurrentUser.IsFas)
-            {
-                var getSingleActorCommand = new GetSingleActorCommand(_userContext.CurrentUser.ActorId);
-
-                var singleResponse = await _mediator
-                    .Send(getSingleActorCommand)
-                    .ConfigureAwait(false);
-
-                return Ok(new[] { singleResponse.Actor });
-            }
-
             var getAllActorsCommand = new GetAllActorsCommand();
 
             var response = await _mediator
@@ -61,11 +51,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpGet("{actorId:guid}")]
-        public async Task<IActionResult> GetSingleActorAsync(Guid actorId)
+        public async Task<ActionResult<ActorDto>> GetSingleActorAsync(Guid actorId)
         {
-            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
-                return Unauthorized();
-
             var getSingleActorCommand = new GetSingleActorCommand(actorId);
 
             var response = await _mediator
@@ -77,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> CreateActorAsync(CreateActorDto actorDto)
+        public async Task<ActionResult<string>> CreateActorAsync(CreateActorDto actorDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
@@ -93,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPut("{actorId:guid}")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
+        public async Task<ActionResult> UpdateActorAsync(Guid actorId, ChangeActorDto changeActor)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
