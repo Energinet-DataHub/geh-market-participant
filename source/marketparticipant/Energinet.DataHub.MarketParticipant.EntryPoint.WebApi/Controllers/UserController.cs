@@ -179,6 +179,19 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("{mailAddress}/known")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<ActionResult> IsMailKnownInOrganizationAsync(string mailAddress)
+    {
+        var command = new IsMailKnownInOrganizationCommand(mailAddress);
+
+        var result = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(result);
+    }
+
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
