@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Client.Models
 {
@@ -24,6 +23,5 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
             string LastName,
             string Email,
             string? PhoneNumber,
-            DateTimeOffset CreatedDate,
-            IEnumerable<AssignedActorDto> AssignedActors);
+            DateTimeOffset CreatedDate);
 }
