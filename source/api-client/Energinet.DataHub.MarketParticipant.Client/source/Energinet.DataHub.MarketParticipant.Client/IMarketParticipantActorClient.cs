@@ -50,5 +50,10 @@ namespace Energinet.DataHub.MarketParticipant.Client
         /// <param name="actorId">The id of the actor to update.</param>
         /// <param name="changeActorDto">The data to update.</param>
         Task UpdateActorAsync(Guid actorId, ChangeActorDto changeActorDto);
+
+        /// <summary>
+        /// Gets audit logs for the specified Actor.
+        /// </summary>
+        Task<ActorAuditLogsDto> GetActorAuditLogsAsync(Guid actorId);
     }
 }
