@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
@@ -43,7 +44,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> GetAsync()
+    public async Task<ActionResult<IEnumerable<UserRoleDto>>> GetAsync()
     {
         var command = new GetAllUserRolesCommand();
 
@@ -56,7 +57,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("{userRoleId:guid}")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> GetAsync(Guid userRoleId)
+    public async Task<ActionResult<UserRoleWithPermissionsDto>> GetAsync(Guid userRoleId)
     {
         var command = new GetUserRoleCommand(userRoleId);
 
@@ -69,7 +70,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPost]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<IActionResult> CreateAsync(CreateUserRoleDto userRole)
+    public async Task<ActionResult<string>> CreateAsync(CreateUserRoleDto userRole)
     {
         var command = new CreateUserRoleCommand(userRole);
 
@@ -82,7 +83,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("{userRoleId:guid}")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<IActionResult> UpdateAsync(Guid userRoleId, UpdateUserRoleDto userRole)
+    public async Task<ActionResult> UpdateAsync(Guid userRoleId, UpdateUserRoleDto userRole)
     {
         if (!_userContext.CurrentUser.IsFas)
             return Unauthorized();
@@ -96,7 +97,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("{userRoleId:guid}/auditlogentry")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<IActionResult> GetUserRoleAuditLogsAsync(Guid userRoleId)
+    public async Task<ActionResult<IEnumerable<UserRoleAuditLogEntryDto>>> GetUserRoleAuditLogsAsync(Guid userRoleId)
     {
         var command = new GetUserRoleAuditLogsCommand(userRoleId);
 
@@ -109,7 +110,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("permissions")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<IActionResult> GetPermissionDetailsAsync(EicFunction eicFunction)
+    public async Task<ActionResult<IEnumerable<PermissionDetailsDto>>> GetPermissionDetailsAsync(EicFunction eicFunction)
     {
         var command = new GetPermissionDetailsCommand(eicFunction);
 
@@ -122,7 +123,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpGet("assignedtopermission")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<IActionResult> AssignedToPermissionAsync(int permissionId)
+    public async Task<ActionResult<IEnumerable<UserRoleDto>>> AssignedToPermissionAsync(int permissionId)
     {
         var command = new GetUserRolesToPermissionCommand(permissionId);
 
@@ -135,7 +136,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPut("{userRoleId:guid}/deactivate")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<IActionResult> DeactivateUserRoleAsync(Guid userRoleId)
+    public async Task<ActionResult> DeactivateUserRoleAsync(Guid userRoleId)
     {
         var command = new DeactivateUserRoleCommand(userRoleId, _userContext.CurrentUser.UserId);
 
