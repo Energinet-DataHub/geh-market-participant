@@ -70,6 +70,25 @@ public sealed class CheckEmailExistsHandlerTests
     }
 
     [Fact]
+    public async Task Called_WithEmailBelongingToUserInCallerOtherOrganizationButIsFas_ReturnsTrue()
+    {
+        // arrange
+        const string usersMailAddress = "johndoe@example.com";
+
+        var target = SetupTarget(
+            callersOrganization: Guid.NewGuid(),
+            usersMailAddress: usersMailAddress,
+            usersOrganization: Guid.NewGuid(),
+            isFas: true);
+
+        // act
+        var actual = await target.Handle(new CheckEmailExistsCommand(usersMailAddress), default);
+
+        // assert
+        Assert.True(actual);
+    }
+
+    [Fact]
     public async Task Called_WithUnknownEmail_ReturnsFalse()
     {
         // arrange
@@ -87,9 +106,9 @@ public sealed class CheckEmailExistsHandlerTests
         Assert.False(actual);
     }
 
-    private static CheckEmailExistsHandler SetupTarget(Guid callersOrganization, string usersMailAddress, Guid usersOrganization)
+    private static CheckEmailExistsHandler SetupTarget(Guid callersOrganization, string usersMailAddress, Guid usersOrganization, bool isFas = false)
     {
-        var frontendUser = new FrontendUser(Guid.NewGuid(), callersOrganization, Guid.NewGuid(), false);
+        var frontendUser = new FrontendUser(Guid.NewGuid(), callersOrganization, Guid.NewGuid(), isFas);
 
         var userContextMock = new Mock<IUserContext<FrontendUser>>();
         userContextMock.Setup(x => x.CurrentUser).Returns(frontendUser);
