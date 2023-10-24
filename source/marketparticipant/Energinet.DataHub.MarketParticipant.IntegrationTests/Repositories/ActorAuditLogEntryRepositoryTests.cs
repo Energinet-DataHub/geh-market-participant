@@ -86,8 +86,8 @@ public sealed class ActorAuditLogEntryRepositoryTests
         Assert.NotEmpty(actorAuditLogs); // +1 as it should contain all the original values as well as the changed one.
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Name);
-        Assert.Contains(actorAuditLogs, o => o.Value == "Test Name 2");
-        Assert.Contains(actorAuditLogs, o => o.Value == orgValue);
+        Assert.Contains(actorAuditLogs, o => o.CurrentValue == "Test Name 2");
+        Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue);
         Assert.Contains(actorAuditLogs, o => o.ActorId == actorId);
     }
 
@@ -124,50 +124,8 @@ public sealed class ActorAuditLogEntryRepositoryTests
         Assert.NotEmpty(actorAuditLogs); // +1 as it should contain all the original values as well as the changed one.
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Status);
-        Assert.Contains(actorAuditLogs, o => o.Value == ActorStatus.Active.ToString());
-        Assert.Contains(actorAuditLogs, o => o.Value == orgValue.ToString());
+        Assert.Contains(actorAuditLogs, o => o.CurrentValue == ActorStatus.Active.ToString());
+        Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue.ToString());
         Assert.Contains(actorAuditLogs, o => o.ActorId == actorId);
-    }
-
-    [Fact]
-    public async Task GetAsync_ContactEmailChanged_WithAuditLogs_CanBeReadBack()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-
-        var user = await _fixture.PrepareUserAsync();
-        host.ServiceCollection.MockFrontendUser(user.Id);
-
-        var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
-
-        await using var scope = host.BeginScope();
-        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorContactRepository = scope.ServiceProvider.GetRequiredService<IActorContactRepository>();
-
-        await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var actorAuditLogEntryRepository = new ActorAuditLogEntryRepository(context);
-
-        // Make an audited change.
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        var actorContact = new ActorContact(actorId, "OrgName", ContactCategory.Default, new MockedEmailAddress(), new PhoneNumber("1234567"));
-        var actorContactChanged = new ActorContact(actorId, "new Contact", ContactCategory.Default, new MockedEmailAddress(), new PhoneNumber("1234567"));
-        var contactId = await actorContactRepository.AddAsync(actorContact);
-        actorContact = await actorContactRepository.GetAsync(contactId);
-        await actorContactRepository.RemoveAsync(actorContact);
-        await actorContactRepository.AddAsync(actorContactChanged);
-
-        // Act
-        var actual = await actorAuditLogEntryRepository
-            .GetAsync(actorId);
-
-        // Assert
-        var actorAuditLogs = actual.ToList();
-        Assert.NotEmpty(actorAuditLogs); // +1 as it should contain all the original values as well as the changed one.
-        Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
-        Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.ContactEmail);
-        Assert.Contains(actorAuditLogs, o => o.Value == actorContact.Email.ToString());
-        Assert.Contains(actorAuditLogs, o => o.Value == actorContactChanged.Email.ToString());
-        Assert.All(actorAuditLogs, o => Assert.Equal(actorId, o.ActorId));
     }
 }

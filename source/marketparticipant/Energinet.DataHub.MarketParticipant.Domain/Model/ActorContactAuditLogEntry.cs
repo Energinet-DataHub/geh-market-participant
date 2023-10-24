@@ -20,7 +20,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 public sealed record ActorContactAuditLogEntry(
     ActorId ActorId,
     AuditIdentity AuditIdentity,
-    ActorContactChangeType ActorChangeType,
+    ActorContactChangeType ActorContactChangeType,
     ContactCategory? ContactCategory,
     DateTimeOffset Timestamp,
-    string CurrentValue);
+    string CurrentValue,
+    string PreviousValue);

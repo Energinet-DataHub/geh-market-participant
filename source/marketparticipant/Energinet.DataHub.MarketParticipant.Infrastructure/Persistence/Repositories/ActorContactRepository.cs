@@ -95,7 +95,7 @@ public sealed class ActorContactRepository : IActorContactRepository
             .Where(ac => ac.Id == entity.Id)
             .ExecuteUpdateAsync(props => props.SetProperty(
                 ace =>
-                    entity.DeletedByIdentityId,
+                    ace.DeletedByIdentityId,
                 _auditIdentityProvider.IdentityId.Value))
             .ConfigureAwait(false);
 
