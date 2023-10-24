@@ -101,7 +101,7 @@ public class TokenController : ControllerBase
     [HttpPost]
     [AllowAnonymous]
     [Route("token")]
-    public async Task<IActionResult> GetTokenAsync(TokenRequest? tokenRequest)
+    public async Task<ActionResult<TokenResponse>> GetTokenAsync(TokenRequest? tokenRequest)
     {
         if (tokenRequest == null || string.IsNullOrWhiteSpace(tokenRequest.ExternalToken))
             return BadRequest();
