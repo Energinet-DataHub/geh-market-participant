@@ -24,14 +24,14 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class IsMailKnownInOrganizationHandler : IRequestHandler<IsMailKnownInOrganizationCommand, bool>
+public sealed class CheckEmailExistsHandler : IRequestHandler<CheckEmailExistsCommand, bool>
 {
     private readonly IUserContext<FrontendUser> _userContext;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserRepository _userRepository;
     private readonly IActorRepository _actorRepository;
 
-    public IsMailKnownInOrganizationHandler(
+    public CheckEmailExistsHandler(
         IUserContext<FrontendUser> userContext,
         IUserIdentityRepository userIdentityRepository,
         IUserRepository userRepository,
@@ -43,12 +43,12 @@ public sealed class IsMailKnownInOrganizationHandler : IRequestHandler<IsMailKno
         _actorRepository = actorRepository;
     }
 
-    public async Task<bool> Handle(IsMailKnownInOrganizationCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(CheckEmailExistsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
         var userIdentity = await _userIdentityRepository
-            .GetAsync(new EmailAddress(request.MailAddress))
+            .GetAsync(new EmailAddress(request.EmailAddress))
             .ConfigureAwait(false);
 
         if (userIdentity == null) return false;
@@ -58,6 +58,8 @@ public sealed class IsMailKnownInOrganizationHandler : IRequestHandler<IsMailKno
             .ConfigureAwait(false);
 
         if (user == null) return false;
+
+        if (_userContext.CurrentUser.IsFas) return true;
 
         var actor = await _actorRepository
             .GetAsync(user.AdministratedBy)

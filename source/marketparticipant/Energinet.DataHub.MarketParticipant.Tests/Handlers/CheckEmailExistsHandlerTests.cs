@@ -30,7 +30,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 
 [UnitTest]
-public sealed class IsMailKnownInOrganizationHandlerTests
+public sealed class CheckEmailExistsHandlerTests
 {
     [Fact]
     public async Task Called_WithEmailBelongingToUserInCallersOrganization_ReturnsTrue()
@@ -45,7 +45,7 @@ public sealed class IsMailKnownInOrganizationHandlerTests
             usersOrganization: organizationId);
 
         // act
-        var actual = await target.Handle(new IsMailKnownInOrganizationCommand(usersMailAddress), default);
+        var actual = await target.Handle(new CheckEmailExistsCommand(usersMailAddress), default);
 
         // assert
         Assert.True(actual);
@@ -63,7 +63,7 @@ public sealed class IsMailKnownInOrganizationHandlerTests
             usersOrganization: Guid.NewGuid());
 
         // act
-        var actual = await target.Handle(new IsMailKnownInOrganizationCommand(usersMailAddress), default);
+        var actual = await target.Handle(new CheckEmailExistsCommand(usersMailAddress), default);
 
         // assert
         Assert.False(actual);
@@ -81,13 +81,13 @@ public sealed class IsMailKnownInOrganizationHandlerTests
             usersOrganization: organizationId);
 
         // act
-        var actual = await target.Handle(new IsMailKnownInOrganizationCommand("janedoe@example.com"), default);
+        var actual = await target.Handle(new CheckEmailExistsCommand("janedoe@example.com"), default);
 
         // assert
         Assert.False(actual);
     }
 
-    private static IsMailKnownInOrganizationHandler SetupTarget(Guid callersOrganization, string usersMailAddress, Guid usersOrganization)
+    private static CheckEmailExistsHandler SetupTarget(Guid callersOrganization, string usersMailAddress, Guid usersOrganization)
     {
         var frontendUser = new FrontendUser(Guid.NewGuid(), callersOrganization, Guid.NewGuid(), false);
 
@@ -136,7 +136,7 @@ public sealed class IsMailKnownInOrganizationHandlerTests
         actorRepositoryMock.Setup(x => x.GetAsync(actor.Id))
             .ReturnsAsync(actor);
 
-        return new IsMailKnownInOrganizationHandler(
+        return new CheckEmailExistsHandler(
             userContextMock.Object,
             userIdentityRepositoryMock.Object,
             userRepositoryMock.Object,

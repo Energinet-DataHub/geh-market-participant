@@ -12,16 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using FluentValidation;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
-
-public sealed class IsMailKnownInOrganizationCommandRuleSet : AbstractValidator<IsMailKnownInOrganizationCommand>
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.User
 {
-    public IsMailKnownInOrganizationCommandRuleSet()
-    {
-        RuleFor(command => command.MailAddress)
-            .NotEmpty();
-    }
+    public sealed record CheckEmailExistsCommand(string EmailAddress) : IRequest<bool>;
 }

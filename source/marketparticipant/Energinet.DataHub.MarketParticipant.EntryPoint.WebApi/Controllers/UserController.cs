@@ -179,11 +179,11 @@ public class UserController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("{mailAddress}/known")]
+    [HttpGet("{emailAddress}/exists")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<ActionResult> IsMailKnownInOrganizationAsync(string mailAddress)
+    public async Task<ActionResult<bool>> CheckEmailExistsAsync(string emailAddress)
     {
-        var command = new IsMailKnownInOrganizationCommand(mailAddress);
+        var command = new CheckEmailExistsCommand(emailAddress);
 
         var result = await _mediator
             .Send(command)
