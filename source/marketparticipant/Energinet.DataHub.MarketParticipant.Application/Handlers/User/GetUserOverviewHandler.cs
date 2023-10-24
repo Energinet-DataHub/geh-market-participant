@@ -134,7 +134,7 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 }
 
                 assignedUserRoles.Add(new AssignedActorDto(
-                    new ActorDto(
+                    new ActorDisplayNameDto(
                         actor.ActorNumber.Value,
                         actor.Name.Value,
                         organization!.Name),
