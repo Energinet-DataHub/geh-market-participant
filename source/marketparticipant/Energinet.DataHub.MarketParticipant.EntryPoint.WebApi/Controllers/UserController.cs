@@ -179,6 +179,19 @@ public class UserController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("{emailAddress}/exists")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<ActionResult<bool>> CheckEmailExistsAsync(string emailAddress)
+    {
+        var command = new CheckEmailExistsCommand(emailAddress);
+
+        var result = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(result);
+    }
+
     private static Guid GetExternalUserId(IEnumerable<Claim> claims)
     {
         var userIdClaim = claims.Single(claim => claim.Type == JwtRegisteredClaimNames.Sub);
