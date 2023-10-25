@@ -231,20 +231,19 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             }
         }
 
-        [Fact]
-        public async Task Validate_MeteringPointTypes_ValidatesProperty()
+        [Theory]
+        [InlineData("GridAccessProvider", false)]
+        [InlineData("EnergySupplier", true)]
+        public async Task Validate_NoGridAreasOnGridAccessProvider_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
-
-            var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), null!) };
-            var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
+            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(ActorMarketRoleDto.GridAreas)}";
 
             var organizationRoleDto = new CreateActorDto(
                 Guid.Parse(ValidId),
                 new ActorNameDto("fake_name"),
                 new ActorNumberDto(ValidGln),
-                marketRole);
+                new[] { new ActorMarketRoleDto(value, Array.Empty<ActorGridAreaDto>(), string.Empty) });
 
             var target = new CreateActorCommandRuleSet();
             var command = new CreateActorCommand(organizationRoleDto);
@@ -253,34 +252,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var result = await target.ValidateAsync(command);
 
             // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
-        }
-
-        [Fact]
-        public async Task Validate_NoMeteringPointTypes_ValidatesProperty()
-        {
-            // Arrange
-            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
-
-            var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), Array.Empty<string>()) };
-            var marketRole = new List<ActorMarketRoleDto> { new(nameof(EicFunction.BillingAgent), validGridAreas, string.Empty) };
-
-            var organizationRoleDto = new CreateActorDto(
-                Guid.Parse(ValidId),
-                new ActorNameDto("fake_name"),
-                new ActorNumberDto(ValidGln),
-                marketRole);
-
-            var target = new CreateActorCommandRuleSet();
-            var command = new CreateActorCommand(organizationRoleDto);
-
-            // Act
-            var result = await target.ValidateAsync(command);
-
-            // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
         }
 
         [Fact]
