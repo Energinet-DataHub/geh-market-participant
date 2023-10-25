@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -135,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var actor = await _fixture.PrepareActorAsync();
-            var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
+            var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
             var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
 
             var testContact = new ActorContact(
