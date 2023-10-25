@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed record UpdatePermissionCommand(int PermissionId, string Description) : IRequest;
+public sealed class GetActorAuditLogEntriesCommandRuleSet : AbstractValidator<GetActorAuditLogsCommand>
+{
+    public GetActorAuditLogEntriesCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+    }
+}
