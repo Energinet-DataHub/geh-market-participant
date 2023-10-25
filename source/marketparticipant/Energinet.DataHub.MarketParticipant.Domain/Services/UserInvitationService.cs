@@ -57,13 +57,14 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
-        await _organizationDomainValidationService
-            .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
-            .ConfigureAwait(false);
-
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
+
         if (invitedUser == null)
         {
+            await _organizationDomainValidationService
+                .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
+                .ConfigureAwait(false);
+
             var sharedId = new SharedUserReferenceId();
 
             var userIdentity = new UserIdentity(
