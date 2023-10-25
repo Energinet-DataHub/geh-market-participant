@@ -58,7 +58,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .ChildRules(gridAreaValidator =>
                             gridAreaValidator
                                 .RuleFor(x => x.GridAreas)
-                                .NotEmpty());
+                                .NotEmpty()
+                                .When(marketRole => Enum.TryParse<EicFunction>(marketRole.EicFunction, out var function) && function == EicFunction.GridAccessProvider));
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
@@ -87,7 +88,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 {
                                     validationRules
                                         .RuleFor(r => r.MeteringPointTypes)
-                                        .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
                                                 .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
