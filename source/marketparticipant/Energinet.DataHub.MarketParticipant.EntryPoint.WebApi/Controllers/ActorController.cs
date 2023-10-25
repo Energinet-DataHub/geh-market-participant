@@ -94,7 +94,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet("{actorId:guid}/actorauditlogs")]
+        [HttpGet("{actorId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<ActionResult<GetActorAuditLogsResponse>> GetActorAuditLogsAsync(Guid actorId)
         {

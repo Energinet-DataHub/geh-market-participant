@@ -91,20 +91,5 @@ namespace Energinet.DataHub.MarketParticipant.Client
                         .Request(ActorBaseUrl, actorId)
                         .PutJsonAsync(changeActorDto));
         }
-
-        public async Task<ActorAuditLogsDto> GetActorAuditLogsAsync(Guid actorId)
-        {
-            var response = await ValidationExceptionHandler
-                .HandleAsync(
-                    () => _clientFactory
-                        .CreateClient()
-                        .Request(ActorBaseUrl, actorId, "auditlogs")
-                        .GetAsync())
-                .ConfigureAwait(false);
-
-            return await response
-                .GetJsonAsync<ActorAuditLogsDto>()
-                .ConfigureAwait(false);
-        }
     }
 }
