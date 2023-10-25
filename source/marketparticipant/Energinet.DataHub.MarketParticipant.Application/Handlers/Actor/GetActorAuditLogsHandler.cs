@@ -73,6 +73,7 @@ public sealed class GetActorAuditLogsHandler
             auditLogEntry.PreviousValue,
             auditLogEntry.AuditIdentity.Value,
             auditLogEntry.Timestamp,
+            auditLogEntry.ContactCategory ?? ContactCategory.Default,
             auditLogEntry.ActorContactChangeType);
     }
 }
