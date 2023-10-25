@@ -54,22 +54,60 @@ public sealed class ActorAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_ChangeName_WithAuditLogs_CanBeReadBack()
+    public async Task GetAsync_Created_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
 
+        // Arrange - Setup User
         var user = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(user.Id);
 
+        // Arrange - Setup Organization and Actor
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
+
+        // Arrange - Setup Repositories
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
+
+        // Make an audited change.
+        var actorId = await actorRepository.AddOrUpdateAsync(actor);
+
+        // Act
+        var actual = await actorAuditLogEntryRepository
+            .GetAsync(actorId);
+
+        // Assert
+        var actorAuditLogs = actual.ToList();
+        Assert.NotEmpty(actorAuditLogs);
+        Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
+        Assert.Contains(actorAuditLogs, o => o.ActorId == actorId);
+        Assert.All(actorAuditLogs, o => Assert.Equal(ActorChangeType.Created, o.ActorChangeType));
+    }
+
+    [Fact]
+    public async Task GetAsync_ChangeName_HasCorrectAuditLogs()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        // Arrange - Setup User
+        var user = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
+        // Arrange - Setup Organization and Actor
         var organization = await _fixture.PrepareOrganizationAsync();
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
         var orgValue = actor.Name.Value;
-        await using var scope = host.BeginScope();
-        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
 
+        // Arrange - Setup Repositories
+        await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var actorAuditLogEntryRepository = new ActorAuditLogEntryRepository(context);
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
 
         // Make an audited change.
         var actorId = await actorRepository.AddOrUpdateAsync(actor);
@@ -83,7 +121,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
 
         // Assert
         var actorAuditLogs = actual.ToList();
-        Assert.NotEmpty(actorAuditLogs); // +1 as it should contain all the original values as well as the changed one.
+        Assert.NotEmpty(actorAuditLogs);
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Name);
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == "Test Name 2");
@@ -92,22 +130,25 @@ public sealed class ActorAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_ChangeStatus_WithAuditLogs_CanBeReadBack()
+    public async Task GetAsync_ChangeStatus_CanBeReadBack()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
 
+        // Arrange - Setup User
         var user = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(user.Id);
 
+        // Arrange - Setup Organization and Actor
         var organization = await _fixture.PrepareOrganizationAsync();
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
         var orgValue = actor.Status;
-        await using var scope = host.BeginScope();
-        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
 
+        // Arrange - Setup Repositories
+        await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var actorAuditLogEntryRepository = new ActorAuditLogEntryRepository(context);
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
 
         // Make an audited change.
         var actorId = await actorRepository.AddOrUpdateAsync(actor);
@@ -121,7 +162,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
 
         // Assert
         var actorAuditLogs = actual.ToList();
-        Assert.NotEmpty(actorAuditLogs); // +1 as it should contain all the original values as well as the changed one.
+        Assert.NotEmpty(actorAuditLogs);
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
         Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Status);
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == ActorStatus.Active.ToString());

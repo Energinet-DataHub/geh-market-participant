@@ -68,7 +68,18 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     var currentValue = auditedProperty.ReadValue(current.Entity);
                     var previousValue = auditedProperty.ReadValue(previous.Entity);
 
-                    if (!Equals(currentValue, previousValue) || isFirst)
+                    if (isFirst)
+                    {
+                        auditEntries.Add(new ActorAuditLogEntry(
+                            actor,
+                            new AuditIdentity(current.Entity.ChangedByIdentityId),
+                            ActorChangeType.Created,
+                            current.PeriodStart,
+                            string.Empty,
+                            string.Empty));
+                    }
+
+                    if (!Equals(currentValue, previousValue))
                     {
                         auditEntries.Add(new ActorAuditLogEntry(
                             actor,

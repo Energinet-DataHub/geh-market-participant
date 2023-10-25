@@ -54,7 +54,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_AddContact_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_AddContact_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -97,7 +97,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_AddAndRemoveContact_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_AddAndRemoveContact_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -142,7 +142,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_UpdateContact_WithNameChange_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_UpdateContact_WithNameChange_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -191,7 +191,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_UpdateContact_WithEmailChange_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_UpdateContact_WithEmailChange_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -239,7 +239,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_UpdateContact_WithPhoneChange_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_UpdateContact_WithPhoneChange_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -287,7 +287,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_AddContacts_MultipleCategories_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_AddContacts_MultipleCategories_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -342,7 +342,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_AddAndUpdateOneContact_WithNameChange_WithMultipleCategories_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_AddAndUpdateOneContact_WithNameChange_WithMultipleCategories_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -404,7 +404,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_AddAndUpdateThenDeleteOneContact_WithNameChangedBeforeDelete_WithMultipleCategoriesOfContacts_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_AddAndUpdateThenDeleteOneContact_WithNameChangedBeforeDelete_WithMultipleCategoriesOfContacts_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -473,7 +473,7 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_AddAndUpdateContacts_NameChangedForBoth_MultipleCategories_WithAuditLogs_HasCorrectAuditLogs()
+    public async Task GetAsync_AddAndUpdateContacts_NameChangedForBoth_MultipleCategories_HasCorrectAuditLogs()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);

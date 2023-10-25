@@ -17,7 +17,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     public enum ActorChangeType
     {
         Name = 1,
-        Created = 5,
-        Status = 6
+        Created = 2,
+        Status = 3
     }
 }
