@@ -66,7 +66,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 var isFirst = i == 0;
                 var current = historicEntities[i];
                 var previous = isFirst ? current : FindPreviousForCategory(current.Entity, i, historicEntities) ?? current;
-                var next = FindNextForCategory(current.Entity, i, historicEntities);
 
                 // If this is the first time we see this category, we need to add the created entries
                 if (!categoriesSeen.Contains(current.Entity.Category))
@@ -76,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 }
 
                 // Check if the current entity is deleted, this can be done by verifying that we have no more entries for this category, and then add a deleted entry
-                if (current.Entity.DeletedByIdentityId != null && next == null)
+                if (current.Entity.DeletedByIdentityId != null && !HasNextForCategory(current.Entity, i, historicEntities))
                 {
                     auditEntries.Add(new ActorContactAuditLogEntry(
                         actorId,
@@ -168,14 +167,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             return null;
         }
 
-        private static (ActorContactEntity Entity, DateTimeOffset PeriodStart)? FindNextForCategory(
+        private static bool HasNextForCategory(
             ActorContactEntity current,
             int currentIndex,
             IReadOnlyList<(ActorContactEntity Entity, DateTimeOffset PeriodStart)> historicEntities)
         {
             if (currentIndex == historicEntities.Count - 1)
             {
-                return null;
+                return false;
             }
 
             for (var i = currentIndex + 1; i < historicEntities.Count; i++)
@@ -183,11 +182,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 var next = historicEntities[i];
                 if (next.Entity.Category == current.Category)
                 {
-                    return next;
+                    return true;
                 }
             }
 
-            return null;
+            return false;
         }
     }
 }
