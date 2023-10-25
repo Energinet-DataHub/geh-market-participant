@@ -96,7 +96,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{actorId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> GetAuditLogsAsync(Guid actorId)
+        public async Task<ActionResult<GetActorAuditLogsResponse>> GetActorAuditLogsAsync(Guid actorId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();

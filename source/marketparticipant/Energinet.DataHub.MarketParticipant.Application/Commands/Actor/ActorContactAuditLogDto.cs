@@ -23,4 +23,5 @@ public record ActorContactAuditLogDto(
     string PreviousValue,
     Guid AuditIdentityId,
     DateTimeOffset Timestamp,
+    ContactCategory ContactCategory,
     ActorContactChangeType ActorContactChangeType);
