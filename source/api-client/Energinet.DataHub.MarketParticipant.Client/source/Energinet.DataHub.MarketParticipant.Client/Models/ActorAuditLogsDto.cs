@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-
-public sealed record UpdatePermissionCommand(int PermissionId, string Description) : IRequest;
+namespace Energinet.DataHub.MarketParticipant.Client.Models
+{
+    public sealed record ActorAuditLogsDto(
+        IEnumerable<ActorAuditLogEntryDto> ActorAuditLogs,
+        IEnumerable<ActorContactAuditLogEntryDto> ActorContactAuditLogs);
+}

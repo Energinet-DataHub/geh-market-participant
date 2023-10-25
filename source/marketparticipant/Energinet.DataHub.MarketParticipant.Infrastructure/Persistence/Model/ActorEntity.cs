@@ -15,10 +15,11 @@
 using System;
 using System.Collections.ObjectModel;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class ActorEntity
+public sealed class ActorEntity : IAuditedEntity
 {
     public Guid Id { get; set; }
     public Guid? ActorId { get; set; }
@@ -28,6 +29,7 @@ public sealed class ActorEntity
     public string ActorNumber { get; set; } = null!;
     public string Name { get; set; } = null!;
     public ActorStatus Status { get; set; }
-
     public Collection<MarketRoleEntity> MarketRoles { get; } = new();
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
 }

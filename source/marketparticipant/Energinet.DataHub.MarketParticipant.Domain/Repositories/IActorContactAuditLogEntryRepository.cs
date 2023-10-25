@@ -12,8 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed record UpdatePermissionCommand(int PermissionId, string Description) : IRequest;
+/// <summary>
+/// Repository for querying actor contact audit logs
+/// </summary>
+public interface IActorContactAuditLogEntryRepository
+{
+    /// <summary>
+    /// Retrieves all log entries for a given actor.
+    /// </summary>
+    /// <param name="actorId">The actorId to get the contact logs for.</param>
+    Task<IEnumerable<ActorContactAuditLogEntry>> GetAsync(ActorId actorId);
+}
