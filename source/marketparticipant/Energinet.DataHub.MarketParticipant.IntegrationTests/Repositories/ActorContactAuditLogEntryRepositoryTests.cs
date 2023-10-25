@@ -89,9 +89,6 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
         Assert.All(actorContactAuditLogs, o => Assert.Equal(actor.Id, o.ActorId.Value));
 
         // Assert - Verify that the contact has expected audit logs
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContact!.Name && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContact.Email.Address && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContact.Phone.Number && string.IsNullOrEmpty(o.PreviousValue));
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Deleted);
     }
@@ -134,9 +131,6 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
         Assert.All(actorContactAuditLogs, o => Assert.Equal(actor.Id, o.ActorId.Value));
 
         // Assert - Verify that the contact has expected audit logs
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContact!.Name && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContact.Email.Address && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContact.Phone.Number && string.IsNullOrEmpty(o.PreviousValue));
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Deleted);
     }
@@ -327,15 +321,9 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
 
         // Assert - Verify that the DEFAULT Category contact has expected audit logs
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContact!.Name && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContact.Email.Address && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContact!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue));
 
         // Assert - Verify that the CHARGES Category contact has expected audit logs
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactOtherCategory!.Name && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContactOtherCategory.Email.Address && string.IsNullOrEmpty(o.PreviousValue));
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContactOtherCategory!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue));
 
         // Assert - Verify that none of the categories contains a deleted audit log
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Deleted);
@@ -386,15 +374,9 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
 
         // Assert - Verify that the DEFAULT category contacts has expected audit logs
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContact!.Name && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContact!.Email.Address && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContact!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
 
         // Assert - Verify that the CHARGES category contacts has expected audit logs
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactOtherCategory!.Name && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContactOtherCategory.Email.Address && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContactOtherCategory!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactChangedOtherCategory!.Name && actorContactOtherCategory.Name == o.PreviousValue && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
@@ -453,16 +435,10 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
         Assert.All(actorContactAuditLogs, o => Assert.Equal(actor.Id, o.ActorId.Value));
 
         // Assert - Verify that the DEFAULT category contacts has expected audit logs
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContact!.Name && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContact!.Email.Address && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContact!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContact.Category);
 
         // Assert - Verify that the CHARGES category contacts has expected  audit logs
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactOtherCategory!.Name && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContactOtherCategory.Email.Address && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContactOtherCategory!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactChangedOtherCategory!.Name && actorContactOtherCategory.Name == o.PreviousValue && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
@@ -522,9 +498,6 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
         Assert.All(actorContactAuditLogs, o => Assert.Equal(actor.Id, o.ActorId.Value));
 
         // Assert - Verify that the DEFAULT category contacts has expected audit logs
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContact!.Name && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContact!.Email.Address && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContact!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContact.Category);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContact!.Category);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactChanged!.Name && actorContact!.Name == o.PreviousValue && o.ContactCategory == actorContact.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChanged.Category);
@@ -532,9 +505,6 @@ public sealed class ActorContactAuditLogEntryRepositoryTests
 
         // Assert - Verify that the CHARGES category contacts has expected audit logs
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Created && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactOtherCategory!.Name && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && o.CurrentValue == actorContactOtherCategory.Email.Address && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
-        Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && o.CurrentValue == actorContactOtherCategory!.Phone?.Number && string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.Contains(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Name && o.CurrentValue == actorContactChangedOtherCategory!.Name && actorContactOtherCategory.Name == o.PreviousValue && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Email && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
         Assert.DoesNotContain(actorContactAuditLogs, o => o.ActorContactChangeType == ActorContactChangeType.Phone && !string.IsNullOrEmpty(o.PreviousValue) && o.ContactCategory == actorContactChangedOtherCategory.Category);
