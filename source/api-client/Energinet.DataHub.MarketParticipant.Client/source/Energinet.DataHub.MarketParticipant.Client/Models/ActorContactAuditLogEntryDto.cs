@@ -22,5 +22,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         string PreviousValue,
         Guid AuditIdentityId,
         DateTimeOffset Timestamp,
+        ContactCategory ContactCategory,
         ActorContactChangeType ActorContactChangeType);
 }
