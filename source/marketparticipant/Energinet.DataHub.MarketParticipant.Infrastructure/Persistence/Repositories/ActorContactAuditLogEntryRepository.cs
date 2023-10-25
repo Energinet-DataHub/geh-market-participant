@@ -71,7 +71,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 if (!categoriesSeen.Contains(current.Entity.Category))
                 {
                     categoriesSeen.Add(current.Entity.Category);
-                    AddCreatedEntries(actorId, auditEntries, current);
+                    auditEntries.Add(new ActorContactAuditLogEntry(
+                        actorId,
+                        new AuditIdentity(current.Entity.ChangedByIdentityId),
+                        ActorContactChangeType.Created,
+                        current.Entity.Category,
+                        current.PeriodStart,
+                        string.Empty,
+                        string.Empty));
                 }
 
                 // Check if the current entity is deleted, this can be done by verifying that we have no more entries for this category, and then add a deleted entry
@@ -109,45 +116,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             }
 
             return auditEntries.OrderBy(entry => entry.Timestamp).ToList();
-        }
-
-        private static void AddCreatedEntries(
-            ActorId actorId,
-            ICollection<ActorContactAuditLogEntry> auditEntries,
-            (ActorContactEntity Entity, DateTimeOffset PeriodStart) current)
-        {
-            auditEntries.Add(new ActorContactAuditLogEntry(
-                actorId,
-                new AuditIdentity(current.Entity.ChangedByIdentityId),
-                ActorContactChangeType.Created,
-                current.Entity.Category,
-                current.PeriodStart,
-                string.Empty,
-                string.Empty));
-            auditEntries.Add(new ActorContactAuditLogEntry(
-                actorId,
-                new AuditIdentity(current.Entity.ChangedByIdentityId),
-                ActorContactChangeType.Name,
-                current.Entity.Category,
-                current.PeriodStart.AddMicroseconds(1),
-                current.Entity.Name,
-                string.Empty));
-            auditEntries.Add(new ActorContactAuditLogEntry(
-                actorId,
-                new AuditIdentity(current.Entity.ChangedByIdentityId),
-                ActorContactChangeType.Email,
-                current.Entity.Category,
-                current.PeriodStart.AddMicroseconds(2),
-                current.Entity.Email,
-                string.Empty));
-            auditEntries.Add(new ActorContactAuditLogEntry(
-                actorId,
-                new AuditIdentity(current.Entity.ChangedByIdentityId),
-                ActorContactChangeType.Phone,
-                current.Entity.Category,
-                current.PeriodStart.AddMicroseconds(3),
-                current.Entity.Phone ?? string.Empty,
-                string.Empty));
         }
 
         private static (ActorContactEntity Entity, DateTimeOffset PeriodStart)? FindPreviousForCategory(
