@@ -68,9 +68,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 var previous = isFirst ? current : FindPreviousForCategory(current.Entity, i, historicEntities) ?? current;
 
                 // If this is the first time we see this category, we need to add the created entries
-                if (!categoriesSeen.Contains(current.Entity.Category))
+                if (categoriesSeen.Add(current.Entity.Category))
                 {
-                    categoriesSeen.Add(current.Entity.Category);
                     auditEntries.Add(new ActorContactAuditLogEntry(
                         actorId,
                         new AuditIdentity(current.Entity.ChangedByIdentityId),
@@ -86,7 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                 {
                     auditEntries.Add(new ActorContactAuditLogEntry(
                         actorId,
-                        new AuditIdentity(current.Entity.ChangedByIdentityId),
+                        new AuditIdentity(current.Entity.DeletedByIdentityId.GetValueOrDefault()),
                         ActorContactChangeType.Deleted,
                         current.Entity.Category,
                         current.PeriodStart,
