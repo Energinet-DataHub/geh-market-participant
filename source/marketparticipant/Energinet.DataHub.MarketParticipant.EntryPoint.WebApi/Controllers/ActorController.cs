@@ -98,6 +98,9 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.ActorsManage)]
         public async Task<IActionResult> GetAuditLogsAsync(Guid actorId)
         {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
             var command = new GetActorAuditLogsCommand(actorId);
 
             var response = await _mediator
