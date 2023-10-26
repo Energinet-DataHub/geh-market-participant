@@ -19,7 +19,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 /// <summary>
-/// Repository for inserting and querying organization audit logs
+/// Repository for querying organization audit logs
 /// </summary>
 public interface IOrganizationAuditLogEntryRepository
 {
