@@ -1,5 +1,13 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.35.0
+
+- Removed Actor Auditlog as it now comes from swagger
+
+## Version 2.34.0
+
+- Added Actor Auditlog
+
 ## Version 2.33.0
 
 - Remove assigned actors from user overview.
