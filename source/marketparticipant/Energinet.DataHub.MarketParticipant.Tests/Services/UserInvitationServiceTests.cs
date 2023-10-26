@@ -434,7 +434,7 @@ public sealed class UserInvitationServiceTests
         emailEventRepositoryMock.Verify(emailEventRepository => emailEventRepository.InsertAsync(
             It.Is<EmailEvent>(emailEvent =>
                 emailEvent.Email == _validInvitation.Email &&
-                emailEvent.EmailEventType == EmailEventType.ExistingUserInvite)));
+                emailEvent.EmailEventType == EmailEventType.UserAssignedToActor)));
     }
 
     [Fact]

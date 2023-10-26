@@ -17,6 +17,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     public enum EmailEventType
     {
         UserInvite = 1,
-        ExistingUserInvite = 2
+        UserAssignedToActor = 2
     }
 }

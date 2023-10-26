@@ -47,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             return emailEvent.EmailEventType switch
             {
                 EmailEventType.UserInvite => SendUserInviteAsync(emailAddress),
-                EmailEventType.ExistingUserInvite => SendExistingUserInviteAsync(emailAddress),
+                EmailEventType.UserAssignedToActor => SendUserAssignedToActorAsync(emailAddress),
                 _ => throw new NotFoundException("EmailEventType not recognized"),
             };
         }
@@ -63,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             return await SendAsync(userEmailAddress, from, to, subject, htmlContent).ConfigureAwait(false);
         }
 
-        private async Task<bool> SendExistingUserInviteAsync(EmailAddress userEmailAddress)
+        private async Task<bool> SendUserAssignedToActorAsync(EmailAddress userEmailAddress)
         {
             return await SendAsync(
                 userEmailAddress,

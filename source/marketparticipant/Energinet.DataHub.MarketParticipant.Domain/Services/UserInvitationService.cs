@@ -57,7 +57,7 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
-        var mailEventType = EmailEventType.ExistingUserInvite;
+        var mailEventType = EmailEventType.UserAssignedToActor;
 
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
 
