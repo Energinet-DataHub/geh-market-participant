@@ -47,7 +47,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             return emailEvent.EmailEventType switch
             {
                 EmailEventType.UserInvite => SendUserInviteAsync(emailAddress),
-                _ => throw new NotFoundException("EmailEventType not recognized")
+                EmailEventType.ExistingUserInvite => SendExistingUserInviteAsync(emailAddress),
+                _ => throw new NotFoundException("EmailEventType not recognized"),
             };
         }
 
@@ -59,6 +60,21 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             const string subject = "Invitation til DataHub";
             var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet <a href=\"{inviteUrl}\">her</a>" +
                               $"<br /><br />Brugeroprettelsen skal færdiggøres indenfor 24 timer.";
+            return await SendAsync(userEmailAddress, from, to, subject, htmlContent).ConfigureAwait(false);
+        }
+
+        private async Task<bool> SendExistingUserInviteAsync(EmailAddress userEmailAddress)
+        {
+            return await SendAsync(
+                userEmailAddress,
+                from: new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail),
+                to: new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address),
+                subject: "Inviteret til ny aktør i DataHub",
+                htmlContent: "Du er blevet inviteret til en ny aktør. Du kan tilgå den nye aktør i DataHub.").ConfigureAwait(false);
+        }
+
+        private async Task<bool> SendAsync(EmailAddress userEmailAddress, SendGrid.Helpers.Mail.EmailAddress from, SendGrid.Helpers.Mail.EmailAddress to, string subject, string htmlContent)
+        {
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
 
