@@ -57,13 +57,16 @@ public sealed class UserInvitationService : IUserInvitationService
     {
         ArgumentNullException.ThrowIfNull(invitation);
 
-        await _organizationDomainValidationService
-            .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
-            .ConfigureAwait(false);
+        var mailEventType = EmailEventType.UserAssignedToActor;
 
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
+
         if (invitedUser == null)
         {
+            await _organizationDomainValidationService
+                .ValidateUserEmailInsideOrganizationDomainsAsync(invitation.AssignedActor, invitation.Email)
+                .ConfigureAwait(false);
+
             var sharedId = new SharedUserReferenceId();
 
             var userIdentity = new UserIdentity(
@@ -80,6 +83,7 @@ public sealed class UserInvitationService : IUserInvitationService
 
             invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
             invitedUser.ActivateUserExpiration();
+            mailEventType = EmailEventType.UserInvite;
         }
 
         foreach (var assignedRole in invitation.AssignedRoles)
@@ -99,7 +103,7 @@ public sealed class UserInvitationService : IUserInvitationService
                 .ConfigureAwait(false);
 
             await _emailEventRepository
-                .InsertAsync(new EmailEvent(invitation.Email, EmailEventType.UserInvite))
+                .InsertAsync(new EmailEvent(invitation.Email, mailEventType))
                 .ConfigureAwait(false);
 
             var auditIdentity = new AuditIdentity(invitationSentByUserId);
