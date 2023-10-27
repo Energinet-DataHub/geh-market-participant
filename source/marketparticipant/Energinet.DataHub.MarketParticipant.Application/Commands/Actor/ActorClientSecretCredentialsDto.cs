@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-public sealed record ActorClientSecretCredentialsDto : ActorCredentialsDto;
+public sealed record ActorClientSecretCredentialsDto;
