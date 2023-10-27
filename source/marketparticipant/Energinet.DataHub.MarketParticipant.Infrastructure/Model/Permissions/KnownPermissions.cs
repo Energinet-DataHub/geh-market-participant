@@ -98,6 +98,22 @@ public static class KnownPermissions
             EicFunction.MeteredDataResponsible,
             EicFunction.EnergySupplier,
             EicFunction.BalanceResponsibleParty,
+        }),
+        new(PermissionId.ActorCredentialsManage, "actor-credentials:manage", InstantPattern.ExtendedIso.Parse("2023-10-27T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator,
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent,
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.ImbalanceSettlementResponsible,
+            EicFunction.MeteredDataAdministrator,
+            EicFunction.MeteredDataResponsible,
+            EicFunction.MeteringPointAdministrator,
+            EicFunction.SystemOperator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.IndependentAggregator,
+            EicFunction.SerialEnergyTrader
         })
     };
 }
