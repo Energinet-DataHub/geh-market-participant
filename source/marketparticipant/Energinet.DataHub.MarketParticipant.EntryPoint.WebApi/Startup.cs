@@ -139,7 +139,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services.AddHttpLoggingScope("mark-part");
             services.AddSwaggerGen(c =>
             {
-                c.SupportNonNullableReferenceTypes();
                 c.SwaggerDoc(
                     "v1",
                     new OpenApiInfo
@@ -162,6 +161,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 c.AddSecurityDefinition("Bearer", securitySchema);
                 c.SupportNonNullableReferenceTypes();
                 c.UseAllOfToExtendReferenceSchemas();
+                c.UseOneOfForPolymorphism();
 
                 var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } } };
 

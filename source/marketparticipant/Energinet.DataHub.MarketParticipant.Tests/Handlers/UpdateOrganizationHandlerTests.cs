@@ -40,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
-                UnitOfWorkProviderMock.Create(),
                 organizationExistsHelperService.Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
@@ -95,7 +94,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
-                UnitOfWorkProviderMock.Create(),
                 organizationExistsHelperService.Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 

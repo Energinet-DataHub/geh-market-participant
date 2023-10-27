@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
@@ -30,18 +29,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IOrganizationExistsHelperService _organizationExistsHelperService;
         private readonly IUniqueOrganizationBusinessRegisterIdentifierService _uniqueOrganizationBusinessRegisterIdentifierService;
-        private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         public UpdateOrganizationHandler(
             IOrganizationRepository organizationRepository,
-            IUnitOfWorkProvider unitOfWorkProvider,
             IOrganizationExistsHelperService organizationExistsHelperService,
             IUniqueOrganizationBusinessRegisterIdentifierService uniqueOrganizationBusinessRegisterIdentifierService)
         {
             _organizationRepository = organizationRepository;
             _organizationExistsHelperService = organizationExistsHelperService;
             _uniqueOrganizationBusinessRegisterIdentifierService = uniqueOrganizationBusinessRegisterIdentifierService;
-            _unitOfWorkProvider = unitOfWorkProvider;
         }
 
         public async Task Handle(UpdateOrganizationCommand request, CancellationToken cancellationToken)
@@ -68,18 +64,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
                 .EnsureUniqueBusinessRegisterIdentifierAsync(organization)
                 .ConfigureAwait(false);
 
-            var uow = await _unitOfWorkProvider
-                .NewUnitOfWorkAsync()
+            var result = await _organizationRepository
+                .AddOrUpdateAsync(organization)
                 .ConfigureAwait(false);
 
-            await using (uow.ConfigureAwait(false))
-            {
-                await _organizationRepository
-                    .AddOrUpdateAsync(organization)
-                    .ConfigureAwait(false);
-
-                await uow.CommitAsync().ConfigureAwait(false);
-            }
+            result.ThrowOnError(OrganizationErrorHandler.HandleOrganizationError);
         }
     }
 }
