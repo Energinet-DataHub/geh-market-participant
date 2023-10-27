@@ -36,6 +36,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
         /// <summary>
         /// Get all email events to be sent by type
         /// </summary>
-        Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(EmailEventType emailEventType);
+        Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(params EmailEventType[] emailEventTypes);
     }
 }
