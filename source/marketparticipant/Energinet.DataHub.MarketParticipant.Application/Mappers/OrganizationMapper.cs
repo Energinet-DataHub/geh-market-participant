@@ -41,9 +41,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             return new ActorDto(
                 actor.Id.Value,
                 actor.OrganizationId.Value,
-                actor.ExternalActorId?.ToString(),
-                new ActorNumberDto(actor.ActorNumber.Value),
                 actor.Status.ToString(),
+                new ActorNumberDto(actor.ActorNumber.Value),
                 new ActorNameDto(actor.Name.Value),
                 actor.MarketRoles.Select(Map).ToList());
         }
