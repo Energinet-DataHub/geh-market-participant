@@ -17,10 +17,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     public class ActorCertificateCredentials : ActorCredentials
     {
         public ActorCertificateCredentials(
-            ActorId actorId,
             string certificateThumbprint,
             string keyVaultSecretIdentifier)
-            : base(new CredentialsId(0), actorId)
         {
             CertificateThumbprint = certificateThumbprint;
             KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
@@ -28,10 +26,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public ActorCertificateCredentials(
             CredentialsId id,
-            ActorId actorId,
             string certificateThumbprint,
             string keyVaultSecretIdentifier)
-            : base(id, actorId)
         {
             CertificateThumbprint = certificateThumbprint;
             KeyVaultSecretIdentifier = keyVaultSecretIdentifier;

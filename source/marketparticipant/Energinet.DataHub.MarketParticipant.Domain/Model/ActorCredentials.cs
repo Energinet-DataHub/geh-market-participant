@@ -16,22 +16,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public abstract class ActorCredentials
     {
-        protected ActorCredentials(
-            ActorId actorId)
-        {
-            Id = new CredentialsId(0);
-            ActorId = actorId;
-        }
-
-        protected ActorCredentials(
-            CredentialsId id,
-            ActorId actorId)
-        {
-            Id = id;
-            ActorId = actorId;
-        }
-
-        public CredentialsId Id { get; }
-        public ActorId ActorId { get; }
     }
 }

@@ -41,6 +41,20 @@ public sealed class Actor : IPublishDomainEvents
     }
 
     public Actor(
+        OrganizationId organizationId,
+        ActorNumber actorNumber,
+        ActorName actorName,
+        IEnumerable<ActorCredentials> credentials)
+    {
+        Id = new ActorId(Guid.Empty);
+        OrganizationId = organizationId;
+        ActorNumber = actorNumber;
+        Name = actorName;
+        _actorStatusTransitioner = new ActorStatusTransitioner();
+        Credentials = credentials;
+    }
+
+    public Actor(
         ActorId id,
         OrganizationId organizationId,
         ExternalActorId? externalActorId,

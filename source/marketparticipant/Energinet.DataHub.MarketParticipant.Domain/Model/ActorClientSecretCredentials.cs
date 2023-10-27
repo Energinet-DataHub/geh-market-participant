@@ -16,16 +16,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorClientSecretCredentials : ActorCredentials
     {
-        public ActorClientSecretCredentials(
-            ActorId actorId)
-            : base(new CredentialsId(0), actorId)
-        {
-        }
-
-        public ActorClientSecretCredentials(
-            CredentialsId id,
-            ActorId actorId)
-            : base(id, actorId)
+        public ActorClientSecretCredentials()
         {
         }
     }

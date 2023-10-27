@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -95,6 +96,83 @@ public sealed class ActorRepositoryTests
         Assert.Equal(actor.OrganizationId, actual.OrganizationId);
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
         Assert.Equal(actor.MarketRoles.Single().Function, actual.MarketRoles.Single().Function);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneActor_WithCredentials_CanReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+        var actorRepository2 = new ActorRepository(context2);
+
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var actorCredentials = new ActorCertificateCredentials("12345678", "secret");
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new List<ActorCredentials>() { actorCredentials });
+
+        // Act
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.NotEmpty(actual.Credentials);
+        Assert.Single(actual.Credentials);
+        Assert.Equal(actor.OrganizationId, actual.OrganizationId);
+        Assert.Equal(actor.ActorNumber, actual.ActorNumber);
+        Assert.Contains(actual.Credentials, cred =>
+        {
+            return cred switch
+            {
+                ActorCertificateCredentials actorCertificateCredentials =>
+                    actorCertificateCredentials.CertificateThumbprint == actorCredentials.CertificateThumbprint &&
+                    actorCertificateCredentials.KeyVaultSecretIdentifier == actorCredentials.KeyVaultSecretIdentifier,
+                ActorClientSecretCredentials actorClientSecretCredentials => true,
+                _ => false
+            };
+        });
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneActor_WithDifferentCredentials_CanReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+        var actorRepository2 = new ActorRepository(context2);
+
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var actorCertCredentials = new ActorCertificateCredentials("12345678", "secret");
+        var actorClientCredentials = new ActorClientSecretCredentials();
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new List<ActorCredentials>() { actorCertCredentials, actorClientCredentials });
+
+        // Act
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.NotEmpty(actual.Credentials);
+        Assert.Equal(2, actual.Credentials.Count());
+        Assert.Equal(actor.OrganizationId, actual.OrganizationId);
+        Assert.Equal(actor.ActorNumber, actual.ActorNumber);
+        Assert.Contains(actual.Credentials, cred =>
+        {
+            return cred switch
+            {
+                ActorCertificateCredentials actorCertificateCredentials =>
+                    actorCertificateCredentials.CertificateThumbprint == actorCertCredentials.CertificateThumbprint &&
+                    actorCertificateCredentials.KeyVaultSecretIdentifier == actorCertCredentials.KeyVaultSecretIdentifier,
+                ActorClientSecretCredentials actorClientSecretCredentials => true,
+                _ => false
+            };
+        });
     }
 
     [Fact]

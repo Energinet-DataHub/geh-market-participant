@@ -60,6 +60,24 @@ internal static class ActorMapper
 
             to.MarketRoles.Add(marketRoleEntity);
         }
+
+        // Map Client secret credentials
+        var clientSecretCredentials = from.Credentials.OfType<ActorClientSecretCredentials>().FirstOrDefault();
+        if (clientSecretCredentials != null)
+        {
+            to.ClientSecretCredential = new ActorClientSecretCredentialsEntity();
+        }
+
+        // Map Certificate credentials
+        var certificateCredentials = from.Credentials.OfType<ActorCertificateCredentials>().FirstOrDefault();
+        if (certificateCredentials != null)
+        {
+            to.CertificateCredential = new ActorCertificateCredentialsEntity
+            {
+                CertificateThumbprint = certificateCredentials.CertificateThumbprint,
+                KeyVaultSecretIdentifier = certificateCredentials.KeyVaultSecretIdentifier
+            };
+        }
     }
 
     public static Actor MapFromEntity(ActorEntity from)
@@ -103,14 +121,12 @@ internal static class ActorMapper
 
     private static ActorCredentials Map(ActorClientSecretCredentialsEntity from)
     {
-        return new ActorClientSecretCredentials(new CredentialsId(from.Id), new ActorId(from.ActorId));
+        return new ActorClientSecretCredentials();
     }
 
     private static ActorCredentials Map(ActorCertificateCredentialsEntity from)
     {
         return new ActorCertificateCredentials(
-            new CredentialsId(from.Id),
-            new ActorId(from.ActorId),
             from.CertificateThumbprint,
             from.KeyVaultSecretIdentifier);
     }

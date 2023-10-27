@@ -18,8 +18,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
 public sealed class ActorCertificateCredentialsEntity
 {
-    public int Id { get; set; }
     public Guid ActorId { get; set; }
-    public string CertificateThumbprint { get; } = null!;
-    public string KeyVaultSecretIdentifier { get; } = null!;
+    public string CertificateThumbprint { get; set; } = null!;
+    public string KeyVaultSecretIdentifier { get; set; } = null!;
 }

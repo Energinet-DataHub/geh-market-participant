@@ -26,7 +26,8 @@ public class
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         builder.ToTable("ActorCertificateCredentials");
-        builder.HasKey(contact => contact.Id);
-        builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
+        builder.HasKey(contact => contact.ActorId);
+        builder.Property(cred => cred.CertificateThumbprint).HasColumnName("Thumbprint");
+        builder.Property(cred => cred.KeyVaultSecretIdentifier).HasColumnName("KvSecretId");
     }
 }
