@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -86,6 +87,21 @@ internal static class ActorMapper
             actorNumber,
             actorStatus,
             marketRoles,
-            actorName);
+            actorName,
+            new List<ActorCredentials>() { Map(from.CertificateCredential), Map(from.ClientSecretCredential) });
+    }
+
+    private static ActorCredentials Map(ActorClientSecretCredentialsEntity from)
+    {
+        return new ActorClientSecretCredentials(new CredentialsId(from.Id), new ActorId(from.ActorId));
+    }
+
+    private static ActorCredentials Map(ActorCertificateCredentialsEntity from)
+    {
+        return new ActorCertificateCredentials(
+            new CredentialsId(from.Id),
+            new ActorId(from.ActorId),
+            from.CertificateThumbprint,
+            from.KeyVaultSecretIdentifier);
     }
 }

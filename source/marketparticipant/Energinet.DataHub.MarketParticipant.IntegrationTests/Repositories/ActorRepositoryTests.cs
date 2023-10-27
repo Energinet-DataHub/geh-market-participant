@@ -50,8 +50,8 @@ public sealed class ActorRepositoryTests
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         // Act
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        var actual = await actorRepository2.GetAsync(actorId);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
 
         // Assert
         Assert.NotNull(actual);
@@ -87,8 +87,8 @@ public sealed class ActorRepositoryTests
         }));
 
         // Act
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        var actual = await actorRepository2.GetAsync(actorId);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
 
         // Assert
         Assert.NotNull(actual);

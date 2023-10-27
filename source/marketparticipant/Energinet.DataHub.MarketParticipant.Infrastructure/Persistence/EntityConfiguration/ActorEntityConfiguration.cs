@@ -32,6 +32,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()
                 .HasForeignKey(marketRole => marketRole.ActorId);
+            builder
+                .HasOne(actor => actor.CertificateCredential)
+                .WithOne()
+                .HasForeignKey<ActorCertificateCredentialsEntity>(cred => cred.ActorId);
+            builder
+                .HasOne(actor => actor.ClientSecretCredential)
+                .WithOne()
+                .HasForeignKey<ActorClientSecretCredentialsEntity>(cred => cred.ActorId);
         }
     }
 }

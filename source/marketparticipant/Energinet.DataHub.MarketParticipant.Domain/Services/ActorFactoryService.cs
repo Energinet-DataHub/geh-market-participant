@@ -90,12 +90,14 @@ public sealed class ActorFactoryService : IActorFactoryService
 
     private async Task<Actor> SaveActorAsync(Actor newActor)
     {
-        var actorId = await _actorRepository
+        var result = await _actorRepository
             .AddOrUpdateAsync(newActor)
             .ConfigureAwait(false);
 
+        result.ThrowOnError(ActorErrorHandler.HandleActorError);
+
         return (await _actorRepository
-            .GetAsync(actorId)
+            .GetAsync(result.Value)
             .ConfigureAwait(false))!;
     }
 }

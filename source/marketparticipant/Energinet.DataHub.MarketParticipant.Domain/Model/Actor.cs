@@ -37,6 +37,7 @@ public sealed class Actor : IPublishDomainEvents
         ActorNumber = actorNumber;
         Name = actorName;
         _actorStatusTransitioner = new ActorStatusTransitioner();
+        Credentials = Enumerable.Empty<ActorCredentials>();
     }
 
     public Actor(
@@ -46,7 +47,8 @@ public sealed class Actor : IPublishDomainEvents
         ActorNumber actorNumber,
         ActorStatus actorStatus,
         IEnumerable<ActorMarketRole> marketRoles,
-        ActorName name)
+        ActorName name,
+        IEnumerable<ActorCredentials> credentials)
     {
         Id = id;
         OrganizationId = organizationId;
@@ -55,6 +57,7 @@ public sealed class Actor : IPublishDomainEvents
         _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
+        Credentials = credentials;
     }
 
     /// <summary>
@@ -112,6 +115,11 @@ public sealed class Actor : IPublishDomainEvents
     /// The Name of the current actor.
     /// </summary>
     public ActorName Name { get; set; }
+
+    /// <summary>
+    /// The list of credentials for the current actor.
+    /// </summary>
+    public IEnumerable<ActorCredentials> Credentials { get; }
 
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.

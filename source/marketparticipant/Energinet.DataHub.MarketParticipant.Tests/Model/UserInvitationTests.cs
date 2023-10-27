@@ -14,6 +14,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -40,7 +41,8 @@ public sealed class UserInvitationTests
             new MockedGln(),
             ActorStatus.New,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
-            new ActorName("fake_value")),
+            new ActorName("fake_value"),
+            Enumerable.Empty<ActorCredentials>()),
         new[]
         {
             new UserRole(
@@ -83,7 +85,8 @@ public sealed class UserInvitationTests
             new MockedGln(),
             status,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
-            new ActorName("fake_value"));
+            new ActorName("fake_value"),
+            Enumerable.Empty<ActorCredentials>());
 
         // Act + Assert
         if (isValid)

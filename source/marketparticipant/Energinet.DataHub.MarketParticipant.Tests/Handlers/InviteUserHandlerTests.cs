@@ -92,7 +92,8 @@ public sealed class InviteUserHandlerTests
                 new MockedGln(),
                 ActorStatus.Active,
                 new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
-                new ActorName("fake_value")));
+                new ActorName("fake_value"),
+                Enumerable.Empty<ActorCredentials>()));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
@@ -130,7 +131,8 @@ public sealed class InviteUserHandlerTests
                 new MockedGln(),
                 ActorStatus.Active,
                 new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
-                new ActorName("fake_value")));
+                new ActorName("fake_value"),
+                Enumerable.Empty<ActorCredentials>()));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
@@ -169,7 +171,8 @@ public sealed class InviteUserHandlerTests
                 new MockedGln(),
                 ActorStatus.Active,
                 new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
-                new ActorName("fake_value")));
+                new ActorName("fake_value"),
+                Enumerable.Empty<ActorCredentials>()));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
         userRoleRepositoryMock

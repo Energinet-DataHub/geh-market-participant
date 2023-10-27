@@ -46,7 +46,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         EicFunction.GridAccessProvider,
                         Enumerable.Empty<ActorGridArea>())
                 },
-                new ActorName("fake_value"));
+                new ActorName("fake_value"),
+                Enumerable.Empty<ActorCredentials>());
 
             // act
             await target.ValidateAsync(actor);
@@ -83,7 +84,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                                 new[] { MeteringPointType.D02Analysis })
                         })
                 },
-                new ActorName("fake_value"));
+                new ActorName("fake_value"),
+                Enumerable.Empty<ActorCredentials>());
 
             // act
             await target.ValidateAsync(actor);
@@ -124,7 +126,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         nonDdmMarketRole,
                         Enumerable.Empty<ActorGridArea>())
                     },
-                    new ActorName("fake_value"));
+                    new ActorName("fake_value"),
+                    Enumerable.Empty<ActorCredentials>());
 
                 // act
                 await target.ValidateAsync(actor);
