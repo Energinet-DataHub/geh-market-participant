@@ -14,4 +14,4 @@
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-public sealed record ActorCertificateCredentialsDto(string Thumbprint) : ActorCredentialsDto;
+public sealed record ActorCertificateCredentialsDto(string Thumbprint);

@@ -161,7 +161,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 c.AddSecurityDefinition("Bearer", securitySchema);
                 c.SupportNonNullableReferenceTypes();
                 c.UseAllOfToExtendReferenceSchemas();
-                c.UseOneOfForPolymorphism();
 
                 var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } } };
 
