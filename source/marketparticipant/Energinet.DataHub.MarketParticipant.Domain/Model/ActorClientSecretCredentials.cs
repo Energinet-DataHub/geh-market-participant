@@ -16,8 +16,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorClientSecretCredentials : ActorCredentials
     {
-        public ActorClientSecretCredentials()
+        public ActorClientSecretCredentials(string clientSecretIdentifier)
         {
+            ClientSecretIdentifier = clientSecretIdentifier;
         }
+
+        public string ClientSecretIdentifier { get; }
     }
 }

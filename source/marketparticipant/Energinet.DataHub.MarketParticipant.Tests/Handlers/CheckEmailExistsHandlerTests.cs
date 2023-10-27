@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
@@ -151,7 +152,7 @@ public sealed class CheckEmailExistsHandlerTests
             ActorStatus.Active,
             Array.Empty<ActorMarketRole>(),
             new ActorName("Power Plant 1"),
-            Enumerable.Empty<ActorCredentials>());
+            new Collection<ActorCredentials>());
 
         var actorRepositoryMock = new Mock<IActorRepository>();
         actorRepositoryMock.Setup(x => x.GetAsync(actor.Id))

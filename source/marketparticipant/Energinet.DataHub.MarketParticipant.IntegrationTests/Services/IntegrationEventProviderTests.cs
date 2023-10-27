@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
@@ -98,7 +99,7 @@ public sealed class IntegrationEventProviderTests
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
             new ActorName(string.Empty),
-            Enumerable.Empty<ActorCredentials>());
+            new Collection<ActorCredentials>());
 
         actor.Activate();
         actor.ExternalActorId = new ExternalActorId(Guid.NewGuid());
@@ -127,7 +128,7 @@ public sealed class IntegrationEventProviderTests
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
             new ActorName(string.Empty),
-            Enumerable.Empty<ActorCredentials>());
+            new Collection<ActorCredentials>());
 
         var gridArea = await _fixture.PrepareGridAreaAsync();
 

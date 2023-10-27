@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
@@ -37,14 +38,14 @@ public sealed class Actor : IPublishDomainEvents
         ActorNumber = actorNumber;
         Name = actorName;
         _actorStatusTransitioner = new ActorStatusTransitioner();
-        Credentials = Enumerable.Empty<ActorCredentials>();
+        Credentials = new Collection<ActorCredentials>();
     }
 
     public Actor(
         OrganizationId organizationId,
         ActorNumber actorNumber,
         ActorName actorName,
-        IEnumerable<ActorCredentials> credentials)
+        ICollection<ActorCredentials> credentials)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
@@ -62,7 +63,7 @@ public sealed class Actor : IPublishDomainEvents
         ActorStatus actorStatus,
         IEnumerable<ActorMarketRole> marketRoles,
         ActorName name,
-        IEnumerable<ActorCredentials> credentials)
+        ICollection<ActorCredentials> credentials)
     {
         Id = id;
         OrganizationId = organizationId;
@@ -133,7 +134,7 @@ public sealed class Actor : IPublishDomainEvents
     /// <summary>
     /// The list of credentials for the current actor.
     /// </summary>
-    public IEnumerable<ActorCredentials> Credentials { get; }
+    public ICollection<ActorCredentials> Credentials { get; }
 
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.

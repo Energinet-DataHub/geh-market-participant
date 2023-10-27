@@ -26,7 +26,7 @@ public class
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         builder.ToTable("ActorClientSecretCredentials");
-        builder.HasKey(contact => contact.Id);
-        builder.Property(contact => contact.Id).ValueGeneratedOnAdd();
+        builder.HasKey(cred => cred.ActorId);
+        builder.Property(cred => cred.ClientSecretIdentifier).HasColumnName("ClientSecretId");
     }
 }

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
@@ -60,7 +61,7 @@ public sealed class SynchronizeActorsHandlerTests
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
             new ActorName("fake_value"),
-            Enumerable.Empty<ActorCredentials>());
+            new Collection<ActorCredentials>());
 
         var externalActorSynchronizationRepository = new Mock<IExternalActorSynchronizationRepository>();
         externalActorSynchronizationRepository

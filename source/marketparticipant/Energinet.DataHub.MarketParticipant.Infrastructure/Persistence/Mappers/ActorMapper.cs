@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -65,7 +66,10 @@ internal static class ActorMapper
         var clientSecretCredentials = from.Credentials.OfType<ActorClientSecretCredentials>().FirstOrDefault();
         if (clientSecretCredentials != null)
         {
-            to.ClientSecretCredential = new ActorClientSecretCredentialsEntity();
+            to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
+            {
+                ClientSecretIdentifier = clientSecretCredentials.ClientSecretIdentifier
+            };
         }
 
         // Map Certificate credentials
@@ -97,7 +101,7 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
-        var credentials = new List<ActorCredentials>();
+        var credentials = new Collection<ActorCredentials>();
         if (from.CertificateCredential != null)
         {
             credentials.Add(Map(from.CertificateCredential));
@@ -121,7 +125,7 @@ internal static class ActorMapper
 
     private static ActorCredentials Map(ActorClientSecretCredentialsEntity from)
     {
-        return new ActorClientSecretCredentials();
+        return new ActorClientSecretCredentials(from.ClientSecretIdentifier);
     }
 
     private static ActorCredentials Map(ActorCertificateCredentialsEntity from)

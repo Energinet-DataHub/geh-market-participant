@@ -148,9 +148,9 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorCertCredentials = new ActorCertificateCredentials("12345678", "secret");
-        var actorClientCredentials = new ActorClientSecretCredentials();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new List<ActorCredentials>() { actorCertCredentials, actorClientCredentials });
+        var actorCertificateCredentials = new ActorCertificateCredentials("12345678", "secret");
+        var actorClientSecretCredentials = new ActorClientSecretCredentials("111111");
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), new List<ActorCredentials>() { actorCertificateCredentials, actorClientSecretCredentials });
 
         // Act
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -166,10 +166,11 @@ public sealed class ActorRepositoryTests
         {
             return cred switch
             {
-                ActorCertificateCredentials actorCertificateCredentials =>
-                    actorCertificateCredentials.CertificateThumbprint == actorCertCredentials.CertificateThumbprint &&
-                    actorCertificateCredentials.KeyVaultSecretIdentifier == actorCertCredentials.KeyVaultSecretIdentifier,
-                ActorClientSecretCredentials actorClientSecretCredentials => true,
+                ActorCertificateCredentials actorCertificateCredentialsTest =>
+                    actorCertificateCredentialsTest.CertificateThumbprint == actorCertificateCredentials.CertificateThumbprint &&
+                    actorCertificateCredentialsTest.KeyVaultSecretIdentifier == actorCertificateCredentials.KeyVaultSecretIdentifier,
+                ActorClientSecretCredentials actorClientSecretCredentialsTest =>
+                    actorClientSecretCredentialsTest.ClientSecretIdentifier == actorClientSecretCredentials.ClientSecretIdentifier,
                 _ => false
             };
         });

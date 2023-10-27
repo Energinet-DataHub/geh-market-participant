@@ -65,6 +65,12 @@ public sealed class ActorRepository : IActorRepository
         {
             return new(ActorError.ThumbprintCredentialsConflict);
         }
+        catch (DbUpdateException ex) when (
+            ex.InnerException is SqlException inner &&
+            inner.Message.Contains("UQ_ActorClientSecretCredentials_SecretIdentifier", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return new(ActorError.ClientSecretCredentialsConflict);
+        }
 
         return new(new ActorId(destination.Id));
     }

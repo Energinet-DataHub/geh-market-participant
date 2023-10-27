@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,7 +50,7 @@ public sealed class UserInvitationServiceTests
             ActorStatus.New,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
             new ActorName("fake_value"),
-            Enumerable.Empty<ActorCredentials>()),
+            new Collection<ActorCredentials>()),
         new[]
         {
             new UserRole(

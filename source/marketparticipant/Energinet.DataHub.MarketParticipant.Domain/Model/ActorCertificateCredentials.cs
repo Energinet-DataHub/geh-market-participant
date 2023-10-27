@@ -24,15 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
             KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
         }
 
-        public ActorCertificateCredentials(
-            CredentialsId id,
-            string certificateThumbprint,
-            string keyVaultSecretIdentifier)
-        {
-            CertificateThumbprint = certificateThumbprint;
-            KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
-        }
-
         public string CertificateThumbprint { get; }
         public string KeyVaultSecretIdentifier { get; }
     }

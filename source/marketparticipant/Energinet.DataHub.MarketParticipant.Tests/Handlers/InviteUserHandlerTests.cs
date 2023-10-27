@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -93,7 +94,7 @@ public sealed class InviteUserHandlerTests
                 ActorStatus.Active,
                 new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
                 new ActorName("fake_value"),
-                Enumerable.Empty<ActorCredentials>()));
+                new Collection<ActorCredentials>()));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
@@ -132,7 +133,7 @@ public sealed class InviteUserHandlerTests
                 ActorStatus.Active,
                 new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
                 new ActorName("fake_value"),
-                Enumerable.Empty<ActorCredentials>()));
+                new Collection<ActorCredentials>()));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
 
@@ -172,7 +173,7 @@ public sealed class InviteUserHandlerTests
                 ActorStatus.Active,
                 new[] { new ActorMarketRole(EicFunction.MeteredDataResponsible) },
                 new ActorName("fake_value"),
-                Enumerable.Empty<ActorCredentials>()));
+                new Collection<ActorCredentials>()));
 
         var userRoleRepositoryMock = new Mock<IUserRoleRepository>();
         userRoleRepositoryMock
