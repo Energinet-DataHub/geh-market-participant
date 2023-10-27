@@ -79,6 +79,16 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
+        var credentials = new List<ActorCredentials>();
+        if (from.CertificateCredential != null)
+        {
+            credentials.Add(Map(from.CertificateCredential));
+        }
+
+        if (from.ClientSecretCredential != null)
+        {
+            credentials.Add(Map(from.ClientSecretCredential));
+        }
 
         return new Actor(
             new ActorId(from.Id),
@@ -88,7 +98,7 @@ internal static class ActorMapper
             actorStatus,
             marketRoles,
             actorName,
-            new List<ActorCredentials>() { Map(from.CertificateCredential), Map(from.ClientSecretCredential) });
+            credentials);
     }
 
     private static ActorCredentials Map(ActorClientSecretCredentialsEntity from)

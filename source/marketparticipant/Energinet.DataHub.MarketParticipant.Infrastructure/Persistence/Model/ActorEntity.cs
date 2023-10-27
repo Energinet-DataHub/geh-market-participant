@@ -30,8 +30,8 @@ public sealed class ActorEntity : IAuditedEntity
     public string Name { get; set; } = null!;
     public ActorStatus Status { get; set; }
     public Collection<MarketRoleEntity> MarketRoles { get; } = new();
-    public ActorCertificateCredentialsEntity CertificateCredential { get; } = new();
-    public ActorClientSecretCredentialsEntity ClientSecretCredential { get; } = new();
+    public ActorCertificateCredentialsEntity? CertificateCredential { get; } = null!;
+    public ActorClientSecretCredentialsEntity? ClientSecretCredential { get; } = null!;
     public int Version { get; set; }
     public Guid ChangedByIdentityId { get; set; }
 }

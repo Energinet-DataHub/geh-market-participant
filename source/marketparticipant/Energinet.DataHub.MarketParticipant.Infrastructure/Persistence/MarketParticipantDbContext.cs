@@ -95,6 +95,8 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new PermissionEntityConfiguration());
         modelBuilder.ApplyConfiguration(new DomainEventEntityConfiguration());
         modelBuilder.ApplyConfiguration(new EmailEventEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorCertificateCredentialsEntityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActorClientSecretCredentialsEntityConfiguration());
         base.OnModelCreating(modelBuilder);
     }
 
