@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return NotFound();
         }
 
-        [HttpPost("{actorId:guid}/credentials")]
+        [HttpPost("{actorId:guid}/credentials/certificate")]
         [AuthorizeUser(PermissionId.ActorCredentialsManage)]
         [RequestSizeLimit(10485760)]
         public async Task<ActionResult> AssignActorCredentialsAsync(Guid actorId, IFormFile certificate)
