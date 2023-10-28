@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
@@ -94,9 +95,40 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok();
         }
 
+        [HttpGet("{actorId:guid}/credentials")]
+        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+        public async Task<ActionResult<ActorCredentialsDto>> GetActorCredentialsAsync(Guid actorId)
+        {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
+            return NotFound();
+        }
+
+        [HttpPost("{actorId:guid}/credentials/certificate")]
+        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+        [RequestSizeLimit(10485760)]
+        public async Task<ActionResult> AssignActorCredentialsAsync(Guid actorId, IFormFile certificate)
+        {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
+            return Ok();
+        }
+
+        [HttpDelete("{actorId:guid}/credentials")]
+        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
+        public async Task<ActionResult> RemoveActorCredentialsAsync(Guid actorId)
+        {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
+            return Ok();
+        }
+
         [HttpGet("{actorId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<IActionResult> GetAuditLogsAsync(Guid actorId)
+        public async Task<ActionResult<GetActorAuditLogsResponse>> GetActorAuditLogsAsync(Guid actorId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();

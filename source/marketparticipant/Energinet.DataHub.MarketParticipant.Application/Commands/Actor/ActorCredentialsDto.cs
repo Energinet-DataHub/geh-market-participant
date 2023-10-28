@@ -12,12 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public enum ActorChangeType
-    {
-        Name = 1,
-        Created = 5,
-        Status = 6
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+
+public sealed record ActorCredentialsDto(ActorCertificateCredentialsDto? CertificateCredentials, ActorClientSecretCredentialsDto? ClientSecretCredentials);

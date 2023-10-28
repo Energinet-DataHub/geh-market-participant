@@ -139,7 +139,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             services.AddHttpLoggingScope("mark-part");
             services.AddSwaggerGen(c =>
             {
-                c.SupportNonNullableReferenceTypes();
                 c.SwaggerDoc(
                     "v1",
                     new OpenApiInfo

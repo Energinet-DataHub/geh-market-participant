@@ -12,14 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public enum ActorContactChangeType
-    {
-        Name = 1,
-        Email = 2,
-        Phone = 3,
-        Created = 4,
-        Deleted = 5
-    }
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+
+public sealed record ActorCertificateCredentialsDto(string Thumbprint);

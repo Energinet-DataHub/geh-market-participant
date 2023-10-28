@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-namespace Energinet.DataHub.MarketParticipant.Client.Models
-{
-    public sealed record ActorAuditLogsDto(
-        IEnumerable<ActorAuditLogEntryDto> ActorAuditLogs,
-        IEnumerable<ActorContactAuditLogEntryDto> ActorContactAuditLogs);
-}
+public sealed record ActorClientSecretCredentialsDto;

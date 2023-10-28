@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)).ReturnsAsync(events);
+            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)).ReturnsAsync(events);
 
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)).ReturnsAsync(events);
+            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)).ReturnsAsync(events);
 
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock.Setup(e => e.GetAsync(events[0].Email)).ReturnsAsync((UserIdentity?)null);
@@ -118,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)).ReturnsAsync(events);
+            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)).ReturnsAsync(events);
 
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),

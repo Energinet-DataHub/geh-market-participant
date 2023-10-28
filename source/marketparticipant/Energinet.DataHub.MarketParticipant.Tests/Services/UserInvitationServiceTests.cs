@@ -98,7 +98,7 @@ public sealed class UserInvitationServiceTests
     }
 
     [Fact]
-    public async Task InviteUserAsync_EmailNotAllowed_DoesNotCreateUser()
+    public async Task InviteUserAsync_NewUserWithEmailOutsideOfOrganizationDomain_DoesNotCreateUser()
     {
         // Arrange
         var userRepositoryMock = new Mock<IUserRepository>();
@@ -142,6 +142,76 @@ public sealed class UserInvitationServiceTests
         emailEventRepositoryMock.Verify(
             emailEventRepository => emailEventRepository.InsertAsync(It.IsAny<EmailEvent>()),
             Times.Never);
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_ExistingUserWithEmailOutsideOfOrganizationDomain_Success()
+    {
+        // Arrange
+        var userRepositoryMock = new Mock<IUserRepository>();
+        var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
+        var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
+        var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userStatusCalculator = new UserStatusCalculator();
+
+        organizationDomainValidationServiceMock
+            .Setup(organizationDomainValidationService =>
+                organizationDomainValidationService.ValidateUserEmailInsideOrganizationDomainsAsync(
+                    It.IsAny<Actor>(),
+                    _validInvitation.Email))
+            .ThrowsAsync(new ValidationException());
+
+        var externalId = new ExternalUserId(Guid.NewGuid());
+
+        userRepositoryMock
+            .Setup(userRepository => userRepository.GetAsync(externalId))
+            .ReturnsAsync(new User(
+                new UserId(Guid.NewGuid()),
+                new ActorId(Guid.Empty),
+                externalId,
+                Array.Empty<UserRoleAssignment>(),
+                null,
+                null));
+
+        userIdentityRepositoryMock
+            .Setup(userIdentityRepository => userIdentityRepository.GetAsync(_validInvitation.Email))
+            .ReturnsAsync(new UserIdentity(
+                externalId,
+                _validInvitation.Email,
+                UserIdentityStatus.Active,
+                _validInvitation.FirstName,
+                _validInvitation.LastName,
+                _validInvitation.PhoneNumber,
+                DateTimeOffset.UtcNow,
+                AuthenticationMethod.Undetermined,
+                new Mock<IList<LoginIdentity>>().Object));
+
+        var target = new UserInvitationService(
+            userRepositoryMock.Object,
+            userIdentityRepositoryMock.Object,
+            emailEventRepositoryMock.Object,
+            organizationDomainValidationServiceMock.Object,
+            userInviteAuditLogEntryRepository.Object,
+            userIdentityAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create(),
+            userStatusCalculator);
+
+        // Act + Assert
+        await target.InviteUserAsync(_validInvitation, _validInvitedByUserId);
+
+        userRepositoryMock.Verify(
+            userRepository => userRepository.AddOrUpdateAsync(It.IsAny<User>()),
+            Times.Once);
+
+        userIdentityRepositoryMock.Verify(
+            userIdentityRepository => userIdentityRepository.CreateAsync(It.IsAny<UserIdentity>()),
+            Times.Never);
+
+        emailEventRepositoryMock.Verify(
+            emailEventRepository => emailEventRepository.InsertAsync(It.IsAny<EmailEvent>()),
+            Times.Once);
     }
 
     [Fact]
@@ -366,7 +436,7 @@ public sealed class UserInvitationServiceTests
         emailEventRepositoryMock.Verify(emailEventRepository => emailEventRepository.InsertAsync(
             It.Is<EmailEvent>(emailEvent =>
                 emailEvent.Email == _validInvitation.Email &&
-                emailEvent.EmailEventType == EmailEventType.UserInvite)));
+                emailEvent.EmailEventType == EmailEventType.UserAssignedToActor)));
     }
 
     [Fact]

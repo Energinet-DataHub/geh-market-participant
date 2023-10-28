@@ -64,13 +64,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             throw new NotFoundException($"Email event with id {emailEvent.Id} was not found");
         }
 
-        public async Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(EmailEventType emailEventType)
+        public async Task<IEnumerable<EmailEvent>> GetAllEmailsToBeSentByTypeAsync(params EmailEventType[] emailEventTypes)
         {
             var emailToBeSent = await _context.EmailEventEntries
-                .Where(e => e.Sent == null && e.EmailEventType == (int)emailEventType)
+                .Where(e => e.Sent == null && emailEventTypes.Contains((EmailEventType)e.EmailEventType))
                 .ToListAsync()
                 .ConfigureAwait(false);
-
             return emailToBeSent.Select(MapTo);
         }
 
