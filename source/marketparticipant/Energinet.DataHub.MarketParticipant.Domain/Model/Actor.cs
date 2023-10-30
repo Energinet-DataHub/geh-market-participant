@@ -38,14 +38,13 @@ public sealed class Actor : IPublishDomainEvents
         ActorNumber = actorNumber;
         Name = actorName;
         _actorStatusTransitioner = new ActorStatusTransitioner();
-        Credentials = new Collection<ActorCredentials>();
     }
 
     public Actor(
         OrganizationId organizationId,
         ActorNumber actorNumber,
         ActorName actorName,
-        ICollection<ActorCredentials> credentials)
+        ActorCredentials credentials)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
@@ -63,7 +62,7 @@ public sealed class Actor : IPublishDomainEvents
         ActorStatus actorStatus,
         IEnumerable<ActorMarketRole> marketRoles,
         ActorName name,
-        ICollection<ActorCredentials> credentials)
+        ActorCredentials? credentials)
     {
         Id = id;
         OrganizationId = organizationId;
@@ -132,9 +131,9 @@ public sealed class Actor : IPublishDomainEvents
     public ActorName Name { get; set; }
 
     /// <summary>
-    /// The list of credentials for the current actor.
+    /// The credentials for the current actor.
     /// </summary>
-    public ICollection<ActorCredentials> Credentials { get; }
+    public ActorCredentials? Credentials { get; }
 
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.

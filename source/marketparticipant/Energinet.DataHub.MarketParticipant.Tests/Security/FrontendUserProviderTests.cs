@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Security;
@@ -65,7 +63,7 @@ public sealed class FrontendUserProviderTests
                 actorStatus,
                 Array.Empty<ActorMarketRole>(),
                 new ActorName(string.Empty),
-                new Collection<ActorCredentials>()));
+                null));
 
         var target = new FrontendUserProvider(actorRepositoryMock.Object);
 

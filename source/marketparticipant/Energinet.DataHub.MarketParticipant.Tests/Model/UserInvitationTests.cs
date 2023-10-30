@@ -13,9 +13,7 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -43,7 +41,7 @@ public sealed class UserInvitationTests
             ActorStatus.New,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
             new ActorName("fake_value"),
-            new Collection<ActorCredentials>()),
+            null),
         new[]
         {
             new UserRole(
@@ -87,7 +85,7 @@ public sealed class UserInvitationTests
             status,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
             new ActorName("fake_value"),
-            new Collection<ActorCredentials>());
+            null);
 
         // Act + Assert
         if (isValid)

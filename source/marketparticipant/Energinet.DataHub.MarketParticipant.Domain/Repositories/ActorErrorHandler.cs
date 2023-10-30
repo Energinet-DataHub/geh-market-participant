@@ -22,7 +22,6 @@ public static class ActorErrorHandler
     public static System.Exception HandleActorError(ActorError source) => source switch
     {
         ActorError.ThumbprintCredentialsConflict => new ValidationException("An actor with the same certificate thumbprint already exists"),
-        ActorError.ClientSecretCredentialsConflict => new ValidationException("An actor with the same Client secret identifier already exists"),
         _ => throw new ArgumentOutOfRangeException(nameof(source))
     };
 }

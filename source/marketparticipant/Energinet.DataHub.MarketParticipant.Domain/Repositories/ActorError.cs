@@ -16,6 +16,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
 public enum ActorError
 {
-    ThumbprintCredentialsConflict,
-    ClientSecretCredentialsConflict
+    ThumbprintCredentialsConflict
 }

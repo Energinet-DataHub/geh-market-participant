@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -211,7 +210,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 status,
                 Enumerable.Empty<ActorMarketRole>(),
                 new ActorName("test_actor_name"),
-                new Collection<ActorCredentials>());
+                null);
         }
     }
 }

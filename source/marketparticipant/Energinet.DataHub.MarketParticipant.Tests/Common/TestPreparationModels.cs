@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -47,7 +46,7 @@ internal static class TestPreparationModels
         ActorStatus.New,
         new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
         new ActorName("Sloth Power"),
-        new Collection<ActorCredentials>());
+        null);
 
     public static UserRole MockedUserRole(Guid userRoleId) => new(
         new UserRoleId(userRoleId),

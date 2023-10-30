@@ -56,7 +56,7 @@ public sealed class DomainEventRepositoryTests
             ActorStatus.Active,
             Array.Empty<ActorMarketRole>(),
             new ActorName(string.Empty),
-            new Collection<ActorCredentials>());
+            null);
 
         // Act
         await target.EnqueueAsync(actor);
@@ -83,7 +83,7 @@ public sealed class DomainEventRepositoryTests
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
             new ActorName(string.Empty),
-            new Collection<ActorCredentials>());
+            null);
 
         actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
         {

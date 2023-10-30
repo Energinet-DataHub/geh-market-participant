@@ -62,25 +62,21 @@ internal static class ActorMapper
             to.MarketRoles.Add(marketRoleEntity);
         }
 
-        // Map Client secret credentials
-        var clientSecretCredentials = from.Credentials.OfType<ActorClientSecretCredentials>().FirstOrDefault();
-        if (clientSecretCredentials != null)
+        switch (from.Credentials)
         {
-            to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
-            {
-                ClientSecretIdentifier = clientSecretCredentials.ClientSecretIdentifier
-            };
-        }
-
-        // Map Certificate credentials
-        var certificateCredentials = from.Credentials.OfType<ActorCertificateCredentials>().FirstOrDefault();
-        if (certificateCredentials != null)
-        {
-            to.CertificateCredential = new ActorCertificateCredentialsEntity
-            {
-                CertificateThumbprint = certificateCredentials.CertificateThumbprint,
-                KeyVaultSecretIdentifier = certificateCredentials.KeyVaultSecretIdentifier
-            };
+            case ActorClientSecretCredentials credentials:
+                to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
+                {
+                    ClientSecretIdentifier = credentials.ClientSecretIdentifier
+                };
+                break;
+            case ActorCertificateCredentials credentials:
+                to.CertificateCredential = new ActorCertificateCredentialsEntity
+                {
+                    CertificateThumbprint = credentials.CertificateThumbprint,
+                    KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier
+                };
+                break;
         }
     }
 
@@ -101,16 +97,7 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
-        var credentials = new Collection<ActorCredentials>();
-        if (from.CertificateCredential != null)
-        {
-            credentials.Add(Map(from.CertificateCredential));
-        }
-
-        if (from.ClientSecretCredential != null)
-        {
-            credentials.Add(Map(from.ClientSecretCredential));
-        }
+        ActorCredentials? credentials = Map(from.CertificateCredential) ?? Map(from.ClientSecretCredential);
 
         return new Actor(
             new ActorId(from.Id),
@@ -123,15 +110,19 @@ internal static class ActorMapper
             credentials);
     }
 
-    private static ActorCredentials Map(ActorClientSecretCredentialsEntity from)
+    private static ActorCredentials? Map(ActorClientSecretCredentialsEntity? from)
     {
-        return new ActorClientSecretCredentials(from.ClientSecretIdentifier);
+        return from is null
+            ? null
+            : new ActorClientSecretCredentials(from.ClientSecretIdentifier);
     }
 
-    private static ActorCredentials Map(ActorCertificateCredentialsEntity from)
+    private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)
     {
-        return new ActorCertificateCredentials(
-            from.CertificateThumbprint,
-            from.KeyVaultSecretIdentifier);
+        return from is null
+            ? null
+            : new ActorCertificateCredentials(
+                from.CertificateThumbprint,
+                from.KeyVaultSecretIdentifier);
     }
 }

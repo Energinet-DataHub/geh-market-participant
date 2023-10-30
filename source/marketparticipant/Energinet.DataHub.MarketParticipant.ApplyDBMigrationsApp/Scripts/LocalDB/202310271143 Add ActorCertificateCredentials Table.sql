@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[ActorCertificateCredentials]
 (
     [ActorId]       [uniqueidentifier]   NOT NULL,
-    [Thumbprint]    [nvarchar](40)      NOT NULL,
+    [Thumbprint]    [nvarchar](40)       NOT NULL,
     [KvSecretId]    [nvarchar](128)      NOT NULL
     CONSTRAINT [UQ_ActorCertificateCredentials_Thumbprint] UNIQUE NONCLUSTERED
 (

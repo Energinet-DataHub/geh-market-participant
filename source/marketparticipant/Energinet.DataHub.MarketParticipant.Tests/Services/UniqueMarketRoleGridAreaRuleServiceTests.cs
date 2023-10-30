@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -48,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         Enumerable.Empty<ActorGridArea>())
                 },
                 new ActorName("fake_value"),
-                new Collection<ActorCredentials>());
+                null);
 
             // act
             await target.ValidateAsync(actor);
@@ -86,7 +85,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         })
                 },
                 new ActorName("fake_value"),
-                new Collection<ActorCredentials>());
+                null);
 
             // act
             await target.ValidateAsync(actor);
@@ -128,7 +127,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                         Enumerable.Empty<ActorGridArea>())
                     },
                     new ActorName("fake_value"),
-                    new Collection<ActorCredentials>());
+                    null);
 
                 // act
                 await target.ValidateAsync(actor);
