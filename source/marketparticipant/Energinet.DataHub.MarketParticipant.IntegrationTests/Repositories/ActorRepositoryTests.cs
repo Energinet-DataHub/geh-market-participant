@@ -112,7 +112,10 @@ public sealed class ActorRepositoryTests
 
         var organization = await _fixture.PrepareOrganizationAsync();
         var actorCredentials = new ActorCertificateCredentials("12345678", "secret");
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), actorCredentials);
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCredentials
+        };
 
         // Act
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -141,7 +144,10 @@ public sealed class ActorRepositoryTests
 
         var organization = await _fixture.PrepareOrganizationAsync();
         var actorClientSecretCredentials = new ActorClientSecretCredentials("111111");
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), actorClientSecretCredentials);
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorClientSecretCredentials
+        };
 
         // Act
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -170,8 +176,14 @@ public sealed class ActorRepositoryTests
         var organization = await _fixture.PrepareOrganizationAsync();
         var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret");
         var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2");
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), actorCertificateCredentials);
-        var actor2 = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"), actorCertificateCredentials2);
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCertificateCredentials
+        };
+        var actor2 = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCertificateCredentials2
+        };
 
         // Act
         var resultOk = await actorRepository.AddOrUpdateAsync(actor);

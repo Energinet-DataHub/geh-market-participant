@@ -41,20 +41,6 @@ public sealed class Actor : IPublishDomainEvents
     }
 
     public Actor(
-        OrganizationId organizationId,
-        ActorNumber actorNumber,
-        ActorName actorName,
-        ActorCredentials credentials)
-    {
-        Id = new ActorId(Guid.Empty);
-        OrganizationId = organizationId;
-        ActorNumber = actorNumber;
-        Name = actorName;
-        _actorStatusTransitioner = new ActorStatusTransitioner();
-        Credentials = credentials;
-    }
-
-    public Actor(
         ActorId id,
         OrganizationId organizationId,
         ExternalActorId? externalActorId,
@@ -133,7 +119,7 @@ public sealed class Actor : IPublishDomainEvents
     /// <summary>
     /// The credentials for the current actor.
     /// </summary>
-    public ActorCredentials? Credentials { get; }
+    public ActorCredentials? Credentials { get; set; }
 
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.
