@@ -149,7 +149,8 @@ public sealed class CheckEmailExistsHandlerTests
             new MockedGln(),
             ActorStatus.Active,
             Array.Empty<ActorMarketRole>(),
-            new ActorName("Power Plant 1"));
+            new ActorName("Power Plant 1"),
+            null);
 
         var actorRepositoryMock = new Mock<IActorRepository>();
         actorRepositoryMock.Setup(x => x.GetAsync(actor.Id))

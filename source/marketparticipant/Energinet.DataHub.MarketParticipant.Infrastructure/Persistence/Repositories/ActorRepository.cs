@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -33,7 +34,7 @@ public sealed class ActorRepository : IActorRepository
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<ActorId> AddOrUpdateAsync(Actor actor)
+    public async Task<Result<ActorId, ActorError>> AddOrUpdateAsync(Actor actor)
     {
         ArgumentNullException.ThrowIfNull(actor);
 
@@ -54,8 +55,18 @@ public sealed class ActorRepository : IActorRepository
         ActorMapper.MapToEntity(actor, destination);
         _marketParticipantDbContext.Actors.Update(destination);
 
-        await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-        return new ActorId(destination.Id);
+        try
+        {
+            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
+        }
+        catch (DbUpdateException ex) when (
+            ex.InnerException is SqlException inner &&
+            inner.Message.Contains("UQ_ActorCertificateCredentials_Thumbprint", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return new(ActorError.ThumbprintCredentialsConflict);
+        }
+
+        return new(new ActorId(destination.Id));
     }
 
     public async Task<Actor?> GetAsync(ActorId actorId)

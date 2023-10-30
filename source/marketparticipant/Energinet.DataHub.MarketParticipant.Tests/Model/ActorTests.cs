@@ -209,7 +209,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 new MockedGln(),
                 status,
                 Enumerable.Empty<ActorMarketRole>(),
-                new ActorName("test_actor_name"));
+                new ActorName("test_actor_name"),
+                null);
         }
     }
 }

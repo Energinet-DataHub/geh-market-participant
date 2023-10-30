@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -53,7 +55,8 @@ public sealed class DomainEventRepositoryTests
             new MockedGln(),
             ActorStatus.Active,
             Array.Empty<ActorMarketRole>(),
-            new ActorName(string.Empty));
+            new ActorName(string.Empty),
+            null);
 
         // Act
         await target.EnqueueAsync(actor);
@@ -79,7 +82,8 @@ public sealed class DomainEventRepositoryTests
             new MockedGln(),
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
-            new ActorName(string.Empty));
+            new ActorName(string.Empty),
+            null);
 
         actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
         {
