@@ -29,11 +29,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class IntegrationEventProviderTests
+public sealed class IntegrationEventProviderIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public IntegrationEventProviderTests(MarketParticipantDatabaseFixture fixture)
+    public IntegrationEventProviderIntegrationTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -67,7 +67,7 @@ public sealed class IntegrationEventProviderTests
         var allIntegrationEvents = typeof(DomainEvent)
             .Assembly
             .GetTypes()
-            .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)) && typeof(IIntegrationEvent).IsAssignableFrom(domainEventType))
+            .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)))
             .ToDictionary(x => x.Name);
 
         foreach (var (eventName, eventType) in allIntegrationEvents)
@@ -96,7 +96,7 @@ public sealed class IntegrationEventProviderTests
             null,
             new MockedGln(),
             ActorStatus.New,
-            Array.Empty<ActorMarketRole>(),
+            new[] { new ActorMarketRole(EicFunction.MeteredDataAdministrator) },
             new ActorName(string.Empty),
             null);
 
@@ -107,14 +107,23 @@ public sealed class IntegrationEventProviderTests
         await domainEventRepository.EnqueueAsync(actor);
     }
 
-    private Task PrepareDomainEventAsync(IServiceProvider scope, Type domainEvent)
+    private static async Task PrepareActorCertificateCredentialsAssignedEventAsync(IServiceProvider scope)
     {
-        return domainEvent.Name switch
-        {
-            nameof(ActorActivated) => PrepareActorActivatedEventAsync(scope),
-            nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
-            _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
-        };
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.New,
+            new[] { new ActorMarketRole(EicFunction.EnergySupplier) },
+            new ActorName(string.Empty),
+            null);
+
+        actor.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+        actor.Activate();
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        await domainEventRepository.EnqueueAsync(actor);
     }
 
     private async Task PrepareGridAreaOwnershipAssignedEventAsync(IServiceProvider scope)
@@ -140,5 +149,16 @@ public sealed class IntegrationEventProviderTests
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
         await domainEventRepository.EnqueueAsync(actor);
+    }
+
+    private Task PrepareDomainEventAsync(IServiceProvider scope, Type domainEvent)
+    {
+        return domainEvent.Name switch
+        {
+            nameof(ActorActivated) => PrepareActorActivatedEventAsync(scope),
+            nameof(ActorCertificateCredentialsAssigned) => PrepareActorCertificateCredentialsAssignedEventAsync(scope),
+            nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
+            _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
+        };
     }
 }
