@@ -186,7 +186,13 @@ public sealed class Actor : IPublishDomainEvents
 
         Credentials = credential;
 
-        _domainEvents.Add(new ActorCertificateAssigned(ActorNumber, credential.CertificateThumbprint));
+        foreach (var marketRole in _marketRoles)
+        {
+            _domainEvents.Add(new ActorCertificateAssigned(
+                ActorNumber,
+                marketRole.Function,
+                credential.CertificateThumbprint));
+        }
     }
 
     /// <summary>
