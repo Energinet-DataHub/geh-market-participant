@@ -126,10 +126,13 @@ public sealed class Actor : IPublishDomainEvents
         {
             if (value is ActorCertificateCredentials acc && Status == ActorStatus.Active)
             {
-                _domainEvents.Add(new ActorCertificateCredentialsAssigned(
-                    ActorNumber,
-                    _marketRoles.Single().Function,
-                    acc.CertificateThumbprint));
+                foreach (var marketRole in _marketRoles)
+                {
+                    _domainEvents.Add(new ActorCertificateCredentialsAssigned(
+                        ActorNumber,
+                        marketRole.Function,
+                        acc.CertificateThumbprint));
+                }
             }
 
             _credentials = value;
