@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Domain;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,13 +27,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 public sealed class RemoveActorCertificateHandler : IRequestHandler<RemoveActorCertificateCommand>
 {
     private readonly IActorRepository _actorRepository;
-
-    // private readonly ICertificateService _certificateService;
+    private readonly ICertificateService _certificateService;
     public RemoveActorCertificateHandler(
         IActorRepository actorRepository,
-        IDomainEventRepository domainEventRepository)
+        ICertificateService certificateService)
     {
         _actorRepository = actorRepository;
+        _certificateService = certificateService;
     }
 
     public async Task Handle(RemoveActorCertificateCommand request, CancellationToken cancellationToken)
@@ -47,6 +46,9 @@ public sealed class RemoveActorCertificateHandler : IRequestHandler<RemoveActorC
             .ConfigureAwait(false);
 
         NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
+
+        if (actor.Credentials is null)
+            return;
 
         // Check that the actor has the correct type of credentials
         if (actor.Credentials is not ActorCertificateCredentials credentials)
@@ -64,9 +66,9 @@ public sealed class RemoveActorCertificateHandler : IRequestHandler<RemoveActorC
             .ConfigureAwait(false);
     }
 
-    private static async Task RemoveFromKeyVaultAsync(string certificateName)
+    private async Task RemoveFromKeyVaultAsync(string certificateName)
     {
         ArgumentNullException.ThrowIfNull(certificateName);
-        await Task.CompletedTask.ConfigureAwait(false); // _certificateService.AddCertificateToKeyVaultAsync("s", certificateBytes).ConfigureAwait(false);
+        await _certificateService.RemoveCertificateAsync(certificateName).ConfigureAwait(false);
     }
 }

@@ -22,4 +22,5 @@ public interface ICertificateService
 {
     X509Certificate2 CreateAndValidateX509Certificate(Stream certificate);
     Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
+    Task RemoveCertificateAsync(string certificateLookupIdentifier);
 }
