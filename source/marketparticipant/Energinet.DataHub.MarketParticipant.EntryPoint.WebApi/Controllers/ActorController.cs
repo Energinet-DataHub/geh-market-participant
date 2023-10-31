@@ -102,7 +102,15 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
 
-            return NotFound();
+            var command = new GetActorCredentialsCommand(actorId);
+
+            var result = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            return result is not null
+                ? Ok(result)
+                : NotFound();
         }
 
         [HttpPost("{actorId:guid}/credentials/certificate")]
