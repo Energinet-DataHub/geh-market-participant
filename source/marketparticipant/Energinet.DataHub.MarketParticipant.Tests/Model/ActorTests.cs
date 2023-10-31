@@ -191,7 +191,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void ExternalActorId_IsAssigned_PublishesEvents()
         {
             // Arrange
-            var target = CreateTestActor(ActorStatus.Active);
+            var target = CreateTestActor(ActorStatus.Active, EicFunction.BalanceResponsibleParty);
 
             // Act
             target.ExternalActorId = new ExternalActorId(Guid.NewGuid());
