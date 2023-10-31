@@ -74,17 +74,17 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
 
         // Make an audited change.
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
 
         // Act
         var actual = await actorAuditLogEntryRepository
-            .GetAsync(actorId);
+            .GetAsync(result.Value);
 
         // Assert
         var actorAuditLogs = actual.ToList();
         Assert.NotEmpty(actorAuditLogs);
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
-        Assert.Contains(actorAuditLogs, o => o.ActorId == actorId);
+        Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
         Assert.All(actorAuditLogs, o => Assert.Equal(ActorChangeType.Created, o.ActorChangeType));
     }
 
@@ -110,14 +110,14 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
 
         // Make an audited change.
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        actor = await actorRepository.GetAsync(actorId);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        actor = await actorRepository.GetAsync(result.Value);
         actor!.Name = new ActorName("Test Name 2");
         await actorRepository.AddOrUpdateAsync(actor!);
 
         // Act
         var actual = await actorAuditLogEntryRepository
-            .GetAsync(actorId);
+            .GetAsync(result.Value);
 
         // Assert
         var actorAuditLogs = actual.ToList();
@@ -126,7 +126,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Name);
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == "Test Name 2");
         Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue);
-        Assert.Contains(actorAuditLogs, o => o.ActorId == actorId);
+        Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
     }
 
     [Fact]
@@ -151,14 +151,14 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
 
         // Make an audited change.
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        actor = await actorRepository.GetAsync(actorId);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        actor = await actorRepository.GetAsync(result.Value);
         actor!.Status = ActorStatus.Active;
         await actorRepository.AddOrUpdateAsync(actor!);
 
         // Act
         var actual = await actorAuditLogEntryRepository
-            .GetAsync(actorId);
+            .GetAsync(result.Value);
 
         // Assert
         var actorAuditLogs = actual.ToList();
@@ -167,6 +167,6 @@ public sealed class ActorAuditLogEntryRepositoryTests
         Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Status);
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == ActorStatus.Active.ToString());
         Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue.ToString());
-        Assert.Contains(actorAuditLogs, o => o.ActorId == actorId);
+        Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
     }
 }

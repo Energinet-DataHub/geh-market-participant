@@ -58,7 +58,8 @@ public sealed class SynchronizeActorsHandlerTests
             new MockedGln(),
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
-            new ActorName("fake_value"));
+            new ActorName("fake_value"),
+            null);
 
         var externalActorSynchronizationRepository = new Mock<IExternalActorSynchronizationRepository>();
         externalActorSynchronizationRepository

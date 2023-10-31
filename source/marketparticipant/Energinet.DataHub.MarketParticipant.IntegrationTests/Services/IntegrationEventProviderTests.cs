@@ -97,7 +97,8 @@ public sealed class IntegrationEventProviderTests
             new MockedGln(),
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
-            new ActorName(string.Empty));
+            new ActorName(string.Empty),
+            null);
 
         actor.Activate();
         actor.ExternalActorId = new ExternalActorId(Guid.NewGuid());
@@ -125,7 +126,8 @@ public sealed class IntegrationEventProviderTests
             new MockedGln(),
             ActorStatus.New,
             Array.Empty<ActorMarketRole>(),
-            new ActorName(string.Empty));
+            new ActorName(string.Empty),
+            null);
 
         var gridArea = await _fixture.PrepareGridAreaAsync();
 
