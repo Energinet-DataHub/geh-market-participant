@@ -12,8 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 public abstract class DomainEvent
 {
+    public Guid EventId { get; init; }
 }
