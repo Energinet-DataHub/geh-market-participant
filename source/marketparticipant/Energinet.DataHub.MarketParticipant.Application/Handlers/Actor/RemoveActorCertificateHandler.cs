@@ -57,18 +57,12 @@ public sealed class RemoveActorCertificateHandler : IRequestHandler<RemoveActorC
         }
 
         // Remove certificate from key vault
-        await RemoveFromKeyVaultAsync(credentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
+        await _certificateService.RemoveCertificateAsync(credentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
 
         // Remove certificate credentials from actor
         actor.Credentials = null;
         await _actorRepository
             .AddOrUpdateAsync(actor)
             .ConfigureAwait(false);
-    }
-
-    private async Task RemoveFromKeyVaultAsync(string certificateName)
-    {
-        ArgumentNullException.ThrowIfNull(certificateName);
-        await _certificateService.RemoveCertificateAsync(certificateName).ConfigureAwait(false);
     }
 }
