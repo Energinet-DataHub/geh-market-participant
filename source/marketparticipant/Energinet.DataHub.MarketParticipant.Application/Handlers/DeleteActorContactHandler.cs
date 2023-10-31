@@ -50,14 +50,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .GetAsync(new ContactId(request.ContactId))
                 .ConfigureAwait(false);
 
-            if (contact == null)
+            if (contact == null || contact.ActorId != actor.Id)
             {
                 return;
-            }
-
-            if (contact.ActorId != actor.Id)
-            {
-                throw new NotFoundValidationException(contact.Id.Value);
             }
 
             await _contactRepository
