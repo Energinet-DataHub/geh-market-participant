@@ -99,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_HasCClientSecretCredentials_ReturnsCorrectCredentials()
+        public async Task Handle_HasClientSecretCredentials_ReturnsCorrectCredentials()
         {
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
