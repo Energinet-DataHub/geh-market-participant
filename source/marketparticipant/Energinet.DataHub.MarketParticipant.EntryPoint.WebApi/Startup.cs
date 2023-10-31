@@ -34,6 +34,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
@@ -113,14 +114,17 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
             });
 
-            services.AddSingleton<ICertificateService>(_ =>
+            services.AddSingleton<ICertificateService>(s =>
             {
                 var certificateKeyVaultUri = configuration.GetSetting(Settings.CertificateKeyVault);
 
                 var defaultCredentials = new DefaultAzureCredential();
 
                 var certificateClient = new CertificateClient(certificateKeyVaultUri, defaultCredentials);
-                return new CertificateService(certificateClient);
+
+                var logger = s.GetRequiredService<ILogger<CertificateService>>();
+
+                return new CertificateService(certificateClient, logger);
             });
 
             if (_configuration.GetSetting(Settings.AllowAllTokens))

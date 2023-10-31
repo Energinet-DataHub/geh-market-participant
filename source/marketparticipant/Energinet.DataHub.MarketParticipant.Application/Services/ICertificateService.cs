@@ -21,5 +21,5 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 public interface ICertificateService
 {
     X509Certificate2 CreateAndValidateX509Certificate(Stream certificate);
-    Task AddCertificateToKeyVaultAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
+    Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
 }

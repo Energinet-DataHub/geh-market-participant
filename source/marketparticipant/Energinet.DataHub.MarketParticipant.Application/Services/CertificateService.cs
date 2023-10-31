@@ -19,19 +19,24 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Certificates;
+using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public class CertificateService : ICertificateService
 {
     private readonly CertificateClient _keyVault;
+    private readonly ILogger<CertificateService> _logger;
 
-    public CertificateService(CertificateClient keyVault)
+    public CertificateService(
+        CertificateClient keyVault,
+        ILogger<CertificateService> logger)
     {
         _keyVault = keyVault;
+        _logger = logger;
     }
 
-    public Task AddCertificateToKeyVaultAsync(string certificateLookupIdentifier, X509Certificate2 certificate)
+    public Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate)
     {
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
         ArgumentNullException.ThrowIfNull(certificate);
@@ -53,11 +58,13 @@ public class CertificateService : ICertificateService
         }
         catch (CryptographicException ex)
         {
-            throw new ValidationException("Certificate validation failed", ex);
+            _logger.LogError(ex, "Certificate validation failed");
+            throw new ValidationException("Certificate invalid");
         }
-        catch
+        catch (Exception ex)
         {
-            throw new ValidationException("Unhandled exception while validating certificate");
+            _logger.LogError(ex, "Unknown Certificate validation exception");
+            throw new ValidationException("Certificate invalid");
         }
     }
 }
