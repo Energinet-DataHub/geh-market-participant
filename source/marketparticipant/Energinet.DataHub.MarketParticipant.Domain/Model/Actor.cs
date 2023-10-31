@@ -170,6 +170,25 @@ public sealed class Actor : IPublishDomainEvents
         }
     }
 
+    public void AssignCertificate(ActorCertificateCredentials credential)
+    {
+        ArgumentNullException.ThrowIfNull(credential);
+
+        if (Status != ActorStatus.New)
+        {
+            throw new ValidationException("It is only allowed to assign certificate for actors marked as 'New'.");
+        }
+
+        if (Credentials != null)
+        {
+            throw new ValidationException("The actor already has a credential assigned.");
+        }
+
+        Credentials = credential;
+
+        _domainEvents.Add(new ActorCertificateAssigned(ActorNumber, credential.CertificateThumbprint));
+    }
+
     /// <summary>
     /// Activates the current actor, the status changes to Active.
     /// Only New actors can be activated.

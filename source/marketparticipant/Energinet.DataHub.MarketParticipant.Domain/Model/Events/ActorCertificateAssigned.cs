@@ -23,11 +23,10 @@ public sealed class ActorCertificateAssigned : DomainEvent, IIntegrationEvent
     [JsonConstructor]
     [Browsable(false)]
     public ActorCertificateAssigned(
-        Guid eventId,
         ActorNumber actorNumber,
         string thumbprint)
     {
-        EventId = eventId;
+        EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
         Thumbprint = thumbprint;
     }

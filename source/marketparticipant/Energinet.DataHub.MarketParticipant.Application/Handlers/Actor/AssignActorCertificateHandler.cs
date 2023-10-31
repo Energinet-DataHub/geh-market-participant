@@ -49,19 +49,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-            // Find actor
             var actor = await _actorRepository
                 .GetAsync(new ActorId(request.ActorId))
                 .ConfigureAwait(false);
 
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            // Certificate should not exist for actor
+            var certificate = await _certificateService.AddCertificateToKeyVaultAsync($"actor-{actor.ActorNumber.Value}", request.Certificate).ConfigureAwait(false);
 
-            // Add certificate to keyvault, here ??
-            await AddToKeyVaultAsync(actor.Name.Value, request.Certificate).ConfigureAwait(false);
+            actor.AssignCertificate(certificate);
 
-            // Add certificate to actor Uow
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
                 .ConfigureAwait(false);
@@ -69,9 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             await using (uow.ConfigureAwait(false))
             {
                 await _actorRepository
-                    .AssignCertificate(actor)
-                    // with certificate event added,
-                    // Add domain event (ActorCertificateAssigned) only if actor is active
+                    .AddOrUpdateAsync(actor)
                     .ConfigureAwait(false);
 
                 await _domainEventRepository
@@ -80,15 +75,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
                 await uow.CommitAsync().ConfigureAwait(false);
             }
-        }
-
-        private async Task AddToKeyVaultAsync(string certificateName, Stream certificate)
-        {
-            ArgumentNullException.ThrowIfNull(certificateName);
-
-            using var reader = new BinaryReader(certificate);
-            var certificateBytes = reader.ReadBytes((int)certificate.Length);
-            await _certificateService.AddCertificateToKeyVaultAsync("s", certificateBytes).ConfigureAwait(false);
         }
     }
 }

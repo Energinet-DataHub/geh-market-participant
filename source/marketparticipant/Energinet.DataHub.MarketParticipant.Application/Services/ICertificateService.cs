@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.IO;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public interface ICertificateService
 {
-    Task AddCertificateToKeyVaultAsync(string certificateName, byte[] certificate);
+    Task<ActorCertificateCredentials> AddCertificateToKeyVaultAsync(string certificateName, Stream certificate);
 }

@@ -12,8 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Certificates;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -26,8 +30,18 @@ public class CertificateService : ICertificateService
         _keyVault = keyVault;
     }
 
-    public Task AddCertificateToKeyVaultAsync(string certificateName, byte[] certificate)
+    public async Task<ActorCertificateCredentials> AddCertificateToKeyVaultAsync(string certificateName, Stream certificate)
     {
-        return _keyVault.ImportCertificateAsync(new ImportCertificateOptions(certificateName, certificate));
+        ArgumentException.ThrowIfNullOrEmpty(certificateName);
+        ArgumentNullException.ThrowIfNull(certificate);
+
+        using var reader = new BinaryReader(certificate);
+        var certificateBytes = reader.ReadBytes((int)certificate.Length);
+
+        var response = await _keyVault.ImportCertificateAsync(new ImportCertificateOptions(certificateName, certificateBytes)).ConfigureAwait(false);
+
+        var thumbprint = Encoding.UTF8.GetString(response.Value.Properties.X509Thumbprint);
+
+        return new ActorCertificateCredentials(thumbprint, response.Value.SecretId.ToString());
     }
 }
