@@ -56,6 +56,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
+            var actorId = new ActorId(Guid.NewGuid());
+
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(actorId));
 
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
@@ -90,6 +95,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var globalLocationNumber = new MockedGln();
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
@@ -129,6 +137,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var actor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
             actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
+            actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(actor);
 
@@ -166,6 +177,9 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
             var updatedActor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(updatedActor);

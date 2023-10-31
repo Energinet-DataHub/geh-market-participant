@@ -40,7 +40,8 @@ public sealed class UserInvitationTests
             new MockedGln(),
             ActorStatus.New,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
-            new ActorName("fake_value")),
+            new ActorName("fake_value"),
+            null),
         new[]
         {
             new UserRole(
@@ -83,7 +84,8 @@ public sealed class UserInvitationTests
             new MockedGln(),
             status,
             new[] { new ActorMarketRole(EicFunction.BalanceResponsibleParty) },
-            new ActorName("fake_value"));
+            new ActorName("fake_value"),
+            null);
 
         // Act + Assert
         if (isValid)
