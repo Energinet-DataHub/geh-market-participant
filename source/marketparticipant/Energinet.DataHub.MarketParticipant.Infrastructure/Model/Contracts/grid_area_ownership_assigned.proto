@@ -45,4 +45,9 @@ message GridAreaOwnershipAssigned {
    * A timestamp from when the ownership is valid.
    */
   google.protobuf.Timestamp valid_from = 4;
+
+  /*
+   * A timestamp from when the ownership was requested.
+   */
+  google.protobuf.Timestamp requested_at = 5;
 }

@@ -26,24 +26,28 @@ public sealed class ActorActivated : DomainEvent
     public ActorActivated(
         Guid eventId,
         ActorNumber actorNumber,
+        EicFunction actorRole,
         ExternalActorId externalActorId,
         Instant validFrom)
     {
         EventId = eventId;
         ActorNumber = actorNumber;
+        ActorRole = actorRole;
         ExternalActorId = externalActorId;
         ValidFrom = validFrom;
     }
 
-    public ActorActivated(ActorNumber actorNumber, ExternalActorId externalActorId)
+    public ActorActivated(ActorNumber actorNumber, EicFunction actorRole, ExternalActorId externalActorId)
     {
         EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
+        ActorRole = actorRole;
         ExternalActorId = externalActorId;
         ValidFrom = Clock.Instance.GetCurrentInstant();
     }
 
     public ActorNumber ActorNumber { get; }
+    public EicFunction ActorRole { get; }
     public ExternalActorId ExternalActorId { get; }
     public Instant ValidFrom { get; }
 }

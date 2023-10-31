@@ -80,7 +80,10 @@ public sealed class Actor : IPublishDomainEvents
         {
             if (value != null)
             {
-                _domainEvents.Add(new ActorActivated(ActorNumber, value));
+                foreach (var marketRole in _marketRoles)
+                {
+                    _domainEvents.Add(new ActorActivated(ActorNumber, marketRole.Function, value));
+                }
             }
 
             _externalActorId = value;
@@ -124,6 +127,11 @@ public sealed class Actor : IPublishDomainEvents
         get => _credentials;
         set
         {
+            if (_credentials != null && value != null)
+            {
+                throw new NotSupportedException("Cannot overwrite credentials. Remember to delete the credentials first using the appropriate service.");
+            }
+
             if (value is ActorCertificateCredentials acc && Status == ActorStatus.Active)
             {
                 foreach (var marketRole in _marketRoles)

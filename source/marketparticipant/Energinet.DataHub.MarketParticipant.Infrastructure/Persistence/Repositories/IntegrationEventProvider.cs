@@ -29,7 +29,7 @@ using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class IntegrationEventProviderIntegration : IIntegrationEventProvider
+public sealed class IntegrationEventProvider : IIntegrationEventProvider
 {
     private static readonly IReadOnlyDictionary<string, Type> _integrationEvents = typeof(DomainEvent)
         .Assembly
@@ -45,7 +45,7 @@ public sealed class IntegrationEventProviderIntegration : IIntegrationEventProvi
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    public IntegrationEventProviderIntegration(
+    public IntegrationEventProvider(
         IMarketParticipantDbContext marketParticipantDbContext,
         IServiceProvider serviceProvider)
     {

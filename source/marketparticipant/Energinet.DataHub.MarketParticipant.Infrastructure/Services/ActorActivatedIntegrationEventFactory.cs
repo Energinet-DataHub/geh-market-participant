@@ -34,6 +34,23 @@ public sealed class ActorActivatedIntegrationEventFactory : IIntegrationEventFac
             new Model.Contracts.ActorActivated
             {
                 ActorNumber = domainEvent.ActorNumber.Value,
+                ActorRole = domainEvent.ActorRole switch
+                {
+                    EicFunction.GridAccessProvider => Model.Contracts.EicFunction.GridAccessProvider,
+                    EicFunction.BalanceResponsibleParty => Model.Contracts.EicFunction.BalanceResponsibleParty,
+                    EicFunction.BillingAgent => Model.Contracts.EicFunction.BillingAgent,
+                    EicFunction.EnergySupplier => Model.Contracts.EicFunction.EnergySupplier,
+                    EicFunction.ImbalanceSettlementResponsible => Model.Contracts.EicFunction.ImbalanceSettlementResponsible,
+                    EicFunction.MeteredDataAdministrator => Model.Contracts.EicFunction.MeteredDataAdministrator,
+                    EicFunction.MeteredDataResponsible => Model.Contracts.EicFunction.MeteredDataResponsible,
+                    EicFunction.MeteringPointAdministrator => Model.Contracts.EicFunction.MeteringPointAdministrator,
+                    EicFunction.SystemOperator => Model.Contracts.EicFunction.SystemOperator,
+                    EicFunction.DanishEnergyAgency => Model.Contracts.EicFunction.DanishEnergyAgency,
+                    EicFunction.DataHubAdministrator => Model.Contracts.EicFunction.DatahubAdministrator,
+                    EicFunction.IndependentAggregator => Model.Contracts.EicFunction.IndependentAggregator,
+                    EicFunction.SerialEnergyTrader => Model.Contracts.EicFunction.SerialEnergyTrader,
+                    _ => throw new NotSupportedException($"Actor role {domainEvent.ActorRole} is not supported in integration event.")
+                },
                 ActorNumberType = domainEvent.ActorNumber.Type switch
                 {
                     ActorNumberType.Eic => Model.Contracts.ActorNumberType.Eic,

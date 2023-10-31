@@ -28,13 +28,15 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent
         ActorNumber actorNumber,
         EicFunction actorRole,
         GridAreaId gridAreaId,
-        Instant validFrom)
+        Instant validFrom,
+        Instant requestedAt)
     {
         EventId = eventId;
         ActorNumber = actorNumber;
         ActorRole = actorRole;
         GridAreaId = gridAreaId;
         ValidFrom = validFrom;
+        RequestedAt = requestedAt;
     }
 
     public GridAreaOwnershipAssigned(ActorNumber actorNumber, EicFunction actorRole, GridAreaId gridAreaId)
@@ -50,10 +52,12 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent
         var nextDate = localDate.PlusDays(1);
 
         ValidFrom = nextDate.AtStartOfDayInZone(TimeZone.Dk).ToInstant();
+        RequestedAt = currentInstant;
     }
 
     public ActorNumber ActorNumber { get; }
     public EicFunction ActorRole { get; }
     public GridAreaId GridAreaId { get; }
     public Instant ValidFrom { get; }
+    public Instant RequestedAt { get; }
 }

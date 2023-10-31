@@ -55,7 +55,8 @@ public sealed class GridAreaOwnershipAssignedIntegrationEventFactory : IIntegrat
                     _ => throw new NotSupportedException($"Actor role {domainEvent.ActorRole} is not supported in integration event.")
                 },
                 GridAreaCode = gridArea.Code.Value,
-                ValidFrom = domainEvent.ValidFrom.ToTimestamp()
+                ValidFrom = domainEvent.ValidFrom.ToTimestamp(),
+                RequestedAt = domainEvent.RequestedAt.ToTimestamp()
             });
     }
 }
