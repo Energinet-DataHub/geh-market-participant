@@ -191,11 +191,6 @@ public sealed class Actor : IPublishDomainEvents
     /// </summary>
     public void Activate()
     {
-        if (_marketRoles.Count < 1)
-        {
-            throw new ValidationException("Cannot active an actor without a market role.");
-        }
-
         _actorStatusTransitioner.Activate();
 
         foreach (var marketRole in _marketRoles)
