@@ -36,23 +36,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Equal(ActorStatus.New, actor.Status);
         }
 
-        [Fact]
-        public void Activate_NoMarketRole_Disallowed()
-        {
-            // Arrange
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("Mock"));
-
-            // Act + Assert
-            Assert.Throws<ValidationException>(() => actor.Activate());
-        }
-
         [Theory]
         [InlineData(ActorStatus.New, true)]
         [InlineData(ActorStatus.Active, true)]
         public void Activate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = CreateTestActor(initialStatus, EicFunction.EnergySupplier);
+            var target = CreateTestActor(initialStatus);
 
             // Act + Assert
             if (isAllowed)
@@ -73,7 +63,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Deactivate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = CreateTestActor(initialStatus, EicFunction.EnergySupplier);
+            var target = CreateTestActor(initialStatus);
 
             // Act + Assert
             if (isAllowed)
@@ -93,7 +83,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void SetAsPassive_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = CreateTestActor(initialStatus, EicFunction.EnergySupplier);
+            var target = CreateTestActor(initialStatus);
 
             // Act + Assert
             if (isAllowed)
