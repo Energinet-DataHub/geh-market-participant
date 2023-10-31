@@ -55,6 +55,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 return;
             }
 
+            if (contact.ActorId != actor.Id)
+            {
+                throw new NotFoundValidationException(contact.Id.Value);
+            }
+
             await _contactRepository
                 .RemoveAsync(contact)
                 .ConfigureAwait(false);
