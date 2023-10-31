@@ -16,39 +16,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Energinet.DataHub.Core.Messaging.Communication;
 using Energinet.DataHub.Core.Messaging.Communication.Publisher;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class IntegrationEventProvider : IIntegrationEventProvider
+public sealed class IntegrationEventProviderIntegration : IIntegrationEventProvider
 {
     private static readonly IReadOnlyDictionary<string, Type> _integrationEvents = typeof(DomainEvent)
         .Assembly
         .GetTypes()
-        .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)) && typeof(IIntegrationEvent).IsAssignableFrom(domainEventType))
+        .Where(domainEventType => domainEventType.IsSubclassOf(typeof(DomainEvent)))
         .ToDictionary(x => x.Name);
 
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
-    private readonly IIntegrationEventFactory _integrationEventFactory;
+    private readonly IServiceProvider _serviceProvider;
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
     };
 
-    public IntegrationEventProvider(
+    public IntegrationEventProviderIntegration(
         IMarketParticipantDbContext marketParticipantDbContext,
-        IIntegrationEventFactory integrationEventFactory)
+        IServiceProvider serviceProvider)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
-        _integrationEventFactory = integrationEventFactory;
+        _serviceProvider = serviceProvider;
         _jsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
     }
 
@@ -69,9 +71,7 @@ public sealed class IntegrationEventProvider : IIntegrationEventProvider
         {
             var domainEvent = Map(domainEventEntity);
 
-            yield return await _integrationEventFactory
-                .CreateAsync(domainEvent)
-                .ConfigureAwait(false);
+            yield return await CreateAsync((dynamic)domainEvent).ConfigureAwait(false);
 
             domainEventEntity.IsSent = true;
 
@@ -90,5 +90,12 @@ public sealed class IntegrationEventProvider : IIntegrationEventProvider
 
         return (DomainEvent?)deserializedDomainEvent ??
                throw new InvalidOperationException($"Could not deserialize event {domainEvent.EventTypeName}.");
+    }
+
+    private Task<IntegrationEvent> CreateAsync<T>(T domainEvent)
+        where T : DomainEvent
+    {
+        var factoryService = _serviceProvider.GetRequiredService<IIntegrationEventFactory<T>>();
+        return factoryService.CreateAsync(domainEvent);
     }
 }

@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
-
-public interface IIntegrationEvent
+public partial class ActorCertificateCredentialsAssigned
 {
-    Guid EventId { get; }
+    public const string EventName = "ActorCertificateCredentialsAssigned";
+    public const int CurrentMinorVersion = 1;
 }

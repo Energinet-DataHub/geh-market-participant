@@ -36,13 +36,23 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Equal(ActorStatus.New, actor.Status);
         }
 
+        [Fact]
+        public void Activate_NoMarketRole_Disallowed()
+        {
+            // Arrange
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("Mock"));
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => actor.Activate());
+        }
+
         [Theory]
         [InlineData(ActorStatus.New, true)]
         [InlineData(ActorStatus.Active, true)]
         public void Activate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = CreateTestActor(initialStatus);
+            var target = CreateTestActor(initialStatus, EicFunction.EnergySupplier);
 
             // Act + Assert
             if (isAllowed)
@@ -63,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void Deactivate_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = CreateTestActor(initialStatus);
+            var target = CreateTestActor(initialStatus, EicFunction.EnergySupplier);
 
             // Act + Assert
             if (isAllowed)
@@ -83,7 +93,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void SetAsPassive_ChangesState_IfAllowed(ActorStatus initialStatus, bool isAllowed)
         {
             // Arrange
-            var target = CreateTestActor(initialStatus);
+            var target = CreateTestActor(initialStatus, EicFunction.EnergySupplier);
 
             // Act + Assert
             if (isAllowed)
@@ -200,7 +210,34 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorActivated));
         }
 
-        private static Actor CreateTestActor(ActorStatus status)
+        [Fact]
+        public void Activate_WithCredentials_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New, EicFunction.EnergySupplier);
+            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+
+            // Act
+            target.Activate();
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
+        }
+
+        [Fact]
+        public void Credentials_AreAssigned_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active, EicFunction.EnergySupplier);
+
+            // Act
+            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
+        }
+
+        private static Actor CreateTestActor(ActorStatus status, params EicFunction[] eicFunctions)
         {
             return new Actor(
                 new ActorId(Guid.NewGuid()),
@@ -208,7 +245,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 new ExternalActorId(Guid.Empty),
                 new MockedGln(),
                 status,
-                Enumerable.Empty<ActorMarketRole>(),
+                eicFunctions.Select(f => new ActorMarketRole(f)),
                 new ActorName("test_actor_name"),
                 null);
         }

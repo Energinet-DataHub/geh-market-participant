@@ -23,45 +23,16 @@ using NodaTime.Serialization.Protobuf;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public sealed class IntegrationEventFactory : IIntegrationEventFactory
+public sealed class GridAreaOwnershipAssignedIntegrationEventFactory : IIntegrationEventFactory<GridAreaOwnershipAssigned>
 {
     private readonly IGridAreaRepository _gridAreaRepository;
 
-    public IntegrationEventFactory(IGridAreaRepository gridAreaRepository)
+    public GridAreaOwnershipAssignedIntegrationEventFactory(IGridAreaRepository gridAreaRepository)
     {
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public Task<IntegrationEvent> CreateAsync(DomainEvent domainEvent)
-    {
-        return CreateEventAsync((dynamic)domainEvent);
-    }
-
-    private static Task<IntegrationEvent> CreateEventAsync(ActorActivated domainEvent)
-    {
-        ArgumentNullException.ThrowIfNull(domainEvent);
-
-        var integrationEvent = new IntegrationEvent(
-            domainEvent.EventId,
-            Model.Contracts.ActorActivated.EventName,
-            Model.Contracts.ActorActivated.CurrentMinorVersion,
-            new Model.Contracts.ActorActivated
-            {
-                ActorNumber = domainEvent.ActorNumber.Value,
-                ActorNumberType = domainEvent.ActorNumber.Type switch
-                {
-                    ActorNumberType.Eic => Model.Contracts.ActorNumberType.Eic,
-                    ActorNumberType.Gln => Model.Contracts.ActorNumberType.Gln,
-                    _ => throw new NotSupportedException($"Actor number type {domainEvent.ActorNumber.Type} is not supported in integration event.")
-                },
-                ExternalActorId = domainEvent.ExternalActorId.ToString(),
-                ValidFrom = domainEvent.ValidFrom.ToTimestamp()
-            });
-
-        return Task.FromResult(integrationEvent);
-    }
-
-    private async Task<IntegrationEvent> CreateEventAsync(GridAreaOwnershipAssigned domainEvent)
+    public async Task<IntegrationEvent> CreateAsync(GridAreaOwnershipAssigned domainEvent)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 

@@ -19,41 +19,35 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class GridAreaOwnershipAssigned : DomainEvent
+public sealed class ActorCertificateCredentialsAssigned : DomainEvent
 {
     [JsonConstructor]
     [Browsable(false)]
-    public GridAreaOwnershipAssigned(
+    public ActorCertificateCredentialsAssigned(
         Guid eventId,
         ActorNumber actorNumber,
         EicFunction actorRole,
-        GridAreaId gridAreaId,
+        string certificateThumbprint,
         Instant validFrom)
     {
         EventId = eventId;
         ActorNumber = actorNumber;
         ActorRole = actorRole;
-        GridAreaId = gridAreaId;
+        CertificateThumbprint = certificateThumbprint;
         ValidFrom = validFrom;
     }
 
-    public GridAreaOwnershipAssigned(ActorNumber actorNumber, EicFunction actorRole, GridAreaId gridAreaId)
+    public ActorCertificateCredentialsAssigned(ActorNumber actorNumber, EicFunction actorRole, string certificateThumbprint)
     {
         EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
         ActorRole = actorRole;
-        GridAreaId = gridAreaId;
-
-        var currentInstant = Clock.Instance.GetCurrentInstant();
-
-        var localDate = currentInstant.InZone(TimeZone.Dk).Date;
-        var nextDate = localDate.PlusDays(1);
-
-        ValidFrom = nextDate.AtStartOfDayInZone(TimeZone.Dk).ToInstant();
+        CertificateThumbprint = certificateThumbprint;
+        ValidFrom = Clock.Instance.GetCurrentInstant();
     }
 
     public ActorNumber ActorNumber { get; }
     public EicFunction ActorRole { get; }
-    public GridAreaId GridAreaId { get; }
+    public string CertificateThumbprint { get; }
     public Instant ValidFrom { get; }
 }

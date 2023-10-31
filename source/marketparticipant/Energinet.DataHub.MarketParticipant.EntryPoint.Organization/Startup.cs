@@ -46,7 +46,7 @@ internal sealed class Startup : StartupBase
         services.AddScoped<UserInvitationExpiredTimerTrigger>();
         services.AddScoped<DispatchIntegrationEventsTrigger>();
 
-        services.AddPublisher<IntegrationEventProvider>();
+        services.AddPublisher<IntegrationEventProviderIntegration>();
         services.Configure<PublisherOptions>(options =>
         {
             options.ServiceBusConnectionString = configuration.GetSetting(Settings.ServiceBusTopicConnectionString);

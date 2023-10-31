@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
@@ -27,6 +26,7 @@ public sealed class Actor : IPublishDomainEvents
     private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
+    private ActorCredentials? _credentials;
 
     public Actor(
         OrganizationId organizationId,
@@ -57,7 +57,7 @@ public sealed class Actor : IPublishDomainEvents
         _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
-        Credentials = credentials;
+        _credentials = credentials;
     }
 
     /// <summary>
@@ -119,7 +119,22 @@ public sealed class Actor : IPublishDomainEvents
     /// <summary>
     /// The credentials for the current actor.
     /// </summary>
-    public ActorCredentials? Credentials { get; set; }
+    public ActorCredentials? Credentials
+    {
+        get => _credentials;
+        set
+        {
+            if (value is ActorCertificateCredentials acc && Status == ActorStatus.Active)
+            {
+                _domainEvents.Add(new ActorCertificateCredentialsAssigned(
+                    ActorNumber,
+                    _marketRoles.Single().Function,
+                    acc.CertificateThumbprint));
+            }
+
+            _credentials = value;
+        }
+    }
 
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.
@@ -176,16 +191,32 @@ public sealed class Actor : IPublishDomainEvents
     /// </summary>
     public void Activate()
     {
+        if (_marketRoles.Count < 1)
+        {
+            throw new ValidationException("Cannot active an actor without a market role.");
+        }
+
         _actorStatusTransitioner.Activate();
 
-        foreach (var marketRole in _marketRoles.Where(role => role.Function == EicFunction.GridAccessProvider))
+        foreach (var marketRole in _marketRoles)
         {
-            foreach (var gridArea in marketRole.GridAreas)
+            if (marketRole.Function == EicFunction.GridAccessProvider)
             {
-                _domainEvents.Add(new GridAreaOwnershipAssigned(
+                foreach (var gridArea in marketRole.GridAreas)
+                {
+                    _domainEvents.Add(new GridAreaOwnershipAssigned(
+                        ActorNumber,
+                        marketRole.Function,
+                        gridArea.Id));
+                }
+            }
+
+            if (Credentials is ActorCertificateCredentials acc)
+            {
+                _domainEvents.Add(new ActorCertificateCredentialsAssigned(
                     ActorNumber,
                     marketRole.Function,
-                    gridArea.Id));
+                    acc.CertificateThumbprint));
             }
         }
     }
