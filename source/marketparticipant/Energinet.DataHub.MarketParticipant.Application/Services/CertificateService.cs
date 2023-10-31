@@ -13,11 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Text;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Certificates;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -30,18 +31,33 @@ public class CertificateService : ICertificateService
         _keyVault = keyVault;
     }
 
-    public async Task<ActorCertificateCredentials> AddCertificateToKeyVaultAsync(string certificateName, Stream certificate)
+    public Task AddCertificateToKeyVaultAsync(string certificateLookupIdentifier, X509Certificate2 certificate)
     {
-        ArgumentException.ThrowIfNullOrEmpty(certificateName);
+        ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
+        ArgumentNullException.ThrowIfNull(certificate);
+
+        return _keyVault.ImportCertificateAsync(new ImportCertificateOptions(certificateLookupIdentifier, certificate.RawData));
+    }
+
+    public X509Certificate2 CreateAndValidateX509Certificate(Stream certificate)
+    {
         ArgumentNullException.ThrowIfNull(certificate);
 
         using var reader = new BinaryReader(certificate);
         var certificateBytes = reader.ReadBytes((int)certificate.Length);
 
-        var response = await _keyVault.ImportCertificateAsync(new ImportCertificateOptions(certificateName, certificateBytes)).ConfigureAwait(false);
-
-        var thumbprint = Encoding.UTF8.GetString(response.Value.Properties.X509Thumbprint);
-
-        return new ActorCertificateCredentials(thumbprint, response.Value.SecretId.ToString());
+        try
+        {
+            var x509Certificate2 = new X509Certificate2(certificateBytes);
+            return x509Certificate2;
+        }
+        catch (CryptographicException ex)
+        {
+            throw new ValidationException("Certificate validation failed", ex);
+        }
+        catch
+        {
+            throw new ValidationException("Unhandled exception while validating certificate");
+        }
     }
 }

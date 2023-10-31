@@ -14,6 +14,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -55,9 +56,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            var certificate = await _certificateService.AddCertificateToKeyVaultAsync($"actor-{actor.ActorNumber.Value}", request.Certificate).ConfigureAwait(false);
+            var x509Certificate = _certificateService.CreateAndValidateX509Certificate(request.Certificate);
+            var certificateLookupIdentifier = $"{actor.ActorNumber.Value}-{x509Certificate.Thumbprint}";
 
-            actor.AssignCertificate(certificate);
+            actor.Credentials = new ActorCertificateCredentials(x509Certificate.Thumbprint, certificateLookupIdentifier);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
@@ -72,6 +74,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 await _domainEventRepository
                     .EnqueueAsync(actor)
                     .ConfigureAwait(false);
+
+                await _certificateService.AddCertificateToKeyVaultAsync(certificateLookupIdentifier, x509Certificate).ConfigureAwait(false);
 
                 await uow.CommitAsync().ConfigureAwait(false);
             }

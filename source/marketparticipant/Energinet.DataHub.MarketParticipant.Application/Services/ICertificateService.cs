@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public interface ICertificateService
 {
-    Task<ActorCertificateCredentials> AddCertificateToKeyVaultAsync(string certificateName, Stream certificate);
+    X509Certificate2 CreateAndValidateX509Certificate(Stream certificate);
+    Task AddCertificateToKeyVaultAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
 }
