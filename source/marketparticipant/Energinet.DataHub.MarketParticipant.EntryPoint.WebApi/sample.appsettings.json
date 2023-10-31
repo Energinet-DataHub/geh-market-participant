@@ -16,5 +16,8 @@
   "AZURE_B2C_TENANT": "The tenant id of the current tenant, e.g. devDataHubB2C.onmicrosoft.com",
 
   "TOKEN_KEY_NAME": "The name of the key used to sign the token.",
-  "TOKEN_KEY_VAULT": "The address of the key vault containing the token signing key."
+  "TOKEN_KEY_VAULT": "The address of the key vault containing the token signing key.",
+
+  "CERTIFICATES_KEY_VAULT": "The address of the key vault containing the actor certificates"
+
 }
