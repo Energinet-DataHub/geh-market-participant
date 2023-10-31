@@ -12,11 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
-
-public interface IIntegrationEvent
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
 {
-    Guid EventId { get; }
+    public sealed class AssignActorCertificateRuleSet : AbstractValidator<AssignActorCertificateCommand>
+    {
+        public AssignActorCertificateRuleSet()
+        {
+            RuleFor(command => command.ActorId)
+                .NotEmpty();
+
+            RuleFor(command => command.Certificate)
+                .NotEmpty();
+        }
+    }
 }

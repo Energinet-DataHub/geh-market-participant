@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
-public abstract class DomainEvent
+public interface ICertificateService
 {
-    public Guid EventId { get; init; }
+    X509Certificate2 CreateAndValidateX509Certificate(Stream certificate);
+    Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
 }

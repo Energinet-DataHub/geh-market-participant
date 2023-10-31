@@ -113,6 +113,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
 
+            ArgumentNullException.ThrowIfNull(certificate);
+
+            var command = new AssignActorCertificateCommand(actorId, certificate.OpenReadStream());
+
+            await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
             return Ok();
         }
 

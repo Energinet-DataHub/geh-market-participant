@@ -13,10 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.IO;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
-
-public abstract class DomainEvent
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public Guid EventId { get; init; }
+    public sealed record AssignActorCertificateCommand(Guid ActorId, Stream Certificate) : IRequest;
 }
