@@ -191,7 +191,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         public void ExternalActorId_IsAssigned_PublishesEvents()
         {
             // Arrange
-            var target = CreateTestActor(ActorStatus.Active);
+            var target = CreateTestActor(ActorStatus.Active, EicFunction.BalanceResponsibleParty);
 
             // Act
             target.ExternalActorId = new ExternalActorId(Guid.NewGuid());
@@ -200,7 +200,34 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorActivated));
         }
 
-        private static Actor CreateTestActor(ActorStatus status)
+        [Fact]
+        public void Activate_WithCredentials_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.New, EicFunction.EnergySupplier);
+            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+
+            // Act
+            target.Activate();
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
+        }
+
+        [Fact]
+        public void Credentials_AreAssigned_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active, EicFunction.EnergySupplier);
+
+            // Act
+            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
+        }
+
+        private static Actor CreateTestActor(ActorStatus status, params EicFunction[] eicFunctions)
         {
             return new Actor(
                 new ActorId(Guid.NewGuid()),
@@ -208,7 +235,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                 new ExternalActorId(Guid.Empty),
                 new MockedGln(),
                 status,
-                Enumerable.Empty<ActorMarketRole>(),
+                eicFunctions.Select(f => new ActorMarketRole(f)),
                 new ActorName("test_actor_name"),
                 null);
         }
