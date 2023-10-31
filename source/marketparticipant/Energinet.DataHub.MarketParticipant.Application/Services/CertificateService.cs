@@ -44,6 +44,14 @@ public class CertificateService : ICertificateService
         return _keyVault.ImportCertificateAsync(new ImportCertificateOptions(certificateLookupIdentifier, certificate.RawData));
     }
 
+    public async Task RemoveCertificateAsync(string certificateLookupIdentifier)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
+
+        await _keyVault.StartDeleteCertificateAsync(certificateLookupIdentifier).ConfigureAwait(false);
+        await _keyVault.PurgeDeletedCertificateAsync(certificateLookupIdentifier).ConfigureAwait(false);
+    }
+
     public X509Certificate2 CreateAndValidateX509Certificate(Stream certificate)
     {
         ArgumentNullException.ThrowIfNull(certificate);
