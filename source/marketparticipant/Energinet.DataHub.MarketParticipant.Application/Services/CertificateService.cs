@@ -49,7 +49,6 @@ public class CertificateService : ICertificateService
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
 
         await _keyVault.StartDeleteCertificateAsync(certificateLookupIdentifier).ConfigureAwait(false);
-        await _keyVault.PurgeDeletedCertificateAsync(certificateLookupIdentifier).ConfigureAwait(false);
     }
 
     public X509Certificate2 CreateAndValidateX509Certificate(Stream certificate)
