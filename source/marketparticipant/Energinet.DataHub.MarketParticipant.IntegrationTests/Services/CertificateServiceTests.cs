@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -36,7 +38,19 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         }
 
         [Fact]
-        public async Task CertificateService_CreateAndValidate()
+        public void CertificateService_CreateAndValidate_Invalid()
+        {
+            // Arrange
+            var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);
+            using var memoryStream = new MemoryStream();
+            memoryStream.Write(Encoding.UTF8.GetBytes("Invalid certificate"));
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => certificateService.CreateAndValidateX509Certificate(memoryStream));
+        }
+
+        [Fact]
+        public async Task CertificateService_CreateAndValidate_Valid()
         {
             // Arrange
             var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);

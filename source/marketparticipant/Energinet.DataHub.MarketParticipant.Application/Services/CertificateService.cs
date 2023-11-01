@@ -54,6 +54,7 @@ public class CertificateService : ICertificateService
         try
         {
             var x509Certificate2 = new X509Certificate2(certificateBytes);
+            using var rsa = x509Certificate2.GetRSAPublicKey();
             return x509Certificate2;
         }
         catch (CryptographicException ex)
