@@ -16,7 +16,6 @@ using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Azure.Security.KeyVault.Certificates;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
@@ -95,6 +94,27 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
 
         // Act + assert
         await Assert.ThrowsAsync<NotFoundValidationException>(() => mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task AssignCertificate_CredentialsAlreadySet()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+
+        var actor = await _databaseFixture.PrepareActorAsync();
+        await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+
+        await using var certificateFileStream = GetCertificate("integration-actor-test-certificate-public.cer");
+        var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
+
+        SetUpCertificateServiceWithMockSave(host);
+
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        // Act + assert
+        await Assert.ThrowsAsync<NotSupportedException>(() => mediator.Send(command));
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
