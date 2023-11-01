@@ -41,7 +41,8 @@ public class CertificateService : ICertificateService
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
         ArgumentNullException.ThrowIfNull(certificate);
 
-        return _keyVault.SetSecretAsync(new KeyVaultSecret(certificateLookupIdentifier, certificate.GetRawCertDataString()));
+        var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
+        return _keyVault.SetSecretAsync(new KeyVaultSecret(certificateLookupIdentifier, convertedCertificateToBase64));
     }
 
     public async Task RemoveCertificateAsync(string certificateLookupIdentifier)
