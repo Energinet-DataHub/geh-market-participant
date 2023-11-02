@@ -16,9 +16,9 @@ using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Common.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -39,18 +39,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class AssignActorCertificateHandlerIntegrationTests
-    : WebApiIntegrationTestsBase, IClassFixture<KeyCertificateFixture>
+    : WebApiIntegrationTestsBase
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
-    private readonly KeyCertificateFixture _keyCertificateFixture;
 
     public AssignActorCertificateHandlerIntegrationTests(
-        MarketParticipantDatabaseFixture databaseFixture,
-        KeyCertificateFixture keyCertificateFixture)
+        MarketParticipantDatabaseFixture databaseFixture)
     : base(databaseFixture)
     {
         _databaseFixture = databaseFixture;
-        _keyCertificateFixture = keyCertificateFixture;
     }
 
     [Fact]
@@ -122,8 +119,6 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         ArgumentNullException.ThrowIfNull(builder);
 
         base.ConfigureWebHost(builder);
-
-        builder.UseSetting(Settings.CertificateKeyVault.Key, _keyCertificateFixture.CertificateClient.VaultUri.ToString());
     }
 
     private static Stream GetCertificate(string certificateName)
@@ -136,10 +131,10 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
     }
 
-    private void SetUpCertificateServiceWithMockSave(WebApiIntegrationTestHost host)
+    private static void SetUpCertificateServiceWithMockSave(WebApiIntegrationTestHost host)
     {
         var certificateServiceMock = new Mock<CertificateService>(
-                _keyCertificateFixture.CertificateClient, It.IsAny<ILogger<CertificateService>>())
+                It.IsAny<SecretClient>(), It.IsAny<ILogger<CertificateService>>())
             .As<ICertificateService>();
         certificateServiceMock
             .Setup(x => x.SaveCertificateAsync(It.IsAny<string>(), It.IsAny<X509Certificate2>()))
