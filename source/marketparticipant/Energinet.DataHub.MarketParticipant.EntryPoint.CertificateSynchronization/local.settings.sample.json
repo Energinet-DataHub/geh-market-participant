@@ -1,0 +1,17 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+
+    "CERTIFICATES_KEY_VAULT": "The key vault containing the certificates.",
+
+    "APIM_TENANT_ID": "The id of the tenant hosting APIM.",
+    "APIM_SP_CLIENT_ID": "The client id of the service principal that can manage APIM.",
+    "APIM_SP_CLIENT_SECRET": "The client secret of the service principal that can manage APIM.",
+
+    "APIM_SERVICE_NAME": "The APIM service instance name,",
+    "APIM_SUBSCRIPTION_ID": "The id of the subscription owning the APIM service.",
+    "APIM_RESOURCE_GROUP_NAME": "The name of the resource group owning the APIM service."
+  }
+}
