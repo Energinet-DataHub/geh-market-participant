@@ -76,6 +76,9 @@ internal static class ActorMapper
                     ExpirationDate = credentials.ExpirationDate,
                 };
                 break;
+            case null:
+                to.CertificateCredential = null;
+                break;
         }
     }
 
