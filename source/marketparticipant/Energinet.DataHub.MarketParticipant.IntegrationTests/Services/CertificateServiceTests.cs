@@ -109,13 +109,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             using var certificate = new X509Certificate2(certificateBytes);
             using var certificateStore = new X509Store(StoreName.My, StoreLocation.CurrentUser, OpenFlags.ReadWrite);
 
-            var searchResult = certificateStore.Certificates.Find(X509FindType.FindByThumbprint, "02ba07db5e00130b0a008c1c9283552408701c58", false);
+            var certThumbprint = certificate.Thumbprint;
+            var searchResult = certificateStore.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, false);
 
-            if (searchResult.Count <= 0)
+            if (searchResult.Count > 0)
             {
-                certificateStore.Add(certificate);
-                certificateStore.Close();
+                certificateStore.Remove(certificate);
             }
+
+            certificateStore.Add(certificate);
+            certificateStore.Close();
         }
     }
 }
