@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .ConfigureAwait(false);
 
             return result is not null
-                ? Ok(result)
+                ? Ok(result.CredentialsDto)
                 : NotFound();
         }
 

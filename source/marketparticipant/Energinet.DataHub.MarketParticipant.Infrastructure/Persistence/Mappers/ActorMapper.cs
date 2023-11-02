@@ -95,7 +95,7 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
-        ActorCredentials? credentials = Map(from.CertificateCredential) ?? Map(from.ClientSecretCredential);
+        var credentials = Map(from.CertificateCredential) ?? Map(from.ClientSecretCredential);
 
         return new Actor(
             new ActorId(from.Id),
