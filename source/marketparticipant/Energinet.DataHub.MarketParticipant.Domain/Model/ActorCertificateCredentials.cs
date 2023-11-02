@@ -12,19 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorCertificateCredentials : ActorCredentials
     {
         public ActorCertificateCredentials(
             string certificateThumbprint,
-            string keyVaultSecretIdentifier)
+            string keyVaultSecretIdentifier,
+            DateTime expirationDate)
         {
             CertificateThumbprint = certificateThumbprint;
             KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
+            ExpirationDate = expirationDate;
         }
 
         public string CertificateThumbprint { get; }
         public string KeyVaultSecretIdentifier { get; }
+        public DateTime ExpirationDate { get; }
     }
 }

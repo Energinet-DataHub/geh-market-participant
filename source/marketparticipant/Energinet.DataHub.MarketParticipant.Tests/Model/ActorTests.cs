@@ -205,7 +205,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         {
             // Arrange
             var target = CreateTestActor(ActorStatus.New, EicFunction.EnergySupplier);
-            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier", DateTime.Now.AddYears(1));
 
             // Act
             target.Activate();
@@ -221,7 +221,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             var target = CreateTestActor(ActorStatus.Active, EicFunction.EnergySupplier);
 
             // Act
-            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier", DateTime.Now.AddYears(1));
 
             // Assert
             Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
