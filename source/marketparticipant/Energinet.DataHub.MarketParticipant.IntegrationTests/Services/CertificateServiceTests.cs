@@ -78,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             await certificateService.SaveCertificateAsync(_keyCertificateFixture.CertificateName, x509Certificate);
 
             // Assert
-            var savedCertificate = await _keyCertificateFixture.CertificateClient.GetCertificateAsync(_keyCertificateFixture.CertificateName);
+            var savedCertificate = await _keyCertificateFixture.CertificateClient.GetSecretAsync(_keyCertificateFixture.CertificateName);
             Assert.True(savedCertificate.HasValue);
             Assert.Equal(_keyCertificateFixture.CertificateName, savedCertificate.Value.Name);
         }

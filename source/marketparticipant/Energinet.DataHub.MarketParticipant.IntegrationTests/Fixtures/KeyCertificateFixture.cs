@@ -15,7 +15,7 @@
 using System;
 using System.Threading.Tasks;
 using Azure.Identity;
-using Azure.Security.KeyVault.Certificates;
+using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
 using Microsoft.Extensions.Configuration;
 using Xunit;
@@ -25,19 +25,19 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 public sealed class KeyCertificateFixture : IAsyncLifetime
 {
     public string CertificateName { get; } = $"IntegrationTestCertificateKey-{Guid.NewGuid()}";
-    public CertificateClient CertificateClient { get; private set; } = null!;
+    public SecretClient CertificateClient { get; private set; } = null!;
 
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        CertificateClient = new CertificateClient(keyVaultUri, new DefaultAzureCredential());
+        CertificateClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
 
         return Task.CompletedTask;
     }
 
     public Task DisposeAsync()
     {
-        return CertificateClient.PurgeDeletedCertificateAsync(CertificateName);
+        return CertificateClient.StartDeleteSecretAsync(CertificateName);
     }
 
     private static Uri GetKeyVaultUri()
