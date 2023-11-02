@@ -77,7 +77,8 @@ internal static class TestUserPreparationHelper
             {
                 ActorId = actorId,
                 CertificateThumbprint = certificateThumbprint,
-                KeyVaultSecretIdentifier = certificateLookupIdentifier
+                KeyVaultSecretIdentifier = certificateLookupIdentifier,
+                ExpirationDate = DateTime.UtcNow.AddDays(5)
             };
 
             var actorEntity = await context.Actors.FindAsync(actorId);
