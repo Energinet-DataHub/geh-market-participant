@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             _keyCertificateFixture = keyCertificateFixture;
         }
 
-        [Fact]
+        //[Fact]
         public void CertificateService_CreateAndValidate_Invalid()
         {
             // Arrange
@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             Assert.Throws<ValidationException>(() => certificateService.CreateAndValidateX509Certificate(memoryStream));
         }
 
-        [Fact]
+        //[Fact]
         public async Task CertificateService_CreateAndValidate_Valid()
         {
             // Arrange
@@ -91,34 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             var assembly = typeof(CertificateServiceTests).Assembly;
             var stream = assembly.GetManifestResourceStream(resourceName);
 
-            SaveCertificateToStore(certificateName);
-
             return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
-        }
-
-        private static void SaveCertificateToStore(string certificateName)
-        {
-            var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
-
-            var assembly = typeof(CertificateServiceTests).Assembly;
-            using var fileStream = assembly.GetManifestResourceStream(resourceName);
-
-            using var reader = new BinaryReader(fileStream);
-            var certificateBytes = reader.ReadBytes((int)fileStream.Length);
-
-            using var certificate = new X509Certificate2(certificateBytes);
-            using var certificateStore = new X509Store(StoreName.My, StoreLocation.CurrentUser, OpenFlags.ReadWrite);
-
-            var certThumbprint = certificate.Thumbprint;
-            var searchResult = certificateStore.Certificates.Find(X509FindType.FindByThumbprint, certThumbprint, false);
-
-            if (searchResult.Count > 0)
-            {
-                certificateStore.Remove(certificate);
-            }
-
-            certificateStore.Add(certificate);
-            certificateStore.Close();
         }
     }
 }

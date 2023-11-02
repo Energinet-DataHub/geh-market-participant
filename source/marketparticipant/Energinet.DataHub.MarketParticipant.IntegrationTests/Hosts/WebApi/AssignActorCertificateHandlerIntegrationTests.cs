@@ -128,31 +128,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         var assembly = typeof(CertificateServiceTests).Assembly;
         var stream = assembly.GetManifestResourceStream(resourceName);
 
-        SaveCertificateToStore(certificateName);
-
         return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
-    }
-
-    private static void SaveCertificateToStore(string certificateName)
-    {
-        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
-
-        var assembly = typeof(CertificateServiceTests).Assembly;
-        using var fileStream = assembly.GetManifestResourceStream(resourceName);
-
-        using var reader = new BinaryReader(fileStream);
-        var certificateBytes = reader.ReadBytes((int)fileStream.Length);
-
-        using var certificate = new X509Certificate2(certificateBytes);
-        using var certificateStore = new X509Store(StoreName.My, StoreLocation.CurrentUser, OpenFlags.ReadWrite);
-
-        var searchResult = certificateStore.Certificates.Find(X509FindType.FindByThumbprint, "02ba07db5e00130b0a008c1c9283552408701c58", false);
-
-        if (searchResult.Count <= 0)
-        {
-            certificateStore.Add(certificate);
-            certificateStore.Close();
-        }
     }
 
     private static void SetUpCertificateServiceWithMockSave(WebApiIntegrationTestHost host)
