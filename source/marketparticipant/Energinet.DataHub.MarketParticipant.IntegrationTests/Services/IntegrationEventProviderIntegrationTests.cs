@@ -119,7 +119,7 @@ public sealed class IntegrationEventProviderIntegrationTests
             new ActorName(string.Empty),
             null);
 
-        actor.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier");
+        actor.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier", DateTime.Now.AddYears(1));
         actor.Activate();
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();

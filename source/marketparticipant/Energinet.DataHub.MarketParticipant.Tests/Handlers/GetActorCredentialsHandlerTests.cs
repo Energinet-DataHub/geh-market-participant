@@ -81,7 +81,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorCertificateCredentials("mock", "mock");
+            actor.Credentials = new ActorCertificateCredentials("mock", "mock", DateTime.Now.AddYears(1));
 
             actorRepositoryMock
                 .Setup(actorRepository => actorRepository.GetAsync(actor.Id))

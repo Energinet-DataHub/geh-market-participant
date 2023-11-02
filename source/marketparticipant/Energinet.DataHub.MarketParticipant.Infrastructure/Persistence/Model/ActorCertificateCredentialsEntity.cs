@@ -21,4 +21,5 @@ public sealed class ActorCertificateCredentialsEntity
     public Guid ActorId { get; set; }
     public string CertificateThumbprint { get; set; } = null!;
     public string KeyVaultSecretIdentifier { get; set; } = null!;
+    public DateTime ExpirationDate { get; set; }
 }
