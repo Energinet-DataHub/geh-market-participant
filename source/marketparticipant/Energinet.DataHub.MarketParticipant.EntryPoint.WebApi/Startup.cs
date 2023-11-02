@@ -14,8 +14,8 @@
 
 using System.Text.Json.Serialization;
 using Azure.Identity;
-using Azure.Security.KeyVault.Certificates;
 using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
@@ -120,7 +120,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
                 var defaultCredentials = new DefaultAzureCredential();
 
-                var certificateClient = new CertificateClient(certificateKeyVaultUri, defaultCredentials);
+                var certificateClient = new SecretClient(certificateKeyVaultUri, defaultCredentials);
 
                 var logger = s.GetRequiredService<ILogger<CertificateService>>();
 
