@@ -67,13 +67,20 @@ internal static class ActorMapper
                 {
                     ClientSecretIdentifier = credentials.ClientSecretIdentifier
                 };
+                to.CertificateCredential = null;
                 break;
             case ActorCertificateCredentials credentials:
                 to.CertificateCredential = new ActorCertificateCredentialsEntity
                 {
                     CertificateThumbprint = credentials.CertificateThumbprint,
-                    KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier
+                    KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier,
+                    ExpirationDate = credentials.ExpirationDate,
                 };
+                to.ClientSecretCredential = null;
+                break;
+            case null:
+                to.CertificateCredential = null;
+                to.ClientSecretCredential = null;
                 break;
         }
     }
@@ -121,6 +128,7 @@ internal static class ActorMapper
             ? null
             : new ActorCertificateCredentials(
                 from.CertificateThumbprint,
-                from.KeyVaultSecretIdentifier);
+                from.KeyVaultSecretIdentifier,
+                from.ExpirationDate);
     }
 }
