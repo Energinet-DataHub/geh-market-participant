@@ -57,7 +57,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var x509Certificate = _certificateService.CreateAndValidateX509Certificate(request.Certificate);
             var certificateLookupIdentifier = $"{actor.ActorNumber.Value}-{x509Certificate.Thumbprint}";
 
-            actor.Credentials = new ActorCertificateCredentials(x509Certificate.Thumbprint, certificateLookupIdentifier);
+            actor.Credentials = new ActorCertificateCredentials(x509Certificate.Thumbprint, certificateLookupIdentifier, x509Certificate.NotAfter);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
