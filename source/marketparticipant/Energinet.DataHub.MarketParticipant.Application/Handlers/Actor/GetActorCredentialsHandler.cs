@@ -34,7 +34,7 @@ public sealed class GetActorCredentialsHandler : IRequestHandler<GetActorCredent
 
     public async Task<GetActorCredentialsResponse?> Handle(GetActorCredentialsCommand request, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(request, nameof(request));
+        ArgumentNullException.ThrowIfNull(request);
 
         // Find actor
         var actor = await _actorRepository
