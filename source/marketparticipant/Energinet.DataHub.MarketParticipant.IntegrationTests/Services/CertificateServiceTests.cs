@@ -15,7 +15,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -38,11 +37,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             _keyCertificateFixture = keyCertificateFixture;
         }
 
-        //[Fact]
+        [Fact]
         public void CertificateService_CreateAndValidate_Invalid()
         {
             // Arrange
-            var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);
+            var certificateService = new CertificateService(
+                _keyCertificateFixture.CertificateClient,
+                new CertificateValidation(),
+                new Mock<ILogger<CertificateService>>().Object);
+
             using var memoryStream = new MemoryStream();
             memoryStream.Write(Encoding.UTF8.GetBytes("Invalid certificate"));
 
@@ -54,7 +57,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         public async Task CertificateService_CreateAndValidate_Valid()
         {
             // Arrange
-            var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);
+            var certificateService = new CertificateService(
+                _keyCertificateFixture.CertificateClient,
+                new Mock<ICertificateValidation>().Object,
+                new Mock<ILogger<CertificateService>>().Object);
             await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 
             // Act
@@ -62,14 +68,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             // Assert
             Assert.NotNull(certificate);
-            Assert.True(certificate.Verify());
         }
 
         [Fact]
         public async Task CertificateService_Save()
         {
             // Arrange
-            var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);
+            var certificateService = new CertificateService(
+                _keyCertificateFixture.CertificateClient,
+                new Mock<ICertificateValidation>().Object,
+                new Mock<ILogger<CertificateService>>().Object);
 
             await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 

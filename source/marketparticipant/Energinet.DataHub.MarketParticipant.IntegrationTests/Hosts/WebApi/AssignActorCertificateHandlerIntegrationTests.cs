@@ -133,8 +133,11 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
 
     private static void SetUpCertificateServiceWithMockSave(WebApiIntegrationTestHost host)
     {
+        var certValidation = new Mock<ICertificateValidation>();
+        certValidation.Setup(e => e.Verify(It.IsAny<X509Certificate2>()));
+
         var certificateServiceMock = new Mock<CertificateService>(
-                It.IsAny<SecretClient>(), It.IsAny<ILogger<CertificateService>>())
+                It.IsAny<SecretClient>(), certValidation.Object, It.IsAny<ILogger<CertificateService>>())
             .As<ICertificateService>();
         certificateServiceMock
             .Setup(x => x.SaveCertificateAsync(It.IsAny<string>(), It.IsAny<X509Certificate2>()))

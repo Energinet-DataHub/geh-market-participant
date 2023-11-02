@@ -122,9 +122,10 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
 
                 var certificateClient = new SecretClient(certificateKeyVaultUri, defaultCredentials);
 
+                var validation = s.GetRequiredService<ICertificateValidation>();
                 var logger = s.GetRequiredService<ILogger<CertificateService>>();
 
-                return new CertificateService(certificateClient, logger);
+                return new CertificateService(certificateClient, validation, logger);
             });
 
             if (_configuration.GetSetting(Settings.AllowAllTokens))

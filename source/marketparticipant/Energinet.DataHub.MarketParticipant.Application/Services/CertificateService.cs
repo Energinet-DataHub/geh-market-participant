@@ -26,13 +26,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services;
 public class CertificateService : ICertificateService
 {
     private readonly SecretClient _keyVault;
+    private readonly ICertificateValidation _certificateValidation;
     private readonly ILogger<CertificateService> _logger;
 
     public CertificateService(
         SecretClient keyVault,
+        ICertificateValidation certificateValidation,
         ILogger<CertificateService> logger)
     {
         _keyVault = keyVault;
+        _certificateValidation = certificateValidation;
         _logger = logger;
     }
 
@@ -62,17 +65,18 @@ public class CertificateService : ICertificateService
         try
         {
             var x509Certificate2 = new X509Certificate2(certificateBytes);
+            _certificateValidation.Verify(x509Certificate2);
             return x509Certificate2;
         }
         catch (CryptographicException ex)
         {
-            _logger.LogError(ex, $"Certificate validation failed {ex.InnerException}");
-            throw new ValidationException($"Certificate validation failed {ex.InnerException}");
+            _logger.LogError(ex, $"Certificate is invalid failed {ex.InnerException}");
+            throw new ValidationException($"Certificate is invalid failed {ex.InnerException}");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Certificate validation failed {ex.InnerException}");
-            throw new ValidationException($"Certificate validation failed {ex.InnerException}");
+            _logger.LogError(ex, $"Certificate is invalid failed {ex.InnerException}");
+            throw new ValidationException($"Certificate is invalid failed {ex.InnerException}");
         }
     }
 }
