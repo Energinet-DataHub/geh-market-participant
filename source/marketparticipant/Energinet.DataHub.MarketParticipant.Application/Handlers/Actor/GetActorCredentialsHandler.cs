@@ -49,7 +49,7 @@ public sealed class GetActorCredentialsHandler : IRequestHandler<GetActorCredent
             ActorCertificateCredentials actorCertificateCredentials =>
                 new GetActorCredentialsResponse(
                     new ActorCredentialsDto(
-                        new ActorCertificateCredentialsDto(actorCertificateCredentials.CertificateThumbprint),
+                        new ActorCertificateCredentialsDto(actorCertificateCredentials.CertificateThumbprint, actorCertificateCredentials.ExpirationDate),
                         null)),
             ActorClientSecretCredentials actorClientSecretCredentials =>
                 new GetActorCredentialsResponse(

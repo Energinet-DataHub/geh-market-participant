@@ -110,7 +110,7 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorCredentials = new ActorCertificateCredentials("12345678", "secret");
+        var actorCredentials = new ActorCertificateCredentials("12345678", "secret", DateTime.Now.AddYears(1));
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorCredentials
@@ -173,8 +173,8 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret");
-        var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2");
+        var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret", DateTime.Now.AddYears(1));
+        var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2", DateTime.Now.AddYears(1));
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorCertificateCredentials
@@ -186,7 +186,7 @@ public sealed class ActorRepositoryTests
 
         // Act
         var resultOk = await actorRepository.AddOrUpdateAsync(actor);
-        var resultError = await actorRepository.AddOrUpdateAsync(actor);
+        var resultError = await actorRepository2.AddOrUpdateAsync(actor2);
 
         // Assert
         Assert.NotNull(resultOk);
