@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Services;
+namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public interface ICertificateService
+public sealed class RemoveActorCertificateCommandRuleSet : AbstractValidator<RemoveActorCertificateCommand>
 {
-    X509Certificate2 CreateAndValidateX509Certificate(Stream certificate);
-    Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate);
-    Task RemoveCertificateAsync(string certificateLookupIdentifier);
+    public RemoveActorCertificateCommandRuleSet()
+    {
+        RuleFor(command => command.ActorId)
+            .NotEmpty();
+    }
 }

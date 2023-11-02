@@ -18,18 +18,18 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using Azure.Security.KeyVault.Certificates;
+using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 public class CertificateService : ICertificateService
 {
-    private readonly CertificateClient _keyVault;
+    private readonly SecretClient _keyVault;
     private readonly ILogger<CertificateService> _logger;
 
     public CertificateService(
-        CertificateClient keyVault,
+        SecretClient keyVault,
         ILogger<CertificateService> logger)
     {
         _keyVault = keyVault;
@@ -41,7 +41,15 @@ public class CertificateService : ICertificateService
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
         ArgumentNullException.ThrowIfNull(certificate);
 
-        return _keyVault.ImportCertificateAsync(new ImportCertificateOptions(certificateLookupIdentifier, certificate.RawData));
+        var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
+        return _keyVault.SetSecretAsync(new KeyVaultSecret(certificateLookupIdentifier, convertedCertificateToBase64));
+    }
+
+    public async Task RemoveCertificateAsync(string certificateLookupIdentifier)
+    {
+        ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
+
+        await _keyVault.StartDeleteSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
     }
 
     public X509Certificate2 CreateAndValidateX509Certificate(Stream certificate)
