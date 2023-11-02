@@ -59,20 +59,22 @@ public class CertificateService : ICertificateService
         using var reader = new BinaryReader(certificate);
         var certificateBytes = reader.ReadBytes((int)certificate.Length);
 
+        var x509Certificate2 = new X509Certificate2(certificateBytes);
+
         try
         {
-            var x509Certificate2 = new X509Certificate2(certificateBytes);
-            using var rsa = x509Certificate2.GetRSAPublicKey();
-            return x509Certificate2;
+            return x509Certificate2.Verify() ? x509Certificate2 : throw new CryptographicException();
         }
         catch (CryptographicException ex)
         {
             _logger.LogError(ex, "Certificate validation failed");
+            x509Certificate2.Dispose();
             throw new ValidationException("Certificate invalid");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unknown Certificate validation exception");
+            x509Certificate2.Dispose();
             throw new ValidationException("Certificate invalid");
         }
     }
