@@ -36,15 +36,15 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    public Task DisposeAsync()
+    public async Task DisposeAsync()
     {
         try
         {
-            return CertificateClient.StartDeleteSecretAsync(CertificateName);
+            await CertificateClient.StartDeleteSecretAsync(CertificateName);
         }
         catch (RequestFailedException requestFailedException) when (requestFailedException.Status == 404)
         {
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
     }
 
