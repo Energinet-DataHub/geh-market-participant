@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
@@ -54,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         {
             // Arrange
             var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);
-            await using var fileStream = GetCertificate("integration-actor-test-certificate-public.cer");
+            await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 
             // Act
             var certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
@@ -70,7 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             // Arrange
             var certificateService = new CertificateService(_keyCertificateFixture.CertificateClient, new Mock<ILogger<CertificateService>>().Object);
 
-            await using var fileStream = GetCertificate("integration-actor-test-certificate-public.cer");
+            await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 
             var x509Certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
 
@@ -83,14 +84,38 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             Assert.Equal(_keyCertificateFixture.CertificateName, savedCertificate.Value.Name);
         }
 
-        private static Stream GetCertificate(string certificateName)
+        private static Stream SetupTestCertificate(string certificateName)
         {
             var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
 
             var assembly = typeof(CertificateServiceTests).Assembly;
             var stream = assembly.GetManifestResourceStream(resourceName);
 
+            SaveCertificateToStore(certificateName);
+
             return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
+        }
+
+        private static void SaveCertificateToStore(string certificateName)
+        {
+            var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
+
+            var assembly = typeof(CertificateServiceTests).Assembly;
+            using var fileStream = assembly.GetManifestResourceStream(resourceName);
+
+            using var reader = new BinaryReader(fileStream);
+            var certificateBytes = reader.ReadBytes((int)fileStream.Length);
+
+            using var certificate = new X509Certificate2(certificateBytes);
+            using var certificateStore = new X509Store(StoreName.My, StoreLocation.CurrentUser, OpenFlags.ReadWrite);
+
+            var searchResult = certificateStore.Certificates.Find(X509FindType.FindByThumbprint, "02ba07db5e00130b0a008c1c9283552408701c58", false);
+
+            if (searchResult.Count <= 0)
+            {
+                certificateStore.Add(certificate);
+                certificateStore.Close();
+            }
         }
     }
 }

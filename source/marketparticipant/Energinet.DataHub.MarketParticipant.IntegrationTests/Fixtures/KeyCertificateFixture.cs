@@ -14,6 +14,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
@@ -37,7 +38,14 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
 
     public Task DisposeAsync()
     {
-        return CertificateClient.StartDeleteSecretAsync(CertificateName);
+        try
+        {
+            return CertificateClient.StartDeleteSecretAsync(CertificateName);
+        }
+        catch (RequestFailedException requestFailedException) when (requestFailedException.Status == 404)
+        {
+            return Task.CompletedTask;
+        }
     }
 
     private static Uri GetKeyVaultUri()

@@ -57,7 +57,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         var actor = await _databaseFixture.PrepareActorAsync();
 
-        await using var certificateFileStream = GetCertificate("integration-actor-test-certificate-public.cer");
+        await using var certificateFileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
         SetUpCertificateServiceWithMockSave(host);
@@ -81,7 +81,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
-        await using var certificateFileStream = GetCertificate("integration-actor-test-certificate-public.cer");
+        await using var certificateFileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
         var command = new AssignActorCertificateCommand(Guid.NewGuid(), certificateFileStream);
 
         SetUpCertificateServiceWithMockSave(host);
@@ -102,7 +102,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         var actor = await _databaseFixture.PrepareActorAsync();
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
 
-        await using var certificateFileStream = GetCertificate("integration-actor-test-certificate-public.cer");
+        await using var certificateFileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
         SetUpCertificateServiceWithMockSave(host);
@@ -121,14 +121,38 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         base.ConfigureWebHost(builder);
     }
 
-    private static Stream GetCertificate(string certificateName)
+    private static Stream SetupTestCertificate(string certificateName)
     {
         var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
 
         var assembly = typeof(CertificateServiceTests).Assembly;
         var stream = assembly.GetManifestResourceStream(resourceName);
 
+        SaveCertificateToStore(certificateName);
+
         return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
+    }
+
+    private static void SaveCertificateToStore(string certificateName)
+    {
+        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
+
+        var assembly = typeof(CertificateServiceTests).Assembly;
+        using var fileStream = assembly.GetManifestResourceStream(resourceName);
+
+        using var reader = new BinaryReader(fileStream);
+        var certificateBytes = reader.ReadBytes((int)fileStream.Length);
+
+        using var certificate = new X509Certificate2(certificateBytes);
+        using var certificateStore = new X509Store(StoreName.My, StoreLocation.CurrentUser, OpenFlags.ReadWrite);
+
+        var searchResult = certificateStore.Certificates.Find(X509FindType.FindByThumbprint, "02ba07db5e00130b0a008c1c9283552408701c58", false);
+
+        if (searchResult.Count <= 0)
+        {
+            certificateStore.Add(certificate);
+            certificateStore.Close();
+        }
     }
 
     private static void SetUpCertificateServiceWithMockSave(WebApiIntegrationTestHost host)
