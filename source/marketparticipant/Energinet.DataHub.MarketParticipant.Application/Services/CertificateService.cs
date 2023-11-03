@@ -54,10 +54,6 @@ public class CertificateService : ICertificateService
         {
             await _keyVault.StartRecoverDeletedSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
         }
-        catch (RequestFailedException e)
-        {
-            throw new InvalidOperationException("Could not add certificate", e);
-        }
     }
 
     public async Task RemoveCertificateAsync(string certificateLookupIdentifier)
