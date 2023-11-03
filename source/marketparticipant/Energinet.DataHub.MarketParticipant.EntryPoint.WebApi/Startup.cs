@@ -151,7 +151,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddDbContextCheck<MarketParticipantDbContext>()
                 .AddCheck<GraphApiHealthCheck>("Graph API Access")
                 .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
-                .AddCheck<KeyVaultHealthCheck>("Key Vault Access");
+                .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
 
             services.AddHttpLoggingScope("mark-part");
             services.AddSwaggerGen(c =>

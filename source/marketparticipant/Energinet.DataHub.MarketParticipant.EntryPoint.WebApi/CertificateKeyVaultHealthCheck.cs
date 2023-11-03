@@ -20,11 +20,11 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 
-public sealed class KeyVaultHealthCheck : IHealthCheck
+public sealed class CertificateKeyVaultHealthCheck : IHealthCheck
 {
     private readonly SecretClient _secretClient;
 
-    public KeyVaultHealthCheck(SecretClient secretClient)
+    public CertificateKeyVaultHealthCheck(SecretClient secretClient)
     {
         _secretClient = secretClient;
     }
