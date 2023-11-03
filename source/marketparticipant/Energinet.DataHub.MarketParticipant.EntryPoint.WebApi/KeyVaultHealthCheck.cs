@@ -33,9 +33,7 @@ public sealed class KeyVaultHealthCheck : IHealthCheck
     {
         try
         {
-            var pages = _secretClient.GetPropertiesOfSecretsAsync(cancellationToken).AsPages();
-
-            await foreach (var unused in pages)
+            await foreach (var unused in _secretClient.GetPropertiesOfSecretsAsync(cancellationToken))
             {
                 break;
             }
