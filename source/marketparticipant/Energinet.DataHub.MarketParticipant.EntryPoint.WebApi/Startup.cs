@@ -172,26 +172,14 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                     In = ParameterLocation.Header,
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer",
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
                 };
 
                 c.AddSecurityDefinition("Bearer", securitySchema);
                 c.SupportNonNullableReferenceTypes();
                 c.UseAllOfToExtendReferenceSchemas();
 
-                var securityRequirement = new OpenApiSecurityRequirement
-                {
-                    {
-                        securitySchema, new[]
-                        {
-                            "Bearer"
-                        }
-                    }
-                };
+                var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } } };
 
                 c.AddSecurityRequirement(securityRequirement);
             });
