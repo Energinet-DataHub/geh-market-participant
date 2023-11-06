@@ -149,7 +149,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         }
 
         [HttpPost("{actorId:guid}/credentials/secret")]
-        [AuthorizeUser(PermissionId.ActorRequestSecret)]
+        [AuthorizeUser(PermissionId.ActorCredentialsManage)]
         public async Task<ActionResult> ActorRequestSecretAsync(Guid actorId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))

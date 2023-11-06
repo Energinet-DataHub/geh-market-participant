@@ -27,6 +27,5 @@ public enum PermissionId
     SettlementReportsManage = 10,
     ESettExchangeManage = 11,
     RequestAggregatedMeasureData = 12,
-    ActorCredentialsManage = 13,
-    ActorRequestSecret = 14
+    ActorCredentialsManage = 13
 }
