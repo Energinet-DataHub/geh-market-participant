@@ -41,6 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 public sealed class AssignActorCertificateHandlerIntegrationTests
     : WebApiIntegrationTestsBase
 {
+    private const string IntegrationActorTestCertificatePublicCer = "integration-actor-test-certificate-public.cer";
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
     public AssignActorCertificateHandlerIntegrationTests(
@@ -57,7 +58,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         var actor = await _databaseFixture.PrepareActorAsync();
 
-        await using var certificateFileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
+        await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
         SetUpCertificateServiceWithMockSave(host);
@@ -81,7 +82,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
-        await using var certificateFileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
+        await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(Guid.NewGuid(), certificateFileStream);
 
         SetUpCertificateServiceWithMockSave(host);
@@ -102,7 +103,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         var actor = await _databaseFixture.PrepareActorAsync();
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
 
-        await using var certificateFileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
+        await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
         SetUpCertificateServiceWithMockSave(host);
