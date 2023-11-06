@@ -32,7 +32,17 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Publish Functionhost
+    - name: Publish CertificateSynchronization Function
+      shell: bash
+      run: |
+        dotnet publish \
+          '.\source\marketparticipant\Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization\Energinet.DataHub.MarketParticipant.EntryPoint.CertificateSynchronization.csproj' \
+          --no-build \
+          --no-restore \
+          --configuration Release \
+          --output '${{ inputs.output_path }}\functions\certificatesynchronization'
+
+    - name: Publish Organization Function
       shell: bash
       run: |
         dotnet publish \
