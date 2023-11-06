@@ -81,13 +81,13 @@ public class CertificateService : ICertificateService
         }
         catch (CryptographicException ex)
         {
-            _logger.LogError(ex, $"Certificate is invalid failed {ex.InnerException}");
-            throw new ValidationException($"Certificate is invalid failed {ex.InnerException}");
+            _logger.LogError(ex, $"Certificate validation failed: {ex.InnerException}");
+            throw new ValidationException($"Certificate validation failed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Certificate is invalid failed {ex.InnerException}");
-            throw new ValidationException($"Certificate is invalid failed {ex.InnerException}");
+            _logger.LogError(ex, $"Certificate validation failed: {ex.InnerException}");
+            throw new ValidationException($"Certificate validation failed");
         }
     }
 }
