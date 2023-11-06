@@ -29,15 +29,32 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     public sealed class ActorRequestSecretHandler : IRequestHandler<ActorRequestSecretCommand, ActorRequestSecretResponse>
     {
         private readonly IActiveDirectoryB2CService _activeDirectoryB2CService;
+        private readonly IActorRepository _actorRepository;
 
-        public ActorRequestSecretHandler(IActiveDirectoryB2CService activeDirectoryB2CService)
+        public ActorRequestSecretHandler(
+            IActiveDirectoryB2CService activeDirectoryB2CService,
+            IActorRepository actorRepository)
         {
             _activeDirectoryB2CService = activeDirectoryB2CService;
+            _actorRepository = actorRepository;
         }
 
         public async Task<ActorRequestSecretResponse> Handle(ActorRequestSecretCommand request, CancellationToken cancellationToken)
         {
-            return await Task.FromResult(new ActorRequestSecretResponse(string.Empty)).ConfigureAwait(false);
+            ArgumentNullException.ThrowIfNull(request);
+
+            var actor = await _actorRepository
+                .GetAsync(new ActorId(request.ActorId))
+                .ConfigureAwait(false);
+
+            NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
+
+            if (actor.ExternalActorId is null)
+                throw new InvalidOperationException("Can't request secret to actor which doesn't have an external id");
+
+            return new ActorRequestSecretResponse(await _activeDirectoryB2CService
+                .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
+                .ConfigureAwait(false));
         }
     }
 }

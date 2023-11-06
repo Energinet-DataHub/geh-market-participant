@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Applications.Item.AddPassword;
 using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
@@ -149,6 +150,46 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
+        }
+
+        public async Task<string> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
+        {
+            ArgumentNullException.ThrowIfNull(externalActorId);
+
+            var appId = externalActorId.Value.ToString();
+            var applicationUsingAppId = await _graphClient
+                .Applications
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"appId eq '{appId}'";
+                })
+                .ConfigureAwait(false);
+
+            var applications = await applicationUsingAppId!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            var foundApp = applications.SingleOrDefault();
+            if (foundApp == null)
+            {
+                throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
+            }
+
+            var passwordCredential = new PasswordCredential
+            {
+                DisplayName = "App secret",
+                StartDateTime = DateTimeOffset.Now,
+                EndDateTime = DateTimeOffset.Now.AddMonths(6),
+                KeyId = Guid.NewGuid(),
+            };
+
+            var secret = await _graphClient
+                .Applications[foundApp.Id]
+                .AddPassword
+                .PostAsync(new AddPasswordPostRequestBody() { PasswordCredential = passwordCredential })
+                .ConfigureAwait(false);
+
+            return secret?.SecretText ?? string.Empty;
         }
 
         private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)
