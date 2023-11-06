@@ -114,6 +114,22 @@ public static class KnownPermissions
             EicFunction.DanishEnergyAgency,
             EicFunction.IndependentAggregator,
             EicFunction.SerialEnergyTrader
+        }),
+        new(PermissionId.ActorRequestSecret, "actor-secrets:request", InstantPattern.ExtendedIso.Parse("2023-11-06T00:00:00Z").Value, new[]
+        {
+            EicFunction.DataHubAdministrator,
+            EicFunction.BalanceResponsibleParty,
+            EicFunction.BillingAgent,
+            EicFunction.EnergySupplier,
+            EicFunction.GridAccessProvider,
+            EicFunction.ImbalanceSettlementResponsible,
+            EicFunction.MeteredDataAdministrator,
+            EicFunction.MeteredDataResponsible,
+            EicFunction.MeteringPointAdministrator,
+            EicFunction.SystemOperator,
+            EicFunction.DanishEnergyAgency,
+            EicFunction.IndependentAggregator,
+            EicFunction.SerialEnergyTrader
         })
     };
 }
