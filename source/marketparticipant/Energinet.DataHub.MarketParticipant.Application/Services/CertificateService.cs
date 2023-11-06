@@ -15,9 +15,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Security.KeyVault.Secrets;
 using Microsoft.Extensions.Logging;
 
@@ -39,13 +41,22 @@ public class CertificateService : ICertificateService
         _logger = logger;
     }
 
-    public Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate)
+    public async Task SaveCertificateAsync(string certificateLookupIdentifier, X509Certificate2 certificate)
     {
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
         ArgumentNullException.ThrowIfNull(certificate);
 
         var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
-        return _keyVault.SetSecretAsync(new KeyVaultSecret(certificateLookupIdentifier, convertedCertificateToBase64));
+        try
+        {
+            await _keyVault
+                .SetSecretAsync(new KeyVaultSecret(certificateLookupIdentifier, convertedCertificateToBase64))
+                .ConfigureAwait(false);
+        }
+        catch (RequestFailedException e) when (e.Status == (int)HttpStatusCode.Conflict)
+        {
+            await _keyVault.StartRecoverDeletedSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
+        }
     }
 
     public async Task RemoveCertificateAsync(string certificateLookupIdentifier)

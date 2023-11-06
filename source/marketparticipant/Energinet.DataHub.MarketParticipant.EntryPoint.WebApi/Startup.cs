@@ -114,18 +114,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
             });
 
-            services.AddSingleton<ICertificateService>(s =>
+            services.AddSingleton<SecretClient>(_ =>
             {
                 var certificateKeyVaultUri = configuration.GetSetting(Settings.CertificateKeyVault);
-
                 var defaultCredentials = new DefaultAzureCredential();
+                return new SecretClient(certificateKeyVaultUri, defaultCredentials);
+            });
 
-                var certificateClient = new SecretClient(certificateKeyVaultUri, defaultCredentials);
-
-                var validation = s.GetRequiredService<ICertificateValidation>();
+            services.AddSingleton<ICertificateService>(s =>
+            {
+                var certificateClient = s.GetRequiredService<SecretClient>();
                 var logger = s.GetRequiredService<ILogger<CertificateService>>();
-
-                return new CertificateService(certificateClient, validation, logger);
+                return new CertificateService(certificateClient, logger);
             });
 
             if (_configuration.GetSetting(Settings.AllowAllTokens))
@@ -150,7 +150,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddLiveCheck()
                 .AddDbContextCheck<MarketParticipantDbContext>()
                 .AddCheck<GraphApiHealthCheck>("Graph API Access")
-                .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access");
+                .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
+                .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
 
             services.AddHttpLoggingScope("mark-part");
             services.AddSwaggerGen(c =>
