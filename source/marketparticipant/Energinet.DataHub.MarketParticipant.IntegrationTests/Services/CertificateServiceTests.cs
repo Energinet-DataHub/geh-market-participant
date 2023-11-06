@@ -15,7 +15,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -47,27 +46,30 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 new Mock<ILogger<CertificateService>>().Object);
 
             using var memoryStream = new MemoryStream();
-            memoryStream.Write(Encoding.UTF8.GetBytes("Invalid certificate"));
+            memoryStream.Write("Invalid certificate integrations tests"u8);
 
             // Act + Assert
             Assert.Throws<ValidationException>(() => certificateService.CreateAndValidateX509Certificate(memoryStream));
         }
 
-        //[Fact]
-        public async Task CertificateService_CreateAndValidate_Valid()
+        [Fact]
+        public void CertificateService_CreateAndValidate_Valid()
         {
             // Arrange
+            var validationMock = new Mock<ICertificateValidation>();
             var certificateService = new CertificateService(
                 _keyCertificateFixture.CertificateClient,
-                new Mock<ICertificateValidation>().Object,
+                validationMock.Object,
                 new Mock<ILogger<CertificateService>>().Object);
-            await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
+
+            using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 
             // Act
             var certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
 
             // Assert
             Assert.NotNull(certificate);
+            validationMock.Verify(x => x.Verify(certificate), Times.Once);
         }
 
         [Fact]
