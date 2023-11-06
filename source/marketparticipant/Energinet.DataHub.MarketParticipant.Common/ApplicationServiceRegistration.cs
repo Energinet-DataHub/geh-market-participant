@@ -97,6 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
+            services.AddScoped<ICertificateValidation, CertificateValidation>();
         }
     }
 }

@@ -64,4 +64,27 @@ internal static class TestUserPreparationHelper
         context.Users.Update(userEntity);
         await context.SaveChangesAsync();
     }
+
+    public static async Task AssignActorCredentialsAsync(
+            this MarketParticipantDatabaseFixture fixture,
+            Guid actorId,
+            string certificateThumbprint,
+            string certificateLookupIdentifier)
+        {
+            await using var context = fixture.DatabaseManager.CreateDbContext();
+
+            var actorCertificateCredentials = new ActorCertificateCredentialsEntity
+            {
+                ActorId = actorId,
+                CertificateThumbprint = certificateThumbprint,
+                KeyVaultSecretIdentifier = certificateLookupIdentifier,
+                ExpirationDate = DateTime.UtcNow.AddDays(5)
+            };
+
+            var actorEntity = await context.Actors.FindAsync(actorId);
+            actorEntity!.CertificateCredential = actorCertificateCredentials;
+
+            context.Actors.Update(actorEntity);
+            await context.SaveChangesAsync();
+        }
 }
