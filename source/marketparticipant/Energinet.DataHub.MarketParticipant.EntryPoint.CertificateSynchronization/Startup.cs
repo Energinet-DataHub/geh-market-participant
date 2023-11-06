@@ -34,6 +34,8 @@ internal sealed class Startup
     {
         services.AddLogging();
         services.AddFunctionLoggingScope("mark-part");
+        services.AddScoped<IKeyVaultCertificates, KeyVaultCertificates>();
+
         services.AddHttpClient<HttpClient>((_, httpClient) =>
         {
             var apimServiceName = configuration.GetValue<string>("APIM_SERVICE_NAME");
@@ -59,12 +61,11 @@ internal sealed class Startup
                 serviceProvider.GetRequiredService<IHttpClientFactory>());
         });
 
-        services.AddSingleton<IKeyVaultCertificates>(_ =>
+        services.AddSingleton(_ =>
         {
             var certificatesKeyVault = configuration.GetValue<Uri>("CERTIFICATES_KEY_VAULT");
-            var certificatesClient = new SecretClient(certificatesKeyVault, new DefaultAzureCredential());
-
-            return new KeyVaultCertificates(certificatesClient);
+            var defaultCredentials = new DefaultAzureCredential();
+            return new SecretClient(certificatesKeyVault, defaultCredentials);
         });
 
         AddHealthChecks(services);
@@ -77,6 +78,8 @@ internal sealed class Startup
 
         services
             .AddHealthChecks()
-            .AddLiveCheck();
+            .AddLiveCheck()
+            .AddCheck<ApimCertificateStoreHealthCheck>("APIM Certificate Access")
+            .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
     }
 }
