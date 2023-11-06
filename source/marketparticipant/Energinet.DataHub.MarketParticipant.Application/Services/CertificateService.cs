@@ -84,10 +84,5 @@ public class CertificateService : ICertificateService
             _logger.LogError(ex, $"Certificate validation failed: {ex.InnerException}");
             throw new ValidationException($"Certificate validation failed");
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Certificate validation failed: {ex.InnerException}");
-            throw new ValidationException($"Certificate validation failed");
-        }
     }
 }

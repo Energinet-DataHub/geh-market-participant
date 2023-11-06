@@ -39,14 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class AssignActorCertificateHandlerIntegrationTests
-    : WebApiIntegrationTestsBase
 {
     private const string IntegrationActorTestCertificatePublicCer = "integration-actor-test-certificate-public.cer";
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
-    public AssignActorCertificateHandlerIntegrationTests(
-        MarketParticipantDatabaseFixture databaseFixture)
-    : base(databaseFixture)
+    public AssignActorCertificateHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture)
     {
         _databaseFixture = databaseFixture;
     }
@@ -113,13 +110,6 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
 
         // Act + assert
         await Assert.ThrowsAsync<NotSupportedException>(() => mediator.Send(command));
-    }
-
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-
-        base.ConfigureWebHost(builder);
     }
 
     private static Stream SetupTestCertificate(string certificateName)
