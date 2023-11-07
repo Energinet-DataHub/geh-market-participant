@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Azure;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -23,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -57,7 +54,7 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         var actor = await _databaseFixture.PrepareActorAsync();
 
-        var certThumbprint = await SetupTestCertificateAndSaveToStore(IntegrationActorTestCertificatePublicCer);
+        var certThumbprint = await _keyCertificateFixture.GetPublicKeyTestCertificateAsync(IntegrationActorTestCertificatePublicCer);
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, certThumbprint, _keyCertificateFixture.CertificateName);
 
         SetUpCertificateServiceWithFixtureClient(host);
@@ -80,6 +77,9 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
         Assert.Null(updatedActor.Credentials);
         var requestException = await Assert.ThrowsAsync<RequestFailedException>(() => _keyCertificateFixture.CertificateClient.GetSecretAsync(_keyCertificateFixture.CertificateName));
         Assert.Equal(404, requestException.Status);
+
+        // clean up
+        await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
     }
 
     private void SetUpCertificateServiceWithFixtureClient(WebApiIntegrationTestHost host)
@@ -90,21 +90,5 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
             new Mock<ILogger<CertificateService>>().Object);
 
         host.ServiceCollection.Replace(ServiceDescriptor.Singleton<ICertificateService>(certificateService));
-    }
-
-    private async Task<string> SetupTestCertificateAndSaveToStore(string certificateName)
-    {
-        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
-        var assembly = typeof(CertificateServiceTests).Assembly;
-        var stream = assembly.GetManifestResourceStream(resourceName);
-
-        using var reader = new BinaryReader(stream!);
-        var certificateBytes = reader.ReadBytes((int)stream!.Length);
-
-        using var certificate = new X509Certificate2(certificateBytes);
-        var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
-        await _keyCertificateFixture.CertificateClient.SetSecretAsync(_keyCertificateFixture.CertificateName, convertedCertificateToBase64);
-
-        return certificate.Thumbprint;
     }
 }

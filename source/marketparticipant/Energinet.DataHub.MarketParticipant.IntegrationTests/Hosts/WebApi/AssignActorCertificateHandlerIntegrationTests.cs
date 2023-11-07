@@ -81,7 +81,8 @@ public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixtur
 
         var certificateSecret = await _keyCertificateFixture.CertificateClient.GetSecretAsync(certificateLookupIdentifier);
         Assert.True(certificateSecret.HasValue);
-        await _keyCertificateFixture.CleanUpCertificateFromStorage(certificateLookupIdentifier);
+        await _keyCertificateFixture.CleanUpCertificateFromStorageAsync(certificateLookupIdentifier);
+        await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
     }
 
     [Fact]
