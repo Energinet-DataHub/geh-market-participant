@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -54,8 +55,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// Adds a client secret to an App registration
         /// </summary>
         /// <param name="externalActorId">TThe unique id for the app.</param>
-        /// <returns>The secret created for the application or empty if failed</returns>
+        /// <returns>The secret created for the application</returns>
         /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this</remarks>
-        Task<string> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId);
+        Task<(Guid SecretId, string SecretText)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId);
+
+        /// <summary>
+        /// Removes a client secret to an App registration
+        /// </summary>
+        /// <param name="externalActorId">TThe unique id for the app.</param>
+        /// <param name="secretId">The secret id to remove</param>
+        Task RemoveSecretForAppRegistrationAsync(ExternalActorId externalActorId, Guid secretId);
     }
 }

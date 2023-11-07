@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -30,13 +31,16 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IActiveDirectoryB2CService _activeDirectoryB2CService;
         private readonly IActorRepository _actorRepository;
+        private readonly ICertificateService _certificateService;
 
         public ActorRequestSecretHandler(
             IActiveDirectoryB2CService activeDirectoryB2CService,
-            IActorRepository actorRepository)
+            IActorRepository actorRepository,
+            ICertificateService certificateService)
         {
             _activeDirectoryB2CService = activeDirectoryB2CService;
             _actorRepository = actorRepository;
+            _certificateService = certificateService;
         }
 
         public async Task<ActorRequestSecretResponse> Handle(ActorRequestSecretCommand request, CancellationToken cancellationToken)
@@ -52,9 +56,29 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             if (actor.ExternalActorId is null)
                 throw new InvalidOperationException("Can't request secret to actor which doesn't have an external id");
 
-            return new ActorRequestSecretResponse(await _activeDirectoryB2CService
+            var secretForApp = await _activeDirectoryB2CService
                 .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
-                .ConfigureAwait(false));
+                .ConfigureAwait(false);
+
+            switch (actor.Credentials)
+            {
+                case ActorCertificateCredentials certificateCredentials:
+                    await _certificateService
+                        .RemoveCertificateAsync(certificateCredentials.KeyVaultSecretIdentifier)
+                        .ConfigureAwait(false);
+                    break;
+                case ActorClientSecretCredentials clientSecretCredentials:
+                    await _certificateService
+                        .RemoveCertificateAsync(clientSecretCredentials.ClientSecretIdentifier)
+                        .ConfigureAwait(false);
+                    break;
+                default:
+                    throw new InvalidOperationException("Unknown credentials type");
+            }
+
+            actor.Credentials = null;
+            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId.ToString());
+            return new ActorRequestSecretResponse(secretForApp.SecretText);
         }
     }
 }
