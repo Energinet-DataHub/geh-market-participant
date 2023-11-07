@@ -142,7 +142,7 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorClientSecretCredentials = new ActorClientSecretCredentials("111111");
+        var actorClientSecretCredentials = new ActorClientSecretCredentials(Guid.NewGuid());
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorClientSecretCredentials
