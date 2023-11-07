@@ -41,6 +41,9 @@ markpartDomain = group "Market Participant" {
         technology "Azure function, C#"
         tags "Microsoft Azure - Function Apps" "Titans"
 
+        # Common relationships
+        this -> dh3.sharedApiManagement "Links and unlinks DH2 active authentication certificates." "REST/https"
+
         # Domain relationships
         this -> markpartCertKeyVault "Gets certificates that should be active in APIM." "Microsoft.Graph/https"
     }
@@ -74,4 +77,3 @@ markpartDomain = group "Market Participant" {
         }
     }
 }
-
