@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class ActorCertificateCredentialsAssignedIntegrationEventFactory : IIntegrationEventFactory<ActorCertificateCredentialsAssigned>
 {
-    public Task<IntegrationEvent> CreateAsync(ActorCertificateCredentialsAssigned domainEvent)
+    public Task<IntegrationEvent> CreateAsync(ActorCertificateCredentialsAssigned domainEvent, int sequenceNumber)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 
@@ -52,7 +52,8 @@ public sealed class ActorCertificateCredentialsAssignedIntegrationEventFactory :
                     _ => throw new NotSupportedException($"Actor role {domainEvent.ActorRole} is not supported in integration event.")
                 },
                 CertificateThumbprint = domainEvent.CertificateThumbprint,
-                ValidFrom = domainEvent.ValidFrom.ToTimestamp()
+                ValidFrom = domainEvent.ValidFrom.ToTimestamp(),
+                SequenceNumber = sequenceNumber
             });
 
         return Task.FromResult(integrationEvent);

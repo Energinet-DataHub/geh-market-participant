@@ -23,7 +23,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
 public sealed class ActorActivatedIntegrationEventFactory : IIntegrationEventFactory<ActorActivated>
 {
-    public Task<IntegrationEvent> CreateAsync(ActorActivated domainEvent)
+    public Task<IntegrationEvent> CreateAsync(ActorActivated domainEvent, int sequenceNumber)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 
