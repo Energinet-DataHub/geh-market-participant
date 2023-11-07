@@ -20,6 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory
         string AppId,
         string AppObjectId,
         string AppName,
-        bool HasSecret,
         IEnumerable<ActiveDirectoryRole> AppRoles);
 }

@@ -121,7 +121,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     {
                         x.QueryParameters.Select = new[]
                         {
-                            "appId", "id", "displayName", "appRoles", "passwordCredentials"
+                            "appId", "id", "displayName", "appRoles"
                         };
                     })
                     .ConfigureAwait(false))!;
@@ -131,7 +131,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     retrievedApp.AppId!,
                     retrievedApp.Id!,
                     retrievedApp.DisplayName!,
-                    retrievedApp.PasswordCredentials?.Any(x => x.DisplayName == SecretDisplayName) ?? false,
                     appRoles);
             }
             catch (Exception e)

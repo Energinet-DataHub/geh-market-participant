@@ -23,11 +23,14 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using FluentValidation.Validators;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
 using Moq;
 using Xunit;
@@ -40,6 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     public sealed class ActiveDirectoryB2CServiceTests
     {
         private readonly IActiveDirectoryB2CService _sut = CreateActiveDirectoryService();
+        private readonly GraphServiceClient _graphClient = CreateGraphClient();
 
         [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
@@ -168,14 +172,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 // Act
                 var result = await _sut
                     .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
-                var existing = await _sut.GetExistingAppRegistrationAsync(
-                    new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                    new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
+                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
 
                 // Assert
                 Assert.NotEmpty(result.SecretText);
                 Assert.NotEmpty(result.SecretId.ToString());
-                Assert.True(existing.HasSecret);
+                Assert.NotNull(existing);
+                Assert.True(existing.PasswordCredentials is { Count: >0 });
             }
             finally
             {
@@ -207,18 +210,37 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 // Act
                 var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretsForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId));
-                var existing = await _sut.GetExistingAppRegistrationAsync(
-                    new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                    new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
+                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
 
                 // Assert
                 Assert.Null(exceptions);
-                Assert.False(existing.HasSecret);
+                Assert.NotNull(existing);
+                Assert.True(existing.PasswordCredentials is { Count: 0 });
             }
             finally
             {
                 await CleanupAsync(cleanupId);
             }
+        }
+
+        private static GraphServiceClient CreateGraphClient()
+        {
+            var integrationTestConfig = new IntegrationTestConfiguration();
+
+            // Graph Service Client
+            var clientSecretCredential = new ClientSecretCredential(
+                integrationTestConfig.B2CSettings.Tenant,
+                integrationTestConfig.B2CSettings.ServicePrincipalId,
+                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+
+            var graphClient = new GraphServiceClient(
+                clientSecretCredential,
+                new[]
+                {
+                    "https://graph.microsoft.com/.default"
+                });
+
+            return graphClient;
         }
 
         private static IActiveDirectoryB2CService CreateActiveDirectoryService()
@@ -265,6 +287,21 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             await _sut
                 .DeleteAppRegistrationAsync(externalActorId)
                 .ConfigureAwait(false);
+        }
+
+        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+        {
+            var appId = externalActorId.Value.ToString();
+            var applicationUsingAppId = await _graphClient
+                .Applications
+                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                .ConfigureAwait(false);
+
+            var applications = await applicationUsingAppId!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            return applications.SingleOrDefault();
         }
     }
 }
