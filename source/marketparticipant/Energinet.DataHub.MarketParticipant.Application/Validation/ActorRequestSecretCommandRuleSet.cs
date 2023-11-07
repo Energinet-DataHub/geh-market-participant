@@ -12,8 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
+using FluentValidation;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-
-public sealed record ActorClientSecretCredentialsDto(Guid ClientSecretIdentifier, DateTimeOffset ExpirationDate);
+namespace Energinet.DataHub.MarketParticipant.Application.Validation
+{
+    public sealed class ActorRequestSecretCommandRuleSet : AbstractValidator<ActorRequestSecretCommand>
+    {
+        public ActorRequestSecretCommandRuleSet()
+        {
+            RuleFor(command => command.ActorId)
+                .NotEmpty();
+        }
+    }
+}
