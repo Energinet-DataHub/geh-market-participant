@@ -54,8 +54,8 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
         var actor = await _databaseFixture.PrepareActorAsync();
 
-        var certThumbprint = await _keyCertificateFixture.GetPublicKeyTestCertificateAsync(IntegrationActorTestCertificatePublicCer);
-        await _databaseFixture.AssignActorCredentialsAsync(actor.Id, certThumbprint, _keyCertificateFixture.CertificateName);
+        var certInfo = await _keyCertificateFixture.GetPublicKeyTestCertificateAsync(IntegrationActorTestCertificatePublicCer);
+        await _databaseFixture.AssignActorCredentialsAsync(actor.Id, certInfo.Thumbprint, certInfo.CertificateName);
 
         SetUpCertificateServiceWithFixtureClient(host);
         await using var scope = host.BeginScope();
@@ -75,7 +75,7 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
         Assert.NotNull(updatedActor);
         Assert.True(actorBeforeUpdate.Credentials is ActorCertificateCredentials);
         Assert.Null(updatedActor.Credentials);
-        var requestException = await Assert.ThrowsAsync<RequestFailedException>(() => _keyCertificateFixture.CertificateClient.GetSecretAsync(_keyCertificateFixture.CertificateName));
+        var requestException = await Assert.ThrowsAsync<RequestFailedException>(() => _keyCertificateFixture.CertificateClient.GetSecretAsync(certInfo.CertificateName));
         Assert.Equal(404, requestException.Status);
 
         // clean up

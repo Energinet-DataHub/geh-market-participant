@@ -55,9 +55,9 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
         }
     }
 
-    public async Task<string> GetPublicKeyTestCertificateAsync(string certificateName)
+    public async Task<(string CertificateName, string Thumbprint)> GetPublicKeyTestCertificateAsync(string certificateFileName)
     {
-        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateName}";
+        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateFileName}";
         var assembly = typeof(KeyCertificateFixture).Assembly;
         var stream = assembly.GetManifestResourceStream(resourceName);
 
@@ -66,9 +66,9 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
 
         using var certificate = new X509Certificate2(certificateBytes);
         var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
-        await CertificateClient.SetSecretAsync(certificateName, convertedCertificateToBase64);
+        await CertificateClient.SetSecretAsync(CertificateName, convertedCertificateToBase64);
 
-        return certificate.Thumbprint;
+        return (CertificateName, certificate.Thumbprint);
     }
 
     private static Uri GetKeyVaultUri()
