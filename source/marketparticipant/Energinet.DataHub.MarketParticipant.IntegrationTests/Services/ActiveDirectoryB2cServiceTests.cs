@@ -227,26 +227,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             }
         }
 
-        private static GraphServiceClient CreateGraphClient()
-        {
-            var integrationTestConfig = new IntegrationTestConfiguration();
-
-            // Graph Service Client
-            var clientSecretCredential = new ClientSecretCredential(
-                integrationTestConfig.B2CSettings.Tenant,
-                integrationTestConfig.B2CSettings.ServicePrincipalId,
-                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
-
-            var graphClient = new GraphServiceClient(
-                clientSecretCredential,
-                new[]
-                {
-                    "https://graph.microsoft.com/.default"
-                });
-
-            return graphClient;
-        }
-
         private static IActiveDirectoryB2CService CreateActiveDirectoryService()
         {
             var integrationTestConfig = new IntegrationTestConfiguration();
