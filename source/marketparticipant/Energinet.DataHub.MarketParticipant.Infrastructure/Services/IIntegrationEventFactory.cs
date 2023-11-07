@@ -21,5 +21,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 public interface IIntegrationEventFactory<TDomainEvent>
     where TDomainEvent : DomainEvent
 {
-    Task<IntegrationEvent> CreateAsync(TDomainEvent domainEvent);
+    Task<IntegrationEvent> CreateAsync(TDomainEvent domainEvent, int sequenceNumber);
 }
