@@ -167,7 +167,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
             {
-                return (secret.KeyId.GetValueOrDefault(), secret.SecretText, secret.EndDateTime.GetValueOrDefault());
+                return (secret.KeyId.Value, secret.SecretText, secret.EndDateTime.Value);
             }
 
             throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
