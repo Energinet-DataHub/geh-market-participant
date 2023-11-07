@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
             if (actor.ExternalActorId is null)
-                throw new ValidationException("Can't request secret to actor which doesn't have an external id");
+                throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
 
             switch (actor.Credentials)
             {

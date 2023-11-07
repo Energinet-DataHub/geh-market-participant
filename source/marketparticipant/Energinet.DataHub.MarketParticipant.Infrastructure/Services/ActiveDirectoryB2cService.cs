@@ -165,10 +165,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 .PostAsync(new AddPasswordPostRequestBody() { PasswordCredential = passwordCredential })
                 .ConfigureAwait(false);
 
-            if (secret?.KeyId is null || secret.SecretText is null || !secret.EndDateTime.HasValue)
-                throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
+            if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
+            {
+                return (secret.KeyId.GetValueOrDefault(), secret.SecretText, secret.EndDateTime.GetValueOrDefault());
+            }
 
-            return (secret.KeyId.GetValueOrDefault(), secret.SecretText, secret.EndDateTime.GetValueOrDefault());
+            throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
         }
 
         public async Task RemoveSecretsForAppRegistrationAsync(ExternalActorId externalActorId)
