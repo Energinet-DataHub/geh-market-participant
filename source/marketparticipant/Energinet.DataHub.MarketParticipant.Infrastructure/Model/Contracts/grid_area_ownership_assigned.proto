@@ -47,7 +47,7 @@ message GridAreaOwnershipAssigned {
   google.protobuf.Timestamp valid_from = 4;
 
   /*
-   * A timestamp from when the ownership was requested.
+   * The sequence number of the event. Used to distinguish between events with identical valid_from timestamps.
    */
-  google.protobuf.Timestamp requested_at = 5;
+  int32 sequence_number = 5;
 }

@@ -71,7 +71,7 @@ public sealed class IntegrationEventProvider : IIntegrationEventProvider
         {
             var domainEvent = Map(domainEventEntity);
 
-            yield return await CreateAsync((dynamic)domainEvent).ConfigureAwait(false);
+            yield return await CreateAsync((dynamic)domainEvent, domainEventEntity.Id).ConfigureAwait(false);
 
             domainEventEntity.IsSent = true;
 
@@ -92,10 +92,10 @@ public sealed class IntegrationEventProvider : IIntegrationEventProvider
                throw new InvalidOperationException($"Could not deserialize event {domainEvent.EventTypeName}.");
     }
 
-    private Task<IntegrationEvent> CreateAsync<T>(T domainEvent)
+    private Task<IntegrationEvent> CreateAsync<T>(T domainEvent, int sequenceNumber)
         where T : DomainEvent
     {
         var factoryService = _serviceProvider.GetRequiredService<IIntegrationEventFactory<T>>();
-        return factoryService.CreateAsync(domainEvent);
+        return factoryService.CreateAsync(domainEvent, sequenceNumber);
     }
 }

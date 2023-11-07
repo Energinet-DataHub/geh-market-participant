@@ -32,7 +32,7 @@ public sealed class GridAreaOwnershipAssignedIntegrationEventFactory : IIntegrat
         _gridAreaRepository = gridAreaRepository;
     }
 
-    public async Task<IntegrationEvent> CreateAsync(GridAreaOwnershipAssigned domainEvent)
+    public async Task<IntegrationEvent> CreateAsync(GridAreaOwnershipAssigned domainEvent, int sequenceNumber)
     {
         ArgumentNullException.ThrowIfNull(domainEvent);
 
@@ -56,7 +56,7 @@ public sealed class GridAreaOwnershipAssignedIntegrationEventFactory : IIntegrat
                 },
                 GridAreaCode = gridArea.Code.Value,
                 ValidFrom = domainEvent.ValidFrom.ToTimestamp(),
-                RequestedAt = domainEvent.RequestedAt.ToTimestamp()
+                SequenceNumber = sequenceNumber
             });
     }
 }
