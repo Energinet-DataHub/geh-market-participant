@@ -166,7 +166,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 .ConfigureAwait(false);
 
             if (secret is { KeyId: null, SecretText: null })
-                throw new InvalidOperationException($"Could not create secret in B2C for application {appId}");
+                throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
 
             return (secret?.KeyId ?? Guid.Empty, secret?.SecretText ?? string.Empty);
         }
