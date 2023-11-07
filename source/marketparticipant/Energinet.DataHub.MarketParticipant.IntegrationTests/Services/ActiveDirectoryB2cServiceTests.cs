@@ -27,7 +27,6 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentValidation.Validators;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
@@ -43,7 +42,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     public sealed class ActiveDirectoryB2CServiceTests
     {
         private readonly IActiveDirectoryB2CService _sut = CreateActiveDirectoryService();
-        private readonly GraphServiceClient _graphClient = CreateGraphClient();
+        private readonly GraphServiceClientFixture _graphServiceClientFixture;
+
+        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture)
+        {
+            _graphServiceClientFixture = graphServiceClientFixture;
+        }
 
         [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
@@ -292,13 +296,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
         {
             var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphClient
+            var applicationUsingAppId = await _graphServiceClientFixture.Client
                 .Applications
                 .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
                 .ConfigureAwait(false);
 
             var applications = await applicationUsingAppId!
-                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphServiceClientFixture.Client)
                 .ConfigureAwait(false);
 
             return applications.SingleOrDefault();
