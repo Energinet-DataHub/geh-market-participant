@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-public sealed record ActorClientSecretCredentialsDto(Guid ClientSecretIdentifier, DateTimeOffset ExpirationDate);
+public sealed record ActorRequestSecretResponse(string SecretText);

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -65,7 +66,8 @@ internal static class ActorMapper
             case ActorClientSecretCredentials credentials:
                 to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
                 {
-                    ClientSecretIdentifier = credentials.ClientSecretIdentifier
+                    ClientSecretIdentifier = credentials.ClientSecretIdentifier.ToString(),
+                    ExpirationDate = credentials.ExpirationDate,
                 };
                 to.CertificateCredential = null;
                 break;
@@ -119,7 +121,7 @@ internal static class ActorMapper
     {
         return from is null
             ? null
-            : new ActorClientSecretCredentials(from.ClientSecretIdentifier);
+            : new ActorClientSecretCredentials(Guid.Parse(from.ClientSecretIdentifier), from.ExpirationDate);
     }
 
     private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)

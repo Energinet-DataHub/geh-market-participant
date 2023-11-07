@@ -22,12 +22,15 @@ using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Applications.Item.AddPassword;
+using Microsoft.Graph.Applications.Item.RemovePassword;
 using Microsoft.Graph.Models;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
     {
+        private const string SecretDisplayName = "B2C Login - Secret";
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
@@ -87,20 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             try
             {
-                var appId = externalActorId.Value.ToString();
-                var applicationUsingAppId = await _graphClient
-                    .Applications
-                    .GetAsync(x =>
-                    {
-                        x.QueryParameters.Filter = $"appId eq '{appId}'";
-                    })
-                    .ConfigureAwait(false);
-
-                var applications = await applicationUsingAppId!
-                    .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
-                    .ConfigureAwait(false);
-
-                var foundApp = applications.SingleOrDefault();
+                var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
                 if (foundApp == null)
                 {
                     throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
@@ -137,7 +127,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     .ConfigureAwait(false))!;
 
                 var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
-
                 return new ActiveDirectoryAppInformation(
                     retrievedApp.AppId!,
                     retrievedApp.Id!,
@@ -149,6 +138,73 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
                 throw;
             }
+        }
+
+        public async Task<(Guid SecretId, string SecretText, DateTimeOffset ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
+        {
+            ArgumentNullException.ThrowIfNull(externalActorId);
+
+            var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
+            if (foundApp == null)
+            {
+                throw new InvalidOperationException("Cannot add secret to B2C, Application was not found.");
+            }
+
+            var passwordCredential = new PasswordCredential
+            {
+                DisplayName = SecretDisplayName,
+                StartDateTime = DateTimeOffset.Now,
+                EndDateTime = DateTimeOffset.Now.AddMonths(6),
+                KeyId = Guid.NewGuid(),
+            };
+
+            var secret = await _graphClient
+                .Applications[foundApp.Id]
+                .AddPassword
+                .PostAsync(new AddPasswordPostRequestBody() { PasswordCredential = passwordCredential })
+                .ConfigureAwait(false);
+
+            if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
+            {
+                return (secret.KeyId.Value, secret.SecretText, secret.EndDateTime.Value);
+            }
+
+            throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
+        }
+
+        public async Task RemoveSecretsForAppRegistrationAsync(ExternalActorId externalActorId)
+        {
+            ArgumentNullException.ThrowIfNull(externalActorId);
+
+            var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
+            if (foundApp == null)
+            {
+                throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
+            }
+
+            foreach (var secret in foundApp.PasswordCredentials!)
+            {
+                await _graphClient
+                    .Applications[foundApp.Id]
+                    .RemovePassword
+                    .PostAsync(new RemovePasswordPostRequestBody() { KeyId = secret.KeyId })
+                    .ConfigureAwait(false);
+            }
+        }
+
+        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+        {
+            var appId = externalActorId.Value.ToString();
+            var applicationUsingAppId = await _graphClient
+                .Applications
+                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                .ConfigureAwait(false);
+
+            var applications = await applicationUsingAppId!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            return applications.SingleOrDefault();
         }
 
         private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)

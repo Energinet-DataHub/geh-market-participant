@@ -99,7 +99,7 @@ public sealed class ActorRepositoryTests
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_OneActor_WithCredentials_CanReadBack()
+    public async Task AddOrUpdateAsync_OneActor_WithCertificateCredentials_CanReadBack()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -131,7 +131,7 @@ public sealed class ActorRepositoryTests
     }
 
     [Fact]
-    public async Task AddOrUpdateAsync_OneActor_WithDifferentCredentials_CanReadBack()
+    public async Task AddOrUpdateAsync_OneActor_WithClientSecretCredentials_CanReadBack()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -142,7 +142,8 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorClientSecretCredentials = new ActorClientSecretCredentials("111111");
+        var endDate = DateTimeOffset.Now.AddYears(1);
+        var actorClientSecretCredentials = new ActorClientSecretCredentials(Guid.NewGuid(), endDate);
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorClientSecretCredentials
@@ -159,6 +160,7 @@ public sealed class ActorRepositoryTests
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
         Assert.IsType<ActorClientSecretCredentials>(actual.Credentials);
         Assert.Equal(actorClientSecretCredentials.ClientSecretIdentifier, (actual.Credentials as ActorClientSecretCredentials)?.ClientSecretIdentifier);
+        Assert.Equal(endDate, (actual.Credentials as ActorClientSecretCredentials)?.ExpirationDate);
     }
 
     [Fact]
