@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
+using FluentValidation;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -54,11 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
             if (actor.ExternalActorId is null)
-                throw new InvalidOperationException("Can't request secret to actor which doesn't have an external id");
-
-            var secretForApp = await _activeDirectoryB2CService
-                .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
-                .ConfigureAwait(false);
+                throw new ValidationException("Can't request secret to actor which doesn't have an external id");
 
             switch (actor.Credentials)
             {
@@ -69,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     break;
                 case ActorClientSecretCredentials clientSecretCredentials:
                     await _activeDirectoryB2CService
-                        .RemoveSecretForAppRegistrationAsync(actor.ExternalActorId, clientSecretCredentials.ClientSecretIdentifier)
+                        .RemoveSecretsForAppRegistrationAsync(actor.ExternalActorId)
                         .ConfigureAwait(false);
                     break;
                 default:
@@ -77,7 +74,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             }
 
             actor.Credentials = null;
-            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId);
+            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
+
+            var secretForApp = await _activeDirectoryB2CService
+                .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
+                .ConfigureAwait(false);
+            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId, secretForApp.ExpirationDate);
+            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
+
             return new ActorRequestSecretResponse(secretForApp.SecretText);
         }
     }

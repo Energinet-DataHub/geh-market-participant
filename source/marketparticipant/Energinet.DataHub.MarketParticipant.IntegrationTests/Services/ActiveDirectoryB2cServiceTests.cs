@@ -206,7 +206,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                     .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
 
                 // Act
-                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId, secretCreated.SecretId));
+                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretsForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId));
                 var existing = await _sut.GetExistingAppRegistrationAsync(
                     new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
                     new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));

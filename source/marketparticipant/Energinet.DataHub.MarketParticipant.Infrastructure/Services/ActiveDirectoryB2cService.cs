@@ -141,7 +141,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        public async Task<(Guid SecretId, string SecretText)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
+        public async Task<(Guid SecretId, string SecretText, DateTimeOffset ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
 
@@ -165,35 +165,30 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 .PostAsync(new AddPasswordPostRequestBody() { PasswordCredential = passwordCredential })
                 .ConfigureAwait(false);
 
-            if (secret is { KeyId: null, SecretText: null })
+            if (secret?.KeyId is null || secret.SecretText is null || !secret.EndDateTime.HasValue)
                 throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
 
-            return (secret?.KeyId ?? Guid.Empty, secret?.SecretText ?? string.Empty);
+            return (secret.KeyId.GetValueOrDefault(), secret.SecretText, secret.EndDateTime.GetValueOrDefault());
         }
 
-        public async Task RemoveSecretForAppRegistrationAsync(ExternalActorId externalActorId, Guid secretId)
+        public async Task RemoveSecretsForAppRegistrationAsync(ExternalActorId externalActorId)
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
 
             var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
             if (foundApp == null)
             {
-                throw new InvalidOperationException("Cannot delete secret from B2C; Application was not found.");
+                throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
             }
 
-            var passwordCredential = new PasswordCredential
+            foreach (var secret in foundApp.PasswordCredentials!)
             {
-                DisplayName = "App secret",
-                StartDateTime = DateTimeOffset.Now,
-                EndDateTime = DateTimeOffset.Now.AddMonths(6),
-                KeyId = Guid.NewGuid(),
-            };
-
-            await _graphClient
-                .Applications[foundApp.Id]
-                .RemovePassword
-                .PostAsync(new RemovePasswordPostRequestBody() { KeyId = secretId })
-                .ConfigureAwait(false);
+                await _graphClient
+                    .Applications[foundApp.Id]
+                    .RemovePassword
+                    .PostAsync(new RemovePasswordPostRequestBody() { KeyId = secret.KeyId })
+                    .ConfigureAwait(false);
+            }
         }
 
         private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-public sealed record ActorClientSecretCredentialsDto;
+public sealed record ActorClientSecretCredentialsDto(Guid ClientSecretIdentifier, DateTimeOffset ExpirationDate);
