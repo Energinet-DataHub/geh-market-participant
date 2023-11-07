@@ -38,14 +38,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class AssignActorCertificateHandlerIntegrationTests
+public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixture<KeyCertificateFixture>
 {
     private const string IntegrationActorTestCertificatePublicCer = "integration-actor-test-certificate-public.cer";
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
+    private readonly KeyCertificateFixture _keyCertificateFixture;
 
-    public AssignActorCertificateHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture)
+    public AssignActorCertificateHandlerIntegrationTests(
+        MarketParticipantDatabaseFixture databaseFixture,
+        KeyCertificateFixture keyCertificateFixture)
     {
         _databaseFixture = databaseFixture;
+        _keyCertificateFixture = keyCertificateFixture;
     }
 
     [Fact]
@@ -58,7 +62,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
-        SetUpCertificateServiceWithMockSave(host);
+        SetUpCertificateServiceWithFixture(host);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -71,6 +75,14 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         var updatedActor = await actorRepository.GetAsync(new ActorId(actor.Id));
         Assert.NotNull(updatedActor?.Credentials);
         Assert.True(updatedActor.Credentials is ActorCertificateCredentials);
+
+        var thumbprint = (updatedActor.Credentials as ActorCertificateCredentials)?.CertificateThumbprint;
+        var certificateLookupIdentifier = $"{actor.ActorNumber}-{thumbprint}";
+
+        var certificateSecret = await _keyCertificateFixture.CertificateClient.GetSecretAsync(certificateLookupIdentifier);
+        Assert.True(certificateSecret.HasValue);
+        await _keyCertificateFixture.CleanUpCertificateFromStorageAsync(certificateLookupIdentifier);
+        await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
     }
 
     [Fact]
@@ -82,7 +94,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(Guid.NewGuid(), certificateFileStream);
 
-        SetUpCertificateServiceWithMockSave(host);
+        SetUpCertificateServiceWithFixture(host);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -103,7 +115,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
-        SetUpCertificateServiceWithMockSave(host);
+        SetUpCertificateServiceWithFixture(host);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -122,20 +134,16 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
     }
 
-    private static void SetUpCertificateServiceWithMockSave(WebApiIntegrationTestHost host)
+    private void SetUpCertificateServiceWithFixture(WebApiIntegrationTestHost host)
     {
         var certValidation = new Mock<ICertificateValidation>();
         certValidation.Setup(e => e.Verify(It.IsAny<X509Certificate2>()));
 
-        var certificateServiceMock = new Mock<CertificateService>(
-                It.IsAny<SecretClient>(), certValidation.Object, It.IsAny<ILogger<CertificateService>>())
-            .As<ICertificateService>();
-        certificateServiceMock
-            .Setup(x => x.SaveCertificateAsync(It.IsAny<string>(), It.IsAny<X509Certificate2>()))
-            .Returns(() => Task.CompletedTask);
-        certificateServiceMock.CallBase = true;
+        var certificateService = new CertificateService(
+            _keyCertificateFixture.CertificateClient,
+            certValidation.Object,
+            new Mock<ILogger<CertificateService>>().Object);
 
-        host.ServiceCollection.RemoveAll<ICertificateService>();
-        host.ServiceCollection.AddSingleton(_ => certificateServiceMock.Object);
+        host.ServiceCollection.Replace(ServiceDescriptor.Singleton<ICertificateService>(certificateService));
     }
 }

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 using System;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Identity;
@@ -38,6 +40,11 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        await CleanUpCertificateFromStorageAsync(CertificateName);
+    }
+
+    public async Task CleanUpCertificateFromStorageAsync(string lookupName)
+    {
         try
         {
             await CertificateClient.StartDeleteSecretAsync(CertificateName);
@@ -46,6 +53,22 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
         {
             await Task.CompletedTask;
         }
+    }
+
+    public async Task<(string CertificateName, string Thumbprint)> GetPublicKeyTestCertificateAsync(string certificateFileName)
+    {
+        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateFileName}";
+        var assembly = typeof(KeyCertificateFixture).Assembly;
+        var stream = assembly.GetManifestResourceStream(resourceName);
+
+        using var reader = new BinaryReader(stream!);
+        var certificateBytes = reader.ReadBytes((int)stream!.Length);
+
+        using var certificate = new X509Certificate2(certificateBytes);
+        var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
+        await CertificateClient.SetSecretAsync(CertificateName, convertedCertificateToBase64);
+
+        return (CertificateName, certificate.Thumbprint);
     }
 
     private static Uri GetKeyVaultUri()
