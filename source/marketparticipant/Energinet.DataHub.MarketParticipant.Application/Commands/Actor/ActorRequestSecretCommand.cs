@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-public sealed record ActorClientSecretCredentialsDto(Guid ClientSecretIdentifier, DateTimeOffset ExpirationDate);
+public sealed record ActorRequestSecretCommand(Guid ActorId) : IRequest<ActorRequestSecretResponse>;

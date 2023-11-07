@@ -20,4 +20,5 @@ public sealed class ActorClientSecretCredentialsEntity
 {
     public Guid ActorId { get; set; }
     public string ClientSecretIdentifier { get; set; } = null!;
+    public DateTimeOffset ExpirationDate { get; set; }
 }

@@ -23,11 +23,13 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
 using Moq;
 using Xunit;
@@ -40,6 +42,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     public sealed class ActiveDirectoryB2CServiceTests
     {
         private readonly IActiveDirectoryB2CService _sut = CreateActiveDirectoryService();
+        private readonly GraphServiceClientFixture _graphServiceClientFixture;
+
+        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture)
+        {
+            _graphServiceClientFixture = graphServiceClientFixture;
+        }
 
         [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
@@ -146,6 +154,79 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             }
         }
 
+        [Fact]
+        public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
+        {
+            ExternalActorId? cleanupId = null;
+
+            try
+            {
+                // Arrange
+                var roles = new List<EicFunction>
+                {
+                    EicFunction.SystemOperator // transmission system operator
+                };
+
+                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
+                    new MockedGln(),
+                    roles);
+
+                cleanupId = createAppRegistrationResponse.ExternalActorId;
+
+                // Act
+                var result = await _sut
+                    .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
+                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
+
+                // Assert
+                Assert.NotEmpty(result.SecretText);
+                Assert.NotEmpty(result.SecretId.ToString());
+                Assert.NotNull(existing);
+                Assert.True(existing.PasswordCredentials is { Count: >0 });
+            }
+            finally
+            {
+                await CleanupAsync(cleanupId);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
+        {
+            ExternalActorId? cleanupId = null;
+
+            try
+            {
+                // Arrange
+                var roles = new List<EicFunction>
+                {
+                    EicFunction.SystemOperator // transmission system operator
+                };
+
+                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
+                    new MockedGln(),
+                    roles);
+
+                cleanupId = createAppRegistrationResponse.ExternalActorId;
+
+                var secretCreated = await _sut
+                    .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
+
+                // Act
+                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretsForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId));
+                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
+
+                // Assert
+                Assert.Null(exceptions);
+                Assert.NotNull(existing);
+                Assert.True(existing.PasswordCredentials is { Count: 0 });
+            }
+            finally
+            {
+                await CleanupAsync(cleanupId);
+            }
+        }
+
         private static IActiveDirectoryB2CService CreateActiveDirectoryService()
         {
             var integrationTestConfig = new IntegrationTestConfiguration();
@@ -190,6 +271,21 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             await _sut
                 .DeleteAppRegistrationAsync(externalActorId)
                 .ConfigureAwait(false);
+        }
+
+        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+        {
+            var appId = externalActorId.Value.ToString();
+            var applicationUsingAppId = await _graphServiceClientFixture.Client
+                .Applications
+                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                .ConfigureAwait(false);
+
+            var applications = await applicationUsingAppId!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphServiceClientFixture.Client)
+                .ConfigureAwait(false);
+
+            return applications.SingleOrDefault();
         }
     }
 }
