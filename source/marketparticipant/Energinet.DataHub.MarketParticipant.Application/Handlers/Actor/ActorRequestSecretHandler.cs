@@ -68,8 +68,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                         .ConfigureAwait(false);
                     break;
                 case ActorClientSecretCredentials clientSecretCredentials:
-                    await _certificateService
-                        .RemoveCertificateAsync(clientSecretCredentials.ClientSecretIdentifier)
+                    await _activeDirectoryB2CService
+                        .RemoveSecretForAppRegistrationAsync(actor.ExternalActorId, clientSecretCredentials.ClientSecretIdentifier)
                         .ConfigureAwait(false);
                     break;
                 default:
@@ -77,7 +77,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             }
 
             actor.Credentials = null;
-            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId.ToString());
+            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId);
             return new ActorRequestSecretResponse(secretForApp.SecretText);
         }
     }

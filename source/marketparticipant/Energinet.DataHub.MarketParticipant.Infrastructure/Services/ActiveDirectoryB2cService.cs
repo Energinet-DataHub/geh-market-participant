@@ -30,6 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
     {
+        private const string SecretDisplayName = "B2C Login - Secret";
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
@@ -133,17 +134,17 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     {
                         x.QueryParameters.Select = new[]
                         {
-                            "appId", "id", "displayName", "appRoles"
+                            "appId", "id", "displayName", "appRoles", "passwordCredentials"
                         };
                     })
                     .ConfigureAwait(false))!;
 
                 var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
-
                 return new ActiveDirectoryAppInformation(
                     retrievedApp.AppId!,
                     retrievedApp.Id!,
                     retrievedApp.DisplayName!,
+                    retrievedApp.PasswordCredentials?.Any(x => x.DisplayName == SecretDisplayName) ?? false,
                     appRoles);
             }
             catch (Exception e)
@@ -178,7 +179,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var passwordCredential = new PasswordCredential
             {
-                DisplayName = "App secret",
+                DisplayName = SecretDisplayName,
                 StartDateTime = DateTimeOffset.Now,
                 EndDateTime = DateTimeOffset.Now.AddMonths(6),
                 KeyId = Guid.NewGuid(),

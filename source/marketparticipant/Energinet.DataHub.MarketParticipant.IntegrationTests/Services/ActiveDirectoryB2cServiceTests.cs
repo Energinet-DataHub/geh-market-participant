@@ -146,6 +146,81 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             }
         }
 
+        [Fact]
+        public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
+        {
+            ExternalActorId? cleanupId = null;
+
+            try
+            {
+                // Arrange
+                var roles = new List<EicFunction>
+                {
+                    EicFunction.SystemOperator // transmission system operator
+                };
+
+                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
+                    new MockedGln(),
+                    roles);
+
+                cleanupId = createAppRegistrationResponse.ExternalActorId;
+
+                // Act
+                var result = await _sut
+                    .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
+                var existing = await _sut.GetExistingAppRegistrationAsync(
+                    new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
+                    new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
+
+                // Assert
+                Assert.NotEmpty(result.SecretText);
+                Assert.NotEmpty(result.SecretId.ToString());
+                Assert.True(existing.HasSecret);
+            }
+            finally
+            {
+                await CleanupAsync(cleanupId);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
+        {
+            ExternalActorId? cleanupId = null;
+
+            try
+            {
+                // Arrange
+                var roles = new List<EicFunction>
+                {
+                    EicFunction.SystemOperator // transmission system operator
+                };
+
+                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
+                    new MockedGln(),
+                    roles);
+
+                cleanupId = createAppRegistrationResponse.ExternalActorId;
+
+                var secretCreated = await _sut
+                    .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
+
+                // Act
+                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId, secretCreated.SecretId));
+                var existing = await _sut.GetExistingAppRegistrationAsync(
+                    new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
+                    new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
+
+                // Assert
+                Assert.Null(exceptions);
+                Assert.False(existing.HasSecret);
+            }
+            finally
+            {
+                await CleanupAsync(cleanupId);
+            }
+        }
+
         private static IActiveDirectoryB2CService CreateActiveDirectoryService()
         {
             var integrationTestConfig = new IntegrationTestConfiguration();
