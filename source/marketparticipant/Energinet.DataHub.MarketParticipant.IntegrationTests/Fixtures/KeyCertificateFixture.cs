@@ -38,6 +38,11 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
+        await CleanUpCertificateFromStorage(CertificateName);
+    }
+
+    public async Task CleanUpCertificateFromStorage(string lookupName)
+    {
         try
         {
             await CertificateClient.StartDeleteSecretAsync(CertificateName);
