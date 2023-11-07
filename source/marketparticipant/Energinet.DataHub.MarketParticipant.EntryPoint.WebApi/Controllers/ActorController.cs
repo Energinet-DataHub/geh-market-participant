@@ -161,7 +161,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return Ok(response.SecretKey);
+            return Ok(response.SecretText);
         }
 
         [HttpGet("{actorId:guid}/auditlogs")]
