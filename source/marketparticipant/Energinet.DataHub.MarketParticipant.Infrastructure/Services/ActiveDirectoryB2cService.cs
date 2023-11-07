@@ -90,20 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             try
             {
-                var appId = externalActorId.Value.ToString();
-                var applicationUsingAppId = await _graphClient
-                    .Applications
-                    .GetAsync(x =>
-                    {
-                        x.QueryParameters.Filter = $"appId eq '{appId}'";
-                    })
-                    .ConfigureAwait(false);
-
-                var applications = await applicationUsingAppId!
-                    .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
-                    .ConfigureAwait(false);
-
-                var foundApp = applications.SingleOrDefault();
+                var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
                 if (foundApp == null)
                 {
                     throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
@@ -158,20 +145,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
 
-            var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphClient
-                .Applications
-                .GetAsync(x =>
-                {
-                    x.QueryParameters.Filter = $"appId eq '{appId}'";
-                })
-                .ConfigureAwait(false);
-
-            var applications = await applicationUsingAppId!
-                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
-                .ConfigureAwait(false);
-
-            var foundApp = applications.SingleOrDefault();
+            var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
             if (foundApp == null)
             {
                 throw new InvalidOperationException("Cannot add secret to B2C, Application was not found.");
@@ -201,20 +175,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
 
-            var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphClient
-                .Applications
-                .GetAsync(x =>
-                {
-                    x.QueryParameters.Filter = $"appId eq '{appId}'";
-                })
-                .ConfigureAwait(false);
-
-            var applications = await applicationUsingAppId!
-                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
-                .ConfigureAwait(false);
-
-            var foundApp = applications.SingleOrDefault();
+            var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
             if (foundApp == null)
             {
                 throw new InvalidOperationException("Cannot delete secret from B2C; Application was not found.");
@@ -233,6 +194,21 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 .RemovePassword
                 .PostAsync(new RemovePasswordPostRequestBody() { KeyId = secretId })
                 .ConfigureAwait(false);
+        }
+
+        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+        {
+            var appId = externalActorId.Value.ToString();
+            var applicationUsingAppId = await _graphClient
+                .Applications
+                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                .ConfigureAwait(false);
+
+            var applications = await applicationUsingAppId!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            return applications.SingleOrDefault();
         }
 
         private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)
