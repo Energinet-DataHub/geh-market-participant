@@ -15,16 +15,22 @@
 using System;
 using System.Threading.Tasks;
 using Azure;
+using Azure.Identity;
+using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Graph;
 using Moq;
 using Xunit;
 using Xunit.Categories;
@@ -33,7 +39,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixture<KeyCertificateFixture>, IClassFixture<GraphServiceClientFixture>
+public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixture<KeyCertificateFixture>
 {
     private const string IntegrationActorTestCertificatePublicCer = "integration-actor-test-certificate-public.cer";
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
@@ -58,6 +64,7 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, certInfo.Thumbprint, certInfo.CertificateName);
 
         SetUpCertificateServiceWithFixtureClient(host);
+        SetupActiveDirectoryService(host);
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
@@ -90,5 +97,41 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
             new Mock<ILogger<CertificateService>>().Object);
 
         host.ServiceCollection.Replace(ServiceDescriptor.Singleton<ICertificateService>(certificateService));
+    }
+
+    private void SetupActiveDirectoryService(WebApiIntegrationTestHost host)
+    {
+        var integrationTestConfig = new IntegrationTestConfiguration();
+
+        // Graph Service Client
+        var clientSecretCredential = new ClientSecretCredential(
+            integrationTestConfig.B2CSettings.Tenant,
+            integrationTestConfig.B2CSettings.ServicePrincipalId,
+            integrationTestConfig.B2CSettings.ServicePrincipalSecret);
+
+        using var graphClient = new GraphServiceClient(
+            clientSecretCredential,
+            new[]
+            {
+                "https://graph.microsoft.com/.default"
+            });
+
+        // Azure AD Config
+        var config = new AzureAdConfig(
+            integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
+            integrationTestConfig.B2CSettings.BackendAppId);
+
+        // Active Directory Roles
+        var activeDirectoryB2CRoles =
+            new ActiveDirectoryB2BRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
+
+        // Logger
+        var logger = Mock.Of<ILogger<ActiveDirectoryB2CService>>();
+
+        host.ServiceCollection.Replace(ServiceDescriptor.Singleton<IActiveDirectoryB2CService>(new ActiveDirectoryB2CService(
+            graphClient,
+            config,
+            activeDirectoryB2CRoles,
+            logger)));
     }
 }
