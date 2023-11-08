@@ -17,5 +17,5 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record RemoveActorCertificateCommand(Guid ActorId) : IRequest;
+    public sealed record RemoveActorCredentialsCommand(Guid ActorId) : IRequest;
 }

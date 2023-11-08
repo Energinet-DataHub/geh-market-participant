@@ -17,9 +17,9 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class RemoveActorCertificateCommandRuleSet : AbstractValidator<RemoveActorCertificateCommand>
+public sealed class RemoveActorCredentialsCommandRuleSet : AbstractValidator<RemoveActorCredentialsCommand>
 {
-    public RemoveActorCertificateCommandRuleSet()
+    public RemoveActorCredentialsCommandRuleSet()
     {
         RuleFor(command => command.ActorId)
             .NotEmpty();
