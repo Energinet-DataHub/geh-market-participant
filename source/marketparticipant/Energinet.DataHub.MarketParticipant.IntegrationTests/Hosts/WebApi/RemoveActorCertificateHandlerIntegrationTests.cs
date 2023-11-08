@@ -61,7 +61,7 @@ public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixtur
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var command = new RemoveActorCertificateCommand(actor.Id);
+        var command = new RemoveActorCredentialsCommand(actor.Id);
 
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
         var actorBeforeUpdate = await actorRepository.GetAsync(new ActorId(actor.Id));
