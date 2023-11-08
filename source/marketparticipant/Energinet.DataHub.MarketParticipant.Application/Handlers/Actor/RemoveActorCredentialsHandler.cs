@@ -71,7 +71,6 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
                 throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a known type of credentials assigned");
         }
 
-        // Remove credentials from Actor
         actor.Credentials = null;
         await _actorRepository
             .AddOrUpdateAsync(actor)
