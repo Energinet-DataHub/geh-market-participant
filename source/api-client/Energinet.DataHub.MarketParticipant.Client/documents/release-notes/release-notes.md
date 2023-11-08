@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.36.0
+
+- Removed GridAreaOverview as it now comes from swagger
+
 ## Version 2.35.0
 
 - Removed Actor Auditlog as it now comes from swagger
