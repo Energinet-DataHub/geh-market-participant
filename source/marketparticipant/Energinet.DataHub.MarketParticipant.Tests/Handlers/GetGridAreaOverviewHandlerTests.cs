@@ -46,6 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                     null,
                     null,
                     null,
+                    null,
                     null)
                 });
 
