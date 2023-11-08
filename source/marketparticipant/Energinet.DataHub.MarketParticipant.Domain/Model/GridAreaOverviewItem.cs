@@ -25,5 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         DateTimeOffset? ValidTo,
         ActorNumber? ActorNumber,
         ActorName? ActorName,
+        string? OrganizationName,
         DateTimeOffset? FullFlexDate);
 }
