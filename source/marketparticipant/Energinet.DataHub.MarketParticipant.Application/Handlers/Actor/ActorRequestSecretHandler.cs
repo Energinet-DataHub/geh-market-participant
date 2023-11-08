@@ -60,9 +60,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             if (actor.ExternalActorId is null)
                 throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
 
-            actor.Credentials = null;
-            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
-
             var secretForApp = await _activeDirectoryB2CService
                 .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
                 .ConfigureAwait(false);
