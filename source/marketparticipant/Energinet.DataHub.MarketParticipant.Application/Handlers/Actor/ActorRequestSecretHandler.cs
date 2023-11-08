@@ -54,15 +54,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
-            if (actor.Credentials is ActorCertificateCredentials)
-                throw new ValidationException($"Actor with id {request.ActorId} does not have ClientSecret type credentials assigned");
+            if (actor.Credentials is not null)
+                throw new ValidationException($"Actor with id {request.ActorId} Can not have new credentials generated, as it already has credentials");
 
             if (actor.ExternalActorId is null)
                 throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
-
-            await _activeDirectoryB2CService
-                .RemoveSecretsForAppRegistrationAsync(actor.ExternalActorId)
-                .ConfigureAwait(false);
 
             actor.Credentials = null;
             await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
@@ -70,6 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var secretForApp = await _activeDirectoryB2CService
                 .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
                 .ConfigureAwait(false);
+
             actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId, secretForApp.ExpirationDate);
             await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
 

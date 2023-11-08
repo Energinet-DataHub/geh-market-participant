@@ -33,7 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixture<KeyCertificateFixture>
+public sealed class RemoveActorCertificateHandlerIntegrationTests : IClassFixture<KeyCertificateFixture>, IClassFixture<GraphServiceClientFixture>
 {
     private const string IntegrationActorTestCertificatePublicCer = "integration-actor-test-certificate-public.cer";
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
