@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
 using Xunit;
@@ -29,7 +30,7 @@ using Xunit.Categories;
 namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 {
     [UnitTest]
-    public sealed class RemoveActorCertificateHandlerTests
+    public sealed class RemoveActorCredentialsHandlerTests
     {
         [Fact]
         public async Task Handle_NoActor_ThrowsNotFoundException()
@@ -37,7 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var target = new RemoveActorCertificateHandler(actorRepositoryMock.Object, certificateServiceMock.Object);
+            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
 
             var actorId = Guid.NewGuid();
 
@@ -45,7 +47,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(actorRepository => actorRepository.GetAsync(new ActorId(actorId)))
                 .ReturnsAsync((Actor?)null);
 
-            var command = new RemoveActorCertificateCommand(actorId);
+            var command = new RemoveActorCredentialsCommand(actorId);
 
             // Act + Assert
             await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
@@ -57,7 +59,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var target = new RemoveActorCertificateHandler(actorRepositoryMock.Object, certificateServiceMock.Object);
+            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
@@ -66,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
                 .ReturnsAsync(actor);
 
-            var command = new RemoveActorCertificateCommand(actorId);
+            var command = new RemoveActorCredentialsCommand(actorId);
 
             // Act
             var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
@@ -81,7 +84,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var target = new RemoveActorCertificateHandler(actorRepositoryMock.Object, certificateServiceMock.Object);
+            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
@@ -91,7 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
                 .ReturnsAsync(actor);
 
-            var command = new RemoveActorCertificateCommand(actorId);
+            var command = new RemoveActorCredentialsCommand(actorId);
 
             // Act
             var exception = await Record.ExceptionAsync(() => target.Handle(command, CancellationToken.None));
@@ -99,29 +103,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Assert
             Assert.Null(exception);
             Assert.Null(actor.Credentials);
-        }
-
-        [Fact]
-        public async Task Handle_ActorHasOtherCredentialsThanCertificate_ThrowsInvalidoperationException()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var certificateServiceMock = new Mock<ICertificateService>();
-            var target = new RemoveActorCertificateHandler(actorRepositoryMock.Object, certificateServiceMock.Object);
-
-            var actorId = Guid.NewGuid();
-            var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorClientSecretCredentials(Guid.NewGuid(), DateTimeOffset.Now.AddYears(1));
-
-            actorRepositoryMock
-                .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
-                .ReturnsAsync(actor);
-
-            var command = new RemoveActorCertificateCommand(actorId);
-
-            // Act + Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => target.Handle(command, CancellationToken.None));
-            Assert.NotNull(actor.Credentials);
         }
     }
 }

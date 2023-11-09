@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<ResetUserTwoFactorAuthenticationCommand>, ResetUserTwoFactorAuthenticationRuleSet>();
             services.AddScoped<IValidator<CheckEmailExistsCommand>, CheckEmailExistsCommandRuleSet>();
             services.AddScoped<IValidator<AssignActorCertificateCommand>, AssignActorCertificateRuleSet>();
-            services.AddScoped<IValidator<RemoveActorCertificateCommand>, RemoveActorCertificateCommandRuleSet>();
+            services.AddScoped<IValidator<RemoveActorCredentialsCommand>, RemoveActorCredentialsCommandRuleSet>();
             services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();
             services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
 

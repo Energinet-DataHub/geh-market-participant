@@ -139,7 +139,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
 
-            var command = new RemoveActorCertificateCommand(actorId);
+            var command = new RemoveActorCredentialsCommand(actorId);
 
             await _mediator
                 .Send(command)

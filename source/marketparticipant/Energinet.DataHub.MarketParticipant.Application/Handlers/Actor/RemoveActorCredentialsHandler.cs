@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -20,23 +21,27 @@ using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 
-public sealed class RemoveActorCertificateHandler : IRequestHandler<RemoveActorCertificateCommand>
+public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorCredentialsCommand>
 {
     private readonly IActorRepository _actorRepository;
     private readonly ICertificateService _certificateService;
-    public RemoveActorCertificateHandler(
+    private readonly IActiveDirectoryB2CService _b2CService;
+    public RemoveActorCredentialsHandler(
         IActorRepository actorRepository,
-        ICertificateService certificateService)
+        ICertificateService certificateService,
+        IActiveDirectoryB2CService b2CService)
     {
         _actorRepository = actorRepository;
         _certificateService = certificateService;
+        _b2CService = b2CService;
     }
 
-    public async Task Handle(RemoveActorCertificateCommand request, CancellationToken cancellationToken)
+    public async Task Handle(RemoveActorCredentialsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -51,15 +56,21 @@ public sealed class RemoveActorCertificateHandler : IRequestHandler<RemoveActorC
             return;
 
         // Check that the actor has the correct type of credentials
-        if (actor.Credentials is not ActorCertificateCredentials credentials)
+        switch (actor.Credentials)
         {
-            throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a certificate type credentials assigned");
+            case ActorCertificateCredentials certificateCredentials:
+                await _certificateService.RemoveCertificateAsync(certificateCredentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
+                break;
+            case ActorClientSecretCredentials:
+                if (actor.ExternalActorId is null)
+                    throw new ValidationException("Can't remove secret, as the actor is either not Active or is still being created");
+
+                await _b2CService.RemoveSecretsForAppRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
+                break;
+            default:
+                throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a known type of credentials assigned");
         }
 
-        // Remove certificate from key vault
-        await _certificateService.RemoveCertificateAsync(credentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
-
-        // Remove certificate credentials from actor
         actor.Credentials = null;
         await _actorRepository
             .AddOrUpdateAsync(actor)
