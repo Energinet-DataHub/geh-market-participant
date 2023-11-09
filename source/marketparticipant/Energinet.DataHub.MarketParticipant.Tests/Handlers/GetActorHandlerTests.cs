@@ -46,9 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetSingleActorCommand(actorId);
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
         }
 
         [Fact]
@@ -68,11 +66,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetSingleActorCommand(actorId);
 
             // Act
-            var response = await target.Handle(command, CancellationToken.None).ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotNull(response.Actor);
-            Assert.Equal(actorId.ToString(), response.Actor.ActorId);
+            Assert.Equal(actorId, response.Actor.ActorId);
         }
     }
 }

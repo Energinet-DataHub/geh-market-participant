@@ -27,24 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewCommand, GetUserOverviewResponse>
 {
-    private readonly IActorRepository _actorRepository;
-    private readonly IOrganizationRepository _organizationRepository;
-    private readonly IUserRepository _userRepository;
     private readonly IUserOverviewRepository _repository;
-    private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetUserOverviewHandler(
-        IActorRepository actorRepository,
-        IOrganizationRepository organizationRepository,
-        IUserRepository userRepository,
-        IUserOverviewRepository repository,
-        IUserRoleRepository userRoleRepository)
+    public GetUserOverviewHandler(IUserOverviewRepository repository)
     {
-        _actorRepository = actorRepository;
-        _organizationRepository = organizationRepository;
-        _userRepository = userRepository;
         _repository = repository;
-        _userRoleRepository = userRoleRepository;
     }
 
     public async Task<GetUserOverviewResponse> Handle(GetUserOverviewCommand request, CancellationToken cancellationToken)
@@ -94,64 +81,17 @@ public sealed class GetUserOverviewHandler : IRequestHandler<GetUserOverviewComm
                 .ConfigureAwait(false);
         }
 
-        var mappedUsers = await PopulateUsersWithUserRolesAsync(users).ConfigureAwait(false);
-
-        return new GetUserOverviewResponse(mappedUsers, userCount);
-    }
-
-    private async Task<IEnumerable<UserOverviewItemDto>> PopulateUsersWithUserRolesAsync(IEnumerable<UserOverviewItem> users)
-    {
-        var mappedUsers = new List<UserOverviewItemDto>();
-
-        foreach (var user in users)
-        {
-            var userWithAssignments = await _userRepository
-                .GetAsync(user.Id)
-                .ConfigureAwait(false);
-
-            var assignedUserRoles = new List<AssignedActorDto>();
-
-            foreach (var assignmentsForActor in userWithAssignments!.RoleAssignments.GroupBy(assignment =>
-                         assignment.ActorId))
-            {
-                var actor = await _actorRepository
-                    .GetAsync(assignmentsForActor.Key)
-                    .ConfigureAwait(false);
-
-                var organization = await _organizationRepository
-                    .GetAsync(actor!.OrganizationId)
-                    .ConfigureAwait(false);
-
-                var userRoleNames = new List<string>();
-
-                foreach (var userRoleId in assignmentsForActor.Select(x => x.UserRoleId))
-                {
-                    var userRole = await _userRoleRepository
-                        .GetAsync(userRoleId)
-                        .ConfigureAwait(false);
-
-                    userRoleNames.Add(userRole!.Name);
-                }
-
-                assignedUserRoles.Add(new AssignedActorDto(
-                    new ActorDto(
-                        actor.ActorNumber.Value,
-                        actor.Name.Value,
-                        organization!.Name),
-                    userRoleNames));
-            }
-
-            mappedUsers.Add(new UserOverviewItemDto(
+        var mappedUsers = users
+            .Select(user => new UserOverviewItemDto(
                 user.Id.Value,
                 user.Status,
                 user.FirstName,
                 user.LastName,
                 user.Email.Address,
                 user.PhoneNumber?.Number,
-                user.CreatedDate,
-                assignedUserRoles));
-        }
+                user.CreatedDate))
+            .ToList();
 
-        return mappedUsers;
+        return new GetUserOverviewResponse(mappedUsers, userCount);
     }
 }

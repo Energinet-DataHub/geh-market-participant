@@ -64,9 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 Array.Empty<ActorMarketRoleDto>()));
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.Equal(actor.Id.Value, response.ActorId);
@@ -107,9 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new[] { marketRole }));
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.Equal(actor.Id.Value, response.ActorId);

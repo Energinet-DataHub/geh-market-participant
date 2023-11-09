@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -47,11 +48,11 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln());
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         // Act
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        var actual = await actorRepository2.GetAsync(actorId);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
 
         // Assert
         Assert.NotNull(actual);
@@ -79,7 +80,7 @@ public sealed class ActorRepositoryTests
             DateTimeOffset.MaxValue));
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln());
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"));
 
         actor.AddMarketRole(new ActorMarketRole(EicFunction.BalanceResponsibleParty, new[]
         {
@@ -87,14 +88,113 @@ public sealed class ActorRepositoryTests
         }));
 
         // Act
-        var actorId = await actorRepository.AddOrUpdateAsync(actor);
-        var actual = await actorRepository2.GetAsync(actorId);
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
 
         // Assert
         Assert.NotNull(actual);
         Assert.Equal(actor.OrganizationId, actual.OrganizationId);
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
         Assert.Equal(actor.MarketRoles.Single().Function, actual.MarketRoles.Single().Function);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneActor_WithCertificateCredentials_CanReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+        var actorRepository2 = new ActorRepository(context2);
+
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var actorCredentials = new ActorCertificateCredentials("12345678", "secret", DateTime.Now.AddYears(1));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCredentials
+        };
+
+        // Act
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.NotNull(actual.Credentials);
+        Assert.Equal(actor.OrganizationId, actual.OrganizationId);
+        Assert.Equal(actor.ActorNumber, actual.ActorNumber);
+        Assert.IsType<ActorCertificateCredentials>(actual.Credentials);
+        Assert.Equal(actorCredentials.KeyVaultSecretIdentifier, (actual.Credentials as ActorCertificateCredentials)?.KeyVaultSecretIdentifier);
+        Assert.Equal(actorCredentials.CertificateThumbprint, (actual.Credentials as ActorCertificateCredentials)?.CertificateThumbprint);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneActor_WithClientSecretCredentials_CanReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+        var actorRepository2 = new ActorRepository(context2);
+
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var endDate = DateTimeOffset.Now.AddYears(1);
+        var actorClientSecretCredentials = new ActorClientSecretCredentials(Guid.NewGuid(), endDate);
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorClientSecretCredentials
+        };
+
+        // Act
+        var result = await actorRepository.AddOrUpdateAsync(actor);
+        var actual = await actorRepository2.GetAsync(result.Value);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.NotNull(actual.Credentials);
+        Assert.Equal(actor.OrganizationId, actual.OrganizationId);
+        Assert.Equal(actor.ActorNumber, actual.ActorNumber);
+        Assert.IsType<ActorClientSecretCredentials>(actual.Credentials);
+        Assert.Equal(actorClientSecretCredentials.ClientSecretIdentifier, (actual.Credentials as ActorClientSecretCredentials)?.ClientSecretIdentifier);
+        Assert.Equal(endDate, (actual.Credentials as ActorClientSecretCredentials)?.ExpirationDate);
+    }
+
+    [Fact]
+    public async Task AddOrUpdateAsync_OneActor_IdenticalThumbprintCredentials_HasError()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = new ActorRepository(context);
+        var actorRepository2 = new ActorRepository(context2);
+
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret", DateTime.Now.AddYears(1));
+        var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2", DateTime.Now.AddYears(1));
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCertificateCredentials
+        };
+        var actor2 = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCertificateCredentials2
+        };
+
+        // Act
+        var resultOk = await actorRepository.AddOrUpdateAsync(actor);
+        var resultError = await actorRepository2.AddOrUpdateAsync(actor2);
+
+        // Assert
+        Assert.NotNull(resultOk);
+        Assert.NotNull(resultError);
+        Assert.Null(resultOk.Error);
+        Assert.Equal(ActorError.ThumbprintCredentialsConflict, resultError.Error);
     }
 
     [Fact]

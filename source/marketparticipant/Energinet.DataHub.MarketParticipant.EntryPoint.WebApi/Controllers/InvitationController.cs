@@ -41,7 +41,7 @@ public sealed class InvitationController : ControllerBase
 
     [HttpPost("users/invite")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
+    public async Task<ActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userInvitation.AssignedActor))
             return Unauthorized();
@@ -55,7 +55,7 @@ public sealed class InvitationController : ControllerBase
 
     [HttpPut("users/{userId:guid}/reinvite")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<IActionResult> ReInviteUserAsync(Guid userId)
+    public async Task<ActionResult> ReInviteUserAsync(Guid userId)
     {
         if (!_userContext.CurrentUser.IsFas)
         {

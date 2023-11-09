@@ -18,7 +18,8 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 
-public interface IIntegrationEventFactory
+public interface IIntegrationEventFactory<TDomainEvent>
+    where TDomainEvent : DomainEvent
 {
-    Task<IntegrationEvent> CreateAsync(DomainEvent domainEvent);
+    Task<IntegrationEvent> CreateAsync(TDomainEvent domainEvent, int sequenceNumber);
 }

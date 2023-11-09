@@ -104,7 +104,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var updateUserIdentityCommand = new UpdateUserIdentityCommand(userIdentityUpdateDto, validUserId);
 
         // Act + Assert
-        await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserIdentityCommand, default)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserIdentityCommand, default));
     }
 
     [Fact]
@@ -132,7 +132,7 @@ public sealed class UpdateUserIdentityHandlerTests
         var updateUserIdentityCommand = new UpdateUserIdentityCommand(userIdentityUpdateDto, validUserId);
 
         // Act + Assert
-        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(updateUserIdentityCommand, default)).ConfigureAwait(false);
+        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(updateUserIdentityCommand, default));
     }
 
     private static UserIdentity CreateFakeUserIdentity() => new(

@@ -38,15 +38,28 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     on actor.Id equals marketRole.ActorId
                 join marketRoleGridArea in _marketParticipantDbContext.MarketRoleGridAreas
                     on marketRole.Id equals marketRoleGridArea.MarketRoleId
+                join organization in _marketParticipantDbContext.Organizations
+                    on actor.OrganizationId equals organization.Id
                 where marketRole.Function == EicFunction.GridAccessProvider
-                select new { actor, marketRole, marketRoleGridArea };
+                select new
+                {
+                    actor,
+                    organization,
+                    marketRole,
+                    marketRoleGridArea,
+                };
 
             var gridAreas =
                 from gridArea in _marketParticipantDbContext.GridAreas
                 join actorWithMarketRoleGridArea in actorsWithMarketRoleGridArea
                     on gridArea.Id equals actorWithMarketRoleGridArea.marketRoleGridArea.GridAreaId into gr
                 from actorWithMarketRoleGridArea in gr.DefaultIfEmpty()
-                select new { actorWithMarketRoleGridArea.actor, gridArea };
+                select new
+                {
+                    actorWithMarketRoleGridArea.actor,
+                    actorWithMarketRoleGridArea.organization,
+                    gridArea,
+                };
 
             var result = await gridAreas.ToListAsync().ConfigureAwait(false);
 
@@ -54,6 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
             {
                 var gridArea = x.gridArea;
                 var actor = x.actor;
+                var organization = x.organization;
 
                 return new GridAreaOverviewItem(
                     new GridAreaId(gridArea.Id),
@@ -64,6 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
                     gridArea.ValidTo,
                     actor != null ? ActorNumber.Create(actor.ActorNumber) : null,
                     actor != null ? new ActorName(actor.Name) : null,
+                    organization?.Name,
                     gridArea.FullFlexDate);
             });
         }

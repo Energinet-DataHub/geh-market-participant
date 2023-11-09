@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var target = new GetUserRolesToPermissionHandler(repositoryMock.Object);
 
             // act
-            var actual = await target.Handle(new GetUserRolesToPermissionCommand((int)PermissionId.UserRolesManage), CancellationToken.None).ConfigureAwait(false);
+            var actual = await target.Handle(new GetUserRolesToPermissionCommand((int)PermissionId.UserRolesManage), CancellationToken.None);
 
             // assert
             Assert.NotNull(actual.UserRoles);

@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
                 .GetAsync(new ContactId(request.ContactId))
                 .ConfigureAwait(false);
 
-            if (contact == null)
+            if (contact == null || contact.ActorId != actor.Id)
             {
                 return;
             }

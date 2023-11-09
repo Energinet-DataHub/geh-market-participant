@@ -85,11 +85,20 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<DeactivateUserCommand>, DeactivateUserCommandRuleSet>();
             services.AddScoped<IValidator<UserInvitationExpiredCommand>, UserInvitationExpiredCommandRuleSet>();
             services.AddScoped<IValidator<GetAuditIdentityCommand>, GetAuditIdentityCommandRuleSet>();
+            services.AddScoped<IValidator<GetOrganizationAuditLogsCommand>, GetOrganizationAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetActorAuditLogsCommand>, GetActorAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<ResetUserTwoFactorAuthenticationCommand>, ResetUserTwoFactorAuthenticationRuleSet>();
+            services.AddScoped<IValidator<CheckEmailExistsCommand>, CheckEmailExistsCommandRuleSet>();
+            services.AddScoped<IValidator<AssignActorCertificateCommand>, AssignActorCertificateRuleSet>();
+            services.AddScoped<IValidator<RemoveActorCredentialsCommand>, RemoveActorCredentialsCommandRuleSet>();
+            services.AddScoped<IValidator<GetActorCredentialsCommand>, GetActorCredentialsCommandRuleSet>();
+            services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
             services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();
+            services.AddScoped<ICertificateValidation, NoCertificateValidation>();
         }
     }
 }

@@ -15,9 +15,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -32,20 +31,20 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserStatusCalculator _userStatusCalculator;
     private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
-    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public DeactivateUserHandler(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
         IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
-        IUserContext<FrontendUser> userContext)
+        IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userStatusCalculator = userStatusCalculator;
         _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
-        _userContext = userContext;
+        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
@@ -79,7 +78,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
             user.Id,
             UserStatus.Inactive.ToString(),
             currentStatus.ToString(),
-            new AuditIdentity(_userContext.CurrentUser.UserId),
+            _auditIdentityProvider.IdentityId,
             DateTimeOffset.UtcNow,
             UserIdentityAuditLogField.Status);
 

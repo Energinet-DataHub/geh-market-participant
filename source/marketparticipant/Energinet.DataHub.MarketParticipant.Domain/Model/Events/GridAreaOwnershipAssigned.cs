@@ -19,7 +19,7 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
+public sealed class GridAreaOwnershipAssigned : DomainEvent
 {
     [JsonConstructor]
     [Browsable(false)]
@@ -52,7 +52,6 @@ public sealed class GridAreaOwnershipAssigned : DomainEvent, IIntegrationEvent
         ValidFrom = nextDate.AtStartOfDayInZone(TimeZone.Dk).ToInstant();
     }
 
-    public Guid EventId { get; }
     public ActorNumber ActorNumber { get; }
     public EicFunction ActorRole { get; }
     public GridAreaId GridAreaId { get; }

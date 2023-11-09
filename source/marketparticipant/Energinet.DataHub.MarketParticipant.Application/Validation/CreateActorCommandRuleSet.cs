@@ -33,6 +33,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .NotEmpty();
 
                     validator
+                        .RuleFor(actor => actor.Name)
+                        .NotNull()
+                        .ChildRules(nameValidator =>
+                        {
+                            nameValidator
+                                .RuleFor(actorNameDto => actorNameDto.Value)
+                                .NotEmpty()
+                                .Length(1, 255);
+                        });
+
+                    validator
                         .RuleFor(actor => actor.ActorNumber)
                         .SetValidator(new GlobalLocationNumberValidationRule<CreateActorDto>())
                         .When(i => string.IsNullOrWhiteSpace(i.ActorNumber.Value) || i.ActorNumber.Value.Length <= 13);
@@ -47,7 +58,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .ChildRules(gridAreaValidator =>
                             gridAreaValidator
                                 .RuleFor(x => x.GridAreas)
-                                .NotEmpty());
+                                .NotEmpty()
+                                .When(marketRole => Enum.TryParse<EicFunction>(marketRole.EicFunction, out var function) && function == EicFunction.GridAccessProvider));
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
@@ -76,7 +88,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 {
                                     validationRules
                                         .RuleFor(r => r.MeteringPointTypes)
-                                        .NotEmpty()
                                         .ChildRules(v =>
                                             v.RuleForEach(r => r)
                                                 .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));

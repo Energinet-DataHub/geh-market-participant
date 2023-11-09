@@ -62,7 +62,8 @@ public sealed class FrontendUserProviderTests
                 new MockedGln(),
                 actorStatus,
                 Array.Empty<ActorMarketRole>(),
-                new ActorName(string.Empty)));
+                new ActorName(string.Empty),
+                null));
 
         var target = new FrontendUserProvider(actorRepositoryMock.Object);
 

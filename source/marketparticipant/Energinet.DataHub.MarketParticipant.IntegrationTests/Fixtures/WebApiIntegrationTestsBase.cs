@@ -44,5 +44,6 @@ public abstract class WebApiIntegrationTestsBase : WebApplicationFactory<Startup
         builder.UseSetting(Settings.TokenKeyVault.Key, "fake_value");
         builder.UseSetting(Settings.TokenKeyName.Key, "fake_value");
         builder.UseSetting(Settings.AllowAllTokens.Key, AllowAllTokens ? "true" : "false");
+        builder.UseSetting(Settings.CertificateKeyVault.Key, "fake_value");
     }
 }

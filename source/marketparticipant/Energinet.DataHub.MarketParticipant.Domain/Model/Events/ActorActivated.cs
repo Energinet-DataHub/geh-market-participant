@@ -19,32 +19,35 @@ using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
-public sealed class ActorActivated : DomainEvent, IIntegrationEvent
+public sealed class ActorActivated : DomainEvent
 {
     [JsonConstructor]
     [Browsable(false)]
     public ActorActivated(
         Guid eventId,
         ActorNumber actorNumber,
+        EicFunction actorRole,
         ExternalActorId externalActorId,
         Instant validFrom)
     {
         EventId = eventId;
         ActorNumber = actorNumber;
+        ActorRole = actorRole;
         ExternalActorId = externalActorId;
         ValidFrom = validFrom;
     }
 
-    public ActorActivated(ActorNumber actorNumber, ExternalActorId externalActorId)
+    public ActorActivated(ActorNumber actorNumber, EicFunction actorRole, ExternalActorId externalActorId)
     {
         EventId = Guid.NewGuid();
         ActorNumber = actorNumber;
+        ActorRole = actorRole;
         ExternalActorId = externalActorId;
         ValidFrom = Clock.Instance.GetCurrentInstant();
     }
 
-    public Guid EventId { get; }
     public ActorNumber ActorNumber { get; }
+    public EicFunction ActorRole { get; }
     public ExternalActorId ExternalActorId { get; }
     public Instant ValidFrom { get; }
 }

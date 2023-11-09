@@ -25,5 +25,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
         DateTimeOffset? ValidTo,
         string? ActorNumber,
         string? ActorName,
+        string? OrganizationName,
         DateTimeOffset? FullFlexDate);
 }

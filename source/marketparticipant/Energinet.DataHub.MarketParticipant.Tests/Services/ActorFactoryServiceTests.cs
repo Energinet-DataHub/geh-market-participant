@@ -56,10 +56,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
+            var actorId = new ActorId(Guid.NewGuid());
+
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(actorId));
 
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln()));
+                .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
 
             // Act
             var response = await target
@@ -67,8 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     new MockedGln(),
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             Assert.NotNull(response);
@@ -92,8 +96,11 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
             actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
+            actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln()));
+                .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
 
             // Act
             await target
@@ -101,8 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     globalLocationNumber,
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             globalLocationNumberUniquenessService.Verify(
@@ -129,7 +135,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
-            var actor = new Actor(organization.Id, new MockedGln());
+            var actor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(actor);
@@ -140,8 +149,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     globalLocationNumber,
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             overlappingBusinessRolesService.Verify(
@@ -168,7 +176,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
-            var updatedActor = new Actor(organization.Id, new MockedGln());
+            var updatedActor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
                 .ReturnsAsync(updatedActor);
@@ -179,8 +190,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     organization,
                     globalLocationNumber,
                     new ActorName("fake_value"),
-                    marketRoles)
-                .ConfigureAwait(false);
+                    marketRoles);
 
             // Assert
             uniqueMarketRoleGridAreaRuleService.Verify(

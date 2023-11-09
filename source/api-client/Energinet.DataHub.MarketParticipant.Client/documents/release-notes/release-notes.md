@@ -1,8 +1,40 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.36.0
+
+- Removed GridAreaOverview as it now comes from swagger
+
+## Version 2.35.0
+
+- Removed Actor Auditlog as it now comes from swagger
+
+## Version 2.34.0
+
+- Added Actor Auditlog
+
+## Version 2.33.0
+
+- Remove assigned actors from user overview.
+
+## Version 2.32.6
+
+- API for resetting users 2FA.
+
+## Version 2.32.5
+
+- Added domain to OrganizationChangeDto
+
+## Version 2.32.4
+
+- Organization audit log API.
+
+## Version 2.32.3
+
+- Remove ElOverblik from market roles.
+
 ## Version 2.32.2
 
-- Updated audit log model for user roles
+- Updated audit log model for user roles.
 
 ## Version 2.32.1
 

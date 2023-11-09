@@ -45,7 +45,8 @@ internal static class TestPreparationModels
         new MockedGln(),
         ActorStatus.New,
         new[] { new ActorMarketRole(EicFunction.GridAccessProvider) },
-        new ActorName("Sloth Power"));
+        new ActorName("Sloth Power"),
+        null);
 
     public static UserRole MockedUserRole(Guid userRoleId) => new(
         new UserRoleId(userRoleId),

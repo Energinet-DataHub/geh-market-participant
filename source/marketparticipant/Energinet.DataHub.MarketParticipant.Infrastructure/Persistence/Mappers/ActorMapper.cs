@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -59,6 +60,31 @@ internal static class ActorMapper
 
             to.MarketRoles.Add(marketRoleEntity);
         }
+
+        switch (from.Credentials)
+        {
+            case ActorClientSecretCredentials credentials:
+                to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
+                {
+                    ClientSecretIdentifier = credentials.ClientSecretIdentifier.ToString(),
+                    ExpirationDate = credentials.ExpirationDate,
+                };
+                to.CertificateCredential = null;
+                break;
+            case ActorCertificateCredentials credentials:
+                to.CertificateCredential = new ActorCertificateCredentialsEntity
+                {
+                    CertificateThumbprint = credentials.CertificateThumbprint,
+                    KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier,
+                    ExpirationDate = credentials.ExpirationDate,
+                };
+                to.ClientSecretCredential = null;
+                break;
+            case null:
+                to.CertificateCredential = null;
+                to.ClientSecretCredential = null;
+                break;
+        }
     }
 
     public static Actor MapFromEntity(ActorEntity from)
@@ -77,7 +103,8 @@ internal static class ActorMapper
 
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
-        var actorName = new ActorName(from.Name);
+        var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
+        var credentials = Map(from.CertificateCredential) ?? Map(from.ClientSecretCredential);
 
         return new Actor(
             new ActorId(from.Id),
@@ -86,6 +113,24 @@ internal static class ActorMapper
             actorNumber,
             actorStatus,
             marketRoles,
-            actorName);
+            actorName,
+            credentials);
+    }
+
+    private static ActorCredentials? Map(ActorClientSecretCredentialsEntity? from)
+    {
+        return from is null
+            ? null
+            : new ActorClientSecretCredentials(Guid.Parse(from.ClientSecretIdentifier), from.ExpirationDate);
+    }
+
+    private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)
+    {
+        return from is null
+            ? null
+            : new ActorCertificateCredentials(
+                from.CertificateThumbprint,
+                from.KeyVaultSecretIdentifier,
+                from.ExpirationDate);
     }
 }

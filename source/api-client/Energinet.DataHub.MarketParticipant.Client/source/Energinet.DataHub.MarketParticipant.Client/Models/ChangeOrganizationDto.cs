@@ -19,5 +19,6 @@ namespace Energinet.DataHub.MarketParticipant.Client.Models
         string BusinessRegisterIdentifier,
         AddressDto Address,
         string? Comment,
-        OrganizationStatus Status);
+        OrganizationStatus Status,
+        string Domain);
 }

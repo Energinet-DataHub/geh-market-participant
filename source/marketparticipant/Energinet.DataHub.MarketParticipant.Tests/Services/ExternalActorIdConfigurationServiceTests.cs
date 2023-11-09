@@ -41,7 +41,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
 
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln)
+        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
         {
             ExternalActorId = externalActorId
         };
@@ -52,7 +52,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         // Act
-        await target.AssignExternalActorIdAsync(actor).ConfigureAwait(false);
+        await target.AssignExternalActorIdAsync(actor);
 
         // Assert
         if (shouldDelete)
@@ -88,7 +88,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
 
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln)
+        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
         {
             ExternalActorId = null
         };
@@ -103,7 +103,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
             .ReturnsAsync(new CreateAppRegistrationResponse(externalActorId, "fake_value", "fake_value"));
 
         // Act
-        await target.AssignExternalActorIdAsync(actor).ConfigureAwait(false);
+        await target.AssignExternalActorIdAsync(actor);
 
         // Assert
         if (shouldCreate)

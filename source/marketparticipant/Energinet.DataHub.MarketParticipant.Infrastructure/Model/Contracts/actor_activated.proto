@@ -15,6 +15,7 @@
 
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
+import "Model/Contracts/eic_function.proto";
 
 option csharp_namespace = "Energinet.DataHub.MarketParticipant.Infrastructure.Model.Contracts";
 
@@ -45,6 +46,11 @@ message ActorActivated {
    * A timestamp from when the activation is valid.
    */
   google.protobuf.Timestamp valid_from = 4;
+
+  /*
+   * The market role of the actor.
+   */
+  EicFunction actor_role = 5;
 }
 
 enum ActorNumberType {

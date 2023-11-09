@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Email
         public async Task<Unit> Handle(SendUserInviteEmailCommand request, CancellationToken cancellationToken)
         {
             var invitesToBeSent = await _emailEventRepository
-                .GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)
+                .GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)
                 .ConfigureAwait(false);
 
             foreach (var emailInvite in invitesToBeSent)

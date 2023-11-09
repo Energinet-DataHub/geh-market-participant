@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
+using Energinet.DataHub.MarketParticipant.Domain.Services.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,8 @@ internal static class InfrastructureRegistration
     public static void AddInfrastructureServices(this IServiceCollection services)
     {
         services.AddScoped<IUserIdentityAuthenticationService, UserIdentityAuthenticationService>();
-        services.AddScoped<IIntegrationEventFactory, IntegrationEventFactory>();
+        services.AddScoped<IIntegrationEventFactory<ActorActivated>, ActorActivatedIntegrationEventFactory>();
+        services.AddScoped<IIntegrationEventFactory<ActorCertificateCredentialsAssigned>, ActorCertificateCredentialsAssignedIntegrationEventFactory>();
+        services.AddScoped<IIntegrationEventFactory<GridAreaOwnershipAssigned>, GridAreaOwnershipAssignedIntegrationEventFactory>();
     }
 }

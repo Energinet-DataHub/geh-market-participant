@@ -13,15 +13,16 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration
 {
-    public sealed class ActorEntityConfiguration : IEntityTypeConfiguration<ActorEntity>
+    public class ActorEntityConfiguration : AuditedEntityTypeConfiguration<ActorEntity>
     {
-        public void Configure(EntityTypeBuilder<ActorEntity> builder)
+        protected override void ConfigureEntity(EntityTypeBuilder<ActorEntity> builder)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
             builder.ToTable("Actor");
@@ -31,6 +32,16 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityC
                 .HasMany(actor => actor.MarketRoles)
                 .WithOne()
                 .HasForeignKey(marketRole => marketRole.ActorId);
+            builder
+                .HasOne(actor => actor.CertificateCredential)
+                .WithOne()
+                .HasForeignKey<ActorCertificateCredentialsEntity>(cred => cred.ActorId);
+            builder
+                .HasOne(actor => actor.ClientSecretCredential)
+                .WithOne()
+                .HasForeignKey<ActorClientSecretCredentialsEntity>(cred => cred.ActorId);
+            builder.Navigation(actor => actor.CertificateCredential).AutoInclude();
+            builder.Navigation(actor => actor.ClientSecretCredential).AutoInclude();
         }
     }
 }

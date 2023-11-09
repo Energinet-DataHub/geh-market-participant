@@ -44,15 +44,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var command = new GetOrganizationsCommand(null);
 
             // Act
-            var response = await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            var response = await target.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.NotEmpty(response.Organizations);
 
             var actualOrganization = response.Organizations.Single();
-            Assert.Equal(organization.Id.ToString(), actualOrganization.OrganizationId);
+            Assert.Equal(organization.Id.Value, actualOrganization.OrganizationId);
         }
     }
 }

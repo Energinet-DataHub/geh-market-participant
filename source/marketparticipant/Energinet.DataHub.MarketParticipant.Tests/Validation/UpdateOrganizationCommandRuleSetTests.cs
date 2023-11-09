@@ -46,13 +46,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(Guid.Empty, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -69,7 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new UpdateOrganizationCommand(_validOrganizationId, null!);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -98,13 +99,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -143,13 +145,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                status);
+                status,
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -185,13 +188,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -227,13 +231,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -269,13 +274,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     value,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -311,13 +317,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     value),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -353,13 +360,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)
@@ -395,13 +403,57 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     "Denmark"),
                 "fake_value",
-                "Active");
+                "Active",
+                "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
+
+            // Assert
+            if (isValid)
+            {
+                Assert.True(result.IsValid);
+                Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+            else
+            {
+                Assert.False(result.IsValid);
+                Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            }
+        }
+
+        [Theory]
+        [InlineData("", false)]
+        [InlineData(null, false)]
+        [InlineData("  ", false)]
+        [InlineData("testdomain.dk", true)]
+        public async Task Validate_Organizatiodomain_ValidatesProperty(string value, bool isValid)
+        {
+            // Arrange
+            var propertyName =
+                $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Domain)}";
+
+            var organizationDto = new ChangeOrganizationDto(
+                ValidName,
+                ValidCvr,
+                new AddressDto(
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    string.Empty,
+                    "Denmark"),
+                "fake_value",
+                "Active",
+                value);
+
+            var target = new UpdateOrganizationCommandRuleSet();
+            var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);
+
+            // Act
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)

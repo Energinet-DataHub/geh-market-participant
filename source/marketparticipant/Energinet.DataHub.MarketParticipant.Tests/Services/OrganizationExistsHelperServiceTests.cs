@@ -49,9 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(organization);
 
             // Act
-            var actual = await target
-                .EnsureOrganizationExistsAsync(organizationId)
-                .ConfigureAwait(false);
+            var actual = await target.EnsureOrganizationExistsAsync(organizationId);
 
             // Assert
             Assert.NotNull(actual);
@@ -71,9 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync((Organization?)null);
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<NotFoundValidationException>(() => target.EnsureOrganizationExistsAsync(organizationId))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.EnsureOrganizationExistsAsync(organizationId));
         }
     }
 }

@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
-using System.Reflection;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
-using NodaTime;
 using Xunit;
 using Xunit.Categories;
 

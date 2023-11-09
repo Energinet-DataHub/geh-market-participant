@@ -15,6 +15,7 @@
 using System.Text.Json.Serialization;
 using Azure.Identity;
 using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.App.Common.Diagnostics.HealthChecks;
 using Energinet.DataHub.Core.App.WebApp.Authentication;
 using Energinet.DataHub.Core.App.WebApp.Authorization;
@@ -33,6 +34,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
@@ -112,6 +114,21 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 return new SigningKeyRing(Clock.Instance, keyClient, tokenKeyName);
             });
 
+            services.AddSingleton<SecretClient>(_ =>
+            {
+                var certificateKeyVaultUri = configuration.GetSetting(Settings.CertificateKeyVault);
+                var defaultCredentials = new DefaultAzureCredential();
+                return new SecretClient(certificateKeyVaultUri, defaultCredentials);
+            });
+
+            services.AddSingleton<ICertificateService>(s =>
+            {
+                var certificateClient = s.GetRequiredService<SecretClient>();
+                var logger = s.GetRequiredService<ILogger<CertificateService>>();
+                var certificateValidation = s.GetRequiredService<ICertificateValidation>();
+                return new CertificateService(certificateClient, certificateValidation, logger);
+            });
+
             if (_configuration.GetSetting(Settings.AllowAllTokens))
             {
                 services.AddDummyJwtBearerAuthentication();
@@ -134,12 +151,12 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 .AddLiveCheck()
                 .AddDbContextCheck<MarketParticipantDbContext>()
                 .AddCheck<GraphApiHealthCheck>("Graph API Access")
-                .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access");
+                .AddCheck<SigningKeyRingHealthCheck>("Signing Key Access")
+                .AddCheck<CertificateKeyVaultHealthCheck>("Certificate Key Vault Access");
 
             services.AddHttpLoggingScope("mark-part");
             services.AddSwaggerGen(c =>
             {
-                c.SupportNonNullableReferenceTypes();
                 c.SwaggerDoc(
                     "v1",
                     new OpenApiInfo
@@ -160,6 +177,8 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
                 };
 
                 c.AddSecurityDefinition("Bearer", securitySchema);
+                c.SupportNonNullableReferenceTypes();
+                c.UseAllOfToExtendReferenceSchemas();
 
                 var securityRequirement = new OpenApiSecurityRequirement { { securitySchema, new[] { "Bearer" } } };
 

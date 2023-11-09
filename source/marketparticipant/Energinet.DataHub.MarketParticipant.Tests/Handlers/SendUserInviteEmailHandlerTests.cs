@@ -43,7 +43,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)).ReturnsAsync(events);
+            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)).ReturnsAsync(events);
 
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
@@ -73,7 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userIdentityRepositoryMock.Object);
 
             // act
-            await target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None).ConfigureAwait(false);
+            await target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None);
 
             // assert
             emailSenderMock.Verify(c => c.SendEmailAsync(events[0].Email, events[0]), Times.Exactly(1));
@@ -90,7 +90,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)).ReturnsAsync(events);
+            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)).ReturnsAsync(events);
 
             var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
             userIdentityRepositoryMock.Setup(e => e.GetAsync(events[0].Email)).ReturnsAsync((UserIdentity?)null);
@@ -105,9 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userIdentityRepositoryMock.Object);
 
             // act + assert
-            await Assert
-                .ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None));
         }
 
         [Fact]
@@ -120,7 +118,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             };
 
             var emailEventsRepositoryMock = new Mock<IEmailEventRepository>();
-            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite)).ReturnsAsync(events);
+            emailEventsRepositoryMock.Setup(x => x.GetAllEmailsToBeSentByTypeAsync(EmailEventType.UserInvite, EmailEventType.UserAssignedToActor)).ReturnsAsync(events);
 
             var userIdentity = new UserIdentity(
                 new ExternalUserId(Guid.NewGuid()),
@@ -148,9 +146,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 userIdentityRepositoryMock.Object);
 
             // act + assert
-            await Assert
-                .ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotSupportedException>(() => target.Handle(new SendUserInviteEmailCommand(), CancellationToken.None));
         }
     }
 }

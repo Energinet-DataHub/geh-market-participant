@@ -40,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
-                UnitOfWorkProviderMock.Create(),
                 organizationExistsHelperService.Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
@@ -78,14 +77,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
+            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active", "TestDomain.dk");
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
             // Act + Assert
-            await target
-                .Handle(command, CancellationToken.None)
-                .ConfigureAwait(false);
+            await target.Handle(command, CancellationToken.None);
         }
 
         [Fact]
@@ -97,7 +94,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var target = new UpdateOrganizationHandler(
                 organizationRepository.Object,
-                UnitOfWorkProviderMock.Create(),
                 organizationExistsHelperService.Object,
                 new Mock<IUniqueOrganizationBusinessRegisterIdentifierService>().Object);
 
@@ -135,14 +131,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeOrganizationDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active");
+            var changeOrganizationDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active", "TestDomain");
 
             var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
 
             // Act + Assert
-            await Assert
-                .ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None))
-                .ConfigureAwait(false);
+            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(command, CancellationToken.None));
         }
     }
 }

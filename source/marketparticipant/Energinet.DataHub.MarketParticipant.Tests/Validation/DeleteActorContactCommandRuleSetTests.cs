@@ -38,7 +38,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new DeleteActorContactCommand(Guid.Empty, _validContactId);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);
@@ -55,7 +55,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new DeleteActorContactCommand(_validActorId, Guid.Empty);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             Assert.False(result.IsValid);

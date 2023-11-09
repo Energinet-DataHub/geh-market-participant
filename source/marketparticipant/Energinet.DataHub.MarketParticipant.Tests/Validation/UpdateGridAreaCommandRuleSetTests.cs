@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var command = new UpdateGridAreaCommand(gridAreaId, updateGridAreaDto);
 
             // Act
-            var result = await target.ValidateAsync(command).ConfigureAwait(false);
+            var result = await target.ValidateAsync(command);
 
             // Assert
             if (isValid)

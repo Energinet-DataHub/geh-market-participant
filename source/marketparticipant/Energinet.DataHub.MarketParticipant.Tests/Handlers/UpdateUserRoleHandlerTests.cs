@@ -20,7 +20,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -55,8 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Collection<int> { ValidPermission }));
 
             // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() =>
-                target.Handle(updateUserRoleCommand, CancellationToken.None)).ConfigureAwait(false);
+            await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
         }
 
         [Fact]
@@ -97,8 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .ReturnsAsync(userRoleToUpdate);
 
             // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                target.Handle(updateUserRoleCommand, CancellationToken.None)).ConfigureAwait(false);
+            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
         }
 
         [Fact]
@@ -127,8 +124,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 new Collection<int> { ValidPermission }));
 
             // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() =>
-                target.Handle(updateUserRoleCommand, CancellationToken.None)).ConfigureAwait(false);
+            await Assert.ThrowsAsync<ValidationException>(() => target.Handle(updateUserRoleCommand, CancellationToken.None));
         }
     }
 }

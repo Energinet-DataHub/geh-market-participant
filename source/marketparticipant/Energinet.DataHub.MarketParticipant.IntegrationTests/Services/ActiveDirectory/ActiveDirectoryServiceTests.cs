@@ -39,13 +39,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("Mock"));
             try
             {
                 // Act
-                var result = await _sut
-                      .CreateOrUpdateAppAsync(actor)
-                      .ConfigureAwait(false);
+                var result = await _sut.CreateOrUpdateAppAsync(actor);
 
                 // Assert
                 Assert.False(string.IsNullOrEmpty(result.ExternalActorId));
@@ -53,9 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             finally
             {
                 // Cleanup
-                await _sut
-                    .DeleteActorAsync(actor)
-                    .ConfigureAwait(false);
+                await _sut.DeleteActorAsync(actor);
             }
         }
 
@@ -64,13 +60,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln)) { Name = new ActorName("Test Actor") };
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("Test Actor"));
             try
             {
                 // Act
-                var result = await _sut
-                    .CreateOrUpdateAppAsync(actor)
-                    .ConfigureAwait(false);
+                var result = await _sut.CreateOrUpdateAppAsync(actor);
 
                 // Assert
                 Assert.False(string.IsNullOrEmpty(result.ExternalActorId));
@@ -79,9 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             finally
             {
                 // Cleanup
-                await _sut
-                    .DeleteActorAsync(actor)
-                    .ConfigureAwait(false);
+                await _sut.DeleteActorAsync(actor);
             }
         }
 
@@ -90,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln)) { Name = new ActorName("1kfNaVkHBJ2sAsueCm0ghQoRRC6cdsDTjRBjGPDs48dSpJrgBsgJ2HwkEr5lENidVen61rajkDDZaleGbgtjWDMMA5UNJyWgPBOvm9Z1vUrWS0") };
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("1kfNaVkHBJ2sAsueCm0ghQoRRC6cdsDTjRBjGPDs48dSpJrgBsgJ2HwkEr5lENidVen61rajkDDZaleGbgtjWDMMA5UNJyWgPBOvm9Z1vUrWS0"));
             var lengthForActorName = $"Actor_{actor.ActorNumber.Value}__{Guid.Empty}".Length;
             var totalNameLength = actor.Name.Value.Length + lengthForActorName;
             var actorName = totalNameLength > 120
@@ -99,9 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             try
             {
                 // Act
-                var result = await _sut
-                    .CreateOrUpdateAppAsync(actor)
-                    .ConfigureAwait(false);
+                var result = await _sut.CreateOrUpdateAppAsync(actor);
 
                 // Assert
                 Assert.False(string.IsNullOrEmpty(result.ExternalActorId));
@@ -110,28 +100,22 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             finally
             {
                 // Cleanup
-                await _sut
-                    .DeleteActorAsync(actor)
-                    .ConfigureAwait(false);
+                await _sut.DeleteActorAsync(actor);
             }
         }
 
         [Fact]
-        public async Task CreateActor_IsIdemPotent_Success()
+        public async Task CreateActor_IsIdempotent_Success()
         {
             // Arrange
             var actorGln = new MockedGln();
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(actorGln), new ActorName("Mock"));
             try
             {
                 // Act
-                var result = await _sut
-                    .CreateOrUpdateAppAsync(actor)
-                    .ConfigureAwait(false);
+                var result = await _sut.CreateOrUpdateAppAsync(actor);
 
-                var result2 = await _sut
-                    .CreateOrUpdateAppAsync(actor)
-                    .ConfigureAwait(false);
+                var result2 = await _sut.CreateOrUpdateAppAsync(actor);
 
                 // Assert
                 Assert.False(string.IsNullOrEmpty(result.ExternalActorId));
@@ -141,9 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
             finally
             {
                 // Cleanup
-                await _sut
-                    .DeleteActorAsync(actor)
-                    .ConfigureAwait(false);
+                await _sut.DeleteActorAsync(actor);
             }
         }
 
@@ -151,19 +133,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         public async Task DeleteActor_Success()
         {
             // Arrange
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()), new ActorName("Mock"));
 
             // Create actor to delete
-            await _sut
-                .CreateOrUpdateAppAsync(actor)
-                .ConfigureAwait(false);
+            await _sut.CreateOrUpdateAppAsync(actor);
 
             // Act
-            await _sut
-                .DeleteActorAsync(actor)
-                .ConfigureAwait(false);
+            await _sut.DeleteActorAsync(actor);
 
-            var exists = await _sut.AppExistsAsync(actor).ConfigureAwait(false);
+            var exists = await _sut.AppExistsAsync(actor);
 
             // Assert
             Assert.False(exists);
@@ -173,23 +151,17 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services.ActiveDi
         public async Task DeleteActor_CalledMultipleTimesForSameActor_DontThrow()
         {
             // Arrange
-            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()));
+            var actor = new Actor(new OrganizationId(Guid.NewGuid()), ActorNumber.Create(new MockedGln()), new ActorName("Mock"));
 
             // Create actor to delete
-            await _sut
-                .CreateOrUpdateAppAsync(actor)
-                .ConfigureAwait(false);
+            await _sut.CreateOrUpdateAppAsync(actor);
 
             // Act
-            await _sut
-                .DeleteActorAsync(actor)
-                .ConfigureAwait(false);
+            await _sut.DeleteActorAsync(actor);
 
-            await _sut
-                .DeleteActorAsync(actor)
-                .ConfigureAwait(false);
+            await _sut.DeleteActorAsync(actor);
 
-            var exists = await _sut.AppExistsAsync(actor).ConfigureAwait(false);
+            var exists = await _sut.AppExistsAsync(actor);
 
             // Assert
             Assert.False(exists);

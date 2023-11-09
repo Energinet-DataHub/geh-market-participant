@@ -51,6 +51,9 @@ public static class Settings
     public static Setting<string> TokenKeyName { get; }
         = new("TOKEN_KEY_NAME");
 
+    public static Setting<Uri> CertificateKeyVault { get; }
+        = new("CERTIFICATES_KEY_VAULT");
+
     public static Setting<string> SendGridApiKey { get; }
         = new("SEND_GRID_APIKEY");
 

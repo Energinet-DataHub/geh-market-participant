@@ -77,7 +77,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await _fixture.PrepareUserAsync().ConfigureAwait(false);
+        await _fixture.PrepareUserAsync();
 
         const string name = "Create_UserRole_AuditLogSaved";
         var createUserRoleDto = new CreateUserRoleDto(
@@ -85,13 +85,13 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             "description",
             UserRoleStatus.Active,
             EicFunction.DataHubAdministrator,
-            new Collection<int> { (int)PermissionId.OrganizationsView, (int)PermissionId.UsersManage });
+            new Collection<int> { (int)PermissionId.OrganizationsManage, (int)PermissionId.UsersManage });
 
         var createUserRoleCommand = new CreateUserRoleCommand(createUserRoleDto);
 
         // Act
-        var response = await mediator.Send(createUserRoleCommand).ConfigureAwait(false);
-        var result = await userRoleAuditLogEntryRepository.GetAsync(new UserRoleId(response.UserRoleId)).ConfigureAwait(false);
+        var response = await mediator.Send(createUserRoleCommand);
+        var result = await userRoleAuditLogEntryRepository.GetAsync(new UserRoleId(response.UserRoleId));
 
         // Assert
         var resultList = result.ToList();
@@ -159,7 +159,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
 
         const string nameUpdate = "Update_UserRole_SortingValidation_NameChangedAuditLog";
         const string descriptionUpdate = "Update_UserRole_SortingValidation_DescriptionChangedAuditLog";
@@ -199,7 +199,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
         var userRoleAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAuditLogEntryRepository>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole).ConfigureAwait(false);
+        var userRole = await _fixture.PrepareUserRoleAsync(ValidUserRole);
         Thread.Sleep(100); // Wait time for simulate real scenario
 
         var userRolePermissionsUpdates = new List<Collection<int>>
@@ -208,7 +208,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
            new() { (int)PermissionId.PermissionsManage },
            new(),
            new() { (int)PermissionId.UsersView, (int)PermissionId.UsersManage, (int)PermissionId.SettlementReportsManage, (int)PermissionId.PermissionsManage, (int)PermissionId.GridAreasManage, (int)PermissionId.ActorsManage },
-           new() { (int)PermissionId.OrganizationsView, (int)PermissionId.OrganizationsManage }
+           new() { (int)PermissionId.UserRolesManage, (int)PermissionId.OrganizationsManage }
         };
 
         var updateUserRoleDto = new UpdateUserRoleDto(userRole.Name, userRole.Description ?? string.Empty, userRole.Status, new Collection<int>());
@@ -231,7 +231,7 @@ public sealed class UserRoleAuditLogIntegrationTest : WebApiIntegrationTestsBase
             .Where(e => e.ChangeType is UserRoleChangeType.PermissionAdded or UserRoleChangeType.PermissionRemoved)
             .OrderBy(p => p.Timestamp)
             .ToList();
-        Assert.Single(permissionChanges, e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.OrganizationsView);
+        Assert.Single(permissionChanges, e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.UserRolesManage);
         Assert.Single(permissionChanges, e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.OrganizationsManage);
 
         Assert.Equal(2, permissionChanges.Count(e => e.ChangeType == UserRoleChangeType.PermissionAdded && e.Permissions.First() == PermissionId.UsersView));

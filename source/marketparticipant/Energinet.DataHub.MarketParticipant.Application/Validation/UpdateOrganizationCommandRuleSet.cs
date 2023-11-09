@@ -77,6 +77,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 .Length(1, 15)
                                 .When(address => !string.IsNullOrEmpty(address.ZipCode));
                         });
+
+                    validator
+                        .RuleFor(organization => organization.Domain)
+                        .Must(OrganizationDomain.IsValid);
                 });
         }
     }

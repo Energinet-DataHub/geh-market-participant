@@ -28,7 +28,7 @@ public interface IActorRepository
     /// </summary>
     /// <param name="actor">The actor to add or update.</param>
     /// <returns>The id of the added/updated actor.</returns>
-    Task<ActorId> AddOrUpdateAsync(Actor actor);
+    Task<Result<ActorId, ActorError>> AddOrUpdateAsync(Actor actor);
 
     /// <summary>
     /// Gets an actor by their internal id.

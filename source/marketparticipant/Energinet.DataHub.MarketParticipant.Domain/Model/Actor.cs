@@ -26,13 +26,17 @@ public sealed class Actor : IPublishDomainEvents
     private readonly List<ActorMarketRole> _marketRoles = new();
     private readonly ActorStatusTransitioner _actorStatusTransitioner;
     private ExternalActorId? _externalActorId;
+    private ActorCredentials? _credentials;
 
-    public Actor(OrganizationId organizationId, ActorNumber actorNumber)
+    public Actor(
+        OrganizationId organizationId,
+        ActorNumber actorNumber,
+        ActorName actorName)
     {
         Id = new ActorId(Guid.Empty);
         OrganizationId = organizationId;
         ActorNumber = actorNumber;
-        Name = new ActorName(string.Empty);
+        Name = actorName;
         _actorStatusTransitioner = new ActorStatusTransitioner();
     }
 
@@ -43,7 +47,8 @@ public sealed class Actor : IPublishDomainEvents
         ActorNumber actorNumber,
         ActorStatus actorStatus,
         IEnumerable<ActorMarketRole> marketRoles,
-        ActorName name)
+        ActorName name,
+        ActorCredentials? credentials)
     {
         Id = id;
         OrganizationId = organizationId;
@@ -52,6 +57,7 @@ public sealed class Actor : IPublishDomainEvents
         _externalActorId = externalActorId;
         _actorStatusTransitioner = new ActorStatusTransitioner(actorStatus);
         _marketRoles.AddRange(marketRoles);
+        _credentials = credentials;
     }
 
     /// <summary>
@@ -74,7 +80,10 @@ public sealed class Actor : IPublishDomainEvents
         {
             if (value != null)
             {
-                _domainEvents.Add(new ActorActivated(ActorNumber, value));
+                foreach (var marketRole in _marketRoles)
+                {
+                    _domainEvents.Add(new ActorActivated(ActorNumber, marketRole.Function, value));
+                }
             }
 
             _externalActorId = value;
@@ -109,6 +118,34 @@ public sealed class Actor : IPublishDomainEvents
     /// The Name of the current actor.
     /// </summary>
     public ActorName Name { get; set; }
+
+    /// <summary>
+    /// The credentials for the current actor.
+    /// </summary>
+    public ActorCredentials? Credentials
+    {
+        get => _credentials;
+        set
+        {
+            if (_credentials != null && value != null)
+            {
+                throw new NotSupportedException("Cannot overwrite credentials. Remember to delete the credentials first using the appropriate service.");
+            }
+
+            if (value is ActorCertificateCredentials acc && Status == ActorStatus.Active)
+            {
+                foreach (var marketRole in _marketRoles)
+                {
+                    _domainEvents.Add(new ActorCertificateCredentialsAssigned(
+                        ActorNumber,
+                        marketRole.Function,
+                        acc.CertificateThumbprint));
+                }
+            }
+
+            _credentials = value;
+        }
+    }
 
     /// <summary>
     /// The roles (functions and permissions) assigned to the current actor.
@@ -167,14 +204,25 @@ public sealed class Actor : IPublishDomainEvents
     {
         _actorStatusTransitioner.Activate();
 
-        foreach (var marketRole in _marketRoles.Where(role => role.Function == EicFunction.GridAccessProvider))
+        foreach (var marketRole in _marketRoles)
         {
-            foreach (var gridArea in marketRole.GridAreas)
+            if (marketRole.Function == EicFunction.GridAccessProvider)
             {
-                _domainEvents.Add(new GridAreaOwnershipAssigned(
+                foreach (var gridArea in marketRole.GridAreas)
+                {
+                    _domainEvents.Add(new GridAreaOwnershipAssigned(
+                        ActorNumber,
+                        marketRole.Function,
+                        gridArea.Id));
+                }
+            }
+
+            if (Credentials is ActorCertificateCredentials acc)
+            {
+                _domainEvents.Add(new ActorCertificateCredentialsAssigned(
                     ActorNumber,
                     marketRole.Function,
-                    gridArea.Id));
+                    acc.CertificateThumbprint));
             }
         }
     }

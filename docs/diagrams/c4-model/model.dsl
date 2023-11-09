@@ -18,6 +18,11 @@ markpartDomain = group "Market Participant" {
         technology "Azure Key Vault"
         tags "Microsoft Azure - Key Vaults" "Titans"
     }
+    markpartCertKeyVault = container "Market Participant Certificate Key Vault" {
+        description "Stores public DH2 certificates used for B2B authentication."
+        technology "Azure Key Vault"
+        tags "Microsoft Azure - Key Vaults" "Titans"
+    }
     markpartApi = container "Market Participant API" {
         description "Multi-tenant API for managing actors, users and permissions."
         technology "Asp.Net Core Web API"
@@ -29,6 +34,18 @@ markpartDomain = group "Market Participant" {
         # Domain relationships
         this -> markpartDb "Reads and writes actor/user data." "EF Core"
         this -> markpartKeyVault "Signs, and reads public key for, tokens." "Microsoft.Graph/https"
+        this -> markpartCertKeyVault "Manages active DH2 certificates used for B2B authentication." "Microsoft.Graph/https"
+    }
+    markpartCertificateSynchronization = container "Market Participant <Certificate Synchronization>" {
+        description "Synchronizes active DH2 authentication certificates with APIM."
+        technology "Azure function, C#"
+        tags "Microsoft Azure - Function Apps" "Titans"
+
+        # Common relationships
+        this -> dh3.sharedApiManagement "Links and unlinks DH2 active authentication certificates." "REST/https"
+
+        # Domain relationships
+        this -> markpartCertKeyVault "Gets certificates that should be active in APIM." "Microsoft.Graph/https"
     }
     markpartOrganizationManager = container "Market Participant <Organization Manager>" {
         description "Synchronizes Azure B2C user and actor state with the domain."
@@ -60,4 +77,3 @@ markpartDomain = group "Market Participant" {
         }
     }
 }
-
