@@ -131,8 +131,6 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
 
         var actor = await _databaseFixture.PrepareActorAsync();
 
-        await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
-
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
