@@ -231,7 +231,13 @@ public sealed class Actor : IPublishDomainEvents
     /// Deactivates the current actor, the status changes to Inactive.
     /// Only New, Active and Passive actors can be deactivated.
     /// </summary>
-    public void Deactivate() => _actorStatusTransitioner.Deactivate();
+    public void Deactivate()
+    {
+        if (_credentials != null)
+            throw new ValidationException("Cannot disable actor with active credentials. Remove the credentials first, then try again.");
+
+        _actorStatusTransitioner.Deactivate();
+    }
 
     /// <summary>
     /// Passive actors have certain domain-specific actions that can be performed.
