@@ -227,6 +227,17 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
         }
 
+        [Fact]
+        public void Deactivate_HasCredentials_NotAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active);
+            target.Credentials = new ActorClientSecretCredentials(Guid.NewGuid(), DateTimeOffset.UtcNow);
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.Deactivate());
+        }
+
         private static Actor CreateTestActor(ActorStatus status, params EicFunction[] eicFunctions)
         {
             return new Actor(
