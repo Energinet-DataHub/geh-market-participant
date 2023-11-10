@@ -55,7 +55,8 @@ public class CertificateService : ICertificateService
         }
         catch (RequestFailedException e) when (e.Status == (int)HttpStatusCode.Conflict)
         {
-            await _keyVault.StartRecoverDeletedSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
+            var opr = await _keyVault.StartRecoverDeletedSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
+            await opr.WaitForCompletionAsync().ConfigureAwait(false);
         }
     }
 
@@ -63,7 +64,8 @@ public class CertificateService : ICertificateService
     {
         ArgumentException.ThrowIfNullOrEmpty(certificateLookupIdentifier);
 
-        await _keyVault.StartDeleteSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
+        var opr = await _keyVault.StartDeleteSecretAsync(certificateLookupIdentifier).ConfigureAwait(false);
+        await opr.WaitForCompletionAsync().ConfigureAwait(false);
     }
 
     public X509Certificate2 CreateAndValidateX509Certificate(Stream certificate)

@@ -73,7 +73,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     .EnqueueAsync(actor)
                     .ConfigureAwait(false);
 
-                await _certificateService.SaveCertificateAsync(certificateLookupIdentifier, x509Certificate).ConfigureAwait(false);
+                await _certificateService
+                    .SaveCertificateAsync(certificateLookupIdentifier, x509Certificate)
+                    .ConfigureAwait(false);
 
                 await uow.CommitAsync().ConfigureAwait(false);
             }
