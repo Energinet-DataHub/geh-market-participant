@@ -18,15 +18,12 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
-using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -98,12 +95,9 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
     public async Task RequestSecret_ActorHasCredentials_Throws()
     {
         // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, _b2CFixture);
 
         var externalActorId = Guid.NewGuid();
-
-        host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ =>
-            new Mock<IActiveDirectoryB2CService>().Object));
 
         var actor = await _databaseFixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
@@ -133,10 +127,7 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
     public async Task RequestSecret_ActorHasNoExternalId_Throws()
     {
         // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-
-        host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ =>
-            new Mock<IActiveDirectoryB2CService>().Object));
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, _b2CFixture);
 
         var actor = await _databaseFixture.PrepareActorAsync();
 
