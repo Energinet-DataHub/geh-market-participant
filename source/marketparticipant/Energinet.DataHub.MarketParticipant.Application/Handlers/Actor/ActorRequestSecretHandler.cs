@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -30,16 +29,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
     {
         private readonly IActiveDirectoryB2CService _activeDirectoryB2CService;
         private readonly IActorRepository _actorRepository;
-        private readonly ICertificateService _certificateService;
 
         public ActorRequestSecretHandler(
             IActiveDirectoryB2CService activeDirectoryB2CService,
-            IActorRepository actorRepository,
-            ICertificateService certificateService)
+            IActorRepository actorRepository)
         {
             _activeDirectoryB2CService = activeDirectoryB2CService;
             _actorRepository = actorRepository;
-            _certificateService = certificateService;
         }
 
         public async Task<ActorRequestSecretResponse> Handle(ActorRequestSecretCommand request, CancellationToken cancellationToken)
