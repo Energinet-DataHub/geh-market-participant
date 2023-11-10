@@ -17,21 +17,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Azure.Identity;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -41,12 +34,15 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     [IntegrationTest]
     public sealed class ActiveDirectoryB2CServiceTests
     {
-        private readonly IActiveDirectoryB2CService _sut = CreateActiveDirectoryService();
+        private readonly IActiveDirectoryB2CService _sut;
         private readonly GraphServiceClientFixture _graphServiceClientFixture;
 
-        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture)
+        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture, B2CFixture b2CFixture)
         {
             _graphServiceClientFixture = graphServiceClientFixture;
+#pragma warning disable CA1062
+            _sut = b2CFixture.B2CService;
+#pragma warning restore CA1062
         }
 
         [Fact]
@@ -209,7 +205,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 cleanupId = createAppRegistrationResponse.ExternalActorId;
 
-                var secretCreated = await _sut
+                await _sut
                     .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
 
                 // Act
@@ -225,42 +221,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             {
                 await CleanupAsync(cleanupId);
             }
-        }
-
-        private static IActiveDirectoryB2CService CreateActiveDirectoryService()
-        {
-            var integrationTestConfig = new IntegrationTestConfiguration();
-
-            // Graph Service Client
-            var clientSecretCredential = new ClientSecretCredential(
-                integrationTestConfig.B2CSettings.Tenant,
-                integrationTestConfig.B2CSettings.ServicePrincipalId,
-                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
-
-            using var graphClient = new GraphServiceClient(
-                clientSecretCredential,
-                new[]
-                {
-                    "https://graph.microsoft.com/.default"
-                });
-
-            // Azure AD Config
-            var config = new AzureAdConfig(
-                integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-                integrationTestConfig.B2CSettings.BackendAppId);
-
-            // Active Directory Roles
-            var activeDirectoryB2CRoles =
-                new ActiveDirectoryB2BRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
-
-            // Logger
-            var logger = Mock.Of<ILogger<ActiveDirectoryB2CService>>();
-
-            return new ActiveDirectoryB2CService(
-                graphClient,
-                config,
-                activeDirectoryB2CRoles,
-                logger);
         }
 
         private async Task CleanupAsync(ExternalActorId? externalActorId)
