@@ -19,10 +19,12 @@ using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests;
@@ -38,7 +40,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
-    public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture)
+    public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture, B2CFixture? b2CFixture = null)
     {
         ArgumentNullException.ThrowIfNull(databaseFixture);
 
@@ -48,6 +50,11 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         host.ServiceCollection.AddSingleton(configuration);
         host._startup.ConfigureServices(host.ServiceCollection);
         InitUserIdProvider(host.ServiceCollection);
+
+        if (b2CFixture != null)
+        {
+            host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ => b2CFixture.B2CService));
+        }
 
         return Task.FromResult(host);
     }

@@ -16,6 +16,7 @@ using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
@@ -36,51 +37,61 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 public sealed class ActorRequestSecretHandlerIntegrationTests
 {
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
+    private readonly B2CFixture _b2CFixture;
 
-    public ActorRequestSecretHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture)
+    public ActorRequestSecretHandlerIntegrationTests(MarketParticipantDatabaseFixture databaseFixture, B2CFixture b2CFixture)
     {
         _databaseFixture = databaseFixture;
+        _b2CFixture = b2CFixture;
     }
 
     [Fact]
     public async Task RequestSecret_ActorHasNoCredentials_CreatesNewSecretInB2CAndUpdatesActor()
     {
         // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, _b2CFixture);
 
-        var externalActorId = Guid.NewGuid();
-        var secretId = Guid.NewGuid();
-        var secret = Guid.NewGuid().ToString();
-        var expirationDate = DateTimeOffset.Now;
+        CreateAppRegistrationResponse? appRegistration = null;
+        try
+        {
+            var gln = new MockedGln();
 
-        var activeDirectoryB2CService = new Mock<IActiveDirectoryB2CService>();
-        activeDirectoryB2CService.Setup(x => x.CreateSecretForAppRegistrationAsync(new ExternalActorId(externalActorId)))
-            .ReturnsAsync((secretId, secret, expirationDate));
+            appRegistration = await _b2CFixture.B2CService.CreateAppRegistrationAsync(gln, new[]
+            {
+                EicFunction.EnergySupplier,
+            });
 
-        host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ => activeDirectoryB2CService.Object));
+            var actor = await _databaseFixture.PrepareActorAsync(
+                TestPreparationEntities.ValidOrganization,
+                TestPreparationEntities.ValidActor.Patch(x =>
+                {
+                    x.ActorNumber = gln;
+                    x.ActorId = appRegistration.ExternalActorId.Value;
+                }),
+                TestPreparationEntities.ValidMarketRole);
 
-        var actor = await _databaseFixture.PrepareActorAsync();
+            await using var scope = host.BeginScope();
+            var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
-        actor.ActorId = externalActorId;
-        context.Update(actor);
-        await context.SaveChangesAsync();
+            var command = new ActorRequestSecretCommand(actor.Id);
 
-        await using var scope = host.BeginScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+            // act
+            await mediator.Send(command);
 
-        var command = new ActorRequestSecretCommand(actor.Id);
+            // asert
+            var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+            var actual = (await actorRepository.GetAsync(new ActorId(actor.Id)))?.Credentials as ActorClientSecretCredentials;
 
-        // act
-        await mediator.Send(command);
-
-        // asert
-        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actual = (await actorRepository.GetAsync(new ActorId(actor.Id)))?.Credentials as ActorClientSecretCredentials;
-
-        Assert.NotNull(actual);
-        Assert.Equal(secretId, actual.ClientSecretIdentifier);
-        Assert.Equal(expirationDate, actual.ExpirationDate);
+            Assert.NotNull(actual);
+        }
+        finally
+        {
+            // cleanup
+            if (appRegistration != null)
+            {
+                await _b2CFixture.B2CService.DeleteAppRegistrationAsync(appRegistration.ExternalActorId);
+            }
+        }
     }
 
     [Fact]
@@ -94,17 +105,18 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
         host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ =>
             new Mock<IActiveDirectoryB2CService>().Object));
 
-        var actor = await _databaseFixture.PrepareActorAsync();
-
-        await using var context = _databaseFixture.DatabaseManager.CreateDbContext();
-        actor.ActorId = externalActorId;
-        actor.ClientSecretCredential = new ActorClientSecretCredentialsEntity
-        {
-            ClientSecretIdentifier = Guid.NewGuid().ToString(),
-            ExpirationDate = DateTimeOffset.Now,
-        };
-        context.Update(actor);
-        await context.SaveChangesAsync();
+        var actor = await _databaseFixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(x =>
+            {
+                x.ActorId = externalActorId;
+                x.ClientSecretCredential = new ActorClientSecretCredentialsEntity
+                {
+                    ClientSecretIdentifier = Guid.NewGuid().ToString(),
+                    ExpirationDate = DateTimeOffset.Now,
+                };
+            }),
+            TestPreparationEntities.ValidMarketRole);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
