@@ -41,9 +41,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                         .DeleteAppRegistrationAsync(actor.ExternalActorId)
                         .ConfigureAwait(false);
 
-                    if (actor.Credentials is ActorClientSecretCredentials)
-                        actor.Credentials = null;
-
                     actor.ExternalActorId = null;
                 }
             }
