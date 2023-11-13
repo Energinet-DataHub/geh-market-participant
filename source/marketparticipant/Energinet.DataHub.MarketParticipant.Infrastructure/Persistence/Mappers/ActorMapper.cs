@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 
@@ -67,7 +68,7 @@ internal static class ActorMapper
                 to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
                 {
                     ClientSecretIdentifier = credentials.ClientSecretIdentifier.ToString(),
-                    ExpirationDate = credentials.ExpirationDate,
+                    ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
                 };
                 to.CertificateCredential = null;
                 break;
@@ -76,7 +77,7 @@ internal static class ActorMapper
                 {
                     CertificateThumbprint = credentials.CertificateThumbprint,
                     KeyVaultSecretIdentifier = credentials.KeyVaultSecretIdentifier,
-                    ExpirationDate = credentials.ExpirationDate,
+                    ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
                 };
                 to.ClientSecretCredential = null;
                 break;
@@ -121,7 +122,7 @@ internal static class ActorMapper
     {
         return from is null
             ? null
-            : new ActorClientSecretCredentials(Guid.Parse(from.ClientSecretIdentifier), from.ExpirationDate);
+            : new ActorClientSecretCredentials(Guid.Parse(from.ClientSecretIdentifier), from.ExpirationDate.ToInstant());
     }
 
     private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)
@@ -131,6 +132,6 @@ internal static class ActorMapper
             : new ActorCertificateCredentials(
                 from.CertificateThumbprint,
                 from.KeyVaultSecretIdentifier,
-                from.ExpirationDate);
+                from.ExpirationDate.ToInstant());
     }
 }

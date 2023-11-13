@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
@@ -110,7 +111,11 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorCredentials = new ActorCertificateCredentials("12345678", "secret", DateTime.Now.AddYears(1));
+        var actorCredentials = new ActorCertificateCredentials(
+            "12345678",
+            "secret",
+            DateTime.UtcNow.AddYears(1).ToInstant());
+
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorCredentials
@@ -142,8 +147,9 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var endDate = DateTimeOffset.Now.AddYears(1);
+        var endDate = DateTime.UtcNow.AddYears(1).ToInstant();
         var actorClientSecretCredentials = new ActorClientSecretCredentials(Guid.NewGuid(), endDate);
+
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorClientSecretCredentials
@@ -175,8 +181,9 @@ public sealed class ActorRepositoryTests
         var actorRepository2 = new ActorRepository(context2);
 
         var organization = await _fixture.PrepareOrganizationAsync();
-        var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret", DateTime.Now.AddYears(1));
-        var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2", DateTime.Now.AddYears(1));
+        var actorCertificateCredentials = new ActorCertificateCredentials("123456784", "secret", DateTime.UtcNow.AddYears(1).ToInstant());
+        var actorCertificateCredentials2 = new ActorCertificateCredentials("123456784", "secret2", DateTime.UtcNow.AddYears(1).ToInstant());
+
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
             Credentials = actorCertificateCredentials

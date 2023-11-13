@@ -49,7 +49,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
             if (actor.Credentials is not null)
-                throw new ValidationException($"Actor with id {request.ActorId} Can not have new credentials generated, as it already has credentials");
+                throw new ValidationException($"Actor with id {request.ActorId} cannot have new credentials generated, as it already has credentials");
 
             if (actor.ExternalActorId is null)
                 throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");

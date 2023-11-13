@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class ActorContactEntity : IAuditedEntity
+public sealed class ActorContactEntity : IDeletableAuditedEntity
 {
     public Guid Id { get; set; }
     public Guid ActorId { get; set; }

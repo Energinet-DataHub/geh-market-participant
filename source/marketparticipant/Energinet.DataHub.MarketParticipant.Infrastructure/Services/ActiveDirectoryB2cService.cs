@@ -25,6 +25,8 @@ using Microsoft.Graph;
 using Microsoft.Graph.Applications.Item.AddPassword;
 using Microsoft.Graph.Applications.Item.RemovePassword;
 using Microsoft.Graph.Models;
+using NodaTime;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
@@ -93,7 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
                 if (foundApp == null)
                 {
-                    throw new InvalidOperationException("Cannot delete registration from B2C; Application was not found.");
+                    throw new InvalidOperationException("Cannot delete registration from B2C; application was not found.");
                 }
 
                 await _graphClient.Applications[foundApp.Id]
@@ -140,33 +142,33 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        public async Task<(Guid SecretId, string SecretText, DateTimeOffset ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
+        public async Task<(Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
 
             var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
             if (foundApp == null)
             {
-                throw new InvalidOperationException("Cannot add secret to B2C, Application was not found.");
+                throw new InvalidOperationException("Cannot add secret to B2C; application was not found.");
             }
 
             var passwordCredential = new PasswordCredential
             {
                 DisplayName = SecretDisplayName,
-                StartDateTime = DateTimeOffset.Now,
-                EndDateTime = DateTimeOffset.Now.AddMonths(6),
+                StartDateTime = DateTimeOffset.UtcNow,
+                EndDateTime = DateTimeOffset.UtcNow.AddMonths(6),
                 KeyId = Guid.NewGuid(),
             };
 
             var secret = await _graphClient
                 .Applications[foundApp.Id]
                 .AddPassword
-                .PostAsync(new AddPasswordPostRequestBody() { PasswordCredential = passwordCredential })
+                .PostAsync(new AddPasswordPostRequestBody { PasswordCredential = passwordCredential })
                 .ConfigureAwait(false);
 
             if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
             {
-                return (secret.KeyId.Value, secret.SecretText, secret.EndDateTime.Value);
+                return (secret.KeyId.Value, secret.SecretText, secret.EndDateTime.Value.ToInstant());
             }
 
             throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");

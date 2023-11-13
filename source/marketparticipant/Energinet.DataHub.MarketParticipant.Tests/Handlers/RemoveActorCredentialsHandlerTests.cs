@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
@@ -89,7 +90,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorCertificateCredentials("mocked", "mocked", DateTime.Now.AddYears(1));
+            actor.Credentials = new ActorCertificateCredentials(
+                "mocked",
+                "mocked",
+                DateTime.UtcNow.AddYears(1).ToInstant());
 
             actorRepositoryMock
                 .Setup(actorRepository => actorRepository.GetAsync(actor.Id))

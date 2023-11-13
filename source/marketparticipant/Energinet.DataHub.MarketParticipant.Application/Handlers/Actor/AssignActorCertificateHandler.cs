@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
@@ -57,7 +58,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var x509Certificate = _certificateService.CreateAndValidateX509Certificate(request.Certificate);
             var certificateLookupIdentifier = $"{actor.ActorNumber.Value}-{x509Certificate.Thumbprint}";
 
-            actor.Credentials = new ActorCertificateCredentials(x509Certificate.Thumbprint, certificateLookupIdentifier, x509Certificate.NotAfter);
+            actor.Credentials = new ActorCertificateCredentials(
+                x509Certificate.Thumbprint,
+                certificateLookupIdentifier,
+                x509Certificate.NotAfter.ToUniversalTime().ToInstant());
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()
