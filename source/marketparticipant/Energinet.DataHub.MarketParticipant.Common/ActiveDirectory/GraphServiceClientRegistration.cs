@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Common.ActiveDirectory
     {
         public static void AddGraphServiceClient(this IServiceCollection services)
         {
-            services.AddScoped(provider =>
+            services.AddSingleton(provider =>
             {
                 var configuration = provider.GetRequiredService<IConfiguration>();
 
