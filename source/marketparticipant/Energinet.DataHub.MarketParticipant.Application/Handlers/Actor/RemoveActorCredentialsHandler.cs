@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -63,8 +62,6 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
             case ActorClientSecretCredentials when actor.ExternalActorId is not null:
                 await _b2CService.RemoveSecretsForAppRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
                 break;
-            case ActorClientSecretCredentials:
-                throw new ValidationException("Can't remove secret, as the actor is either not Active or is still being created");
             default:
                 throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a known type of credentials assigned");
         }

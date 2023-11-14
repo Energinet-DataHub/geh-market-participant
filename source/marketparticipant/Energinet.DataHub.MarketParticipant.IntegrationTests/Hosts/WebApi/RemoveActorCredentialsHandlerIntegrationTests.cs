@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -96,35 +95,6 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
                 await _b2CFixture.B2CService.DeleteAppRegistrationAsync(appRegistration.ExternalActorId);
             }
         }
-    }
-
-    [Fact]
-    public async Task RemoveActorSecret_NoExternalIdOnActor_Throws()
-    {
-        // arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
-
-        var gln = new MockedGln();
-
-        var actor = await _databaseFixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(x =>
-            {
-                x.ActorNumber = gln;
-                x.ClientSecretCredential = new ActorClientSecretCredentialsEntity
-                {
-                    ExpirationDate = DateTimeOffset.Now,
-                    ClientSecretIdentifier = Guid.NewGuid().ToString(),
-                };
-            }),
-            TestPreparationEntities.ValidMarketRole);
-
-        // act
-        var actual = await Assert.ThrowsAsync<ValidationException>(() => SendCommand(host, new RemoveActorCredentialsCommand(actor.Id)));
-
-        // asert
-        Assert.Equal("Can't remove secret, as the actor is either not Active or is still being created", actual.Message);
-        Assert.NotNull((await GetActor(host, actor))?.Credentials as ActorClientSecretCredentials);
     }
 
     [Fact]

@@ -111,7 +111,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests
         // Act + assert
         var actual = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(command));
 
-        Assert.Equal($"Actor with id {actor.Id} Can not have new credentials generated, as it already has credentials", actual.Message);
+        Assert.Equal("Credentials have already been assigned", actual.Message);
     }
 
     private static Stream SetupTestCertificate(string certificateName)

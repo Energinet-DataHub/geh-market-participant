@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             var certificateLookupIdentifier = $"{actor.ActorNumber.Value}-{x509Certificate.Thumbprint}";
 
             if (actor.Credentials is not null)
-                throw new ValidationException($"Actor with id {request.ActorId} Can not have new credentials generated, as it already has credentials");
+                throw new ValidationException("Credentials have already been assigned");
 
             actor.Credentials = new ActorCertificateCredentials(x509Certificate.Thumbprint, certificateLookupIdentifier, x509Certificate.NotAfter);
 
