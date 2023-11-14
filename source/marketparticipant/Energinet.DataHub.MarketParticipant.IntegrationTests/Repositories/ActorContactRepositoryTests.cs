@@ -15,13 +15,10 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -45,8 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
-            var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
+            var contactRepository = new ActorContactRepository(context);
 
             // Act
             var testContact = await contactRepository
@@ -65,8 +61,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var actor = await _fixture.PrepareActorAsync();
-            var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
-            var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
+            var contactRepository = new ActorContactRepository(context);
             var categories = new[]
             {
                 ContactCategory.EndOfSupply,
@@ -103,8 +98,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var actor = await _fixture.PrepareActorAsync();
-            var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
-            var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
+            var contactRepository = new ActorContactRepository(context);
 
             var testContact = new ActorContact(
                 new ActorId(actor.Id),
@@ -136,8 +130,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context = _fixture.DatabaseManager.CreateDbContext();
 
             var actor = await _fixture.PrepareActorAsync();
-            var auditIdentityProvider = scope.ServiceProvider.GetRequiredService<IAuditIdentityProvider>();
-            var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
+            var contactRepository = new ActorContactRepository(context);
 
             var testContact = new ActorContact(
                 new ActorId(actor.Id),
@@ -164,8 +157,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
-            var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
-            var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
+            var contactRepository = new ActorContactRepository(context);
 
             var testContact = new ActorContact(
                 new ContactId(Guid.NewGuid()),
@@ -189,9 +181,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var actor = await _fixture.PrepareActorAsync();
 
             await using var contextReadback = _fixture.DatabaseManager.CreateDbContext();
-            var auditIdentityProvider = new Mock<IAuditIdentityProvider>().Object;
-            var contactRepository = new ActorContactRepository(context, auditIdentityProvider);
-            var contactRepositoryReadback = new ActorContactRepository(contextReadback, auditIdentityProvider);
+            var contactRepository = new ActorContactRepository(context);
+            var contactRepositoryReadback = new ActorContactRepository(contextReadback);
 
             var testContact = new ActorContact(
                 new ActorId(actor.Id),

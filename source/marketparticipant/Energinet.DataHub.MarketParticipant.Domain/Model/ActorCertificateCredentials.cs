@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -21,7 +21,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         public ActorCertificateCredentials(
             string certificateThumbprint,
             string keyVaultSecretIdentifier,
-            DateTime expirationDate)
+            Instant expirationDate)
         {
             CertificateThumbprint = certificateThumbprint;
             KeyVaultSecretIdentifier = keyVaultSecretIdentifier;
@@ -30,6 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 
         public string CertificateThumbprint { get; }
         public string KeyVaultSecretIdentifier { get; }
-        public DateTime ExpirationDate { get; }
+        public Instant ExpirationDate { get; }
     }
 }

@@ -13,20 +13,20 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.EntityConfiguration;
 
-public class
-    ActorCertificateCredentialsEntityConfiguration : IEntityTypeConfiguration<ActorCertificateCredentialsEntity>
+public class ActorCertificateCredentialsEntityConfiguration : AuditedEntityTypeConfiguration<ActorCertificateCredentialsEntity>
 {
-    public void Configure(EntityTypeBuilder<ActorCertificateCredentialsEntity> builder)
+    protected override void ConfigureEntity(EntityTypeBuilder<ActorCertificateCredentialsEntity> builder)
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
         builder.ToTable("ActorCertificateCredentials");
-        builder.HasKey(cred => cred.ActorId);
+        builder.HasKey(cred => cred.Id);
         builder.Property(cred => cred.CertificateThumbprint).HasColumnName("Thumbprint");
         builder.Property(cred => cred.KeyVaultSecretIdentifier).HasColumnName("KvSecretId");
     }
