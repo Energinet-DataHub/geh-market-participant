@@ -20,30 +20,40 @@ using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Energinet.DataHub.Core.FunctionApp.TestCommon;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public sealed class KeyCertificateFixture : IAsyncLifetime
+public sealed class CertificateFixture : IAsyncLifetime
 {
-    public string CertificateName { get; } = $"IntegrationTestCertificateKey-{Guid.NewGuid()}";
-    public SecretClient CertificateClient { get; private set; } = null!;
+    public SecretClient SecretClient { get; private set; } = null!;
+    public CertificateService CertificateService { get; private set; } = null!;
 
     public Task InitializeAsync()
     {
         var keyVaultUri = GetKeyVaultUri();
-        CertificateClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
+        SecretClient = new SecretClient(keyVaultUri, new DefaultAzureCredential());
+
+        var certValidation = new Mock<ICertificateValidation>();
+
+        CertificateService = new CertificateService(
+            SecretClient,
+            certValidation.Object,
+            new Mock<ILogger<CertificateService>>().Object);
 
         return Task.CompletedTask;
     }
 
-    public async Task DisposeAsync()
+    public Task DisposeAsync()
     {
-        await CleanUpCertificateFromStorageAsync(CertificateName);
+        return Task.CompletedTask;
     }
 
-    public async Task CleanUpCertificateFromStorageAsync(string lookupName)
+    public async Task CleanUpCertificateFromStorageAsync(string name)
     {
         try
         {
@@ -56,20 +66,34 @@ public sealed class KeyCertificateFixture : IAsyncLifetime
         }
     }
 
-    public async Task<(string CertificateName, string Thumbprint)> GetPublicKeyTestCertificateAsync(string certificateFileName)
+    public async Task<bool> CertificateExistsAsync(string name)
     {
-        var resourceName = $"Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.{certificateFileName}";
-        var assembly = typeof(KeyCertificateFixture).Assembly;
+        try
+        {
+            var secret = await SecretClient.GetSecretAsync(name);
+            return secret.HasValue;
+        }
+        catch (RequestFailedException requestFailedException) when (requestFailedException.Status == 404)
+        {
+            return false;
+        }
+    }
+
+    public async Task<X509Certificate2> CreatePublicKeyCertificateAsync(string name)
+    {
+        var resourceName = "Energinet.DataHub.MarketParticipant.IntegrationTests.Common.Certificates.integration-actor-test-certificate-public.cer";
+        var assembly = typeof(CertificateFixture).Assembly;
         var stream = assembly.GetManifestResourceStream(resourceName);
 
         using var reader = new BinaryReader(stream!);
         var certificateBytes = reader.ReadBytes((int)stream!.Length);
 
-        using var certificate = new X509Certificate2(certificateBytes);
-        var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
-        await CertificateClient.SetSecretAsync(CertificateName, convertedCertificateToBase64);
+        var certificate = new X509Certificate2(certificateBytes);
 
-        return (CertificateName, certificate.Thumbprint);
+        var convertedCertificateToBase64 = Convert.ToBase64String(certificate.RawData);
+        await SecretClient.SetSecretAsync(name, convertedCertificateToBase64);
+
+        return certificate;
     }
 
     private static Uri GetKeyVaultUri()

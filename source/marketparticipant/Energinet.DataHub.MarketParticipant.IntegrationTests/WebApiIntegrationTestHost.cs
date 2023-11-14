@@ -40,7 +40,7 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
 
     public IServiceCollection ServiceCollection { get; } = new ServiceCollection();
 
-    public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture, B2CFixture? b2CFixture = null)
+    public static Task<WebApiIntegrationTestHost> InitializeAsync(MarketParticipantDatabaseFixture databaseFixture, B2CFixture? b2CFixture = null, CertificateFixture? certificateFixture = null)
     {
         ArgumentNullException.ThrowIfNull(databaseFixture);
 
@@ -54,6 +54,11 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
         if (b2CFixture != null)
         {
             host.ServiceCollection.Replace(ServiceDescriptor.Scoped<IActiveDirectoryB2CService>(_ => b2CFixture.B2CService));
+        }
+
+        if (certificateFixture != null)
+        {
+            host.ServiceCollection.Replace(ServiceDescriptor.Scoped<ICertificateService>(_ => certificateFixture.CertificateService));
         }
 
         return Task.FromResult(host);
@@ -77,7 +82,11 @@ public sealed class WebApiIntegrationTestHost : IAsyncDisposable
             new(Settings.SqlDbConnectionString.Key, dbConnectionString),
             new(Settings.ExternalOpenIdUrl.Key, "fake_value"),
             new(Settings.BackendBffAppId.Key, "fake_value"),
-            new(Settings.InternalOpenIdUrl.Key, "fake_value")
+            new(Settings.InternalOpenIdUrl.Key, "fake_value"),
+            new(Settings.CertificateKeyVault.Key, "fake_value"),
+            new(Settings.B2CBackendServicePrincipalNameObjectId.Key, "fake_value"),
+            new(Settings.B2CBackendId.Key, "fake_value"),
+            new(Settings.B2CBackendObjectId.Key, "fake_value"),
         };
 
         return new ConfigurationBuilder()

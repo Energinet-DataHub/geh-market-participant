@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -57,6 +58,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             var x509Certificate = _certificateService.CreateAndValidateX509Certificate(request.Certificate);
             var certificateLookupIdentifier = $"{actor.ActorNumber.Value}-{x509Certificate.Thumbprint}";
+
+            if (actor.Credentials is not null)
+                throw new ValidationException("Credentials have already been assigned");
 
             actor.Credentials = new ActorCertificateCredentials(
                 x509Certificate.Thumbprint,

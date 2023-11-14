@@ -189,7 +189,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 await _graphClient
                     .Applications[foundApp.Id]
                     .RemovePassword
-                    .PostAsync(new RemovePasswordPostRequestBody() { KeyId = secret.KeyId })
+                    .PostAsync(new RemovePasswordPostRequestBody { KeyId = secret.KeyId })
                     .ConfigureAwait(false);
             }
         }
