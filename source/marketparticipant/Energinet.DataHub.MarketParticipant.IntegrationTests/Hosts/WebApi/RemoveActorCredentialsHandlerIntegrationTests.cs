@@ -117,8 +117,8 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
                     x.CertificateCredential = new ActorCertificateCredentialsEntity
                     {
                         CertificateThumbprint = certificate.Thumbprint,
-                        KeyVaultSecretIdentifier = certificate.CertificateName,
-                        ExpirationDate = certificate.ExpirationDate,
+                        KeyVaultSecretIdentifier = certificateName,
+                        ExpirationDate = certificate.NotAfter,
                     };
                 }),
                 TestPreparationEntities.ValidMarketRole);
