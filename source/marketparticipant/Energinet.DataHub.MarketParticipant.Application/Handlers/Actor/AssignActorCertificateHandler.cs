@@ -23,6 +23,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
+using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
@@ -61,7 +62,10 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             if (actor.Credentials is not null)
                 throw new ValidationException("Credentials have already been assigned");
 
-            actor.Credentials = new ActorCertificateCredentials(x509Certificate.Thumbprint, certificateLookupIdentifier, x509Certificate.NotAfter);
+            actor.Credentials = new ActorCertificateCredentials(
+                x509Certificate.Thumbprint,
+                certificateLookupIdentifier,
+                x509Certificate.NotAfter.ToUniversalTime().ToInstant());
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

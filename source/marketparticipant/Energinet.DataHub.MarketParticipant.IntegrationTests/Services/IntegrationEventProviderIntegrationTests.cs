@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
@@ -119,7 +120,11 @@ public sealed class IntegrationEventProviderIntegrationTests
             new ActorName(string.Empty),
             null);
 
-        actor.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier", DateTime.Now.AddYears(1));
+        actor.Credentials = new ActorCertificateCredentials(
+            new string('A', 40),
+            "mocked_identifier",
+            DateTime.UtcNow.AddYears(1).ToInstant());
+
         actor.Activate();
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();

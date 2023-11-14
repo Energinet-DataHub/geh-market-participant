@@ -13,13 +13,19 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class ActorCertificateCredentialsEntity
+public sealed class ActorCertificateCredentialsEntity : IDeletableAuditedEntity
 {
+    public int Id { get; set; }
     public Guid ActorId { get; set; }
     public string CertificateThumbprint { get; set; } = null!;
     public string KeyVaultSecretIdentifier { get; set; } = null!;
-    public DateTime ExpirationDate { get; set; }
+    public DateTimeOffset ExpirationDate { get; set; }
+
+    public int Version { get; set; }
+    public Guid ChangedByIdentityId { get; set; }
+    public Guid? DeletedByIdentityId { get; set; }
 }

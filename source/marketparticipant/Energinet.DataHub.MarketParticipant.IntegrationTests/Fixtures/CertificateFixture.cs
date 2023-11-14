@@ -57,7 +57,8 @@ public sealed class CertificateFixture : IAsyncLifetime
     {
         try
         {
-            await SecretClient.StartDeleteSecretAsync(name);
+            var opr = await SecretClient.StartDeleteSecretAsync(name);
+            await opr.WaitForCompletionAsync();
         }
         catch (RequestFailedException requestFailedException) when (requestFailedException.Status == 404)
         {

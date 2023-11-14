@@ -18,7 +18,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 
-public sealed class UserRolePermissionEntity : IAuditedEntity
+public sealed class UserRolePermissionEntity : IDeletableAuditedEntity
 {
     public Guid UserRoleId { get; set; }
     public PermissionId Permission { get; set; }

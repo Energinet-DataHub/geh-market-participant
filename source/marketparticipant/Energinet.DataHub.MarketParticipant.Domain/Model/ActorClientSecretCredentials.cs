@@ -13,18 +13,19 @@
 // limitations under the License.
 
 using System;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorClientSecretCredentials : ActorCredentials
     {
-        public ActorClientSecretCredentials(Guid clientSecretIdentifier, DateTimeOffset expirationDate)
+        public ActorClientSecretCredentials(Guid clientSecretIdentifier, Instant expirationDate)
         {
             ClientSecretIdentifier = clientSecretIdentifier;
             ExpirationDate = expirationDate;
         }
 
         public Guid ClientSecretIdentifier { get; }
-        public DateTimeOffset ExpirationDate { get; }
+        public Instant ExpirationDate { get; }
     }
 }

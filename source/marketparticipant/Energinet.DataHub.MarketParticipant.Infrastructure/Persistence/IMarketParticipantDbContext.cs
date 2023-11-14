@@ -120,6 +120,16 @@ public interface IMarketParticipantDbContext
     DbSet<EmailEventEntity> EmailEventEntries { get; }
 
     /// <summary>
+    ///     Represent access to the ActorCertificateCredentials database table
+    /// </summary>
+    DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; }
+
+    /// <summary>
+    ///     Represent access to the ActorClientSecretCredentials database table
+    /// </summary>
+    DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();

@@ -18,6 +18,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
     {
         Name = 1,
         Created = 2,
-        Status = 3
+        Status = 3,
+        CertificateCredentials = 4,
+        SecretCredentials = 5,
     }
 }

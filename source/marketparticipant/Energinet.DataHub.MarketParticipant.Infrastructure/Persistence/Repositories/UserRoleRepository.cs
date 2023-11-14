@@ -16,27 +16,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
 public sealed class UserRoleRepository : IUserRoleRepository
 {
-    private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public UserRoleRepository(
-        IAuditIdentityProvider auditIdentityProvider,
-        IMarketParticipantDbContext marketParticipantDbContext)
+    public UserRoleRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
-        _auditIdentityProvider = auditIdentityProvider;
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
@@ -138,43 +132,12 @@ public sealed class UserRoleRepository : IUserRoleRepository
                 userRoleEntity.Permissions.Add(permissionEntity);
             }
 
-            var currentDbContext = (DbContext)_marketParticipantDbContext;
-            IDbContextTransaction? currentTransaction = null;
-
-            if (currentDbContext.Database.CurrentTransaction == null)
+            foreach (var permissionEntity in permissionsDeleted)
             {
-                currentTransaction = await currentDbContext
-                    .Database
-                    .BeginTransactionAsync()
-                    .ConfigureAwait(false);
+                userRoleEntity.Permissions.Remove(permissionEntity);
             }
 
-            try
-            {
-                foreach (var permissionEntity in permissionsDeleted)
-                {
-                    permissionEntity.DeletedByIdentityId = _auditIdentityProvider.IdentityId.Value;
-                }
-
-                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-
-                foreach (var permissionEntity in permissionsDeleted)
-                {
-                    userRoleEntity.Permissions.Remove(permissionEntity);
-                }
-
-                await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
-
-                if (currentTransaction != null)
-                    await currentTransaction.CommitAsync().ConfigureAwait(false);
-            }
-            catch (Exception)
-            {
-                if (currentTransaction != null)
-                    await currentTransaction.DisposeAsync().ConfigureAwait(false);
-
-                throw;
-            }
+            await _marketParticipantDbContext.SaveChangesAsync().ConfigureAwait(false);
         }
         else
         {
