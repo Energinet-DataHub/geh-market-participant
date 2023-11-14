@@ -73,7 +73,7 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
                     x.ActorId = appRegistration.ExternalActorId.Value;
                     x.ClientSecretCredential = new ActorClientSecretCredentialsEntity
                     {
-                        ExpirationDate = secret.ExpirationDate,
+                        ExpirationDate = secret.ExpirationDate.ToDateTimeOffset(),
                         ClientSecretIdentifier = secret.SecretId.ToString(),
                     };
                 }),
