@@ -161,7 +161,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             var secret = await _graphClient
                 .Applications[foundApp.Id]
                 .AddPassword
-                .PostAsync(new AddPasswordPostRequestBody() { PasswordCredential = passwordCredential })
+                .PostAsync(new AddPasswordPostRequestBody { PasswordCredential = passwordCredential })
                 .ConfigureAwait(false);
 
             if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
@@ -187,7 +187,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 await _graphClient
                     .Applications[foundApp.Id]
                     .RemovePassword
-                    .PostAsync(new RemovePasswordPostRequestBody() { KeyId = secret.KeyId })
+                    .PostAsync(new RemovePasswordPostRequestBody { KeyId = secret.KeyId })
                     .ConfigureAwait(false);
             }
         }

@@ -13,11 +13,10 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,9 +25,6 @@ using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -36,31 +32,29 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixture<KeyCertificateFixture>
+public sealed class AssignActorCertificateHandlerIntegrationTests
 {
     private const string IntegrationActorTestCertificatePublicCer = "integration-actor-test-certificate-public.cer";
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
-    private readonly KeyCertificateFixture _keyCertificateFixture;
+    private readonly CertificateFixture _certificateFixture;
 
     public AssignActorCertificateHandlerIntegrationTests(
         MarketParticipantDatabaseFixture databaseFixture,
-        KeyCertificateFixture keyCertificateFixture)
+        CertificateFixture certificateFixture)
     {
         _databaseFixture = databaseFixture;
-        _keyCertificateFixture = keyCertificateFixture;
+        _certificateFixture = certificateFixture;
     }
 
     [Fact]
     public async Task AssignCertificate_FlowCompleted()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, certificateFixture: _certificateFixture);
         var actor = await _databaseFixture.PrepareActorAsync();
 
         await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
-
-        SetUpCertificateServiceWithFixture(host);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -77,9 +71,9 @@ public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixtur
         var thumbprint = (updatedActor.Credentials as ActorCertificateCredentials)?.CertificateThumbprint;
         var certificateLookupIdentifier = $"{actor.ActorNumber}-{thumbprint}";
 
-        var certificateSecret = await _keyCertificateFixture.CertificateClient.GetSecretAsync(certificateLookupIdentifier);
-        Assert.True(certificateSecret.HasValue);
-        await _keyCertificateFixture.CleanUpCertificateFromStorageAsync(certificateLookupIdentifier);
+        var certificateExists = await _certificateFixture.CertificateExistsAsync(certificateLookupIdentifier);
+        Assert.True(certificateExists);
+        await _certificateFixture.CleanUpCertificateFromStorageAsync(certificateLookupIdentifier);
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
     }
 
@@ -87,12 +81,10 @@ public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixtur
     public async Task AssignCertificate_NoActorFound()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, certificateFixture: _certificateFixture);
 
         await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(Guid.NewGuid(), certificateFileStream);
-
-        SetUpCertificateServiceWithFixture(host);
 
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
@@ -105,7 +97,7 @@ public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixtur
     public async Task AssignCertificate_CredentialsAlreadySet()
     {
         // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, certificateFixture: _certificateFixture);
 
         var actor = await _databaseFixture.PrepareActorAsync();
         await _databaseFixture.AssignActorCredentialsAsync(actor.Id, Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
@@ -113,13 +105,13 @@ public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixtur
         await using var certificateFileStream = SetupTestCertificate(IntegrationActorTestCertificatePublicCer);
         var command = new AssignActorCertificateCommand(actor.Id, certificateFileStream);
 
-        SetUpCertificateServiceWithFixture(host);
-
         await using var scope = host.BeginScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act + assert
-        await Assert.ThrowsAsync<NotSupportedException>(() => mediator.Send(command));
+        var actual = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(command));
+
+        Assert.Equal($"Actor with id {actor.Id} Can not have new credentials generated, as it already has credentials", actual.Message);
     }
 
     private static Stream SetupTestCertificate(string certificateName)
@@ -130,18 +122,5 @@ public sealed class AssignActorCertificateHandlerIntegrationTests : IClassFixtur
         var stream = assembly.GetManifestResourceStream(resourceName);
 
         return stream ?? throw new InvalidOperationException($"Could not find resource {resourceName}");
-    }
-
-    private void SetUpCertificateServiceWithFixture(WebApiIntegrationTestHost host)
-    {
-        var certValidation = new Mock<ICertificateValidation>();
-        certValidation.Setup(e => e.Verify(It.IsAny<X509Certificate2>()));
-
-        var certificateService = new CertificateService(
-            _keyCertificateFixture.CertificateClient,
-            certValidation.Object,
-            new Mock<ILogger<CertificateService>>().Object);
-
-        host.ServiceCollection.Replace(ServiceDescriptor.Singleton<ICertificateService>(certificateService));
     }
 }
