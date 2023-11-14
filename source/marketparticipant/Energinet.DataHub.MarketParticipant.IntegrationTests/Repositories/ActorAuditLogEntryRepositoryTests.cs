@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -21,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositorie
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 using Xunit;
 using Xunit.Categories;
 
@@ -31,6 +33,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 public sealed class ActorAuditLogEntryRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
+
     public ActorAuditLogEntryRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
@@ -113,7 +116,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var result = await actorRepository.AddOrUpdateAsync(actor);
         actor = await actorRepository.GetAsync(result.Value);
         actor!.Name = new ActorName("Test Name 2");
-        await actorRepository.AddOrUpdateAsync(actor!);
+        await actorRepository.AddOrUpdateAsync(actor);
 
         // Act
         var actual = await actorAuditLogEntryRepository
@@ -154,7 +157,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var result = await actorRepository.AddOrUpdateAsync(actor);
         actor = await actorRepository.GetAsync(result.Value);
         actor!.Status = ActorStatus.Active;
-        await actorRepository.AddOrUpdateAsync(actor!);
+        await actorRepository.AddOrUpdateAsync(actor);
 
         // Act
         var actual = await actorAuditLogEntryRepository
@@ -168,5 +171,65 @@ public sealed class ActorAuditLogEntryRepositoryTests
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == ActorStatus.Active.ToString());
         Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue.ToString());
         Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
+    }
+
+    [Fact]
+    public async Task GetAsync_AssignRemoveAssignCredentials_HasCorrectAuditLogs()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+
+        // Arrange - Setup User
+        var user = await _fixture.PrepareUserAsync();
+        host.ServiceCollection.MockFrontendUser(user.Id);
+
+        // Arrange - Setup Actor
+        var actorEntity = await _fixture.PrepareActorAsync();
+        var actorId = new ActorId(actorEntity.Id);
+
+        // Arrange - Setup Repositories
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
+
+        var actorCertificateCredentials = new ActorCertificateCredentials(
+            "mocked_print_A",
+            "mocked_id",
+            SystemClock.Instance.GetCurrentInstant());
+
+        var actorClientSecretCredentials = new ActorClientSecretCredentials(
+            Guid.NewGuid(),
+            SystemClock.Instance.GetCurrentInstant());
+
+        // Make an audited change.
+        var actor = await actorRepository.GetAsync(actorId);
+        actor!.Credentials = actorCertificateCredentials;
+        await actorRepository.AddOrUpdateAsync(actor);
+
+        actor.Credentials = null;
+        await actorRepository.AddOrUpdateAsync(actor);
+
+        actor.Credentials = actorClientSecretCredentials;
+        await actorRepository.AddOrUpdateAsync(actor);
+
+        // Act
+        var actual = await actorAuditLogEntryRepository.GetAsync(actorId);
+
+        // Assert
+        var actorAuditLogs = actual.ToList();
+        Assert.NotEmpty(actorAuditLogs);
+
+        Assert.Contains(actorAuditLogs, entry =>
+            entry is { ActorChangeType: ActorChangeType.CertificateCredentials, PreviousValue: "" } &&
+            entry.CurrentValue == actorCertificateCredentials.CertificateThumbprint);
+
+        Assert.Contains(actorAuditLogs, entry =>
+            entry is { ActorChangeType: ActorChangeType.CertificateCredentials, CurrentValue: "" } &&
+            entry.PreviousValue == actorCertificateCredentials.CertificateThumbprint);
+
+        Assert.Contains(actorAuditLogs, entry =>
+            entry is { ActorChangeType: ActorChangeType.SecretCredentials, PreviousValue: "" } &&
+            entry.CurrentValue == actorClientSecretCredentials.ExpirationDate.ToString("g", CultureInfo.InvariantCulture));
     }
 }

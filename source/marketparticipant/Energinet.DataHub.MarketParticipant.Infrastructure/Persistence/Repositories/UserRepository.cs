@@ -16,28 +16,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
 public sealed class UserRepository : IUserRepository
 {
-    private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
     private readonly IUserIdentityRepository _userIdentityRepository;
 
     public UserRepository(
-        IAuditIdentityProvider auditIdentityProvider,
         IMarketParticipantDbContext marketParticipantDbContext,
         IUserIdentityRepository userIdentityRepository)
     {
-        _auditIdentityProvider = auditIdentityProvider;
         _marketParticipantDbContext = marketParticipantDbContext;
         _userIdentityRepository = userIdentityRepository;
     }
@@ -54,37 +49,13 @@ public sealed class UserRepository : IUserRepository
         entity.MitIdSignupInitiatedAt = user.MitIdSignupInitiatedAt;
         entity.InvitationExpiresAt = user.InvitationExpiresAt;
 
-        var currentDbContext = (DbContext)_marketParticipantDbContext;
-        IDbContextTransaction? currentTransaction = null;
+        UpdateUserRoleAssignments(user.RoleAssignments, entity);
 
-        if (currentDbContext.Database.CurrentTransaction == null)
-        {
-            currentTransaction = await currentDbContext
-                .Database
-                .BeginTransactionAsync()
-                .ConfigureAwait(false);
-        }
+        _marketParticipantDbContext.Users.Update(entity);
 
-        try
-        {
-            await UpdateUserRoleAssignmentsAsync(user.RoleAssignments, entity).ConfigureAwait(false);
-
-            _marketParticipantDbContext.Users.Update(entity);
-
-            await _marketParticipantDbContext
-                .SaveChangesAsync()
-                .ConfigureAwait(false);
-
-            if (currentTransaction != null)
-                await currentTransaction.CommitAsync().ConfigureAwait(false);
-        }
-        catch (Exception)
-        {
-            if (currentTransaction != null)
-                await currentTransaction.DisposeAsync().ConfigureAwait(false);
-
-            throw;
-        }
+        await _marketParticipantDbContext
+            .SaveChangesAsync()
+            .ConfigureAwait(false);
 
         return new UserId(entity.Id);
     }
@@ -127,34 +98,7 @@ public sealed class UserRepository : IUserRepository
         return userEntities.Select(UserMapper.MapFromEntity);
     }
 
-    private IQueryable<UserEntity> BuildUserQuery()
-    {
-        return _marketParticipantDbContext
-            .Users
-            .Include(u => u.RoleAssignments);
-    }
-
-    private async Task<UserEntity> GetOrNewEntityAsync(User user)
-    {
-        if (user.Id.Value == default)
-        {
-            var identity = await _userIdentityRepository
-                .GetAsync(user.ExternalId)
-                .ConfigureAwait(false);
-
-            return new UserEntity
-            {
-                Email = identity!.Email.Address,
-                SharedReferenceId = user.SharedId.Value
-            };
-        }
-
-        return await BuildUserQuery()
-            .FirstAsync(x => x.Id == user.Id.Value)
-            .ConfigureAwait(false);
-    }
-
-    private async Task UpdateUserRoleAssignmentsAsync(IEnumerable<UserRoleAssignment> userRoleAssignments, UserEntity userEntity)
+    private static void UpdateUserRoleAssignments(IEnumerable<UserRoleAssignment> userRoleAssignments, UserEntity userEntity)
     {
         var removedUserRoleAssignments = new HashSet<UserRoleAssignmentEntity>(userEntity.RoleAssignments);
 
@@ -182,17 +126,32 @@ public sealed class UserRepository : IUserRepository
                 });
             }
         }
+    }
 
-        foreach (var removedUserRoleAssignment in removedUserRoleAssignments)
+    private IQueryable<UserEntity> BuildUserQuery()
+    {
+        return _marketParticipantDbContext
+            .Users
+            .Include(u => u.RoleAssignments);
+    }
+
+    private async Task<UserEntity> GetOrNewEntityAsync(User user)
+    {
+        if (user.Id.Value == default)
         {
-            await _marketParticipantDbContext
-                .UserRoleAssignments
-                .Where(ura =>
-                    ura.UserId == removedUserRoleAssignment.UserId &&
-                    ura.ActorId == removedUserRoleAssignment.ActorId &&
-                    ura.UserRoleId == removedUserRoleAssignment.UserRoleId)
-                .ExecuteUpdateAsync(props => props.SetProperty(entity => entity.DeletedByIdentityId, _auditIdentityProvider.IdentityId.Value))
+            var identity = await _userIdentityRepository
+                .GetAsync(user.ExternalId)
                 .ConfigureAwait(false);
+
+            return new UserEntity
+            {
+                Email = identity!.Email.Address,
+                SharedReferenceId = user.SharedId.Value
+            };
         }
+
+        return await BuildUserQuery()
+            .FirstAsync(x => x.Id == user.Id.Value)
+            .ConfigureAwait(false);
     }
 }

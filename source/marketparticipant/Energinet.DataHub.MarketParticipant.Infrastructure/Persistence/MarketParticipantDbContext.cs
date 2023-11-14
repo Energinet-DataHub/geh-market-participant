@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Audit;
@@ -34,8 +35,9 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     {
         _auditIdentityProvider = auditIdentityProvider;
 
-        ChangeTracker.Tracked += (s, e) => OnEntityStateChanged(e.Entry);
-        ChangeTracker.StateChanged += (s, e) => OnEntityStateChanged(e.Entry);
+        // ReSharper disable VirtualMemberCallInConstructor // Follows MS example.
+        ChangeTracker.Tracked += (_, e) => OnEntityStateChanged(e.Entry);
+        ChangeTracker.StateChanged += (_, e) => OnEntityStateChanged(e.Entry);
     }
 
     // Used for mocking.
@@ -43,8 +45,9 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     {
         _auditIdentityProvider = KnownAuditIdentityProvider.TestFramework;
 
-        ChangeTracker.Tracked += (s, e) => OnEntityStateChanged(e.Entry);
-        ChangeTracker.StateChanged += (s, e) => OnEntityStateChanged(e.Entry);
+        // ReSharper disable VirtualMemberCallInConstructor // Follows MS example.
+        ChangeTracker.Tracked += (_, e) => OnEntityStateChanged(e.Entry);
+        ChangeTracker.StateChanged += (_, e) => OnEntityStateChanged(e.Entry);
     }
 
     public DbSet<OrganizationEntity> Organizations { get; private set; } = null!;
@@ -66,10 +69,25 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<PermissionEntity> Permissions { get; private set; } = null!;
     public DbSet<DomainEventEntity> DomainEvents { get; private set; } = null!;
     public DbSet<EmailEventEntity> EmailEventEntries { get; private set; } = null!;
+    public DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; private set; } = null!;
+    public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
 
-    public Task<int> SaveChangesAsync()
+    public async Task<int> SaveChangesAsync()
     {
-        return base.SaveChangesAsync();
+        var hasExternalTransaction = Database.CurrentTransaction != null;
+
+        var affected = await base.SaveChangesAsync().ConfigureAwait(false);
+
+        if (!hasExternalTransaction)
+        {
+            var contextCreatedTransaction = Database.CurrentTransaction;
+            if (contextCreatedTransaction != null)
+            {
+                await contextCreatedTransaction.CommitAsync().ConfigureAwait(false);
+            }
+        }
+
+        return affected;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -100,21 +118,38 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         base.OnModelCreating(modelBuilder);
     }
 
+    // How to do: https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/events
+    // But it does not work: https://github.com/dotnet/EntityFramework.Docs/issues/3267
+    // But there is a workaround: https://github.com/dotnet/EntityFramework.Docs/issues/3888
     private void OnEntityStateChanged(EntityEntry entityEntry)
     {
-        if (entityEntry.Entity is not IAuditedEntity changedByIdentity)
-            return;
-
-        // How to do: https://learn.microsoft.com/en-us/ef/core/logging-events-diagnostics/events
-        // But it does not work: https://github.com/dotnet/EntityFramework.Docs/issues/3267
-        // But there is a workaround: https://github.com/dotnet/EntityFramework.Docs/issues/3888
-        switch (entityEntry.State)
+        if (entityEntry.Entity is IAuditedEntity changedByIdentity)
         {
-            case EntityState.Modified:
-            case EntityState.Added:
-                entityEntry.Property(nameof(IAuditedEntity.Version)).CurrentValue = changedByIdentity.Version + 1;
-                entityEntry.Property(nameof(IAuditedEntity.ChangedByIdentityId)).CurrentValue = _auditIdentityProvider.IdentityId.Value;
-                break;
+            switch (entityEntry.State)
+            {
+                case EntityState.Modified:
+                case EntityState.Added:
+                    entityEntry.Property(nameof(IAuditedEntity.Version)).CurrentValue = changedByIdentity.Version + 1;
+                    entityEntry.Property(nameof(IAuditedEntity.ChangedByIdentityId)).CurrentValue = _auditIdentityProvider.IdentityId.Value;
+                    break;
+            }
         }
+
+        if (entityEntry is { Entity: IDeletableAuditedEntity deletedAuditedEntity, State: EntityState.Deleted })
+        {
+            PatchDeletedBy((dynamic)deletedAuditedEntity);
+        }
+    }
+
+    private void PatchDeletedBy<T>(T entityDeleted)
+        where T : class, IDeletableAuditedEntity
+    {
+        if (Database.CurrentTransaction == null)
+            Database.BeginTransaction();
+
+        Set<T>()
+            .Where(entity => entity == entityDeleted)
+            .ExecuteUpdate(props =>
+                props.SetProperty(prop => prop.DeletedByIdentityId, _auditIdentityProvider.IdentityId.Value));
     }
 }
