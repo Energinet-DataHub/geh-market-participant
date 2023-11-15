@@ -29,10 +29,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDire
 public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticationService
 {
     private readonly GraphServiceClient _graphClient;
+    private readonly bool _enforce2Fa;
 
-    public UserIdentityAuthenticationService(GraphServiceClient graphClient)
+    public UserIdentityAuthenticationService(GraphServiceClient graphClient, bool enforce2Fa)
     {
         _graphClient = graphClient;
+        _enforce2Fa = enforce2Fa;
     }
 
     public async Task AddAuthenticationAsync(ExternalUserId userId, AuthenticationMethod authenticationMethod)
@@ -82,6 +84,9 @@ public sealed class UserIdentityAuthenticationService : IUserIdentityAuthenticat
     public async Task<bool> HasTwoFactorAuthenticationAsync(ExternalUserId userId)
     {
         ArgumentNullException.ThrowIfNull(userId);
+
+        if (!_enforce2Fa)
+            return true;
 
         var builder = GetUserAuthenticationBuilder(userId);
         var methods = await builder.SoftwareOathMethods.GetAsync().ConfigureAwait(false);
