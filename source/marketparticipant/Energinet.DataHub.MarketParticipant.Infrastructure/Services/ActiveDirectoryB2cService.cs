@@ -46,15 +46,14 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
-            var permissions = actor.MarketRoles.Select(m => m.Function).ToList();
+            var permissions = actor.MarketRoles.Select(m => m.Function);
             var b2CPermissions = (await MapEicFunctionsToB2CIdsAsync(permissions).ConfigureAwait(false)).ToList();
-            var enumeratedPermissions = b2CPermissions.ToList();
-            var permissionsToPass = enumeratedPermissions.Select(x => x.ToString()).ToList();
+            var permissionsToPass = b2CPermissions.Select(x => x.ToString());
             var app = await EnsureAppAsync(actor, permissionsToPass).ConfigureAwait(false);
 
             var servicePrincipal = await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
 
-            foreach (var permission in enumeratedPermissions)
+            foreach (var permission in b2CPermissions)
             {
                 await GrantAddedRoleToServicePrincipalAsync(
                         servicePrincipal.Id!,
@@ -111,17 +110,13 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 .IteratePagesAsync<ServicePrincipal, ServicePrincipalCollectionResponse>(_graphClient)
                 .ConfigureAwait(false);
 
-            return servicePrincipals.FirstOrDefault();
+            return servicePrincipals.SingleOrDefault();
         }
 
         private async Task<Microsoft.Graph.Models.Application> EnsureAppAsync(Actor actor, IEnumerable<string> permissions)
         {
-            var app = await FindApplicationRegistrationAsync(actor).ConfigureAwait(false);
-            if (app is not null)
-                return app;
-
-            app = await CreateAppInB2CAsync(actor, permissions).ConfigureAwait(false);
-            return app;
+            return await FindApplicationRegistrationAsync(actor).ConfigureAwait(false) ??
+                   await CreateAppInB2CAsync(actor, permissions).ConfigureAwait(false);
         }
 
         private async Task<ServicePrincipal> EnsureServicePrincipalToAppAsync(Microsoft.Graph.Models.Application app)
@@ -139,12 +134,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var servicePrincipal = servicePrincipals.FirstOrDefault();
 
-            if (servicePrincipal is not null)
-            {
-                return servicePrincipal;
-            }
-
-            return (await _graphClient.ServicePrincipals
+            return servicePrincipal ?? (await _graphClient.ServicePrincipals
                 .PostAsync(new ServicePrincipal
                 {
                     AppId = app.AppId,
@@ -166,7 +156,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
                 .ConfigureAwait(false);
 
-            return applications.FirstOrDefault();
+            return applications.SingleOrDefault();
         }
 
         private async Task<IEnumerable<Guid>> MapEicFunctionsToB2CIdsAsync(IEnumerable<EicFunction> eicFunctions)
