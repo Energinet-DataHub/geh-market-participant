@@ -14,7 +14,6 @@
 
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -24,11 +23,10 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public interface IActiveDirectoryB2CService
     {
         /// <summary>
-        /// Creates a consumer app registration.
+        /// Assigns an application registration to the given actor.
         /// </summary>
         /// <param name="actor">The actor for which to create an app and service principal.</param>
-        /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
-        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(Actor actor);
+        Task AssignApplicationRegistrationAsync(Actor actor);
 
         /// <summary>
         /// Deletes the app and service prinicipal, for the given actor, from active directory.

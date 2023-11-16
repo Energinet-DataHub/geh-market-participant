@@ -39,19 +39,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                     await _activeDirectoryService
                         .DeleteAppRegistrationAsync(actor)
                         .ConfigureAwait(false);
-
-                    actor.ExternalActorId = null;
                 }
             }
             else
             {
                 if (actor.Status is ActorStatus.Active or ActorStatus.Passive)
                 {
-                    var externalActorId = await _activeDirectoryService
-                        .CreateAppRegistrationAsync(actor)
+                    await _activeDirectoryService
+                        .AssignApplicationRegistrationAsync(actor)
                         .ConfigureAwait(false);
-
-                    actor.ExternalActorId = externalActorId.ExternalActorId;
                 }
             }
         }

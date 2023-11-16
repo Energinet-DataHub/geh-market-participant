@@ -64,16 +64,14 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
 
         try
         {
-            var appRegistration = await _b2CFixture.B2CService.CreateAppRegistrationAsync(actor);
-
-            actor.ExternalActorId = appRegistration.ExternalActorId;
+            await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
             var actorEntity = await _databaseFixture.PrepareActorAsync(
                 TestPreparationEntities.ValidOrganization,
                 TestPreparationEntities.ValidActor.Patch(x =>
                 {
                     x.ActorNumber = gln;
-                    x.ActorId = appRegistration.ExternalActorId.Value;
+                    x.ActorId = actor.ExternalActorId!.Value;
                 }),
                 TestPreparationEntities.ValidMarketRole);
 

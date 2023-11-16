@@ -72,9 +72,9 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
 
         try
         {
-            var appRegistration = await _b2CFixture.B2CService.CreateAppRegistrationAsync(actor);
+            await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
-            actor.ExternalActorId = appRegistration.ExternalActorId;
+            actor.ExternalActorId = actor.ExternalActorId;
 
             var secret = await _secretFixture.ClientSecretService.CreateSecretAsync(actor);
 
@@ -83,7 +83,7 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
                 TestPreparationEntities.ValidActor.Patch(x =>
                 {
                     x.ActorNumber = gln;
-                    x.ActorId = appRegistration.ExternalActorId.Value;
+                    x.ActorId = actor.ExternalActorId!.Value;
                     x.ClientSecretCredential = new ActorClientSecretCredentialsEntity
                     {
                         ExpirationDate = secret.ExpirationDate.ToDateTimeOffset(),

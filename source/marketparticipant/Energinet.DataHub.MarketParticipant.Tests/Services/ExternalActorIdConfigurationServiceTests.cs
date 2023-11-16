@@ -15,7 +15,6 @@
 using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -70,7 +69,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         activeDirectoryService.Verify(
-            x => x.CreateAppRegistrationAsync(actor),
+            x => x.AssignApplicationRegistrationAsync(actor),
             Times.Never);
     }
 
@@ -86,7 +85,6 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
         var gln = new MockedGln();
-        var externalActorId = new ExternalActorId(Guid.NewGuid());
         var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
         {
             ExternalActorId = null
@@ -96,10 +94,6 @@ public sealed class ExternalActorIdConfigurationServiceTests
         {
             actor.Status = s;
         }
-
-        activeDirectoryService
-            .Setup(x => x.CreateAppRegistrationAsync(actor))
-            .ReturnsAsync(new CreateAppRegistrationResponse(externalActorId, "fake_value", "fake_value"));
 
         // Act
         await target.AssignExternalActorIdAsync(actor);

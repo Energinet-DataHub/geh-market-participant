@@ -156,14 +156,9 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
             .DeleteAsync();
     }
 
-    public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
-        AppRegistrationObjectId appRegistrationObjectId,
-        AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId)
+    public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(string appId)
     {
-        ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-        ArgumentNullException.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
-
-        var retrievedApp = (await _graphClient!.Applications[appRegistrationObjectId.Value.ToString()]
+        var retrievedApp = (await _graphClient!.Applications //[appRegistrationObjectId.Value.ToString()]
             .GetAsync(x =>
             {
                 x.QueryParameters.Select = new[]
@@ -171,16 +166,37 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                     "appId",
                     "id",
                     "displayName",
-                    "appRoles"
+                    "appRoles",
                 };
+                x.QueryParameters.Filter = $"appId eq '{appId}'";
             })
             .ConfigureAwait(false))!;
 
-        var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
+        var applications = await retrievedApp
+            .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(Client)
+            .ConfigureAwait(false);
+
+        var application = applications.FirstOrDefault() ?? throw new InvalidOperationException("No application found");
+
+        var servicePrincipalCollectionResponse = await _graphClient.ServicePrincipals
+            .GetAsync(x =>
+            {
+                x.QueryParameters.Filter = $"appId eq '{application.AppId}'";
+            })
+            .ConfigureAwait(false);
+
+        var servicePrincipals = await servicePrincipalCollectionResponse!
+            .IteratePagesAsync<ServicePrincipal, ServicePrincipalCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
+
+        var servicePrincipal = servicePrincipals.FirstOrDefault() ?? throw new InvalidOperationException("No service principal found");
+
+        var appRoles = await GetRolesAsync(servicePrincipal.Id!).ConfigureAwait(false);
+
         return new ActiveDirectoryAppInformation(
-            retrievedApp.AppId!,
-            retrievedApp.Id!,
-            retrievedApp.DisplayName!,
+            application.AppId!,
+            application.Id!,
+            application.DisplayName!,
             appRoles);
     }
 

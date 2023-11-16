@@ -15,14 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Graph.Models.ODataErrors;
 using Xunit;
 using Xunit.Categories;
 
@@ -55,15 +52,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             try
             {
                 // Act
-                var response = await _sut
-                    .CreateAppRegistrationAsync(actor);
+                await _sut.AssignApplicationRegistrationAsync(actor);
 
                 // Assert
-                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(
-                    new AppRegistrationObjectId(Guid.Parse(response.AppObjectId)),
-                    new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId));
+                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
 
-                Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
+                Assert.Equal(actor.ExternalActorId.Value.ToString(), app.AppId);
             }
             finally
             {
@@ -82,13 +76,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             });
             try
             {
-                var createAppRegistrationResponse = await _sut
-                    .CreateAppRegistrationAsync(actor);
+                await _sut.AssignApplicationRegistrationAsync(actor);
 
                 // Act
-                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(
-                    new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                    new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
+                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
 
                 // Assert
                 Assert.Equal("d82c211d-cce0-e95e-bd80-c2aedf99f32b", app.AppRoles.First().RoleId);
@@ -111,19 +102,16 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             try
             {
-                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(actor);
+                await _sut.AssignApplicationRegistrationAsync(actor);
+
+                var externalActorId = actor.ExternalActorId!.Value.ToString();
 
                 // Act
-                await _sut
-                    .DeleteAppRegistrationAsync(actor);
+                await _sut.DeleteAppRegistrationAsync(actor);
 
                 // Assert
-                var ex = await Assert.ThrowsAsync<ODataError>(async () => await _graphServiceClientFixture
-                    .GetExistingAppRegistrationAsync(
-                        new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId)));
-
-                Assert.Equal((int)HttpStatusCode.NotFound, ex.ResponseStatusCode);
+                await Assert.ThrowsAsync<InvalidOperationException>(async () => await _graphServiceClientFixture
+                    .GetExistingAppRegistrationAsync(externalActorId));
             }
             finally
             {

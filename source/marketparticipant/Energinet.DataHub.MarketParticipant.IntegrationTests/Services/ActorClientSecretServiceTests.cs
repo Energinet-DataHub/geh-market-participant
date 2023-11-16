@@ -55,14 +55,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             try
             {
-                var createAppRegistrationResponse = await _b2CFixture.B2CService.CreateAppRegistrationAsync(actor);
-
-                actor.ExternalActorId = createAppRegistrationResponse.ExternalActorId;
+                await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
                 // Act
                 var result = await _sut
                     .CreateSecretAsync(actor);
-                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
+
+                var existing = await GetExistingAppAsync(actor.ExternalActorId!);
 
                 // Assert
                 Assert.NotEmpty(result.SecretText);
@@ -87,16 +86,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             try
             {
                 // Arrange
-                var createAppRegistrationResponse = await _b2CFixture.B2CService.CreateAppRegistrationAsync(actor);
-
-                actor.ExternalActorId = createAppRegistrationResponse.ExternalActorId;
+                await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
                 await _sut
                     .CreateSecretAsync(actor);
 
                 // Act
                 var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretAsync(actor));
-                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
+                var existing = await GetExistingAppAsync(actor.ExternalActorId!);
 
                 // Assert
                 Assert.Null(exceptions);

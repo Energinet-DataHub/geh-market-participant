@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
@@ -43,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _activeDirectoryB2BRolesProvider = activeDirectoryB2BRolesProvider;
         }
 
-        public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(Actor actor)
+        public async Task AssignApplicationRegistrationAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
@@ -63,10 +62,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     .ConfigureAwait(false);
             }
 
-            return new CreateAppRegistrationResponse(
-                new ExternalActorId(Guid.Parse(app.AppId!)),
-                app.Id!,
-                servicePrincipal.Id!);
+            actor.ExternalActorId = new ExternalActorId(Guid.Parse(app.AppId!));
         }
 
         public async Task DeleteAppRegistrationAsync(Actor actor)
@@ -92,6 +88,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             await _graphClient.Applications[actorApp.Id]
                 .DeleteAsync()
                 .ConfigureAwait(false);
+
+            actor.ExternalActorId = null;
         }
 
         private static string GenerateActorDisplayName(Actor actor)
