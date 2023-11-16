@@ -105,7 +105,6 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
-        var credentials = Map(from.CertificateCredential) ?? Map(from, from.ClientSecretCredential);
 
         return new Actor(
             new ActorId(from.Id),
@@ -115,26 +114,27 @@ internal static class ActorMapper
             actorStatus,
             marketRoles,
             actorName,
-            credentials);
+            MapCredentials(from));
     }
 
-    private static ActorCredentials? Map(ActorEntity actor, ActorClientSecretCredentialsEntity? from)
+    private static ActorCredentials? MapCredentials(ActorEntity actor)
     {
-        return from is null
-            ? null
-            : new ActorClientSecretCredentials(
+        if (actor.CertificateCredential != null)
+        {
+            return new ActorCertificateCredentials(
+                actor.CertificateCredential.CertificateThumbprint,
+                actor.CertificateCredential.KeyVaultSecretIdentifier,
+                actor.CertificateCredential.ExpirationDate.ToInstant());
+        }
+
+        if (actor.ClientSecretCredential != null)
+        {
+            return new ActorClientSecretCredentials(
                 actor.ActorId!.Value,
-                Guid.Parse(from.ClientSecretIdentifier),
-                from.ExpirationDate.ToInstant());
-    }
+                Guid.Parse(actor.ClientSecretCredential.ClientSecretIdentifier),
+                actor.ClientSecretCredential.ExpirationDate.ToInstant());
+        }
 
-    private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)
-    {
-        return from is null
-            ? null
-            : new ActorCertificateCredentials(
-                from.CertificateThumbprint,
-                from.KeyVaultSecretIdentifier,
-                from.ExpirationDate.ToInstant());
+        return null;
     }
 }
