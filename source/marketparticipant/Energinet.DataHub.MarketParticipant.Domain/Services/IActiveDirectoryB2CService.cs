@@ -58,7 +58,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="externalActorId">TThe unique id for the app.</param>
         /// <returns>The secret created for the application</returns>
         /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this</remarks>
-        Task<(Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId);
+        Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId);
 
         /// <summary>
         /// Removes all client secrets to an App registration

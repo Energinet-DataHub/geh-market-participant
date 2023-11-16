@@ -200,6 +200,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
 
         var actorClientSecretCredentials = new ActorClientSecretCredentials(
             Guid.NewGuid(),
+            Guid.NewGuid(),
             SystemClock.Instance.GetCurrentInstant());
 
         // Make an audited change.
@@ -210,6 +211,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         actor.Credentials = null;
         await actorRepository.AddOrUpdateAsync(actor);
 
+        actor.ExternalActorId = new ExternalActorId(actorClientSecretCredentials.ClientId);
         actor.Credentials = actorClientSecretCredentials;
         await actorRepository.AddOrUpdateAsync(actor);
 
