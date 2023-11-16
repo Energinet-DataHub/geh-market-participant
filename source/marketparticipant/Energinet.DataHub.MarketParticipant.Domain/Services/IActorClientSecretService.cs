@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
         /// <param name="actor">The actor for which to create a client secret for.</param>
         /// <returns>The secret created for the application</returns>
         /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this</remarks>
-        Task<(Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretAsync(Actor actor);
+        Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(Actor actor);
 
         /// <summary>
         /// Remove a given actors client secret.

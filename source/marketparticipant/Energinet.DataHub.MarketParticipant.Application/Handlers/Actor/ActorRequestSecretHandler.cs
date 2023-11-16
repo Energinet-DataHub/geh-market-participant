@@ -55,11 +55,17 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
 
             var secretForApp = await _actorClientSecretService
-                .CreateSecretAsync(actor)
+                .CreateSecretForAppRegistrationAsync(actor)
                 .ConfigureAwait(false);
 
-            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId, secretForApp.ExpirationDate);
-            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
+            actor.Credentials = new ActorClientSecretCredentials(
+                secretForApp.ClientId,
+                secretForApp.SecretId,
+                secretForApp.ExpirationDate);
+
+            await _actorRepository
+                .AddOrUpdateAsync(actor)
+                .ConfigureAwait(false);
 
             return new ActorRequestSecretResponse(secretForApp.SecretText);
         }

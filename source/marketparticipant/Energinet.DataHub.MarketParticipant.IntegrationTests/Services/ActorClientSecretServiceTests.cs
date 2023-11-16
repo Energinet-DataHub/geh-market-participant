@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
                 // Act
                 var result = await _sut
-                    .CreateSecretAsync(actor);
+                    .CreateSecretForAppRegistrationAsync(actor);
 
                 var existing = await GetExistingAppAsync(actor.ExternalActorId!);
 
@@ -89,7 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
                 await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
                 await _sut
-                    .CreateSecretAsync(actor);
+                    .CreateSecretForAppRegistrationAsync(actor);
 
                 // Act
                 var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretAsync(actor));

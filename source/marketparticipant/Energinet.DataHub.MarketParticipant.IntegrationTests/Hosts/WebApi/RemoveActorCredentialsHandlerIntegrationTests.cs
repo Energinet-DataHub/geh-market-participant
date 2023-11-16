@@ -76,7 +76,7 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
 
             actor.ExternalActorId = actor.ExternalActorId;
 
-            var secret = await _actorClientSecretFixture.ClientSecretService.CreateSecretAsync(actor);
+            var secret = await _actorClientSecretFixture.ClientSecretService.CreateSecretForAppRegistrationAsync(actor);
 
             var actorEntity = await _databaseFixture.PrepareActorAsync(
                 TestPreparationEntities.ValidOrganization,

@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             _graphClient = graphClient;
         }
 
-        public async Task<(Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretAsync(Actor actor)
+        public async Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor);
             ArgumentNullException.ThrowIfNull(actor.ExternalActorId);
@@ -67,7 +67,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
             {
-                return (secret.KeyId.Value, secret.SecretText, secret.EndDateTime.Value.ToInstant());
+                return (
+                    actor.ExternalActorId.Value,
+                    secret.KeyId.Value,
+                    secret.SecretText,
+                    secret.EndDateTime.Value.ToInstant());
             }
 
             throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
