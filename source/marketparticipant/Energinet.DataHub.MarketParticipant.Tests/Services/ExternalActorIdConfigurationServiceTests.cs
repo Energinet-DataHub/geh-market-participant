@@ -37,6 +37,11 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryB2CService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
+        activeDirectoryService.Setup(x => x.AssignApplicationRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = new ExternalActorId(Guid.NewGuid()));
+        activeDirectoryService.Setup(x => x.DeleteAppRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = null);
+
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
         var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
@@ -83,6 +88,11 @@ public sealed class ExternalActorIdConfigurationServiceTests
         // Arrange
         var activeDirectoryService = new Mock<IActiveDirectoryB2CService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
+
+        activeDirectoryService.Setup(x => x.AssignApplicationRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = new ExternalActorId(Guid.NewGuid()));
+        activeDirectoryService.Setup(x => x.DeleteAppRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = null);
 
         var gln = new MockedGln();
         var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
