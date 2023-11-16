@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -38,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                 {
                     // There is an external id, but it is no longer allowed.
                     await _activeDirectoryService
-                        .DeleteAppRegistrationAsync(actor.ExternalActorId)
+                        .DeleteAppRegistrationAsync(actor)
                         .ConfigureAwait(false);
 
                     actor.ExternalActorId = null;
@@ -48,11 +47,11 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             {
                 if (actor.Status is ActorStatus.Active or ActorStatus.Passive)
                 {
-                    var response = await _activeDirectoryService
-                        .CreateAppRegistrationAsync(actor.ActorNumber, actor.MarketRoles.Select(m => m.Function).ToList())
+                    var externalActorId = await _activeDirectoryService
+                        .CreateAppRegistrationAsync(actor)
                         .ConfigureAwait(false);
 
-                    actor.ExternalActorId = response.ExternalActorId;
+                    actor.ExternalActorId = externalActorId.ExternalActorId;
                 }
             }
         }

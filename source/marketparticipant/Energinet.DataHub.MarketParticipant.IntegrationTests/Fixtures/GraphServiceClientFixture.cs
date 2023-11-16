@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Common.Configuration;
+using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Microsoft.Graph;
@@ -29,7 +30,9 @@ using User = Microsoft.Graph.Models.User;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
+#pragma warning disable CA1001
 public sealed class GraphServiceClientFixture : IAsyncLifetime
+#pragma warning restore CA1001
 {
     private readonly IntegrationTestConfiguration _integrationTestConfiguration = new();
     private readonly List<ExternalUserId> _createdUsers = new();
@@ -46,7 +49,10 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
         _graphClient = new GraphServiceClient(
             clientSecretCredential,
-            new[] { "https://graph.microsoft.com/.default" });
+            new[]
+            {
+                "https://graph.microsoft.com/.default"
+            });
 
         Environment.SetEnvironmentVariable(Settings.B2CTenant.Key, _integrationTestConfiguration.B2CSettings.Tenant);
         Environment.SetEnvironmentVariable(Settings.B2CServicePrincipalId.Key, _integrationTestConfiguration.B2CSettings.ServicePrincipalId);
@@ -75,8 +81,9 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
                 // User already deleted.
             }
 #pragma warning disable CA1508
-            catch (Exception ex) when (firstException == null)
-#pragma warning restore CA1508
+#pragma warning disable CA1031
+            catch (Exception ex) when (firstException is null)
+#pragma warning restore CA1031
             {
                 // Nothing can be done.
                 firstException = ex;
@@ -88,6 +95,7 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
 
         if (firstException != null)
             throw firstException;
+#pragma warning restore CA1508
     }
 
     public async Task<ExternalUserId> CreateUserAsync(
@@ -97,7 +105,10 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         var newUser = CreateTestUserModel(testEmail);
         newUser.Identities!.Clear();
         newUser.Identities!.AddRange(identities);
-        newUser.OtherMails = new List<string> { testEmail };
+        newUser.OtherMails = new List<string>
+        {
+            testEmail
+        };
 
         var externalUserId = await CreateUserAndAddToCleanUpListAsync(newUser);
         return externalUserId;
@@ -143,6 +154,59 @@ public sealed class GraphServiceClientFixture : IAsyncLifetime
         await Client
             .Users[existingUser.Id]
             .DeleteAsync();
+    }
+
+    public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
+        AppRegistrationObjectId appRegistrationObjectId,
+        AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId)
+    {
+        ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
+        ArgumentNullException.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
+
+        var retrievedApp = (await _graphClient!.Applications[appRegistrationObjectId.Value.ToString()]
+            .GetAsync(x =>
+            {
+                x.QueryParameters.Select = new[]
+                {
+                    "appId",
+                    "id",
+                    "displayName",
+                    "appRoles"
+                };
+            })
+            .ConfigureAwait(false))!;
+
+        var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
+        return new ActiveDirectoryAppInformation(
+            retrievedApp.AppId!,
+            retrievedApp.Id!,
+            retrievedApp.DisplayName!,
+            appRoles);
+    }
+
+    private async Task<IEnumerable<ActiveDirectoryRole>> GetRolesAsync(string servicePrincipalObjectId)
+    {
+        var response = await _graphClient!.ServicePrincipals[servicePrincipalObjectId]
+            .AppRoleAssignments
+            .GetAsync()
+            .ConfigureAwait(false);
+
+        var roles = await response!
+            .IteratePagesAsync<AppRoleAssignment, AppRoleAssignmentCollectionResponse>(_graphClient)
+            .ConfigureAwait(false);
+
+        if (roles is null)
+        {
+            throw new InvalidOperationException($"'{nameof(roles)}' is null");
+        }
+
+        var roleIds = new List<ActiveDirectoryRole>();
+        foreach (var role in roles)
+        {
+            roleIds.Add(new ActiveDirectoryRole(role.AppRoleId.ToString()!));
+        }
+
+        return roleIds;
     }
 
     private async Task<ExternalUserId> CreateUserAndAddToCleanUpListAsync(User newUser)

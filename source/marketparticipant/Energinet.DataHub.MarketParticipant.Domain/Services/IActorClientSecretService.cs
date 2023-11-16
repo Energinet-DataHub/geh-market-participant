@@ -12,28 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
     /// <summary>
-    /// Service for accessing Azure AD.
+    /// Service for managing client secrets for actors.
     /// </summary>
-    public interface IActiveDirectoryB2CService
+    public interface IActorClientSecretService
     {
         /// <summary>
-        /// Creates a consumer app registration.
+        /// Creates a client secret for an actor.
         /// </summary>
-        /// <param name="actor">The actor for which to create an app and service principal.</param>
-        /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
-        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(Actor actor);
+        /// <param name="actor">The actor for which to create a client secret for.</param>
+        /// <returns>The secret created for the application</returns>
+        /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this</remarks>
+        Task<(Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretAsync(Actor actor);
 
         /// <summary>
-        /// Deletes the app and service prinicipal, for the given actor, from active directory.
+        /// Remove a given actors client secret.
         /// </summary>
-        /// <param name="actor">The actor for which to remove the app and service principal.</param>
-        Task DeleteAppRegistrationAsync(Actor actor);
+        /// <param name="actor">The actor for which to remove secrets from.</param>
+        Task RemoveSecretAsync(Actor actor);
     }
 }

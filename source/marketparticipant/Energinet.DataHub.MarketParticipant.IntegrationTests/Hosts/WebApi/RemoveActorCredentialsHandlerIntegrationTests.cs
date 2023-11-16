@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -36,15 +35,18 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly B2CFixture _b2CFixture;
     private readonly CertificateFixture _certificateFixture;
+    private readonly SecretFixture _secretFixture;
 
     public RemoveActorCredentialsHandlerIntegrationTests(
         MarketParticipantDatabaseFixture databaseFixture,
         B2CFixture b2CFixture,
-        CertificateFixture certificateFixture)
+        CertificateFixture certificateFixture,
+        SecretFixture secretFixture)
     {
         _databaseFixture = databaseFixture;
         _b2CFixture = b2CFixture;
         _certificateFixture = certificateFixture;
+        _secretFixture = secretFixture;
     }
 
     [Fact]
@@ -53,19 +55,30 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
         // arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture, _b2CFixture);
 
-        CreateAppRegistrationResponse? appRegistration = null;
+        var gln = new MockedGln();
+
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.Active,
+            new[]
+            {
+                new ActorMarketRole(EicFunction.EnergySupplier)
+            },
+            new ActorName(Guid.NewGuid().ToString()),
+            null);
+
         try
         {
-            var gln = new MockedGln();
+            var appRegistration = await _b2CFixture.B2CService.CreateAppRegistrationAsync(actor);
 
-            appRegistration = await _b2CFixture.B2CService.CreateAppRegistrationAsync(gln, new[]
-            {
-                EicFunction.EnergySupplier,
-            });
+            actor.ExternalActorId = appRegistration.ExternalActorId;
 
-            var secret = await _b2CFixture.B2CService.CreateSecretForAppRegistrationAsync(appRegistration.ExternalActorId);
+            var secret = await _secretFixture.ClientSecretService.CreateSecretAsync(actor);
 
-            var actor = await _databaseFixture.PrepareActorAsync(
+            var actorEntity = await _databaseFixture.PrepareActorAsync(
                 TestPreparationEntities.ValidOrganization,
                 TestPreparationEntities.ValidActor.Patch(x =>
                 {
@@ -79,21 +92,18 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
                 }),
                 TestPreparationEntities.ValidMarketRole);
 
-            Assert.NotNull((await GetActor(host, actor))?.Credentials as ActorClientSecretCredentials);
+            Assert.NotNull((await GetActor(host, actorEntity))?.Credentials as ActorClientSecretCredentials);
 
             // act
-            await SendCommand(host, new RemoveActorCredentialsCommand(actor.Id));
+            await SendCommand(host, new RemoveActorCredentialsCommand(actorEntity.Id));
 
             // asert
-            Assert.Null((await GetActor(host, actor))?.Credentials as ActorClientSecretCredentials);
+            Assert.Null((await GetActor(host, actorEntity))?.Credentials as ActorClientSecretCredentials);
         }
         finally
         {
             // cleanup
-            if (appRegistration != null)
-            {
-                await _b2CFixture.B2CService.DeleteAppRegistrationAsync(appRegistration.ExternalActorId);
-            }
+            await _b2CFixture.B2CService.DeleteAppRegistrationAsync(actor);
         }
     }
 

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
@@ -59,19 +58,19 @@ public sealed class ExternalActorIdConfigurationServiceTests
         {
             Assert.Null(actor.ExternalActorId);
             activeDirectoryService.Verify(
-                x => x.DeleteAppRegistrationAsync(externalActorId),
+                x => x.DeleteAppRegistrationAsync(actor),
                 Times.Once);
         }
         else
         {
             Assert.Equal(externalActorId, actor.ExternalActorId);
             activeDirectoryService.Verify(
-                x => x.DeleteAppRegistrationAsync(It.IsAny<ExternalActorId>()),
+                x => x.DeleteAppRegistrationAsync(actor),
                 Times.Never);
         }
 
         activeDirectoryService.Verify(
-            x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<EicFunction>>()),
+            x => x.CreateAppRegistrationAsync(actor),
             Times.Never);
     }
 
@@ -99,7 +98,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         activeDirectoryService
-            .Setup(x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<EicFunction>>()))
+            .Setup(x => x.CreateAppRegistrationAsync(actor))
             .ReturnsAsync(new CreateAppRegistrationResponse(externalActorId, "fake_value", "fake_value"));
 
         // Act
@@ -116,7 +115,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         activeDirectoryService.Verify(
-            x => x.DeleteAppRegistrationAsync(It.IsAny<ExternalActorId>()),
+            x => x.DeleteAppRegistrationAsync(actor),
             Times.Never);
     }
 }
