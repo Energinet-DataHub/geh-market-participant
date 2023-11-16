@@ -35,18 +35,18 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
     private readonly B2CFixture _b2CFixture;
     private readonly CertificateFixture _certificateFixture;
-    private readonly SecretFixture _secretFixture;
+    private readonly ActorClientSecretFixture _actorClientSecretFixture;
 
     public RemoveActorCredentialsHandlerIntegrationTests(
         MarketParticipantDatabaseFixture databaseFixture,
         B2CFixture b2CFixture,
         CertificateFixture certificateFixture,
-        SecretFixture secretFixture)
+        ActorClientSecretFixture actorClientSecretFixture)
     {
         _databaseFixture = databaseFixture;
         _b2CFixture = b2CFixture;
         _certificateFixture = certificateFixture;
-        _secretFixture = secretFixture;
+        _actorClientSecretFixture = actorClientSecretFixture;
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public sealed class RemoveActorCredentialsHandlerIntegrationTests
 
             actor.ExternalActorId = actor.ExternalActorId;
 
-            var secret = await _secretFixture.ClientSecretService.CreateSecretAsync(actor);
+            var secret = await _actorClientSecretFixture.ClientSecretService.CreateSecretAsync(actor);
 
             var actorEntity = await _databaseFixture.PrepareActorAsync(
                 TestPreparationEntities.ValidOrganization,

@@ -22,7 +22,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
         ICollectionFixture<GraphServiceClientFixture>,
         ICollectionFixture<B2CFixture>,
         ICollectionFixture<CertificateFixture>,
-        ICollectionFixture<SecretFixture>
+        ICollectionFixture<ActorClientSecretFixture>
     {
         // This class has no code, and is never created. Its purpose is simply
         // to be the place to apply [CollectionDefinition] and all the

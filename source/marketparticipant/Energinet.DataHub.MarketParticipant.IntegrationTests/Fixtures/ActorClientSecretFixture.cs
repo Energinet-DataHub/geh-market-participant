@@ -23,7 +23,7 @@ using Xunit;
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
 #pragma warning disable CA1001
-    public sealed class SecretFixture : IAsyncLifetime
+    public sealed class ActorClientSecretFixture : IAsyncLifetime
 #pragma warning restore CA1001
     {
         private GraphServiceClient? _graphClient;

@@ -35,12 +35,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         private readonly GraphServiceClientFixture _graphServiceClientFixture;
         private readonly B2CFixture _b2CFixture;
 
-        public ActorClientSecretServiceTests(GraphServiceClientFixture graphServiceClientFixture, SecretFixture secretFixture, B2CFixture b2CFixture)
+        public ActorClientSecretServiceTests(GraphServiceClientFixture graphServiceClientFixture, ActorClientSecretFixture actorClientSecretFixture, B2CFixture b2CFixture)
         {
             _graphServiceClientFixture = graphServiceClientFixture;
             _b2CFixture = b2CFixture;
 #pragma warning disable CA1062
-            _sut = secretFixture.ClientSecretService;
+            _sut = actorClientSecretFixture.ClientSecretService;
 #pragma warning restore CA1062
         }
 
