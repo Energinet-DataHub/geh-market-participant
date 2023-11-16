@@ -158,6 +158,8 @@ public sealed class ActorRepositoryTests
             Credentials = actorClientSecretCredentials
         };
 
+        actor.ExternalActorId = new ExternalActorId(actorClientSecretCredentials.ClientId);
+
         // Act
         var result = await actorRepository.AddOrUpdateAsync(actor);
         var actual = await actorRepository2.GetAsync(result.Value);

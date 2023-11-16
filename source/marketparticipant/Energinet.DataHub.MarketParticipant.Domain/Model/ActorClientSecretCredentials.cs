@@ -19,14 +19,14 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
     public class ActorClientSecretCredentials : ActorCredentials
     {
-        public ActorClientSecretCredentials(Guid clientSecretId, Guid secretIdentifier, Instant expirationDate)
+        public ActorClientSecretCredentials(Guid clientId, Guid secretIdentifier, Instant expirationDate)
         {
-            ClientSecretId = clientSecretId;
+            ClientId = clientId;
             SecretIdentifier = secretIdentifier;
             ExpirationDate = expirationDate;
         }
 
-        public Guid ClientSecretId { get; }
+        public Guid ClientId { get; }
         public Guid SecretIdentifier { get; }
         public Instant ExpirationDate { get; }
     }
