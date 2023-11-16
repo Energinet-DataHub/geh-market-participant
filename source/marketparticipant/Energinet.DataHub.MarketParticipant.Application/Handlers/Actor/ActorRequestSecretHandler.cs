@@ -22,6 +22,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using FluentValidation;
 using MediatR;
+using NodaTime;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
@@ -59,7 +60,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .ConfigureAwait(false);
 
             actor.Credentials = new ActorClientSecretCredentials(
-                secretForApp.ClientSecretId,
+                secretForApp.ClientId,
                 secretForApp.SecretId,
                 secretForApp.ExpirationDate);
 

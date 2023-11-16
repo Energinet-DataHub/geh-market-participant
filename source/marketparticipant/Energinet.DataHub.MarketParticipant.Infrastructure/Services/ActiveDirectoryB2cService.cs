@@ -142,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             }
         }
 
-        public async Task<(Guid ClientSecretId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
+        public async Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
         {
             ArgumentNullException.ThrowIfNull(externalActorId);
 
