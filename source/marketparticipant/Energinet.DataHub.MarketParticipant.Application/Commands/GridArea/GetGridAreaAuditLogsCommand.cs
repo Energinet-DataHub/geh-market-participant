@@ -12,16 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
-using FluentValidation;
+using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Validation;
-
-public sealed class GetGridAreaAuditLogEntriesCommandRuleSet : AbstractValidator<GetGridAreaAuditLogEntriesCommand>
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public GetGridAreaAuditLogEntriesCommandRuleSet()
-    {
-        RuleFor(command => command.GridAreaId)
-            .NotEmpty();
-    }
+    public sealed record GetGridAreaAuditLogsCommand(Guid GridAreaId) : IRequest<GetGridAreaAuditLogsResponse>;
 }

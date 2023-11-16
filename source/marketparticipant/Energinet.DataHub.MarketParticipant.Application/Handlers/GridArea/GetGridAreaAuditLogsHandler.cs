@@ -24,16 +24,16 @@ using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Applicati
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
 {
-    public sealed class GetGridAreaAuditLogEntriesHandler : IRequestHandler<GetGridAreaAuditLogEntriesCommand, GetGridAreaAuditLogEntriesResponse>
+    public sealed class GetGridAreaAuditLogsHandler : IRequestHandler<GetGridAreaAuditLogsCommand, GetGridAreaAuditLogsResponse>
     {
         private readonly IGridAreaAuditLogEntryRepository _repository;
 
-        public GetGridAreaAuditLogEntriesHandler(IGridAreaAuditLogEntryRepository repository)
+        public GetGridAreaAuditLogsHandler(IGridAreaAuditLogEntryRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<GetGridAreaAuditLogEntriesResponse> Handle(GetGridAreaAuditLogEntriesCommand request, CancellationToken cancellationToken)
+        public async Task<GetGridAreaAuditLogsResponse> Handle(GetGridAreaAuditLogsCommand request, CancellationToken cancellationToken)
         {
             ArgumentNullException.ThrowIfNull(request, nameof(request));
 
@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
                      (GridAreaAuditLogEntryField)entry.Field));
             }
 
-            return new GetGridAreaAuditLogEntriesResponse(entriesDto);
+            return new GetGridAreaAuditLogsResponse(entriesDto);
         }
     }
 }

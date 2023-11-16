@@ -21,7 +21,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization
         string Name,
         string BusinessRegisterIdentifier,
         string Domain,
-        string? Comment,
         string Status,
         AddressDto Address);
 }

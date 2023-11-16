@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
             var actorId = new ActorId(Guid.NewGuid());
 
@@ -91,7 +91,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 globalLocationNumberUniquenessService.Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var globalLocationNumber = new MockedGln();
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
 
@@ -129,7 +129,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
@@ -170,7 +170,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
                 uniqueMarketRoleGridAreaRuleService.Object);
 
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain, null);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };

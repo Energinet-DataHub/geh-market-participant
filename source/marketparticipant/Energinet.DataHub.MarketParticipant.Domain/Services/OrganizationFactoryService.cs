@@ -39,14 +39,13 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             string name,
             BusinessRegisterIdentifier businessRegisterIdentifier,
             Address address,
-            OrganizationDomain domain,
-            string? comment)
+            OrganizationDomain domain)
         {
             ArgumentNullException.ThrowIfNull(name, nameof(name));
             ArgumentNullException.ThrowIfNull(businessRegisterIdentifier, nameof(businessRegisterIdentifier));
             ArgumentNullException.ThrowIfNull(address, nameof(address));
 
-            var newOrganization = new Organization(name, businessRegisterIdentifier, address, domain, comment);
+            var newOrganization = new Organization(name, businessRegisterIdentifier, address, domain);
 
             await _uniqueOrganizationBusinessRegisterIdentifierService
                 .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization).ConfigureAwait(false);
