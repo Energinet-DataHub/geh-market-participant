@@ -58,8 +58,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                 .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
                 .ConfigureAwait(false);
 
-            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId, secretForApp.ExpirationDate);
-            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
+            actor.Credentials = new ActorClientSecretCredentials(
+                secretForApp.ClientSecretId,
+                secretForApp.SecretId,
+                secretForApp.ExpirationDate);
+
+            await _actorRepository
+                .AddOrUpdateAsync(actor)
+                .ConfigureAwait(false);
 
             return new ActorRequestSecretResponse(secretForApp.SecretText);
         }

@@ -57,7 +57,7 @@ public sealed class GetActorCredentialsHandler : IRequestHandler<GetActorCredent
                     new ActorCredentialsDto(
                         null,
                         new ActorClientSecretCredentialsDto(
-                            actorClientSecretCredentials.ClientSecretIdentifier,
+                            actorClientSecretCredentials.ClientSecretId,
                             actorClientSecretCredentials.ExpirationDate.ToDateTimeOffset()))),
             _ => throw new InvalidOperationException($"Unknown credentials type: {actor.Credentials.GetType()}")
         };

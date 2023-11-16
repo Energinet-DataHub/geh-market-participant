@@ -67,7 +67,7 @@ internal static class ActorMapper
             case ActorClientSecretCredentials credentials:
                 to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
                 {
-                    ClientSecretIdentifier = credentials.ClientSecretIdentifier.ToString(),
+                    ClientSecretIdentifier = credentials.SecretIdentifier.ToString(),
                     ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
                 };
                 to.CertificateCredential = null;
@@ -105,7 +105,7 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
-        var credentials = Map(from.CertificateCredential) ?? Map(from.ClientSecretCredential);
+        var credentials = Map(from.CertificateCredential) ?? Map(from, from.ClientSecretCredential);
 
         return new Actor(
             new ActorId(from.Id),
@@ -118,11 +118,14 @@ internal static class ActorMapper
             credentials);
     }
 
-    private static ActorCredentials? Map(ActorClientSecretCredentialsEntity? from)
+    private static ActorCredentials? Map(ActorEntity actor, ActorClientSecretCredentialsEntity? from)
     {
         return from is null
             ? null
-            : new ActorClientSecretCredentials(Guid.Parse(from.ClientSecretIdentifier), from.ExpirationDate.ToInstant());
+            : new ActorClientSecretCredentials(
+                actor.ActorId!.Value,
+                Guid.Parse(from.ClientSecretIdentifier),
+                from.ExpirationDate.ToInstant());
     }
 
     private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)

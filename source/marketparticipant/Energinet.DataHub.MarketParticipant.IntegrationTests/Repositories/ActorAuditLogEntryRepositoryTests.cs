@@ -200,6 +200,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
 
         var actorClientSecretCredentials = new ActorClientSecretCredentials(
             Guid.NewGuid(),
+            Guid.NewGuid(),
             SystemClock.Instance.GetCurrentInstant());
 
         // Make an audited change.

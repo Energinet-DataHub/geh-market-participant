@@ -148,7 +148,10 @@ public sealed class ActorRepositoryTests
 
         var organization = await _fixture.PrepareOrganizationAsync();
         var endDate = DateTime.UtcNow.AddYears(1).ToInstant();
-        var actorClientSecretCredentials = new ActorClientSecretCredentials(Guid.NewGuid(), endDate);
+        var actorClientSecretCredentials = new ActorClientSecretCredentials(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            endDate);
 
         var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
         {
@@ -165,7 +168,7 @@ public sealed class ActorRepositoryTests
         Assert.Equal(actor.OrganizationId, actual.OrganizationId);
         Assert.Equal(actor.ActorNumber, actual.ActorNumber);
         Assert.IsType<ActorClientSecretCredentials>(actual.Credentials);
-        Assert.Equal(actorClientSecretCredentials.ClientSecretIdentifier, (actual.Credentials as ActorClientSecretCredentials)?.ClientSecretIdentifier);
+        Assert.Equal(actorClientSecretCredentials.SecretIdentifier, (actual.Credentials as ActorClientSecretCredentials)?.SecretIdentifier);
         Assert.Equal(endDate, (actual.Credentials as ActorClientSecretCredentials)?.ExpirationDate);
     }
 
