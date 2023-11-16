@@ -211,6 +211,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         actor.Credentials = null;
         await actorRepository.AddOrUpdateAsync(actor);
 
+        actor.ExternalActorId = new ExternalActorId(actorClientSecretCredentials.ClientId);
         actor.Credentials = actorClientSecretCredentials;
         await actorRepository.AddOrUpdateAsync(actor);
 
