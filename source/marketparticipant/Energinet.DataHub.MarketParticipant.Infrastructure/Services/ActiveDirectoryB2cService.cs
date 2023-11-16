@@ -48,10 +48,8 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
             var permissions = actor.MarketRoles.Select(m => m.Function);
             var b2CPermissions = (await MapEicFunctionsToB2CIdsAsync(permissions).ConfigureAwait(false)).ToList();
-            var permissionsToPass = b2CPermissions.Select(x => x.ToString());
-            var app = await EnsureAppAsync(actor, permissionsToPass).ConfigureAwait(false);
-
-            var servicePrincipal = await EnsureServicePrincipalToAppAsync(app).ConfigureAwait(false);
+            var applicationRegistration = await EnsureApplicationRegistrationAsync(actor, b2CPermissions).ConfigureAwait(false);
+            var servicePrincipal = await EnsureServicePrincipalToAppAsync(applicationRegistration).ConfigureAwait(false);
 
             foreach (var permission in b2CPermissions)
             {
@@ -61,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                     .ConfigureAwait(false);
             }
 
-            actor.ExternalActorId = new ExternalActorId(Guid.Parse(app.AppId!));
+            actor.ExternalActorId = new ExternalActorId(Guid.Parse(applicationRegistration.AppId!));
         }
 
         public async Task DeleteAppRegistrationAsync(Actor actor)
@@ -113,7 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return servicePrincipals.SingleOrDefault();
         }
 
-        private async Task<Microsoft.Graph.Models.Application> EnsureAppAsync(Actor actor, IEnumerable<string> permissions)
+        private async Task<Microsoft.Graph.Models.Application> EnsureApplicationRegistrationAsync(Actor actor, IEnumerable<Guid> permissions)
         {
             return await FindApplicationRegistrationAsync(actor).ConfigureAwait(false) ??
                    await CreateAppInB2CAsync(actor, permissions).ConfigureAwait(false);
@@ -196,12 +194,12 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         private async Task<Microsoft.Graph.Models.Application> CreateAppInB2CAsync(
             Actor actor,
-            IEnumerable<string> permissions)
+            IEnumerable<Guid> permissions)
         {
             var resourceAccesses = permissions.Select(permission =>
                 new ResourceAccess
                 {
-                    Id = Guid.Parse(permission),
+                    Id = permission,
                     Type = "Role",
                 }).ToList();
 
