@@ -37,6 +37,8 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class GetActorAuditLogsHandlerIntegrationTests
 {
+    private readonly Guid _externalId = Guid.NewGuid();
+
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
     public GetActorAuditLogsHandlerIntegrationTests(
@@ -110,6 +112,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     public Task GetAuditLogs_ChangeSecretCredentials_IsAudited()
     {
         var expected = new ActorClientSecretCredentials(
+            _externalId,
             Guid.NewGuid(),
             DateTimeOffset.Parse("2020-01-01", CultureInfo.InvariantCulture).ToInstant());
 
@@ -185,6 +188,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
     public Task GetAuditLogs_RemoveClientSecretCredentials_IsAudited()
     {
         var expected = new ActorClientSecretCredentials(
+            _externalId,
             Guid.NewGuid(),
             DateTimeOffset.Parse("2021-01-01", CultureInfo.InvariantCulture).ToInstant());
 
@@ -291,7 +295,10 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
-        var actorEntity = await _databaseFixture.PrepareActorAsync();
+        var actorEntity = await _databaseFixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(a => a.ActorId = _externalId),
+            TestPreparationEntities.ValidMarketRole);
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
 
