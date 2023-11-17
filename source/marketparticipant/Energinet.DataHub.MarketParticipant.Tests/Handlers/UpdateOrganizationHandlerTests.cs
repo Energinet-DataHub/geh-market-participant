@@ -53,20 +53,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var validAddressDto = new AddressDto(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-
             var organization = new Organization(
                 new OrganizationId(orgId),
                 "fake_value",
                 validBusinessRegisterIdentifier,
                 validAddress,
                 new OrganizationDomain("energinet.dk"),
-                "Test Comment",
                 OrganizationStatus.Active);
 
             organizationExistsHelperService
@@ -77,7 +69,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active", "TestDomain.dk");
+            var changeDto = new ChangeOrganizationDto("New name", "Active", "TestDomain.dk");
 
             var command = new UpdateOrganizationCommand(orgId, changeDto);
 
@@ -107,20 +99,12 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 "Test City",
                 "Test Country");
 
-            var validAddressDto = new AddressDto(
-                "test Street",
-                "1",
-                "1111",
-                "Test City",
-                "Test Country");
-
             var dbOrganization = new Organization(
                 new OrganizationId(orgId),
                 "fake_value",
                 validBusinessRegisterIdentifier,
                 validAddress,
                 new OrganizationDomain("energinet.dk"),
-                "Test Comment",
                 OrganizationStatus.Deleted);
 
             organizationExistsHelperService
@@ -131,7 +115,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Organization>()))
                 .ReturnsAsync(new Result<OrganizationId, OrganizationError>(new OrganizationId(orgId)));
 
-            var changeOrganizationDto = new ChangeOrganizationDto("New name", validBusinessRegisterIdentifier.Identifier, validAddressDto, "Test Comment 2", "Active", "TestDomain");
+            var changeOrganizationDto = new ChangeOrganizationDto("New name", "Active", "TestDomain");
 
             var command = new UpdateOrganizationCommand(orgId, changeOrganizationDto);
 

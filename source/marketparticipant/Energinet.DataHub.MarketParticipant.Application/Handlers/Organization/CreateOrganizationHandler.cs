@@ -45,7 +45,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization
             var cvr = new BusinessRegisterIdentifier(request.Organization.BusinessRegisterIdentifier);
 
             var organization = await _organizationFactoryService
-                .CreateAsync(request.Organization.Name, cvr, address, domain, request.Organization.Comment)
+                .CreateAsync(request.Organization.Name, cvr, address, domain)
                 .ConfigureAwait(false);
 
             return new CreateOrganizationResponse(organization.Id.Value);

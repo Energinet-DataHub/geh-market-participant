@@ -30,7 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
                 organization.Domain.Value,
-                organization.Comment,
                 organization.Status.ToString(),
                 Map(organization.Address));
         }

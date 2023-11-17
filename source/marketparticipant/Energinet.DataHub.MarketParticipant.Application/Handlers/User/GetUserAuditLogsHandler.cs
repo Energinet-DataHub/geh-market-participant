@@ -23,14 +23,14 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
-public sealed class GetUserAuditLogEntriesHandler
-    : IRequestHandler<GetUserAuditLogsCommand, GetUserAuditLogResponse>
+public sealed class GetUserAuditLogsHandler
+    : IRequestHandler<GetUserAuditLogsCommand, GetUserAuditLogsResponse>
 {
     private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
     private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
     private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
 
-    public GetUserAuditLogEntriesHandler(
+    public GetUserAuditLogsHandler(
         IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
         IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
         IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository)
@@ -40,7 +40,7 @@ public sealed class GetUserAuditLogEntriesHandler
         _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
     }
 
-    public async Task<GetUserAuditLogResponse> Handle(
+    public async Task<GetUserAuditLogsResponse> Handle(
         GetUserAuditLogsCommand request,
         CancellationToken cancellationToken)
     {
@@ -60,7 +60,7 @@ public sealed class GetUserAuditLogEntriesHandler
             .GetAsync(userId)
             .ConfigureAwait(false);
 
-        return new GetUserAuditLogResponse(
+        return new GetUserAuditLogsResponse(
             roleAssignmentAuditLogs.Select(Map),
             userInviteLogs.Select(MapInvites),
             userIdentityLogs.Select(MapIdentity));

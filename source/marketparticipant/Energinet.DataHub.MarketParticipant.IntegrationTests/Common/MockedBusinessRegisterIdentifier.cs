@@ -17,13 +17,26 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 
-public static class MockedBusinessRegisterIdentifier
+public sealed class MockedBusinessRegisterIdentifier
 {
     private static int _no = 10000000;
+    private readonly string _value;
+
+    public MockedBusinessRegisterIdentifier()
+    {
+        ++_no;
+        _value = _no.ToString(CultureInfo.InvariantCulture);
+    }
+
+#pragma warning disable CA1062, CA2225, CA5394
+    public static implicit operator BusinessRegisterIdentifier(MockedBusinessRegisterIdentifier mock)
+    {
+        return new BusinessRegisterIdentifier(mock._value);
+    }
+#pragma warning restore
 
     public static BusinessRegisterIdentifier New()
     {
-        ++_no;
-        return new(_no.ToString(CultureInfo.InvariantCulture));
+        return new MockedBusinessRegisterIdentifier();
     }
 }

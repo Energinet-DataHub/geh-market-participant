@@ -110,8 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 "TestOrg",
                 new BusinessRegisterIdentifier("identifier"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty),
-                orgDomainToTest,
-                "comment");
+                orgDomainToTest);
 
             organizationRepositoryMock
                 .Setup(o => o.GetAsync(It.IsAny<OrganizationId>()))

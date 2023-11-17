@@ -31,7 +31,6 @@ internal static class TestPreparationModels
         MockedBusinessRegisterIdentifier.New(),
         new Address("Vej Allé", "7", "7100", "Vejle", "DK"),
         new MockedDomain(),
-        null,
         OrganizationStatus.Active);
 
     public static Actor MockedActor() => MockedActor(Guid.NewGuid(), Guid.NewGuid());

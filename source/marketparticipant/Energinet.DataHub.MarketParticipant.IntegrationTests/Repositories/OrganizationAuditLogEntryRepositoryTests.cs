@@ -64,12 +64,6 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
     [Theory]
     [InlineData(OrganizationChangeType.Name, "New Name")]
     [InlineData(OrganizationChangeType.DomainChange, "NewDomain.dk")]
-    [InlineData(OrganizationChangeType.BusinessRegisterIdentifier, "12345678")]
-    [InlineData(OrganizationChangeType.AddressCountry, "Test Country 2")]
-    [InlineData(OrganizationChangeType.AddressCity, "Test City 2")]
-    [InlineData(OrganizationChangeType.AddressNumber, "12")]
-    [InlineData(OrganizationChangeType.AddressStreetName, "test Street2")]
-    [InlineData(OrganizationChangeType.AddressZipCode, "2222")]
     public async Task GetAsync_WithAuditLogs_CanBeReadBack(OrganizationChangeType changeType, string newValue)
     {
         // Arrange
@@ -78,7 +72,7 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         var user = await _fixture.PrepareUserAsync();
         host.ServiceCollection.MockFrontendUser(user.Id);
 
-        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, "Test Comment");
+        var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
         await using var scope = host.BeginScope();
         var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
@@ -89,46 +83,23 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
         var organization = await organizationRepository.GetAsync(orgId.Value);
-        var orgValue = string.Empty;
+        string orgValue;
+
         switch (changeType)
         {
             case OrganizationChangeType.Name:
                 orgValue = organization!.Name;
-                organization!.Name = newValue;
+                organization.Name = newValue;
                 break;
             case OrganizationChangeType.DomainChange:
                 orgValue = organization!.Domain.Value;
-                organization!.Domain = new OrganizationDomain(newValue);
-                break;
-            case OrganizationChangeType.BusinessRegisterIdentifier:
-                orgValue = organization!.BusinessRegisterIdentifier.Identifier;
-                organization!.BusinessRegisterIdentifier = new BusinessRegisterIdentifier(newValue);
-                break;
-            case OrganizationChangeType.AddressCity:
-                orgValue = organization!.Address.City;
-                organization!.Address = _validAddress with { City = newValue };
-                break;
-            case OrganizationChangeType.AddressCountry:
-                orgValue = organization!.Address.Country;
-                organization!.Address = _validAddress with { Country = newValue };
-                break;
-            case OrganizationChangeType.AddressNumber:
-                orgValue = organization!.Address.Number;
-                organization!.Address = _validAddress with { Number = newValue };
-                break;
-            case OrganizationChangeType.AddressStreetName:
-                orgValue = organization!.Address.StreetName;
-                organization!.Address = _validAddress with { StreetName = newValue };
-                break;
-            case OrganizationChangeType.AddressZipCode:
-                orgValue = organization!.Address.ZipCode;
-                organization!.Address = _validAddress with { ZipCode = newValue };
+                organization.Domain = new OrganizationDomain(newValue);
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
         }
 
-        await organizationRepository.AddOrUpdateAsync(organization!);
+        await organizationRepository.AddOrUpdateAsync(organization);
 
         // Act
         var actual = await organizationAuditLogEntryRepository

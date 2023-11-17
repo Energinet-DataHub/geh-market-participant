@@ -85,7 +85,7 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
         await mediator.Send(updateCommand3);
 
         // Assert
-        var response = await mediator.Send(new GetGridAreaAuditLogEntriesCommand(gridArea.Id));
+        var response = await mediator.Send(new GetGridAreaAuditLogsCommand(gridArea.Id));
         var auditLogs = response.GridAreaAuditLogEntries.ToList();
 
         Assert.Equal("NewGridAreaName1", auditLogs[0].NewValue);

@@ -80,7 +80,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [AuthorizeUser(PermissionId.GridAreasManage)]
         public async Task<ActionResult<IEnumerable<GridAreaAuditLogEntryDto>>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
-            var command = new GetGridAreaAuditLogEntriesCommand(gridAreaId);
+            var command = new GetGridAreaAuditLogsCommand(gridAreaId);
             var response = await _mediator.Send(command).ConfigureAwait(false);
             return Ok(response.GridAreaAuditLogEntries);
         }
