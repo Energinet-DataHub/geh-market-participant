@@ -182,14 +182,22 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                 AppRoleId = roleId,
             };
 
-            var role = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
+            var appRoleAssignedTo = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
+                .AppRoleAssignments
+                .GetAsync().ConfigureAwait(false);
+
+            var roles = await appRoleAssignedTo!
+                .IteratePagesAsync<AppRoleAssignment, AppRoleAssignmentCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            if (roles.Any(x => x.AppRoleId == roleId))
+            {
+                return;
+            }
+
+            await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
                 .AppRoleAssignedTo
                 .PostAsync(appRole).ConfigureAwait(false);
-
-            if (role is null)
-            {
-                throw new InvalidOperationException($"The object: '{nameof(role)}' is null.");
-            }
         }
 
         private async Task<Microsoft.Graph.Models.Application> CreateAppInB2CAsync(
