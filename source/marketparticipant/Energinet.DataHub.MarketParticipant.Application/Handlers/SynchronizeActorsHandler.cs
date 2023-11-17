@@ -64,7 +64,6 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
                     .GetAsync(new ActorId(nextEntry.Value))
                     .ConfigureAwait(false))!;
 
-                // TODO: This service must be replaced with a reliable version in a future PR.
                 await _externalActorIdConfigurationService
                     .AssignExternalActorIdAsync(actor)
                     .ConfigureAwait(false);

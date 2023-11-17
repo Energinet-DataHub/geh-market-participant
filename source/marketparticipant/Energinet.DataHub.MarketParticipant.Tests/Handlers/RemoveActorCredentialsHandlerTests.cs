@@ -39,8 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
+            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
 
@@ -60,8 +60,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
+            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
@@ -85,8 +85,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
+            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);

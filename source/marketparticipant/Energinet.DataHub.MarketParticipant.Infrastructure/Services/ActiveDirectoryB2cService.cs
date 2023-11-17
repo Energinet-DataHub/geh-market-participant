@@ -17,196 +17,140 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
-using Microsoft.Extensions.Logging;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Services.ActiveDirectory;
 using Microsoft.Graph;
-using Microsoft.Graph.Applications.Item.AddPassword;
-using Microsoft.Graph.Applications.Item.RemovePassword;
 using Microsoft.Graph.Models;
-using NodaTime;
-using NodaTime.Extensions;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 {
     public sealed class ActiveDirectoryB2CService : IActiveDirectoryB2CService
     {
-        private const string SecretDisplayName = "B2C Login - Secret";
+        private const string ActorApplicationRegistrationDisplayNamePrefix = "Actor";
         private readonly GraphServiceClient _graphClient;
         private readonly AzureAdConfig _azureAdConfig;
         private readonly IActiveDirectoryB2BRolesProvider _activeDirectoryB2BRolesProvider;
-        private readonly ILogger<ActiveDirectoryB2CService> _logger;
 
         public ActiveDirectoryB2CService(
             GraphServiceClient graphClient,
             AzureAdConfig config,
-            IActiveDirectoryB2BRolesProvider activeDirectoryB2BRolesProvider,
-            ILogger<ActiveDirectoryB2CService> logger)
+            IActiveDirectoryB2BRolesProvider activeDirectoryB2BRolesProvider)
         {
             _graphClient = graphClient;
             _azureAdConfig = config;
             _activeDirectoryB2BRolesProvider = activeDirectoryB2BRolesProvider;
-            _logger = logger;
         }
 
-        public async Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            ActorNumber actorNumber,
-            IReadOnlyCollection<EicFunction> permissions)
+        public async Task AssignApplicationRegistrationAsync(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(actorNumber, nameof(actorNumber));
-            ArgumentNullException.ThrowIfNull(permissions, nameof(permissions));
+            ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 
+            var permissions = actor.MarketRoles.Select(m => m.Function);
             var b2CPermissions = (await MapEicFunctionsToB2CIdsAsync(permissions).ConfigureAwait(false)).ToList();
-            var enumeratedPermissions = b2CPermissions.ToList();
-            var permissionsToPass = enumeratedPermissions.Select(x => x.ToString()).ToList();
-            try
+            var applicationRegistration = await EnsureApplicationRegistrationAsync(actor, b2CPermissions).ConfigureAwait(false);
+            var servicePrincipal = await EnsureServicePrincipalToAppAsync(applicationRegistration).ConfigureAwait(false);
+
+            foreach (var permission in b2CPermissions)
             {
-                var app = await CreateAppInB2CAsync(actorNumber.Value, permissionsToPass).ConfigureAwait(false);
-
-                var servicePrincipal = await AddServicePrincipalToAppInB2CAsync(app.AppId!).ConfigureAwait(false);
-
-                foreach (var permission in enumeratedPermissions)
-                {
-                    await GrantAddedRoleToServicePrincipalAsync(
-                            servicePrincipal.Id!,
-                            permission)
-                        .ConfigureAwait(false);
-                }
-
-                return new CreateAppRegistrationResponse(
-                    new ExternalActorId(Guid.Parse(app.AppId!)),
-                    app.Id!,
-                    servicePrincipal.Id!);
+                await GrantAddedRoleToServicePrincipalAsync(
+                        servicePrincipal.Id!,
+                        permission)
+                    .ConfigureAwait(false);
             }
-            catch (Exception e)
-            {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
-                throw;
-            }
+
+            actor.ExternalActorId = new ExternalActorId(Guid.Parse(applicationRegistration.AppId!));
         }
 
-        public async Task DeleteAppRegistrationAsync(ExternalActorId externalActorId)
+        public async Task DeleteAppRegistrationAsync(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(externalActorId);
+            ArgumentNullException.ThrowIfNull(actor);
 
-            try
+            var actorApp = await FindApplicationRegistrationAsync(actor).ConfigureAwait(false);
+            if (actorApp is null)
             {
-                var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
-                if (foundApp == null)
-                {
-                    throw new InvalidOperationException("Cannot delete registration from B2C; application was not found.");
-                }
+                return;
+            }
 
-                await _graphClient.Applications[foundApp.Id]
+            // Remove service Principal for actor application registration
+            var appServicePrincipal = await GetServicePrincipalAsync(actorApp).ConfigureAwait(false);
+            if (appServicePrincipal is not null)
+            {
+                await _graphClient.ServicePrincipals[appServicePrincipal.Id]
                     .DeleteAsync()
                     .ConfigureAwait(false);
             }
-            catch (Exception e)
-            {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
-                throw;
-            }
-        }
 
-        public async Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
-            AppRegistrationObjectId appRegistrationObjectId,
-            AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId)
-        {
-            ArgumentNullException.ThrowIfNull(appRegistrationObjectId, nameof(appRegistrationObjectId));
-            ArgumentNullException.ThrowIfNull(appRegistrationServicePrincipalObjectId, nameof(appRegistrationServicePrincipalObjectId));
-
-            try
-            {
-                var retrievedApp = (await _graphClient.Applications[appRegistrationObjectId.Value.ToString()]
-                    .GetAsync(x =>
-                    {
-                        x.QueryParameters.Select = new[]
-                        {
-                            "appId", "id", "displayName", "appRoles"
-                        };
-                    })
-                    .ConfigureAwait(false))!;
-
-                var appRoles = await GetRolesAsync(appRegistrationServicePrincipalObjectId.Value).ConfigureAwait(false);
-                return new ActiveDirectoryAppInformation(
-                    retrievedApp.AppId!,
-                    retrievedApp.Id!,
-                    retrievedApp.DisplayName!,
-                    appRoles);
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
-                throw;
-            }
-        }
-
-        public async Task<(Guid ClientId, Guid SecretId, string SecretText, Instant ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId)
-        {
-            ArgumentNullException.ThrowIfNull(externalActorId);
-
-            var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
-            if (foundApp == null)
-            {
-                throw new InvalidOperationException("Cannot add secret to B2C; application was not found.");
-            }
-
-            var passwordCredential = new PasswordCredential
-            {
-                DisplayName = SecretDisplayName,
-                StartDateTime = DateTimeOffset.UtcNow,
-                EndDateTime = DateTimeOffset.UtcNow.AddMonths(6),
-                KeyId = Guid.NewGuid(),
-            };
-
-            var secret = await _graphClient
-                .Applications[foundApp.Id]
-                .AddPassword
-                .PostAsync(new AddPasswordPostRequestBody { PasswordCredential = passwordCredential })
+            // Remove actor application
+            await _graphClient.Applications[actorApp.Id]
+                .DeleteAsync()
                 .ConfigureAwait(false);
 
-            if (secret is { SecretText: not null, KeyId: not null, EndDateTime: not null })
-            {
-                return (
-                    externalActorId.Value,
-                    secret.KeyId.Value,
-                    secret.SecretText,
-                    secret.EndDateTime.Value.ToInstant());
-            }
-
-            throw new InvalidOperationException($"Could not create secret in B2C for application {foundApp.AppId}");
+            actor.ExternalActorId = null;
         }
 
-        public async Task RemoveSecretsForAppRegistrationAsync(ExternalActorId externalActorId)
+        private static string GenerateActorDisplayName(Actor actor)
         {
-            ArgumentNullException.ThrowIfNull(externalActorId);
-
-            var foundApp = await GetExistingAppAsync(externalActorId).ConfigureAwait(false);
-            if (foundApp == null)
-            {
-                throw new InvalidOperationException("Cannot delete secrets from B2C; Application was not found.");
-            }
-
-            foreach (var secret in foundApp.PasswordCredentials!)
-            {
-                await _graphClient
-                    .Applications[foundApp.Id]
-                    .RemovePassword
-                    .PostAsync(new RemovePasswordPostRequestBody { KeyId = secret.KeyId })
-                    .ConfigureAwait(false);
-            }
+            return $"{ActorApplicationRegistrationDisplayNamePrefix}_{actor.ActorNumber.Value}_{actor.Id}";
         }
 
-        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+        private async Task<ServicePrincipal?> GetServicePrincipalAsync(Microsoft.Graph.Models.Application application)
         {
-            var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphClient
+            var response = await _graphClient
+                .ServicePrincipals
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"appId eq '{application.AppId}'";
+                })
+                .ConfigureAwait(false);
+
+            var servicePrincipals = await response!
+                .IteratePagesAsync<ServicePrincipal, ServicePrincipalCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            return servicePrincipals.SingleOrDefault();
+        }
+
+        private async Task<Microsoft.Graph.Models.Application> EnsureApplicationRegistrationAsync(Actor actor, IEnumerable<Guid> permissions)
+        {
+            return await FindApplicationRegistrationAsync(actor).ConfigureAwait(false) ??
+                   await CreateAppInB2CAsync(actor, permissions).ConfigureAwait(false);
+        }
+
+        private async Task<ServicePrincipal> EnsureServicePrincipalToAppAsync(Microsoft.Graph.Models.Application app)
+        {
+            var response = await _graphClient.ServicePrincipals
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"appId eq '{app.AppId}'";
+                })
+                .ConfigureAwait(false);
+
+            var servicePrincipals = await response!
+                .IteratePagesAsync<ServicePrincipal, ServicePrincipalCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            var servicePrincipal = servicePrincipals.FirstOrDefault();
+
+            return servicePrincipal ?? (await _graphClient.ServicePrincipals
+                .PostAsync(new ServicePrincipal
+                {
+                    AppId = app.AppId,
+                })
+                .ConfigureAwait(false))!;
+        }
+
+        private async Task<Microsoft.Graph.Models.Application?> FindApplicationRegistrationAsync(Actor actor)
+        {
+            var applicationCollectionResponse = await _graphClient
                 .Applications
-                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                .GetAsync(x =>
+                {
+                    x.QueryParameters.Filter = $"displayName eq '{GenerateActorDisplayName(actor)}'";
+                })
                 .ConfigureAwait(false);
 
-            var applications = await applicationUsingAppId!
+            var applications = await applicationCollectionResponse!
                 .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
                 .ConfigureAwait(false);
 
@@ -227,39 +171,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             return b2CIds;
         }
 
-        private async Task<IEnumerable<ActiveDirectoryRole>> GetRolesAsync(string servicePrincipalObjectId)
-        {
-            try
-            {
-                var response = await _graphClient.ServicePrincipals[servicePrincipalObjectId]
-                    .AppRoleAssignments
-                    .GetAsync()
-                    .ConfigureAwait(false);
-
-                var roles = await response!
-                    .IteratePagesAsync<AppRoleAssignment, AppRoleAssignmentCollectionResponse>(_graphClient)
-                    .ConfigureAwait(false);
-
-                if (roles is null)
-                {
-                    throw new InvalidOperationException($"'{nameof(roles)}' is null");
-                }
-
-                var roleIds = new List<ActiveDirectoryRole>();
-                foreach (var role in roles)
-                {
-                    roleIds.Add(new ActiveDirectoryRole(role.AppRoleId.ToString()!));
-                }
-
-                return roleIds;
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical(e, $"Exception in {nameof(ActiveDirectoryB2CService)}");
-                throw;
-            }
-        }
-
         private async ValueTask GrantAddedRoleToServicePrincipalAsync(
             string consumerServicePrincipalObjectId,
             Guid roleId)
@@ -268,37 +179,45 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
             {
                 PrincipalId = Guid.Parse(consumerServicePrincipalObjectId),
                 ResourceId = Guid.Parse(_azureAdConfig.BackendAppServicePrincipalObjectId),
-                AppRoleId = roleId
+                AppRoleId = roleId,
             };
 
-            var role = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
+            var appRoleAssignedTo = await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
+                .AppRoleAssignments
+                .GetAsync().ConfigureAwait(false);
+
+            var roles = await appRoleAssignedTo!
+                .IteratePagesAsync<AppRoleAssignment, AppRoleAssignmentCollectionResponse>(_graphClient)
+                .ConfigureAwait(false);
+
+            if (roles.Any(x => x.AppRoleId == roleId))
+            {
+                return;
+            }
+
+            await _graphClient.ServicePrincipals[consumerServicePrincipalObjectId]
                 .AppRoleAssignedTo
                 .PostAsync(appRole).ConfigureAwait(false);
-
-            if (role is null)
-            {
-                throw new InvalidOperationException($"The object: '{nameof(role)}' is null.");
-            }
         }
 
         private async Task<Microsoft.Graph.Models.Application> CreateAppInB2CAsync(
-            string consumerAppName,
-            IReadOnlyList<string> permissions)
+            Actor actor,
+            IEnumerable<Guid> permissions)
         {
             var resourceAccesses = permissions.Select(permission =>
                 new ResourceAccess
                 {
-                    Id = Guid.Parse(permission),
-                    Type = "Role"
+                    Id = permission,
+                    Type = "Role",
                 }).ToList();
 
             return (await _graphClient.Applications
                 .PostAsync(new Microsoft.Graph.Models.Application
                 {
-                    DisplayName = consumerAppName,
+                    DisplayName = GenerateActorDisplayName(actor),
                     Api = new ApiApplication
                     {
-                        RequestedAccessTokenVersion = 2
+                        RequestedAccessTokenVersion = 2,
                     },
                     CreatedDateTime = DateTimeOffset.Now,
                     RequiredResourceAccess = new List<RequiredResourceAccess>
@@ -306,22 +225,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
                         new()
                         {
                             ResourceAppId = _azureAdConfig.BackendAppId,
-                            ResourceAccess = resourceAccesses
-                        }
+                            ResourceAccess = resourceAccesses,
+                        },
                     },
-                    SignInAudience = "AzureADMultipleOrgs"
+                    SignInAudience = SignInAudience.AzureADMultipleOrgs.ToString(),
                 }).ConfigureAwait(false))!;
-        }
-
-        private async Task<ServicePrincipal> AddServicePrincipalToAppInB2CAsync(string consumerAppId)
-        {
-            var consumerServicePrincipal = new ServicePrincipal
-            {
-                AppId = consumerAppId
-            };
-
-            return (await _graphClient.ServicePrincipals
-                .PostAsync(consumerServicePrincipal).ConfigureAwait(false))!;
         }
     }
 }
