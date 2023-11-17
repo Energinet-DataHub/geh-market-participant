@@ -137,7 +137,7 @@ public sealed class ActorAuditLogEntryRepository : IActorAuditLogEntryRepository
             {
                 auditEntries.Add(new ActorAuditLogEntry(
                     actor,
-                    new AuditIdentity(entity.ChangedByIdentityId),
+                    new AuditIdentity(entity.DeletedByIdentityId.Value),
                     ActorChangeType.CertificateCredentials,
                     periodStart,
                     string.Empty,
@@ -175,7 +175,7 @@ public sealed class ActorAuditLogEntryRepository : IActorAuditLogEntryRepository
             {
                 auditEntries.Add(new ActorAuditLogEntry(
                     actor,
-                    new AuditIdentity(entity.ChangedByIdentityId),
+                    new AuditIdentity(entity.DeletedByIdentityId.Value),
                     ActorChangeType.SecretCredentials,
                     periodStart,
                     string.Empty,

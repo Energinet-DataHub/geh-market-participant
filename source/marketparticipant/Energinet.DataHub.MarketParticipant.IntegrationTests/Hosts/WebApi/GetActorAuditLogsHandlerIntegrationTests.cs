@@ -292,45 +292,52 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
         var actorEntity = await _databaseFixture.PrepareActorAsync();
-        var auditedUser = await _databaseFixture.PrepareUserAsync();
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
-        userContext
-            .Setup(uc => uc.CurrentUser)
-            .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
 
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
         host.ServiceCollection.AddScoped(_ => userContext.Object);
 
         await using var scope = host.BeginScope();
+
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var command = new GetActorAuditLogsCommand(actorEntity.Id);
+        var auditLogsProcessed = 1; // Skip 1, as first log is always Created.
 
         foreach (var action in changeActions)
         {
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
+
             var actor = await actorRepository.GetAsync(new ActorId(actorEntity.Id));
             Assert.NotNull(actor);
 
             action(actor);
             await actorRepository.AddOrUpdateAsync(actor);
-        }
 
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var command = new GetActorAuditLogsCommand(actorEntity.Id);
+            var auditLogs = await mediator.Send(command);
+
+            foreach (var actorAuditLog in auditLogs.ActorAuditLogs.Skip(auditLogsProcessed))
+            {
+                Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
+                Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
+                Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
+        }
 
         // Act
         var actual = await mediator.Send(command);
 
         // Assert
         assert(actual);
-
-        // Skip(1), as first log is always Created.
-        foreach (var actorAuditLog in actual.ActorAuditLogs.Skip(1))
-        {
-            Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-            Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
-            Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
-            Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
-        }
     }
 
     private async Task TestAuditOfActorContactChangeAsync(
@@ -341,22 +348,29 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
         var actorEntity = await _databaseFixture.PrepareActorAsync();
-        var auditedUser = await _databaseFixture.PrepareUserAsync();
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
-        userContext
-            .Setup(uc => uc.CurrentUser)
-            .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
 
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
         host.ServiceCollection.AddScoped(_ => userContext.Object);
 
         await using var scope = host.BeginScope();
+
         var actorContactRepository = scope.ServiceProvider.GetRequiredService<IActorContactRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
         var actorId = new ActorId(actorEntity.Id);
+        var command = new GetActorAuditLogsCommand(actorEntity.Id);
+        var auditLogsProcessed = 0;
 
         foreach (var generator in contactGenerator)
         {
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
+
             var contact = generator(actorId);
 
             var existing = await actorContactRepository.GetAsync(actorId);
@@ -371,24 +385,24 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             {
                 await actorContactRepository.AddAsync(contact);
             }
-        }
 
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var command = new GetActorAuditLogsCommand(actorEntity.Id);
+            var auditLogs = await mediator.Send(command);
+
+            foreach (var actorAuditLog in auditLogs.ActorContactAuditLogs.Skip(auditLogsProcessed))
+            {
+                Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
+                Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
+                Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
+        }
 
         // Act
         var actual = await mediator.Send(command);
 
         // Assert
         assert(actual);
-
-        // Skip(1), as first log is always Created.
-        foreach (var actorAuditLog in actual.ActorContactAuditLogs.Skip(1))
-        {
-            Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-            Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
-            Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
-            Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
-        }
     }
 }

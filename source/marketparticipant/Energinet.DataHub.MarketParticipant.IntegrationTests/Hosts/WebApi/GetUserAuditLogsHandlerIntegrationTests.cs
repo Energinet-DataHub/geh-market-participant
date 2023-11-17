@@ -20,6 +20,7 @@ using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
@@ -36,6 +37,10 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.WebApi;
 [IntegrationTest]
 public sealed class GetUserAuditLogsHandlerIntegrationTests
 {
+    private const string InitialFirstName = "initial_first_name";
+    private const string InitialLastName = "initial_last_name";
+    private const string InitialPhoneNumber = "+45 00000000";
+
     private readonly MarketParticipantDatabaseFixture _databaseFixture;
 
     public GetUserAuditLogsHandlerIntegrationTests(
@@ -100,6 +105,63 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             });
     }
 
+    [Fact]
+    public Task GetAuditLogs_ChangeUserIdentityFirstName_IsAudited()
+    {
+        var expectedFirstName = Guid.NewGuid().ToString();
+
+        return TestAuditOfUserIdentityChangeAsync(
+            response =>
+            {
+                var expectedFirstNameLog = response
+                    .IdentityAuditLogs
+                    .Single(log => log.Field == UserIdentityAuditLogField.FirstName);
+
+                Assert.True(response.IdentityAuditLogs.All(log => log.Field == UserIdentityAuditLogField.FirstName));
+                Assert.Equal(expectedFirstName, expectedFirstNameLog.NewValue);
+                Assert.Equal(InitialFirstName, expectedFirstNameLog.OldValue);
+            },
+            () => new UserIdentityUpdateDto(expectedFirstName, InitialLastName, InitialPhoneNumber));
+    }
+
+    [Fact]
+    public Task GetAuditLogs_ChangeUserIdentityLastName_IsAudited()
+    {
+        var expectedLastName = Guid.NewGuid().ToString();
+
+        return TestAuditOfUserIdentityChangeAsync(
+            response =>
+            {
+                var expectedLastNameLog = response
+                    .IdentityAuditLogs
+                    .Single(log => log.Field == UserIdentityAuditLogField.LastName);
+
+                Assert.True(response.IdentityAuditLogs.All(log => log.Field == UserIdentityAuditLogField.LastName));
+                Assert.Equal(expectedLastName, expectedLastNameLog.NewValue);
+                Assert.Equal("initial_last_name", expectedLastNameLog.OldValue);
+            },
+            () => new UserIdentityUpdateDto(InitialFirstName, expectedLastName, InitialPhoneNumber));
+    }
+
+    [Fact]
+    public Task GetAuditLogs_ChangeUserIdentityPhoneNumber_IsAudited()
+    {
+        var expectedPhoneNumber = "+45 12345678";
+
+        return TestAuditOfUserIdentityChangeAsync(
+            response =>
+            {
+                var expectedPhoneNumberLog = response
+                    .IdentityAuditLogs
+                    .Single(log => log.Field == UserIdentityAuditLogField.PhoneNumber);
+
+                Assert.True(response.IdentityAuditLogs.All(log => log.Field == UserIdentityAuditLogField.PhoneNumber));
+                Assert.Equal(expectedPhoneNumber, expectedPhoneNumberLog.NewValue);
+                Assert.Equal("+45 00000000", expectedPhoneNumberLog.OldValue);
+            },
+            () => new UserIdentityUpdateDto(InitialFirstName, InitialLastName, expectedPhoneNumber));
+    }
+
     private async Task TestAuditOfUserRoleAssignmentChangeAsync(
         Action<GetUserAuditLogsResponse> assert,
         params Action<User>[] changeActions)
@@ -108,45 +170,123 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
 
         var actorEntity = await _databaseFixture.PrepareActorAsync();
-        var auditedUser = await _databaseFixture.PrepareUserAsync();
         var userEntity = await _databaseFixture.PrepareUserAsync();
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
-        userContext
-            .Setup(uc => uc.CurrentUser)
-            .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
 
         host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
         host.ServiceCollection.AddScoped(_ => userContext.Object);
 
         await using var scope = host.BeginScope();
+
         var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var command = new GetUserAuditLogsCommand(userEntity.Id);
+        var auditLogsProcessed = 0;
 
         foreach (var action in changeActions)
         {
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
+
             var user = await userRepository.GetAsync(new UserId(userEntity.Id));
             Assert.NotNull(user);
 
             action(user);
             await userRepository.AddOrUpdateAsync(user);
-        }
 
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var command = new GetUserAuditLogsCommand(userEntity.Id);
+            var auditLogs = await mediator.Send(command);
+
+            foreach (var userAuditLog in auditLogs.UserRoleAssignmentAuditLogs.Skip(auditLogsProcessed))
+            {
+                Assert.Equal(auditedUser.Id, userAuditLog.AuditIdentityId);
+                Assert.Equal(userEntity.Id, userAuditLog.UserId);
+                Assert.True(userAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(userAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
+        }
 
         // Act
         var actual = await mediator.Send(command);
 
         // Assert
         assert(actual);
+    }
 
-        // Skip initial audits.
-        foreach (var userAuditLog in actual.UserRoleAssignmentAuditLogs)
+    private async Task TestAuditOfUserIdentityChangeAsync(
+        Action<GetUserAuditLogsResponse> assert,
+        params Func<UserIdentityUpdateDto>[] changeActions)
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_databaseFixture);
+
+        var actorEntity = await _databaseFixture.PrepareActorAsync();
+        var userEntity = await _databaseFixture.PrepareUserAsync();
+
+        var userContext = new Mock<IUserContext<FrontendUser>>();
+
+        host.ServiceCollection.RemoveAll<IUserContext<FrontendUser>>();
+        host.ServiceCollection.AddScoped(_ => userContext.Object);
+
+        var userIdentityRepository = new Mock<IUserIdentityRepository>();
+
+        userIdentityRepository
+            .Setup(r => r.GetAsync(new ExternalUserId(userEntity.ExternalId)))
+            .ReturnsAsync(new UserIdentity(
+                new ExternalUserId(userEntity.ExternalId),
+                new MockedEmailAddress(),
+                UserIdentityStatus.Active,
+                InitialFirstName,
+                InitialLastName,
+                new PhoneNumber(InitialPhoneNumber),
+                DateTimeOffset.UtcNow,
+                AuthenticationMethod.Undetermined,
+                Array.Empty<LoginIdentity>()));
+
+        host.ServiceCollection.RemoveAll<IUserIdentityRepository>();
+        host.ServiceCollection.AddScoped(_ => userIdentityRepository.Object);
+
+        await using var scope = host.BeginScope();
+
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var command = new GetUserAuditLogsCommand(userEntity.Id);
+        var auditLogsProcessed = 0;
+
+        foreach (var action in changeActions)
         {
-            Assert.Equal(auditedUser.Id, userAuditLog.AuditIdentityId);
-            Assert.Equal(userEntity.Id, userAuditLog.UserId);
-            Assert.True(userAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
-            Assert.True(userAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+            var auditedUser = await _databaseFixture.PrepareUserAsync();
+
+            userContext
+                .Setup(uc => uc.CurrentUser)
+                .Returns(new FrontendUser(auditedUser.Id, actorEntity.OrganizationId, actorEntity.Id, false));
+
+            var updateUserIdentityCommand = new UpdateUserIdentityCommand(action(), userEntity.Id);
+            await mediator.Send(updateUserIdentityCommand);
+
+            var auditLogs = await mediator.Send(command);
+
+            foreach (var userAuditLog in auditLogs.IdentityAuditLogs.Skip(auditLogsProcessed))
+            {
+                Assert.Equal(auditedUser.Id, userAuditLog.AuditIdentityId);
+                Assert.Equal(userEntity.Id, userAuditLog.UserId);
+                Assert.True(userAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
+                Assert.True(userAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
+
+                auditLogsProcessed++;
+            }
         }
+
+        // Act
+        var actual = await mediator.Send(command);
+
+        // Assert
+        assert(actual);
     }
 }
