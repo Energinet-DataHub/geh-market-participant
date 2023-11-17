@@ -24,7 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
             to.Id = from.Id.Value;
             to.Name = from.Name;
             to.BusinessRegisterIdentifier = from.BusinessRegisterIdentifier.Identifier;
-            to.Comment = from.Comment;
             to.Status = (int)from.Status;
             to.Domain = from.Domain.Value;
             MapAddressToEntity(from.Address, to);
@@ -38,7 +37,6 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers
                 new BusinessRegisterIdentifier(from.BusinessRegisterIdentifier),
                 MapAddress(from),
                 new OrganizationDomain(from.Domain),
-                from.Comment,
                 (OrganizationStatus)from.Status);
         }
 

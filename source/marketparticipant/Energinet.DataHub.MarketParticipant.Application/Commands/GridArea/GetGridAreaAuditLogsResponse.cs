@@ -14,9 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
-
-public sealed record GetUserAuditLogResponse(
-    IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-    IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs,
-    IEnumerable<UserIdentityAuditLogEntryDto> IdentityAuditLogs);
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+{
+    public sealed record GetGridAreaAuditLogsResponse(IEnumerable<GridAreaAuditLogEntryDto> GridAreaAuditLogEntries);
+}

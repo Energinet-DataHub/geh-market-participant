@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var context2 = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
-            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, "Test Comment");
+            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -60,7 +60,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
             Assert.Equal(testOrg.Name, newOrg.Name);
-            Assert.Equal(testOrg.Comment, newOrg.Comment);
             Assert.Equal(testOrg.Status, newOrg.Status);
         }
 
@@ -76,7 +75,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
+            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -100,7 +99,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
-            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
+            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -139,7 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             await using var scope = host.BeginScope();
             await using var context = _fixture.DatabaseManager.CreateDbContext();
             var orgRepository = new OrganizationRepository(context);
-            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
+            var testOrg = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(testOrg);
@@ -151,7 +150,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
                 newOrg.BusinessRegisterIdentifier,
                 newOrg.Address,
                 _validDomain,
-                "Test Comment 2",
                 OrganizationStatus.New);
 
             await orgRepository.AddOrUpdateAsync(newOrg);
@@ -161,7 +159,6 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             Assert.NotNull(newOrg);
             Assert.NotEqual(Guid.Empty, newOrg.Id.Value);
             Assert.Equal("NewName", newOrg.Name);
-            Assert.Equal("Test Comment 2", newOrg.Comment);
             Assert.Equal(OrganizationStatus.New, newOrg.Status);
         }
 
@@ -177,7 +174,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
+            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             // Act
             var orgId = await orgRepository.AddOrUpdateAsync(organization);
@@ -199,7 +196,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository = new OrganizationRepository(context);
             var orgRepository2 = new OrganizationRepository(context2);
 
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
+            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             await orgRepository.AddOrUpdateAsync(organization);
 
@@ -223,7 +220,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
             var orgRepository2 = new OrganizationRepository(context2);
 
             var globalLocationNumber = new MockedGln();
-            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain, null);
+            var organization = new Organization("Test", MockedBusinessRegisterIdentifier.New(), _validAddress, _validDomain);
 
             var organizationId = await orgRepository.AddOrUpdateAsync(organization);
             await _fixture.PrepareActorAsync(

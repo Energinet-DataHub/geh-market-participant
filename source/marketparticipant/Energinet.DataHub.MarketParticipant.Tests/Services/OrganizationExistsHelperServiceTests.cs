@@ -42,7 +42,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
 
             var validBusinessRegisterIdentifier = new BusinessRegisterIdentifier("12345678");
             var organizationId = Guid.NewGuid();
-            var organization = new Organization("fake_value", validBusinessRegisterIdentifier, validAddress, new OrganizationDomain("energinet.dk"), null);
+            var organization = new Organization("fake_value", validBusinessRegisterIdentifier, validAddress, new OrganizationDomain("energinet.dk"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(It.Is<OrganizationId>(y => y.Value == organizationId)))

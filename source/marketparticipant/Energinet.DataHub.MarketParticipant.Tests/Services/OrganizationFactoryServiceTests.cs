@@ -53,8 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 null!,
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
-                _validDomain,
-                "Test Comment"));
+                _validDomain));
         }
 
         [Fact]
@@ -72,8 +71,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     null!,
                     _validAddress,
-                    _validDomain,
-                    "Test Comment"));
+                    _validDomain));
         }
 
         [Fact]
@@ -91,8 +89,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
                     null!,
-                    _validDomain,
-                    "Test Comment"));
+                    _validDomain));
         }
 
         [Fact]
@@ -112,7 +109,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
                 _validDomain,
-                "Test Comment",
                 OrganizationStatus.Active);
 
             organizationRepository
@@ -129,8 +125,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     "fake_value",
                     _validCvrBusinessRegisterIdentifier,
                     _validAddress,
-                    _validDomain,
-                    "Test Comment");
+                    _validDomain);
 
             // Assert
             Assert.NotNull(response);

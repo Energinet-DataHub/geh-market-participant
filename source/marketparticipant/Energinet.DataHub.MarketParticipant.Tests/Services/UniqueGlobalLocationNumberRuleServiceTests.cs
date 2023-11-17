@@ -46,7 +46,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new MockedGln();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
             var target = new UniqueGlobalLocationNumberRuleService(organizationRepository.Object);
 
             var gln = new MockedGln();
-            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null);
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"));
 
             organizationRepository
                 .Setup(x => x.GetAsync(gln))
@@ -88,7 +88,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 _validCvrBusinessRegisterIdentifier,
                 _validAddress,
                 new OrganizationDomain("energinet.dk"),
-                "Test Comment",
                 OrganizationStatus.Active);
 
             organizationRepository
@@ -96,7 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .ReturnsAsync(new[] { organization });
 
             // Act + Assert
-            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk"), null), gln));
+            await Assert.ThrowsAsync<ValidationException>(() => target.ValidateGlobalLocationNumberAvailableAsync(new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, new OrganizationDomain("energinet.dk")), gln));
         }
     }
 }

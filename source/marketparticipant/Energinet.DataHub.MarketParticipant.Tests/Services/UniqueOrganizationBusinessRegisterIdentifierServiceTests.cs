@@ -35,7 +35,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new BusinessRegisterIdentifier("same_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
-                string.Empty,
                 OrganizationStatus.Active);
 
             var anotherOrganizationToUpdateWithSameIdentifier = new Organization(
@@ -44,7 +43,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new BusinessRegisterIdentifier("same_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
-                string.Empty,
                 OrganizationStatus.Active);
 
             var repository = new Mock<IOrganizationRepository>();
@@ -67,7 +65,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new BusinessRegisterIdentifier("fake_value"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
-                string.Empty,
                 OrganizationStatus.Active);
 
             var repository = new Mock<IOrganizationRepository>();
@@ -79,7 +76,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 new BusinessRegisterIdentifier("unique"),
                 new Address(string.Empty, string.Empty, string.Empty, string.Empty, "DK"),
                 new OrganizationDomain("energinet.dk"),
-                string.Empty,
                 OrganizationStatus.Active);
 
             var target = new UniqueOrganizationBusinessRegisterIdentifierService(repository.Object);

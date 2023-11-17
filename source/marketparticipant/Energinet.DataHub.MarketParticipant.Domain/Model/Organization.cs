@@ -24,15 +24,13 @@ public sealed class Organization
         string name,
         BusinessRegisterIdentifier businessRegisterIdentifier,
         Address address,
-        OrganizationDomain domain,
-        string? comment)
+        OrganizationDomain domain)
     {
         Id = new OrganizationId(Guid.Empty);
         Name = name;
         BusinessRegisterIdentifier = businessRegisterIdentifier;
         Address = address;
         Domain = domain;
-        Comment = comment;
         _organizationStatusTransitioner = new OrganizationStatusTransitioner();
     }
 
@@ -42,7 +40,6 @@ public sealed class Organization
         BusinessRegisterIdentifier businessRegisterIdentifier,
         Address address,
         OrganizationDomain domain,
-        string? comment,
         OrganizationStatus status)
     {
         Id = id;
@@ -50,16 +47,14 @@ public sealed class Organization
         BusinessRegisterIdentifier = businessRegisterIdentifier;
         Address = address;
         Domain = domain;
-        Comment = comment;
         _organizationStatusTransitioner = new OrganizationStatusTransitioner(status);
     }
 
     public OrganizationId Id { get; }
     public string Name { get; set; }
-    public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; set; }
-    public Address Address { get; set; }
+    public BusinessRegisterIdentifier BusinessRegisterIdentifier { get; }
+    public Address Address { get; }
     public OrganizationDomain Domain { get; set; }
-    public string? Comment { get; set; }
 
     public OrganizationStatus Status
     {
