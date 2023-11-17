@@ -29,16 +29,16 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
 {
     private readonly IActorRepository _actorRepository;
     private readonly ICertificateService _certificateService;
-    private readonly IActiveDirectoryB2CService _b2CService;
+    private readonly IActorClientSecretService _actorClientSecretService;
 
     public RemoveActorCredentialsHandler(
         IActorRepository actorRepository,
         ICertificateService certificateService,
-        IActiveDirectoryB2CService b2CService)
+        IActorClientSecretService actorClientSecretService)
     {
         _actorRepository = actorRepository;
         _certificateService = certificateService;
-        _b2CService = b2CService;
+        _actorClientSecretService = actorClientSecretService;
     }
 
     public async Task Handle(RemoveActorCredentialsCommand request, CancellationToken cancellationToken)
@@ -60,7 +60,7 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
                 await _certificateService.RemoveCertificateAsync(certificateCredentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
                 break;
             case ActorClientSecretCredentials when actor.ExternalActorId is not null:
-                await _b2CService.RemoveSecretsForAppRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
+                await _actorClientSecretService.RemoveSecretAsync(actor).ConfigureAwait(false);
                 break;
             default:
                 throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a known type of credentials assigned");

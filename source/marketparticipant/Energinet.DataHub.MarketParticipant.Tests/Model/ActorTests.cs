@@ -241,6 +241,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             var target = CreateTestActor(ActorStatus.Active);
             target.Credentials = new ActorClientSecretCredentials(
                 Guid.NewGuid(),
+                Guid.NewGuid(),
                 DateTimeOffset.UtcNow.ToInstant());
 
             // Act + Assert

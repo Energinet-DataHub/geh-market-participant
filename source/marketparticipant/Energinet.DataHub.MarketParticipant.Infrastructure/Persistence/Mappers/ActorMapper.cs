@@ -67,7 +67,7 @@ internal static class ActorMapper
             case ActorClientSecretCredentials credentials:
                 to.ClientSecretCredential = new ActorClientSecretCredentialsEntity
                 {
-                    ClientSecretIdentifier = credentials.ClientSecretIdentifier.ToString(),
+                    ClientSecretIdentifier = credentials.SecretIdentifier.ToString(),
                     ExpirationDate = credentials.ExpirationDate.ToDateTimeOffset(),
                 };
                 to.CertificateCredential = null;
@@ -105,7 +105,6 @@ internal static class ActorMapper
         var actorNumber = ActorNumber.Create(from.ActorNumber);
         var actorStatus = from.Status;
         var actorName = new ActorName(string.IsNullOrWhiteSpace(from.Name) ? "-" : from.Name); // TODO: This check should be removed once we are on new env.
-        var credentials = Map(from.CertificateCredential) ?? Map(from.ClientSecretCredential);
 
         return new Actor(
             new ActorId(from.Id),
@@ -115,23 +114,27 @@ internal static class ActorMapper
             actorStatus,
             marketRoles,
             actorName,
-            credentials);
+            MapCredentials(from));
     }
 
-    private static ActorCredentials? Map(ActorClientSecretCredentialsEntity? from)
+    private static ActorCredentials? MapCredentials(ActorEntity actor)
     {
-        return from is null
-            ? null
-            : new ActorClientSecretCredentials(Guid.Parse(from.ClientSecretIdentifier), from.ExpirationDate.ToInstant());
-    }
+        if (actor.CertificateCredential != null)
+        {
+            return new ActorCertificateCredentials(
+                actor.CertificateCredential.CertificateThumbprint,
+                actor.CertificateCredential.KeyVaultSecretIdentifier,
+                actor.CertificateCredential.ExpirationDate.ToInstant());
+        }
 
-    private static ActorCredentials? Map(ActorCertificateCredentialsEntity? from)
-    {
-        return from is null
-            ? null
-            : new ActorCertificateCredentials(
-                from.CertificateThumbprint,
-                from.KeyVaultSecretIdentifier,
-                from.ExpirationDate.ToInstant());
+        if (actor.ClientSecretCredential != null)
+        {
+            return new ActorClientSecretCredentials(
+                actor.ActorId!.Value,
+                Guid.Parse(actor.ClientSecretCredential.ClientSecretIdentifier),
+                actor.ClientSecretCredential.ExpirationDate.ToInstant());
+        }
+
+        return null;
     }
 }

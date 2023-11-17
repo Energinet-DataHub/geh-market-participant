@@ -18,8 +18,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
+using Microsoft.Graph.Models;
 using Xunit;
 using Xunit.Categories;
 
@@ -27,72 +29,23 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 {
     [Collection(nameof(IntegrationTestCollectionFixture))]
     [IntegrationTest]
-    public sealed class ActiveDirectoryB2CServiceTests
+    public sealed class ActorClientSecretServiceTests
     {
-        private readonly IActiveDirectoryB2CService _sut;
+        private readonly IActorClientSecretService _sut;
         private readonly GraphServiceClientFixture _graphServiceClientFixture;
+        private readonly B2CFixture _b2CFixture;
 
-        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture, B2CFixture b2CFixture)
+        public ActorClientSecretServiceTests(GraphServiceClientFixture graphServiceClientFixture, ActorClientSecretFixture actorClientSecretFixture, B2CFixture b2CFixture)
         {
             _graphServiceClientFixture = graphServiceClientFixture;
+            _b2CFixture = b2CFixture;
 #pragma warning disable CA1062
-            _sut = b2CFixture.B2CService;
+            _sut = actorClientSecretFixture.ClientSecretService;
 #pragma warning restore CA1062
         }
 
         [Fact]
-        public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
-        {
-            // Arrange
-            var actor = CreateActor(new[]
-            {
-                EicFunction.SystemOperator
-            });
-
-            try
-            {
-                // Act
-                await _sut.AssignApplicationRegistrationAsync(actor);
-
-                // Assert
-                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
-
-                Assert.Equal(actor.ExternalActorId.Value.ToString(), app.AppId);
-            }
-            finally
-            {
-                await CleanupAsync(actor);
-            }
-        }
-
-        [Fact]
-        public async Task GetExistingAppRegistrationAsync_AddTwoRolesToAppRegistration_Success()
-        {
-            // Arrange
-            var actor = CreateActor(new[]
-            {
-                EicFunction.SystemOperator, // transmission system operator
-                EicFunction.MeteredDataResponsible
-            });
-            try
-            {
-                await _sut.AssignApplicationRegistrationAsync(actor);
-
-                // Act
-                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
-
-                // Assert
-                Assert.Equal("d82c211d-cce0-e95e-bd80-c2aedf99f32b", app.AppRoles.First().RoleId);
-                Assert.Equal("00e32df2-b846-2e18-328f-702cec8f1260", app.AppRoles.ElementAt(1).RoleId);
-            }
-            finally
-            {
-                await CleanupAsync(actor);
-            }
-        }
-
-        [Fact]
-        public async Task DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
+        public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
         {
             // Arrange
             var actor = CreateActor(new[]
@@ -102,16 +55,50 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             try
             {
-                await _sut.AssignApplicationRegistrationAsync(actor);
-
-                var externalActorId = actor.ExternalActorId!.Value.ToString();
+                await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
 
                 // Act
-                await _sut.DeleteAppRegistrationAsync(actor);
+                var result = await _sut
+                    .CreateSecretForAppRegistrationAsync(actor);
+
+                var existing = await GetExistingAppAsync(actor.ExternalActorId!);
 
                 // Assert
-                await Assert.ThrowsAsync<InvalidOperationException>(async () => await _graphServiceClientFixture
-                    .GetExistingAppRegistrationAsync(externalActorId));
+                Assert.NotEmpty(result.SecretText);
+                Assert.NotEmpty(result.SecretId.ToString());
+                Assert.NotNull(existing);
+                Assert.True(existing.PasswordCredentials is { Count: > 0 });
+            }
+            finally
+            {
+                await CleanupAsync(actor);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
+        {
+            var actor = CreateActor(new[]
+            {
+                EicFunction.SystemOperator, // transmission system operator
+            });
+
+            try
+            {
+                // Arrange
+                await _b2CFixture.B2CService.AssignApplicationRegistrationAsync(actor);
+
+                await _sut
+                    .CreateSecretForAppRegistrationAsync(actor);
+
+                // Act
+                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretAsync(actor));
+                var existing = await GetExistingAppAsync(actor.ExternalActorId!);
+
+                // Assert
+                Assert.Null(exceptions);
+                Assert.NotNull(existing);
+                Assert.True(existing.PasswordCredentials is { Count: 0 });
             }
             finally
             {
@@ -134,9 +121,24 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
         private async Task CleanupAsync(Actor actor)
         {
-            await _sut
+            await _b2CFixture.B2CService
                 .DeleteAppRegistrationAsync(actor)
                 .ConfigureAwait(false);
+        }
+
+        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
+        {
+            var appId = externalActorId.Value.ToString();
+            var applicationUsingAppId = await _graphServiceClientFixture.Client
+                .Applications
+                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                .ConfigureAwait(false);
+
+            var applications = await applicationUsingAppId!
+                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphServiceClientFixture.Client)
+                .ConfigureAwait(false);
+
+            return applications.SingleOrDefault();
         }
     }
 }

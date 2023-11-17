@@ -27,14 +27,14 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class ActorRequestSecretHandler : IRequestHandler<ActorRequestSecretCommand, ActorRequestSecretResponse>
     {
-        private readonly IActiveDirectoryB2CService _activeDirectoryB2CService;
+        private readonly IActorClientSecretService _actorClientSecretService;
         private readonly IActorRepository _actorRepository;
 
         public ActorRequestSecretHandler(
-            IActiveDirectoryB2CService activeDirectoryB2CService,
+            IActorClientSecretService actorClientSecretService,
             IActorRepository actorRepository)
         {
-            _activeDirectoryB2CService = activeDirectoryB2CService;
+            _actorClientSecretService = actorClientSecretService;
             _actorRepository = actorRepository;
         }
 
@@ -54,12 +54,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             if (actor.ExternalActorId is null)
                 throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
 
-            var secretForApp = await _activeDirectoryB2CService
-                .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
+            var secretForApp = await _actorClientSecretService
+                .CreateSecretForAppRegistrationAsync(actor)
                 .ConfigureAwait(false);
 
-            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId, secretForApp.ExpirationDate);
-            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
+            actor.Credentials = new ActorClientSecretCredentials(
+                secretForApp.ClientId,
+                secretForApp.SecretId,
+                secretForApp.ExpirationDate);
+
+            await _actorRepository
+                .AddOrUpdateAsync(actor)
+                .ConfigureAwait(false);
 
             return new ActorRequestSecretResponse(secretForApp.SecretText);
         }
