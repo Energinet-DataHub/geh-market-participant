@@ -72,7 +72,7 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
 
         var actorEntity = await _databaseFixture.PrepareActorAsync();
         var auditedUser = await _databaseFixture.PrepareUserAsync();
-        var permissionId = PermissionId.UsersManage;
+        var permissionId = PermissionId.ActorCredentialsManage;
 
         var userContext = new Mock<IUserContext<FrontendUser>>();
         userContext
