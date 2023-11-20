@@ -53,7 +53,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost("{actorId:guid}/contact")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult<string>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
+        public async Task<ActionResult<Guid>> CreateContactAsync(Guid actorId, CreateActorContactDto contactDto)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(createContactCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response.ContactId.ToString());
+            return Ok(response.ContactId);
         }
 
         [HttpDelete("{actorId:guid}/contact/{contactId:guid}")]

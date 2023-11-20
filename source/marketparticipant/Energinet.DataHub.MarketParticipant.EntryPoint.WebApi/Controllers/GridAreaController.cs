@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.GridAreasManage)]
-        public async Task<ActionResult<string>> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
+        public async Task<ActionResult<Guid>> CreateGridAreaAsync(CreateGridAreaDto gridAreaDto)
         {
             var createGridAreaCommand = new CreateGridAreaCommand(gridAreaDto);
 
@@ -44,7 +44,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(createGridAreaCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response.GridAreaId.ToString());
+            return Ok(response.GridAreaId);
         }
 
         [HttpPut]
