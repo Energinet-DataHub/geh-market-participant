@@ -70,7 +70,7 @@ public sealed class UserRoleController : ControllerBase
 
     [HttpPost]
     [AuthorizeUser(PermissionId.UserRolesManage)]
-    public async Task<ActionResult<string>> CreateAsync(CreateUserRoleDto userRole)
+    public async Task<ActionResult<Guid>> CreateAsync(CreateUserRoleDto userRole)
     {
         var command = new CreateUserRoleCommand(userRole);
 
@@ -78,7 +78,7 @@ public sealed class UserRoleController : ControllerBase
             .Send(command)
             .ConfigureAwait(false);
 
-        return Ok(response.UserRoleId.ToString());
+        return Ok(response.UserRoleId);
     }
 
     [HttpPut("{userRoleId:guid}")]

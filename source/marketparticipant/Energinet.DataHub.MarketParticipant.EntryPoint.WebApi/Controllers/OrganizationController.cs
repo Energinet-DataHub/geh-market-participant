@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
-        public async Task<ActionResult<string>> CreateOrganizationAsync(CreateOrganizationDto organization)
+        public async Task<ActionResult<Guid>> CreateOrganizationAsync(CreateOrganizationDto organization)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(createOrganizationCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response.OrganizationId.ToString());
+            return Ok(response.OrganizationId);
         }
 
         [HttpPut("{organizationId:guid}")]
