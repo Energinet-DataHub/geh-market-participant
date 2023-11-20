@@ -202,6 +202,9 @@ public sealed class Actor : IPublishDomainEvents
     /// </summary>
     public void Activate()
     {
+        if (Id.Value == Guid.Empty)
+            throw new NotSupportedException("Cannot activate uncommitted actor.");
+
         _actorStatusTransitioner.Activate();
 
         foreach (var marketRole in _marketRoles)

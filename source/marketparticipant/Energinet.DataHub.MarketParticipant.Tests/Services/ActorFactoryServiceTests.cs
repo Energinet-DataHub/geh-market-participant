@@ -52,7 +52,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+                new Mock<IDomainEventRepository>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
@@ -62,16 +63,26 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
                 .ReturnsAsync(new Result<ActorId, ActorError>(actorId));
 
+            var committedActor = new Actor(
+                actorId,
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                marketRoles,
+                new ActorName("fake_value"),
+                null);
+
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
+                .ReturnsAsync(committedActor);
 
             // Act
             var response = await target
                 .CreateAsync(
                     organization,
-                    new MockedGln(),
-                    new ActorName("fake_value"),
+                    committedActor.ActorNumber,
+                    committedActor.Name,
                     marketRoles);
 
             // Assert
@@ -89,30 +100,40 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 globalLocationNumberUniquenessService.Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+                new Mock<IDomainEventRepository>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
-            var globalLocationNumber = new MockedGln();
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.EnergySupplier, Enumerable.Empty<ActorGridArea>()) };
+
+            var committedActor = new Actor(
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                marketRoles,
+                new ActorName("fake_value"),
+                null);
 
             actorRepositoryMock
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
                 .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(new Actor(organization.Id, new MockedGln(), new ActorName("Mock")));
+                .ReturnsAsync(committedActor);
 
             // Act
             await target
                 .CreateAsync(
                     organization,
-                    globalLocationNumber,
-                    new ActorName("fake_value"),
+                    committedActor.ActorNumber,
+                    committedActor.Name,
                     marketRoles);
 
             // Assert
             globalLocationNumberUniquenessService.Verify(
-                x => x.ValidateGlobalLocationNumberAvailableAsync(organization, globalLocationNumber),
+                x => x.ValidateGlobalLocationNumberAvailableAsync(organization, committedActor.ActorNumber),
                 Times.Once);
         }
 
@@ -127,33 +148,42 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 overlappingBusinessRolesService.Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object);
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+                new Mock<IDomainEventRepository>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
-            var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
-            var actor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
+            var committedActor = new Actor(
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                marketRoles,
+                new ActorName("fake_value"),
+                null);
+
             actorRepositoryMock
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
                 .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(actor);
+                .ReturnsAsync(committedActor);
 
             // Act
             await target
                 .CreateAsync(
                     organization,
-                    globalLocationNumber,
-                    new ActorName("fake_value"),
+                    committedActor.ActorNumber,
+                    committedActor.Name,
                     marketRoles);
 
             // Assert
             overlappingBusinessRolesService.Verify(
-                x => x.ValidateEicFunctionsAcrossActors(It.IsAny<IEnumerable<Actor>>()),
+                x => x.ValidateEicFunctionsAcrossActorsAsync(It.IsAny<Actor>()),
                 Times.Once);
         }
 
@@ -168,34 +198,90 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
                 new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
-                uniqueMarketRoleGridAreaRuleService.Object);
+                uniqueMarketRoleGridAreaRuleService.Object,
+                new Mock<IDomainEventRepository>().Object);
 
             var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
-            var globalLocationNumber = new MockedGln();
             var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
             var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
             var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
 
-            var updatedActor = new Actor(organization.Id, new MockedGln(), new ActorName("Mock"));
+            var committedActor = new Actor(
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                marketRoles,
+                new ActorName("fake_value"),
+                null);
+
             actorRepositoryMock
                 .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
                 .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
             actorRepositoryMock
                 .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
-                .ReturnsAsync(updatedActor);
+                .ReturnsAsync(committedActor);
 
             // Act
             await target
                 .CreateAsync(
                     organization,
-                    globalLocationNumber,
-                    new ActorName("fake_value"),
+                    committedActor.ActorNumber,
+                    committedActor.Name,
                     marketRoles);
 
             // Assert
             uniqueMarketRoleGridAreaRuleService.Verify(
-                x => x.ValidateAsync(updatedActor),
+                x => x.ValidateAndReserveAsync(committedActor),
                 Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateAsync_NewActor_EnsuresEventsAreEnqueued()
+        {
+            // Arrange
+            var actorRepositoryMock = new Mock<IActorRepository>();
+            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
+            var target = new ActorFactoryService(
+                actorRepositoryMock.Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+                domainEventRepositoryMock.Object);
+
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+            var meteringPointTypes = new[] { MeteringPointType.D02Analysis };
+            var gridAreas = new List<ActorGridArea> { new(new GridAreaId(Guid.NewGuid()), meteringPointTypes) };
+            var marketRoles = new List<ActorMarketRole> { new(EicFunction.BalanceResponsibleParty, gridAreas) };
+
+            var committedActor = new Actor(
+                new ActorId(Guid.NewGuid()),
+                organization.Id,
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                marketRoles,
+                new ActorName("fake_value"),
+                null);
+
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(new ActorId(Guid.NewGuid())));
+            actorRepositoryMock
+                .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
+                .ReturnsAsync(committedActor);
+
+            // Act
+            await target.CreateAsync(
+                organization,
+                committedActor.ActorNumber,
+                committedActor.Name,
+                marketRoles);
+
+            // Assert
+            domainEventRepositoryMock.Verify(x => x.EnqueueAsync(committedActor), Times.Once);
         }
     }
 }

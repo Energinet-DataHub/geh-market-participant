@@ -36,7 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
             _marketRoleAndGridAreaForActorReservationService = marketRoleAndGridAreaForActorReservationService;
         }
 
-        public async Task ValidateAsync(Actor actor)
+        public async Task ValidateAndReserveAsync(Actor actor)
         {
             ArgumentNullException.ThrowIfNull(actor, nameof(actor));
 

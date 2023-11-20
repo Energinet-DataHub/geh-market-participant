@@ -44,10 +44,15 @@ public sealed class ExternalActorIdConfigurationServiceTests
 
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
-        {
-            ExternalActorId = externalActorId
-        };
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            externalActorId,
+            gln,
+            ActorStatus.New,
+            Array.Empty<ActorMarketRole>(),
+            new ActorName("fake_value"),
+            null);
 
         foreach (var s in status)
         {
@@ -95,10 +100,15 @@ public sealed class ExternalActorIdConfigurationServiceTests
             .Callback<Actor>(x => x.ExternalActorId = null);
 
         var gln = new MockedGln();
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
-        {
-            ExternalActorId = null
-        };
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            gln,
+            ActorStatus.New,
+            Array.Empty<ActorMarketRole>(),
+            new ActorName("fake_value"),
+            null);
 
         foreach (var s in status)
         {

@@ -12,21 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+/// <summary>
+/// Ensures that actors within an organization have valid roles.
+/// </summary>
+public interface IOverlappingEicFunctionsRuleService
 {
     /// <summary>
-    /// Ensures that actors within an organization have valid roles.
+    /// Ensures that the given actor have unique market roles and can exist in the same organization.
+    /// Throws an exception, if the roles are invalid.
     /// </summary>
-    public interface IOverlappingEicFunctionsRuleService
-    {
-        /// <summary>
-        /// Ensures that the given actors have unique Eic functions and can exist in the same organization.
-        /// Throws an exception, if the roles are invalid.
-        /// </summary>
-        /// <param name="actors">The list of actors in an organization.</param>
-        void ValidateEicFunctionsAcrossActors(IEnumerable<Actor> actors);
-    }
+    /// <param name="actor">The actor in an organization to validate.</param>
+    Task ValidateEicFunctionsAcrossActorsAsync(Actor actor);
 }

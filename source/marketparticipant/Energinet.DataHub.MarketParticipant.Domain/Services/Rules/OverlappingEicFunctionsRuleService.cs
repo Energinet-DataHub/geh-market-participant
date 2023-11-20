@@ -16,32 +16,75 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
+namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules;
+
+public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunctionsRuleService
 {
-    public sealed class OverlappingEicFunctionsRuleService : IOverlappingEicFunctionsRuleService
+    private readonly IActorRepository _actorRepository;
+
+    public OverlappingEicFunctionsRuleService(IActorRepository actorRepository)
     {
-        public void ValidateEicFunctionsAcrossActors(IEnumerable<Actor> actors)
+        _actorRepository = actorRepository;
+    }
+
+    public async Task ValidateEicFunctionsAcrossActorsAsync(Actor actor)
+    {
+        ArgumentNullException.ThrowIfNull(actor);
+
+        var actors = await _actorRepository
+            .GetActorsAsync(actor.OrganizationId)
+            .ConfigureAwait(false);
+
+        var otherActorsInOrganization = actors
+            .Where(a => a.Id != actor.Id)
+            .ToList();
+
+        ValidateUniquenessAcrossActors(actor, otherActorsInOrganization);
+        ValidateAdministratorMarketRoleAcrossActors(actor, otherActorsInOrganization);
+    }
+
+    private static void ValidateUniquenessAcrossActors(Actor actor, IEnumerable<Actor> otherActorsInOrganization)
+    {
+        var allActors = otherActorsInOrganization
+            .Append(actor)
+            .GroupBy(x => x.ActorNumber);
+
+        foreach (var actorsWithSameActorNumber in allActors)
         {
-            ArgumentNullException.ThrowIfNull(actors, nameof(actors));
+            var setOfSets = actorsWithSameActorNumber
+                .Select(x => x.MarketRoles.Select(m => m.Function))
+                .ToList();
 
-            foreach (var actorsWithSameActorNumber in actors.GroupBy(x => x.ActorNumber))
+            var usedMarketRoles = new HashSet<EicFunction>();
+
+            foreach (var marketRole in setOfSets.SelectMany(x => x))
             {
-                var setOfSets = actorsWithSameActorNumber
-                    .Select(x => x.MarketRoles.Select(m => m.Function))
-                    .ToList();
-
-                var usedMarketRoles = new HashSet<EicFunction>();
-
-                foreach (var marketRole in setOfSets.SelectMany(x => x))
+                if (!usedMarketRoles.Add(marketRole))
                 {
-                    if (!usedMarketRoles.Add(marketRole))
-                    {
-                        throw new ValidationException($"Cannot add '{marketRole}' as this market role is already assigned to another actor within the organization.");
-                    }
+                    throw new ValidationException($"Cannot add '{marketRole}' as this market role is already assigned to another actor within the organization.");
                 }
             }
+        }
+    }
+
+    private static void ValidateAdministratorMarketRoleAcrossActors(Actor actor, IEnumerable<Actor> otherActorsInOrganization)
+    {
+        if (actor.Status != ActorStatus.New ||
+            actor.MarketRoles.All(a => a.Function != EicFunction.DataHubAdministrator))
+        {
+            return;
+        }
+
+        // DataHubAdministrator is only allowed if the organization already has DataHubAdministrator.
+        if (otherActorsInOrganization.All(
+                a => a.MarketRoles.All(
+                    m => m.Function != EicFunction.DataHubAdministrator)))
+        {
+            throw new ValidationException($"Market role '{EicFunction.DataHubAdministrator}' cannot be used in this organization.");
         }
     }
 }
