@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -119,18 +118,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
         private async Task ValidateAggregateAsync(Domain.Model.Actor actor)
         {
-            await _uniqueMarketRoleGridAreaRuleService.ValidateAsync(actor).ConfigureAwait(false);
-
-            var allOrganizationActors = await _actorRepository
-                .GetActorsAsync(actor.OrganizationId)
+            await _uniqueMarketRoleGridAreaRuleService
+                .ValidateAndReserveAsync(actor)
                 .ConfigureAwait(false);
 
-            var updatedActors = allOrganizationActors
-                .Where(a => a.Id != actor.Id)
-                .Append(actor)
-                .ToList();
-
-            _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(updatedActors);
+            await _overlappingEicFunctionsRuleService
+                .ValidateEicFunctionsAcrossActorsAsync(actor)
+                .ConfigureAwait(false);
         }
     }
 }

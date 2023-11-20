@@ -13,8 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -86,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             // Assert
             overlappingEicFunctionsService.Verify(
-                x => x.ValidateEicFunctionsAcrossActors(It.Is<IEnumerable<Actor>>(col => col.Any(a => a.Id == actor.Id))),
+                x => x.ValidateEicFunctionsAcrossActorsAsync(It.Is<Actor>(a => a.Id == actor.Id)),
                 Times.Once);
         }
 

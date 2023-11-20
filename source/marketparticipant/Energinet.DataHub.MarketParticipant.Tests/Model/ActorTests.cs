@@ -37,6 +37,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             Assert.Equal(ActorStatus.New, actor.Status);
         }
 
+        [Fact]
+        public void Activate_WithoutId_NotAllowed()
+        {
+            // Arrange
+            var target = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("fake_value"));
+
+            // Act + Assert
+            Assert.Throws<NotSupportedException>(() => target.Activate());
+        }
+
         [Theory]
         [InlineData(ActorStatus.New, true)]
         [InlineData(ActorStatus.Active, true)]
