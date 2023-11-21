@@ -49,13 +49,13 @@ public static class CommonExceptionHandlingExtensions
     {
         response.StatusCode = StatusCodes.Status400BadRequest;
         var affectedProperties = exception.Errors.Select(err => new ErrorDescriptor(err.ErrorCode, err.ErrorMessage, err.PropertyName));
-        return WriteErrorAsync(response, new ErrorDescriptor("VALIDATION_EXCEPTION", "See details property for more information.", Details: affectedProperties));
+        return WriteErrorAsync(response, new ErrorDescriptor("ARGUMENT_EXCEPTION", "See details property for more information.", Details: affectedProperties));
     }
 
     private static Task HandleKnownExceptionAsync(DataValidationException exception, HttpResponse response)
     {
         response.StatusCode = StatusCodes.Status400BadRequest;
-        return WriteErrorAsync(response, new ErrorDescriptor("VALIDATION_EXCEPTION", exception.Message));
+        return WriteErrorAsync(response, new ErrorDescriptor("DOMAIN_EXCEPTION", exception.Message));
     }
 
     private static Task HandleKnownExceptionAsync(Exception exception, HttpResponse response)
