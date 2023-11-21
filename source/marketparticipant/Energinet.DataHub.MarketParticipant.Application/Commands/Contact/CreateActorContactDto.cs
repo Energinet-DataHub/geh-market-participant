@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
     public sealed record CreateActorContactDto(
         string Name,
-        string Category,
+        ContactCategory Category,
         string Email,
         string? Phone);
 }
