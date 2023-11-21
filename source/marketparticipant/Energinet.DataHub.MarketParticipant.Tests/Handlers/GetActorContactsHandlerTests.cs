@@ -105,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var actualContact = response.Contacts.Single();
             Assert.Equal(expected.Id.Value, actualContact.ContactId);
             Assert.Equal(expected.Name, actualContact.Name);
-            Assert.Equal(expected.Category.ToString(), actualContact.Category);
+            Assert.Equal(expected.Category, actualContact.Category);
             Assert.Equal(expected.Email.Address, actualContact.Email);
             Assert.Equal(expected.Phone?.Number, actualContact.Phone);
         }
