@@ -25,7 +25,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
             ArgumentNullException.ThrowIfNull(contact, nameof(contact));
             return new ActorContactDto(
                 contact.Id.Value,
-                contact.Category.ToString(),
+                contact.Category,
                 contact.Name,
                 contact.Email.Address,
                 contact.Phone?.Number);
