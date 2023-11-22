@@ -44,8 +44,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                         .Must(marketRoles => marketRoles
                             .Where(r => (ActorMarketRoleDto?)r != null)
                             .Select(r => r.EicFunction)
-                            .Select(f => Enum.TryParse(f, true, out EicFunction result) ? result : 0)
-                            .Where(f => f != 0)
                             .All(new HashSet<EicFunction>().Add))
                         .WithMessage("Multiple market roles have the same EIC function.");
 
@@ -72,8 +70,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 {
                                     roleValidator
                                         .RuleFor(x => x.EicFunction)
-                                        .NotEmpty()
-                                        .IsEnumName(typeof(EicFunction), false);
+                                        .NotEmpty();
                                 }));
 
                     changeActorValidator
