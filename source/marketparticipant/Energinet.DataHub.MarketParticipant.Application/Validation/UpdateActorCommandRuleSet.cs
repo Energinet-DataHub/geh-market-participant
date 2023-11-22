@@ -70,7 +70,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 {
                                     roleValidator
                                         .RuleFor(x => x.EicFunction)
-                                        .NotEmpty();
+                                        .NotEmpty()
+                                        .IsInEnum();
                                 }));
 
                     changeActorValidator
