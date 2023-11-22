@@ -169,6 +169,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [Theory]
         [InlineData(EicFunction.GridAccessProvider, true)]
         [InlineData(EicFunction.BalanceResponsibleParty, true)]
+        [InlineData((EicFunction)65000, false)]
         public async Task Validate_MarketRoleFunction_ValidatesProperty(EicFunction value, bool isValid)
         {
             // Arrange
