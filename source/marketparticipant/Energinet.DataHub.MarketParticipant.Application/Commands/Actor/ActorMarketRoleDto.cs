@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor
 {
-    public sealed record ActorMarketRoleDto(string EicFunction, IEnumerable<ActorGridAreaDto> GridAreas, string? Comment);
+    public sealed record ActorMarketRoleDto(EicFunction EicFunction, IEnumerable<ActorGridAreaDto> GridAreas, string? Comment);
 }
