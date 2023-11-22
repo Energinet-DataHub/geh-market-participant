@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public sealed class ActorSynchronizationEntity
+[CollectionDefinition(nameof(SyncIntegrationTestCollectionFixture))]
+public sealed class SyncIntegrationTestCollectionFixture :
+    ICollectionFixture<MarketParticipantDatabaseFixture>
 {
-    public int Id { get; set; }
-    public Guid ActorId { get; set; }
-    public Guid OrganizationId { get; set; }
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
 }

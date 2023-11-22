@@ -18,16 +18,10 @@ using System.Threading.Tasks;
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
 /// <summary>
-/// Schedules synchronization of actors into external systems.
+/// Handles synchronization of actors into external systems.
 /// </summary>
 public interface IExternalActorSynchronizationRepository
 {
-    /// <summary>
-    /// Schedules synchronization of the specified actor.
-    /// </summary>
-    /// <param name="actorId">The actor id.</param>
-    Task ScheduleAsync(Guid actorId);
-
     /// <summary>
     /// Dequeue the next scheduled actor for synchronization.
     /// Returns null if there are no actors to synchronize.
