@@ -34,7 +34,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                     .Select(x => Enum.Parse<MeteringPointType>(x, true)).Distinct()));
 
                 yield return new ActorMarketRole(
-                    Enum.Parse<EicFunction>(marketRoleDto.EicFunction, true),
+                    marketRoleDto.EicFunction,
                     aggregatedGrids,
                     marketRoleDto.Comment);
             }

@@ -59,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                             gridAreaValidator
                                 .RuleFor(x => x.GridAreas)
                                 .NotEmpty()
-                                .When(marketRole => Enum.TryParse<EicFunction>(marketRole.EicFunction, out var function) && function == EicFunction.GridAccessProvider));
+                                .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
 
                     validator
                         .RuleFor(actor => actor.MarketRoles)
@@ -74,7 +74,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                     roleValidator
                                         .RuleFor(x => x.EicFunction)
                                         .NotEmpty()
-                                        .IsEnumName(typeof(EicFunction), false);
+                                        .IsInEnum();
                                 });
                         });
 

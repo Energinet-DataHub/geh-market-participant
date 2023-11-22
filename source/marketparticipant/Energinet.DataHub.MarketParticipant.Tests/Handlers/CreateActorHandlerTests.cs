@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var organization = TestPreparationModels.MockedOrganization();
             var actor = TestPreparationModels.MockedActor(Guid.NewGuid(), organization.Id.Value);
 
-            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent.ToString(), Enumerable.Empty<ActorGridAreaDto>(), string.Empty);
+            var marketRole = new ActorMarketRoleDto(EicFunction.BillingAgent, Enumerable.Empty<ActorGridAreaDto>(), string.Empty);
 
             organizationExistsHelperService
                 .Setup(x => x.EnsureOrganizationExistsAsync(organization.Id.Value))
