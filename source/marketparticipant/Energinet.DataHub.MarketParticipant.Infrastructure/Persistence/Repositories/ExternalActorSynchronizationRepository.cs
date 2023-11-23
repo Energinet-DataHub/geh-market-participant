@@ -16,7 +16,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -30,41 +30,16 @@ public sealed class ExternalActorSynchronizationRepository : IExternalActorSynch
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task ScheduleAsync(Guid actorId)
-    {
-        ArgumentNullException.ThrowIfNull(actorId);
-
-        var actorSync = new ActorSynchronizationEntity
-        {
-            ActorId = actorId
-        };
-
-        await _marketParticipantDbContext
-            .ActorSynchronizationEntries
-            .AddAsync(actorSync)
-            .ConfigureAwait(false);
-
-        await _marketParticipantDbContext
-            .SaveChangesAsync()
-            .ConfigureAwait(false);
-    }
-
-    public async Task<Guid?> DequeueNextAsync()
+    public async Task<Guid?> NextAsync()
     {
         var query =
-            from actorSync in _marketParticipantDbContext.ActorSynchronizationEntries
-            orderby actorSync.Id
-            select actorSync;
+            from actor in _marketParticipantDbContext.Actors
+            where
+                (actor.ActorId == null && actor.Status == ActorStatus.Active) ||
+                (actor.ActorId == null && actor.Status == ActorStatus.Passive) ||
+                (actor.ActorId != null && actor.Status != ActorStatus.Active && actor.Status != ActorStatus.Passive)
+            select (Guid?)actor.Id;
 
-        var nextEntity = await query.FirstOrDefaultAsync().ConfigureAwait(false);
-        if (nextEntity == null)
-            return null;
-
-        _marketParticipantDbContext.ActorSynchronizationEntries.Remove(nextEntity);
-        await _marketParticipantDbContext
-            .SaveChangesAsync()
-            .ConfigureAwait(false);
-
-        return nextEntity.ActorId;
+        return await query.FirstOrDefaultAsync().ConfigureAwait(false);
     }
 }

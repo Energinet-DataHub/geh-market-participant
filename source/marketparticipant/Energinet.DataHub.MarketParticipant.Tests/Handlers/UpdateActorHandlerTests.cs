@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -41,7 +40,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IDomainEventRepository>().Object);
 
@@ -69,7 +67,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 overlappingEicFunctionsService.Object,
-                new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 new Mock<IDomainEventRepository>().Object);
 
@@ -89,36 +86,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
         }
 
         [Fact]
-        public async Task Handle_ExternalActorId_SyncIsScheduled()
-        {
-            // Arrange
-            var actorRepositoryMock = new Mock<IActorRepository>();
-            var externalActorSynchronizationService = new Mock<IExternalActorSynchronizationRepository>();
-
-            var target = new UpdateActorHandler(
-                actorRepositoryMock.Object,
-                UnitOfWorkProviderMock.Create(),
-                new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                externalActorSynchronizationService.Object,
-                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
-                new Mock<IDomainEventRepository>().Object);
-
-            var actor = MockActor(actorRepositoryMock);
-
-            var command = new UpdateActorCommand(
-                actor.Id.Value,
-                new ChangeActorDto("Active", new ActorNameDto(string.Empty), Array.Empty<ActorMarketRoleDto>()));
-
-            // Act
-            await target.Handle(command, CancellationToken.None);
-
-            // Assert
-            externalActorSynchronizationService.Verify(
-                x => x.ScheduleAsync(It.Is<Guid>(aid => aid == actor.Id.Value)),
-                Times.Once);
-        }
-
-        [Fact]
         public async Task Handle_DomainEvents_ArePublished()
         {
             // Arrange
@@ -129,7 +96,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
                 actorRepositoryMock.Object,
                 UnitOfWorkProviderMock.Create(),
                 new Mock<IOverlappingEicFunctionsRuleService>().Object,
-                new Mock<IExternalActorSynchronizationRepository>().Object,
                 new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
                 domainEventRepository.Object);
 
