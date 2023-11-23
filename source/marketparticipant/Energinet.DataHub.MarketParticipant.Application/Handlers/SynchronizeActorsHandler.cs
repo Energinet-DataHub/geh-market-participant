@@ -55,7 +55,7 @@ public sealed class SynchronizeActorsHandler : IRequestHandler<SynchronizeActors
         await using (uow.ConfigureAwait(false))
         {
             var nextEntry = await _externalActorSynchronizationRepository
-                 .DequeueNextAsync()
+                 .NextAsync()
                  .ConfigureAwait(false);
 
             if (nextEntry.HasValue)

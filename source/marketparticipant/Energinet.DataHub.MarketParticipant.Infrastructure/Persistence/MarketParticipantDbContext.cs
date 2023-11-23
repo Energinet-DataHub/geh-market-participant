@@ -58,7 +58,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<ActorContactEntity> ActorContacts { get; private set; } = null!;
     public DbSet<GridAreaLinkEntity> GridAreaLinks { get; private set; } = null!;
     public DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; private set; } = null!;
-    public DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; private set; } = null!;
     public DbSet<UserEntity> Users { get; private set; } = null!;
     public DbSet<UserRoleAssignmentEntity> UserRoleAssignments { get; private set; } = null!;
     public DbSet<UserRoleEntity> UserRoles { get; private set; } = null!;
@@ -101,7 +100,6 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         modelBuilder.ApplyConfiguration(new GridAreaLinkEntityConfiguration());
         modelBuilder.ApplyConfiguration(new ActorContactEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UniqueActorMarketRoleGridAreaEntityConfiguration());
-        modelBuilder.ApplyConfiguration(new ActorSynchronizationEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentEntityConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleEicFunctionEntityConfiguration());

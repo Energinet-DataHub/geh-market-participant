@@ -142,6 +142,23 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Services
 
         private async Task<Microsoft.Graph.Models.Application?> FindApplicationRegistrationAsync(Actor actor)
         {
+            if (actor.ExternalActorId != null)
+            {
+                var appId = actor.ExternalActorId.ToString();
+                var applicationUsingAppId = await _graphClient
+                    .Applications
+                    .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
+                    .ConfigureAwait(false);
+
+                var applicationsUsingAppId = await applicationUsingAppId!
+                    .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphClient)
+                    .ConfigureAwait(false);
+
+                var foundByAppId = applicationsUsingAppId.SingleOrDefault();
+                if (foundByAppId != null)
+                    return foundByAppId;
+            }
+
             var applicationCollectionResponse = await _graphClient
                 .Applications
                 .GetAsync(x =>

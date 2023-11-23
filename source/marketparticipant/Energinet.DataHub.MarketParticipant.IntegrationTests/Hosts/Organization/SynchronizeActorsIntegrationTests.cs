@@ -22,7 +22,7 @@ using Xunit.Categories;
 
 namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Hosts.Organization;
 
-[Collection(nameof(IntegrationTestCollectionFixture))]
+[Collection(nameof(SyncIntegrationTestCollectionFixture))]
 [IntegrationTest]
 public sealed class SynchronizeActorsIntegrationTests
 {
