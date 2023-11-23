@@ -45,6 +45,7 @@ public class TokenController : ControllerBase
     private const string FasMembership = "fas";
     private const string ActorNumberClaim = "actornumber";
     private const string MarketRolesClaim = "marketroles";
+    private const string MultiTenancyClaim = "multitenancy";
 
     private readonly IExternalTokenValidator _externalTokenValidator;
     private readonly ISigningKeyRing _signingKeyRing;
@@ -153,7 +154,9 @@ public class TokenController : ControllerBase
 
         if (grantedPermissions.IsFas)
         {
-            dataHubTokenClaims = dataHubTokenClaims.Append(new Claim(MembershipClaim, FasMembership));
+            dataHubTokenClaims = dataHubTokenClaims
+                .Append(new Claim(MembershipClaim, FasMembership))
+                .Append(new Claim(MultiTenancyClaim, "true", ClaimValueTypes.Boolean));
         }
 
         var dataHubToken = new JwtSecurityToken(
