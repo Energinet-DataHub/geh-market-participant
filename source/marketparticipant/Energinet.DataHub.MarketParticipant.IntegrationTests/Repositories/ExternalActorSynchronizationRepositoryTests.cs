@@ -36,7 +36,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
     }
 
     [Fact]
-    public async Task DequeueNextAsync_NoSync_ReturnsNull()
+    public async Task NextAsync_NoSync_ReturnsNull()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -44,14 +44,14 @@ public sealed class ExternalActorSynchronizationRepositoryTests
         var target = scope.ServiceProvider.GetRequiredService<IExternalActorSynchronizationRepository>();
 
         // Act
-        var next = await target.DequeueNextAsync();
+        var next = await target.NextAsync();
 
         // Assert
         Assert.Null(next);
     }
 
     [Fact]
-    public async Task DequeueNextAsync_OneSync_IsReturned()
+    public async Task NextAsync_OneSync_IsReturned()
     {
         // Arrange
         await using var host = await OrganizationIntegrationTestHost.InitializeAsync(_fixture);
@@ -64,7 +64,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
             TestPreparationEntities.ValidMarketRole);
 
         // Act
-        var next = await target.DequeueNextAsync();
+        var next = await target.NextAsync();
 
         actor.ActorId = null;
         actor.Status = ActorStatus.Inactive;
@@ -79,7 +79,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
     }
 
     [Fact]
-    public async Task DequeueNextAsync_TillEmpty_ReturnsNull()
+    public async Task NextAsync_TillEmpty_ReturnsNull()
     {
         // Arrange
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext();
@@ -95,7 +95,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
                 TestPreparationEntities.ValidActor.Patch(a => a.Status = ActorStatus.Active),
                 TestPreparationEntities.ValidMarketRole);
 
-            var next = await target.DequeueNextAsync();
+            var next = await target.NextAsync();
             Assert.Equal(actor.Id, next);
 
             actor.ActorId = null;
@@ -105,7 +105,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
             await dbContext.SaveChangesAsync();
         }
 
-        var last = await target.DequeueNextAsync();
+        var last = await target.NextAsync();
 
         // Assert
         Assert.Null(last);
@@ -120,7 +120,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
     [InlineData(null, ActorStatus.Active, true)]
     [InlineData(null, ActorStatus.Passive, true)]
     [InlineData(null, ActorStatus.Inactive, false)]
-    public async Task DequeueNextAsync_ActorStatus_IsSynchronized(string? externalId, ActorStatus actorStatus, bool shouldSync)
+    public async Task NextAsync_ActorStatus_IsSynchronized(string? externalId, ActorStatus actorStatus, bool shouldSync)
     {
         // Arrange
         await using var dbContext = _fixture.DatabaseManager.CreateDbContext();
@@ -138,7 +138,7 @@ public sealed class ExternalActorSynchronizationRepositoryTests
             TestPreparationEntities.ValidMarketRole);
 
         // Act
-        var next = await target.DequeueNextAsync();
+        var next = await target.NextAsync();
 
         // Assert
         if (shouldSync)

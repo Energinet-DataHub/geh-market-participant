@@ -26,5 +26,5 @@ public interface IExternalActorSynchronizationRepository
     /// Dequeue the next scheduled actor for synchronization.
     /// Returns null if there are no actors to synchronize.
     /// </summary>
-    Task<Guid?> DequeueNextAsync();
+    Task<Guid?> NextAsync();
 }

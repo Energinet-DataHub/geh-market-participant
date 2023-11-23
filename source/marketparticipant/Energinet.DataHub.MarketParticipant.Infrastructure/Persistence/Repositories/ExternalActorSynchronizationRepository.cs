@@ -30,7 +30,7 @@ public sealed class ExternalActorSynchronizationRepository : IExternalActorSynch
         _marketParticipantDbContext = marketParticipantDbContext;
     }
 
-    public async Task<Guid?> DequeueNextAsync()
+    public async Task<Guid?> NextAsync()
     {
         var query =
             from actor in _marketParticipantDbContext.Actors

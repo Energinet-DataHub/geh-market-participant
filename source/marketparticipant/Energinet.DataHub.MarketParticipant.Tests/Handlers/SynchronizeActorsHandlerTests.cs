@@ -63,7 +63,7 @@ public sealed class SynchronizeActorsHandlerTests
 
         var externalActorSynchronizationRepository = new Mock<IExternalActorSynchronizationRepository>();
         externalActorSynchronizationRepository
-            .Setup(x => x.DequeueNextAsync())
+            .Setup(x => x.NextAsync())
             .ReturnsAsync(actorId);
 
         var actorRepositoryMock = new Mock<IActorRepository>();
