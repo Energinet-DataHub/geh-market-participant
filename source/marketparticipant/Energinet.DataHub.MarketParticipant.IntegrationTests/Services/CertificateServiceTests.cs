@@ -88,11 +88,18 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 
             var x509Certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
 
-            // Act
-            await certificateService.SaveCertificateAsync(name, x509Certificate);
+            try
+            {
+                // Act
+                await certificateService.SaveCertificateAsync(name, x509Certificate);
 
-            // Assert
-            Assert.True(await _certificateFixture.CertificateExistsAsync(name));
+                // Assert
+                Assert.True(await _certificateFixture.CertificateExistsAsync(name));
+            }
+            finally
+            {
+                await _certificateFixture.CleanUpCertificateFromStorageAsync(name);
+            }
         }
 
         private static Stream SetupTestCertificate(string certificateName)
