@@ -24,7 +24,7 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.10.4" />
     <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.5.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="8.1.1" />
+    <PackageReference Include="Energinet.DataHub.Core.App.WebApp" Version="8.2.0" />
     <PackageReference Include="Energinet.DataHub.Core.Logging.LoggingScopeMiddleware" Version="2.3.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.12" />
