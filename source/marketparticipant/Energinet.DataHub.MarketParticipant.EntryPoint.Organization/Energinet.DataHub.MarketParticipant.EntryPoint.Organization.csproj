@@ -27,12 +27,12 @@ limitations under the License.
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.AzureServiceBus" Version="7.0.0" />
     <PackageReference Include="AspNetCore.HealthChecks.SendGrid" Version="7.0.0" />
-    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.1.0" />
+    <PackageReference Include="Energinet.DataHub.Core.App.FunctionApp" Version="8.2.0" />
     <PackageReference Include="Energinet.DataHub.Core.Logging.LoggingScopeMiddleware" Version="2.3.1" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.19.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.20.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.2.0" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.15.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Timer" Version="4.3.0" />
+    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.16.2" />
     <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="7.0.12" />
   </ItemGroup>
   <ItemGroup>
