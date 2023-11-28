@@ -52,7 +52,8 @@ public static class KnownPermissions
             EicFunction.DanishEnergyAgency,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
-            EicFunction.SerialEnergyTrader
+            EicFunction.SerialEnergyTrader,
+            EicFunction.MeterOperator
         }),
         new(PermissionId.UsersView, "users:view", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
@@ -67,7 +68,8 @@ public static class KnownPermissions
             EicFunction.DanishEnergyAgency,
             EicFunction.DataHubAdministrator,
             EicFunction.IndependentAggregator,
-            EicFunction.SerialEnergyTrader
+            EicFunction.SerialEnergyTrader,
+            EicFunction.MeterOperator
         }),
         new(PermissionId.UserRolesManage, "user-roles:manage", InstantPattern.ExtendedIso.Parse("2023-03-07T00:00:00Z").Value, new[]
         {
@@ -113,7 +115,8 @@ public static class KnownPermissions
             EicFunction.SystemOperator,
             EicFunction.DanishEnergyAgency,
             EicFunction.IndependentAggregator,
-            EicFunction.SerialEnergyTrader
+            EicFunction.SerialEnergyTrader,
+            EicFunction.MeterOperator
         })
     };
 }
