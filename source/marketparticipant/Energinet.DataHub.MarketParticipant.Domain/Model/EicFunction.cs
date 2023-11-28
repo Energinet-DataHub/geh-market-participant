@@ -21,6 +21,7 @@ public enum EicFunction
     EnergySupplier = 12,
     GridAccessProvider = 14,
     ImbalanceSettlementResponsible = 15,
+    MeterOperator = 22,
     MeteredDataAdministrator = 23,
     MeteredDataResponsible = 26,
     MeteringPointAdministrator = 27,
