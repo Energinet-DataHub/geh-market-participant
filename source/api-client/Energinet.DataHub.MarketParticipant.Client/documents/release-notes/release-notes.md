@@ -1,5 +1,9 @@
 # Energinet.DataHub.MarketParticipant.Client Release notes
 
+## Version 2.36.1
+
+- Added new Marketrole, Meter operator
+
 ## Version 2.36.0
 
 - Removed GridAreaOverview as it now comes from swagger
