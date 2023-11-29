@@ -70,4 +70,7 @@ public static class Settings
         = new("SERVICE_BUS_HEALTH_CHECK_CONNECTION_STRING");
     public static Setting<string> ServiceBusTopicName { get; }
         = new("SBT_MARKET_PARTICIPANT_CHANGED_NAME");
+
+    public static Setting<bool> Enforce2Fa { get; }
+        = new("ENFORCE_2FA", true);
 }

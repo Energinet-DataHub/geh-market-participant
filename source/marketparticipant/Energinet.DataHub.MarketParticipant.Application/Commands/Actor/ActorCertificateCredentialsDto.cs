@@ -16,4 +16,4 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 
-public sealed record ActorCertificateCredentialsDto(string Thumbprint, DateTime ExpirationDate);
+public sealed record ActorCertificateCredentialsDto(string Thumbprint, DateTimeOffset ExpirationDate);

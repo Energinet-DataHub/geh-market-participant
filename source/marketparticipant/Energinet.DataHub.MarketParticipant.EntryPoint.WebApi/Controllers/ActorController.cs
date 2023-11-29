@@ -65,7 +65,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult<string>> CreateActorAsync(CreateActorDto actorDto)
+        public async Task<ActionResult<Guid>> CreateActorAsync(CreateActorDto actorDto)
         {
             if (!_userContext.CurrentUser.IsFas)
                 return Unauthorized();
@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(createActorCommand)
                 .ConfigureAwait(false);
 
-            return Ok(response.ActorId.ToString());
+            return Ok(response.ActorId);
         }
 
         [HttpPut("{actorId:guid}")]
@@ -150,7 +150,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpPost("{actorId:guid}/credentials/secret")]
         [AuthorizeUser(PermissionId.ActorCredentialsManage)]
-        public async Task<ActionResult<string>> ActorRequestSecretAsync(Guid actorId)
+        public async Task<ActionResult<ActorClientSecretDto>> ActorRequestSecretAsync(Guid actorId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
@@ -161,7 +161,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return Ok(response.SecretText);
+            return Ok(new ActorClientSecretDto(response.SecretText));
         }
 
         [HttpGet("{actorId:guid}/auditlogs")]

@@ -36,7 +36,6 @@ public sealed class GetActorCredentialsHandler : IRequestHandler<GetActorCredent
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        // Find actor
         var actor = await _actorRepository
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
@@ -49,13 +48,17 @@ public sealed class GetActorCredentialsHandler : IRequestHandler<GetActorCredent
             ActorCertificateCredentials actorCertificateCredentials =>
                 new GetActorCredentialsResponse(
                     new ActorCredentialsDto(
-                        new ActorCertificateCredentialsDto(actorCertificateCredentials.CertificateThumbprint, actorCertificateCredentials.ExpirationDate),
+                        new ActorCertificateCredentialsDto(
+                            actorCertificateCredentials.CertificateThumbprint,
+                            actorCertificateCredentials.ExpirationDate.ToDateTimeOffset()),
                         null)),
             ActorClientSecretCredentials actorClientSecretCredentials =>
                 new GetActorCredentialsResponse(
                     new ActorCredentialsDto(
                         null,
-                        new ActorClientSecretCredentialsDto(actorClientSecretCredentials.ClientSecretIdentifier, actorClientSecretCredentials.ExpirationDate))),
+                        new ActorClientSecretCredentialsDto(
+                            actorClientSecretCredentials.ClientId,
+                            actorClientSecretCredentials.ExpirationDate.ToDateTimeOffset()))),
             _ => throw new InvalidOperationException($"Unknown credentials type: {actor.Credentials.GetType()}")
         };
     }

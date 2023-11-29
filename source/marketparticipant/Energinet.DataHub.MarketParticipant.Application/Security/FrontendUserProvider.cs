@@ -34,7 +34,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
     public async Task<FrontendUser?> ProvideUserAsync(
         Guid userId,
         Guid actorId,
-        bool isFas,
+        bool multiTenancy,
         IEnumerable<Claim> claims)
     {
         var actor = await _actorRepository.GetAsync(new ActorId(actorId)).ConfigureAwait(false);
@@ -43,7 +43,7 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
                 userId,
                 actor.OrganizationId.Value,
                 actor.Id.Value,
-                isFas)
+                multiTenancy)
             : null;
     }
 }

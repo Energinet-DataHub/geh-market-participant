@@ -13,12 +13,13 @@
 // limitations under the License.
 
 using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Contact
 {
     public sealed record ActorContactDto(
         Guid ContactId,
-        string Category,
+        ContactCategory Category,
         string Name,
         string Email,
         string? Phone);

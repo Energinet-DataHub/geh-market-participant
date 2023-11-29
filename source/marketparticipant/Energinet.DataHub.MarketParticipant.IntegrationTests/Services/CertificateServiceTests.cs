@@ -27,13 +27,13 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
 {
     [Collection(nameof(IntegrationTestCollectionFixture))]
     [IntegrationTest]
-    public sealed class CertificateServiceTests : IClassFixture<KeyCertificateFixture>
+    public sealed class CertificateServiceTests
     {
-        private readonly KeyCertificateFixture _keyCertificateFixture;
+        private readonly CertificateFixture _certificateFixture;
 
-        public CertificateServiceTests(KeyCertificateFixture keyCertificateFixture)
+        public CertificateServiceTests(CertificateFixture certificateFixture)
         {
-            _keyCertificateFixture = keyCertificateFixture;
+            _certificateFixture = certificateFixture;
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         {
             // Arrange
             var certificateService = new CertificateService(
-                _keyCertificateFixture.CertificateClient,
+                _certificateFixture.SecretClient,
                 new CertificateValidation(),
                 new Mock<ILogger<CertificateService>>().Object);
 
@@ -57,8 +57,9 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         {
             // Arrange
             var validationMock = new Mock<ICertificateValidation>();
+
             var certificateService = new CertificateService(
-                _keyCertificateFixture.CertificateClient,
+                _certificateFixture.SecretClient,
                 validationMock.Object,
                 new Mock<ILogger<CertificateService>>().Object);
 
@@ -77,21 +78,28 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
         {
             // Arrange
             var certificateService = new CertificateService(
-                _keyCertificateFixture.CertificateClient,
+                _certificateFixture.SecretClient,
                 new Mock<ICertificateValidation>().Object,
                 new Mock<ILogger<CertificateService>>().Object);
+
+            var name = Guid.NewGuid().ToString();
 
             await using var fileStream = SetupTestCertificate("integration-actor-test-certificate-public.cer");
 
             var x509Certificate = certificateService.CreateAndValidateX509Certificate(fileStream);
 
-            // Act
-            await certificateService.SaveCertificateAsync(_keyCertificateFixture.CertificateName, x509Certificate);
+            try
+            {
+                // Act
+                await certificateService.SaveCertificateAsync(name, x509Certificate);
 
-            // Assert
-            var savedCertificate = await _keyCertificateFixture.CertificateClient.GetSecretAsync(_keyCertificateFixture.CertificateName);
-            Assert.True(savedCertificate.HasValue);
-            Assert.Equal(_keyCertificateFixture.CertificateName, savedCertificate.Value.Name);
+                // Assert
+                Assert.True(await _certificateFixture.CertificateExistsAsync(name));
+            }
+            finally
+            {
+                await _certificateFixture.CleanUpCertificateFromStorageAsync(name);
+            }
         }
 
         private static Stream SetupTestCertificate(string certificateName)

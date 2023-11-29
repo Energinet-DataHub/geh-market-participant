@@ -19,12 +19,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures
 {
     public sealed class MarketParticipantDatabaseFixture : IAsyncLifetime
     {
-        public MarketParticipantDatabaseFixture()
-        {
-            DatabaseManager = new MarketParticipantDatabaseManager();
-        }
-
-        public MarketParticipantDatabaseManager DatabaseManager { get; }
+        public MarketParticipantDatabaseManager DatabaseManager { get; } = new();
 
         public Task InitializeAsync()
         {

@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using System;
+using MediatR;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
-
-public sealed class ActorSynchronizationEntity
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
 {
-    public int Id { get; set; }
-    public Guid ActorId { get; set; }
-    public Guid OrganizationId { get; set; }
+    public sealed record GetGridAreaAuditLogsCommand(Guid GridAreaId) : IRequest<GetGridAreaAuditLogsResponse>;
 }

@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-public sealed record GetUserAuditLogsCommand(Guid UserId) : IRequest<GetUserAuditLogResponse>;
+public sealed record GetUserAuditLogsCommand(Guid UserId) : IRequest<GetUserAuditLogsResponse>;

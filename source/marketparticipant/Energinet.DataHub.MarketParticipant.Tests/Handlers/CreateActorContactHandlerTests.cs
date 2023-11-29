@@ -66,7 +66,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             var wrongId = Guid.NewGuid();
             var command = new CreateActorContactCommand(
                 wrongId,
-                new CreateActorContactDto("fake_value", "Default", "fake@value", null));
+                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
             // act + assert
             var ex = await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
@@ -109,7 +109,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorContactCommand(
                 actor.Id.Value,
-                new CreateActorContactDto("fake_value", "Default", "fake@value", null));
+                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
             // Act
             await target.Handle(command, CancellationToken.None);
@@ -149,7 +149,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
 
             var command = new CreateActorContactCommand(
                 actor.Id.Value,
-                new CreateActorContactDto("fake_value", "Default", "fake@value", null));
+                new CreateActorContactDto("fake_value", ContactCategory.Default, "fake@value", null));
 
             // Act
             var response = await target.Handle(command, CancellationToken.None);

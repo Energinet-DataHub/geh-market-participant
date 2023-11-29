@@ -24,6 +24,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
@@ -38,8 +39,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
+            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
 
@@ -59,8 +60,8 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
+            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
@@ -84,12 +85,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
-            var b2CServiceMock = new Mock<IActiveDirectoryB2CService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, b2CServiceMock.Object);
+            var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
+            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
-            actor.Credentials = new ActorCertificateCredentials("mocked", "mocked", DateTime.Now.AddYears(1));
+            actor.Credentials = new ActorCertificateCredentials(
+                "mocked",
+                "mocked",
+                DateTime.UtcNow.AddYears(1).ToInstant());
 
             actorRepositoryMock
                 .Setup(actorRepository => actorRepository.GetAsync(actor.Id))

@@ -55,11 +55,11 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<GetGridAreasCommand>, GetGridAreasCommandRuleSet>();
             services.AddScoped<IValidator<GetGridAreaCommand>, GetGridAreaCommandRuleSet>();
             services.AddScoped<IValidator<GetGridAreaOverviewCommand>, GetGridAreaOverviewCommandRuleSet>();
-            services.AddScoped<IValidator<GetGridAreaAuditLogEntriesCommand>, GetGridAreaAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetGridAreaAuditLogsCommand>, GetGridAreaAuditLogsCommandRuleSet>();
             services.AddScoped<IValidator<GetUserOverviewCommand>, GetUserOverviewCommandRuleSet>();
             services.AddScoped<IValidator<GetUserCommand>, GetUserCommandRuleSet>();
             services.AddScoped<IValidator<GetUserRolesCommand>, GetUserRolesCommandRuleSet>();
-            services.AddScoped<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogEntriesCommandRuleSet>();
+            services.AddScoped<IValidator<GetUserAuditLogsCommand>, GetUserAuditLogsCommandRuleSet>();
             services.AddScoped<IValidator<GetUserRoleAuditLogsCommand>, GetUserRoleAuditLogEntriesCommandRuleSet>();
             services.AddScoped<IValidator<GetUserPermissionsCommand>, GetUserPermissionsCommandRuleSet>();
             services.AddScoped<IValidator<UpdatePermissionCommand>, UpdatePermissionCommandRuleSet>();
@@ -95,6 +95,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IValidator<ActorRequestSecretCommand>, ActorRequestSecretCommandRuleSet>();
 
             services.AddScoped<IActiveDirectoryB2CService, ActiveDirectoryB2CService>();
+            services.AddScoped<IActorClientSecretService, ActorClientSecretService>();
             services.AddScoped<IOrganizationExistsHelperService, OrganizationExistsHelperService>();
             services.AddScoped<IExternalActorSynchronizationRepository, ExternalActorSynchronizationRepository>();
             services.AddScoped<IUserIdentityOpenIdLinkService, UserIdentityOpenIdLinkService>();

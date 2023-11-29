@@ -65,11 +65,6 @@ public interface IMarketParticipantDbContext
     DbSet<UniqueActorMarketRoleGridAreaEntity> UniqueActorMarketRoleGridAreas { get; }
 
     /// <summary>
-    ///     Represent access to the ActorSynchronization database table
-    /// </summary>
-    DbSet<ActorSynchronizationEntity> ActorSynchronizationEntries { get; }
-
-    /// <summary>
     ///     Represent access to the User database table
     /// </summary>
     DbSet<UserEntity> Users { get; }
@@ -118,6 +113,16 @@ public interface IMarketParticipantDbContext
     ///     Represent access to the EmailEventEntry database table
     /// </summary>
     DbSet<EmailEventEntity> EmailEventEntries { get; }
+
+    /// <summary>
+    ///     Represent access to the ActorCertificateCredentials database table
+    /// </summary>
+    DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; }
+
+    /// <summary>
+    ///     Represent access to the ActorClientSecretCredentials database table
+    /// </summary>
+    DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; }
 
     /// <summary>
     ///     Saves changes to the database.

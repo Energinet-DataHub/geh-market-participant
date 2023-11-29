@@ -16,7 +16,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -28,18 +27,15 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 {
     public sealed class ActorRequestSecretHandler : IRequestHandler<ActorRequestSecretCommand, ActorRequestSecretResponse>
     {
-        private readonly IActiveDirectoryB2CService _activeDirectoryB2CService;
+        private readonly IActorClientSecretService _actorClientSecretService;
         private readonly IActorRepository _actorRepository;
-        private readonly ICertificateService _certificateService;
 
         public ActorRequestSecretHandler(
-            IActiveDirectoryB2CService activeDirectoryB2CService,
-            IActorRepository actorRepository,
-            ICertificateService certificateService)
+            IActorClientSecretService actorClientSecretService,
+            IActorRepository actorRepository)
         {
-            _activeDirectoryB2CService = activeDirectoryB2CService;
+            _actorClientSecretService = actorClientSecretService;
             _actorRepository = actorRepository;
-            _certificateService = certificateService;
         }
 
         public async Task<ActorRequestSecretResponse> Handle(ActorRequestSecretCommand request, CancellationToken cancellationToken)
@@ -53,17 +49,23 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
             if (actor.Credentials is not null)
-                throw new ValidationException($"Actor with id {request.ActorId} Can not have new credentials generated, as it already has credentials");
+                throw new ValidationException("Credentials have already been assigned");
 
             if (actor.ExternalActorId is null)
                 throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
 
-            var secretForApp = await _activeDirectoryB2CService
-                .CreateSecretForAppRegistrationAsync(actor.ExternalActorId)
+            var secretForApp = await _actorClientSecretService
+                .CreateSecretForAppRegistrationAsync(actor)
                 .ConfigureAwait(false);
 
-            actor.Credentials = new ActorClientSecretCredentials(secretForApp.SecretId, secretForApp.ExpirationDate);
-            await _actorRepository.AddOrUpdateAsync(actor).ConfigureAwait(false);
+            actor.Credentials = new ActorClientSecretCredentials(
+                secretForApp.ClientId,
+                secretForApp.SecretId,
+                secretForApp.ExpirationDate);
+
+            await _actorRepository
+                .AddOrUpdateAsync(actor)
+                .ConfigureAwait(false);
 
             return new ActorRequestSecretResponse(secretForApp.SecretText);
         }

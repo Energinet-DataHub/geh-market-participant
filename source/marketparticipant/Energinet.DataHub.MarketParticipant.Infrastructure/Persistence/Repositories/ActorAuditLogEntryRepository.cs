@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -21,76 +22,170 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
+using NodaTime.Extensions;
 
-namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public sealed class ActorAuditLogEntryRepository : IActorAuditLogEntryRepository
 {
-    public sealed class ActorAuditLogEntryRepository : IActorAuditLogEntryRepository
+    private readonly IMarketParticipantDbContext _context;
+
+    public ActorAuditLogEntryRepository(IMarketParticipantDbContext context)
     {
-        private readonly IMarketParticipantDbContext _context;
+        _context = context;
+    }
 
-        public ActorAuditLogEntryRepository(IMarketParticipantDbContext context)
+    public async Task<IEnumerable<ActorAuditLogEntry>> GetAsync(ActorId actor)
+    {
+        var actorAuditLogs = await GetActorAuditsAsync(actor)
+            .ConfigureAwait(false);
+
+        var certificateAuditLogs = await GetActorCertificateCredentialAuditsAsync(actor)
+            .ConfigureAwait(false);
+
+        var clientSecretAuditLogs = await GetActorClientSecretCredentialAuditsAsync(actor)
+            .ConfigureAwait(false);
+
+        return actorAuditLogs
+            .Concat(certificateAuditLogs)
+            .Concat(clientSecretAuditLogs)
+            .OrderBy(entry => entry.Timestamp)
+            .ToList();
+    }
+
+    private async Task<IEnumerable<ActorAuditLogEntry>> GetActorAuditsAsync(ActorId actor)
+    {
+        var historicEntities = await _context.Actors
+            .ReadAllHistoryForAsync(entity => entity.Id == actor.Value)
+            .ConfigureAwait(false);
+
+        var auditedProperties = new[]
         {
-            _context = context;
-        }
+            new
+            {
+                Property = ActorChangeType.Name,
+                ReadValue = new Func<ActorEntity, object?>(entity => entity.Name)
+            },
+            new
+            {
+                Property = ActorChangeType.Status,
+                ReadValue = new Func<ActorEntity, object?>(entity => entity.Status)
+            },
+        };
 
-        public async Task<IEnumerable<ActorAuditLogEntry>> GetAsync(ActorId actor)
+        var auditEntries = new List<ActorAuditLogEntry>();
+
+        for (var i = 0; i < historicEntities.Count; i++)
         {
-            var historicEntities = await _context.Actors
-                .ReadAllHistoryForAsync(entity => entity.Id == actor.Value)
-                .ConfigureAwait(false);
+            var isFirst = i == 0;
+            var current = historicEntities[i];
+            var previous = isFirst ? current : historicEntities[i - 1];
 
-            var auditedProperties = new[]
+            if (isFirst)
             {
-                new
-                {
-                    Property = ActorChangeType.Name,
-                    ReadValue = new Func<ActorEntity, object?>(entity => entity.Name)
-                },
-                new
-                {
-                    Property = ActorChangeType.Status,
-                    ReadValue = new Func<ActorEntity, object?>(entity => entity.Status)
-                },
-            };
+                auditEntries.Add(new ActorAuditLogEntry(
+                    actor,
+                    new AuditIdentity(current.Entity.ChangedByIdentityId),
+                    ActorChangeType.Created,
+                    current.PeriodStart,
+                    string.Empty,
+                    string.Empty));
+            }
 
-            var auditEntries = new List<ActorAuditLogEntry>();
-
-            for (var i = 0; i < historicEntities.Count; i++)
+            foreach (var auditedProperty in auditedProperties)
             {
-                var isFirst = i == 0;
-                var current = historicEntities[i];
-                var previous = isFirst ? current : historicEntities[i - 1];
+                var currentValue = auditedProperty.ReadValue(current.Entity);
+                var previousValue = auditedProperty.ReadValue(previous.Entity);
 
-                if (isFirst)
+                if (!Equals(currentValue, previousValue))
                 {
                     auditEntries.Add(new ActorAuditLogEntry(
                         actor,
                         new AuditIdentity(current.Entity.ChangedByIdentityId),
-                        ActorChangeType.Created,
+                        auditedProperty.Property,
                         current.PeriodStart,
-                        string.Empty,
-                        string.Empty));
-                }
-
-                foreach (var auditedProperty in auditedProperties)
-                {
-                    var currentValue = auditedProperty.ReadValue(current.Entity);
-                    var previousValue = auditedProperty.ReadValue(previous.Entity);
-
-                    if (!Equals(currentValue, previousValue))
-                    {
-                        auditEntries.Add(new ActorAuditLogEntry(
-                            actor,
-                            new AuditIdentity(current.Entity.ChangedByIdentityId),
-                            auditedProperty.Property,
-                            current.PeriodStart,
-                            currentValue?.ToString() ?? string.Empty,
-                            previousValue?.ToString() ?? string.Empty));
-                    }
+                        currentValue?.ToString() ?? string.Empty,
+                        previousValue?.ToString() ?? string.Empty));
                 }
             }
-
-            return auditEntries.OrderBy(entry => entry.Timestamp).ToList();
         }
+
+        return auditEntries;
+    }
+
+    private async Task<IEnumerable<ActorAuditLogEntry>> GetActorCertificateCredentialAuditsAsync(ActorId actor)
+    {
+        var historicEntities = await _context.ActorCertificateCredentials
+            .ReadAllHistoryForAsync(entity => entity.ActorId == actor.Value)
+            .ConfigureAwait(false);
+
+        var auditEntries = new List<ActorAuditLogEntry>();
+
+        foreach (var (entity, periodStart) in historicEntities)
+        {
+            if (entity.DeletedByIdentityId == null)
+            {
+                auditEntries.Add(new ActorAuditLogEntry(
+                    actor,
+                    new AuditIdentity(entity.ChangedByIdentityId),
+                    ActorChangeType.CertificateCredentials,
+                    periodStart,
+                    entity.CertificateThumbprint,
+                    string.Empty));
+            }
+            else
+            {
+                auditEntries.Add(new ActorAuditLogEntry(
+                    actor,
+                    new AuditIdentity(entity.DeletedByIdentityId.Value),
+                    ActorChangeType.CertificateCredentials,
+                    periodStart,
+                    string.Empty,
+                    entity.CertificateThumbprint));
+            }
+        }
+
+        return auditEntries;
+    }
+
+    private async Task<IEnumerable<ActorAuditLogEntry>> GetActorClientSecretCredentialAuditsAsync(ActorId actor)
+    {
+        var historicEntities = await _context.ActorClientSecretCredentials
+            .ReadAllHistoryForAsync(entity => entity.ActorId == actor.Value)
+            .ConfigureAwait(false);
+
+        var auditEntries = new List<ActorAuditLogEntry>();
+
+        foreach (var (entity, periodStart) in historicEntities)
+        {
+            if (entity.DeletedByIdentityId == null)
+            {
+                auditEntries.Add(new ActorAuditLogEntry(
+                    actor,
+                    new AuditIdentity(entity.ChangedByIdentityId),
+                    ActorChangeType.SecretCredentials,
+                    periodStart,
+                    entity
+                        .ExpirationDate
+                        .ToInstant()
+                        .ToString("g", CultureInfo.InvariantCulture),
+                    string.Empty));
+            }
+            else
+            {
+                auditEntries.Add(new ActorAuditLogEntry(
+                    actor,
+                    new AuditIdentity(entity.DeletedByIdentityId.Value),
+                    ActorChangeType.SecretCredentials,
+                    periodStart,
+                    string.Empty,
+                    entity
+                        .ExpirationDate
+                        .ToInstant()
+                        .ToString("g", CultureInfo.InvariantCulture)));
+            }
+        }
+
+        return auditEntries;
     }
 }

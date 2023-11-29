@@ -50,7 +50,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 null);
 
             // act
-            await target.ValidateAsync(actor);
+            await target.ValidateAndReserveAsync(actor);
 
             // assert
             repository.Verify(x => x.RemoveAllReservationsAsync(actor.Id), Times.Exactly(1));
@@ -88,7 +88,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 null);
 
             // act
-            await target.ValidateAsync(actor);
+            await target.ValidateAndReserveAsync(actor);
 
             // assert
             foreach (var mr in actor.MarketRoles)
@@ -130,7 +130,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                     null);
 
                 // act
-                await target.ValidateAsync(actor);
+                await target.ValidateAndReserveAsync(actor);
 
                 // assert
                 repository.Verify(x => x.TryReserveAsync(It.IsAny<ActorId>(), It.IsAny<EicFunction>(), It.IsAny<GridAreaId>()), Times.Never);

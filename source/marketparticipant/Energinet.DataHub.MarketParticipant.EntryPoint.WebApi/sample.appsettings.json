@@ -18,6 +18,7 @@
   "TOKEN_KEY_NAME": "The name of the key used to sign the token.",
   "TOKEN_KEY_VAULT": "The address of the key vault containing the token signing key.",
 
-  "CERTIFICATES_KEY_VAULT": "The address of the key vault containing the actor certificates"
+  "CERTIFICATES_KEY_VAULT": "The address of the key vault containing the actor certificates",
 
+  "ENFORCE_2FA": true
 }

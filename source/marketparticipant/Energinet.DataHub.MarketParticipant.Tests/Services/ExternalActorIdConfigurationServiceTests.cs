@@ -13,10 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
 using Moq;
@@ -39,12 +37,22 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryB2CService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
+        activeDirectoryService.Setup(x => x.AssignApplicationRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = new ExternalActorId(Guid.NewGuid()));
+        activeDirectoryService.Setup(x => x.DeleteAppRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = null);
+
         var gln = new MockedGln();
         var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
-        {
-            ExternalActorId = externalActorId
-        };
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            externalActorId,
+            gln,
+            ActorStatus.New,
+            Array.Empty<ActorMarketRole>(),
+            new ActorName("fake_value"),
+            null);
 
         foreach (var s in status)
         {
@@ -59,19 +67,19 @@ public sealed class ExternalActorIdConfigurationServiceTests
         {
             Assert.Null(actor.ExternalActorId);
             activeDirectoryService.Verify(
-                x => x.DeleteAppRegistrationAsync(externalActorId),
+                x => x.DeleteAppRegistrationAsync(actor),
                 Times.Once);
         }
         else
         {
             Assert.Equal(externalActorId, actor.ExternalActorId);
             activeDirectoryService.Verify(
-                x => x.DeleteAppRegistrationAsync(It.IsAny<ExternalActorId>()),
+                x => x.DeleteAppRegistrationAsync(actor),
                 Times.Never);
         }
 
         activeDirectoryService.Verify(
-            x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<EicFunction>>()),
+            x => x.AssignApplicationRegistrationAsync(actor),
             Times.Never);
     }
 
@@ -86,21 +94,26 @@ public sealed class ExternalActorIdConfigurationServiceTests
         var activeDirectoryService = new Mock<IActiveDirectoryB2CService>();
         var target = new ExternalActorIdConfigurationService(activeDirectoryService.Object);
 
+        activeDirectoryService.Setup(x => x.AssignApplicationRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = new ExternalActorId(Guid.NewGuid()));
+        activeDirectoryService.Setup(x => x.DeleteAppRegistrationAsync(It.IsAny<Actor>()))
+            .Callback<Actor>(x => x.ExternalActorId = null);
+
         var gln = new MockedGln();
-        var externalActorId = new ExternalActorId(Guid.NewGuid());
-        var actor = new Actor(new OrganizationId(Guid.NewGuid()), gln, new ActorName("Mock"))
-        {
-            ExternalActorId = null
-        };
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            gln,
+            ActorStatus.New,
+            Array.Empty<ActorMarketRole>(),
+            new ActorName("fake_value"),
+            null);
 
         foreach (var s in status)
         {
             actor.Status = s;
         }
-
-        activeDirectoryService
-            .Setup(x => x.CreateAppRegistrationAsync(gln, It.IsAny<IReadOnlyCollection<EicFunction>>()))
-            .ReturnsAsync(new CreateAppRegistrationResponse(externalActorId, "fake_value", "fake_value"));
 
         // Act
         await target.AssignExternalActorIdAsync(actor);
@@ -116,7 +129,7 @@ public sealed class ExternalActorIdConfigurationServiceTests
         }
 
         activeDirectoryService.Verify(
-            x => x.DeleteAppRegistrationAsync(It.IsAny<ExternalActorId>()),
+            x => x.DeleteAppRegistrationAsync(actor),
             Times.Never);
     }
 }

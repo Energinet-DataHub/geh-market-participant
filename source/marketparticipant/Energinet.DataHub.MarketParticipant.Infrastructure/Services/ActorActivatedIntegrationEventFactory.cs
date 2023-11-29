@@ -49,6 +49,7 @@ public sealed class ActorActivatedIntegrationEventFactory : IIntegrationEventFac
                     EicFunction.DataHubAdministrator => Model.Contracts.EicFunction.DatahubAdministrator,
                     EicFunction.IndependentAggregator => Model.Contracts.EicFunction.IndependentAggregator,
                     EicFunction.SerialEnergyTrader => Model.Contracts.EicFunction.SerialEnergyTrader,
+                    EicFunction.MeterOperator => Model.Contracts.EicFunction.MeterOperator,
                     _ => throw new NotSupportedException($"Actor role {domainEvent.ActorRole} is not supported in integration event.")
                 },
                 ActorNumberType = domainEvent.ActorNumber.Type switch

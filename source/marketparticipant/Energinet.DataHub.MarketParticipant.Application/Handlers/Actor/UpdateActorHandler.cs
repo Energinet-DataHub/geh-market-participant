@@ -13,13 +13,11 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Extensions;
 using Energinet.DataHub.MarketParticipant.Application.Mappers;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -34,7 +32,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
         private readonly IActorRepository _actorRepository;
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
         private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
-        private readonly IExternalActorSynchronizationRepository _externalActorSynchronizationRepository;
         private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
         private readonly IDomainEventRepository _domainEventRepository;
 
@@ -42,14 +39,12 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             IActorRepository actorRepository,
             IUnitOfWorkProvider unitOfWorkProvider,
             IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
-            IExternalActorSynchronizationRepository externalActorSynchronizationRepository,
             IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
             IDomainEventRepository domainEventRepository)
         {
             _actorRepository = actorRepository;
             _unitOfWorkProvider = unitOfWorkProvider;
             _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
-            _externalActorSynchronizationRepository = externalActorSynchronizationRepository;
             _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
             _domainEventRepository = domainEventRepository;
         }
@@ -79,10 +74,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
                 await _domainEventRepository
                     .EnqueueAsync(actor)
-                    .ConfigureAwait(false);
-
-                await _externalActorSynchronizationRepository
-                    .ScheduleAsync(actor.Id.Value)
                     .ConfigureAwait(false);
 
                 await uow.CommitAsync().ConfigureAwait(false);
@@ -119,18 +110,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
         private async Task ValidateAggregateAsync(Domain.Model.Actor actor)
         {
-            await _uniqueMarketRoleGridAreaRuleService.ValidateAsync(actor).ConfigureAwait(false);
-
-            var allOrganizationActors = await _actorRepository
-                .GetActorsAsync(actor.OrganizationId)
+            await _uniqueMarketRoleGridAreaRuleService
+                .ValidateAndReserveAsync(actor)
                 .ConfigureAwait(false);
 
-            var updatedActors = allOrganizationActors
-                .Where(a => a.Id != actor.Id)
-                .Append(actor)
-                .ToList();
-
-            _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(updatedActors);
+            await _overlappingEicFunctionsRuleService
+                .ValidateEicFunctionsAcrossActorsAsync(actor)
+                .ConfigureAwait(false);
         }
     }
 }

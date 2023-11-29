@@ -109,7 +109,7 @@ public class UserController : ControllerBase
 
     [HttpGet("{userId:guid}/auditlogentry")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<ActionResult<GetUserAuditLogResponse>> GetAuditLogsAsync(Guid userId)
+    public async Task<ActionResult<GetUserAuditLogsResponse>> GetAuditLogsAsync(Guid userId)
     {
         var command = new GetUserAuditLogsCommand(userId);
 

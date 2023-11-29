@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,19 +28,22 @@ public sealed class ActorFactoryService : IActorFactoryService
     private readonly IOverlappingEicFunctionsRuleService _overlappingEicFunctionsRuleService;
     private readonly IUniqueGlobalLocationNumberRuleService _uniqueGlobalLocationNumberRuleService;
     private readonly IUniqueMarketRoleGridAreaRuleService _uniqueMarketRoleGridAreaRuleService;
+    private readonly IDomainEventRepository _domainEventRepository;
 
     public ActorFactoryService(
         IActorRepository actorRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IOverlappingEicFunctionsRuleService overlappingEicFunctionsRuleService,
         IUniqueGlobalLocationNumberRuleService uniqueGlobalLocationNumberRuleService,
-        IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService)
+        IUniqueMarketRoleGridAreaRuleService uniqueMarketRoleGridAreaRuleService,
+        IDomainEventRepository domainEventRepository)
     {
         _actorRepository = actorRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _overlappingEicFunctionsRuleService = overlappingEicFunctionsRuleService;
         _uniqueGlobalLocationNumberRuleService = uniqueGlobalLocationNumberRuleService;
         _uniqueMarketRoleGridAreaRuleService = uniqueMarketRoleGridAreaRuleService;
+        _domainEventRepository = domainEventRepository;
     }
 
     public async Task<Actor> CreateAsync(
@@ -55,20 +57,18 @@ public sealed class ActorFactoryService : IActorFactoryService
         ArgumentNullException.ThrowIfNull(actorName);
         ArgumentNullException.ThrowIfNull(marketRoles);
 
-        await _uniqueGlobalLocationNumberRuleService
-            .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
-            .ConfigureAwait(false);
-
         var newActor = new Actor(organization.Id, actorNumber, actorName);
 
         foreach (var marketRole in marketRoles)
             newActor.AddMarketRole(marketRole);
 
-        var existingActors = await _actorRepository
-            .GetActorsAsync(organization.Id)
+        await _uniqueGlobalLocationNumberRuleService
+            .ValidateGlobalLocationNumberAvailableAsync(organization, actorNumber)
             .ConfigureAwait(false);
 
-        _overlappingEicFunctionsRuleService.ValidateEicFunctionsAcrossActors(existingActors.Append(newActor));
+        await _overlappingEicFunctionsRuleService
+            .ValidateEicFunctionsAcrossActorsAsync(newActor)
+            .ConfigureAwait(false);
 
         var uow = await _unitOfWorkProvider
             .NewUnitOfWorkAsync()
@@ -76,28 +76,37 @@ public sealed class ActorFactoryService : IActorFactoryService
 
         await using (uow.ConfigureAwait(false))
         {
-            var savedActor = await SaveActorAsync(newActor).ConfigureAwait(false);
+            var actorId = await SaveActorAsync(newActor).ConfigureAwait(false);
+
+            var committedActor = (await _actorRepository
+                .GetAsync(actorId)
+                .ConfigureAwait(false))!;
 
             await _uniqueMarketRoleGridAreaRuleService
-                .ValidateAsync(savedActor)
+                .ValidateAndReserveAsync(committedActor)
                 .ConfigureAwait(false);
+
+            committedActor.Activate();
+
+            await _domainEventRepository
+                .EnqueueAsync(committedActor)
+                .ConfigureAwait(false);
+
+            await SaveActorAsync(committedActor).ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
 
-            return savedActor;
+            return committedActor;
         }
     }
 
-    private async Task<Actor> SaveActorAsync(Actor newActor)
+    private async Task<ActorId> SaveActorAsync(Actor newActor)
     {
         var result = await _actorRepository
             .AddOrUpdateAsync(newActor)
             .ConfigureAwait(false);
 
         result.ThrowOnError(ActorErrorHandler.HandleActorError);
-
-        return (await _actorRepository
-            .GetAsync(result.Value)
-            .ConfigureAwait(false))!;
+        return result.Value;
     }
 }

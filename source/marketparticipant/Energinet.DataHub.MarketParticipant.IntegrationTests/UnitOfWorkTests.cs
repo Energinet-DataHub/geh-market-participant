@@ -84,7 +84,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 "Test Country");
 
             var validBusinessRegisterIdentifier = MockedBusinessRegisterIdentifier.New();
-            return new Organization("Test", validBusinessRegisterIdentifier, validAddress, new MockedDomain(), null);
+            return new Organization("Test", validBusinessRegisterIdentifier, validAddress, new MockedDomain());
         }
     }
 }

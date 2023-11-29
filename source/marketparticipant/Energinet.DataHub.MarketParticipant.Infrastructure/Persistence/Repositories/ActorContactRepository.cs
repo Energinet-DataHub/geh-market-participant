@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
@@ -27,15 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
 public sealed class ActorContactRepository : IActorContactRepository
 {
-    private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IMarketParticipantDbContext _marketParticipantDbContext;
 
-    public ActorContactRepository(
-        IMarketParticipantDbContext marketParticipantDbContext,
-        IAuditIdentityProvider auditIdentityProvider)
+    public ActorContactRepository(IMarketParticipantDbContext marketParticipantDbContext)
     {
         _marketParticipantDbContext = marketParticipantDbContext;
-        _auditIdentityProvider = auditIdentityProvider;
     }
 
     public async Task<ActorContact?> GetAsync(ContactId contactId)
@@ -88,15 +83,6 @@ public sealed class ActorContactRepository : IActorContactRepository
 
         if (entity == null)
             return;
-
-        await _marketParticipantDbContext
-            .ActorContacts
-            .Where(ac => ac.Id == entity.Id)
-            .ExecuteUpdateAsync(props => props.SetProperty(
-                ace =>
-                    ace.DeletedByIdentityId,
-                _auditIdentityProvider.IdentityId.Value))
-            .ConfigureAwait(false);
 
         _marketParticipantDbContext.ActorContacts.Remove(entity);
 

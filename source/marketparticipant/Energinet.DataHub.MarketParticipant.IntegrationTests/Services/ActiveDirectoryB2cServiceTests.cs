@@ -15,23 +15,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
-using Azure.Identity;
-using Energinet.DataHub.Core.FunctionApp.TestCommon.Configuration;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using Energinet.DataHub.MarketParticipant.Infrastructure;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Extensions;
-using Energinet.DataHub.MarketParticipant.Infrastructure.Services;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
-using Microsoft.Graph.Models;
-using Microsoft.Graph.Models.ODataErrors;
-using Moq;
 using Xunit;
 using Xunit.Categories;
 
@@ -41,69 +29,57 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
     [IntegrationTest]
     public sealed class ActiveDirectoryB2CServiceTests
     {
-        private readonly IActiveDirectoryB2CService _sut = CreateActiveDirectoryService();
+        private readonly IActiveDirectoryB2CService _sut;
         private readonly GraphServiceClientFixture _graphServiceClientFixture;
 
-        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture)
+        public ActiveDirectoryB2CServiceTests(GraphServiceClientFixture graphServiceClientFixture, B2CFixture b2CFixture)
         {
             _graphServiceClientFixture = graphServiceClientFixture;
+#pragma warning disable CA1062
+            _sut = b2CFixture.B2CService;
+#pragma warning restore CA1062
         }
 
         [Fact]
         public async Task CreateConsumerAppRegistrationAsync_AppIsRegistered_Success()
         {
-            ExternalActorId? cleanupId = null;
+            // Arrange
+            var actor = CreateActor(new[]
+            {
+                EicFunction.SystemOperator
+            });
 
             try
             {
-                // Arrange
-                var roles = new List<EicFunction>
-                {
-                    EicFunction.SystemOperator // transmission system operator
-                };
-
                 // Act
-                var response = await _sut
-                    .CreateAppRegistrationAsync(new MockedGln(), roles);
-
-                cleanupId = response.ExternalActorId;
+                await _sut.AssignApplicationRegistrationAsync(actor);
 
                 // Assert
-                var app = await _sut.GetExistingAppRegistrationAsync(
-                        new AppRegistrationObjectId(Guid.Parse(response.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(response.ServicePrincipalObjectId));
+                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
 
-                Assert.Equal(response.ExternalActorId.Value.ToString(), app.AppId);
+                Assert.Equal(actor.ExternalActorId.Value.ToString(), app.AppId);
             }
             finally
             {
-                await CleanupAsync(cleanupId);
+                await CleanupAsync(actor);
             }
         }
 
         [Fact]
         public async Task GetExistingAppRegistrationAsync_AddTwoRolesToAppRegistration_Success()
         {
-            ExternalActorId? cleanupId = null;
-
+            // Arrange
+            var actor = CreateActor(new[]
+            {
+                EicFunction.SystemOperator, // transmission system operator
+                EicFunction.MeteredDataResponsible
+            });
             try
             {
-                // Arrange
-                var roles = new List<EicFunction>
-                {
-                    EicFunction.SystemOperator, // transmission system operator
-                    EicFunction.MeteredDataResponsible
-                };
-
-                var createAppRegistrationResponse = await _sut
-                    .CreateAppRegistrationAsync(new MockedGln(), roles);
-
-                cleanupId = createAppRegistrationResponse.ExternalActorId;
+                await _sut.AssignApplicationRegistrationAsync(actor);
 
                 // Act
-                var app = await _sut.GetExistingAppRegistrationAsync(
-                        new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                        new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId));
+                var app = await _graphServiceClientFixture.GetExistingAppRegistrationAsync(actor.ExternalActorId!.ToString());
 
                 // Assert
                 Assert.Equal("d82c211d-cce0-e95e-bd80-c2aedf99f32b", app.AppRoles.First().RoleId);
@@ -111,181 +87,56 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Services
             }
             finally
             {
-                await CleanupAsync(cleanupId);
+                await CleanupAsync(actor);
             }
         }
 
         [Fact]
         public async Task DeleteConsumerAppRegistrationAsync_DeleteCreatedAppRegistration_ServiceException404IsThrownWhenTryingToGetTheDeletedApp()
         {
-            ExternalActorId? cleanupId = null;
+            // Arrange
+            var actor = CreateActor(new[]
+            {
+                EicFunction.SystemOperator, // transmission system operator
+            });
 
             try
             {
-                // Arrange
-                var roles = new List<EicFunction>
-                {
-                    EicFunction.SystemOperator // transmission system operator
-                };
+                await _sut.AssignApplicationRegistrationAsync(actor);
 
-                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
-                        new MockedGln(),
-                        roles);
-
-                cleanupId = createAppRegistrationResponse.ExternalActorId;
+                var externalActorId = actor.ExternalActorId!.Value.ToString();
 
                 // Act
-                await _sut
-                    .DeleteAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
-
-                cleanupId = null;
+                await _sut.DeleteAppRegistrationAsync(actor);
 
                 // Assert
-                var ex = await Assert.ThrowsAsync<ODataError>(async () => await _sut
-                        .GetExistingAppRegistrationAsync(
-                            new AppRegistrationObjectId(Guid.Parse(createAppRegistrationResponse.AppObjectId)),
-                            new AppRegistrationServicePrincipalObjectId(createAppRegistrationResponse.ServicePrincipalObjectId)));
-
-                Assert.Equal((int)HttpStatusCode.NotFound, ex.ResponseStatusCode);
+                await Assert.ThrowsAsync<InvalidOperationException>(async () => await _graphServiceClientFixture
+                    .GetExistingAppRegistrationAsync(externalActorId));
             }
             finally
             {
-                await CleanupAsync(cleanupId);
+                await CleanupAsync(actor);
             }
         }
 
-        [Fact]
-        public async Task AddSecretToAppRegistration_ReturnsPassword_AndAppHasPassword()
+        private static Actor CreateActor(IEnumerable<EicFunction> roles)
         {
-            ExternalActorId? cleanupId = null;
-
-            try
-            {
-                // Arrange
-                var roles = new List<EicFunction>
-                {
-                    EicFunction.SystemOperator // transmission system operator
-                };
-
-                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
-                    new MockedGln(),
-                    roles);
-
-                cleanupId = createAppRegistrationResponse.ExternalActorId;
-
-                // Act
-                var result = await _sut
-                    .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
-                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
-
-                // Assert
-                Assert.NotEmpty(result.SecretText);
-                Assert.NotEmpty(result.SecretId.ToString());
-                Assert.NotNull(existing);
-                Assert.True(existing.PasswordCredentials is { Count: >0 });
-            }
-            finally
-            {
-                await CleanupAsync(cleanupId);
-            }
+            return new Actor(
+                new ActorId(Guid.NewGuid()),
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                roles.Select(x => new ActorMarketRole(x)),
+                new ActorName(Guid.NewGuid().ToString()),
+                null);
         }
 
-        [Fact]
-        public async Task RemoveSecretFromAppRegistration_DoesNotThrow_And_PasswordIsRemoved()
+        private async Task CleanupAsync(Actor actor)
         {
-            ExternalActorId? cleanupId = null;
-
-            try
-            {
-                // Arrange
-                var roles = new List<EicFunction>
-                {
-                    EicFunction.SystemOperator // transmission system operator
-                };
-
-                var createAppRegistrationResponse = await _sut.CreateAppRegistrationAsync(
-                    new MockedGln(),
-                    roles);
-
-                cleanupId = createAppRegistrationResponse.ExternalActorId;
-
-                var secretCreated = await _sut
-                    .CreateSecretForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId);
-
-                // Act
-                var exceptions = await Record.ExceptionAsync(() => _sut.RemoveSecretsForAppRegistrationAsync(createAppRegistrationResponse.ExternalActorId));
-                var existing = await GetExistingAppAsync(createAppRegistrationResponse.ExternalActorId);
-
-                // Assert
-                Assert.Null(exceptions);
-                Assert.NotNull(existing);
-                Assert.True(existing.PasswordCredentials is { Count: 0 });
-            }
-            finally
-            {
-                await CleanupAsync(cleanupId);
-            }
-        }
-
-        private static IActiveDirectoryB2CService CreateActiveDirectoryService()
-        {
-            var integrationTestConfig = new IntegrationTestConfiguration();
-
-            // Graph Service Client
-            var clientSecretCredential = new ClientSecretCredential(
-                integrationTestConfig.B2CSettings.Tenant,
-                integrationTestConfig.B2CSettings.ServicePrincipalId,
-                integrationTestConfig.B2CSettings.ServicePrincipalSecret);
-
-            using var graphClient = new GraphServiceClient(
-                clientSecretCredential,
-                new[]
-                {
-                    "https://graph.microsoft.com/.default"
-                });
-
-            // Azure AD Config
-            var config = new AzureAdConfig(
-                integrationTestConfig.B2CSettings.BackendServicePrincipalObjectId,
-                integrationTestConfig.B2CSettings.BackendAppId);
-
-            // Active Directory Roles
-            var activeDirectoryB2CRoles =
-                new ActiveDirectoryB2BRolesProvider(graphClient, integrationTestConfig.B2CSettings.BackendAppObjectId);
-
-            // Logger
-            var logger = Mock.Of<ILogger<ActiveDirectoryB2CService>>();
-
-            return new ActiveDirectoryB2CService(
-                graphClient,
-                config,
-                activeDirectoryB2CRoles,
-                logger);
-        }
-
-        private async Task CleanupAsync(ExternalActorId? externalActorId)
-        {
-            if (externalActorId == null)
-                return;
-
             await _sut
-                .DeleteAppRegistrationAsync(externalActorId)
+                .DeleteAppRegistrationAsync(actor)
                 .ConfigureAwait(false);
-        }
-
-        private async Task<Microsoft.Graph.Models.Application?> GetExistingAppAsync(ExternalActorId externalActorId)
-        {
-            var appId = externalActorId.Value.ToString();
-            var applicationUsingAppId = await _graphServiceClientFixture.Client
-                .Applications
-                .GetAsync(x => { x.QueryParameters.Filter = $"appId eq '{appId}'"; })
-                .ConfigureAwait(false);
-
-            var applications = await applicationUsingAppId!
-                .IteratePagesAsync<Microsoft.Graph.Models.Application, ApplicationCollectionResponse>(_graphServiceClientFixture.Client)
-                .ConfigureAwait(false);
-
-            return applications.SingleOrDefault();
         }
     }
 }

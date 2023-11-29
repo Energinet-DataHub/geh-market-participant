@@ -12,11 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
+using Xunit;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
+namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 
-public sealed record GetUserAuditLogResponse(
-    IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-    IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs,
-    IEnumerable<UserIdentityAuditLogEntryDto> IdentityAuditLogs);
+[CollectionDefinition(nameof(SyncIntegrationTestCollectionFixture))]
+public sealed class SyncIntegrationTestCollectionFixture :
+    ICollectionFixture<MarketParticipantDatabaseFixture>,
+    ICollectionFixture<GraphServiceClientFixture>
+{
+    // This class has no code, and is never created. Its purpose is simply
+    // to be the place to apply [CollectionDefinition] and all the
+    // ICollectionFixture<> interfaces.
+}

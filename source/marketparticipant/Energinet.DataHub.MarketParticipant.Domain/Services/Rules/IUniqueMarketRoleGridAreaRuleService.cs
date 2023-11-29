@@ -26,6 +26,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
         /// Ensures given market roles only exists once per grid area across all organizations
         /// </summary>
         /// <param name="actor">Actor for which to ensure unique market roles</param>
-        Task ValidateAsync(Actor actor);
+        Task ValidateAndReserveAsync(Actor actor);
     }
 }

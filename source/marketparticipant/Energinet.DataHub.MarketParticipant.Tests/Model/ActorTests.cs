@@ -18,6 +18,7 @@ using System.Linq;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 using Energinet.DataHub.MarketParticipant.Tests.Common;
+using NodaTime.Extensions;
 using Xunit;
 using Xunit.Categories;
 
@@ -34,6 +35,16 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
 
             // Assert
             Assert.Equal(ActorStatus.New, actor.Status);
+        }
+
+        [Fact]
+        public void Activate_WithoutId_NotAllowed()
+        {
+            // Arrange
+            var target = new Actor(new OrganizationId(Guid.NewGuid()), new MockedGln(), new ActorName("fake_value"));
+
+            // Act + Assert
+            Assert.Throws<NotSupportedException>(() => target.Activate());
         }
 
         [Theory]
@@ -205,7 +216,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         {
             // Arrange
             var target = CreateTestActor(ActorStatus.New, EicFunction.EnergySupplier);
-            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier", DateTime.Now.AddYears(1));
+            target.Credentials = new ActorCertificateCredentials(
+                new string('A', 40),
+                "mocked_identifier",
+                DateTime.UtcNow.AddYears(1).ToInstant());
 
             // Act
             target.Activate();
@@ -221,10 +235,27 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
             var target = CreateTestActor(ActorStatus.Active, EicFunction.EnergySupplier);
 
             // Act
-            target.Credentials = new ActorCertificateCredentials(new string('A', 40), "mocked_identifier", DateTime.Now.AddYears(1));
+            target.Credentials = new ActorCertificateCredentials(
+                new string('A', 40),
+                "mocked_identifier",
+                DateTime.UtcNow.AddYears(1).ToInstant());
 
             // Assert
             Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
+        }
+
+        [Fact]
+        public void Deactivate_HasCredentials_NotAllowed()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active);
+            target.Credentials = new ActorClientSecretCredentials(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                DateTimeOffset.UtcNow.ToInstant());
+
+            // Act + Assert
+            Assert.Throws<ValidationException>(() => target.Deactivate());
         }
 
         private static Actor CreateTestActor(ActorStatus status, params EicFunction[] eicFunctions)

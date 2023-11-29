@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -30,22 +29,22 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
 {
     private readonly IActorRepository _actorRepository;
     private readonly ICertificateService _certificateService;
-    private readonly IActiveDirectoryB2CService _b2CService;
+    private readonly IActorClientSecretService _actorClientSecretService;
+
     public RemoveActorCredentialsHandler(
         IActorRepository actorRepository,
         ICertificateService certificateService,
-        IActiveDirectoryB2CService b2CService)
+        IActorClientSecretService actorClientSecretService)
     {
         _actorRepository = actorRepository;
         _certificateService = certificateService;
-        _b2CService = b2CService;
+        _actorClientSecretService = actorClientSecretService;
     }
 
     public async Task Handle(RemoveActorCredentialsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request, nameof(request));
 
-        // Find actor
         var actor = await _actorRepository
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
@@ -55,17 +54,13 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
         if (actor.Credentials is null)
             return;
 
-        // Check that the actor has the correct type of credentials
         switch (actor.Credentials)
         {
             case ActorCertificateCredentials certificateCredentials:
                 await _certificateService.RemoveCertificateAsync(certificateCredentials.KeyVaultSecretIdentifier).ConfigureAwait(false);
                 break;
-            case ActorClientSecretCredentials:
-                if (actor.ExternalActorId is null)
-                    throw new ValidationException("Can't remove secret, as the actor is either not Active or is still being created");
-
-                await _b2CService.RemoveSecretsForAppRegistrationAsync(actor.ExternalActorId).ConfigureAwait(false);
+            case ActorClientSecretCredentials when actor.ExternalActorId is not null:
+                await _actorClientSecretService.RemoveSecretAsync(actor).ConfigureAwait(false);
                 break;
             default:
                 throw new InvalidOperationException($"Actor with id {request.ActorId} does not have a known type of credentials assigned");

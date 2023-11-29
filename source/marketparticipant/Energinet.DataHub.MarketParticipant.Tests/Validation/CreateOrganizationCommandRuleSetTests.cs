@@ -54,7 +54,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationName_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Name)}";
             const string validCvr = "123";
             var validAddress = new AddressDto(
                 "test Street",
@@ -67,8 +67,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 value,
                 validCvr,
                 validAddress,
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -98,7 +97,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationBusinessRegisterIdentifier_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.BusinessRegisterIdentifier)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.BusinessRegisterIdentifier)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
@@ -109,8 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     "Denmark"),
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -140,7 +138,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressStreetname_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.StreetName)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.StreetName)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
@@ -151,8 +149,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     "Denmark"),
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -182,7 +179,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressCity_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.City)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.City)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
@@ -193,8 +190,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     value,
                     "Denmark"),
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -224,7 +220,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressCountry_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Country)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.Country)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
@@ -235,8 +231,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     value),
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -266,7 +261,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressNumber_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.Number)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.Number)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
@@ -277,8 +272,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     "Denmark"),
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);
@@ -308,7 +302,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         public async Task Validate_OrganizationAddressZipCode_ValidatesProperty(string value, bool isValid)
         {
             // Arrange
-            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Address)}.{nameof(ChangeOrganizationDto.Address.ZipCode)}";
+            var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.ZipCode)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
@@ -319,8 +313,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     value,
                     string.Empty,
                     "Denmark"),
-                "energinet.dk",
-                "Test Comment");
+                "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
             var command = new CreateOrganizationCommand(organizationDto);

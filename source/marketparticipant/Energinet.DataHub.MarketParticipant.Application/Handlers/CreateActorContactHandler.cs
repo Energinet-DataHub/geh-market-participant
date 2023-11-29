@@ -76,7 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers
             return new ActorContact(
                 actorId,
                 contactDto.Name,
-                Enum.Parse<ContactCategory>(contactDto.Category, true),
+                contactDto.Category,
                 new EmailAddress(contactDto.Email),
                 optionalPhoneNumber);
         }

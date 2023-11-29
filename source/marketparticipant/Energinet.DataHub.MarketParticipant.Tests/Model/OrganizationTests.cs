@@ -36,8 +36,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                     "fake_value",
                     "fake_value",
                     "fake_value"),
-                new OrganizationDomain("energinet.dk"),
-                null);
+                new OrganizationDomain("energinet.dk"));
 
             // Assert
             Assert.Equal(OrganizationStatus.New, organization.Status);
@@ -144,7 +143,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
                     "fake_value",
                     "fake_value"),
                  new OrganizationDomain("energinet.dk"),
-                 "fake_value",
                  status);
         }
     }

@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Model.ActiveDirectory;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Services
 {
@@ -26,43 +23,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
     public interface IActiveDirectoryB2CService
     {
         /// <summary>
-        /// Creates a consumer app registration.
+        /// Assigns an application registration to the given actor.
         /// </summary>
-        /// <param name="actorNumber">The actor number of the actor to create.</param>
-        /// <param name="permissions">Roles to be assigned to the app.</param>
-        /// <returns>A <see cref="CreateAppRegistrationResponse"/> representing the newly created app and service principal.</returns>
-        Task<CreateAppRegistrationResponse> CreateAppRegistrationAsync(
-            ActorNumber actorNumber,
-            IReadOnlyCollection<EicFunction> permissions);
+        /// <param name="actor">The actor for which to create an app and service principal.</param>
+        Task AssignApplicationRegistrationAsync(Actor actor);
 
         /// <summary>
-        /// Gets an existing app from active directory.
+        /// Deletes the app and service prinicipal, for the given actor, from active directory.
         /// </summary>
-        /// <param name="appRegistrationObjectId">The object id for the registered app.</param>
-        /// <param name="appRegistrationServicePrincipalObjectId">The object id representing the service principal.</param>
-        /// <returns>A <see cref="ActiveDirectoryAppInformation"/> representing the retrieved app.</returns>
-        Task<ActiveDirectoryAppInformation> GetExistingAppRegistrationAsync(
-            AppRegistrationObjectId appRegistrationObjectId,
-            AppRegistrationServicePrincipalObjectId appRegistrationServicePrincipalObjectId);
-
-        /// <summary>
-        /// Deletes the registered app from active directory.
-        /// </summary>
-        /// <param name="externalActorId">The unique id for the app.</param>
-        Task DeleteAppRegistrationAsync(ExternalActorId externalActorId);
-
-        /// <summary>
-        /// Adds a client secret to an App registration
-        /// </summary>
-        /// <param name="externalActorId">TThe unique id for the app.</param>
-        /// <returns>The secret created for the application</returns>
-        /// <remarks>The secret returned can only be used while in memory, it is not available in clear text after this</remarks>
-        Task<(Guid SecretId, string SecretText, DateTimeOffset ExpirationDate)> CreateSecretForAppRegistrationAsync(ExternalActorId externalActorId);
-
-        /// <summary>
-        /// Removes all client secrets to an App registration
-        /// </summary>
-        /// <param name="externalActorId">The unique id for the app.</param>
-        Task RemoveSecretsForAppRegistrationAsync(ExternalActorId externalActorId);
+        /// <param name="actor">The actor for which to remove the app and service principal.</param>
+        Task DeleteAppRegistrationAsync(Actor actor);
     }
 }

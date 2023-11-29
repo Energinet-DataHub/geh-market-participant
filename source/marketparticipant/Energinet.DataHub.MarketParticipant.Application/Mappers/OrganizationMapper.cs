@@ -30,7 +30,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
                 organization.Name,
                 organization.BusinessRegisterIdentifier.Identifier,
                 organization.Domain.Value,
-                organization.Comment,
                 organization.Status.ToString(),
                 Map(organization.Address));
         }
@@ -60,7 +59,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Mappers
         private static ActorMarketRoleDto Map(ActorMarketRole marketRole)
         {
             return new ActorMarketRoleDto(
-                marketRole.Function.ToString(),
+                marketRole.Function,
                 marketRole.GridAreas.Select(e => new ActorGridAreaDto(e.Id.Value, e.MeteringPointTypes.Select(m => m.ToString()))),
                 marketRole.Comment);
         }
