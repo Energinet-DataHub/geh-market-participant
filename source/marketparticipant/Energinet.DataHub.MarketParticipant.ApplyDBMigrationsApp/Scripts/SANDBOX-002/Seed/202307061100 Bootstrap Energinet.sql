@@ -30,7 +30,8 @@ INSERT INTO [dbo].[Organization] (
     [Address_Country],
     [Comment],
     [Status],
-    [Domain]
+    [Domain],
+    [ChangedByIdentityId]
 )
 VALUES
     (
@@ -44,7 +45,8 @@ VALUES
 	'DK',
 	NULL,
 	2,
-	'energinet.dk');
+	'energinet.dk',
+    '00000000-FFFF-FFFF-FFFF-000000000000');
 
 -- Create Energinet Actor
 DECLARE @actorId varchar(36) = '00000000-0000-0000-0000-000000000001'
@@ -56,7 +58,8 @@ INSERT INTO [dbo].[Actor] (
     [ActorNumber],
     [Status],
     [Name],
-    [IsFas]
+    [IsFas],
+    [ChangedByIdentityId]
 )
 VALUES
     (
@@ -66,7 +69,8 @@ VALUES
         '5790001330583',
         2,
         'Energinet DataHub A/S (DataHub systemadministrator)',
-        1);
+        1,
+        '00000000-FFFF-FFFF-FFFF-000000000000');
 
 -- Assign Market Role
 INSERT INTO [dbo].[MarketRole] (
