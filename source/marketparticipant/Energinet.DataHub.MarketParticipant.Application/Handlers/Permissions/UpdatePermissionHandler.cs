@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
@@ -40,7 +41,12 @@ public sealed class UpdatePermissionHandler : IRequestHandler<UpdatePermissionCo
             .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(permissionToUpdate, $"Permission not found: {request.PermissionId}");
+        if (permissionToUpdate == null)
+        {
+            throw new ValidationException($"Permission not found: {request.PermissionId}")
+                .WithErrorCode("not_found")
+                .WithArgs(("id", (PermissionId)request.PermissionId));
+        }
 
         permissionToUpdate.Description = request.Description;
 

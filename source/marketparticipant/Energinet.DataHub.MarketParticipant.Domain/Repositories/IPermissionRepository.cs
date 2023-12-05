@@ -24,7 +24,7 @@ public interface IPermissionRepository
     Task<IEnumerable<Permission>> GetAllAsync();
     Task<IEnumerable<Permission>> GetForMarketRoleAsync(EicFunction eicFunction);
 
-    Task<Permission> GetAsync(PermissionId permission);
+    Task<Permission?> GetAsync(PermissionId permission);
     Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions);
 
     Task UpdatePermissionAsync(Permission permission);

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -35,24 +36,31 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
 
     public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId)
     {
+        ArgumentNullException.ThrowIfNull(requestExternalUserId);
+
         var identityUserOpenId = await _userIdentityRepository.FindIdentityReadyForOpenIdSetupAsync(requestExternalUserId).ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(identityUserOpenId, $"External user id {requestExternalUserId} not found for open id setup.");
+        NotFoundValidationException.ThrowIfNull(
+            identityUserOpenId,
+            requestExternalUserId.Value,
+            $"External user id {requestExternalUserId} not found for open id setup.");
 
         var userIdentityInvitedOnEmail = await _userIdentityRepository.GetAsync(identityUserOpenId.Email).ConfigureAwait(false);
-
         if (userIdentityInvitedOnEmail == null)
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
-            throw new NotFoundValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
+            throw new ValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.")
+                .WithErrorCode("open_id_not_found")
+                .WithArgs(("id", identityUserOpenId.Email));
         }
 
         var userLocalIdentityByEmail = await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
-
         if (userLocalIdentityByEmail == null)
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
-            throw new NotFoundValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
+            throw new ValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.")
+                .WithErrorCode("open_id_not_found")
+                .WithArgs(("id", userIdentityInvitedOnEmail.Id));
         }
 
         if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTimeOffset.UtcNow.AddMinutes(-15))

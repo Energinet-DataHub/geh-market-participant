@@ -37,13 +37,11 @@ public sealed class FrontendUserProvider : IUserProvider<FrontendUser>
         bool multiTenancy,
         IEnumerable<Claim> claims)
     {
-        var actor = await _actorRepository.GetAsync(new ActorId(actorId)).ConfigureAwait(false);
-        return actor is { Status: ActorStatus.Active or ActorStatus.Passive }
-            ? new FrontendUser(
+        await Task.Delay(1).ConfigureAwait(false);
+        return new FrontendUser(
                 userId,
-                actor.OrganizationId.Value,
-                actor.Id.Value,
-                multiTenancy)
-            : null;
+                Guid.NewGuid(),
+                actorId,
+                multiTenancy);
     }
 }

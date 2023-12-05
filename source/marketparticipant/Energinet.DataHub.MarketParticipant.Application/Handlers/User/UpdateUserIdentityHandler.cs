@@ -50,10 +50,10 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
         ArgumentNullException.ThrowIfNull(request);
 
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
-        NotFoundValidationException.ThrowIfNull(user, $"The specified user {request.UserId} was not found.");
+        NotFoundValidationException.ThrowIfNull(user, request.UserId, $"The specified user {request.UserId} was not found.");
 
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
-        NotFoundValidationException.ThrowIfNull(userIdentity, $"The specified user identity {user.ExternalId} was not found.");
+        NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value, $"The specified user identity {user.ExternalId} was not found.");
 
         await LogAuditEntryAsync(
             user.Id,

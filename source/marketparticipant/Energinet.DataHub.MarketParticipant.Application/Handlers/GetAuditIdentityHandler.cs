@@ -101,7 +101,7 @@ public sealed class GetAuditIdentityHandler : IRequestHandler<GetAuditIdentityCo
             .GetAsync(user.ExternalId)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(userIdentity, $"No external identity found for id {request.AuditIdentityId}.");
+        NotFoundValidationException.ThrowIfNull(userIdentity, request.AuditIdentityId, $"No external identity found for id {request.AuditIdentityId}.");
 
         return new GetAuditIdentityResponse($"{userIdentity.FirstName} ({userIdentity.Email})");
     }

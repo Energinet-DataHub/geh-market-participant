@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
@@ -85,7 +86,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Model
         {
             if (!allowedStates.Contains(_status) && targetState != _status)
             {
-                throw new ValidationException($"Cannot change state from {_status} to {targetState}.");
+                throw new ValidationException($"Cannot change state from {_status} to {targetState}.")
+                    .WithErrorCode("organization.state.mismatch")
+                    .WithArgs(("from", _status), ("to", targetState));
             }
         }
     }

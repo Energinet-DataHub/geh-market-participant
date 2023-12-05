@@ -22,22 +22,32 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Exception
     {
         [Obsolete("Use ctor with a value.")]
         public NotFoundValidationException()
+            : base("Entity does not exist.")
         {
         }
 
+        [Obsolete("Use ctor with a value.")]
         public NotFoundValidationException(string message)
             : base(message)
         {
         }
 
+        [Obsolete("Use ctor with a value.")]
         public NotFoundValidationException(string message, System.Exception innerException)
             : base(message, innerException)
         {
         }
 
         public NotFoundValidationException(Guid id)
-            : base(CreateMessage(id))
+            : this(id, CreateMessage(id))
         {
+        }
+
+        public NotFoundValidationException(Guid id, string message)
+            : base(message)
+        {
+            this.WithErrorCode("not_found");
+            this.WithArgs(("id", id));
         }
 
         public static void ThrowIfNull([NotNull] object? value, Guid id)
@@ -48,17 +58,17 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Exception
             }
         }
 
-        public static void ThrowIfNull([NotNull] object? value, string message)
+        public static void ThrowIfNull([NotNull] object? value, Guid id, string message)
         {
             if (value == null)
             {
-                throw new NotFoundValidationException(message);
+                throw new NotFoundValidationException(id, message);
             }
         }
 
         private static string CreateMessage(Guid id)
         {
-            return $"Entity with id {id} does not exist.";
+            return $"Entity '{id}' does not exist.";
         }
     }
 }
