@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,6 +24,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
 public sealed class DataValidationExceptionHandler : CommonExceptionHandlerBase<ValidationException>
 {
+    private static readonly ReadOnlyDictionary<string, object> _emptyArgs = new(new Dictionary<string, object>());
     private readonly string _errorCodePrefix;
 
     public DataValidationExceptionHandler(string errorCodePrefix)
@@ -41,12 +43,12 @@ public sealed class DataValidationExceptionHandler : CommonExceptionHandlerBase<
         return response.WriteAsJsonAsync(new { errors = new[] { errorDescriptor } });
     }
 
-    private static Dictionary<string, object> NormalizeArgs(ValidationException exception)
+    private static IReadOnlyDictionary<string, object> NormalizeArgs(ValidationException exception)
     {
         if (exception.Data[ValidationExceptionExtensions.ArgsDataKey] is IEnumerable<(string Key, object Value)> args)
             return args.ToDictionary(x => x.Key, x => x.Value);
 
-        return new Dictionary<string, object>();
+        return _emptyArgs;
     }
 
     private string NormalizeErrorCode(ValidationException exception)
