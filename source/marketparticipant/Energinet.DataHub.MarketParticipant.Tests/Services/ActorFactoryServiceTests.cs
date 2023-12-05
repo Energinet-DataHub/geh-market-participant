@@ -90,6 +90,62 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
         }
 
         [Fact]
+        public async Task CreateAsync_NewActorGridAccessProvider_MultiGridAreas_AddsAndReturnsActor()
+        {
+            // Arrange
+            var actorRepositoryMock = new Mock<IActorRepository>();
+
+            var target = new ActorFactoryService(
+                actorRepositoryMock.Object,
+                UnitOfWorkProviderMock.Create(),
+                new Mock<IOverlappingEicFunctionsRuleService>().Object,
+                new Mock<IUniqueGlobalLocationNumberRuleService>().Object,
+                new Mock<IUniqueMarketRoleGridAreaRuleService>().Object,
+                new Mock<IDomainEventRepository>().Object);
+
+            var validMeteringPointTypes = new List<MeteringPointType> { MeteringPointType.D05NetProduction };
+            var validGridAreas = new List<ActorGridArea>
+            {
+                new(new GridAreaId(Guid.NewGuid()), validMeteringPointTypes),
+                new(new GridAreaId(Guid.NewGuid()), validMeteringPointTypes),
+                new(new GridAreaId(Guid.NewGuid()), validMeteringPointTypes)
+            };
+
+            var organization = new Organization("fake_value", _validCvrBusinessRegisterIdentifier, _validAddress, _validDomain);
+            var marketRoles = new List<ActorMarketRole> { new(EicFunction.GridAccessProvider, validGridAreas) };
+            var actorId = new ActorId(Guid.NewGuid());
+
+            actorRepositoryMock
+                .Setup(x => x.AddOrUpdateAsync(It.IsAny<Actor>()))
+                .ReturnsAsync(new Result<ActorId, ActorError>(actorId));
+
+            var committedActor = new Actor(
+                actorId,
+                new OrganizationId(Guid.NewGuid()),
+                null,
+                new MockedGln(),
+                ActorStatus.Active,
+                marketRoles,
+                new ActorName("fake_value"),
+                null);
+
+            actorRepositoryMock
+                .Setup(x => x.GetAsync(It.IsAny<ActorId>()))
+                .ReturnsAsync(committedActor);
+
+            // Act
+            var response = await target
+                .CreateAsync(
+                    organization,
+                    committedActor.ActorNumber,
+                    committedActor.Name,
+                    marketRoles);
+
+            // Assert
+            Assert.NotNull(response);
+        }
+
+        [Fact]
         public async Task CreateAsync_NewActor_EnsuresGlnUniqueness()
         {
             // Arrange
