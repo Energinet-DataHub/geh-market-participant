@@ -46,7 +46,6 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Exception
         public NotFoundValidationException(Guid id, string message)
             : base(message)
         {
-            this.WithErrorCode("not_found");
             this.WithArgs(("id", id));
         }
 

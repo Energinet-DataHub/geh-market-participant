@@ -72,6 +72,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi
             {
                 const string prefix = "market_participant";
                 builder.Use(new FluentValidationExceptionHandler(prefix));
+                builder.Use(new NotFoundValidationExceptionHandler(prefix));
                 builder.Use(new DataValidationExceptionHandler(prefix));
                 builder.Use(new FallbackExceptionHandler(prefix));
             });
