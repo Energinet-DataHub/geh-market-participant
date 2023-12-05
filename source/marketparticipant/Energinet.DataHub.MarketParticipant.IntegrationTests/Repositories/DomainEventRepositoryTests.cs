@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -98,5 +99,45 @@ public sealed class DomainEventRepositoryTests
             domainEvent.EntityId == actor.Id.Value &&
             domainEvent.EntityType == "Actor" &&
             domainEvent.EventTypeName == "GridAreaOwnershipAssigned");
+    }
+
+    [Fact]
+    public async Task EnqueueAsync_WithEvents_MultiGridArea_EventsSaved()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context = _fixture.DatabaseManager.CreateDbContext();
+
+        var target = scope.ServiceProvider.GetRequiredService<IDomainEventRepository>();
+
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.New,
+            Array.Empty<ActorMarketRole>(),
+            new ActorName(string.Empty),
+            null);
+
+        actor.AddMarketRole(new ActorMarketRole(EicFunction.GridAccessProvider, new[]
+        {
+            new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>()),
+            new ActorGridArea(new GridAreaId(Guid.NewGuid()), Array.Empty<MeteringPointType>())
+        }));
+
+        actor.Activate();
+
+        // Act
+        await target.EnqueueAsync(actor);
+
+        // Assert
+        var events = context.DomainEvents.Where(domainEvent =>
+            domainEvent.EntityId == actor.Id.Value &&
+            domainEvent.EntityType == "Actor" &&
+            domainEvent.EventTypeName == "GridAreaOwnershipAssigned");
+
+        Assert.Equal(2, events.Count());
     }
 }
