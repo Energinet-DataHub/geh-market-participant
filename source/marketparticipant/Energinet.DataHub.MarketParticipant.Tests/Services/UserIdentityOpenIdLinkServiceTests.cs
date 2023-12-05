@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
@@ -109,7 +110,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 userIdentityRepository.Object);
 
             // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+            await Assert.ThrowsAsync<ValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
             userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
             userIdentityRepository.Verify(e => e.GetAsync(email));
         }
@@ -141,7 +142,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Services
                 userIdentityRepository.Object);
 
             // Act + Assert
-            await Assert.ThrowsAsync<NotFoundValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
+            await Assert.ThrowsAsync<ValidationException>(() => userIdentityOpenIdLinkService.ValidateAndSetupOpenIdAsync(externalUserId));
             userIdentityRepository.Verify(e => e.DeleteAsync(externalUserId));
             userRepository.Verify(e => e.GetAsync(userToReturnFromService.Id));
         }

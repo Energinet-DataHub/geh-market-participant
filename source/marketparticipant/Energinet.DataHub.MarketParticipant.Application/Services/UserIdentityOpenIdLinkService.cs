@@ -50,7 +50,7 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new ValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.")
-                .WithErrorCode("open_id_not_found")
+                .WithErrorCode("user.open_id.not_found")
                 .WithArgs(("id", identityUserOpenId.Email));
         }
 
@@ -59,7 +59,7 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
             throw new ValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.")
-                .WithErrorCode("open_id_not_found")
+                .WithErrorCode("user.open_id.not_found")
                 .WithArgs(("id", userIdentityInvitedOnEmail.Id));
         }
 
