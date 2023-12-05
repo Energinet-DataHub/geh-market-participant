@@ -63,7 +63,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         await (request.IsAdministratedByIdentity switch
         {
             true => DeactivateUserAsync(user),
-            false => DisassociateUserAsync(user),
+            false => RemoveUserFromCurrentActorAsync(user),
         }).ConfigureAwait(false);
     }
 
@@ -100,7 +100,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
     }
 
-    private async Task DisassociateUserAsync(Domain.Model.Users.User user)
+    private async Task RemoveUserFromCurrentActorAsync(Domain.Model.Users.User user)
     {
         var userRoleAssignemts = user.RoleAssignments.Where(x => x.ActorId.Value == _userContext.CurrentUser.ActorId);
 

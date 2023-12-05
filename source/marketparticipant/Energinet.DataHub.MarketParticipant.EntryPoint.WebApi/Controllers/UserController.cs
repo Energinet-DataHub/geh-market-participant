@@ -83,7 +83,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
     public async Task<ActionResult<GetUserResponse>> GetAsync(Guid userId)
     {
-        if (await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false) != IdentityUserPermission.None)
+        if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new GetUserCommand(userId);
@@ -136,7 +136,7 @@ public class UserController : ControllerBase
         Guid userId,
         UserIdentityUpdateDto userIdentityUpdateDto)
     {
-        if (await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false) != IdentityUserPermission.AdministratedByActor)
+        if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
@@ -161,7 +161,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> DeactivateAsync(Guid userId)
     {
-        var identityUserPermission = await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false);
+        var identityUserPermission = await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false);
 
         if (identityUserPermission is IdentityUserPermission.None)
         {
@@ -179,7 +179,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
     {
-        if (await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false) != IdentityUserPermission.AdministratedByActor)
+        if (await GetIdentityPermissionForCurrentUserAsync(userId).ConfigureAwait(false) == IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new ResetUserTwoFactorAuthenticationCommand(userId);
@@ -210,7 +210,7 @@ public class UserController : ControllerBase
         return Guid.Parse(userIdClaim.Value);
     }
 
-    private async Task<IdentityUserPermission> GetIdentityUserPermissionAsync(Guid userId)
+    private async Task<IdentityUserPermission> GetIdentityPermissionForCurrentUserAsync(Guid userId)
     {
         if (_userContext.CurrentUser.IsFas)
             return IdentityUserPermission.AdministratedByActor;
