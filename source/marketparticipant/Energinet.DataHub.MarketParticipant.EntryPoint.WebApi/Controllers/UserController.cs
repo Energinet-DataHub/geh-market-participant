@@ -47,6 +47,13 @@ public class UserController : ControllerBase
         _mediator = mediator;
     }
 
+    private enum IdentityUserPermission
+    {
+        None,
+        AssignedToActor,
+        AdministratedByActor,
+    }
+
     [HttpGet("actors")]
     [AllowAnonymous]
     public async Task<ActionResult<GetActorsAssociatedWithExternalUserIdResponse>> GetAssociatedUserActorsAsync(string externalToken)
@@ -76,7 +83,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersView, PermissionId.UsersManage)]
     public async Task<ActionResult<GetUserResponse>> GetAsync(Guid userId)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+        if (await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false) != IdentityUserPermission.None)
             return Unauthorized();
 
         var command = new GetUserCommand(userId);
@@ -104,7 +111,10 @@ public class UserController : ControllerBase
             .Where(_userContext.CurrentUser.IsAssignedToActor)
             .ToList();
 
-        return Ok(associatedActors with { ActorIds = allowedActors });
+        return Ok(associatedActors with
+        {
+            ActorIds = allowedActors
+        });
     }
 
     [HttpGet("{userId:guid}/auditlogentry")]
@@ -126,7 +136,7 @@ public class UserController : ControllerBase
         Guid userId,
         UserIdentityUpdateDto userIdentityUpdateDto)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+        if (await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false) != IdentityUserPermission.AdministratedByActor)
             return Unauthorized();
 
         var command = new UpdateUserIdentityCommand(userIdentityUpdateDto, userId);
@@ -151,13 +161,15 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> DeactivateAsync(Guid userId)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
-            return Unauthorized();
+        var identityUserPermission = await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false);
 
-        var command = new DeactivateUserCommand(userId);
+        if (identityUserPermission is IdentityUserPermission.None)
+        {
+            return Unauthorized();
+        }
 
         await _mediator
-            .Send(command)
+            .Send(new DeactivateUserCommand(userId, identityUserPermission == IdentityUserPermission.AdministratedByActor))
             .ConfigureAwait(false);
 
         return Ok();
@@ -167,7 +179,7 @@ public class UserController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> ResetTwoFactorAuthenticationAsync(Guid userId)
     {
-        if (!await HasCurrentUserAccessToUserAsync(userId).ConfigureAwait(false))
+        if (await GetIdentityUserPermissionAsync(userId).ConfigureAwait(false) != IdentityUserPermission.AdministratedByActor)
             return Unauthorized();
 
         var command = new ResetUserTwoFactorAuthenticationCommand(userId);
@@ -198,16 +210,21 @@ public class UserController : ControllerBase
         return Guid.Parse(userIdClaim.Value);
     }
 
-    private async Task<bool> HasCurrentUserAccessToUserAsync(Guid userId)
+    private async Task<IdentityUserPermission> GetIdentityUserPermissionAsync(Guid userId)
     {
         if (_userContext.CurrentUser.IsFas)
-            return true;
+            return IdentityUserPermission.AdministratedByActor;
 
         var associatedActors = await _mediator
             .Send(new GetActorsAssociatedWithUserCommand(userId))
             .ConfigureAwait(false);
 
-        return _userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy) ||
-               associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor);
+        if (_userContext.CurrentUser.IsAssignedToActor(associatedActors.AdministratedBy))
+            return IdentityUserPermission.AdministratedByActor;
+
+        if (associatedActors.ActorIds.Any(_userContext.CurrentUser.IsAssignedToActor))
+            return IdentityUserPermission.AssignedToActor;
+
+        return IdentityUserPermission.None;
     }
 }
