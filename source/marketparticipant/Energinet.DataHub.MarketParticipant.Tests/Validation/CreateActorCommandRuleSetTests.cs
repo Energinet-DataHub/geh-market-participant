@@ -262,6 +262,37 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Fact]
+        public async Task Validate_MarketRoleFunction_Multiple_GridAreas_Allowed_On_GridAccessProvider()
+        {
+            // Arrange
+            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].{nameof(ActorMarketRoleDto.EicFunction)}";
+
+            var validMeteringPointTypes = new[] { MeteringPointType.D05NetProduction.ToString() };
+            var validGridAreas = new List<ActorGridAreaDto>
+            {
+                new(Guid.NewGuid(), validMeteringPointTypes),
+                new(Guid.NewGuid(), validMeteringPointTypes),
+                new(Guid.NewGuid(), validMeteringPointTypes)
+            };
+
+            var organizationRoleDto = new CreateActorDto(
+                Guid.Parse(ValidId),
+                new ActorNameDto("fake_name"),
+                new ActorNumberDto(ValidGln),
+                new[] { new ActorMarketRoleDto(EicFunction.GridAccessProvider, validGridAreas, string.Empty) });
+
+            var target = new CreateActorCommandRuleSet();
+            var command = new CreateActorCommand(organizationRoleDto);
+
+            // Act
+            var result = await target.ValidateAsync(command);
+
+            // Assert
+            Assert.True(result.IsValid);
+            Assert.DoesNotContain(propertyName, result.Errors.Select(x => x.PropertyName));
+        }
+
+        [Fact]
         public async Task Validate_NullMeteringPointTypes_ValidatesProperty()
         {
             // Arrange
