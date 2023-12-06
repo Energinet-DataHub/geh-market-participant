@@ -13,9 +13,12 @@
 // limitations under the License.
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
+using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -32,19 +35,22 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
     private readonly IUserStatusCalculator _userStatusCalculator;
     private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
+    private readonly IUserContext<FrontendUser> _userContext;
 
     public DeactivateUserHandler(
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
         IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
-        IAuditIdentityProvider auditIdentityProvider)
+        IAuditIdentityProvider auditIdentityProvider,
+        IUserContext<FrontendUser> userContext)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userStatusCalculator = userStatusCalculator;
         _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
         _auditIdentityProvider = auditIdentityProvider;
+        _userContext = userContext;
     }
 
     public async Task Handle(DeactivateUserCommand request, CancellationToken cancellationToken)
@@ -54,6 +60,15 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         var user = await _userRepository.GetAsync(new UserId(request.UserId)).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(user, request.UserId);
 
+        await (request.IsAdministratedByIdentity switch
+        {
+            true => DeactivateUserAsync(user),
+            false => RemoveUserFromCurrentActorAsync(user),
+        }).ConfigureAwait(false);
+    }
+
+    private async Task DeactivateUserAsync(Domain.Model.Users.User user)
+    {
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value);
 
@@ -83,5 +98,19 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
             UserIdentityAuditLogField.Status);
 
         await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
+    }
+
+    private async Task RemoveUserFromCurrentActorAsync(Domain.Model.Users.User user)
+    {
+        var userRoleAssignemts = user.RoleAssignments.Where(x => x.ActorId.Value == _userContext.CurrentUser.ActorId);
+
+        foreach (var userRoleAssignment in userRoleAssignemts)
+        {
+            user.RoleAssignments.Remove(userRoleAssignment);
+        }
+
+        await _userRepository
+            .AddOrUpdateAsync(user)
+            .ConfigureAwait(false);
     }
 }
