@@ -13,17 +13,13 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
-public static class ActorErrorHandler
+public abstract class CommonExceptionHandlerBase<T>
+    where T : Exception
 {
-    public static System.Exception HandleActorError(ActorError source) => source switch
-    {
-        ActorError.ThumbprintCredentialsConflict => new ValidationException("An actor with the same certificate thumbprint already exists.")
-            .WithErrorCode("actor.credentials.thumbprint_reserved"),
-        _ => throw new ArgumentOutOfRangeException(nameof(source))
-    };
+    public abstract Task HandleExceptionAsync(T exception, HttpResponse response);
 }

@@ -13,65 +13,20 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using DataValidationException = System.ComponentModel.DataAnnotations.ValidationException;
-using FluentValidationException = FluentValidation.ValidationException;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Extensions;
 
 public static class CommonExceptionHandlingExtensions
 {
-    public static IApplicationBuilder UseCommonExceptionHandling(this IApplicationBuilder app)
+    public static IApplicationBuilder UseCommonExceptionHandling(this IApplicationBuilder app, Action<CommonExceptionHandlingBuilder> registration)
     {
-        return app.UseExceptionHandler(appBuilder => appBuilder.Use(_ => HandleRequestExceptionAsync));
-    }
+        ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(registration);
 
-    private static Task HandleRequestExceptionAsync(HttpContext context)
-    {
-        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-        ArgumentNullException.ThrowIfNull(exceptionHandlerFeature, nameof(exceptionHandlerFeature));
-        return HandleKnownExceptionAsync((dynamic)exceptionHandlerFeature.Error, context.Response);
-    }
+        var cehRegistration = new CommonExceptionHandlingBuilder();
+        registration(cehRegistration);
 
-    private static Task HandleKnownExceptionAsync(NotFoundValidationException exception, HttpResponse response)
-    {
-        response.StatusCode = StatusCodes.Status404NotFound;
-        return WriteErrorAsync(response, new ErrorDescriptor("NOT_FOUND_EXCEPTION", exception.Message));
+        return app.UseExceptionHandler(appBuilder => appBuilder.Use(_ => cehRegistration.HandleRequestExceptionAsync));
     }
-
-    private static Task HandleKnownExceptionAsync(FluentValidationException exception, HttpResponse response)
-    {
-        response.StatusCode = StatusCodes.Status400BadRequest;
-        var affectedProperties = exception.Errors.Select(err => new ErrorDescriptor(err.ErrorCode, err.ErrorMessage, err.PropertyName));
-        return WriteErrorAsync(response, new ErrorDescriptor("VALIDATION_EXCEPTION", "See details property for more information.", Details: affectedProperties));
-    }
-
-    private static Task HandleKnownExceptionAsync(DataValidationException exception, HttpResponse response)
-    {
-        response.StatusCode = StatusCodes.Status400BadRequest;
-        return WriteErrorAsync(response, new ErrorDescriptor("VALIDATION_EXCEPTION", exception.Message));
-    }
-
-    private static Task HandleKnownExceptionAsync(Exception exception, HttpResponse response)
-    {
-        response.StatusCode = StatusCodes.Status500InternalServerError;
-        return WriteErrorAsync(response, new ErrorDescriptor("INTERNAL_ERROR", "An error occurred while processing the request."));
-    }
-
-    private static Task WriteErrorAsync(HttpResponse response, ErrorDescriptor error)
-    {
-        return response.WriteAsJsonAsync(new { error });
-    }
-
-    private sealed record ErrorDescriptor(
-        string Code,
-        string Message,
-        string? Target = null,
-        IEnumerable<ErrorDescriptor>? Details = null);
 }

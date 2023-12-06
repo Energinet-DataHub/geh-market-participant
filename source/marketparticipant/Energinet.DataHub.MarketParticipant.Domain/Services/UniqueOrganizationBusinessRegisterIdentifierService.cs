@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -32,6 +33,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
 
         public async Task EnsureUniqueBusinessRegisterIdentifierAsync(Organization organization)
         {
+            ArgumentNullException.ThrowIfNull(organization);
+
             var organizations = await _organizationRepository.GetAsync().ConfigureAwait(false);
             if (organizations.Any(
                 x => string.Equals(
@@ -40,7 +43,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
                     StringComparison.OrdinalIgnoreCase)
                      && x.Id.Value != organization.Id.Value))
             {
-                throw new ValidationException("The business register identifier is already in use");
+                throw new ValidationException("The business register identifier is already in use.")
+                    .WithErrorCode("organization.business_register_identifier.reserved")
+                    .WithArgs(("identifier", organization.BusinessRegisterIdentifier.Identifier));
             }
         }
     }

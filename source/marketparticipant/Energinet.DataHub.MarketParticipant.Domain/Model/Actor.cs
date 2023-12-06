@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Events;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -154,6 +155,8 @@ public sealed class Actor : IPublishDomainEvents
 
     IReadOnlyList<DomainEvent> IPublishDomainEvents.DomainEvents => _domainEvents;
 
+    private bool AreMarketRolesReadOnly => Status != ActorStatus.New;
+
     /// <summary>
     /// Adds a new role from the current actor.
     /// This is only allowed for 'New' actors.
@@ -163,14 +166,15 @@ public sealed class Actor : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(marketRole);
 
-        if (Status != ActorStatus.New)
+        if (AreMarketRolesReadOnly)
         {
             throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
         }
 
         if (_marketRoles.Any(role => role.Function == marketRole.Function))
         {
-            throw new ValidationException("The market roles cannot contain duplicates.");
+            throw new ValidationException("The market roles cannot contain duplicates.")
+                .WithErrorCode("actor.market_role.duplicates");
         }
 
         _marketRoles.Add(marketRole);
@@ -185,14 +189,16 @@ public sealed class Actor : IPublishDomainEvents
     {
         ArgumentNullException.ThrowIfNull(marketRole);
 
-        if (Status != ActorStatus.New)
+        if (AreMarketRolesReadOnly)
         {
             throw new ValidationException("It is only allowed to modify market roles for actors marked as 'New'.");
         }
 
         if (!_marketRoles.Remove(marketRole))
         {
-            throw new ValidationException($"Market role for {marketRole.Function} was not found.");
+            throw new ValidationException($"Market role for {marketRole.Function} was not found.")
+                .WithErrorCode("actor.market_role.not_found")
+                .WithArgs(("market_role", marketRole.Function));
         }
     }
 
@@ -237,7 +243,10 @@ public sealed class Actor : IPublishDomainEvents
     public void Deactivate()
     {
         if (_credentials != null)
-            throw new ValidationException("Cannot disable actor with active credentials. Remove the credentials first, then try again.");
+        {
+            throw new ValidationException("Cannot disable actor with active credentials. Remove the credentials first, then try again.")
+                .WithErrorCode("actor.credentials.still_active");
+        }
 
         _actorStatusTransitioner.Deactivate();
     }

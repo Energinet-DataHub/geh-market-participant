@@ -35,24 +35,27 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
 
     public async Task<UserIdentity> ValidateAndSetupOpenIdAsync(ExternalUserId requestExternalUserId)
     {
+        ArgumentNullException.ThrowIfNull(requestExternalUserId);
+
         var identityUserOpenId = await _userIdentityRepository.FindIdentityReadyForOpenIdSetupAsync(requestExternalUserId).ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(identityUserOpenId, $"External user id {requestExternalUserId} not found for open id setup.");
+        NotFoundValidationException.ThrowIfNull(
+            identityUserOpenId,
+            requestExternalUserId.Value,
+            $"External user id {requestExternalUserId} not found for open id setup.");
 
         var userIdentityInvitedOnEmail = await _userIdentityRepository.GetAsync(identityUserOpenId.Email).ConfigureAwait(false);
-
         if (userIdentityInvitedOnEmail == null)
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
-            throw new NotFoundValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
+            throw new NotSupportedException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
         }
 
         var userLocalIdentityByEmail = await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
-
         if (userLocalIdentityByEmail == null)
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
-            throw new NotFoundValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
+            throw new NotSupportedException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
         }
 
         if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTimeOffset.UtcNow.AddMinutes(-15))
