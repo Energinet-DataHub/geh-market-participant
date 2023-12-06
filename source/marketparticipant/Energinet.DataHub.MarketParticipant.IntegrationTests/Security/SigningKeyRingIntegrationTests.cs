@@ -14,6 +14,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Security.KeyVault.Keys;
 using Azure.Security.KeyVault.Keys.Cryptography;
@@ -54,6 +55,24 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
         // Assert
         var jwk = keys.Single();
         Assert.Equal(_keyClientFixture.KeyName + "/", new Uri(jwk.Id).Segments[^2]);
+    }
+
+    [Fact]
+    public async Task GetKeysAsync_ExceptionOccurs_DoesNotDeadlock()
+    {
+        // Arrange
+        var keyClient = new Mock<KeyClient>();
+        keyClient.Setup(x => x.GetPropertiesOfKeyVersionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Throws(() => new InvalidOperationException());
+
+        var target = new SigningKeyRing(
+            SystemClock.Instance,
+            keyClient.Object,
+            _keyClientFixture.KeyName);
+
+        // Act, Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => target.GetKeysAsync());
+        await Assert.ThrowsAsync<InvalidOperationException>(() => target.GetKeysAsync());
     }
 
     [Fact]
