@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -56,7 +57,9 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
                     if (!couldReserve)
                     {
-                        throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.");
+                        throw new ValidationException($"Another actor is already assigned the role of '{actorMarketRole.Function}' for the chosen grid area.")
+                            .WithErrorCode("actor.grid_area.reserved")
+                            .WithArgs(("market_role", actorMarketRole.Function), ("grid_area_id", gridArea.Id));
                     }
                 }
             }

@@ -15,6 +15,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users.Authentication;
 
@@ -35,7 +36,8 @@ public sealed class SmsAuthenticationMethod : AuthenticationMethod
     {
         if (!Regex.IsMatch(PhoneNumber.Number, "^\\+[0-9]+ [0-9]+$"))
         {
-            throw new ValidationException("SMS authentication requires the phone number to be formatted as '+{country} {number}', e.g. +1 5555551234.");
+            throw new ValidationException("SMS authentication requires the phone number to be formatted as '+{country} {number}', e.g. +1 5555551234.")
+                .WithErrorCode("user.authentication.invalid_phone");
         }
     }
 }

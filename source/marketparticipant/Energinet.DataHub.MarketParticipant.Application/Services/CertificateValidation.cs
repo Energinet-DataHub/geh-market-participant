@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography.X509Certificates;
-using FluentValidation;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -28,7 +29,8 @@ public class CertificateValidation : ICertificateValidation
 
         if (!verifyResult)
         {
-            throw new ValidationException("Certificate validation failed");
+            throw new ValidationException("Certificate validation failed.")
+                .WithErrorCode("actor.credentials.invalid");
         }
     }
 }

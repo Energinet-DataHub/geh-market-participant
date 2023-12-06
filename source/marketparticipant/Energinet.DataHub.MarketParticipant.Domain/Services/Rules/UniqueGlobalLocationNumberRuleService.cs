@@ -15,6 +15,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
@@ -37,7 +38,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services.Rules
 
             if (organizations.Any(o => o.Id != organization.Id))
             {
-                throw new ValidationException("The specified GLN is already in use.");
+                throw new ValidationException("The specified GLN is already in use.")
+                    .WithErrorCode("actor.number.reserved");
             }
         }
     }

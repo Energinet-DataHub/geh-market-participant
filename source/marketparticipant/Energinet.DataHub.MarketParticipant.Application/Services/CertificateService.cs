@@ -21,6 +21,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Security.KeyVault.Secrets;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Microsoft.Extensions.Logging;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
@@ -84,7 +85,8 @@ public class CertificateService : ICertificateService
         catch (CryptographicException ex)
         {
             _logger.LogError(ex, $"Certificate validation failed: {ex.InnerException}");
-            throw new ValidationException($"Certificate validation failed");
+            throw new ValidationException("Certificate validation failed.")
+                .WithErrorCode("actor.credentials.invalid");
         }
     }
 }

@@ -49,7 +49,8 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Services
             newOrganization.Activate();
 
             await _uniqueOrganizationBusinessRegisterIdentifierService
-                .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization).ConfigureAwait(false);
+                .EnsureUniqueBusinessRegisterIdentifierAsync(newOrganization)
+                .ConfigureAwait(false);
 
             var uow = await _unitOfWorkProvider
                 .NewUnitOfWorkAsync()

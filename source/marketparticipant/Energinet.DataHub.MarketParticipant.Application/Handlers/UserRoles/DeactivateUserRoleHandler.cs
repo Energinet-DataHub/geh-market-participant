@@ -54,7 +54,7 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
         var userRoleId = new UserRoleId(request.UserRoleId);
         var userRole = await _userRoleRepository.GetAsync(userRoleId).ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(userRole, $"User role with id: {userRoleId} was not found");
+        NotFoundValidationException.ThrowIfNull(userRole, userRoleId.Value, $"User role with id: {userRoleId} was not found");
 
         var users = await _userRepository
             .GetToUserRoleAsync(userRoleId)

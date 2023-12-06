@@ -15,6 +15,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
@@ -23,7 +24,11 @@ public sealed class OrganizationDomain
     public OrganizationDomain(string value)
     {
         if (!IsValid(value))
-            throw new ValidationException("Invalid domain");
+        {
+            throw new ValidationException($"The specified value '{value}' is not a valid domain.")
+                .WithErrorCode("organization.domain.invalid")
+                .WithArgs(("value", value));
+        }
 
         Value = value;
     }

@@ -72,7 +72,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
 
                     validator
                         .RuleFor(organization => organization.Domain)
-                        .Must(OrganizationDomain.IsValid);
+                        .Must(OrganizationDomain.IsValid)
+                        .WithErrorCode("invalid_domain");
                 });
         }
     }
