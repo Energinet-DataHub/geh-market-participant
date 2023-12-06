@@ -193,12 +193,7 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
             _keyClientFixture.KeyClient,
             _keyClientFixture.KeyName);
 
-        var data = new byte[]
-        {
-            1,
-            2,
-            3
-        };
+        var data = new byte[] { 1, 2, 3 };
 
         // Act
         var signingClient = await target.GetSigningClientAsync();
