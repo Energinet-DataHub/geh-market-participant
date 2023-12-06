@@ -48,14 +48,14 @@ public sealed class PermissionRepository : IPermissionRepository
         return GetAsync(knownPermissions);
     }
 
-    public async Task<Permission?> GetAsync(PermissionId permission)
+    public async Task<Permission> GetAsync(PermissionId permission)
     {
         var knownPermissions = KnownPermissions.All
             .Where(p => p.Id == permission)
             .ToList();
 
         var foundPermissions = await GetAsync(knownPermissions).ConfigureAwait(false);
-        return foundPermissions.SingleOrDefault();
+        return foundPermissions.Single();
     }
 
     public async Task<IEnumerable<Permission>> GetAsync(IEnumerable<PermissionId> permissions)

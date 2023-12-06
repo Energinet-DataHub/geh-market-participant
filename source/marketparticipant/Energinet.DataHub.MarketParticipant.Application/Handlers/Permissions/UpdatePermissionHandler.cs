@@ -40,8 +40,6 @@ public sealed class UpdatePermissionHandler : IRequestHandler<UpdatePermissionCo
             .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(permissionToUpdate, request.PermissionId, $"Permission '{request.PermissionId}' does not exist.");
-
         permissionToUpdate.Description = request.Description;
 
         await _permissionRepository

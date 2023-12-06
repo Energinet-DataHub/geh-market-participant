@@ -43,8 +43,6 @@ public sealed class GetPermissionHandler : IRequestHandler<GetPermissionCommand,
             .GetAsync((PermissionId)request.Id)
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(permission, request.Id, $"Permission '{request.Id}' does not exist.");
-
         return new GetPermissionResponse(
             new PermissionDto(
                 (int)permission.Id,

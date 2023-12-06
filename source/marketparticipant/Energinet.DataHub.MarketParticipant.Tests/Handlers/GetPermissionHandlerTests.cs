@@ -16,7 +16,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,23 +28,6 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers;
 [UnitTest]
 public sealed class GetPermissionHandlerTests
 {
-    [Fact]
-    public async Task Handle_UnknownPermission_ThrowsNotFound()
-    {
-        // Arrange
-        var repositoryMock = new Mock<IPermissionRepository>();
-
-        repositoryMock
-            .Setup(x => x.GetAsync(PermissionId.ActorsManage))
-            .ReturnsAsync((Permission?)null);
-
-        var target = new GetPermissionHandler(repositoryMock.Object);
-        var command = new GetPermissionCommand(int.MaxValue);
-
-        // Act + Assert
-        await Assert.ThrowsAsync<NotFoundValidationException>(() => target.Handle(command, CancellationToken.None));
-    }
-
     [Fact]
     public async Task Handle_ValidPermission_ReturnsPermission()
     {
