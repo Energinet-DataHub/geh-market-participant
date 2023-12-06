@@ -70,6 +70,8 @@ public sealed class PermissionAuditLogEntryRepositoryTests
 
         // Make an audited change.
         var permission = await permissionRepository.GetAsync(PermissionId.UsersManage);
+        Assert.NotNull(permission);
+
         permission.Description = "New description";
         await permissionRepository.UpdatePermissionAsync(permission);
 
