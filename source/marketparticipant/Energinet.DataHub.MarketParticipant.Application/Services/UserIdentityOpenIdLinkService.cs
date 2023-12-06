@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -49,18 +48,14 @@ public class UserIdentityOpenIdLinkService : IUserIdentityOpenIdLinkService
         if (userIdentityInvitedOnEmail == null)
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
-            throw new ValidationException($"User with email {identityUserOpenId.Email} not found with expected signInType.")
-                .WithErrorCode("user.open_id.not_found")
-                .WithArgs(("id", identityUserOpenId.Email));
+            throw new NotSupportedException($"User with email {identityUserOpenId.Email} not found with expected signInType.");
         }
 
         var userLocalIdentityByEmail = await _userRepository.GetAsync(userIdentityInvitedOnEmail.Id).ConfigureAwait(false);
         if (userLocalIdentityByEmail == null)
         {
             await DeleteOpenIdUserAsync(identityUserOpenId.Id).ConfigureAwait(false);
-            throw new ValidationException($"User with id {userIdentityInvitedOnEmail.Id} not found.")
-                .WithErrorCode("user.open_id.not_found")
-                .WithArgs(("id", userIdentityInvitedOnEmail.Id));
+            throw new NotSupportedException($"User with id {userIdentityInvitedOnEmail.Id} not found.");
         }
 
         if (userLocalIdentityByEmail.MitIdSignupInitiatedAt < DateTimeOffset.UtcNow.AddMinutes(-15))
