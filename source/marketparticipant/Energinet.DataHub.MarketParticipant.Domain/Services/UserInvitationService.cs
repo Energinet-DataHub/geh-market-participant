@@ -129,7 +129,8 @@ public sealed class UserInvitationService : IUserInvitationService
         var userStatus = _userStatusCalculator.CalculateUserStatus(user, userIdentity);
         if (userStatus != UserStatus.Invited && userStatus != UserStatus.InviteExpired)
         {
-            throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.");
+            throw new ValidationException($"The current user invitation for user {user.Id} is not expired and cannot be re-invited.")
+                .WithErrorCode("user.invite.not_expired");
         }
 
         user.ActivateUserExpiration();

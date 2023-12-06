@@ -13,8 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography.X509Certificates;
-using FluentValidation;
+using Energinet.DataHub.MarketParticipant.Domain.Exception;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services;
 
@@ -26,7 +27,8 @@ public sealed class NoCertificateValidation : ICertificateValidation
 
         if (certificate.NotAfter < DateTime.UtcNow)
         {
-            throw new ValidationException("Certificate has expired.");
+            throw new ValidationException("Certificate has expired.")
+                .WithErrorCode("actor.credentials.expired");
         }
     }
 }

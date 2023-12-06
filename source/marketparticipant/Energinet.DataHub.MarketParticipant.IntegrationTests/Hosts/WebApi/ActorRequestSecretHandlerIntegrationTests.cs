@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -20,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
-using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -125,7 +125,7 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
         // act, assert
         var actual = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(command));
 
-        Assert.Equal("Credentials have already been assigned", actual.Message);
+        Assert.Equal("Credentials have already been assigned.", actual.Message);
     }
 
     [Fact]
@@ -144,6 +144,6 @@ public sealed class ActorRequestSecretHandlerIntegrationTests
         // act, assert
         var actual = await Assert.ThrowsAsync<ValidationException>(() => mediator.Send(command));
 
-        Assert.Equal("Can't request a new secret, as the actor is either not Active or is still being created", actual.Message);
+        Assert.Equal("Can't request a new secret, as the actor is either not Active or is still being created.", actual.Message);
     }
 }

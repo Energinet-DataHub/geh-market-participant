@@ -46,7 +46,8 @@ public sealed class OrganizationDomainValidationService : IOrganizationDomainVal
 
         if (!userInviteEmail.Address.EndsWith("@" + organization.Domain.Value, StringComparison.OrdinalIgnoreCase))
         {
-            throw new ValidationException("User email not valid, should match organization domain");
+            throw new ValidationException("User email not valid, should match organization domain.")
+                .WithErrorCode("user.authentication.email_domain_mismatch");
         }
     }
 }

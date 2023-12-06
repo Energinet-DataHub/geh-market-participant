@@ -76,7 +76,7 @@ public sealed class InviteUserHandler : IRequestHandler<InviteUserCommand>
             .GetAsync(new ActorId(actorId))
             .ConfigureAwait(false);
 
-        NotFoundValidationException.ThrowIfNull(actor, actorId, $"The specified actor {actorId} was not found.");
+        NotFoundValidationException.ThrowIfNull(actor, actorId);
 
         var organization = await _organizationRepository
             .GetAsync(actor.OrganizationId)

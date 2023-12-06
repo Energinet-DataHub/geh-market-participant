@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -20,7 +21,6 @@ using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Domain.Services;
-using FluentValidation;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
@@ -49,10 +49,13 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
             NotFoundValidationException.ThrowIfNull(actor, request.ActorId);
 
             if (actor.Credentials is not null)
-                throw new ValidationException("Credentials have already been assigned");
+                throw new ValidationException("Credentials have already been assigned.");
 
             if (actor.ExternalActorId is null)
-                throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created");
+            {
+                throw new ValidationException("Can't request a new secret, as the actor is either not Active or is still being created.")
+                    .WithErrorCode("actor.credentials.invalid_state");
+            }
 
             var secretForApp = await _actorClientSecretService
                 .CreateSecretForAppRegistrationAsync(actor)
