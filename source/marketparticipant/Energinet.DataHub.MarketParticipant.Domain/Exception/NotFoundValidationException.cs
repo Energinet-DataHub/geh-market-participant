@@ -65,6 +65,15 @@ namespace Energinet.DataHub.MarketParticipant.Domain.Exception
             }
         }
 
+        public static void ThrowIfNull<TId>([NotNull] object? value, TId id, string message)
+            where TId : notnull
+        {
+            if (value == null)
+            {
+                throw new NotFoundValidationException(Guid.Empty, message).WithArgs(("id", id));
+            }
+        }
+
         private static string CreateMessage(Guid id)
         {
             return $"Entity '{id}' does not exist.";

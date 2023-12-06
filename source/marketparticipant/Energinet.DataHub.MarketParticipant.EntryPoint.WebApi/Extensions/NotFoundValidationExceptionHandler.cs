@@ -36,7 +36,7 @@ public sealed class NotFoundValidationExceptionHandler : CommonExceptionHandlerB
     {
         var errorDescriptor = new ErrorDescriptor(
             exception.Message,
-            $"{_errorCodePrefix}.validation.not_found",
+            $"{_errorCodePrefix}.bad_argument.not_found",
             NormalizeArgs(exception));
 
         response.StatusCode = StatusCodes.Status404NotFound;

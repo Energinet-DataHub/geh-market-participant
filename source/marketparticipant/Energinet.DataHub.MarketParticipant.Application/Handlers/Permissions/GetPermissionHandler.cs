@@ -40,15 +40,10 @@ public sealed class GetPermissionHandler : IRequestHandler<GetPermissionCommand,
         ArgumentNullException.ThrowIfNull(request);
 
         var permission = await _permissionRepository
-                            .GetAsync((PermissionId)request.Id)
-                            .ConfigureAwait(false);
+            .GetAsync((PermissionId)request.Id)
+            .ConfigureAwait(false);
 
-        if (permission == null)
-        {
-            throw new ValidationException($"Permission not found: {request.Id}")
-                .WithErrorCode("not_found")
-                .WithArgs(("id", (PermissionId)request.Id));
-        }
+        NotFoundValidationException.ThrowIfNull(permission, request.Id, $"Permission '{request.Id}' does not exist.");
 
         return new GetPermissionResponse(
             new PermissionDto(

@@ -24,7 +24,6 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
         public GetPermissionCommandRuleSet()
         {
             RuleFor(command => command.Id)
-                .NotEmpty()
                 .Must(p => Enum.IsDefined(typeof(PermissionId), p));
         }
     }
