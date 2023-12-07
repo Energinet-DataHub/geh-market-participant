@@ -50,8 +50,9 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                     changeActorValidator
                         .RuleForEach(actor => actor.MarketRoles)
                         .ChildRules(gridAreaValidator => gridAreaValidator
-                                .RuleFor(x => x.GridAreas)
-                                .NotEmpty());
+                            .RuleFor(x => x.GridAreas)
+                            .NotEmpty()
+                            .When(marketRole => marketRole.EicFunction == EicFunction.GridAccessProvider));
 
                     changeActorValidator
                         .RuleFor(x => x.MarketRoles)
