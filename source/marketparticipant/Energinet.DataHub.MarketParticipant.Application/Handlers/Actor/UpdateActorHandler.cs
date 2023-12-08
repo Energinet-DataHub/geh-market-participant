@@ -82,25 +82,28 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
         private static void UpdateAggregate(Domain.Model.Actor actor, ChangeActorDto changes)
         {
-            var incomingMarketRoles = MarketRoleMapper.Map(changes.MarketRoles);
-            var existingMarketRoles = actor.MarketRoles;
-
-            var joinedMarketRoles = EnumerableExtensions
-                .FullOuterJoin(
-                    incomingMarketRoles,
-                    existingMarketRoles,
-                    (incomingRole, existingRole) => incomingRole.Function == existingRole.Function);
-
-            foreach (var (incomingRole, existingRole) in joinedMarketRoles)
+            if (actor.Status == ActorStatus.New)
             {
-                if (existingRole is not null)
-                {
-                    actor.RemoveMarketRole(existingRole);
-                }
+                var incomingMarketRoles = MarketRoleMapper.Map(changes.MarketRoles);
+                var existingMarketRoles = actor.MarketRoles;
 
-                if (incomingRole is not null)
+                var joinedMarketRoles = EnumerableExtensions
+                    .FullOuterJoin(
+                        incomingMarketRoles,
+                        existingMarketRoles,
+                        (incomingRole, existingRole) => incomingRole.Function == existingRole.Function);
+
+                foreach (var (incomingRole, existingRole) in joinedMarketRoles)
                 {
-                    actor.AddMarketRole(incomingRole);
+                    if (existingRole is not null)
+                    {
+                        actor.RemoveMarketRole(existingRole);
+                    }
+
+                    if (incomingRole is not null)
+                    {
+                        actor.AddMarketRole(incomingRole);
+                    }
                 }
             }
 
