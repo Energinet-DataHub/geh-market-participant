@@ -125,6 +125,11 @@ public interface IMarketParticipantDbContext
     DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; }
 
     /// <summary>
+    ///     Represent access to the UsedActorCertificates database table
+    /// </summary>
+    DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; }
+
+    /// <summary>
     ///     Saves changes to the database.
     /// </summary>
     Task<int> SaveChangesAsync();
