@@ -58,21 +58,37 @@ public sealed class SigningKeyRingIntegrationTests : IClassFixture<KeyClientFixt
     }
 
     [Fact]
-    public async Task GetKeysAsync_ExceptionOccurs_DoesNotDeadlock()
+    public async Task GetKeysAsync_ConnectionDrops_CanRecover()
     {
         // Arrange
         var keyClient = new Mock<KeyClient>();
-        keyClient.Setup(x => x.GetPropertiesOfKeyVersionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        keyClient
+            .Setup(x => x.GetPropertiesOfKeyVersionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .Throws(() => new InvalidOperationException());
+
+        var keys = _keyClientFixture
+            .KeyClient
+            .GetPropertiesOfKeyVersionsAsync(_keyClientFixture.KeyName);
 
         var target = new SigningKeyRing(
             SystemClock.Instance,
             keyClient.Object,
             _keyClientFixture.KeyName);
 
-        // Act, Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => target.GetKeysAsync());
-        await Assert.ThrowsAsync<InvalidOperationException>(() => target.GetKeysAsync());
+        // Act
+        await Assert.ThrowsAsync<InvalidOperationException>(target.GetKeysAsync);
+
+        // Assert
+        keyClient
+            .Setup(x => x.GetPropertiesOfKeyVersionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(keys);
+
+        keyClient
+            .Setup(x => x.GetKeyAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(_keyClientFixture.KeyClient.GetKeyAsync);
+
+        var actual = await target.GetKeysAsync();
+        Assert.NotEmpty(actual);
     }
 
     [Fact]
