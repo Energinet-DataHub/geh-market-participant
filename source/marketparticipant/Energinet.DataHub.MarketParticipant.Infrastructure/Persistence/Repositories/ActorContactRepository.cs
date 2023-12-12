@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Mappers;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
@@ -84,10 +85,26 @@ public sealed class ActorContactRepository : IActorContactRepository
         if (entity == null)
             return;
 
+        IDbContextTransaction? transaction = null;
+
+        var dbContext = (DbContext)_marketParticipantDbContext;
+        if (dbContext.Database.CurrentTransaction == null)
+        {
+            transaction = await dbContext
+                .Database
+                .BeginTransactionAsync()
+                .ConfigureAwait(false);
+        }
+
         _marketParticipantDbContext.ActorContacts.Remove(entity);
 
         await _marketParticipantDbContext
             .SaveChangesAsync()
             .ConfigureAwait(false);
+
+        if (transaction != null)
+        {
+            await transaction.CommitAsync().ConfigureAwait(false);
+        }
     }
 }
