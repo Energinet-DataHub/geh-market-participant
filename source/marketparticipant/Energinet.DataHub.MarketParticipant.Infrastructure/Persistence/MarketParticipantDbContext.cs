@@ -138,9 +138,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
                 case EntityState.Modified:
                 case EntityState.Added:
                     entityEntry.Property(nameof(IAuditedEntity.Version)).CurrentValue = changedByIdentity.Version + 1;
-                    entityEntry.Property(nameof(IAuditedEntity.Version)).IsModified = true;
                     entityEntry.Property(nameof(IAuditedEntity.ChangedByIdentityId)).CurrentValue = _auditIdentityProvider.IdentityId.Value;
-                    entityEntry.Property(nameof(IAuditedEntity.ChangedByIdentityId)).IsModified = true;
                     break;
             }
         }
