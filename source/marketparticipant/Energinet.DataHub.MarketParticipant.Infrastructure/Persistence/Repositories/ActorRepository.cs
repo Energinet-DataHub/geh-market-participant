@@ -52,6 +52,15 @@ public sealed class ActorRepository : IActorRepository
                 .ConfigureAwait(false) ?? throw new InvalidOperationException($"Actor with id {actor.Id.Value} is missing, even though it cannot be deleted.");
         }
 
+        if (actor.Credentials is ActorCertificateCredentials certificateCredentials &&
+            destination.CertificateCredential?.CertificateThumbprint != certificateCredentials.CertificateThumbprint)
+        {
+            _marketParticipantDbContext.UsedActorCertificates.Add(new UsedActorCertificatesEntity
+            {
+                Thumbprint = certificateCredentials.CertificateThumbprint,
+            });
+        }
+
         ActorMapper.MapToEntity(actor, destination);
         _marketParticipantDbContext.Actors.Update(destination);
 
@@ -61,7 +70,7 @@ public sealed class ActorRepository : IActorRepository
         }
         catch (DbUpdateException ex) when (
             ex.InnerException is SqlException inner &&
-            inner.Message.Contains("UQ_ActorCertificateCredentials_Thumbprint", StringComparison.InvariantCultureIgnoreCase))
+            inner.Message.Contains("UQ_UsedActorCertificates_Thumbprint", StringComparison.InvariantCultureIgnoreCase))
         {
             return new(ActorError.ThumbprintCredentialsConflict);
         }

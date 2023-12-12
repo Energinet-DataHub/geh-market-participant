@@ -71,6 +71,7 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public DbSet<EmailEventEntity> EmailEventEntries { get; private set; } = null!;
     public DbSet<ActorCertificateCredentialsEntity> ActorCertificateCredentials { get; private set; } = null!;
     public DbSet<ActorClientSecretCredentialsEntity> ActorClientSecretCredentials { get; private set; } = null!;
+    public DbSet<UsedActorCertificatesEntity> UsedActorCertificates { get; private set; } = null!;
 
     public async Task<int> SaveChangesAsync()
     {
