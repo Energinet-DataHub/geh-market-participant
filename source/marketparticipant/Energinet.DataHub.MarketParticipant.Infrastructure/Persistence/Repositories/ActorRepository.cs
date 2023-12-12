@@ -70,7 +70,8 @@ public sealed class ActorRepository : IActorRepository
         }
         catch (DbUpdateException ex) when (
             ex.InnerException is SqlException inner &&
-            inner.Message.Contains("UQ_UsedActorCertificates_Thumbprint", StringComparison.InvariantCultureIgnoreCase))
+            (inner.Message.Contains("UQ_ActorCertificateCredentials_Thumbprint", StringComparison.InvariantCultureIgnoreCase) ||
+             inner.Message.Contains("UQ_UsedActorCertificates_Thumbprint", StringComparison.InvariantCultureIgnoreCase)))
         {
             return new(ActorError.ThumbprintCredentialsConflict);
         }
