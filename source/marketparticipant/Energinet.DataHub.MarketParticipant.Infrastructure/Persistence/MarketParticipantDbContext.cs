@@ -27,6 +27,7 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence;
 public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
 {
     private readonly IAuditIdentityProvider _auditIdentityProvider;
+    private bool _savingChanges;
 
     public MarketParticipantDbContext(
         DbContextOptions<MarketParticipantDbContext> options,
@@ -74,8 +75,17 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
     public async Task<int> SaveChangesAsync()
     {
         var hasExternalTransaction = Database.CurrentTransaction != null;
+        int affected;
 
-        var affected = await base.SaveChangesAsync().ConfigureAwait(false);
+        try
+        {
+            _savingChanges = true;
+            affected = await base.SaveChangesAsync().ConfigureAwait(false);
+        }
+        finally
+        {
+            _savingChanges = false;
+        }
 
         if (!hasExternalTransaction)
         {
@@ -143,7 +153,12 @@ public class MarketParticipantDbContext : DbContext, IMarketParticipantDbContext
         where T : class, IDeletableAuditedEntity
     {
         if (Database.CurrentTransaction == null)
+        {
+            if (!_savingChanges)
+                throw new InvalidOperationException("Deleting audited entity requires a transaction. Since the audited entity was deleted outside of SaveChanges, a transaction is not started automatically.");
+
             Database.BeginTransaction();
+        }
 
         Set<T>()
             .Where(entity => entity == entityDeleted)
