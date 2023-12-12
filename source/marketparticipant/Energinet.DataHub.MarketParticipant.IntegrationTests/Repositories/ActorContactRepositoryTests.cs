@@ -144,9 +144,12 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             // Act
             await contactRepository.RemoveAsync(newContact!);
-            var deletedContact = await contactRepository.GetAsync(contactId);
 
             // Assert
+            await using var contextReadBack = _fixture.DatabaseManager.CreateDbContext();
+            var contactRepositoryReadBack = new ActorContactRepository(contextReadBack);
+            var deletedContact = await contactRepositoryReadBack.GetAsync(contactId);
+
             Assert.Null(deletedContact);
         }
 
