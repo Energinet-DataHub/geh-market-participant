@@ -52,7 +52,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var actorEntity = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(e => e.Status = ActorStatus.Active),
-            TestPreparationEntities.ValidMarketRole);
+            TestPreparationEntities.ValidMarketRole.Patch(e => e.Function = EicFunction.BalanceResponsibleParty));
 
         var newName = "ActorNameUpdated";
 
@@ -88,7 +88,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var actorEntity = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor,
-            TestPreparationEntities.ValidMarketRole,
+            TestPreparationEntities.ValidMarketRole.Patch(e => e.Function = EicFunction.BalanceResponsibleParty),
             marketRoleToAdd);
 
         var actor = await actorRepository.GetAsync(new ActorId(actorEntity.Id));
@@ -126,7 +126,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var actorEntity = await _fixture.PrepareActorAsync(
             TestPreparationEntities.ValidOrganization,
             TestPreparationEntities.ValidActor.Patch(a => a.Status = ActorStatus.Active),
-            TestPreparationEntities.ValidMarketRole,
+            TestPreparationEntities.ValidMarketRole.Patch(e => e.Function = EicFunction.BalanceResponsibleParty),
             marketRoleToAdd);
 
         var actor = await actorRepository.GetAsync(new ActorId(actorEntity.Id));
