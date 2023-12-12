@@ -48,7 +48,7 @@ internal static class TestPreparationEntities
 
     public static MarketRoleEntity ValidMarketRole => new()
     {
-        Function = EicFunction.BalanceResponsibleParty,
+        Function = EicFunction.GridAccessProvider,
         Comment = "Test Market Role Comment"
     };
 
