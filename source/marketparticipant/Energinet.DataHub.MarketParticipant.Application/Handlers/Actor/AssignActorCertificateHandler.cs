@@ -73,9 +73,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
 
             await using (uow.ConfigureAwait(false))
             {
-                await _actorRepository
+                var result = await _actorRepository
                     .AddOrUpdateAsync(actor)
                     .ConfigureAwait(false);
+
+                result.ThrowOnError(ActorErrorHandler.HandleActorError);
 
                 await _domainEventRepository
                     .EnqueueAsync(actor)

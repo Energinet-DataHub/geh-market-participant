@@ -1,0 +1,8 @@
+UPDATE [dbo].[GridArea] SET [Code] = '003' WHERE [Code] = '3'
+UPDATE [dbo].[GridArea] SET [Code] = '007' WHERE [Code] = '7'
+UPDATE [dbo].[GridArea] SET [Code] = '016' WHERE [Code] = '16'
+UPDATE [dbo].[GridArea] SET [Code] = '031' WHERE [Code] = '31'
+UPDATE [dbo].[GridArea] SET [Code] = '042' WHERE [Code] = '42'
+UPDATE [dbo].[GridArea] SET [Code] = '051' WHERE [Code] = '51'
+UPDATE [dbo].[GridArea] SET [Code] = '084' WHERE [Code] = '84'
+UPDATE [dbo].[GridArea] SET [Code] = '085' WHERE [Code] = '85'
