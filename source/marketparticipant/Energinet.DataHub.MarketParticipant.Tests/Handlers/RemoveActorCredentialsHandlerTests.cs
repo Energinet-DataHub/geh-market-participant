@@ -39,8 +39,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
+            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
             var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
+            var target = new RemoveActorCredentialsHandler(
+                actorRepositoryMock.Object,
+                certificateServiceMock.Object,
+                UnitOfWorkProviderMock.Create(),
+                domainEventRepositoryMock.Object,
+                actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
 
@@ -60,8 +66,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
+            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
             var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
+            var target = new RemoveActorCredentialsHandler(
+                actorRepositoryMock.Object,
+                certificateServiceMock.Object,
+                UnitOfWorkProviderMock.Create(),
+                domainEventRepositoryMock.Object,
+                actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
@@ -85,8 +97,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             // Arrange
             var actorRepositoryMock = new Mock<IActorRepository>();
             var certificateServiceMock = new Mock<ICertificateService>();
+            var domainEventRepositoryMock = new Mock<IDomainEventRepository>();
             var actorClientSecretServiceMock = new Mock<IActorClientSecretService>();
-            var target = new RemoveActorCredentialsHandler(actorRepositoryMock.Object, certificateServiceMock.Object, actorClientSecretServiceMock.Object);
+            var target = new RemoveActorCredentialsHandler(
+                actorRepositoryMock.Object,
+                certificateServiceMock.Object,
+                UnitOfWorkProviderMock.Create(),
+                domainEventRepositoryMock.Object,
+                actorClientSecretServiceMock.Object);
 
             var actorId = Guid.NewGuid();
             var actor = TestPreparationModels.MockedActor(actorId);
@@ -98,6 +116,10 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Handlers
             actorRepositoryMock
                 .Setup(actorRepository => actorRepository.GetAsync(actor.Id))
                 .ReturnsAsync(actor);
+
+            actorRepositoryMock
+                .Setup(actorRepository => actorRepository.AddOrUpdateAsync(actor))
+                .ReturnsAsync(new Result<ActorId, ActorError>(actor.Id));
 
             var command = new RemoveActorCredentialsCommand(actorId);
 
