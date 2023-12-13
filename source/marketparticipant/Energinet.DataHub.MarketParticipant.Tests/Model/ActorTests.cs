@@ -245,6 +245,24 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         }
 
         [Fact]
+        public void Credentials_AreRemoved_PublishesEvents()
+        {
+            // Arrange
+            var target = CreateTestActor(ActorStatus.Active, EicFunction.EnergySupplier);
+            target.Credentials = new ActorCertificateCredentials(
+                new string('A', 40),
+                "mocked_identifier",
+                DateTime.UtcNow.AddYears(1).ToInstant());
+
+            // Act
+            target.Credentials = null;
+
+            // Assert
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsAssigned));
+            Assert.Equal(1, ((IPublishDomainEvents)target).DomainEvents.Count(e => e is ActorCertificateCredentialsRemoved));
+        }
+
+        [Fact]
         public void Deactivate_HasCredentials_NotAllowed()
         {
             // Arrange

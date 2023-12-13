@@ -89,7 +89,7 @@ public sealed class IntegrationEventProviderIntegrationTests
         }
     }
 
-    private static async Task PrepareActorActivatedEventAsync(IServiceProvider scope)
+    private static Task PrepareActorActivatedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -105,10 +105,10 @@ public sealed class IntegrationEventProviderIntegrationTests
         actor.ExternalActorId = new ExternalActorId(Guid.NewGuid());
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
-        await domainEventRepository.EnqueueAsync(actor);
+        return domainEventRepository.EnqueueAsync(actor);
     }
 
-    private static async Task PrepareActorCertificateCredentialsAssignedEventAsync(IServiceProvider scope)
+    private static Task PrepareActorCertificateCredentialsAssignedEventAsync(IServiceProvider scope)
     {
         var actor = new Actor(
             new ActorId(Guid.NewGuid()),
@@ -128,7 +128,33 @@ public sealed class IntegrationEventProviderIntegrationTests
         actor.Activate();
 
         var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
-        await domainEventRepository.EnqueueAsync(actor);
+        return domainEventRepository.EnqueueAsync(actor);
+    }
+
+    private static Task PrepareActorCertificateCredentialsRemovedEventAsync(IServiceProvider scope)
+    {
+        var actor = new Actor(
+            new ActorId(Guid.NewGuid()),
+            new OrganizationId(Guid.NewGuid()),
+            null,
+            new MockedGln(),
+            ActorStatus.New,
+            new[] { new ActorMarketRole(EicFunction.EnergySupplier) },
+            new ActorName(string.Empty),
+            null);
+
+        actor.Credentials = new ActorCertificateCredentials(
+            new string('A', 40),
+            "mocked_identifier",
+            DateTime.UtcNow.AddYears(1).ToInstant());
+
+        actor.Activate();
+        ((IPublishDomainEvents)actor).ClearPublishedDomainEvents();
+
+        actor.Credentials = null;
+
+        var domainEventRepository = scope.GetRequiredService<IDomainEventRepository>();
+        return domainEventRepository.EnqueueAsync(actor);
     }
 
     private async Task PrepareGridAreaOwnershipAssignedEventAsync(IServiceProvider scope)
@@ -162,6 +188,7 @@ public sealed class IntegrationEventProviderIntegrationTests
         {
             nameof(ActorActivated) => PrepareActorActivatedEventAsync(scope),
             nameof(ActorCertificateCredentialsAssigned) => PrepareActorCertificateCredentialsAssignedEventAsync(scope),
+            nameof(ActorCertificateCredentialsRemoved) => PrepareActorCertificateCredentialsRemovedEventAsync(scope),
             nameof(GridAreaOwnershipAssigned) => PrepareGridAreaOwnershipAssignedEventAsync(scope),
             _ => throw new NotSupportedException($"Domain event {domainEvent.Name} is missing a test.")
         };

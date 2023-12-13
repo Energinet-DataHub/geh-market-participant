@@ -133,14 +133,28 @@ public sealed class Actor : IPublishDomainEvents
                 throw new NotSupportedException("Cannot overwrite credentials. Remember to delete the credentials first using the appropriate service.");
             }
 
-            if (value is ActorCertificateCredentials acc && Status == ActorStatus.Active)
+            if (Status == ActorStatus.Active && _credentials != value)
             {
-                foreach (var marketRole in _marketRoles)
+                if (_credentials is ActorCertificateCredentials oldCredentials)
                 {
-                    _domainEvents.Add(new ActorCertificateCredentialsAssigned(
-                        ActorNumber,
-                        marketRole.Function,
-                        acc.CertificateThumbprint));
+                    foreach (var marketRole in _marketRoles)
+                    {
+                        _domainEvents.Add(new ActorCertificateCredentialsRemoved(
+                            ActorNumber,
+                            marketRole.Function,
+                            oldCredentials.CertificateThumbprint));
+                    }
+                }
+
+                if (value is ActorCertificateCredentials newCredentials)
+                {
+                    foreach (var marketRole in _marketRoles)
+                    {
+                        _domainEvents.Add(new ActorCertificateCredentialsAssigned(
+                            ActorNumber,
+                            marketRole.Function,
+                            newCredentials.CertificateThumbprint));
+                    }
                 }
             }
 
