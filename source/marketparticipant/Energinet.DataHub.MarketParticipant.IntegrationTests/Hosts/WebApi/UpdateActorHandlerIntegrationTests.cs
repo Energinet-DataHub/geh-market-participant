@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -74,6 +75,39 @@ public sealed class UpdateActorHandlerIntegrationTests
     }
 
     [Fact]
+    public async Task UpdateActorName_ActiveActorState_MarketRolesAreNotUpdated()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+
+        var actorEntity = await _fixture.PrepareActorAsync(
+            TestPreparationEntities.ValidOrganization,
+            TestPreparationEntities.ValidActor.Patch(e => e.Status = ActorStatus.Active),
+            TestPreparationEntities.ValidMarketRole.Patch(e => e.Function = EicFunction.BalanceResponsibleParty));
+
+        var newName = "ActorNameUpdated";
+
+        var actorDto = new ChangeActorDto(
+            ActorStatus.Active.ToString(),
+            new ActorNameDto(newName),
+            new[] { new ActorMarketRoleDto(EicFunction.BillingAgent, Array.Empty<ActorGridAreaDto>(), null) });
+
+        var updateCommand = new UpdateActorCommand(actorEntity.Id, actorDto);
+
+        // Act
+        await mediator.Send(updateCommand);
+
+        var getActorCommand = new GetSingleActorCommand(actorEntity.Id);
+        var response = await mediator.Send(getActorCommand);
+
+        // Assert
+        Assert.Equal(newName, response.Actor.Name.Value);
+        Assert.Equal(EicFunction.BalanceResponsibleParty, response.Actor.MarketRoles.Single().EicFunction);
+    }
+
+    [Fact]
     public async Task UpdateActorMarketRoles_NewActorState_Success()
     {
         // Arrange
@@ -110,26 +144,5 @@ public sealed class UpdateActorHandlerIntegrationTests
         Assert.Single(response.Actor.MarketRoles);
         Assert.Equal(actor.Name.Value, response.Actor.Name.Value);
         Assert.Equal(actor.Status.ToString(), response.Actor.Status);
-    }
-
-    [Fact]
-    public async Task UpdateActorMarketRoles_ActiveActorState_Exception()
-    {
-        // Arrange
-        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
-
-        await using var scope = host.BeginScope();
-        var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-
-        var marketRoleToAdd = TestPreparationEntities.ValidMarketRole.Patch(m => m.Function = EicFunction.SystemOperator);
-
-        var actorEntity = await _fixture.PrepareActorAsync(
-            TestPreparationEntities.ValidOrganization,
-            TestPreparationEntities.ValidActor.Patch(a => a.Status = ActorStatus.Active),
-            TestPreparationEntities.ValidMarketRole.Patch(e => e.Function = EicFunction.BalanceResponsibleParty),
-            marketRoleToAdd);
-
-        var actor = await actorRepository.GetAsync(new ActorId(actorEntity.Id));
-        Assert.Throws<ValidationException>(() => actor!.RemoveMarketRole(actor.MarketRoles.Single(m => m.Function == EicFunction.SystemOperator)));
     }
 }
