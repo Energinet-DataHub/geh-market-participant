@@ -17,6 +17,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -29,15 +30,21 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
 {
     private readonly IActorRepository _actorRepository;
     private readonly ICertificateService _certificateService;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
+    private readonly IDomainEventRepository _domainEventRepository;
     private readonly IActorClientSecretService _actorClientSecretService;
 
     public RemoveActorCredentialsHandler(
         IActorRepository actorRepository,
         ICertificateService certificateService,
+        IUnitOfWorkProvider unitOfWorkProvider,
+        IDomainEventRepository domainEventRepository,
         IActorClientSecretService actorClientSecretService)
     {
         _actorRepository = actorRepository;
         _certificateService = certificateService;
+        _unitOfWorkProvider = unitOfWorkProvider;
+        _domainEventRepository = domainEventRepository;
         _actorClientSecretService = actorClientSecretService;
     }
 
@@ -67,8 +74,24 @@ public sealed class RemoveActorCredentialsHandler : IRequestHandler<RemoveActorC
         }
 
         actor.Credentials = null;
-        await _actorRepository
-            .AddOrUpdateAsync(actor)
+
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
             .ConfigureAwait(false);
+
+        await using (uow.ConfigureAwait(false))
+        {
+            var result = await _actorRepository
+                .AddOrUpdateAsync(actor)
+                .ConfigureAwait(false);
+
+            result.ThrowOnError(ActorErrorHandler.HandleActorError);
+
+            await _domainEventRepository
+                .EnqueueAsync(actor)
+                .ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
     }
 }
