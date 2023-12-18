@@ -14,6 +14,7 @@
 
 using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
@@ -37,7 +38,7 @@ public sealed class PermissionAuditLogRepositoryTests
     }
 
     [Fact]
-    public async Task GetAsync_NoAuditLogs_ReturnsEmptyList()
+    public async Task GetAsync_NoChanges_ReturnsClaim()
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -50,7 +51,10 @@ public sealed class PermissionAuditLogRepositoryTests
             .GetAsync(PermissionId.UserRolesManage);
 
         // Assert
-        Assert.Empty(actual);
+        var permissionAuditLogs = actual.ToList();
+        Assert.Single(permissionAuditLogs);
+        Assert.Equal(KnownAuditIdentityProvider.Migration.IdentityId, permissionAuditLogs[0].AuditIdentity);
+        Assert.Equal(PermissionAuditedChange.Claim, permissionAuditLogs[0].Change);
     }
 
     [Fact]
@@ -80,7 +84,7 @@ public sealed class PermissionAuditLogRepositoryTests
             .GetAsync(PermissionId.UsersManage);
 
         // Assert
-        var permissionAuditLogs = actual.ToList();
+        var permissionAuditLogs = actual.Skip(1).ToList();
         Assert.Single(permissionAuditLogs);
         Assert.Equal(user.Id, permissionAuditLogs[0].AuditIdentity.Value);
         Assert.Equal(PermissionAuditedChange.Description, permissionAuditLogs[0].Change);
