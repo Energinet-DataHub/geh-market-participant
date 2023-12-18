@@ -12,8 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed record GetPermissionAuditLogsCommand(int PermissionId) : IRequest<PermissionAuditLogsResponse>;
+public interface IAuditedEntityDataSource<TAuditedEntity>
+{
+    Task<IEnumerable<(TAuditedEntity Entity, DateTimeOffset Timestamp)>> ReadAsync();
+}

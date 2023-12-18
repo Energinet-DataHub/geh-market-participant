@@ -16,10 +16,12 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Infrastructure.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Fixtures;
 using MediatR;
@@ -44,6 +46,25 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
     }
 
     [Fact]
+    public Task GetAuditLogs_CreatedClaim_IsAudited()
+    {
+        var expected = KnownPermissions
+            .All
+            .Single(kp => kp.Id == PermissionId.ActorCredentialsManage);
+
+        return TestAuditOfPermissionChangeAsync(
+            response =>
+            {
+                var expectedLog = response
+                    .AuditLogs
+                    .Single(log => log.Change == PermissionAuditedChange.Claim);
+
+                Assert.Equal(expected.Claim, expectedLog.CurrentValue);
+                Assert.Equal(expected.Created.ToDateTimeOffset(), expectedLog.Timestamp);
+            });
+    }
+
+    [Fact]
     public Task GetAuditLogs_ChangeDescription_IsAudited()
     {
         var expected = Guid.NewGuid().ToString();
@@ -52,10 +73,10 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLog = response
-                    .PermissionAuditLogs
-                    .Single(log => log.PermissionChangeType == PermissionChangeType.DescriptionChange);
+                    .AuditLogs
+                    .Single(log => log.Change == PermissionAuditedChange.Description);
 
-                Assert.Equal(expected, expectedLog.Value);
+                Assert.Equal(expected, expectedLog.CurrentValue);
             },
             organization =>
             {
@@ -64,7 +85,7 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
     }
 
     private async Task TestAuditOfPermissionChangeAsync(
-        Action<GetPermissionAuditLogsResponse> assert,
+        Action<PermissionAuditLogsResponse> assert,
         params Action<Permission>[] changeActions)
     {
         // Arrange
@@ -85,6 +106,10 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
         await using var scope = host.BeginScope();
         var permissionRepository = scope.ServiceProvider.GetRequiredService<IPermissionRepository>();
 
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var command = new GetPermissionAuditLogsCommand((int)permissionId);
+        var existing = await mediator.Send(command);
+
         foreach (var action in changeActions)
         {
             var organization = await permissionRepository.GetAsync(permissionId);
@@ -94,20 +119,15 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
             await permissionRepository.UpdatePermissionAsync(organization);
         }
 
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        var command = new GetPermissionAuditLogsCommand((int)permissionId);
-
         // Act
         var actual = await mediator.Send(command);
 
         // Assert
         assert(actual);
 
-        // Skip initial audits.
-        foreach (var permissionAuditLog in actual.PermissionAuditLogs)
+        foreach (var permissionAuditLog in actual.AuditLogs.Skip(existing.AuditLogs.Count()))
         {
             Assert.Equal(auditedUser.Id, permissionAuditLog.AuditIdentityId);
-            Assert.Equal((int)permissionId, permissionAuditLog.PermissionId);
             Assert.True(permissionAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
             Assert.True(permissionAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
         }

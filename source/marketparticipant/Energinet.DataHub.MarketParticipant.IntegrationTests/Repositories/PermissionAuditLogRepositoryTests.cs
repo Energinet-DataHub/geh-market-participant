@@ -27,11 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class PermissionAuditLogEntryRepositoryTests
+public sealed class PermissionAuditLogRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public PermissionAuditLogEntryRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public PermissionAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -43,7 +43,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(contextGet);
+        var permissionAuditLogEntryRepository = new PermissionAuditLogRepository(contextGet);
 
         // Act
         var actual = await permissionAuditLogEntryRepository
@@ -66,7 +66,7 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         var permissionRepository = scope.ServiceProvider.GetRequiredService<IPermissionRepository>();
 
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var permissionAuditLogEntryRepository = new PermissionAuditLogEntryRepository(context);
+        var permissionAuditLogEntryRepository = new PermissionAuditLogRepository(context);
 
         // Make an audited change.
         var permission = await permissionRepository.GetAsync(PermissionId.UsersManage);
@@ -83,7 +83,6 @@ public sealed class PermissionAuditLogEntryRepositoryTests
         var permissionAuditLogs = actual.ToList();
         Assert.Single(permissionAuditLogs);
         Assert.Equal(user.Id, permissionAuditLogs[0].AuditIdentity.Value);
-        Assert.Equal(PermissionChangeType.DescriptionChange, permissionAuditLogs[0].PermissionChangeType);
-        Assert.Equal(PermissionId.UsersManage, permissionAuditLogs[0].Permission);
+        Assert.Equal(PermissionAuditedChange.Description, permissionAuditLogs[0].Change);
     }
 }

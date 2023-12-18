@@ -12,8 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using MediatR;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using NodaTime;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed record GetPermissionAuditLogsCommand(int PermissionId) : IRequest<PermissionAuditLogsResponse>;
+public sealed record AuditLog<TAuditedChange>(
+    TAuditedChange Change,
+    Instant Timestamp,
+    AuditIdentity AuditIdentity,
+    bool IsInitialAssignment,
+    string? CurrentValue,
+    string? PreviousValue);

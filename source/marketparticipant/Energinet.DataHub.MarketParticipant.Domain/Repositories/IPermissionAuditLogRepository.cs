@@ -13,7 +13,20 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public sealed record GetPermissionAuditLogsResponse(IEnumerable<PermissionAuditLogDto> PermissionAuditLogs);
+/// <summary>
+/// Repository for inserting and querying audit logs for permissions.
+/// </summary>
+public interface IPermissionAuditLogRepository
+{
+    /// <summary>
+    /// Retrieves all log entries for a given permission.
+    /// </summary>
+    /// <param name="permission">The permission to get the logs for.</param>
+    Task<IEnumerable<AuditLog<PermissionAuditedChange>>> GetAsync(PermissionId permission);
+}

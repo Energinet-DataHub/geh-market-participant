@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -77,7 +78,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{permissionId:int}/auditlogs")]
         [AuthorizeUser(PermissionId.UserRolesManage)]
-        public async Task<ActionResult<IEnumerable<PermissionAuditLogDto>>> GetAuditLogsAsync(int permissionId)
+        public async Task<ActionResult<IEnumerable<AuditLogDto<PermissionAuditedChange>>>> GetAuditLogsAsync(int permissionId)
         {
             var command = new GetPermissionAuditLogsCommand(permissionId);
 
@@ -85,7 +86,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return Ok(response.PermissionAuditLogs);
+            return Ok(response.AuditLogs);
         }
     }
 }

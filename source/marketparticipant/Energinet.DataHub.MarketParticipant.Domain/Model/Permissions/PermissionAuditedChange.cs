@@ -12,20 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
-
-/// <summary>
-/// Repository for inserting and querying user roles audit logs
-/// </summary>
-public interface IPermissionAuditLogEntryRepository
+public enum PermissionAuditedChange
 {
-    /// <summary>
-    /// Retrieves all log entries for a given permission.
-    /// </summary>
-    /// <param name="permission">The permission to get the logs for.</param>
-    Task<IEnumerable<PermissionAuditLogEntry>> GetAsync(PermissionId permission);
+    Claim = 1,
+    Description = 2
 }

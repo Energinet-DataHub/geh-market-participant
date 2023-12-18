@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public record PermissionAuditLogDto(
-    int PermissionId,
-    string Value,
-    Guid AuditIdentityId,
-    DateTimeOffset Timestamp,
-    PermissionChangeType PermissionChangeType);
+public sealed record PermissionAuditLogsResponse(IEnumerable<AuditLogDto<PermissionAuditedChange>> AuditLogs);
