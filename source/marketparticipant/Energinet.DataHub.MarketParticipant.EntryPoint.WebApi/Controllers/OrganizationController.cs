@@ -111,6 +111,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok(response.Actors);
         }
 
+        // TODO: Delete.
         [HttpGet("{organizationId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
         public async Task<ActionResult<IEnumerable<OrganizationAuditLogDto>>> GetAuditLogsAsync(Guid organizationId)

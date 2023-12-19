@@ -12,11 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions
-{
-    // TODO: Delete.
-    public enum PermissionChangeType
-    {
-        DescriptionChange = 1
-    }
-}
+using System;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
+
+// TODO: Delete.
+public record PermissionAuditLogDto(
+    int PermissionId,
+    string Value,
+    Guid AuditIdentityId,
+    DateTimeOffset Timestamp,
+    PermissionChangeType PermissionChangeType);
