@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
-
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
-public sealed record OrganizationAuditLogEntry(
-    OrganizationId OrganizationId,
-    AuditIdentity AuditIdentity,
-    OrganizationChangeType OrganizationChangeType,
-    DateTimeOffset Timestamp,
-    string Value);
+public enum OrganizationAuditedChange
+{
+    Domain = 1,
+    Name = 2,
+}

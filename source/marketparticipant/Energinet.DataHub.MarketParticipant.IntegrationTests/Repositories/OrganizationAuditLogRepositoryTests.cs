@@ -28,7 +28,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class OrganizationAuditLogEntryRepositoryTests
+public sealed class OrganizationAuditLogRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
     private readonly Address _validAddress = new(
@@ -39,7 +39,7 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         "Test Country");
     private readonly OrganizationDomain _validDomain = new(new MockedDomain());
 
-    public OrganizationAuditLogEntryRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public OrganizationAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -51,7 +51,7 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var organizationAuditLogEntryRepository = new OrganizationAuditLogEntryRepository(contextGet);
+        var organizationAuditLogEntryRepository = new OrganizationAuditLogRepository(contextGet);
 
         // Act
         var actual = await organizationAuditLogEntryRepository
@@ -62,9 +62,9 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
     }
 
     [Theory]
-    [InlineData(OrganizationChangeType.Name, "New Name")]
-    [InlineData(OrganizationChangeType.DomainChange, "NewDomain.dk")]
-    public async Task GetAsync_WithAuditLogs_CanBeReadBack(OrganizationChangeType changeType, string newValue)
+    [InlineData(OrganizationAuditedChange.Name, "New Name")]
+    [InlineData(OrganizationAuditedChange.Domain, "NewDomain.dk")]
+    public async Task GetAsync_WithAuditLogs_CanBeReadBack(OrganizationAuditedChange changeType, string newValue)
     {
         // Arrange
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
@@ -78,7 +78,7 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         var organizationRepository = scope.ServiceProvider.GetRequiredService<IOrganizationRepository>();
 
         await using var context = _fixture.DatabaseManager.CreateDbContext();
-        var organizationAuditLogEntryRepository = new OrganizationAuditLogEntryRepository(context);
+        var organizationAuditLogEntryRepository = new OrganizationAuditLogRepository(context);
 
         // Make an audited change.
         var orgId = await organizationRepository.AddOrUpdateAsync(testOrg);
@@ -87,11 +87,11 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
 
         switch (changeType)
         {
-            case OrganizationChangeType.Name:
+            case OrganizationAuditedChange.Name:
                 orgValue = organization!.Name;
                 organization.Name = newValue;
                 break;
-            case OrganizationChangeType.DomainChange:
+            case OrganizationAuditedChange.Domain:
                 orgValue = organization!.Domain.Value;
                 organization.Domain = new OrganizationDomain(newValue);
                 break;
@@ -102,16 +102,13 @@ public sealed class OrganizationAuditLogEntryRepositoryTests
         await organizationRepository.AddOrUpdateAsync(organization);
 
         // Act
-        var actual = await organizationAuditLogEntryRepository
-            .GetAsync(orgId.Value);
+        var actual = await organizationAuditLogEntryRepository.GetAsync(orgId.Value);
 
         // Assert
         var organizationAuditLogs = actual.ToList();
-        Assert.Equal(Enum.GetValues<OrganizationChangeType>().Length + 1, organizationAuditLogs.Count); // +1 as it should contain all the original values as well as the changed one.
+        Assert.Equal(Enum.GetValues<OrganizationAuditedChange>().Length + 1, organizationAuditLogs.Count); // +1 as it should contain all the original values as well as the changed one.
         Assert.Contains(organizationAuditLogs, o => o.AuditIdentity.Value == user.Id);
-        Assert.Contains(organizationAuditLogs, o => o.OrganizationChangeType == changeType);
-        Assert.Contains(organizationAuditLogs, o => o.Value == newValue);
-        Assert.Contains(organizationAuditLogs, o => o.Value == orgValue);
-        Assert.Contains(organizationAuditLogs, o => o.OrganizationId == orgId.Value);
+        Assert.Contains(organizationAuditLogs, o => o.Change == changeType);
+        Assert.Contains(organizationAuditLogs, o => o.CurrentValue == newValue && o.PreviousValue == orgValue);
     }
 }

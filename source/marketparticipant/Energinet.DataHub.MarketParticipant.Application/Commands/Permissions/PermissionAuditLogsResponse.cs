@@ -15,6 +15,6 @@
 using System.Collections.Generic;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands;
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
 public sealed record PermissionAuditLogsResponse(IEnumerable<AuditLogDto<PermissionAuditedChange>> AuditLogs);
