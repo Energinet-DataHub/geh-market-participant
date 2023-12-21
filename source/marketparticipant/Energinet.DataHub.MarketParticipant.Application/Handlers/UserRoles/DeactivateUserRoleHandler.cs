@@ -29,20 +29,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.UserRoles;
 public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRoleCommand>
 {
     private readonly IUserRepository _userRepository;
-    private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
+    private readonly IUserRoleAssignmentAuditLogRepository _userRoleAssignmentAuditLogRepository;
     private readonly IUserRoleRepository _userRoleRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
 
     public DeactivateUserRoleHandler(
         IUserRepository userRepository,
-        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
+        IUserRoleAssignmentAuditLogRepository userRoleAssignmentAuditLogRepository,
         IUserRoleRepository userRoleRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IAuditIdentityProvider auditIdentityProvider)
     {
         _userRepository = userRepository;
-        _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
+        _userRoleAssignmentAuditLogRepository = userRoleAssignmentAuditLogRepository;
         _userRoleRepository = userRoleRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _auditIdentityProvider = auditIdentityProvider;
@@ -71,7 +71,10 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
                 var role = user.RoleAssignments.Single(x => x.UserRoleId == userRoleId);
                 user.RoleAssignments.Remove(role);
 
-                await AuditRoleAssignmentAsync(user, role).ConfigureAwait(false);
+                await _userRoleAssignmentAuditLogRepository
+                    .AuditDeactivationAsync(user.Id, _auditIdentityProvider.IdentityId, role)
+                    .ConfigureAwait(false);
+
                 await _userRepository.AddOrUpdateAsync(user).ConfigureAwait(false);
             }
 
@@ -80,18 +83,5 @@ public sealed class DeactivateUserRoleHandler : IRequestHandler<DeactivateUserRo
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
-    }
-
-    private async Task AuditRoleAssignmentAsync(Domain.Model.Users.User user, UserRoleAssignment userRoleAssignment)
-    {
-        await _userRoleAssignmentAuditLogEntryRepository.InsertAuditLogEntryAsync(
-            user.Id,
-            new UserRoleAssignmentAuditLogEntry(
-                user.Id,
-                userRoleAssignment.ActorId,
-                userRoleAssignment.UserRoleId,
-                _auditIdentityProvider.IdentityId,
-                DateTimeOffset.UtcNow,
-                UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation)).ConfigureAwait(false);
     }
 }

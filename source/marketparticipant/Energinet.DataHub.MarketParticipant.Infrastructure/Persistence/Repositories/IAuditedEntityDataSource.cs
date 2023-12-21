@@ -20,5 +20,5 @@ namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Reposit
 
 public interface IAuditedEntityDataSource<TAuditedEntity>
 {
-    Task<IEnumerable<(TAuditedEntity Entity, DateTimeOffset Timestamp)>> ReadAsync();
+    Task<IEnumerable<(TAuditedEntity Entity, DateTimeOffset Timestamp)>> ReadChangesAsync();
 }

@@ -16,10 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Handlers.User;
-using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -38,14 +37,14 @@ public sealed class UpdateUserIdentityHandlerTests
     public async Task Completes_With_Success()
     {
         // Arrange
-        var userContextFrontendUser = new Mock<IUserContext<FrontendUser>>();
+        var auditIdentityProviderMock = new Mock<IAuditIdentityProvider>();
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
 
-        userContextFrontendUser
-            .Setup(x => x.CurrentUser)
-            .Returns(new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false));
+        auditIdentityProviderMock
+            .Setup(x => x.IdentityId)
+            .Returns(new AuditIdentity(Guid.NewGuid()));
 
         var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232323");
         var validUserId = Guid.NewGuid();
@@ -60,10 +59,11 @@ public sealed class UpdateUserIdentityHandlerTests
             .ReturnsAsync(CreateFakeUserIdentity);
 
         var target = new UpdateUserIdentityHandler(
-            userContextFrontendUser.Object,
+            auditIdentityProviderMock.Object,
             userRepositoryMock.Object,
             userIdentityRepository.Object,
-            userIdentityAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var updateUserIdentityCommand = new UpdateUserIdentityCommand(userIdentityUpdateDto, validUserId);
 
@@ -75,10 +75,10 @@ public sealed class UpdateUserIdentityHandlerTests
     public async Task Invalid_PhoneNumber_ValidationException()
     {
         // Arrange
-        var userContextFrontendUser = new Mock<IUserContext<FrontendUser>>();
-        userContextFrontendUser
-            .Setup(x => x.CurrentUser)
-            .Returns(new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false));
+        var auditIdentityProviderMock = new Mock<IAuditIdentityProvider>();
+        auditIdentityProviderMock
+            .Setup(x => x.IdentityId)
+            .Returns(new AuditIdentity(Guid.NewGuid()));
 
         var userRepositoryMock = new Mock<IUserRepository>();
         userRepositoryMock
@@ -90,16 +90,17 @@ public sealed class UpdateUserIdentityHandlerTests
             .Setup(x => x.GetAsync(It.IsAny<ExternalUserId>()))
             .ReturnsAsync(CreateFakeUserIdentity());
 
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
 
         var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 invalid");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
-            userContextFrontendUser.Object,
+            auditIdentityProviderMock.Object,
             userRepositoryMock.Object,
             userIdentityRepository.Object,
-            userIdentityAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var updateUserIdentityCommand = new UpdateUserIdentityCommand(userIdentityUpdateDto, validUserId);
 
@@ -111,23 +112,24 @@ public sealed class UpdateUserIdentityHandlerTests
     public async Task UserNotFound_Throws()
     {
         // Arrange
-        var userContextFrontendUser = new Mock<IUserContext<FrontendUser>>();
+        var auditIdentityProviderMock = new Mock<IAuditIdentityProvider>();
         var userIdentityRepository = new Mock<IUserIdentityRepository>();
         var userRepositoryMock = new Mock<IUserRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
 
-        userContextFrontendUser
-            .Setup(x => x.CurrentUser)
-            .Returns(new FrontendUser(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), false));
+        auditIdentityProviderMock
+            .Setup(x => x.IdentityId)
+            .Returns(new AuditIdentity(Guid.NewGuid()));
 
         var userIdentityUpdateDto = new UserIdentityUpdateDto("firstName", "lastName", "+45 23232324");
         var validUserId = Guid.NewGuid();
 
         var target = new UpdateUserIdentityHandler(
-            userContextFrontendUser.Object,
+            auditIdentityProviderMock.Object,
             userRepositoryMock.Object,
             userIdentityRepository.Object,
-            userIdentityAuditLogEntryRepository.Object);
+            userIdentityAuditLogEntryRepository.Object,
+            UnitOfWorkProviderMock.Create());
 
         var updateUserIdentityCommand = new UpdateUserIdentityCommand(userIdentityUpdateDto, validUserId);
 

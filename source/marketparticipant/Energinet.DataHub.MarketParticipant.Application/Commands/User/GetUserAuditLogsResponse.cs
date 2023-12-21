@@ -16,6 +16,7 @@ using System.Collections.Generic;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
+// TODO: Delete.
 public sealed record GetUserAuditLogsResponse(
     IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
     IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs,

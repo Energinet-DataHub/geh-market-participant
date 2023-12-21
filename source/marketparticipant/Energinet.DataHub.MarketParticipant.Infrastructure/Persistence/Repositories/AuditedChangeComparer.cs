@@ -16,27 +16,27 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-public sealed class AuditedChange<TAuditedChange, TAuditedEntity>
+public sealed class AuditedChangeComparer<TAuditedChange, TAuditedEntity>
     where TAuditedChange : Enum
     where TAuditedEntity : class
 {
     private readonly Func<TAuditedEntity, object?> _compareSelector;
     private readonly Func<TAuditedEntity, string?> _auditedValueSelector;
 
-    public AuditedChange(
+    public AuditedChangeComparer(
         TAuditedChange change,
         Func<TAuditedEntity, object?> compareSelector,
         Func<TAuditedEntity, string?> auditedValueSelector,
-        bool isAssignedInitially)
+        AuditedChangeCompareAt compareAt)
     {
         Change = change;
         _compareSelector = compareSelector;
         _auditedValueSelector = auditedValueSelector;
-        IsAssignedInitially = isAssignedInitially;
+        CompareAt = compareAt;
     }
 
     public TAuditedChange Change { get; }
-    public bool IsAssignedInitially { get; }
+    public AuditedChangeCompareAt CompareAt { get; }
 
     public bool HasChanges(TAuditedEntity previous, TAuditedEntity current)
     {

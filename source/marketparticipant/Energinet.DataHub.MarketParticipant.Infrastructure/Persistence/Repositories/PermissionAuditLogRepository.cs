@@ -46,7 +46,7 @@ public sealed class PermissionAuditLogRepository : IPermissionAuditLogRepository
 
         return new AuditLogBuilder<PermissionAuditedChange, PermissionEntity>(dataSource)
             .WithInitial(initialPermission, knownPermission.Created)
-            .Add(PermissionAuditedChange.Claim, _ => knownPermission.Claim, true)
+            .Add(PermissionAuditedChange.Claim, _ => knownPermission.Claim, AuditedChangeCompareAt.Creation)
             .Add(PermissionAuditedChange.Description, entity => entity.Description)
             .BuildAsync();
     }

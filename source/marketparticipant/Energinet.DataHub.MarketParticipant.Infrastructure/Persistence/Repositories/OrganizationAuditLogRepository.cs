@@ -34,8 +34,8 @@ public sealed class OrganizationAuditLogRepository : IOrganizationAuditLogReposi
         var dataSource = new HistoryTableDataSource<OrganizationEntity>(_context.Organizations, entity => entity.Id == organization.Value);
 
         return new AuditLogBuilder<OrganizationAuditedChange, OrganizationEntity>(dataSource)
-            .Add(OrganizationAuditedChange.Name, entity => entity.Name, true)
-            .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, true)
+            .Add(OrganizationAuditedChange.Name, entity => entity.Name, AuditedChangeCompareAt.Creation)
+            .Add(OrganizationAuditedChange.Domain, entity => entity.Domain, AuditedChangeCompareAt.Creation)
             .BuildAsync();
     }
 }

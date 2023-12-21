@@ -28,28 +28,28 @@ public static class AuditLogBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.Add(new AuditedChange<TAuditedChange, TAuditedEntity>(
+        return builder.Add(new AuditedChangeComparer<TAuditedChange, TAuditedEntity>(
             change,
             compareSelector,
             entity => compareSelector(entity)?.ToString(),
-            false));
+            AuditedChangeCompareAt.ChangeOnly));
     }
 
     public static AuditLogBuilder<TAuditedChange, TAuditedEntity> Add<TAuditedChange, TAuditedEntity>(
         this AuditLogBuilder<TAuditedChange, TAuditedEntity> builder,
         TAuditedChange change,
         Func<TAuditedEntity, object?> compareSelector,
-        bool isAssignedInitially)
+        AuditedChangeCompareAt compareAt)
             where TAuditedChange : Enum
             where TAuditedEntity : class, IAuditedEntity
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.Add(new AuditedChange<TAuditedChange, TAuditedEntity>(
+        return builder.Add(new AuditedChangeComparer<TAuditedChange, TAuditedEntity>(
             change,
             compareSelector,
             entity => compareSelector(entity)?.ToString(),
-            isAssignedInitially));
+            compareAt));
     }
 
     public static AuditLogBuilder<TAuditedChange, TAuditedEntity> Add<TAuditedChange, TAuditedEntity>(
@@ -57,16 +57,33 @@ public static class AuditLogBuilderExtensions
         TAuditedChange change,
         Func<TAuditedEntity, object?> compareSelector,
         Func<TAuditedEntity, string?> auditedValueSelector,
-        bool isAssignedInitially)
+        AuditedChangeCompareAt compareAt)
             where TAuditedChange : Enum
             where TAuditedEntity : class, IAuditedEntity
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.Add(new AuditedChange<TAuditedChange, TAuditedEntity>(
+        return builder.Add(new AuditedChangeComparer<TAuditedChange, TAuditedEntity>(
             change,
             compareSelector,
             auditedValueSelector,
-            isAssignedInitially));
+            compareAt));
+    }
+
+    public static AuditLogBuilder<TAuditedChange, TAuditedEntity> Add<TAuditedChange, TAuditedEntity>(
+        this AuditLogBuilder<TAuditedChange, TAuditedEntity> builder,
+        TAuditedChange change,
+        AuditedChangeCompareAt compareAt,
+        Func<TAuditedEntity, string?> auditedValueSelector)
+            where TAuditedChange : Enum
+            where TAuditedEntity : class, IAuditedEntity
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.Add(new AuditedChangeComparer<TAuditedChange, TAuditedEntity>(
+            change,
+            _ => null,
+            auditedValueSelector,
+            compareAt));
     }
 }

@@ -28,18 +28,20 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
     where TAuditedChange : Enum
     where TAuditedEntity : class, IAuditedEntity
 {
-    private readonly List<AuditedChange<TAuditedChange, TAuditedEntity>> _auditedChanges = new();
+    private readonly List<AuditedChangeComparer<TAuditedChange, TAuditedEntity>> _auditedChanges = new();
     private readonly IAuditedEntityDataSource<TAuditedEntity> _dataSource;
     private (TAuditedEntity, DateTimeOffset)? _initialEntity;
+    private Func<TAuditedEntity, object?> _keySelector;
 
     public AuditLogBuilder(IAuditedEntityDataSource<TAuditedEntity> dataSource)
     {
         _dataSource = dataSource;
+        _keySelector = _ => null;
     }
 
-    public AuditLogBuilder<TAuditedChange, TAuditedEntity> Add(AuditedChange<TAuditedChange, TAuditedEntity> auditedChange)
+    public AuditLogBuilder<TAuditedChange, TAuditedEntity> Add(AuditedChangeComparer<TAuditedChange, TAuditedEntity> auditedChangeComparer)
     {
-        _auditedChanges.Add(auditedChange);
+        _auditedChanges.Add(auditedChangeComparer);
         return this;
     }
 
@@ -49,34 +51,47 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
         return this;
     }
 
+    public AuditLogBuilder<TAuditedChange, TAuditedEntity> WithGrouping<TKey>(Func<TAuditedEntity, TKey> keySelector)
+    {
+        _keySelector = entity => keySelector(entity);
+        return this;
+    }
+
     public async Task<IEnumerable<AuditLog<TAuditedChange>>> BuildAsync()
     {
-        var entities = await _dataSource
-            .ReadAsync()
+        var changes = await _dataSource
+            .ReadChangesAsync()
             .ConfigureAwait(false);
 
         if (_initialEntity != null)
         {
-            entities = entities.Prepend(_initialEntity.Value);
+            changes = changes.Prepend(_initialEntity.Value);
         }
 
-        var entityList = entities.ToList();
         var auditLogs = new List<AuditLog<TAuditedChange>>();
 
-        for (var i = 0; i < entityList.Count; i++)
+        foreach (var changeGroup in changes.GroupBy(entity => _keySelector(entity.Entity)))
         {
-            auditLogs.AddRange(i == 0 ? BuildInitialAuditLogs(entityList) : BuildAuditLogs(entityList, i));
+            var entityList = changeGroup
+                .OrderBy(entity => entity.Timestamp)
+                .ThenBy(entity => entity.Entity.Version)
+                .ToList();
+
+            for (var i = 0; i < entityList.Count; i++)
+            {
+                auditLogs.AddRange(i == 0 ? BuildCreationAuditLogs(entityList) : BuildAuditLogs(entityList, i));
+            }
         }
 
         return auditLogs;
     }
 
-    private IEnumerable<AuditLog<TAuditedChange>> BuildInitialAuditLogs(IReadOnlyList<(TAuditedEntity Entity, DateTimeOffset Timestamp)> entities)
+    private IEnumerable<AuditLog<TAuditedChange>> BuildCreationAuditLogs(IReadOnlyList<(TAuditedEntity Entity, DateTimeOffset Timestamp)> entities)
     {
         var (entity, timestamp) = entities[0];
 
         return from auditChange in _auditedChanges
-               where auditChange.IsAssignedInitially
+               where auditChange.CompareAt is AuditedChangeCompareAt.Creation or AuditedChangeCompareAt.BothCreationAndDeletion
                select new AuditLog<TAuditedChange>(
                    auditChange.Change,
                    timestamp.ToInstant(),
@@ -91,6 +106,9 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
         var (previous, _) = entities[i - 1];
         var (current, timestamp) = entities[i];
 
+        if (i == entities.Count - 1 && current is IDeletableAuditedEntity { DeletedByIdentityId: not null } deleted)
+            return BuildDeletionAuditLogs((current, timestamp), deleted.DeletedByIdentityId.Value);
+
         return from auditChange in _auditedChanges
                where auditChange.HasChanges(previous, current)
                select new AuditLog<TAuditedChange>(
@@ -100,5 +118,20 @@ public sealed class AuditLogBuilder<TAuditedChange, TAuditedEntity>
                    false,
                    auditChange.GetAuditedValue(current),
                    auditChange.GetAuditedValue(previous));
+    }
+
+    private IEnumerable<AuditLog<TAuditedChange>> BuildDeletionAuditLogs((TAuditedEntity Entity, DateTimeOffset Timestamp) deletedEntity, Guid deletedBy)
+    {
+        var (entity, timestamp) = deletedEntity;
+
+        return from auditChange in _auditedChanges
+               where auditChange.CompareAt is AuditedChangeCompareAt.Deletion or AuditedChangeCompareAt.BothCreationAndDeletion
+               select new AuditLog<TAuditedChange>(
+                   auditChange.Change,
+                   timestamp.ToInstant(),
+                   new AuditIdentity(deletedBy),
+                   false,
+                   null,
+                   auditChange.GetAuditedValue(entity));
     }
 }

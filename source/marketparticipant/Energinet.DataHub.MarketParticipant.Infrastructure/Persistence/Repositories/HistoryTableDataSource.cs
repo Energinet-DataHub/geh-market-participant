@@ -28,15 +28,15 @@ public sealed class HistoryTableDataSource<TAuditedEntity> : IAuditedEntityDataS
     where TAuditedEntity : class, IAuditedEntity
 {
     private readonly DbSet<TAuditedEntity> _dataSource;
-    private readonly Expression<Func<TAuditedEntity, bool>> _entitySelector;
+    private readonly Expression<Func<TAuditedEntity, bool>> _wherePredicate;
 
-    public HistoryTableDataSource(DbSet<TAuditedEntity> dataSource, Expression<Func<TAuditedEntity, bool>> entitySelector)
+    public HistoryTableDataSource(DbSet<TAuditedEntity> dataSource, Expression<Func<TAuditedEntity, bool>> wherePredicate)
     {
         _dataSource = dataSource;
-        _entitySelector = entitySelector;
+        _wherePredicate = wherePredicate;
     }
 
-    public async Task<IEnumerable<(TAuditedEntity Entity, DateTimeOffset Timestamp)>> ReadAsync()
+    public async Task<IEnumerable<(TAuditedEntity Entity, DateTimeOffset Timestamp)>> ReadChangesAsync()
     {
         var historyTableName = _dataSource
             .GetService<IDesignTimeModel>()
@@ -45,7 +45,7 @@ public sealed class HistoryTableDataSource<TAuditedEntity> : IAuditedEntityDataS
             .GetHistoryTableName();
 
         var allCurrent = await _dataSource
-            .Where(_entitySelector)
+            .Where(_wherePredicate)
             .Select(entity => new
             {
                 Entity = entity,
@@ -57,13 +57,12 @@ public sealed class HistoryTableDataSource<TAuditedEntity> : IAuditedEntityDataS
         var allHistory = await _dataSource
             .FromSqlRaw($"SELECT * FROM dbo.{historyTableName}")
             .AsNoTracking()
-            .Where(_entitySelector)
+            .Where(_wherePredicate)
             .Select(entity => new
             {
                 Entity = entity,
                 PeriodStart = EF.Property<DateTime>(entity, "PeriodStart"),
             })
-            .OrderBy(entity => entity.Entity.Version)
             .ToListAsync()
             .ConfigureAwait(false);
 

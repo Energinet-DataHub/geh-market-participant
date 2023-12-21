@@ -63,11 +63,10 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLog = response
-                    .UserRoleAssignmentAuditLogs
-                    .Single(log => log.AssignmentType == UserRoleAssignmentTypeAuditLog.Added);
+                    .AuditLogs
+                    .Single(log => log.Change == UserAuditedChange.UserRoleAssigned);
 
-                Assert.Equal(assignedActor.Id, expectedLog.ActorId);
-                Assert.Equal(assignedUserRole.Id, expectedLog.UserRoleId);
+                Assert.Equal($"({assignedActor.Id};{assignedUserRole.Id})", expectedLog.CurrentValue);
             },
             user =>
             {
@@ -89,11 +88,10 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLog = response
-                    .UserRoleAssignmentAuditLogs
-                    .Single(log => log.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed);
+                    .AuditLogs
+                    .Single(log => log.Change == UserAuditedChange.UserRoleRemoved);
 
-                Assert.Equal(assignedActor.Id, expectedLog.ActorId);
-                Assert.Equal(assignedUserRole.Id, expectedLog.UserRoleId);
+                Assert.Equal($"({assignedActor.Id};{assignedUserRole.Id})", expectedLog.PreviousValue);
             },
             user =>
             {
@@ -114,12 +112,12 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedFirstNameLog = response
-                    .IdentityAuditLogs
-                    .Single(log => log.Field == UserIdentityAuditLogField.FirstName);
+                    .AuditLogs
+                    .Single(log => log.Change == UserAuditedChange.FirstName);
 
-                Assert.True(response.IdentityAuditLogs.All(log => log.Field == UserIdentityAuditLogField.FirstName));
-                Assert.Equal(expectedFirstName, expectedFirstNameLog.NewValue);
-                Assert.Equal(InitialFirstName, expectedFirstNameLog.OldValue);
+                Assert.Single(response.AuditLogs);
+                Assert.Equal(expectedFirstName, expectedFirstNameLog.CurrentValue);
+                Assert.Equal(InitialFirstName, expectedFirstNameLog.PreviousValue);
             },
             () => new UserIdentityUpdateDto(expectedFirstName, InitialLastName, InitialPhoneNumber));
     }
@@ -133,12 +131,12 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLastNameLog = response
-                    .IdentityAuditLogs
-                    .Single(log => log.Field == UserIdentityAuditLogField.LastName);
+                    .AuditLogs
+                    .Single(log => log.Change == UserAuditedChange.LastName);
 
-                Assert.True(response.IdentityAuditLogs.All(log => log.Field == UserIdentityAuditLogField.LastName));
-                Assert.Equal(expectedLastName, expectedLastNameLog.NewValue);
-                Assert.Equal("initial_last_name", expectedLastNameLog.OldValue);
+                Assert.Single(response.AuditLogs);
+                Assert.Equal(expectedLastName, expectedLastNameLog.CurrentValue);
+                Assert.Equal("initial_last_name", expectedLastNameLog.PreviousValue);
             },
             () => new UserIdentityUpdateDto(InitialFirstName, expectedLastName, InitialPhoneNumber));
     }
@@ -152,18 +150,18 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedPhoneNumberLog = response
-                    .IdentityAuditLogs
-                    .Single(log => log.Field == UserIdentityAuditLogField.PhoneNumber);
+                    .AuditLogs
+                    .Single(log => log.Change == UserAuditedChange.PhoneNumber);
 
-                Assert.True(response.IdentityAuditLogs.All(log => log.Field == UserIdentityAuditLogField.PhoneNumber));
-                Assert.Equal(expectedPhoneNumber, expectedPhoneNumberLog.NewValue);
-                Assert.Equal("+45 00000000", expectedPhoneNumberLog.OldValue);
+                Assert.Single(response.AuditLogs);
+                Assert.Equal(expectedPhoneNumber, expectedPhoneNumberLog.CurrentValue);
+                Assert.Equal("+45 00000000", expectedPhoneNumberLog.PreviousValue);
             },
             () => new UserIdentityUpdateDto(InitialFirstName, InitialLastName, expectedPhoneNumber));
     }
 
     private async Task TestAuditOfUserRoleAssignmentChangeAsync(
-        Action<GetUserAuditLogsResponse> assert,
+        Action<UserAuditLogsResponse> assert,
         params Action<User>[] changeActions)
     {
         // Arrange
@@ -201,10 +199,9 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var userAuditLog in auditLogs.UserRoleAssignmentAuditLogs.Skip(auditLogsProcessed))
+            foreach (var userAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, userAuditLog.AuditIdentityId);
-                Assert.Equal(userEntity.Id, userAuditLog.UserId);
                 Assert.True(userAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(userAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 
@@ -220,7 +217,7 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
     }
 
     private async Task TestAuditOfUserIdentityChangeAsync(
-        Action<GetUserAuditLogsResponse> assert,
+        Action<UserAuditLogsResponse> assert,
         params Func<UserIdentityUpdateDto>[] changeActions)
     {
         // Arrange
@@ -272,10 +269,9 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var userAuditLog in auditLogs.IdentityAuditLogs.Skip(auditLogsProcessed))
+            foreach (var userAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, userAuditLog.AuditIdentityId);
-                Assert.Equal(userEntity.Id, userAuditLog.UserId);
                 Assert.True(userAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(userAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 

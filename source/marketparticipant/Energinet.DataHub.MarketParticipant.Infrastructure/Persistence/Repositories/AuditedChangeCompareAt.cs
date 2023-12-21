@@ -11,14 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 
-// TODO: Delete.
-public sealed record UserInviteDetailsAuditLogEntry(
-    UserId UserId,
-    ActorId ActorId,
-    string ActorName,
-    AuditIdentity AuditIdentity,
-    DateTimeOffset Timestamp);
+public enum AuditedChangeCompareAt
+{
+    ChangeOnly,
+    Creation,
+    Deletion,
+    BothCreationAndDeletion
+}

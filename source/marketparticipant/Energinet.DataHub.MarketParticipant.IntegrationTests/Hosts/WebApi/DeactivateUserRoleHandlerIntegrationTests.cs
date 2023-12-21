@@ -118,8 +118,8 @@ public sealed class DeactivateUserRoleHandlerIntegrationTests
 
         // Assert
         var auditLogs = await mediator.Send(new GetUserAuditLogsCommand(user.Id));
-        Assert.Single(auditLogs.UserRoleAssignmentAuditLogs, r =>
-            r.AssignmentType == UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation &&
-            r.UserRoleId == userRole.Id);
+        Assert.Single(auditLogs.AuditLogs, r =>
+            r.Change == UserAuditedChange.UserRoleRemovedDueToDeactivation &&
+            r.PreviousValue == userRole.Id.ToString());
     }
 }

@@ -36,10 +36,10 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IActorRepository, ActorRepository>();
             services.AddScoped<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>();
             services.AddScoped<IUserIdentityRepository, UserIdentityRepository>();
-            services.AddScoped<IUserRoleAssignmentAuditLogEntryRepository, UserRoleAssignmentAuditLogEntryRepository>();
+            services.AddScoped<IUserRoleAssignmentAuditLogRepository, UserRoleAssignmentAuditLogRepository>();
             services.AddScoped<IUserRoleAuditLogEntryRepository, UserRoleAuditLogEntryRepository>();
-            services.AddScoped<IUserInviteAuditLogEntryRepository, UserInviteAuditLogEntryRepository>();
-            services.AddScoped<IUserIdentityAuditLogEntryRepository, UserIdentityAuditLogEntryRepository>();
+            services.AddScoped<IUserInviteAuditLogRepository, UserInviteAuditLogRepository>();
+            services.AddScoped<IUserIdentityAuditLogRepository, UserIdentityAuditLogRepository>();
             services.AddScoped<IPermissionAuditLogRepository, PermissionAuditLogRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IDomainEventRepository, DomainEventRepository>();

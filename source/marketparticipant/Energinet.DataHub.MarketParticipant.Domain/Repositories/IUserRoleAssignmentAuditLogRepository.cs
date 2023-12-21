@@ -14,13 +14,14 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-public interface IUserIdentityAuditLogEntryRepository
+public interface IUserRoleAssignmentAuditLogRepository
 {
-    Task<IEnumerable<UserIdentityAuditLogEntry>> GetAsync(UserId userId);
+    Task<IEnumerable<AuditLog<UserAuditedChange>>> GetAsync(UserId userId);
 
-    Task InsertAuditLogEntryAsync(UserIdentityAuditLogEntry logEntry);
+    Task AuditDeactivationAsync(UserId userId, AuditIdentity auditIdentity, UserRoleAssignment userRoleAssignment);
 }

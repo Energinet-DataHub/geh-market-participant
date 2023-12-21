@@ -14,6 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
+// TODO: Move to repo.
 public enum UserRoleAssignmentTypeAuditLog
 {
     Added,

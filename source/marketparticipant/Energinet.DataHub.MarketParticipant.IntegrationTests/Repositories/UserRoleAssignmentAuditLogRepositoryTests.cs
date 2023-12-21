@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
 using Energinet.DataHub.MarketParticipant.IntegrationTests.Common;
@@ -26,11 +26,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class UserIdentityAuditLogEntryRepositoryTests
+public sealed class UserRoleAssignmentAuditLogRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public UserIdentityAuditLogEntryRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public UserRoleAssignmentAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -42,13 +42,12 @@ public sealed class UserIdentityAuditLogEntryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var userIdentityAuditLogEntryRepository = new UserIdentityAuditLogEntryRepository(contextGet);
+        var userRoleAssignmentAuditLogEntryRepository = new UserRoleAssignmentAuditLogRepository(contextGet);
 
         var userId = new UserId(Guid.NewGuid());
 
         // Act
-        var actual = await userIdentityAuditLogEntryRepository
-            .GetAsync(userId);
+        var actual = await userRoleAssignmentAuditLogEntryRepository.GetAsync(userId);
 
         // Assert
         Assert.Empty(actual);
@@ -61,37 +60,29 @@ public sealed class UserIdentityAuditLogEntryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var userIdentityAuditLogEntryRepository = new UserIdentityAuditLogEntryRepository(contextGet);
+        var userRoleAssignmentAuditLogRepository = new UserRoleAssignmentAuditLogRepository(contextGet);
 
         var user = await _fixture.PrepareUserAsync();
-        var userChangedBy = await _fixture.PrepareUserAsync();
-
-        var entry = new UserIdentityAuditLogEntry(
-             new UserId(user.Id),
-             Guid.NewGuid().ToString(),
-             Guid.NewGuid().ToString(),
-             new AuditIdentity(userChangedBy.Id),
-             DateTimeOffset.UtcNow,
-             UserIdentityAuditLogField.FirstName);
+        var userRole = await _fixture.PrepareUserRoleAsync();
 
         // Insert an audit log.
-        await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();
+        {
+            await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();
 
-        var insertAuditLogEntryRepository = new UserIdentityAuditLogEntryRepository(contextInsert);
-        await insertAuditLogEntryRepository.InsertAuditLogEntryAsync(entry);
+            var insertRepository = new UserRoleAssignmentAuditLogRepository(contextInsert);
+            await insertRepository.AuditDeactivationAsync(
+                new UserId(user.Id),
+                new AuditIdentity(user.Id),
+                new UserRoleAssignment(new ActorId(Guid.NewGuid()), new UserRoleId(userRole.Id)));
+        }
 
         // Act
-        var actual = await userIdentityAuditLogEntryRepository
+        var actual = await userRoleAssignmentAuditLogRepository
             .GetAsync(new UserId(user.Id));
 
         // Assert
-        var userIdentityAuditLogs = actual.ToList();
-        Assert.Single(userIdentityAuditLogs);
-        Assert.Equal(entry.UserId, userIdentityAuditLogs[0].UserId);
-        Assert.Equal(entry.Timestamp, userIdentityAuditLogs[0].Timestamp);
-        Assert.Equal(entry.AuditIdentity, userIdentityAuditLogs[0].AuditIdentity);
-        Assert.Equal(entry.Field, userIdentityAuditLogs[0].Field);
-        Assert.Equal(entry.NewValue, userIdentityAuditLogs[0].NewValue);
-        Assert.Equal(entry.OldValue, userIdentityAuditLogs[0].OldValue);
+        Assert.Single(actual, log =>
+            log.Change == UserAuditedChange.UserRoleRemovedDueToDeactivation &&
+            log.PreviousValue == userRole.Id.ToString());
     }
 }

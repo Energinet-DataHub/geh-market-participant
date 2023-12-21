@@ -11,14 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-using System;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
-// TODO: Delete.
-public sealed record UserInviteDetailsAuditLogEntry(
-    UserId UserId,
-    ActorId ActorId,
-    string ActorName,
-    AuditIdentity AuditIdentity,
-    DateTimeOffset Timestamp);
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IUserIdentityAuditLogRepository
+{
+    Task<IEnumerable<AuditLog<UserAuditedChange>>> GetAsync(UserId userId);
+
+    Task AuditAsync(UserId userId, AuditIdentity auditIdentity, UserAuditedChange change, string? currentValue, string? previousValue);
+}
