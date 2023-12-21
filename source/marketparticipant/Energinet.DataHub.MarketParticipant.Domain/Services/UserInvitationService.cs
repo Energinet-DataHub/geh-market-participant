@@ -58,9 +58,9 @@ public sealed class UserInvitationService : IUserInvitationService
         ArgumentNullException.ThrowIfNull(invitation);
 
         var mailEventType = EmailEventType.UserAssignedToActor;
+        var userIdentityModified = false;
 
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
-
         if (invitedUser == null)
         {
             await _organizationDomainValidationService
@@ -83,7 +83,9 @@ public sealed class UserInvitationService : IUserInvitationService
 
             invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
             invitedUser.ActivateUserExpiration();
+
             mailEventType = EmailEventType.UserInvite;
+            userIdentityModified = true;
         }
 
         foreach (var assignedRole in invitation.AssignedRoles)
@@ -108,10 +110,13 @@ public sealed class UserInvitationService : IUserInvitationService
 
             var auditIdentity = new AuditIdentity(invitationSentByUserId);
 
-            await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
+            if (userIdentityModified)
+            {
+                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
+            }
 
             await _userInviteAuditLogRepository
-                .AuditAsync(invitedUserId, new AuditIdentity(invitationSentByUserId), invitation.AssignedActor.Id)
+                .AuditAsync(invitedUserId, auditIdentity, invitation.AssignedActor.Id)
                 .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
