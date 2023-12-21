@@ -161,7 +161,7 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
     }
 
     private async Task TestAuditOfUserRoleAssignmentChangeAsync(
-        Action<UserAuditLogsResponse> assert,
+        Action<GetUserAuditLogsResponse> assert,
         params Action<User>[] changeActions)
     {
         // Arrange
@@ -217,7 +217,7 @@ public sealed class GetUserAuditLogsHandlerIntegrationTests
     }
 
     private async Task TestAuditOfUserIdentityChangeAsync(
-        Action<UserAuditLogsResponse> assert,
+        Action<GetUserAuditLogsResponse> assert,
         params Func<UserIdentityUpdateDto>[] changeActions)
     {
         // Arrange

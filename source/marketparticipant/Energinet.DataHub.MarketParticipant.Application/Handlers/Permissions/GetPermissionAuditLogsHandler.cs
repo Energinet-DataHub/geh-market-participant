@@ -24,7 +24,7 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
-public sealed class GetPermissionAuditLogsHandler : IRequestHandler<GetPermissionAuditLogsCommand, PermissionAuditLogsResponse>
+public sealed class GetPermissionAuditLogsHandler : IRequestHandler<GetPermissionAuditLogsCommand, GetPermissionAuditLogsResponse>
 {
     private readonly IPermissionAuditLogRepository _permissionAuditLogsRepository;
 
@@ -33,7 +33,7 @@ public sealed class GetPermissionAuditLogsHandler : IRequestHandler<GetPermissio
         _permissionAuditLogsRepository = permissionAuditLogsRepository;
     }
 
-    public async Task<PermissionAuditLogsResponse> Handle(GetPermissionAuditLogsCommand request, CancellationToken cancellationToken)
+    public async Task<GetPermissionAuditLogsResponse> Handle(GetPermissionAuditLogsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
@@ -41,6 +41,6 @@ public sealed class GetPermissionAuditLogsHandler : IRequestHandler<GetPermissio
             .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
-        return new PermissionAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<PermissionAuditedChange>(log)));
+        return new GetPermissionAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<PermissionAuditedChange>(log)));
     }
 }

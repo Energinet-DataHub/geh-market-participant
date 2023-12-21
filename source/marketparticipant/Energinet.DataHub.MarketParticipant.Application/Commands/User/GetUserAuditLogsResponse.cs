@@ -13,11 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
-// TODO: Delete.
-public sealed record GetUserAuditLogsResponse(
-    IEnumerable<UserRoleAssignmentAuditLogEntryDto> UserRoleAssignmentAuditLogs,
-    IEnumerable<UserInviteAuditLogEntryDto> InviteAuditLogs,
-    IEnumerable<UserIdentityAuditLogEntryDto> IdentityAuditLogs);
+public sealed record GetUserAuditLogsResponse(IEnumerable<AuditLogDto<UserAuditedChange>> AuditLogs);

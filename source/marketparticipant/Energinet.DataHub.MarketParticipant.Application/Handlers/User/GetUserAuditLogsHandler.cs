@@ -25,7 +25,7 @@ using MediatR;
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class GetUserAuditLogsHandler
-    : IRequestHandler<GetUserAuditLogsCommand, UserAuditLogsResponse>
+    : IRequestHandler<GetUserAuditLogsCommand, GetUserAuditLogsResponse>
 {
     private readonly IUserRoleAssignmentAuditLogRepository _userRoleAssignmentAuditLogRepository;
     private readonly IUserInviteAuditLogRepository _userInviteAuditLogRepository;
@@ -41,7 +41,7 @@ public sealed class GetUserAuditLogsHandler
         _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
     }
 
-    public async Task<UserAuditLogsResponse> Handle(
+    public async Task<GetUserAuditLogsResponse> Handle(
         GetUserAuditLogsCommand request,
         CancellationToken cancellationToken)
     {
@@ -66,6 +66,6 @@ public sealed class GetUserAuditLogsHandler
             .Concat(userIdentityAuditLogs)
             .OrderBy(x => x.Timestamp);
 
-        return new UserAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<UserAuditedChange>(log)));
+        return new GetUserAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<UserAuditedChange>(log)));
     }
 }

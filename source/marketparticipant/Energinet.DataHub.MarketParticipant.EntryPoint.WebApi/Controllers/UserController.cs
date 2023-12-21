@@ -123,7 +123,7 @@ public class UserController : ControllerBase
     // TODO: Delete.
     [HttpGet("{userId:guid}/auditlogentry")]
     [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<ActionResult<GetUserAuditLogsResponse>> GetAuditLogsAsync(Guid userId)
+    public async Task<ActionResult<GetUserAuditLogsResponseOld>> GetAuditLogsAsync(Guid userId)
     {
         var command = new GetUserAuditLogsCommand(userId);
 
@@ -230,7 +230,7 @@ public class UserController : ControllerBase
             }
         }
 
-        return Ok(new GetUserAuditLogsResponse(userRoleAssignmentAuditLogs, userInviteAuditLogEntryDto, userIdentityAuditLogEntryDto));
+        return Ok(new GetUserAuditLogsResponseOld(userRoleAssignmentAuditLogs, userInviteAuditLogEntryDto, userIdentityAuditLogEntryDto));
     }
 
     [HttpGet("{userId:guid}/audit")]

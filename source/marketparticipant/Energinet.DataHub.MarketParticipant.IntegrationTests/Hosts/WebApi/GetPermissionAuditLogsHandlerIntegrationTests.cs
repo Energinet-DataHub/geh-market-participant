@@ -84,7 +84,7 @@ public sealed class GetPermissionAuditLogsHandlerIntegrationTests
     }
 
     private async Task TestAuditOfPermissionChangeAsync(
-        Action<PermissionAuditLogsResponse> assert,
+        Action<GetPermissionAuditLogsResponse> assert,
         params Action<Permission>[] changeActions)
     {
         // Arrange
