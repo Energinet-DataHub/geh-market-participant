@@ -64,19 +64,19 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
 
         await using (uow.ConfigureAwait(false))
         {
-            await LogAuditEntryAsync(
+            await AuditWhenChangedAsync(
                 user.Id,
                 UserAuditedChange.FirstName,
                 request.UserIdentityUpdate.FirstName,
                 userIdentity.FirstName).ConfigureAwait(false);
 
-            await LogAuditEntryAsync(
+            await AuditWhenChangedAsync(
                 user.Id,
                 UserAuditedChange.LastName,
                 request.UserIdentityUpdate.LastName,
                 userIdentity.LastName).ConfigureAwait(false);
 
-            await LogAuditEntryAsync(
+            await AuditWhenChangedAsync(
                 user.Id,
                 UserAuditedChange.PhoneNumber,
                 request.UserIdentityUpdate.PhoneNumber,
@@ -92,16 +92,16 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
         }
     }
 
-    private Task LogAuditEntryAsync(UserId userId, UserAuditedChange change, string? newValue, string? oldValue)
+    private Task AuditWhenChangedAsync(UserId userId, UserAuditedChange change, string? currentValue, string? previousValue)
     {
-        if (newValue == oldValue)
+        if (currentValue == previousValue)
             return Task.CompletedTask;
 
         return _userIdentityAuditLogRepository.AuditAsync(
             userId,
             _auditIdentityProvider.IdentityId,
             change,
-            newValue,
-            oldValue);
+            currentValue,
+            previousValue);
     }
 }
