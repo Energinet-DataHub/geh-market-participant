@@ -17,7 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands;
 
-public sealed record AuditLogDto<TAuditedChange>
+public sealed class AuditLogDto<TAuditedChange>
 {
     public AuditLogDto(AuditLog<TAuditedChange> auditLog)
     {
