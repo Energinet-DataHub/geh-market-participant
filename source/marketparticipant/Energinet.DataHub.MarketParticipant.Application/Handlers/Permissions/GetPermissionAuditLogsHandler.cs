@@ -41,6 +41,8 @@ public sealed class GetPermissionAuditLogsHandler : IRequestHandler<GetPermissio
             .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
-        return new GetPermissionAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<PermissionAuditedChange>(log)));
+        return new GetPermissionAuditLogsResponse(auditLogs
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<PermissionAuditedChange>(log)));
     }
 }

@@ -44,6 +44,8 @@ public sealed class GetOrganizationAuditLogsHandler
             .GetAsync(new OrganizationId(request.OrganizationId))
             .ConfigureAwait(false);
 
-        return new GetOrganizationAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<OrganizationAuditedChange>(log)));
+        return new GetOrganizationAuditLogsResponse(auditLogs
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<OrganizationAuditedChange>(log)));
     }
 }

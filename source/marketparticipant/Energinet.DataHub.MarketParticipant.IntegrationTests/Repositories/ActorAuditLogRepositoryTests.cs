@@ -30,11 +30,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories;
 
 [Collection(nameof(IntegrationTestCollectionFixture))]
 [IntegrationTest]
-public sealed class ActorAuditLogEntryRepositoryTests
+public sealed class ActorAuditLogRepositoryTests
 {
     private readonly MarketParticipantDatabaseFixture _fixture;
 
-    public ActorAuditLogEntryRepositoryTests(MarketParticipantDatabaseFixture fixture)
+    public ActorAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
     {
         _fixture = fixture;
     }
@@ -46,7 +46,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
         await using var scope = host.BeginScope();
         await using var contextGet = _fixture.DatabaseManager.CreateDbContext();
-        var actorAuditLogEntryRepository = new ActorAuditLogEntryRepository(contextGet);
+        var actorAuditLogEntryRepository = new ActorAuditLogRepository(contextGet);
 
         // Act
         var actual = await actorAuditLogEntryRepository
@@ -74,7 +74,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
         // Make an audited change.
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -87,8 +87,8 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var actorAuditLogs = actual.ToList();
         Assert.NotEmpty(actorAuditLogs);
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
-        Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
-        Assert.All(actorAuditLogs, o => Assert.Equal(ActorChangeType.Created, o.ActorChangeType));
+        Assert.Contains(actorAuditLogs, o => o is { Change: ActorAuditedChange.Status, IsInitialAssignment: true });
+        Assert.Contains(actorAuditLogs, o => o is { Change: ActorAuditedChange.Name, IsInitialAssignment: true });
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
         // Make an audited change.
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -126,10 +126,9 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var actorAuditLogs = actual.ToList();
         Assert.NotEmpty(actorAuditLogs);
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
-        Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Name);
+        Assert.Contains(actorAuditLogs, o => o.Change == ActorAuditedChange.Name);
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == "Test Name 2");
         Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue);
-        Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
     }
 
     [Fact]
@@ -151,7 +150,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
         // Make an audited change.
         var result = await actorRepository.AddOrUpdateAsync(actor);
@@ -167,10 +166,9 @@ public sealed class ActorAuditLogEntryRepositoryTests
         var actorAuditLogs = actual.ToList();
         Assert.NotEmpty(actorAuditLogs);
         Assert.Contains(actorAuditLogs, o => o.AuditIdentity.Value == user.Id);
-        Assert.Contains(actorAuditLogs, o => o.ActorChangeType == ActorChangeType.Status);
+        Assert.Contains(actorAuditLogs, o => o.Change == ActorAuditedChange.Status);
         Assert.Contains(actorAuditLogs, o => o.CurrentValue == ActorStatus.Active.ToString());
         Assert.Contains(actorAuditLogs, o => o.PreviousValue == orgValue.ToString());
-        Assert.Contains(actorAuditLogs, o => o.ActorId == result.Value);
     }
 
     [Fact]
@@ -191,7 +189,7 @@ public sealed class ActorAuditLogEntryRepositoryTests
         await using var scope = host.BeginScope();
         await using var context = _fixture.DatabaseManager.CreateDbContext();
         var actorRepository = scope.ServiceProvider.GetRequiredService<IActorRepository>();
-        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogEntryRepository>();
+        var actorAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IActorAuditLogRepository>();
 
         var actorCertificateCredentials = new ActorCertificateCredentials(
             "mocked_print_A",
@@ -223,15 +221,15 @@ public sealed class ActorAuditLogEntryRepositoryTests
         Assert.NotEmpty(actorAuditLogs);
 
         Assert.Contains(actorAuditLogs, entry =>
-            entry is { ActorChangeType: ActorChangeType.CertificateCredentials, PreviousValue: "" } &&
+            entry is { Change: ActorAuditedChange.CertificateCredentials, PreviousValue: null } &&
             entry.CurrentValue == actorCertificateCredentials.CertificateThumbprint);
 
         Assert.Contains(actorAuditLogs, entry =>
-            entry is { ActorChangeType: ActorChangeType.CertificateCredentials, CurrentValue: "" } &&
+            entry is { Change: ActorAuditedChange.CertificateCredentials, CurrentValue: null } &&
             entry.PreviousValue == actorCertificateCredentials.CertificateThumbprint);
 
         Assert.Contains(actorAuditLogs, entry =>
-            entry is { ActorChangeType: ActorChangeType.SecretCredentials, PreviousValue: "" } &&
+            entry is { Change: ActorAuditedChange.ClientSecretCredentials, PreviousValue: null } &&
             entry.CurrentValue == actorClientSecretCredentials.ExpirationDate.ToString("g", CultureInfo.InvariantCulture));
     }
 }

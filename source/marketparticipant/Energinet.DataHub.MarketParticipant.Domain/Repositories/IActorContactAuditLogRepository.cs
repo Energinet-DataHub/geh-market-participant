@@ -18,14 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
 
-/// <summary>
-/// Repository for querying actor audit logs
-/// </summary>
-public interface IActorAuditLogEntryRepository
+public interface IActorContactAuditLogRepository
 {
-    /// <summary>
-    /// Retrieves all log entries for a given actor.
-    /// </summary>
-    /// <param name="actor">The actor to get the logs for.</param>
-    Task<IEnumerable<ActorAuditLogEntry>> GetAsync(ActorId actor);
+    Task<IEnumerable<AuditLog<ActorAuditedChange>>> GetAsync(ActorId actorId);
 }

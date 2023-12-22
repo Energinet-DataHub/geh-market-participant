@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -23,18 +24,17 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor;
 
-public sealed class GetActorAuditLogsHandler
-    : IRequestHandler<GetActorAuditLogsCommand, GetActorAuditLogsResponse>
+public sealed class GetActorAuditLogsHandler : IRequestHandler<GetActorAuditLogsCommand, GetActorAuditLogsResponse>
 {
-    private readonly IActorAuditLogEntryRepository _actorAuditLogEntryRepository;
-    private readonly IActorContactAuditLogEntryRepository _actorContactAuditLogEntryRepository;
+    private readonly IActorAuditLogRepository _actorAuditLogRepository;
+    private readonly IActorContactAuditLogRepository _actorContactAuditLogRepository;
 
     public GetActorAuditLogsHandler(
-        IActorAuditLogEntryRepository actorAuditLogEntryRepository,
-        IActorContactAuditLogEntryRepository actorContactAuditLogEntryRepository)
+        IActorAuditLogRepository actorAuditLogRepository,
+        IActorContactAuditLogRepository actorContactAuditLogRepository)
     {
-        _actorAuditLogEntryRepository = actorAuditLogEntryRepository;
-        _actorContactAuditLogEntryRepository = actorContactAuditLogEntryRepository;
+        _actorAuditLogRepository = actorAuditLogRepository;
+        _actorContactAuditLogRepository = actorContactAuditLogRepository;
     }
 
     public async Task<GetActorAuditLogsResponse> Handle(
@@ -43,37 +43,17 @@ public sealed class GetActorAuditLogsHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var actorAuditLogs = await _actorAuditLogEntryRepository
+        var actorAuditLogs = await _actorAuditLogRepository
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
 
-        var actorContactAuditLogs = await _actorContactAuditLogEntryRepository
+        var actorContactAuditLogs = await _actorContactAuditLogRepository
             .GetAsync(new ActorId(request.ActorId))
             .ConfigureAwait(false);
 
-        return new GetActorAuditLogsResponse(actorAuditLogs.Select(Map), actorContactAuditLogs.Select(Map));
-    }
-
-    private static ActorAuditLogDto Map(ActorAuditLogEntry auditLogEntry)
-    {
-        return new ActorAuditLogDto(
-            auditLogEntry.ActorId.Value,
-            auditLogEntry.CurrentValue,
-            auditLogEntry.PreviousValue,
-            auditLogEntry.AuditIdentity.Value,
-            auditLogEntry.Timestamp,
-            auditLogEntry.ActorChangeType);
-    }
-
-    private static ActorContactAuditLogDto Map(ActorContactAuditLogEntry auditLogEntry)
-    {
-        return new ActorContactAuditLogDto(
-            auditLogEntry.ActorId.Value,
-            auditLogEntry.CurrentValue,
-            auditLogEntry.PreviousValue,
-            auditLogEntry.AuditIdentity.Value,
-            auditLogEntry.Timestamp,
-            auditLogEntry.ContactCategory ?? ContactCategory.Default,
-            auditLogEntry.ActorContactChangeType);
+        return new GetActorAuditLogsResponse(actorAuditLogs
+            .Concat(actorContactAuditLogs)
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<ActorAuditedChange>(log)));
     }
 }

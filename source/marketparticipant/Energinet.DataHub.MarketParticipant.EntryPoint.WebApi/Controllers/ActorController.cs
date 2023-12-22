@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -164,9 +165,65 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok(new ActorClientSecretDto(response.SecretText));
         }
 
+        // TODO: Delete.
         [HttpGet("{actorId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult<GetActorAuditLogsResponse>> GetActorAuditLogsAsync(Guid actorId)
+        public async Task<ActionResult<GetActorAuditLogsResponseOld>> GetActorAuditLogsAsync(Guid actorId)
+        {
+            if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
+                return Unauthorized();
+
+            var command = new GetActorAuditLogsCommand(actorId);
+
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            var actorAuditLogs = new List<ActorAuditLogDto>();
+            var actorContactAuditLogs = new List<ActorContactAuditLogDto>();
+
+            foreach (var auditLog in response.AuditLogs)
+            {
+                switch (auditLog.Change)
+                {
+                    case ActorAuditedChange.Name:
+                        actorAuditLogs.Add(new ActorAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ActorChangeType.Name));
+                        break;
+                    case ActorAuditedChange.Status:
+                        actorAuditLogs.Add(new ActorAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ActorChangeType.Status));
+                        break;
+                    case ActorAuditedChange.ContactName:
+                        actorContactAuditLogs.Add(new ActorContactAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ContactCategory.Default, ActorContactChangeType.Name));
+                        break;
+                    case ActorAuditedChange.ContactEmail:
+                        actorContactAuditLogs.Add(new ActorContactAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ContactCategory.Default, ActorContactChangeType.Email));
+                        break;
+                    case ActorAuditedChange.ContactPhone:
+                        actorContactAuditLogs.Add(new ActorContactAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ContactCategory.Default, ActorContactChangeType.Phone));
+                        break;
+                    case ActorAuditedChange.ContactCategoryAdded:
+                        actorContactAuditLogs.Add(new ActorContactAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, Enum.Parse<ContactCategory>(auditLog.CurrentValue!), ActorContactChangeType.Created));
+                        break;
+                    case ActorAuditedChange.ContactCategoryRemoved:
+                        actorContactAuditLogs.Add(new ActorContactAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, Enum.Parse<ContactCategory>(auditLog.PreviousValue!), ActorContactChangeType.Deleted));
+                        break;
+                    case ActorAuditedChange.CertificateCredentials:
+                        actorAuditLogs.Add(new ActorAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ActorChangeType.CertificateCredentials));
+                        break;
+                    case ActorAuditedChange.ClientSecretCredentials:
+                        actorAuditLogs.Add(new ActorAuditLogDto(actorId, auditLog.CurrentValue!, auditLog.PreviousValue!, auditLog.AuditIdentityId, auditLog.Timestamp, ActorChangeType.SecretCredentials));
+                        break;
+                    default:
+                        throw new InvalidOperationException("Incorrect audit log change.");
+                }
+            }
+
+            return Ok(new GetActorAuditLogsResponseOld(actorAuditLogs, actorContactAuditLogs));
+        }
+
+        [HttpGet("{actorId:guid}/audit")]
+        [AuthorizeUser(PermissionId.ActorsManage)]
+        public async Task<ActionResult<GetActorAuditLogsResponse>> GetAuditAsync(Guid actorId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
