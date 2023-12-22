@@ -16,18 +16,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IGridAreaAuditLogRepository
 {
-    /// <summary>
-    /// Repository giving access to grid area audit log entries
-    /// </summary>
-    public interface IGridAreaAuditLogEntryRepository
-    {
-        /// <summary>
-        /// Retrieves all log entries for a given grid area
-        /// </summary>
-        /// <param name="gridAreaId"></param>
-        /// <returns>Grid area log entries for the given grid area</returns>
-        Task<IEnumerable<GridAreaAuditLogEntry>> GetAsync(GridAreaId gridAreaId);
-    }
+    Task<IEnumerable<AuditLog<GridAreaAuditedChange>>> GetAsync(GridAreaId gridAreaId);
 }

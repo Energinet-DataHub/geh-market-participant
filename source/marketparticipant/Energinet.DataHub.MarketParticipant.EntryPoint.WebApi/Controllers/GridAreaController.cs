@@ -16,10 +16,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Application.Commands.GridArea.GridAreaAuditLogEntryField;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 {
@@ -76,13 +78,37 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok(response.GridArea);
         }
 
+        // TODO: Delete.
         [HttpGet("{gridAreaId:guid}/auditlogentry")]
         [AuthorizeUser(PermissionId.GridAreasManage)]
         public async Task<ActionResult<IEnumerable<GridAreaAuditLogEntryDto>>> GetGridAreaAuditLogEntriesAsync(Guid gridAreaId)
         {
             var command = new GetGridAreaAuditLogsCommand(gridAreaId);
             var response = await _mediator.Send(command).ConfigureAwait(false);
-            return Ok(response.GridAreaAuditLogEntries);
+
+            var auditLogs = new List<GridAreaAuditLogEntryDto>();
+
+            foreach (var auditLog in response.AuditLogs)
+            {
+                auditLogs.Add(new GridAreaAuditLogEntryDto(
+                    auditLog.Timestamp,
+                    auditLog.PreviousValue!,
+                    auditLog.CurrentValue!,
+                    gridAreaId,
+                    auditLog.AuditIdentityId,
+                    GridAreaAuditLogEntryField.Name));
+            }
+
+            return Ok(auditLogs);
+        }
+
+        [HttpGet("{gridAreaId:guid}/audit")]
+        [AuthorizeUser(PermissionId.GridAreasManage)]
+        public async Task<ActionResult<IEnumerable<AuditLog<GridAreaAuditedChange>>>> GetAuditAsync(Guid gridAreaId)
+        {
+            var command = new GetGridAreaAuditLogsCommand(gridAreaId);
+            var response = await _mediator.Send(command).ConfigureAwait(false);
+            return Ok(response.AuditLogs);
         }
     }
 }

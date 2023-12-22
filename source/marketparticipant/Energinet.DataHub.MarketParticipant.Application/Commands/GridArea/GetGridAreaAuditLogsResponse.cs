@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
-{
-    public sealed record GetGridAreaAuditLogsResponse(IEnumerable<GridAreaAuditLogEntryDto> GridAreaAuditLogEntries);
-}
+namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
+
+public sealed record GetGridAreaAuditLogsResponse(IEnumerable<AuditLogDto<GridAreaAuditedChange>> AuditLogs);

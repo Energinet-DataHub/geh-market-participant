@@ -30,7 +30,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IMarketRoleAndGridAreaForActorReservationService, MarketRoleAndGridAreaForActorReservationService>();
             services.AddScoped<IGridAreaOverviewRepository, GridAreaOverviewRepository>();
             services.AddScoped<IUserOverviewRepository, UserOverviewRepository>();
-            services.AddScoped<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>();
+            services.AddScoped<IGridAreaAuditLogRepository, GridAreaAuditLogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IActorRepository, ActorRepository>();

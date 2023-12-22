@@ -25,11 +25,11 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 {
     [Collection(nameof(IntegrationTestCollectionFixture))]
     [IntegrationTest]
-    public sealed class GridAreaAuditLogEntryRepositoryTests
+    public sealed class GridAreaAuditLogRepositoryTests
     {
         private readonly MarketParticipantDatabaseFixture _fixture;
 
-        public GridAreaAuditLogEntryRepositoryTests(MarketParticipantDatabaseFixture fixture)
+        public GridAreaAuditLogRepositoryTests(MarketParticipantDatabaseFixture fixture)
         {
             _fixture = fixture;
         }
@@ -62,14 +62,14 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests.Repositories
 
             await gridAreaRepository.AddOrUpdateAsync(changedGridArea);
 
-            var target = new GridAreaAuditLogEntryRepository(context);
+            var target = new GridAreaAuditLogRepository(context);
 
             // Act
             var actual = (await target.GetAsync(gridAreaId)).ToList();
 
             // Assert
             Assert.Single(actual);
-            Assert.Equal(gridAreaId, actual.Single().GridAreaId);
+            Assert.Equal(changedGridArea.Name.Value, actual.Single().CurrentValue);
         }
     }
 }

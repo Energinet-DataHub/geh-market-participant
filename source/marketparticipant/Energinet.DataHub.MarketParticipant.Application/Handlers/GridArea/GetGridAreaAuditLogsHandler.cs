@@ -13,48 +13,36 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
 using MediatR;
-using GridAreaAuditLogEntryField = Energinet.DataHub.MarketParticipant.Application.Commands.GridArea.GridAreaAuditLogEntryField;
 
-namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea
+namespace Energinet.DataHub.MarketParticipant.Application.Handlers.GridArea;
+
+public sealed class GetGridAreaAuditLogsHandler : IRequestHandler<GetGridAreaAuditLogsCommand, GetGridAreaAuditLogsResponse>
 {
-    public sealed class GetGridAreaAuditLogsHandler : IRequestHandler<GetGridAreaAuditLogsCommand, GetGridAreaAuditLogsResponse>
+    private readonly IGridAreaAuditLogRepository _repository;
+
+    public GetGridAreaAuditLogsHandler(IGridAreaAuditLogRepository repository)
     {
-        private readonly IGridAreaAuditLogEntryRepository _repository;
+        _repository = repository;
+    }
 
-        public GetGridAreaAuditLogsHandler(IGridAreaAuditLogEntryRepository repository)
-        {
-            _repository = repository;
-        }
+    public async Task<GetGridAreaAuditLogsResponse> Handle(GetGridAreaAuditLogsCommand request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
 
-        public async Task<GetGridAreaAuditLogsResponse> Handle(GetGridAreaAuditLogsCommand request, CancellationToken cancellationToken)
-        {
-            ArgumentNullException.ThrowIfNull(request, nameof(request));
+        var auditLogs = await _repository
+            .GetAsync(new GridAreaId(request.GridAreaId))
+            .ConfigureAwait(false);
 
-            var entries = await _repository
-                .GetAsync(new GridAreaId(request.GridAreaId))
-                .ConfigureAwait(false);
-
-            var entriesDto = new List<GridAreaAuditLogEntryDto>();
-
-            foreach (var entry in entries)
-            {
-                entriesDto.Add(new GridAreaAuditLogEntryDto(
-                     entry.Timestamp,
-                     entry.OldValue,
-                     entry.NewValue,
-                     entry.GridAreaId.Value,
-                     entry.AuditIdentity.Value,
-                     (GridAreaAuditLogEntryField)entry.Field));
-            }
-
-            return new GetGridAreaAuditLogsResponse(entriesDto);
-        }
+        return new GetGridAreaAuditLogsResponse(auditLogs
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<GridAreaAuditedChange>(log)));
     }
 }
