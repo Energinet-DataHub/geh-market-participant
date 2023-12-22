@@ -68,12 +68,6 @@ public sealed class UserInviteAuditLogRepositoryTests
         var userChangedBy = await _fixture.PrepareUserAsync();
         var actor = await _fixture.PrepareActorAsync();
 
-        var entry = new UserInviteAuditLogEntry(
-             new UserId(user.Id),
-             new ActorId(actor.Id),
-             new AuditIdentity(userChangedBy.Id),
-             DateTimeOffset.UtcNow);
-
         // Insert an audit log.
         await using var contextInsert = _fixture.DatabaseManager.CreateDbContext();
 
@@ -90,9 +84,9 @@ public sealed class UserInviteAuditLogRepositoryTests
         // Assert
         var userInviteDetailsAuditLogs = actual.ToList();
         Assert.Single(userInviteDetailsAuditLogs);
-        Assert.Equal(entry.ActorId.ToString(), userInviteDetailsAuditLogs[0].CurrentValue);
+        Assert.Equal(actor.Id.ToString(), userInviteDetailsAuditLogs[0].CurrentValue);
         Assert.True(userInviteDetailsAuditLogs[0].Timestamp.ToDateTimeOffset() > DateTimeOffset.UtcNow.AddSeconds(-5));
         Assert.True(userInviteDetailsAuditLogs[0].Timestamp.ToDateTimeOffset() < DateTimeOffset.UtcNow.AddSeconds(5));
-        Assert.Equal(entry.AuditIdentity, userInviteDetailsAuditLogs[0].AuditIdentity);
+        Assert.Equal(userChangedBy.Id, userInviteDetailsAuditLogs[0].AuditIdentity.Value);
     }
 }

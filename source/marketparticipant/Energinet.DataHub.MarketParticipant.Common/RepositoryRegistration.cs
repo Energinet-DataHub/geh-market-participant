@@ -37,7 +37,7 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>();
             services.AddScoped<IUserIdentityRepository, UserIdentityRepository>();
             services.AddScoped<IUserRoleAssignmentAuditLogRepository, UserRoleAssignmentAuditLogRepository>();
-            services.AddScoped<IUserRoleAuditLogEntryRepository, UserRoleAuditLogEntryRepository>();
+            services.AddScoped<IUserRoleAuditLogRepository, UserRoleAuditLogRepository>();
             services.AddScoped<IUserInviteAuditLogRepository, UserInviteAuditLogRepository>();
             services.AddScoped<IUserIdentityAuditLogRepository, UserIdentityAuditLogRepository>();
             services.AddScoped<IPermissionAuditLogRepository, PermissionAuditLogRepository>();

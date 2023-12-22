@@ -14,6 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
+// TODO: Delete.
 public enum UserRoleChangeType
 {
     Created = 1,

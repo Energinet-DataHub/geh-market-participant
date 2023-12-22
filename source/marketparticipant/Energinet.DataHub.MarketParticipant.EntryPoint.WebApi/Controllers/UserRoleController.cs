@@ -16,11 +16,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -95,6 +97,7 @@ public sealed class UserRoleController : ControllerBase
         return Ok();
     }
 
+    // TODO: Delete.
     [HttpGet("{userRoleId:guid}/auditlogentry")]
     [AuthorizeUser(PermissionId.UserRolesManage)]
     public async Task<ActionResult<IEnumerable<UserRoleAuditLogEntryDto>>> GetUserRoleAuditLogsAsync(Guid userRoleId)
@@ -105,7 +108,89 @@ public sealed class UserRoleController : ControllerBase
             .Send(command)
             .ConfigureAwait(false);
 
-        return Ok(response.UserRoleAuditLogs);
+        var auditLogs = new List<UserRoleAuditLogEntryDto>();
+
+        foreach (var auditLog in response.AuditLogs)
+        {
+            switch (auditLog.Change)
+            {
+                case UserRoleAuditedChange.Name:
+                    auditLogs.Add(new UserRoleAuditLogEntryDto(
+                        userRoleId,
+                        auditLog.AuditIdentityId,
+                        auditLog.CurrentValue!,
+                        null,
+                        Array.Empty<int>(),
+                        null,
+                        UserRoleStatus.Inactive,
+                        UserRoleChangeType.NameChange,
+                        auditLog.Timestamp));
+                    break;
+                case UserRoleAuditedChange.Description:
+                    auditLogs.Add(new UserRoleAuditLogEntryDto(
+                        userRoleId,
+                        auditLog.AuditIdentityId,
+                        null!,
+                        auditLog.CurrentValue!,
+                        Array.Empty<int>(),
+                        null,
+                        UserRoleStatus.Inactive,
+                        UserRoleChangeType.DescriptionChange,
+                        auditLog.Timestamp));
+                    break;
+                case UserRoleAuditedChange.Status:
+                    auditLogs.Add(new UserRoleAuditLogEntryDto(
+                        userRoleId,
+                        auditLog.AuditIdentityId,
+                        null!,
+                        null,
+                        Array.Empty<int>(),
+                        null,
+                        Enum.Parse<UserRoleStatus>(auditLog.CurrentValue!),
+                        UserRoleChangeType.StatusChange,
+                        auditLog.Timestamp));
+                    break;
+                case UserRoleAuditedChange.PermissionAdded:
+                    auditLogs.Add(new UserRoleAuditLogEntryDto(
+                        userRoleId,
+                        auditLog.AuditIdentityId,
+                        null!,
+                        null,
+                        new[] { (int)Enum.Parse<PermissionId>(auditLog.CurrentValue!) },
+                        null,
+                        UserRoleStatus.Inactive,
+                        UserRoleChangeType.PermissionAdded,
+                        auditLog.Timestamp));
+                    break;
+                case UserRoleAuditedChange.PermissionRemoved:
+                    auditLogs.Add(new UserRoleAuditLogEntryDto(
+                        userRoleId,
+                        auditLog.AuditIdentityId,
+                        null!,
+                        null,
+                        new[] { (int)Enum.Parse<PermissionId>(auditLog.CurrentValue!) },
+                        null,
+                        UserRoleStatus.Inactive,
+                        UserRoleChangeType.PermissionRemoved,
+                        auditLog.Timestamp));
+                    break;
+            }
+        }
+
+        return Ok(auditLogs);
+    }
+
+    [HttpGet("{userRoleId:guid}/audit")]
+    [AuthorizeUser(PermissionId.UserRolesManage)]
+    public async Task<ActionResult<IEnumerable<AuditLogDto<UserRoleAuditedChange>>>> GetAuditAsync(Guid userRoleId)
+    {
+        var command = new GetUserRoleAuditLogsCommand(userRoleId);
+
+        var response = await _mediator
+            .Send(command)
+            .ConfigureAwait(false);
+
+        return Ok(response.AuditLogs);
     }
 
     [HttpGet("permissions")]
