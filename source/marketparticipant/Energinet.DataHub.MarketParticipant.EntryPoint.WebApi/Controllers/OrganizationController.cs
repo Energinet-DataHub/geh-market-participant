@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Security;
@@ -145,7 +146,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{organizationId:guid}/audit")]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
-        public async Task<ActionResult<IEnumerable<AuditLog<OrganizationAuditedChange>>>> GetAuditAsync(Guid organizationId)
+        public async Task<ActionResult<IEnumerable<AuditLogDto<OrganizationAuditedChange>>>> GetAuditAsync(Guid organizationId)
         {
             var command = new GetOrganizationAuditLogsCommand(organizationId);
 

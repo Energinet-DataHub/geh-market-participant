@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.GridArea;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -104,7 +105,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{gridAreaId:guid}/audit")]
         [AuthorizeUser(PermissionId.GridAreasManage)]
-        public async Task<ActionResult<IEnumerable<AuditLog<GridAreaAuditedChange>>>> GetAuditAsync(Guid gridAreaId)
+        public async Task<ActionResult<IEnumerable<AuditLogDto<GridAreaAuditedChange>>>> GetAuditAsync(Guid gridAreaId)
         {
             var command = new GetGridAreaAuditLogsCommand(gridAreaId);
             var response = await _mediator.Send(command).ConfigureAwait(false);
