@@ -61,8 +61,8 @@ public sealed class UserRoleAuditLogRepository : IUserRoleAuditLogRepository
         var dataSource = new HistoryTableDataSource<UserRolePermissionEntity>(_context.UserRolePermissionEntries, entity => entity.UserRoleId == userRoleId.Value);
 
         return new AuditLogBuilder<UserRoleAuditedChange, UserRolePermissionEntity>(dataSource)
-            .Add(UserRoleAuditedChange.PermissionAdded, entity => entity.Permission, AuditedChangeCompareAt.Creation)
-            .Add(UserRoleAuditedChange.PermissionRemoved, entity => entity.Permission, AuditedChangeCompareAt.Deletion)
+            .Add(UserRoleAuditedChange.PermissionAdded, entity => (int)entity.Permission, AuditedChangeCompareAt.Creation)
+            .Add(UserRoleAuditedChange.PermissionRemoved, entity => (int)entity.Permission, AuditedChangeCompareAt.Deletion)
             .WithGrouping(entity => entity.Permission)
             .BuildAsync();
     }
