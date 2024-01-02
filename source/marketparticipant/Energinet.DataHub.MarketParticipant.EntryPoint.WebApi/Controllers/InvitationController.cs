@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
@@ -43,6 +44,8 @@ public sealed class InvitationController : ControllerBase
     [AuthorizeUser(PermissionId.UsersManage)]
     public async Task<ActionResult> InviteUserAsync([FromBody] UserInvitationDto userInvitation)
     {
+        ArgumentNullException.ThrowIfNull(userInvitation);
+
         if (!_userContext.CurrentUser.IsFasOrAssignedToActor(userInvitation.AssignedActor))
             return Unauthorized();
 
@@ -75,5 +78,21 @@ public sealed class InvitationController : ControllerBase
             .ConfigureAwait(false);
 
         return Ok();
+    }
+
+    [HttpGet("users/{userId:guid}/associated-actors")]
+    [AuthorizeUser(PermissionId.UsersManage)]
+    public async Task<ActionResult<IEnumerable<Guid>>> GetAssociatedActorsAsync(Guid userId)
+    {
+        var associatedActors = await _mediator
+            .Send(new GetActorsAssociatedWithUserCommand(userId))
+            .ConfigureAwait(false);
+
+        return Ok(
+            _userContext.CurrentUser.IsFas
+                ? associatedActors.ActorIds
+                : associatedActors.ActorIds.Contains(_userContext.CurrentUser.ActorId)
+                    ? new List<Guid> { _userContext.CurrentUser.ActorId }
+                    : new List<Guid>());
     }
 }
