@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
-public record GetUserRoleAuditLogsResponse(IEnumerable<UserRoleAuditLogEntryDto> UserRoleAuditLogs);
+public sealed record GetUserRoleAuditLogsResponse(IEnumerable<AuditLogDto<UserRoleAuditedChange>> AuditLogs);

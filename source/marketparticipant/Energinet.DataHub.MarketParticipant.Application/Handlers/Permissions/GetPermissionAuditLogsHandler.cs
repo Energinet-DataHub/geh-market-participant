@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -23,32 +24,25 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
-public sealed class GetPermissionAuditLogsHandler
-    : IRequestHandler<GetPermissionAuditLogsCommand, GetPermissionAuditLogsResponse>
+public sealed class GetPermissionAuditLogsHandler : IRequestHandler<GetPermissionAuditLogsCommand, GetPermissionAuditLogsResponse>
 {
-    private readonly IPermissionAuditLogEntryRepository _permissionAuditLogsRepository;
+    private readonly IPermissionAuditLogRepository _permissionAuditLogsRepository;
 
-    public GetPermissionAuditLogsHandler(IPermissionAuditLogEntryRepository permissionAuditLogsRepository)
+    public GetPermissionAuditLogsHandler(IPermissionAuditLogRepository permissionAuditLogsRepository)
     {
         _permissionAuditLogsRepository = permissionAuditLogsRepository;
     }
 
-    public async Task<GetPermissionAuditLogsResponse> Handle(
-        GetPermissionAuditLogsCommand request,
-        CancellationToken cancellationToken)
+    public async Task<GetPermissionAuditLogsResponse> Handle(GetPermissionAuditLogsCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var permissionAuditLogs = await _permissionAuditLogsRepository
+        var auditLogs = await _permissionAuditLogsRepository
             .GetAsync((PermissionId)request.PermissionId)
             .ConfigureAwait(false);
 
-        return new GetPermissionAuditLogsResponse(permissionAuditLogs.Select(auditLogEntry =>
-            new PermissionAuditLogDto(
-                (int)auditLogEntry.Permission,
-                auditLogEntry.Value,
-                auditLogEntry.AuditIdentity.Value,
-                auditLogEntry.Timestamp,
-                auditLogEntry.PermissionChangeType)));
+        return new GetPermissionAuditLogsResponse(auditLogs
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<PermissionAuditedChange>(log)));
     }
 }

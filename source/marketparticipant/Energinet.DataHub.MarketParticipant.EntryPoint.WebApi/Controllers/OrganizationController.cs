@@ -16,9 +16,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
@@ -110,6 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok(response.Actors);
         }
 
+        // TODO: Delete.
         [HttpGet("{organizationId:guid}/auditlogs")]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
         public async Task<ActionResult<IEnumerable<OrganizationAuditLogDto>>> GetAuditLogsAsync(Guid organizationId)
@@ -120,7 +123,38 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return Ok(response.OrganizationAuditLogs);
+            var auditLogs = new List<OrganizationAuditLogDto>();
+
+            foreach (var auditLog in response.AuditLogs)
+            {
+                var change = auditLog.Change switch
+                {
+                    OrganizationAuditedChange.Name => OrganizationChangeType.Name,
+                    OrganizationAuditedChange.Domain => OrganizationChangeType.DomainChange,
+                };
+
+                auditLogs.Add(new OrganizationAuditLogDto(
+                    organizationId,
+                    auditLog.CurrentValue,
+                    auditLog.AuditIdentityId,
+                    auditLog.Timestamp,
+                    change));
+            }
+
+            return Ok(auditLogs);
+        }
+
+        [HttpGet("{organizationId:guid}/audit")]
+        [AuthorizeUser(PermissionId.OrganizationsManage)]
+        public async Task<ActionResult<IEnumerable<AuditLogDto<OrganizationAuditedChange>>>> GetAuditAsync(Guid organizationId)
+        {
+            var command = new GetOrganizationAuditLogsCommand(organizationId);
+
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            return Ok(response.AuditLogs);
         }
     }
 }

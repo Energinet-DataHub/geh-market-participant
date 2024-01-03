@@ -63,11 +63,8 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var actual = await mediator.Send(command);
 
         // Assert
-        Assert.Empty(actual.ActorContactAuditLogs);
-
-        var actorCreatedAudit = actual.ActorAuditLogs.Single();
-        Assert.Equal(actorEntity.Id, actorCreatedAudit.ActorId);
-        Assert.Equal(ActorChangeType.Created, actorCreatedAudit.ActorChangeType);
+        var actorCreatedAudit = actual.AuditLogs.Single(log => log.Change == ActorAuditedChange.Status);
+        Assert.Equal(ActorStatus.New.ToString(), actorCreatedAudit.CurrentValue);
         Assert.True(actorCreatedAudit.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
         Assert.True(actorCreatedAudit.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
     }
@@ -80,7 +77,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.Name);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.Name, IsInitialAssignment: false });
 
                 Assert.Equal(expected.Value, expectedLog.CurrentValue);
                 Assert.Equal(TestPreparationEntities.ValidActor.Name, expectedLog.PreviousValue);
@@ -97,7 +94,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.Status);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.Status, IsInitialAssignment: false });
 
                 Assert.Equal(ActorStatus.Active.ToString(), expectedLog.CurrentValue);
                 Assert.Equal(ActorStatus.New.ToString(), expectedLog.PreviousValue);
@@ -119,10 +116,10 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.SecretCredentials);
+                var expectedLog = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.ClientSecretCredentials);
 
                 Assert.Equal(expected.ExpirationDate.ToString("g", CultureInfo.InvariantCulture), expectedLog.CurrentValue);
-                Assert.Equal(string.Empty, expectedLog.PreviousValue);
+                Assert.Null(expectedLog.PreviousValue);
             },
             actor =>
             {
@@ -141,10 +138,10 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorAuditLogs.Single(log => log.ActorChangeType == ActorChangeType.CertificateCredentials);
+                var expectedLog = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.CertificateCredentials);
 
                 Assert.Equal(expected.CertificateThumbprint, expectedLog.CurrentValue);
-                Assert.Equal(string.Empty, expectedLog.PreviousValue);
+                Assert.Null(expectedLog.PreviousValue);
             },
             actor =>
             {
@@ -164,14 +161,14 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLogs = response
-                    .ActorAuditLogs
-                    .Where(log => log.ActorChangeType == ActorChangeType.CertificateCredentials)
+                    .AuditLogs
+                    .Where(log => log.Change == ActorAuditedChange.CertificateCredentials)
                     .ToList();
 
                 Assert.Equal(2, expectedLogs.Count);
                 Assert.Equal(expected.CertificateThumbprint, expectedLogs[0].CurrentValue);
-                Assert.Equal(string.Empty, expectedLogs[0].PreviousValue);
-                Assert.Equal(string.Empty, expectedLogs[1].CurrentValue);
+                Assert.Null(expectedLogs[0].PreviousValue);
+                Assert.Null(expectedLogs[1].CurrentValue);
                 Assert.Equal(expected.CertificateThumbprint, expectedLogs[1].PreviousValue);
             },
             actor =>
@@ -196,14 +193,14 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLogs = response
-                    .ActorAuditLogs
-                    .Where(log => log.ActorChangeType == ActorChangeType.SecretCredentials)
+                    .AuditLogs
+                    .Where(log => log.Change == ActorAuditedChange.ClientSecretCredentials)
                     .ToList();
 
                 Assert.Equal(2, expectedLogs.Count);
                 Assert.Equal(expected.ExpirationDate.ToString("g", CultureInfo.InvariantCulture), expectedLogs[0].CurrentValue);
-                Assert.Equal(string.Empty, expectedLogs[0].PreviousValue);
-                Assert.Equal(string.Empty, expectedLogs[1].CurrentValue);
+                Assert.Null(expectedLogs[0].PreviousValue);
+                Assert.Null(expectedLogs[1].CurrentValue);
                 Assert.Equal(expected.ExpirationDate.ToString("g", CultureInfo.InvariantCulture), expectedLogs[1].PreviousValue);
             },
             actor =>
@@ -226,7 +223,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Name);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.ContactName, IsInitialAssignment: false });
 
                 Assert.Equal(changedName, expectedLog.CurrentValue);
                 Assert.Equal(initialName, expectedLog.PreviousValue);
@@ -244,7 +241,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Email);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.ContactEmail, IsInitialAssignment: false });
 
                 Assert.Equal(changedEmail, expectedLog.CurrentValue);
                 Assert.Equal(initialEmail, expectedLog.PreviousValue);
@@ -263,7 +260,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedLog = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Phone);
+                var expectedLog = response.AuditLogs.Single(log => log is { Change: ActorAuditedChange.ContactPhone, IsInitialAssignment: false });
 
                 Assert.Equal(changedPhone.Number, expectedLog.CurrentValue);
                 Assert.Equal(initialPhone.Number, expectedLog.PreviousValue);
@@ -278,8 +275,8 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         return TestAuditOfActorContactChangeAsync(
             response =>
             {
-                var expectedCreated = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Created);
-                var expectedDeleted = response.ActorContactAuditLogs.Single(log => log.ActorContactChangeType == ActorContactChangeType.Deleted);
+                var expectedCreated = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.ContactCategoryAdded);
+                var expectedDeleted = response.AuditLogs.Single(log => log.Change == ActorAuditedChange.ContactCategoryRemoved);
 
                 Assert.NotNull(expectedCreated);
                 Assert.NotNull(expectedDeleted);
@@ -311,7 +308,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         var command = new GetActorAuditLogsCommand(actorEntity.Id);
-        var auditLogsProcessed = 1; // Skip 1, as first log is always Created.
+        var auditLogsProcessed = 2; // Skip 2, as first log is always Created.
 
         foreach (var action in changeActions)
         {
@@ -329,10 +326,9 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.ActorAuditLogs.Skip(auditLogsProcessed))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-                Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 
@@ -368,7 +364,7 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
         var actorId = new ActorId(actorEntity.Id);
         var command = new GetActorAuditLogsCommand(actorEntity.Id);
-        var auditLogsProcessed = 0;
+        var auditLogsProcessed = 2;
 
         foreach (var generator in contactGenerator)
         {
@@ -395,10 +391,9 @@ public sealed class GetActorAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.ActorContactAuditLogs.Skip(auditLogsProcessed))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-                Assert.Equal(actorEntity.Id, actorAuditLog.ActorId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 

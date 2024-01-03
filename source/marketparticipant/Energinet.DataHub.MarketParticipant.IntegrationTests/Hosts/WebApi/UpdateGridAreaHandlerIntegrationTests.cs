@@ -86,11 +86,11 @@ public sealed class UpdateGridAreaHandlerIntegrationTests
 
         // Assert
         var response = await mediator.Send(new GetGridAreaAuditLogsCommand(gridArea.Id));
-        var auditLogs = response.GridAreaAuditLogEntries.ToList();
+        var auditLogs = response.AuditLogs.ToList();
 
-        Assert.Equal("NewGridAreaName1", auditLogs[0].NewValue);
-        Assert.Equal("NewGridAreaName2", auditLogs[1].NewValue);
-        Assert.Equal("NewGridAreaName3", auditLogs[2].NewValue);
+        Assert.Equal("NewGridAreaName1", auditLogs[0].CurrentValue);
+        Assert.Equal("NewGridAreaName2", auditLogs[1].CurrentValue);
+        Assert.Equal("NewGridAreaName3", auditLogs[2].CurrentValue);
         Assert.Equal(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value, auditLogs[0].AuditIdentityId);
         Assert.Equal(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value, auditLogs[1].AuditIdentityId);
         Assert.Equal(KnownAuditIdentityProvider.OrganizationBackgroundService.IdentityId.Value, auditLogs[2].AuditIdentityId);

@@ -180,9 +180,9 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var response = await mediator.Send(getCommand);
 
         // Assert
-        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        var responseLogs = response.AuditLogs.ToList();
         responseLogs.Should().HaveCount(2);
-        responseLogs.TrueForAll(e => e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added).Should().BeTrue();
+        responseLogs.TrueForAll(e => e.Change == UserAuditedChange.UserRoleAssigned).Should().BeTrue();
     }
 
     [Fact]
@@ -229,11 +229,11 @@ public sealed class UpdateUserRoleAssignmentsIntegrationTests
         var response = await mediator.Send(getCommand);
 
         // Assert
-        var responseLogs = response.UserRoleAssignmentAuditLogs.ToList();
+        var responseLogs = response.AuditLogs.ToList();
         responseLogs.Should().HaveCount(4);
 
-        var addedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Added);
-        var removedLogs = responseLogs.Where(l => l.AssignmentType == UserRoleAssignmentTypeAuditLog.Removed);
+        var addedLogs = responseLogs.Where(l => l.Change == UserAuditedChange.UserRoleAssigned);
+        var removedLogs = responseLogs.Where(l => l.Change == UserAuditedChange.UserRoleRemoved);
         addedLogs.Should().HaveCount(3);
         removedLogs.Should().HaveCount(1);
     }

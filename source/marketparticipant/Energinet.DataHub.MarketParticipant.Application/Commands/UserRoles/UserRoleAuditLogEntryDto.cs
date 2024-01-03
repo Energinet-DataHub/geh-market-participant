@@ -18,6 +18,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.UserRoles;
 
+// TODO: Delete.
 public sealed record UserRoleAuditLogEntryDto(
     Guid UserRoleId,
     Guid AuditIdentityId,

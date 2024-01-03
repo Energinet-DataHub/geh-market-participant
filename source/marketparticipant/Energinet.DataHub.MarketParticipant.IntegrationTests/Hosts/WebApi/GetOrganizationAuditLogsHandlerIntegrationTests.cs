@@ -53,11 +53,11 @@ public sealed class GetOrganizationAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLog = response
-                    .OrganizationAuditLogs
+                    .AuditLogs
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
-                    .Single(log => log.OrganizationChangeType == OrganizationChangeType.Name);
+                    .Single(log => log.Change == OrganizationAuditedChange.Name);
 
-                Assert.Equal(expected, expectedLog.Value);
+                Assert.Equal(expected, expectedLog.CurrentValue);
             },
             organization =>
             {
@@ -74,11 +74,11 @@ public sealed class GetOrganizationAuditLogsHandlerIntegrationTests
             response =>
             {
                 var expectedLog = response
-                    .OrganizationAuditLogs
+                    .AuditLogs
                     .Where(log => log.AuditIdentityId != KnownAuditIdentityProvider.TestFramework.IdentityId.Value)
-                    .Single(log => log.OrganizationChangeType == OrganizationChangeType.DomainChange);
+                    .Single(log => log.Change == OrganizationAuditedChange.Domain);
 
-                Assert.Equal(expected, expectedLog.Value);
+                Assert.Equal(expected, expectedLog.CurrentValue);
             },
             organization =>
             {
@@ -124,10 +124,9 @@ public sealed class GetOrganizationAuditLogsHandlerIntegrationTests
 
             var auditLogs = await mediator.Send(command);
 
-            foreach (var actorAuditLog in auditLogs.OrganizationAuditLogs.Skip(auditLogsProcessed))
+            foreach (var actorAuditLog in auditLogs.AuditLogs.Skip(auditLogsProcessed))
             {
                 Assert.Equal(auditedUser.Id, actorAuditLog.AuditIdentityId);
-                Assert.Equal(actorEntity.OrganizationId, actorAuditLog.OrganizationId);
                 Assert.True(actorAuditLog.Timestamp > DateTimeOffset.UtcNow.AddSeconds(-5));
                 Assert.True(actorAuditLog.Timestamp < DateTimeOffset.UtcNow.AddSeconds(5));
 

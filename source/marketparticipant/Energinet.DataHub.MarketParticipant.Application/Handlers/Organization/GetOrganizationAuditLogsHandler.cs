@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,11 +27,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Organization;
 public sealed class GetOrganizationAuditLogsHandler
     : IRequestHandler<GetOrganizationAuditLogsCommand, GetOrganizationAuditLogsResponse>
 {
-    private readonly IOrganizationAuditLogEntryRepository _organizationAuditLogEntryRepository;
+    private readonly IOrganizationAuditLogRepository _organizationAuditLogRepository;
 
-    public GetOrganizationAuditLogsHandler(IOrganizationAuditLogEntryRepository organizationAuditLogEntryRepository)
+    public GetOrganizationAuditLogsHandler(IOrganizationAuditLogRepository organizationAuditLogRepository)
     {
-        _organizationAuditLogEntryRepository = organizationAuditLogEntryRepository;
+        _organizationAuditLogRepository = organizationAuditLogRepository;
     }
 
     public async Task<GetOrganizationAuditLogsResponse> Handle(
@@ -39,16 +40,12 @@ public sealed class GetOrganizationAuditLogsHandler
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        var organizationAuditLogs = await _organizationAuditLogEntryRepository
+        var auditLogs = await _organizationAuditLogRepository
             .GetAsync(new OrganizationId(request.OrganizationId))
             .ConfigureAwait(false);
 
-        return new GetOrganizationAuditLogsResponse(organizationAuditLogs.Select(auditLogEntry =>
-            new OrganizationAuditLogDto(
-                auditLogEntry.OrganizationId.Value,
-                auditLogEntry.Value,
-                auditLogEntry.AuditIdentity.Value,
-                auditLogEntry.Timestamp,
-                auditLogEntry.OrganizationChangeType)));
+        return new GetOrganizationAuditLogsResponse(auditLogs
+            .OrderBy(log => log.Timestamp)
+            .Select(log => new AuditLogDto<OrganizationAuditedChange>(log)));
     }
 }

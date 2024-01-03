@@ -33,7 +33,7 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserStatusCalculator _userStatusCalculator;
-    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IUserContext<FrontendUser> _userContext;
 
@@ -41,14 +41,14 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
-        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
         IAuditIdentityProvider auditIdentityProvider,
         IUserContext<FrontendUser> userContext)
     {
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userStatusCalculator = userStatusCalculator;
-        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
         _auditIdentityProvider = auditIdentityProvider;
         _userContext = userContext;
     }
@@ -89,22 +89,21 @@ public sealed class DeactivateUserHandler : IRequestHandler<DeactivateUserComman
                 .ConfigureAwait(false);
         }
 
-        var auditEntry = new UserIdentityAuditLogEntry(
-            user.Id,
-            UserStatus.Inactive.ToString(),
-            currentStatus.ToString(),
-            _auditIdentityProvider.IdentityId,
-            DateTimeOffset.UtcNow,
-            UserIdentityAuditLogField.Status);
-
-        await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry).ConfigureAwait(false);
+        await _userIdentityAuditLogRepository
+            .AuditAsync(
+                user.Id,
+                _auditIdentityProvider.IdentityId,
+                UserAuditedChange.Status,
+                UserStatus.Inactive.ToString(),
+                currentStatus.ToString())
+            .ConfigureAwait(false);
     }
 
     private async Task RemoveUserFromCurrentActorAsync(Domain.Model.Users.User user)
     {
-        var userRoleAssignemts = user.RoleAssignments.Where(x => x.ActorId.Value == _userContext.CurrentUser.ActorId);
+        var userRoleAssignments = user.RoleAssignments.Where(x => x.ActorId.Value == _userContext.CurrentUser.ActorId);
 
-        foreach (var userRoleAssignment in userRoleAssignemts)
+        foreach (var userRoleAssignment in userRoleAssignments)
         {
             user.RoleAssignments.Remove(userRoleAssignment);
         }

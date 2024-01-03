@@ -28,8 +28,8 @@ public sealed class UserInvitationService : IUserInvitationService
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IEmailEventRepository _emailEventRepository;
     private readonly IOrganizationDomainValidationService _organizationDomainValidationService;
-    private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
-    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserInviteAuditLogRepository _userInviteAuditLogRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
     private readonly IUserStatusCalculator _userStatusCalculator;
 
@@ -38,8 +38,8 @@ public sealed class UserInvitationService : IUserInvitationService
         IUserIdentityRepository userIdentityRepository,
         IEmailEventRepository emailEventRepository,
         IOrganizationDomainValidationService organizationDomainValidationService,
-        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
-        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
+        IUserInviteAuditLogRepository userInviteAuditLogRepository,
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
         IUnitOfWorkProvider unitOfWorkProvider,
         IUserStatusCalculator userStatusCalculator)
     {
@@ -47,8 +47,8 @@ public sealed class UserInvitationService : IUserInvitationService
         _userIdentityRepository = userIdentityRepository;
         _emailEventRepository = emailEventRepository;
         _organizationDomainValidationService = organizationDomainValidationService;
-        _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
-        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userInviteAuditLogRepository = userInviteAuditLogRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
         _unitOfWorkProvider = unitOfWorkProvider;
         _userStatusCalculator = userStatusCalculator;
     }
@@ -58,9 +58,9 @@ public sealed class UserInvitationService : IUserInvitationService
         ArgumentNullException.ThrowIfNull(invitation);
 
         var mailEventType = EmailEventType.UserAssignedToActor;
+        var userIdentityModified = false;
 
         var invitedUser = await GetUserAsync(invitation.Email).ConfigureAwait(false);
-
         if (invitedUser == null)
         {
             await _organizationDomainValidationService
@@ -83,7 +83,9 @@ public sealed class UserInvitationService : IUserInvitationService
 
             invitedUser = new User(invitation.AssignedActor.Id, sharedId, userIdentityId);
             invitedUser.ActivateUserExpiration();
+
             mailEventType = EmailEventType.UserInvite;
+            userIdentityModified = true;
         }
 
         foreach (var assignedRole in invitation.AssignedRoles)
@@ -108,8 +110,14 @@ public sealed class UserInvitationService : IUserInvitationService
 
             var auditIdentity = new AuditIdentity(invitationSentByUserId);
 
-            await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
-            await AuditLogUserInviteAsync(invitedUserId, auditIdentity, invitation.AssignedActor.Id).ConfigureAwait(false);
+            if (userIdentityModified)
+            {
+                await AuditLogUserIdentityAsync(invitedUserId, auditIdentity, invitation).ConfigureAwait(false);
+            }
+
+            await _userInviteAuditLogRepository
+                .AuditAsync(invitedUserId, auditIdentity, invitation.AssignedActor.Id)
+                .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
@@ -145,7 +153,7 @@ public sealed class UserInvitationService : IUserInvitationService
 
         await using (uow.ConfigureAwait(false))
         {
-            var invitedUserId = await _userRepository
+            await _userRepository
                 .AddOrUpdateAsync(user)
                 .ConfigureAwait(false);
 
@@ -153,7 +161,9 @@ public sealed class UserInvitationService : IUserInvitationService
                 .InsertAsync(new EmailEvent(userIdentity.Email, EmailEventType.UserInvite))
                 .ConfigureAwait(false);
 
-            await AuditLogUserInviteAsync(invitedUserId, new AuditIdentity(invitationSentByUserId), user.AdministratedBy).ConfigureAwait(false);
+            await _userInviteAuditLogRepository
+                .AuditAsync(user.Id, new AuditIdentity(invitationSentByUserId), user.AdministratedBy)
+                .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }
@@ -170,48 +180,18 @@ public sealed class UserInvitationService : IUserInvitationService
             : null;
     }
 
-    private Task AuditLogUserInviteAsync(UserId toUserId, AuditIdentity invitationSentBy, ActorId assignedActor)
-    {
-        var userInviteAuditLog = new UserInviteAuditLogEntry(
-            toUserId,
-            assignedActor,
-            invitationSentBy,
-            DateTimeOffset.UtcNow);
-
-        return _userInviteAuditLogEntryRepository
-            .InsertAuditLogEntryAsync(userInviteAuditLog);
-    }
-
     private async Task AuditLogUserIdentityAsync(UserId invitedUserId, AuditIdentity invitationSentBy, UserInvitation invitation)
     {
-        await _userIdentityAuditLogEntryRepository
-            .InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
-                invitedUserId,
-                invitation.FirstName,
-                string.Empty,
-                invitationSentBy,
-                DateTimeOffset.UtcNow,
-                UserIdentityAuditLogField.FirstName))
+        await _userIdentityAuditLogRepository
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.FirstName, invitation.FirstName, null)
             .ConfigureAwait(false);
 
-        await _userIdentityAuditLogEntryRepository
-            .InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
-                invitedUserId,
-                invitation.LastName,
-                string.Empty,
-                invitationSentBy,
-                DateTimeOffset.UtcNow,
-                UserIdentityAuditLogField.LastName))
+        await _userIdentityAuditLogRepository
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.LastName, invitation.LastName, null)
             .ConfigureAwait(false);
 
-        await _userIdentityAuditLogEntryRepository
-            .InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
-                invitedUserId,
-                invitation.PhoneNumber.Number,
-                string.Empty,
-                invitationSentBy,
-                DateTimeOffset.UtcNow,
-                UserIdentityAuditLogField.PhoneNumber))
+        await _userIdentityAuditLogRepository
+            .AuditAsync(invitedUserId, invitationSentBy, UserAuditedChange.PhoneNumber, invitation.PhoneNumber.Number, null)
             .ConfigureAwait(false);
     }
 }
