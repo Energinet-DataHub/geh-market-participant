@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
@@ -223,7 +224,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("{actorId:guid}/audit")]
         [AuthorizeUser(PermissionId.ActorsManage)]
-        public async Task<ActionResult<GetActorAuditLogsResponse>> GetAuditAsync(Guid actorId)
+        public async Task<ActionResult<IEnumerable<AuditLogDto<ActorAuditedChange>>>> GetAuditAsync(Guid actorId)
         {
             if (!_userContext.CurrentUser.IsFasOrAssignedToActor(actorId))
                 return Unauthorized();
@@ -234,7 +235,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return Ok(response);
+            return Ok(response.AuditLogs);
         }
     }
 }
