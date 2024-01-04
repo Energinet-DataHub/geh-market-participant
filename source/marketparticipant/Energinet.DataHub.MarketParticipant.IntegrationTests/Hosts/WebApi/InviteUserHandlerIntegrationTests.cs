@@ -95,17 +95,16 @@ public sealed class InviteUserHandlerIntegrationTests : IAsyncLifetime
         var createdUserIdentity = await userIdentityRepository.GetAsync(createdExternalUserId);
         Assert.NotNull(createdUserIdentity);
 
-        var userInviteAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserInviteAuditLogEntryRepository>();
-        var userInviteAuditLog = await userInviteAuditLogEntryRepository.GetAsync(createdUser.Id);
-        Assert.Single(userInviteAuditLog, e => e.UserId == createdUser.Id);
+        var userInviteAuditLogRepository = scope.ServiceProvider.GetRequiredService<IUserInviteAuditLogRepository>();
+        var userInviteAuditLog = await userInviteAuditLogRepository.GetAsync(createdUser.Id);
+        Assert.Single(userInviteAuditLog, e => e.Change == UserAuditedChange.InvitedIntoActor);
 
-        var userRoleAssignmentAuditLogEntryRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAssignmentAuditLogEntryRepository>();
-        var assignmentAuditLogEntries = await userRoleAssignmentAuditLogEntryRepository.GetAsync(createdUser.Id);
+        var userRoleAssignmentAuditLogRepository = scope.ServiceProvider.GetRequiredService<IUserRoleAssignmentAuditLogRepository>();
+        var assignmentAuditLogEntries = await userRoleAssignmentAuditLogRepository.GetAsync(createdUser.Id);
         Assert.Single(assignmentAuditLogEntries, e =>
             e.AuditIdentity.Value == invitedByUser.Id &&
-            e.AssignmentType == UserRoleAssignmentTypeAuditLog.Added &&
-            e.ActorId.Value == actor.Id &&
-            e.UserId == createdUser.Id);
+            e.Change == UserAuditedChange.UserRoleAssigned &&
+            e.CurrentValue == $"({actor.Id};{userRole.Id})");
     }
 
     public Task InitializeAsync() => _graphServiceClientFixture.CleanupExternalUserAsync(TestUserEmail);

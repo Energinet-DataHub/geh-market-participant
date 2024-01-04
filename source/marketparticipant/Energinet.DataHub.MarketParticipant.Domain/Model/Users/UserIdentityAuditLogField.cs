@@ -14,6 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
+// TODO: Part of repo, move to there.
 public enum UserIdentityAuditLogField
 {
     FirstName = 1,

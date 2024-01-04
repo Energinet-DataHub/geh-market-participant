@@ -15,9 +15,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
-using Energinet.DataHub.MarketParticipant.Application.Security;
+using Energinet.DataHub.MarketParticipant.Application.Services;
+using Energinet.DataHub.MarketParticipant.Domain;
 using Energinet.DataHub.MarketParticipant.Domain.Exception;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
@@ -28,21 +28,24 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 
 public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdentityCommand>
 {
-    private readonly IUserContext<FrontendUser> _userContext;
+    private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
-    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
+    private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
     public UpdateUserIdentityHandler(
-        IUserContext<FrontendUser> userContext,
+        IAuditIdentityProvider auditIdentityProvider,
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
-        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository)
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
+        IUnitOfWorkProvider unitOfWorkProvider)
     {
-        _userContext = userContext;
+        _auditIdentityProvider = auditIdentityProvider;
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
-        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
+        _unitOfWorkProvider = unitOfWorkProvider;
     }
 
     public async Task Handle(UpdateUserIdentityCommand request, CancellationToken cancellationToken)
@@ -55,44 +58,50 @@ public sealed class UpdateUserIdentityHandler : IRequestHandler<UpdateUserIdenti
         var userIdentity = await _userIdentityRepository.GetAsync(user.ExternalId).ConfigureAwait(false);
         NotFoundValidationException.ThrowIfNull(userIdentity, user.ExternalId.Value, $"The specified user identity {user.ExternalId} was not found.");
 
-        await LogAuditEntryAsync(
-            user.Id,
-            UserIdentityAuditLogField.FirstName,
-            request.UserIdentityUpdate.FirstName,
-            userIdentity.FirstName).ConfigureAwait(false);
+        var uow = await _unitOfWorkProvider
+            .NewUnitOfWorkAsync()
+            .ConfigureAwait(false);
 
-        await LogAuditEntryAsync(
-            user.Id,
-            UserIdentityAuditLogField.LastName,
-            request.UserIdentityUpdate.LastName,
-            userIdentity.LastName).ConfigureAwait(false);
+        await using (uow.ConfigureAwait(false))
+        {
+            await AuditWhenChangedAsync(
+                user.Id,
+                UserAuditedChange.FirstName,
+                request.UserIdentityUpdate.FirstName,
+                userIdentity.FirstName).ConfigureAwait(false);
 
-        await LogAuditEntryAsync(
-            user.Id,
-            UserIdentityAuditLogField.PhoneNumber,
-            request.UserIdentityUpdate.PhoneNumber,
-            userIdentity.PhoneNumber?.Number ?? string.Empty).ConfigureAwait(false);
+            await AuditWhenChangedAsync(
+                user.Id,
+                UserAuditedChange.LastName,
+                request.UserIdentityUpdate.LastName,
+                userIdentity.LastName).ConfigureAwait(false);
 
-        userIdentity.PhoneNumber = new PhoneNumber(request.UserIdentityUpdate.PhoneNumber);
-        userIdentity.LastName = request.UserIdentityUpdate.LastName;
-        userIdentity.FirstName = request.UserIdentityUpdate.FirstName;
+            await AuditWhenChangedAsync(
+                user.Id,
+                UserAuditedChange.PhoneNumber,
+                request.UserIdentityUpdate.PhoneNumber,
+                userIdentity.PhoneNumber?.Number).ConfigureAwait(false);
 
-        await _userIdentityRepository.UpdateUserAsync(userIdentity).ConfigureAwait(false);
+            userIdentity.PhoneNumber = new PhoneNumber(request.UserIdentityUpdate.PhoneNumber);
+            userIdentity.LastName = request.UserIdentityUpdate.LastName;
+            userIdentity.FirstName = request.UserIdentityUpdate.FirstName;
+
+            await _userIdentityRepository.UpdateUserAsync(userIdentity).ConfigureAwait(false);
+
+            await uow.CommitAsync().ConfigureAwait(false);
+        }
     }
 
-    private Task LogAuditEntryAsync(UserId userId, UserIdentityAuditLogField field, string newValue, string oldValue)
+    private Task AuditWhenChangedAsync(UserId userId, UserAuditedChange change, string? currentValue, string? previousValue)
     {
-        if (newValue == oldValue)
+        if (currentValue == previousValue)
             return Task.CompletedTask;
 
-        var auditEntry = new UserIdentityAuditLogEntry(
+        return _userIdentityAuditLogRepository.AuditAsync(
             userId,
-            newValue,
-            oldValue,
-            new AuditIdentity(_userContext.CurrentUser.UserId),
-            DateTimeOffset.UtcNow,
-            field);
-
-        return _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(auditEntry);
+            _auditIdentityProvider.IdentityId,
+            change,
+            currentValue,
+            previousValue);
     }
 }

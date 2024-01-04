@@ -15,6 +15,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -75,6 +76,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok();
         }
 
+        // TODO: Delete.
         [HttpGet("{permissionId:int}/auditlogs")]
         [AuthorizeUser(PermissionId.UserRolesManage)]
         public async Task<ActionResult<IEnumerable<PermissionAuditLogDto>>> GetAuditLogsAsync(int permissionId)
@@ -85,7 +87,40 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return Ok(response.PermissionAuditLogs);
+            var auditLogs = new List<PermissionAuditLogDto>();
+
+            foreach (var auditLog in response.AuditLogs)
+            {
+                if (auditLog.Change == PermissionAuditedChange.Claim)
+                    continue;
+
+                var change = auditLog.Change switch
+                {
+                    PermissionAuditedChange.Description => PermissionChangeType.DescriptionChange,
+                };
+
+                auditLogs.Add(new PermissionAuditLogDto(
+                    permissionId,
+                    auditLog.CurrentValue,
+                    auditLog.AuditIdentityId,
+                    auditLog.Timestamp,
+                    change));
+            }
+
+            return Ok(auditLogs);
+        }
+
+        [HttpGet("{permissionId:int}/audit")]
+        [AuthorizeUser(PermissionId.UserRolesManage)]
+        public async Task<ActionResult<IEnumerable<AuditLogDto<PermissionAuditedChange>>>> GetAuditAsync(int permissionId)
+        {
+            var command = new GetPermissionAuditLogsCommand(permissionId);
+
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            return Ok(response.AuditLogs);
         }
     }
 }

@@ -16,6 +16,7 @@ using System;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.User;
 
+// TODO: Delete.
 public sealed record UserInviteAuditLogEntryDto(
     Guid UserId,
     Guid ActorId,

@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
+// TODO: Delete.
 public record PermissionAuditLogDto(
     int PermissionId,
     string Value,

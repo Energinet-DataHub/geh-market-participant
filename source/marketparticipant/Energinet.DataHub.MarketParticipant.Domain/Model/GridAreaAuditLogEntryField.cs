@@ -14,6 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model
 {
+    // TODO: Delete.
     public enum GridAreaAuditLogEntryField
     {
         Name

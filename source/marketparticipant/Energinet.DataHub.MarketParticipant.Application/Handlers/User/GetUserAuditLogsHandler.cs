@@ -16,6 +16,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Commands;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 using Energinet.DataHub.MarketParticipant.Domain.Repositories;
@@ -26,18 +27,18 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.User;
 public sealed class GetUserAuditLogsHandler
     : IRequestHandler<GetUserAuditLogsCommand, GetUserAuditLogsResponse>
 {
-    private readonly IUserRoleAssignmentAuditLogEntryRepository _userRoleAssignmentAuditLogEntryRepository;
-    private readonly IUserInviteAuditLogEntryRepository _userInviteAuditLogEntryRepository;
-    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserRoleAssignmentAuditLogRepository _userRoleAssignmentAuditLogRepository;
+    private readonly IUserInviteAuditLogRepository _userInviteAuditLogRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
 
     public GetUserAuditLogsHandler(
-        IUserRoleAssignmentAuditLogEntryRepository userRoleAssignmentAuditLogEntryRepository,
-        IUserInviteAuditLogEntryRepository userInviteAuditLogEntryRepository,
-        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository)
+        IUserRoleAssignmentAuditLogRepository userRoleAssignmentAuditLogRepository,
+        IUserInviteAuditLogRepository userInviteAuditLogRepository,
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository)
     {
-        _userRoleAssignmentAuditLogEntryRepository = userRoleAssignmentAuditLogEntryRepository;
-        _userInviteAuditLogEntryRepository = userInviteAuditLogEntryRepository;
-        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userRoleAssignmentAuditLogRepository = userRoleAssignmentAuditLogRepository;
+        _userInviteAuditLogRepository = userInviteAuditLogRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
     }
 
     public async Task<GetUserAuditLogsResponse> Handle(
@@ -48,53 +49,23 @@ public sealed class GetUserAuditLogsHandler
 
         var userId = new UserId(request.UserId);
 
-        var roleAssignmentAuditLogs = await _userRoleAssignmentAuditLogEntryRepository
+        var roleAssignmentAuditLogs = await _userRoleAssignmentAuditLogRepository
             .GetAsync(userId)
             .ConfigureAwait(false);
 
-        var userInviteLogs = await _userInviteAuditLogEntryRepository
+        var userInviteAuditLogs = await _userInviteAuditLogRepository
             .GetAsync(userId)
             .ConfigureAwait(false);
 
-        var userIdentityLogs = await _userIdentityAuditLogEntryRepository
+        var userIdentityAuditLogs = await _userIdentityAuditLogRepository
             .GetAsync(userId)
             .ConfigureAwait(false);
 
-        return new GetUserAuditLogsResponse(
-            roleAssignmentAuditLogs.Select(Map),
-            userInviteLogs.Select(MapInvites),
-            userIdentityLogs.Select(MapIdentity));
-    }
+        var auditLogs = roleAssignmentAuditLogs
+            .Concat(userInviteAuditLogs)
+            .Concat(userIdentityAuditLogs)
+            .OrderBy(x => x.Timestamp);
 
-    private static UserRoleAssignmentAuditLogEntryDto Map(UserRoleAssignmentAuditLogEntry auditLogEntry)
-    {
-        return new UserRoleAssignmentAuditLogEntryDto(
-            auditLogEntry.UserId.Value,
-            auditLogEntry.ActorId.Value,
-            auditLogEntry.UserRoleId.Value,
-            auditLogEntry.AuditIdentity.Value,
-            auditLogEntry.Timestamp,
-            auditLogEntry.AssignmentType);
-    }
-
-    private static UserInviteAuditLogEntryDto MapInvites(UserInviteDetailsAuditLogEntry auditLogEntry)
-    {
-        return new UserInviteAuditLogEntryDto(
-            auditLogEntry.UserId.Value,
-            auditLogEntry.ActorId.Value,
-            auditLogEntry.ActorName,
-            auditLogEntry.AuditIdentity.Value,
-            auditLogEntry.Timestamp);
-    }
-
-    private static UserIdentityAuditLogEntryDto MapIdentity(UserIdentityAuditLogEntry auditLogEntry)
-    {
-        return new UserIdentityAuditLogEntryDto(
-            auditLogEntry.UserId.Value,
-            auditLogEntry.NewValue,
-            auditLogEntry.OldValue,
-            auditLogEntry.AuditIdentity.Value,
-            auditLogEntry.Timestamp,
-            auditLogEntry.Field);
+        return new GetUserAuditLogsResponse(auditLogs.Select(log => new AuditLogDto<UserAuditedChange>(log)));
     }
 }

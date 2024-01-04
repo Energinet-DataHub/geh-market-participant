@@ -71,8 +71,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var target = new UserInvitationService(
@@ -104,8 +104,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         organizationDomainValidationServiceMock
@@ -151,8 +151,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         organizationDomainValidationServiceMock
@@ -221,8 +221,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         userIdentityRepositoryMock
@@ -267,8 +267,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
@@ -323,8 +323,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
@@ -387,8 +387,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var externalId = new ExternalUserId(Guid.NewGuid());
@@ -446,8 +446,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var mockedUser = TestPreparationModels.MockedUser(Guid.NewGuid());
@@ -481,8 +481,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var user = new User(
@@ -531,8 +531,8 @@ public sealed class UserInvitationServiceTests
         var userIdentityRepositoryMock = new Mock<IUserIdentityRepository>();
         var emailEventRepositoryMock = new Mock<IEmailEventRepository>();
         var organizationDomainValidationServiceMock = new Mock<IOrganizationDomainValidationService>();
-        var userInviteAuditLogEntryRepository = new Mock<IUserInviteAuditLogEntryRepository>();
-        var userIdentityAuditLogEntryRepository = new Mock<IUserIdentityAuditLogEntryRepository>();
+        var userInviteAuditLogRepository = new Mock<IUserInviteAuditLogRepository>();
+        var userIdentityAuditLogRepository = new Mock<IUserIdentityAuditLogRepository>();
         var userStatusCalculator = new UserStatusCalculator();
 
         var user = new User(
@@ -567,8 +567,8 @@ public sealed class UserInvitationServiceTests
             userIdentityRepositoryMock.Object,
             emailEventRepositoryMock.Object,
             organizationDomainValidationServiceMock.Object,
-            userInviteAuditLogEntryRepository.Object,
-            userIdentityAuditLogEntryRepository.Object,
+            userInviteAuditLogRepository.Object,
+            userIdentityAuditLogRepository.Object,
             UnitOfWorkProviderMock.Create(),
             userStatusCalculator);
 
@@ -581,8 +581,8 @@ public sealed class UserInvitationServiceTests
             .Verify(u => u.AddOrUpdateAsync(user), Times.Once);
         emailEventRepositoryMock
             .Verify(e => e.InsertAsync(It.IsAny<EmailEvent>()), Times.Once);
-        userInviteAuditLogEntryRepository
-            .Verify(a => a.InsertAuditLogEntryAsync(It.IsAny<UserInviteAuditLogEntry>()), Times.Once);
+        userInviteAuditLogRepository
+            .Verify(a => a.AuditAsync(user.Id, new AuditIdentity(_validInvitedByUserId.Value), user.AdministratedBy), Times.Once);
     }
 
     private static void VerifyUserInvitationExpirationCorrectly(Mock<IUserRepository> userRepositoryMock)

@@ -14,6 +14,7 @@
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model.Permissions
 {
+    // TODO: Delete.
     public enum PermissionChangeType
     {
         DescriptionChange = 1

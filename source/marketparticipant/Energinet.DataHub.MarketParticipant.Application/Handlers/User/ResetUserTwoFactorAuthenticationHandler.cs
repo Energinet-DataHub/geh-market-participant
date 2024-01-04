@@ -32,7 +32,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandler : IRequestHandler<Re
     private readonly IUserRepository _userRepository;
     private readonly IUserIdentityRepository _userIdentityRepository;
     private readonly IUserStatusCalculator _userStatusCalculator;
-    private readonly IUserIdentityAuditLogEntryRepository _userIdentityAuditLogEntryRepository;
+    private readonly IUserIdentityAuditLogRepository _userIdentityAuditLogRepository;
     private readonly IAuditIdentityProvider _auditIdentityProvider;
     private readonly IUserIdentityAuthenticationService _userIdentityAuthenticationService;
     private readonly IUnitOfWorkProvider _unitOfWorkProvider;
@@ -41,7 +41,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandler : IRequestHandler<Re
         IUserRepository userRepository,
         IUserIdentityRepository userIdentityRepository,
         IUserStatusCalculator userStatusCalculator,
-        IUserIdentityAuditLogEntryRepository userIdentityAuditLogEntryRepository,
+        IUserIdentityAuditLogRepository userIdentityAuditLogRepository,
         IAuditIdentityProvider auditIdentityProvider,
         IUserIdentityAuthenticationService userIdentityAuthenticationService,
         IUnitOfWorkProvider unitOfWorkProvider)
@@ -49,7 +49,7 @@ public sealed class ResetUserTwoFactorAuthenticationHandler : IRequestHandler<Re
         _userRepository = userRepository;
         _userIdentityRepository = userIdentityRepository;
         _userStatusCalculator = userStatusCalculator;
-        _userIdentityAuditLogEntryRepository = userIdentityAuditLogEntryRepository;
+        _userIdentityAuditLogRepository = userIdentityAuditLogRepository;
         _auditIdentityProvider = auditIdentityProvider;
         _userIdentityAuthenticationService = userIdentityAuthenticationService;
         _unitOfWorkProvider = unitOfWorkProvider;
@@ -81,13 +81,14 @@ public sealed class ResetUserTwoFactorAuthenticationHandler : IRequestHandler<Re
                 .AddOrUpdateAsync(user)
                 .ConfigureAwait(false);
 
-            await _userIdentityAuditLogEntryRepository.InsertAuditLogEntryAsync(new UserIdentityAuditLogEntry(
-                user.Id,
-                UserStatus.Invited.ToString(),
-                currentStatus.ToString(),
-                _auditIdentityProvider.IdentityId,
-                DateTimeOffset.UtcNow,
-                UserIdentityAuditLogField.Status)).ConfigureAwait(false);
+            await _userIdentityAuditLogRepository
+                .AuditAsync(
+                    user.Id,
+                    _auditIdentityProvider.IdentityId,
+                    UserAuditedChange.Status,
+                    UserStatus.Invited.ToString(),
+                    currentStatus.ToString())
+                .ConfigureAwait(false);
 
             await uow.CommitAsync().ConfigureAwait(false);
         }

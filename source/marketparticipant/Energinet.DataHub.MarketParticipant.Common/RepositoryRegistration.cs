@@ -30,23 +30,23 @@ namespace Energinet.DataHub.MarketParticipant.Common
             services.AddScoped<IMarketRoleAndGridAreaForActorReservationService, MarketRoleAndGridAreaForActorReservationService>();
             services.AddScoped<IGridAreaOverviewRepository, GridAreaOverviewRepository>();
             services.AddScoped<IUserOverviewRepository, UserOverviewRepository>();
-            services.AddScoped<IGridAreaAuditLogEntryRepository, GridAreaAuditLogEntryRepository>();
+            services.AddScoped<IGridAreaAuditLogRepository, GridAreaAuditLogRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserRoleRepository, UserRoleRepository>();
             services.AddScoped<IActorRepository, ActorRepository>();
             services.AddScoped<IUserQueryRepository, Infrastructure.Persistence.Repositories.Query.UserQueryRepository>();
             services.AddScoped<IUserIdentityRepository, UserIdentityRepository>();
-            services.AddScoped<IUserRoleAssignmentAuditLogEntryRepository, UserRoleAssignmentAuditLogEntryRepository>();
-            services.AddScoped<IUserRoleAuditLogEntryRepository, UserRoleAuditLogEntryRepository>();
-            services.AddScoped<IUserInviteAuditLogEntryRepository, UserInviteAuditLogEntryRepository>();
-            services.AddScoped<IUserIdentityAuditLogEntryRepository, UserIdentityAuditLogEntryRepository>();
-            services.AddScoped<IPermissionAuditLogEntryRepository, PermissionAuditLogEntryRepository>();
+            services.AddScoped<IUserRoleAssignmentAuditLogRepository, UserRoleAssignmentAuditLogRepository>();
+            services.AddScoped<IUserRoleAuditLogRepository, UserRoleAuditLogRepository>();
+            services.AddScoped<IUserInviteAuditLogRepository, UserInviteAuditLogRepository>();
+            services.AddScoped<IUserIdentityAuditLogRepository, UserIdentityAuditLogRepository>();
+            services.AddScoped<IPermissionAuditLogRepository, PermissionAuditLogRepository>();
             services.AddScoped<IPermissionRepository, PermissionRepository>();
             services.AddScoped<IDomainEventRepository, DomainEventRepository>();
             services.AddScoped<IEmailEventRepository, EmailEventRepository>();
-            services.AddScoped<IOrganizationAuditLogEntryRepository, OrganizationAuditLogEntryRepository>();
-            services.AddScoped<IActorAuditLogEntryRepository, ActorAuditLogEntryRepository>();
-            services.AddScoped<IActorContactAuditLogEntryRepository, ActorContactAuditLogEntryRepository>();
+            services.AddScoped<IOrganizationAuditLogRepository, OrganizationAuditLogRepository>();
+            services.AddScoped<IActorAuditLogRepository, ActorAuditLogRepository>();
+            services.AddScoped<IActorContactAuditLogRepository, ActorContactAuditLogRepository>();
         }
     }
 }

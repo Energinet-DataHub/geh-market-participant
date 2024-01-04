@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model.Users;
 
 namespace Energinet.DataHub.MarketParticipant.Domain.Model;
 
+// TODO: Delete.
 public sealed record GridAreaAuditLogEntry(
     DateTimeOffset Timestamp,
     AuditIdentity AuditIdentity,

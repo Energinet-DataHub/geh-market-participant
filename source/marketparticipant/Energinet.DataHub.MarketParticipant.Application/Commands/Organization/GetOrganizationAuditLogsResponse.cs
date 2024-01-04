@@ -13,7 +13,8 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 
-public sealed record GetOrganizationAuditLogsResponse(IEnumerable<OrganizationAuditLogDto> OrganizationAuditLogs);
+public sealed record GetOrganizationAuditLogsResponse(IEnumerable<AuditLogDto<OrganizationAuditedChange>> AuditLogs);

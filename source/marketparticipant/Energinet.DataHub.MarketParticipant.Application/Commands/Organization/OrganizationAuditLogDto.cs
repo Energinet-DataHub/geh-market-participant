@@ -17,6 +17,7 @@ using Energinet.DataHub.MarketParticipant.Domain.Model;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Organization;
 
+// TODO: Delete.
 public record OrganizationAuditLogDto(
     Guid OrganizationId,
     string Value,
