@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
@@ -128,7 +127,7 @@ public sealed class UpdateActorHandlerIntegrationTests
         var actor = await actorRepository.GetAsync(new ActorId(actorEntity.Id));
         actor!.RemoveMarketRole(actor.MarketRoles.Single(m => m.Function == EicFunction.SystemOperator));
 
-        var actorDto = OrganizationMapper.Map(actor!);
+        var actorDto = OrganizationMapper.Map(actor);
 
         var updateCommand = new UpdateActorCommand(
             actorEntity.Id,

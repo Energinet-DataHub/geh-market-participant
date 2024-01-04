@@ -16,38 +16,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Repositories
+namespace Energinet.DataHub.MarketParticipant.Domain.Repositories;
+
+public interface IActorContactRepository
 {
-    /// <summary>
-    /// Provides access to the Grid Areas.
-    /// </summary>
-    public interface IActorContactRepository
-    {
-        /// <summary>
-        /// Gets an Contact with the specified Id
-        /// </summary>
-        /// <param name="contactId">The Id of the Contact to get.</param>
-        /// <returns>The specified Contact or null if not found</returns>
-        Task<ActorContact?> GetAsync(ContactId contactId);
-
-        /// <summary>
-        /// Gets all contacts tied to a specific actor.
-        /// </summary>
-        /// <param name="actorId">The id of the actor to get the contacts for.</param>
-        /// <returns>A collection of contacts tied to the specified actor.</returns>
-        Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId);
-
-        /// <summary>
-        /// Updates a Contact, or adds it if it's not already present.
-        /// </summary>
-        /// <param name="contact">The Contact to add or update</param>
-        /// <returns>The id of the added Contact</returns>
-        Task<ContactId> AddAsync(ActorContact contact);
-
-        /// <summary>
-        /// Deletes the specified contact.
-        /// </summary>
-        /// <param name="contact">The contact to delete.</param>
-        Task RemoveAsync(ActorContact contact);
-    }
+    Task<ActorContact?> GetAsync(ContactId contactId);
+    Task<IEnumerable<ActorContact>> GetAsync(ActorId actorId);
+    Task<ContactId> AddAsync(ActorContact contact);
+    Task RemoveAsync(ActorContact contact);
 }

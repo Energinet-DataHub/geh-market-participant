@@ -112,38 +112,6 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
             return Ok(response.Actors);
         }
 
-        // TODO: Delete.
-        [HttpGet("{organizationId:guid}/auditlogs")]
-        [AuthorizeUser(PermissionId.OrganizationsManage)]
-        public async Task<ActionResult<IEnumerable<OrganizationAuditLogDto>>> GetAuditLogsAsync(Guid organizationId)
-        {
-            var command = new GetOrganizationAuditLogsCommand(organizationId);
-
-            var response = await _mediator
-                .Send(command)
-                .ConfigureAwait(false);
-
-            var auditLogs = new List<OrganizationAuditLogDto>();
-
-            foreach (var auditLog in response.AuditLogs)
-            {
-                var change = auditLog.Change switch
-                {
-                    OrganizationAuditedChange.Name => OrganizationChangeType.Name,
-                    OrganizationAuditedChange.Domain => OrganizationChangeType.DomainChange,
-                };
-
-                auditLogs.Add(new OrganizationAuditLogDto(
-                    organizationId,
-                    auditLog.CurrentValue,
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    change));
-            }
-
-            return Ok(auditLogs);
-        }
-
         [HttpGet("{organizationId:guid}/audit")]
         [AuthorizeUser(PermissionId.OrganizationsManage)]
         public async Task<ActionResult<IEnumerable<AuditLogDto<OrganizationAuditedChange>>>> GetAuditAsync(Guid organizationId)

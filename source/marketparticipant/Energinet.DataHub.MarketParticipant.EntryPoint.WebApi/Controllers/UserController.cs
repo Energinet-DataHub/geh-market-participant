@@ -20,7 +20,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Energinet.DataHub.Core.App.Common.Abstractions.Users;
 using Energinet.DataHub.MarketParticipant.Application.Commands;
-using Energinet.DataHub.MarketParticipant.Application.Commands.Actor;
 using Energinet.DataHub.MarketParticipant.Application.Commands.User;
 using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
@@ -118,119 +117,6 @@ public class UserController : ControllerBase
         {
             ActorIds = allowedActors
         });
-    }
-
-    // TODO: Delete.
-    [HttpGet("{userId:guid}/auditlogentry")]
-    [AuthorizeUser(PermissionId.UsersManage)]
-    public async Task<ActionResult<GetUserAuditLogsResponseOld>> GetAuditLogsAsync(Guid userId)
-    {
-        var command = new GetUserAuditLogsCommand(userId);
-
-        var response = await _mediator
-            .Send(command)
-            .ConfigureAwait(false);
-
-        var userRoleAssignmentAuditLogs = new List<UserRoleAssignmentAuditLogEntryDto>();
-        var userInviteAuditLogEntryDto = new List<UserInviteAuditLogEntryDto>();
-        var userIdentityAuditLogEntryDto = new List<UserIdentityAuditLogEntryDto>();
-
-        foreach (var auditLog in response.AuditLogs)
-        {
-            if (auditLog.Change == UserAuditedChange.FirstName)
-            {
-                userIdentityAuditLogEntryDto.Add(new UserIdentityAuditLogEntryDto(
-                    userId,
-                    auditLog.CurrentValue,
-                    auditLog.PreviousValue,
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserIdentityAuditLogField.FirstName));
-            }
-
-            if (auditLog.Change == UserAuditedChange.LastName)
-            {
-                userIdentityAuditLogEntryDto.Add(new UserIdentityAuditLogEntryDto(
-                    userId,
-                    auditLog.CurrentValue,
-                    auditLog.PreviousValue,
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserIdentityAuditLogField.LastName));
-            }
-
-            if (auditLog.Change == UserAuditedChange.PhoneNumber)
-            {
-                userIdentityAuditLogEntryDto.Add(new UserIdentityAuditLogEntryDto(
-                    userId,
-                    auditLog.CurrentValue,
-                    auditLog.PreviousValue,
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserIdentityAuditLogField.PhoneNumber));
-            }
-
-            if (auditLog.Change == UserAuditedChange.Status)
-            {
-                userIdentityAuditLogEntryDto.Add(new UserIdentityAuditLogEntryDto(
-                    userId,
-                    auditLog.CurrentValue,
-                    auditLog.PreviousValue,
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserIdentityAuditLogField.Status));
-            }
-
-            if (auditLog.Change == UserAuditedChange.InvitedIntoActor)
-            {
-                var actorId = Guid.Parse(auditLog.CurrentValue);
-                var actorLookup = await _mediator
-                    .Send(new GetSingleActorCommand(actorId))
-                    .ConfigureAwait(false);
-
-                userInviteAuditLogEntryDto.Add(new UserInviteAuditLogEntryDto(
-                    userId,
-                    actorId,
-                    actorLookup.Actor.Name.Value,
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp));
-            }
-
-            if (auditLog.Change == UserAuditedChange.UserRoleAssigned)
-            {
-                userRoleAssignmentAuditLogs.Add(new UserRoleAssignmentAuditLogEntryDto(
-                    userId,
-                    Guid.Parse(auditLog.CurrentValue!.Split(";")[0].Replace("(", string.Empty)),
-                    Guid.Parse(auditLog.CurrentValue!.Split(";")[1].Replace(")", string.Empty)),
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserRoleAssignmentTypeAuditLog.Added));
-            }
-
-            if (auditLog.Change == UserAuditedChange.UserRoleRemoved)
-            {
-                userRoleAssignmentAuditLogs.Add(new UserRoleAssignmentAuditLogEntryDto(
-                    userId,
-                    Guid.Parse(auditLog.PreviousValue!.Split(";")[0].Replace("(", string.Empty)),
-                    Guid.Parse(auditLog.PreviousValue!.Split(";")[1].Replace(")", string.Empty)),
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserRoleAssignmentTypeAuditLog.Removed));
-            }
-
-            if (auditLog.Change == UserAuditedChange.UserRoleRemovedDueToDeactivation)
-            {
-                userRoleAssignmentAuditLogs.Add(new UserRoleAssignmentAuditLogEntryDto(
-                    userId,
-                    Guid.Parse(auditLog.PreviousValue!),
-                    Guid.Parse(auditLog.PreviousValue!),
-                    auditLog.AuditIdentityId,
-                    auditLog.Timestamp,
-                    UserRoleAssignmentTypeAuditLog.RemovedDueToDeactivation));
-            }
-        }
-
-        return Ok(new GetUserAuditLogsResponseOld(userRoleAssignmentAuditLogs, userInviteAuditLogEntryDto, userIdentityAuditLogEntryDto));
     }
 
     [HttpGet("{userId:guid}/audit")]
