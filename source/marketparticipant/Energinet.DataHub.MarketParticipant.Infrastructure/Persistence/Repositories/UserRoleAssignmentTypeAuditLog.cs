@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Application.Commands.GridArea
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+internal enum UserRoleAssignmentTypeAuditLog
 {
-    public enum GridAreaAuditLogEntryField
-    {
-        Name
-    }
+    RemovedDueToDeactivation = 2
 }
