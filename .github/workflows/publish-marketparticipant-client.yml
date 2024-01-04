@@ -40,7 +40,6 @@ jobs:
         uses: Energinet-DataHub/.github/.github/actions/dotnet-setup-and-tools@v12
         with:
           use_azure_functions_tools: "true"
-          dotnet_version: 7.0.200
 
       - name: Build and test solution
         uses: Energinet-DataHub/.github/.github/actions/dotnet-solution-build-and-test@v12
@@ -55,7 +54,7 @@ jobs:
 
       - name: Package content or build has changed
         id: changed-content
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v41
         with:
           files: |
             source/api-client/Energinet.DataHub.MarketParticipant.Client/**/*.*
