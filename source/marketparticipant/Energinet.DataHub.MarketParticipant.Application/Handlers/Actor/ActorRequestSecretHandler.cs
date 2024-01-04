@@ -57,20 +57,20 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Actor
                     .WithErrorCode("actor.credentials.invalid_state");
             }
 
-            var secretForApp = await _actorClientSecretService
+            var (clientId, secretId, secretText, expirationDate) = await _actorClientSecretService
                 .CreateSecretForAppRegistrationAsync(actor)
                 .ConfigureAwait(false);
 
             actor.Credentials = new ActorClientSecretCredentials(
-                secretForApp.ClientId,
-                secretForApp.SecretId,
-                secretForApp.ExpirationDate);
+                clientId,
+                secretId,
+                expirationDate);
 
             await _actorRepository
                 .AddOrUpdateAsync(actor)
                 .ConfigureAwait(false);
 
-            return new ActorRequestSecretResponse(secretForApp.SecretText);
+            return new ActorRequestSecretResponse(secretText);
         }
     }
 }

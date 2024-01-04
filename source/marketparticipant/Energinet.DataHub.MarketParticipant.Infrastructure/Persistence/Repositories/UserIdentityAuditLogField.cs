@@ -12,15 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Energinet.DataHub.MarketParticipant.Domain.Model
+namespace Energinet.DataHub.MarketParticipant.Infrastructure.Persistence.Repositories;
+
+public enum UserIdentityAuditLogField
 {
-    // TODO: Delete.
-    public enum ActorContactChangeType
-    {
-        Name = 1,
-        Email = 2,
-        Phone = 3,
-        Created = 4,
-        Deleted = 5
-    }
+    FirstName = 1,
+    LastName = 2,
+    PhoneNumber = 3,
+    Status = 4,
 }

@@ -209,7 +209,7 @@ public sealed class UserIdentityRepository : IUserIdentityRepository
             .PatchAsync(new User
             {
                 AccountEnabled = true,
-                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought is was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
+                Department = employeeId // Cannot use relevant User.EmployeeId as MS thought it was a brilliant idea to limit it to 16 chars, so it cannot fit a Guid.
             })
             .ConfigureAwait(false);
 
