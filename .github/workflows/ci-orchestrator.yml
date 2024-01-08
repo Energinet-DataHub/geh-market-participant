@@ -24,13 +24,11 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.dotnet == 'true' }}
     uses: ./.github/workflows/ci-dotnet.yml
-    secrets: inherit
 
   ci_client_package:
     needs: changes
     if: ${{ needs.changes.outputs.client_package == 'true' }}
     uses: ./.github/workflows/publish-marketparticipant-client.yml
-    secrets: inherit
 
   render_c4model_views:
     needs: changes
