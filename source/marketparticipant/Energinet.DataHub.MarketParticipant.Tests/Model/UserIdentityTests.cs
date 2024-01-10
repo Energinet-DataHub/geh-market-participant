@@ -52,18 +52,18 @@ public sealed class UserIdentityTests
     [InlineData("John", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
-    public void Ctor_UserIdentityTests_ValidatesFirstName(string value, bool isValid)
+    public void Ctor_UserIdentityTests_ValidatesFirstName(string? value, bool isValid)
     {
         if (isValid)
         {
-            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, value, ValidLastName, _validPhoneNumber, _validAuthentication).FirstName);
+            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, value!, ValidLastName, _validPhoneNumber, _validAuthentication).FirstName);
         }
         else
         {
             Assert.Throws<ValidationException>(() => new UserIdentity(
                 new SharedUserReferenceId(),
                 _validEmailAddress,
-                value,
+                value!,
                 ValidLastName,
                 _validPhoneNumber,
                 _validAuthentication));
@@ -77,11 +77,11 @@ public sealed class UserIdentityTests
     [InlineData("Doe", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
     [InlineData("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", false)]
-    public void Ctor_UserIdentityTests_ValidatesLastName(string value, bool isValid)
+    public void Ctor_UserIdentityTests_ValidatesLastName(string? value, bool isValid)
     {
         if (isValid)
         {
-            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, ValidFirstName, value, _validPhoneNumber, _validAuthentication).LastName);
+            Assert.Equal(value, new UserIdentity(new SharedUserReferenceId(), _validEmailAddress, ValidFirstName, value!, _validPhoneNumber, _validAuthentication).LastName);
         }
         else
         {
@@ -89,7 +89,7 @@ public sealed class UserIdentityTests
                 new SharedUserReferenceId(),
                 _validEmailAddress,
                 ValidFirstName,
-                value,
+                value!,
                 _validPhoneNumber,
                 _validAuthentication));
         }

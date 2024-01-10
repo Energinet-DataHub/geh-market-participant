@@ -82,7 +82,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
 
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation($"User invite email sent successfully to {userEmailAddress.Address}");
+                _logger.LogInformation("User invite email sent successfully to {Address}.", userEmailAddress.Address);
             }
             else
             {

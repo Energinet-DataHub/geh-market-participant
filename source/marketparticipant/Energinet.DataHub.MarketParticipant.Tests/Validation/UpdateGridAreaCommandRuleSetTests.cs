@@ -33,13 +33,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Valid Name", true)]
         [InlineData("50aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
         [InlineData("51aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX", false)]
-        public async Task Validate_Name_ValidatesProperty(string newName, bool isValid)
+        public async Task Validate_Name_ValidatesProperty(string? newName, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(UpdateGridAreaCommand.GridAreaDto)}.{nameof(ChangeGridAreaDto.Name)}";
             var gridAreaId = Guid.NewGuid();
 
-            var updateGridAreaDto = new ChangeGridAreaDto(gridAreaId, newName);
+            var updateGridAreaDto = new ChangeGridAreaDto(gridAreaId, newName!);
 
             var target = new UpdateGridAreaCommandRuleSet();
             var command = new UpdateGridAreaCommand(gridAreaId, updateGridAreaDto);

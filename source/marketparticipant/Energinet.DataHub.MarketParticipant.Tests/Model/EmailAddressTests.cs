@@ -32,15 +32,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData("john@doe.com.", true)]
         [InlineData("john@doe", true)]
         [InlineData("john+other@doe", true)]
-        public void Ctor_Email_ValidatesAddress(string value, bool isValid)
+        public void Ctor_Email_ValidatesAddress(string? value, bool isValid)
         {
             if (isValid)
             {
-                Assert.Equal(value, new EmailAddress(value).Address);
+                Assert.Equal(value, new EmailAddress(value!).Address);
             }
             else
             {
-                Assert.Throws<ValidationException>(() => new EmailAddress(value));
+                Assert.Throws<ValidationException>(() => new EmailAddress(value!));
             }
         }
 

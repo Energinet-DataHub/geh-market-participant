@@ -52,13 +52,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData(ValidName, true)]
         [InlineData("Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", true)]
         [InlineData("AaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX", false)]
-        public async Task Validate_Name_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_Name_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateGridAreaCommand.GridArea)}.{nameof(CreateGridAreaDto.Name)}";
 
             var createGridAreaDto = new CreateGridAreaDto(
-                value,
+                value!,
                 ValidCode,
                 ValidPriceArea);
 
@@ -95,14 +95,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("+01", false)]
         [InlineData("1,0", false)]
         [InlineData("01a", false)]
-        public async Task Validate_Code_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_Code_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateGridAreaCommand.GridArea)}.{nameof(CreateGridAreaDto.Code)}";
 
             var createGridAreaDto = new CreateGridAreaDto(
                 ValidName,
-                value,
+                value!,
                 ValidPriceArea);
 
             var target = new CreateGridAreaCommandRuleSet();
@@ -136,7 +136,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Dk2", true)]
         [InlineData("DK3", false)]
         [InlineData("Unknown", false)]
-        public async Task Validate_PriceAreaCode_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_PriceAreaCode_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateGridAreaCommand.GridArea)}.{nameof(CreateGridAreaDto.PriceAreaCode)}";
@@ -144,7 +144,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var createGridAreaDto = new CreateGridAreaDto(
                 ValidName,
                 ValidCode,
-                value);
+                value!);
 
             var target = new CreateGridAreaCommandRuleSet();
             var command = new CreateGridAreaCommand(createGridAreaDto);
