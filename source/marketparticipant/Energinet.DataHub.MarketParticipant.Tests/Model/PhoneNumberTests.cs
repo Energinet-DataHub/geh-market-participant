@@ -35,15 +35,15 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Model
         [InlineData("010101 letters 02", false)]
         [InlineData("000000000000000000000000000000", true)]
         [InlineData("0000000000000000000000000000001", false)]
-        public void Ctor_PhoneNumber_ValidatesNumbers(string value, bool isValid)
+        public void Ctor_PhoneNumber_ValidatesNumbers(string? value, bool isValid)
         {
             if (isValid)
             {
-                Assert.Equal(value, new PhoneNumber(value).Number);
+                Assert.Equal(value, new PhoneNumber(value!).Number);
             }
             else
             {
-                Assert.Throws<ValidationException>(() => new PhoneNumber(value));
+                Assert.Throws<ValidationException>(() => new PhoneNumber(value!));
             }
         }
     }

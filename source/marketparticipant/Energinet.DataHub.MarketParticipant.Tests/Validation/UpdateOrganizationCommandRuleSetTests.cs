@@ -75,13 +75,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Some Name", true)]
         [InlineData("Maximum looooooooooooooooooooooooooooooooooooooong", true)]
         [InlineData("Toooooo loooooooooooooooooooooooooooooooooooooooong", false)]
-        public async Task Validate_OrganizationName_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationName_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Name)}";
 
             var organizationDto = new ChangeOrganizationDto(
-                value,
+                value!,
                 "Active",
                 "testDomain.dk");
 
@@ -113,14 +113,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Active", true)]
         [InlineData("Blocked", true)]
         [InlineData("Deleted", true)]
-        public async Task Validate_OrganizationStatus_ValidatesProperty(string status, bool isValid)
+        public async Task Validate_OrganizationStatus_ValidatesProperty(string? status, bool isValid)
         {
             // Arrange
             const string propertyName = $"{nameof(UpdateOrganizationCommand.Organization)}.{nameof(ChangeOrganizationDto.Status)}";
 
             var organizationDto = new ChangeOrganizationDto(
                 "fake_value",
-                status,
+                status!,
                 "testDomain.dk");
 
             var target = new UpdateOrganizationCommandRuleSet();
@@ -147,7 +147,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData(null, false)]
         [InlineData("  ", false)]
         [InlineData("testdomain.dk", true)]
-        public async Task Validate_OrganizationDomain_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationDomain_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName =
@@ -156,7 +156,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var organizationDto = new ChangeOrganizationDto(
                 ValidName,
                 "Active",
-                value);
+                value!);
 
             var target = new UpdateOrganizationCommandRuleSet();
             var command = new UpdateOrganizationCommand(_validOrganizationId, organizationDto);

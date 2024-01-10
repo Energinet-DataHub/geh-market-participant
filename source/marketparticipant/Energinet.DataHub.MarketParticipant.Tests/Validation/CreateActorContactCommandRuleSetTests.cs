@@ -100,7 +100,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Reminder", true)]
         [InlineData("{max_value}", true)]
         [InlineData("{too_long_value}", false)]
-        public async Task Validate_Name_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_Name_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateActorContactCommand.Contact)}.{nameof(CreateActorContactDto.Name)}";
@@ -112,7 +112,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 value = _test251Length;
 
             var contactDto = new CreateActorContactDto(
-                value,
+                value!,
                 ValidCategory,
                 ValidEmail,
                 ValidPhone);
@@ -143,7 +143,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("john@doe.com", true)]
         [InlineData("{max_value}", true)]
         [InlineData("{too_long_value}", false)]
-        public async Task Validate_Email_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_Email_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateActorContactCommand.Contact)}.{nameof(CreateActorContactDto.Email)}";
@@ -157,7 +157,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var contactDto = new CreateActorContactDto(
                 ValidName,
                 ValidCategory,
-                value,
+                value!,
                 ValidPhone);
 
             var target = new CreateActorContactCommandRuleSet();
@@ -184,7 +184,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData(null, true)]
         [InlineData("01020304", true)]
         [InlineData("+45 01020304", true)]
-        public async Task Validate_Phone_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_Phone_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateActorContactCommand.Contact)}.{nameof(CreateActorContactDto.Phone)}";

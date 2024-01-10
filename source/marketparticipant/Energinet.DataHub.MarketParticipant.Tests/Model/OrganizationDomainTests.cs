@@ -35,13 +35,13 @@ public sealed class OrganizationDomainTests
     [InlineData("https://energinet.dk", false)]
     [InlineData(null, false)]
     [InlineData("", false)]
-    public void IsValid_InvalidOrValidDomain_MatchesExpected(string domain, bool expected)
+    public void IsValid_InvalidOrValidDomain_MatchesExpected(string? domain, bool expected)
     {
         // arrange
         var target = OrganizationDomain.IsValid;
 
         // act
-        var actual = target(domain);
+        var actual = target(domain!);
 
         // assert
         Assert.Equal(expected, actual);
@@ -56,10 +56,10 @@ public sealed class OrganizationDomainTests
     [InlineData("https://energinet.dk")]
     [InlineData(null)]
     [InlineData("")]
-    public void Ctor_InvalidDomain_Throws(string domain)
+    public void Ctor_InvalidDomain_Throws(string? domain)
     {
         // arrange, act, assert
-        Assert.Throws<ValidationException>(() => new OrganizationDomain(domain));
+        Assert.Throws<ValidationException>(() => new OrganizationDomain(domain!));
     }
 
     [Fact]

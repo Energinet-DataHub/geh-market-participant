@@ -26,15 +26,15 @@ public sealed record EmailAddress
 
     public string Address { get; }
 
+    public override string ToString()
+    {
+        return Address;
+    }
+
     private static string ValidateAddress(string address)
     {
         return !string.IsNullOrWhiteSpace(address) && address.Length <= 64 && MailAddress.TryCreate(address, out _)
             ? address
             : throw new ValidationException($"The provided e-mail '{address}' is not valid.");
-    }
-
-    public override string ToString()
-    {
-        return Address;
     }
 }

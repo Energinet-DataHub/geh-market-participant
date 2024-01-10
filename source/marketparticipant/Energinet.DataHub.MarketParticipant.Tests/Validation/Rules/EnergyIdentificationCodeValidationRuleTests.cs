@@ -27,13 +27,13 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation.Rules
         [InlineData("")]
         [InlineData(null)]
         [InlineData("  ")]
-        public void Validate_InvalidEic_ReturnsFalse(string value)
+        public void Validate_InvalidEic_ReturnsFalse(string? value)
         {
             // Arrange
             var rule = new EnergyIdentificationCodeValidationRuleTester();
 
             // Act
-            var result = rule.Validate(value);
+            var result = rule.Validate(value!);
 
             // Assert
             Assert.False(result);
