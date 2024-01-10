@@ -27,15 +27,15 @@ public sealed record PhoneNumber
 
     public string Number { get; }
 
+    public override string ToString()
+    {
+        return Number;
+    }
+
     private static string ValidateNumber(string number)
     {
         return !string.IsNullOrWhiteSpace(number) && number.Length <= 30 && _validator.IsValid(number)
             ? number
             : throw new ValidationException($"The provided phone number '{number}' is not valid.");
-    }
-
-    public override string ToString()
-    {
-        return Number;
     }
 }

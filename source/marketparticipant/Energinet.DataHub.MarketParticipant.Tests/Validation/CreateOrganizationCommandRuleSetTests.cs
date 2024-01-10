@@ -51,7 +51,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("Some Name", true)]
         [InlineData("Maximum looooooooooooooooooooooooooooooooooooooong", true)]
         [InlineData("Toooooo loooooooooooooooooooooooooooooooooooooooong", false)]
-        public async Task Validate_OrganizationName_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationName_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Name)}";
@@ -64,7 +64,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                 "Test Country");
 
             var organizationDto = new CreateOrganizationDto(
-                value,
+                value!,
                 validCvr,
                 validAddress,
                 "energinet.dk");
@@ -94,14 +94,14 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("  ", false)]
         [InlineData("12345678", true)]
         [InlineData("123456789", false)]
-        public async Task Validate_OrganizationBusinessRegisterIdentifier_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationBusinessRegisterIdentifier_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.BusinessRegisterIdentifier)}";
 
             var organizationDto = new CreateOrganizationDto(
                 ValidName,
-                value,
+                value!,
                 new AddressDto(
                     string.Empty,
                     string.Empty,
@@ -135,7 +135,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("  ", false)]
         [InlineData("Np81mDz09UmzLJphrnvA2Suzm5GItyOjb0sWJgXhAasF9vFceybMCicq3kT1O4JWD0PKXzPjtK8QUQwVUUHo4HV3zePz5eXZXYfGz2Zvr9tpMLsxKv6TiDPhX27g1IUzAUyoRJbKW65uZVlS2N2JbthH3uKEYnmhe3O14z2VDDKLnXbMU7uqfQ8XyAIXOPEz2jEnft8sGXSqDB7hw2njPTILlboBqohahxXdS0YfB4FFoR55wp9xdG0ULO", true)]
         [InlineData("Np81mDz09UmzLJphrnvA2Suzm5GItyOjb0sWJgXhAasF9vFceybMCicq3kT1O4JWD0PKXzPjtK8QUQwVUUHo4HV3zePz5eXZXYfGz2Zvr9tpMLsxKv6TiDPhX27g1IUzAUyoRJbKW65uZVlS2N2JbthH3uKEYnmhe3O14z2VDDKLnXbMU7uqfQ8XyAIXOPEz2jEnft8sGXSqDB7hw2njPTILlboBqohahxXdS0YfB4FFoR55wp9xdG0ULOa", false)]
-        public async Task Validate_OrganizationAddressStreetname_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationAddressStreetname_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.StreetName)}";
@@ -176,7 +176,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("  ", false)]
         [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2", true)]
         [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2A", false)]
-        public async Task Validate_OrganizationAddressCity_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationAddressCity_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.City)}";
@@ -217,7 +217,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("  ", false)]
         [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2", true)]
         [InlineData("I5eel4D4bPnbdEi2O9lQNggj1vjXQPdyhsebRVpqMCPVCevBX2A", false)]
-        public async Task Validate_OrganizationAddressCountry_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationAddressCountry_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.Country)}";
@@ -230,7 +230,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
                     string.Empty,
                     string.Empty,
                     string.Empty,
-                    value),
+                    value!),
                 "energinet.dk");
 
             var target = new CreateOrganizationCommandRuleSet();
@@ -258,7 +258,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("  ", false)]
         [InlineData("K57S9FHJZjmhB6U", true)]
         [InlineData("K57S9FHJZjmhB6UA", false)]
-        public async Task Validate_OrganizationAddressNumber_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationAddressNumber_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.Number)}";
@@ -299,7 +299,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         [InlineData("  ", false)]
         [InlineData("K57S9FHJZjmhB6U", true)]
         [InlineData("K57S9FHJZjmhB6UA", false)]
-        public async Task Validate_OrganizationAddressZipCode_ValidatesProperty(string value, bool isValid)
+        public async Task Validate_OrganizationAddressZipCode_ValidatesProperty(string? value, bool isValid)
         {
             // Arrange
             var propertyName = $"{nameof(CreateOrganizationCommand.Organization)}.{nameof(CreateOrganizationDto.Address)}.{nameof(CreateOrganizationDto.Address.ZipCode)}";
