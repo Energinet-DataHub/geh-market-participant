@@ -75,7 +75,7 @@ public static class KnownPermissions
         {
             EicFunction.DataHubAdministrator
         }),
-        new(PermissionId.PermissionsManage, "permissions:manage", InstantPattern.ExtendedIso.Parse("2023-03-15T00:00:00Z").Value, new[]
+        new(PermissionId.ImbalancePricesManage, "imbalance-prices:manage", InstantPattern.ExtendedIso.Parse("2024-01-12T00:00:00Z").Value, new[]
         {
             EicFunction.DataHubAdministrator
         }),

@@ -22,7 +22,7 @@ public enum PermissionId
     UsersManage = 5,
     UsersView = 6,
     UserRolesManage = 7,
-    PermissionsManage = 8,
+    ImbalancePricesManage = 8,
     CalculationsManage = 9,
     SettlementReportsManage = 10,
     ESettExchangeManage = 11,
