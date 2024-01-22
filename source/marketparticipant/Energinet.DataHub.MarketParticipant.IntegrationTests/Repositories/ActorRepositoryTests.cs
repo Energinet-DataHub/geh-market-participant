@@ -153,7 +153,7 @@ public sealed class ActorRepositoryTests
 
         var organization = await _fixture.PrepareOrganizationAsync();
         var actorCredentials = new ActorCertificateCredentials(
-            "12345678",
+            "1234567899",
             "secret",
             DateTime.UtcNow.AddYears(1).ToInstant());
 
