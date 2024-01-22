@@ -55,10 +55,16 @@ public sealed class ActorRepository : IActorRepository
         if (actor.Credentials is ActorCertificateCredentials certificateCredentials &&
             destination.CertificateCredential?.CertificateThumbprint != certificateCredentials.CertificateThumbprint)
         {
-            _marketParticipantDbContext.UsedActorCertificates.Add(new UsedActorCertificatesEntity
+            var certificateReUsedByCurrentActor = await _marketParticipantDbContext.UsedActorCertificates.SingleOrDefaultAsync(e =>
+                e.Thumbprint == certificateCredentials.CertificateThumbprint && e.ActorId == destination.Id).ConfigureAwait(false);
+
+            if (certificateReUsedByCurrentActor is null)
             {
-                Thumbprint = certificateCredentials.CertificateThumbprint,
-            });
+                destination.UsedActorCertificates.Add(new UsedActorCertificatesEntity
+                {
+                    Thumbprint = certificateCredentials.CertificateThumbprint
+                });
+            }
         }
 
         ActorMapper.MapToEntity(actor, destination);
