@@ -136,6 +136,56 @@ public sealed class ActorRepositoryTests
     }
 
     [Fact]
+    public async Task AddOrUpdateAsync_OneActor_WithCertificateCredentials_ReuseCertificate_CanReadBack()
+    {
+        // Arrange
+        await using var host = await WebApiIntegrationTestHost.InitializeAsync(_fixture);
+        await using var scope = host.BeginScope();
+        await using var context1 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context2 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context3 = _fixture.DatabaseManager.CreateDbContext();
+        await using var context4 = _fixture.DatabaseManager.CreateDbContext();
+
+        var actorRepository1 = new ActorRepository(context1);
+        var actorRepository2 = new ActorRepository(context2);
+        var actorRepository3 = new ActorRepository(context3);
+        var actorRepository4 = new ActorRepository(context4);
+
+        var organization = await _fixture.PrepareOrganizationAsync();
+        var actorCredentials = new ActorCertificateCredentials(
+            "1234567899",
+            "secret",
+            DateTime.UtcNow.AddYears(1).ToInstant());
+
+        var actor = new Actor(new OrganizationId(organization.Id), new MockedGln(), new ActorName("Mock"))
+        {
+            Credentials = actorCredentials
+        };
+
+        // Act
+        var createdActorIdWithCertificate = await actorRepository1.AddOrUpdateAsync(actor);
+
+        var actorToClearCertificate = await actorRepository2.GetAsync(createdActorIdWithCertificate.Value);
+        actorToClearCertificate!.Credentials = null;
+        await actorRepository2.AddOrUpdateAsync(actorToClearCertificate);
+
+        var actorToReUseCertificate = await actorRepository3.GetAsync(createdActorIdWithCertificate.Value);
+        actorToReUseCertificate!.Credentials = actorCredentials;
+        await actorRepository3.AddOrUpdateAsync(actorToReUseCertificate);
+
+        var actual = await actorRepository4.GetAsync(createdActorIdWithCertificate.Value);
+
+        // Assert
+        Assert.NotNull(actual);
+        Assert.NotNull(actual.Credentials);
+        Assert.Equal(actor.OrganizationId, actual.OrganizationId);
+        Assert.Equal(actor.ActorNumber, actual.ActorNumber);
+        Assert.IsType<ActorCertificateCredentials>(actual.Credentials);
+        Assert.Equal(actorCredentials.KeyVaultSecretIdentifier, (actual.Credentials as ActorCertificateCredentials)?.KeyVaultSecretIdentifier);
+        Assert.Equal(actorCredentials.CertificateThumbprint, (actual.Credentials as ActorCertificateCredentials)?.CertificateThumbprint);
+    }
+
+    [Fact]
     public async Task AddOrUpdateAsync_OneActor_WithClientSecretCredentials_CanReadBack()
     {
         // Arrange
