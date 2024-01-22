@@ -3,13 +3,11 @@ ALTER TABLE [dbo].[UsedActorCertificates]
     CONSTRAINT [FK_UsedActorCertificates_Actor] FOREIGN KEY ([ActorId]) REFERENCES [dbo].[Actor] ([Id])
 GO
 
--- UPDATE [dbo].[UsedActorCertificates] WITH ActorId
 UPDATE [dbo].[UsedActorCertificates]
 SET [ActorId] = [dbo].[ActorCertificateCredentials].[ActorId]
 FROM [dbo].[UsedActorCertificates]
          INNER JOIN [dbo].[ActorCertificateCredentials] ON [dbo].[UsedActorCertificates].[Thumbprint] = [dbo].[ActorCertificateCredentials].[Thumbprint]
 
--- ALTER Table [dbo].[UsedActorCertificates] to NOT NULL
 ALTER TABLE [dbo].[UsedActorCertificates]
     ALTER COLUMN [ActorId] [uniqueidentifier] NOT NULL
 
