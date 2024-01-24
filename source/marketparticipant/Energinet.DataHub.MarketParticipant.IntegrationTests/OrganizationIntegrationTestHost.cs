@@ -73,6 +73,7 @@ namespace Energinet.DataHub.MarketParticipant.IntegrationTests
                 new(Settings.UserInviteFromEmail.Key, "fake_value"),
                 new(Settings.UserInviteBccEmail.Key, "fake_value"),
                 new(Settings.UserInviteFlow.Key, "fake_value"),
+                new(Settings.EnvironmentDescription.Key, "fake_value"),
                 new(Settings.ServiceBusTopicConnectionString.Key, "fake_value"),
                 new(Settings.ServiceBusTopicName.Key, "fake_value")
             };
