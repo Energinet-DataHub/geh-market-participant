@@ -18,4 +18,4 @@ public sealed record InviteConfig(
     string UserInviteFromEmail,
     string UserInviteBccEmail,
     string UserInviteFlow,
-    string EnvironmentDescription);
+    string? EnvironmentDescription);
