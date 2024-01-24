@@ -57,8 +57,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
             var inviteUrl = _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge";
             var from = new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail);
             var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
-            const string subject = "Invitation til DataHub";
-            var htmlContent = $"Invitation til DataHub<br /><br />Bliv oprettet <a href=\"{inviteUrl}\">her</a>" +
+            var subject = $"Invitation til DataHub {_config.EnvironmentDescription}";
+            var htmlContent = $"Invitation til DataHub {_config.EnvironmentDescription}<br /><br />Bliv oprettet <a href=\"{inviteUrl}\">her</a>" +
                               $"<br /><br />Brugeroprettelsen skal færdiggøres indenfor 24 timer.";
             return await SendAsync(userEmailAddress, from, to, subject, htmlContent).ConfigureAwait(false);
         }
@@ -69,8 +69,8 @@ namespace Energinet.DataHub.MarketParticipant.Application.Services
                 userEmailAddress,
                 from: new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail),
                 to: new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address),
-                subject: "Inviteret til ny aktør i DataHub",
-                htmlContent: "Du er blevet inviteret til en ny aktør. Du kan tilgå den nye aktør i DataHub.").ConfigureAwait(false);
+                subject: $"Inviteret til ny aktør i DataHub {_config.EnvironmentDescription}",
+                htmlContent: $"Du er blevet inviteret til en ny aktør. Du kan tilgå den nye aktør i DataHub {_config.EnvironmentDescription}.").ConfigureAwait(false);
         }
 
         private async Task<bool> SendAsync(EmailAddress userEmailAddress, SendGrid.Helpers.Mail.EmailAddress from, SendGrid.Helpers.Mail.EmailAddress to, string subject, string htmlContent)
