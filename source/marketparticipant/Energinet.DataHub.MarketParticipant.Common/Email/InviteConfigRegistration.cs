@@ -31,8 +31,9 @@ internal static class InviteConfigRegistration
             var from = configuration.GetSetting(Settings.UserInviteFromEmail);
             var bcc = configuration.GetSetting(Settings.UserInviteBccEmail);
             var userFlow = configuration.GetSetting(Settings.UserInviteFlow);
+            var environmentDescription = configuration.GetSetting(Settings.EnvironmentDescription);
 
-            return new InviteConfig(from, bcc, userFlow);
+            return new InviteConfig(from, bcc, userFlow, environmentDescription);
         });
     }
 }

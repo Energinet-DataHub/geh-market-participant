@@ -17,4 +17,5 @@ namespace Energinet.DataHub.MarketParticipant.Application;
 public sealed record InviteConfig(
     string UserInviteFromEmail,
     string UserInviteBccEmail,
-    string UserInviteFlow);
+    string UserInviteFlow,
+    string EnvironmentDescription);
