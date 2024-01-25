@@ -88,5 +88,18 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
             return Ok(response.AuditLogs);
         }
+
+        [HttpGet("relation")]
+        [AuthorizeUser(PermissionId.UserRolesManage)]
+        public async Task<FileResult> GetPermissionsRelationAsync()
+        {
+            var command = new GetPermissionsRelationCommand();
+
+            var response = await _mediator
+                .Send(command)
+                .ConfigureAwait(false);
+
+            return File(response, "text/csv", "PermissionsRelation.csv");
+        }
     }
 }
