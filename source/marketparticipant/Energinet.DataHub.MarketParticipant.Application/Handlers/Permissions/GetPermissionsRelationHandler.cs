@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -47,8 +48,7 @@ public sealed class GetPermissionsRelationHandler
 
         var allMarketRoles = Enum.GetNames<EicFunction>();
 
-        var stringWriter = new StringBuilder();
-        stringWriter.AppendLine("PermissionName;UserRoleName;MarketRole");
+        var records = new List<RelationRecord>();
 
         foreach (var permission in allPermissions.OrderBy(e => e.Name))
         {
@@ -58,18 +58,36 @@ public sealed class GetPermissionsRelationHandler
             {
                 foreach (var userRole in userRoles)
                 {
-                    var line = $"{permission.Name};{userRole.Name};{userRole.EicFunction}";
-                    stringWriter.AppendLine(line);
+                    records.Add(new RelationRecord(permission.Name, userRole.EicFunction.ToString(), userRole.Name));
                 }
             }
             else
             {
-                var line = $"{permission.Name};;";
-                stringWriter.AppendLine(line);
+                records.Add(new RelationRecord(permission.Name, string.Empty, string.Empty));
             }
+        }
+
+        foreach (var marketRole in allMarketRoles)
+        {
+            if (records.All(x => x.MarketRole != marketRole))
+            {
+                records.Add(new RelationRecord(string.Empty, marketRole, string.Empty));
+            }
+        }
+
+        using var stringWriter = new StringWriter();
+        await stringWriter.WriteLineAsync("PermissionName;MarketRole;UserRole").ConfigureAwait(false);
+
+        var recordsOrdered = records.OrderBy(e => e.MarketRole).ThenBy(e => e.Permission).ThenBy(e => e.UserRole);
+
+        foreach (var record in recordsOrdered)
+        {
+            await stringWriter.WriteLineAsync($"{record.Permission};{record.MarketRole};{record.UserRole}").ConfigureAwait(false);
         }
 
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(stringWriter.ToString()));
         return stream;
     }
+
+    private sealed record RelationRecord(string Permission, string MarketRole, string UserRole);
 }
