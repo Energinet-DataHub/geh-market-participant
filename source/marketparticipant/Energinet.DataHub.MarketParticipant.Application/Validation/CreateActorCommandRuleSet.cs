@@ -87,6 +87,7 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 {
                                     validationRules
                                         .RuleFor(r => r.MeteringPointTypes)
+                                        .NotNull()
                                         .ChildRules(v => v
                                             .RuleForEach(r => r)
                                             .NotEmpty()

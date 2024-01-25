@@ -85,10 +85,11 @@ namespace Energinet.DataHub.MarketParticipant.Application.Validation
                                 {
                                     validationRules
                                         .RuleFor(r => r.MeteringPointTypes)
-                                        .NotEmpty()
-                                        .ChildRules(v =>
-                                            v.RuleForEach(r => r)
-                                                .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
+                                        .NotNull()
+                                        .ChildRules(v => v
+                                            .RuleForEach(r => r)
+                                            .NotEmpty()
+                                            .Must(x => Enum.TryParse<MeteringPointType>(x, true, out _)));
                                 });
                         });
                 });
