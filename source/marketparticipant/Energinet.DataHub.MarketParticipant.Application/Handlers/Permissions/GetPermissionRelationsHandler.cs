@@ -26,13 +26,13 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 
-public sealed class GetPermissionsRelationHandler
-    : IRequestHandler<GetPermissionsRelationCommand, Stream>
+public sealed class GetPermissionRelationsHandler
+    : IRequestHandler<GetPermissionRelationsCommand, Stream>
 {
     private readonly IPermissionRepository _permissionRepository;
     private readonly IUserRoleRepository _userRoleRepository;
 
-    public GetPermissionsRelationHandler(
+    public GetPermissionRelationsHandler(
         IPermissionRepository permissionRepository,
         IUserRoleRepository userRoleRepository)
     {
@@ -40,7 +40,7 @@ public sealed class GetPermissionsRelationHandler
         _userRoleRepository = userRoleRepository;
     }
 
-    public async Task<Stream> Handle(GetPermissionsRelationCommand request, CancellationToken cancellationToken)
+    public async Task<Stream> Handle(GetPermissionRelationsCommand request, CancellationToken cancellationToken)
     {
         var allPermissions = await _permissionRepository.GetAllAsync().ConfigureAwait(false);
 
@@ -50,7 +50,7 @@ public sealed class GetPermissionsRelationHandler
 
         var records = new List<RelationRecord>();
 
-        foreach (var permission in allPermissions.OrderBy(e => e.Name))
+        foreach (var permission in allPermissions)
         {
             var userRoles = allUserRoles.Where(x => x.Permissions.Contains(permission.Id)).ToList();
 
@@ -75,14 +75,17 @@ public sealed class GetPermissionsRelationHandler
             }
         }
 
+        return WriteRecordsToStream(records.OrderBy(e => e.MarketRole).ThenBy(e => e.Permission));
+    }
+
+    private static Stream WriteRecordsToStream(IEnumerable<RelationRecord> records)
+    {
         using var stringWriter = new StringWriter();
-        await stringWriter.WriteLineAsync("PermissionName;MarketRole;UserRole").ConfigureAwait(false);
+        stringWriter.WriteLine("PermissionName;MarketRole;UserRole");
 
-        var recordsOrdered = records.OrderBy(e => e.MarketRole).ThenBy(e => e.Permission).ThenBy(e => e.UserRole);
-
-        foreach (var record in recordsOrdered)
+        foreach (var record in records)
         {
-            await stringWriter.WriteLineAsync($"{record.Permission};{record.MarketRole};{record.UserRole}").ConfigureAwait(false);
+            stringWriter.WriteLine($"{record.Permission};{record.MarketRole};{record.UserRole}");
         }
 
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(stringWriter.ToString()));

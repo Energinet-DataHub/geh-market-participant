@@ -17,4 +17,4 @@ using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
 
-public sealed record GetPermissionsRelationCommand() : IRequest<Stream>;
+public sealed record GetPermissionRelationsCommand() : IRequest<Stream>;

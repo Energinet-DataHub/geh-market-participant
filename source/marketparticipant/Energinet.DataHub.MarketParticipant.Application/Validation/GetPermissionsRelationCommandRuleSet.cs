@@ -17,7 +17,7 @@ using FluentValidation;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Validation;
 
-public sealed class GetPermissionsRelationCommandRuleSet : AbstractValidator<GetPermissionsRelationCommand>
+public sealed class GetPermissionsRelationCommandRuleSet : AbstractValidator<GetPermissionRelationsCommand>
 {
     public GetPermissionsRelationCommandRuleSet()
     {

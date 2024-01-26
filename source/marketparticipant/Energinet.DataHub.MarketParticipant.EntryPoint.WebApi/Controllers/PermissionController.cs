@@ -21,6 +21,7 @@ using Energinet.DataHub.MarketParticipant.Application.Security;
 using Energinet.DataHub.MarketParticipant.Domain.Model.Permissions;
 using Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Security;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
@@ -91,9 +92,17 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
 
         [HttpGet("relation")]
         [AuthorizeUser(PermissionId.UserRolesManage)]
-        public async Task<FileResult> GetPermissionsRelationAsync()
+        [Produces("application/octet-stream")]
+        [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+        public async Task<ActionResult> GetPermissionsRelationAsync()
         {
-            var command = new GetPermissionsRelationCommand();
+            if (!_userContext.CurrentUser.IsFas)
+            {
+                Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Unauthorized();
+            }
+
+            var command = new GetPermissionRelationsCommand();
 
             var response = await _mediator
                 .Send(command)
