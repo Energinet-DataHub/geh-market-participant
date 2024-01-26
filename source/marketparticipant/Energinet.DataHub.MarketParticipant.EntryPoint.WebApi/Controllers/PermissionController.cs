@@ -96,11 +96,11 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
         [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetPermissionsRelationAsync()
         {
-            if (!_userContext.CurrentUser.IsFas)
+            /*if (!_userContext.CurrentUser.IsFas)
             {
                 Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return Unauthorized();
-            }
+            }*/
 
             var command = new GetPermissionRelationsCommand();
 
@@ -108,7 +108,7 @@ namespace Energinet.DataHub.MarketParticipant.EntryPoint.WebApi.Controllers
                 .Send(command)
                 .ConfigureAwait(false);
 
-            return File(response, "text/csv", "PermissionsRelation.csv");
+            return File(response, "text/csv", "PermissionOverview.csv");
         }
     }
 }

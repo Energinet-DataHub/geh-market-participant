@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,8 +19,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Energinet.DataHub.MarketParticipant.Application.Commands.Permissions;
-using Energinet.DataHub.MarketParticipant.Domain.Model;
-using Energinet.DataHub.MarketParticipant.Domain.Repositories;
+using Energinet.DataHub.MarketParticipant.Application.Services;
 using MediatR;
 
 namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
@@ -29,56 +27,21 @@ namespace Energinet.DataHub.MarketParticipant.Application.Handlers.Permissions;
 public sealed class GetPermissionRelationsHandler
     : IRequestHandler<GetPermissionRelationsCommand, Stream>
 {
-    private readonly IPermissionRepository _permissionRepository;
-    private readonly IUserRoleRepository _userRoleRepository;
+    private readonly IPermissionRelationService _permissionRelationService;
 
-    public GetPermissionRelationsHandler(
-        IPermissionRepository permissionRepository,
-        IUserRoleRepository userRoleRepository)
+    public GetPermissionRelationsHandler(IPermissionRelationService permissionRelationService)
     {
-        _permissionRepository = permissionRepository;
-        _userRoleRepository = userRoleRepository;
+        _permissionRelationService = permissionRelationService;
     }
 
     public async Task<Stream> Handle(GetPermissionRelationsCommand request, CancellationToken cancellationToken)
     {
-        var allPermissions = await _permissionRepository.GetAllAsync().ConfigureAwait(false);
-
-        var allUserRoles = (await _userRoleRepository.GetAllAsync().ConfigureAwait(false)).ToList();
-
-        var allMarketRoles = Enum.GetNames<EicFunction>();
-
-        var records = new List<RelationRecord>();
-
-        foreach (var permission in allPermissions)
-        {
-            var userRoles = allUserRoles.Where(x => x.Permissions.Contains(permission.Id)).ToList();
-
-            if (userRoles.Any())
-            {
-                foreach (var userRole in userRoles)
-                {
-                    records.Add(new RelationRecord(permission.Name, userRole.EicFunction.ToString(), userRole.Name));
-                }
-            }
-            else
-            {
-                records.Add(new RelationRecord(permission.Name, string.Empty, string.Empty));
-            }
-        }
-
-        foreach (var marketRole in allMarketRoles)
-        {
-            if (records.All(x => x.MarketRole != marketRole))
-            {
-                records.Add(new RelationRecord(string.Empty, marketRole, string.Empty));
-            }
-        }
+        var records = await _permissionRelationService.BuildRelationRecordsAsync().ConfigureAwait(false);
 
         return WriteRecordsToStream(records.OrderBy(e => e.MarketRole).ThenBy(e => e.Permission));
     }
 
-    private static Stream WriteRecordsToStream(IEnumerable<RelationRecord> records)
+    private static Stream WriteRecordsToStream(IEnumerable<PermissionRelationRecord> records)
     {
         using var stringWriter = new StringWriter();
         stringWriter.WriteLine("PermissionName;MarketRole;UserRole");
@@ -91,6 +54,4 @@ public sealed class GetPermissionRelationsHandler
         var stream = new MemoryStream(Encoding.UTF8.GetBytes(stringWriter.ToString()));
         return stream;
     }
-
-    private sealed record RelationRecord(string Permission, string MarketRole, string UserRole);
 }
