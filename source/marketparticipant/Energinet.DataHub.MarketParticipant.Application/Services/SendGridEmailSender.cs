@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Energinet.DataHub.MarketParticipant.Application.Services.Email;
 using Energinet.DataHub.MarketParticipant.Domain.Model;
 using Microsoft.Extensions.Logging;
 using SendGrid;
@@ -23,66 +25,82 @@ using EmailAddress = Energinet.DataHub.MarketParticipant.Domain.Model.EmailAddre
 
 namespace Energinet.DataHub.MarketParticipant.Application.Services
 {
-    public class SendGridEmailSender : IEmailSender
+    public sealed class SendGridEmailSender : IEmailSender
     {
         private readonly InviteConfig _config;
         private readonly ILogger<SendGridEmailSender> _logger;
         private readonly ISendGridClient _client;
+        private readonly IEmailContentGenerator _emailHtmlGenerator;
 
         public SendGridEmailSender(
             InviteConfig config,
             ISendGridClient sendGridClient,
+            IEmailContentGenerator emailHtmlGenerator,
             ILogger<SendGridEmailSender> logger)
         {
             _config = config;
             _logger = logger;
             _client = sendGridClient;
+            _emailHtmlGenerator = emailHtmlGenerator;
         }
 
-        public Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
+        public async Task<bool> SendEmailAsync(EmailAddress emailAddress, EmailEvent emailEvent)
         {
             ArgumentNullException.ThrowIfNull(emailAddress);
             ArgumentNullException.ThrowIfNull(emailEvent);
 
+            var template = SelectTemplate(emailEvent);
+            var parameters = GatherTemplateParameters(emailEvent);
+
+            var generatedEmail = await _emailHtmlGenerator
+                .GenerateAsync(template, parameters)
+                .ConfigureAwait(false);
+
+            return await SendAsync(
+                new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail),
+                new SendGrid.Helpers.Mail.EmailAddress(emailAddress.Address),
+                generatedEmail.Subject,
+                generatedEmail.HtmlContent)
+                .ConfigureAwait(false);
+        }
+
+        private static EmailTemplate SelectTemplate(EmailEvent emailEvent)
+        {
             return emailEvent.EmailEventType switch
             {
-                EmailEventType.UserInvite => SendUserInviteAsync(emailAddress),
-                EmailEventType.UserAssignedToActor => SendUserAssignedToActorAsync(emailAddress),
+                EmailEventType.UserInvite => EmailTemplate.UserInvite,
+                EmailEventType.UserAssignedToActor => EmailTemplate.UserAssignedToActor,
                 _ => throw new NotFoundException("EmailEventType not recognized"),
             };
         }
 
-        private async Task<bool> SendUserInviteAsync(EmailAddress userEmailAddress)
+        private IReadOnlyDictionary<string, string> GatherTemplateParameters(EmailEvent emailEvent)
         {
-            var inviteUrl = _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge";
-            var from = new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail);
-            var to = new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address);
-            var subject = $"Invitation til DataHub {_config.EnvironmentDescription}";
-            var htmlContent = $"Invitation til DataHub {_config.EnvironmentDescription}<br /><br />Bliv oprettet <a href=\"{inviteUrl}\">her</a>" +
-                              $"<br /><br />Brugeroprettelsen skal færdiggøres indenfor 24 timer.";
-            return await SendAsync(userEmailAddress, from, to, subject, htmlContent).ConfigureAwait(false);
+            // TODO: Read data from somewhere.
+            return new Dictionary<string, string>
+            {
+                { "environment", _config.EnvironmentDescription ?? string.Empty },
+                { "user_name", "Test User Name" },
+                { "actor_org", "ActorOrg" },
+                { "actor_gln", "ActorGln" },
+                { "actor_name", "ActorName" },
+                { "invite_link", _config.UserInviteFlow + "&nonce=defaultNonce&scope=openid&response_type=code&prompt=login&code_challenge_method=S256&code_challenge=defaultCodeChallenge" },
+            };
         }
 
-        private async Task<bool> SendUserAssignedToActorAsync(EmailAddress userEmailAddress)
-        {
-            return await SendAsync(
-                userEmailAddress,
-                from: new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteFromEmail),
-                to: new SendGrid.Helpers.Mail.EmailAddress(userEmailAddress.Address),
-                subject: $"Inviteret til ny aktør i DataHub {_config.EnvironmentDescription}",
-                htmlContent: $"Du er blevet inviteret til en ny aktør. Du kan tilgå den nye aktør i DataHub {_config.EnvironmentDescription}.").ConfigureAwait(false);
-        }
-
-        private async Task<bool> SendAsync(EmailAddress userEmailAddress, SendGrid.Helpers.Mail.EmailAddress from, SendGrid.Helpers.Mail.EmailAddress to, string subject, string htmlContent)
+        private async Task<bool> SendAsync(
+            SendGrid.Helpers.Mail.EmailAddress from,
+            SendGrid.Helpers.Mail.EmailAddress to,
+            string subject,
+            string htmlContent)
         {
             var msg = MailHelper.CreateSingleEmail(from, to, subject, string.Empty, htmlContent);
             msg.AddBcc(new SendGrid.Helpers.Mail.EmailAddress(_config.UserInviteBccEmail));
 
             var response = await _client.SendEmailAsync(msg).ConfigureAwait(false);
-
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("User invite email sent successfully to {Address}.", userEmailAddress.Address);
+                _logger.LogInformation("User invite email sent successfully to {Address}.", to.Email);
             }
             else
             {
