@@ -38,7 +38,9 @@ public sealed class GetPermissionRelationsHandler
     {
         var records = await _permissionRelationService.BuildRelationRecordsAsync().ConfigureAwait(false);
 
-        return WriteRecordsToStream(records.OrderBy(e => e.MarketRole).ThenBy(e => e.Permission));
+        return WriteRecordsToStream(records
+            .OrderBy(e => e.MarketRole)
+            .ThenBy(e => e.Permission));
     }
 
     private static Stream WriteRecordsToStream(IEnumerable<PermissionRelationRecord> records)
