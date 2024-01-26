@@ -293,6 +293,31 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Fact]
+        public async Task Validate_NoMeteringPoints_IsAllowed()
+        {
+            // Arrange
+            const string propertyName = $"{nameof(CreateActorCommand.Actor)}.{nameof(CreateActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes[0]";
+
+            var validGridAreas = new List<ActorGridAreaDto> { new(Guid.NewGuid(), Array.Empty<string>()) };
+            var marketRole = new List<ActorMarketRoleDto> { new(EicFunction.BillingAgent, validGridAreas, string.Empty) };
+
+            var organizationRoleDto = new CreateActorDto(
+                Guid.Parse(ValidId),
+                new ActorNameDto("fake_name"),
+                new ActorNumberDto(ValidGln),
+                marketRole);
+
+            var target = new CreateActorCommandRuleSet();
+            var command = new CreateActorCommand(organizationRoleDto);
+
+            // Act
+            var result = await target.ValidateAsync(command);
+
+            // Assert
+            Assert.True(result.IsValid);
+        }
+
+        [Fact]
         public async Task Validate_NullMeteringPointTypes_ValidatesProperty()
         {
             // Arrange

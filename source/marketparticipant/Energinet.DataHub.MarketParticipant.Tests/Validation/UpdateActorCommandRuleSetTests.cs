@@ -256,7 +256,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
         }
 
         [Fact]
-        public async Task Validate_NoMeteringPoints_ValidatesProperty()
+        public async Task Validate_NoMeteringPoints_IsAllowed()
         {
             // Arrange
             const string propertyName = $"{nameof(UpdateActorCommand.ChangeActor)}.{nameof(ChangeActorDto.MarketRoles)}[0].GridAreas[0].MeteringPointTypes";
@@ -273,8 +273,7 @@ namespace Energinet.DataHub.MarketParticipant.Tests.Validation
             var result = await target.ValidateAsync(command);
 
             // Assert
-            Assert.False(result.IsValid);
-            Assert.Contains(propertyName, result.Errors.Select(x => x.PropertyName));
+            Assert.True(result.IsValid);
         }
 
         [Fact]
